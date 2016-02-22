@@ -31,6 +31,7 @@ import org.cloudfoundry.client.v2.job.Jobs;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitions;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomains;
+import org.cloudfoundry.client.v2.routemappings.RouteMappings;
 import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindings;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokers;
@@ -60,6 +61,7 @@ import org.cloudfoundry.spring.client.v2.jobs.SpringJobs;
 import org.cloudfoundry.spring.client.v2.organizations.SpringOrganizations;
 import org.cloudfoundry.spring.client.v2.privatedomains.SpringPrivateDomains;
 import org.cloudfoundry.spring.client.v2.quotadefinitions.SpringOrganizationQuotaDefinitions;
+import org.cloudfoundry.spring.client.v2.routemappings.SpringRouteMappings;
 import org.cloudfoundry.spring.client.v2.routes.SpringRoutes;
 import org.cloudfoundry.spring.client.v2.servicebindings.SpringServiceBindings;
 import org.cloudfoundry.spring.client.v2.servicebrokers.SpringServiceBrokers;
@@ -135,6 +137,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private final Processes processes;
 
+    private final RouteMappings routeMappings;
+
     private final Routes routes;
 
     private final ServiceBindings serviceBindings;
@@ -197,6 +201,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.packages = new SpringPackages(restOperations, root, schedulerGroup);
         this.privateDomains = new SpringPrivateDomains(restOperations, root, schedulerGroup);
         this.processes = new SpringProcesses(restOperations, root, schedulerGroup);
+        this.routeMappings = new SpringRouteMappings(restOperations, root, schedulerGroup);
         this.routes = new SpringRoutes(restOperations, root, schedulerGroup);
         this.sharedDomains = new SpringSharedDomains(restOperations, root, schedulerGroup);
         this.serviceBindings = new SpringServiceBindings(restOperations, root, schedulerGroup);
@@ -308,6 +313,11 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     @Override
     public Processes processes() {
         return processes;
+    }
+
+    @Override
+    public RouteMappings routeMappings() {
+        return this.routeMappings;
     }
 
     @Override

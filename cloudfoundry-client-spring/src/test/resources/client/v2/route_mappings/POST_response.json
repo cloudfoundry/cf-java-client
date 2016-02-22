@@ -1,0 +1,15 @@
+{
+  "metadata": {
+    "guid": "ca9cdd28-53c4-4b8e-a7e0-1838f69b8f91",
+    "url": "/v2/route_mappings/ca9cdd28-53c4-4b8e-a7e0-1838f69b8f91",
+    "created_at": "2016-01-19T19:40:59Z",
+    "updated_at": null
+  },
+  "entity": {
+    "app_guid": "d232b485-b035-4d65-9f77-6b867d859de5",
+    "app_port": 8888,
+    "route_guid": "c041e8a3-64d0-4beb-bac8-1900e3aedd07",
+    "app_url": "/v2/apps/d232b485-b035-4d65-9f77-6b867d859de5",
+    "route_url": "/v2/routes/c041e8a3-64d0-4beb-bac8-1900e3aedd07"
+  }
+}
