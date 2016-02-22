@@ -19,6 +19,7 @@ package org.cloudfoundry.spring.client.v2.userprovidedserviceinstances;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceEntity;
@@ -26,9 +27,11 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServi
 import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringUserProvidedServiceInstancesTest {
@@ -84,6 +87,40 @@ public final class SpringUserProvidedServiceInstancesTest {
         @Override
         protected Mono<CreateUserProvidedServiceInstanceResponse> invoke(CreateUserProvidedServiceInstanceRequest request) {
             return this.userProvidedServiceInstances.create(request);
+        }
+    }
+
+    public static final class Delete extends AbstractApiTest<DeleteUserProvidedServiceInstanceRequest, Void> {
+
+        private final SpringUserProvidedServiceInstances userProvidedServiceInstances = new SpringUserProvidedServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteUserProvidedServiceInstanceRequest getInvalidRequest() {
+            return DeleteUserProvidedServiceInstanceRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(DELETE).path("/v2/user_provided_service_instances/5b6b45c8-89be-48d2-affd-f64346ad4d93")
+                .status(NO_CONTENT);
+        }
+
+        @Override
+        protected Void getResponse() {
+            return null;
+        }
+
+        @Override
+        protected DeleteUserProvidedServiceInstanceRequest getValidRequest() throws Exception {
+            return DeleteUserProvidedServiceInstanceRequest.builder()
+                .userProvidedServiceInstanceId("5b6b45c8-89be-48d2-affd-f64346ad4d93")
+                .build();
+        }
+
+        @Override
+        protected Mono<Void> invoke(DeleteUserProvidedServiceInstanceRequest request) {
+            return this.userProvidedServiceInstances.delete(request);
         }
     }
 
