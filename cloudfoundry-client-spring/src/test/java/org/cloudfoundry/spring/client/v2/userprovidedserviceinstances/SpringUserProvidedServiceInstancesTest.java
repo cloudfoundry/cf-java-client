@@ -19,12 +19,17 @@ package org.cloudfoundry.spring.client.v2.userprovidedserviceinstances;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceEntity;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceResource;
 import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringUserProvidedServiceInstancesTest {
 
@@ -79,6 +84,60 @@ public final class SpringUserProvidedServiceInstancesTest {
         @Override
         protected Mono<CreateUserProvidedServiceInstanceResponse> invoke(CreateUserProvidedServiceInstanceRequest request) {
             return this.userProvidedServiceInstances.create(request);
+        }
+    }
+
+    public static final class List extends AbstractApiTest<ListUserProvidedServiceInstancesRequest, ListUserProvidedServiceInstancesResponse> {
+
+        private final SpringUserProvidedServiceInstances userProvidedServiceInstances = new SpringUserProvidedServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected ListUserProvidedServiceInstancesRequest getInvalidRequest() {
+            return null;
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("/v2/user_provided_service_instances?page=-1")
+                .status(OK)
+                .responsePayload("client/v2/user_provided_service_instances/GET_response.json");
+        }
+
+        @Override
+        protected ListUserProvidedServiceInstancesResponse getResponse() {
+            return ListUserProvidedServiceInstancesResponse.builder()
+                .totalPages(1)
+                .totalResults(1)
+                .resource(UserProvidedServiceInstanceResource.builder()
+                    .metadata(Resource.Metadata.builder()
+                        .createdAt("2015-07-27T22:43:34Z")
+                        .id("8db6d37b-1ca8-4d0a-b1d3-2a6aaceae866")
+                        .url("/v2/user_provided_service_instances/8db6d37b-1ca8-4d0a-b1d3-2a6aaceae866")
+                        .build())
+                    .entity(UserProvidedServiceInstanceEntity.builder()
+                        .name("name-2365")
+                        .credential("creds-key-665", "creds-val-665")
+                        .spaceId("2fff6e71-d329-4991-9c89-7fa8abca70df")
+                        .type("user_provided_service_instance")
+                        .syslogDrainUrl("https://foo.com/url-90")
+                        .spaceUrl("/v2/spaces/2fff6e71-d329-4991-9c89-7fa8abca70df")
+                        .serviceBindingsUrl("/v2/user_provided_service_instances/8db6d37b-1ca8-4d0a-b1d3-2a6aaceae866/service_bindings")
+                        .build())
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListUserProvidedServiceInstancesRequest getValidRequest() throws Exception {
+            return ListUserProvidedServiceInstancesRequest.builder()
+                .page(-1)
+                .build();
+        }
+
+        @Override
+        protected Mono<ListUserProvidedServiceInstancesResponse> invoke(ListUserProvidedServiceInstancesRequest request) {
+            return this.userProvidedServiceInstances.list(request);
         }
     }
 

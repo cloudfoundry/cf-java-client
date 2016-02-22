@@ -1,0 +1,27 @@
+{
+  "total_results": 1,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "8db6d37b-1ca8-4d0a-b1d3-2a6aaceae866",
+        "url": "/v2/user_provided_service_instances/8db6d37b-1ca8-4d0a-b1d3-2a6aaceae866",
+        "created_at": "2015-07-27T22:43:34Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "name-2365",
+        "credentials": {
+          "creds-key-665": "creds-val-665"
+        },
+        "space_guid": "2fff6e71-d329-4991-9c89-7fa8abca70df",
+        "type": "user_provided_service_instance",
+        "syslog_drain_url": "https://foo.com/url-90",
+        "space_url": "/v2/spaces/2fff6e71-d329-4991-9c89-7fa8abca70df",
+        "service_bindings_url": "/v2/user_provided_service_instances/8db6d37b-1ca8-4d0a-b1d3-2a6aaceae866/service_bindings"
+      }
+    }
+  ]
+}

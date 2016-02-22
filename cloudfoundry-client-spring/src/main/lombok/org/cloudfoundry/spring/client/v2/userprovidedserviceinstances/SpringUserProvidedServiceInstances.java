@@ -19,8 +19,11 @@ package org.cloudfoundry.spring.client.v2.userprovidedserviceinstances;
 import lombok.ToString;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstances;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
@@ -53,6 +56,19 @@ public final class SpringUserProvidedServiceInstances extends AbstractSpringOper
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "user_provided_service_instances");
+            }
+
+        });
+    }
+
+    @Override
+    public Mono<ListUserProvidedServiceInstancesResponse> list(final ListUserProvidedServiceInstancesRequest request) {
+        return get(request, ListUserProvidedServiceInstancesResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "user_provided_service_instances");
+                QueryBuilder.augment(builder, request);
             }
 
         });
