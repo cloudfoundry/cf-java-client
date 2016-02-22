@@ -19,6 +19,7 @@ package org.cloudfoundry.spring.client.v2.userprovidedserviceinstances;
 import lombok.ToString;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstances;
@@ -56,6 +57,18 @@ public final class SpringUserProvidedServiceInstances extends AbstractSpringOper
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "user_provided_service_instances");
+            }
+
+        });
+    }
+
+    @Override
+    public Mono<Void> delete(final DeleteUserProvidedServiceInstanceRequest request) {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId());
             }
 
         });

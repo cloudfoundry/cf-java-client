@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface ServiceBrokers {
 
     /**
-     * Makes the <a href="apidocs.cloudfoundry.org/214/service_brokers/create_a_service_broker.html">Create Service Broker</a> request
+     * Makes the <a href="apidocs.cloudfoundry.org/latest-release/service_brokers/create_a_service_broker.html">Create Service Broker</a> request
      *
      * @param request the Create Service Broker request
      * @return the response from the Create Service Broker request

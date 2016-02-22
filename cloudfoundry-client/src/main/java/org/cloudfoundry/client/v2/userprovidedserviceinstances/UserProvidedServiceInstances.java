@@ -33,7 +33,17 @@ public interface UserProvidedServiceInstances {
     Mono<CreateUserProvidedServiceInstanceResponse> create(CreateUserProvidedServiceInstanceRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/user_provided_service_instances/list_all_user_provided_service_instances.html">List User Provided Service Instances</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/delete_a_particular_user_provided_service_instance.html">Delete the User Provided Service
+     * Instance</a> request
+     *
+     * @param request the Delete User Provided Service Instance request
+     * @return the response from the Delete User Provided Service Instance request
+     */
+    Mono<Void> delete(DeleteUserProvidedServiceInstanceRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/list_all_user_provided_service_instances.html">List User Provided Service Instances</a>
+     * request
      *
      * @param request the List User Provided Service Instances request
      * @return the response from the List User Provided Service Instances request
