@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface RouteMappings {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/229/routes_mapping/mapping_an_app_and_a_route.html">Creating a Route Mapping</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/routes_mapping/mapping_an_app_and_a_route.html">Creating a Route Mapping</a> request
      *
      * @param request the Creating a Route Mapping request
      * @return the response from the Creating a Route Mapping request
