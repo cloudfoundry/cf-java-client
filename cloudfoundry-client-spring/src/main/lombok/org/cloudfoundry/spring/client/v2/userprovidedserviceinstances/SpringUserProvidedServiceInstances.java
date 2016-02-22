@@ -70,6 +70,7 @@ public final class SpringUserProvidedServiceInstances extends AbstractSpringOper
                 builder.pathSegment("v2", "user_provided_service_instances");
                 QueryBuilder.augment(builder, request);
             }
+
         });
     }
 
