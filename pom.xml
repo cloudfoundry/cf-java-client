@@ -131,6 +131,7 @@
                             <include>**/*Test.java</include>
                             <include>**/*Test$*.java</include>
                         </includes>
+                        <runOrder>random</runOrder>
                     </configuration>
                 </plugin>
                 <plugin>
