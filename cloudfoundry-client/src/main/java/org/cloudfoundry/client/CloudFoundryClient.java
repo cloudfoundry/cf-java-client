@@ -25,6 +25,7 @@ import org.cloudfoundry.client.v2.job.Jobs;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitions;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomains;
+import org.cloudfoundry.client.v2.routemappings.RouteMappings;
 import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindings;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokers;
@@ -156,9 +157,16 @@ public interface CloudFoundryClient {
     Processes processes();
 
     /**
+     * Main entry point to the Cloud Foundry Route Mappings Client API
+     *
+     * @return the Cloud Foundry Route Mappings Client API
+     */
+    RouteMappings routeMappings();
+
+    /**
      * Main entry point to the Cloud Foundry Routes Client API
      *
-     * @return the Cloud Foundry Packages Client API
+     * @return the Cloud Foundry Routes Client API
      */
     Routes routes();
 
