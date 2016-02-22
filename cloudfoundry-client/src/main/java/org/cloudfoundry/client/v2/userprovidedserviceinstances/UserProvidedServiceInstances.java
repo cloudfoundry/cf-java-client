@@ -32,4 +32,12 @@ public interface UserProvidedServiceInstances {
      */
     Mono<CreateUserProvidedServiceInstanceResponse> create(CreateUserProvidedServiceInstanceRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/user_provided_service_instances/list_all_user_provided_service_instances.html">List User Provided Service Instances</a> request
+     *
+     * @param request the List User Provided Service Instances request
+     * @return the response from the List User Provided Service Instances request
+     */
+    Mono<ListUserProvidedServiceInstancesResponse> list(ListUserProvidedServiceInstancesRequest request);
+
 }
