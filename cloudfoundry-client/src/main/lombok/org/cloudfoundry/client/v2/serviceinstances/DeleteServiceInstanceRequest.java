@@ -19,11 +19,16 @@ package org.cloudfoundry.client.v2.serviceinstances;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import org.cloudfoundry.QueryParameter;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
+/**
+ * The request payload for the Delete Service Instance operation.
+ */
+@Data
 public final class DeleteServiceInstanceRequest implements Validatable {
 
     /**
