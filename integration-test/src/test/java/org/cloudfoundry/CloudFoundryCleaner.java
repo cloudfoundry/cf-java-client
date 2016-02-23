@@ -35,28 +35,68 @@ import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Mono;
 import reactor.fn.Predicate;
 import reactor.rx.Stream;
 
+import java.util.List;
+import java.util.Optional;
+
+import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.cloudfoundry.util.OperationUtils.afterStreamComplete;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 final class CloudFoundryCleaner {
 
-    private CloudFoundryCleaner() {
+    private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.test");
+
+    private final CloudFoundryClient cloudFoundryClient;
+
+    private final Predicate<DomainResource> domainPredicate;
+
+    private final Mono<Optional<String>> systemOrganizationId;
+
+    private final Mono<List<String>> systemSpaceIds;
+
+    CloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Predicate<DomainResource> domainPredicate, Mono<Optional<String>> systemOrganizationId, Mono<List<String>> systemSpaceIds) {
+        this.cloudFoundryClient = cloudFoundryClient;
+        this.domainPredicate = domainPredicate;
+        this.systemOrganizationId = systemOrganizationId;
+        this.systemSpaceIds = systemSpaceIds;
     }
 
-    static Stream<Void> clean(CloudFoundryClient cloudFoundryClient,
-                              Predicate<ApplicationResource> applicationPredicate,
-                              Predicate<DomainResource> domainPredicate,
-                              Predicate<OrganizationResource> organizationPredicate,
-                              Predicate<RouteResource> routePredicate,
-                              Predicate<SpaceResource> spacePredicate) {
+    void clean() {
+        Mono
+            .when(this.systemOrganizationId, this.systemSpaceIds)
+            .flatMap(function((systemOrganizationId, systemSpaceIds) -> {
 
-        return cleanApplications(cloudFoundryClient, applicationPredicate)
-            .as(afterStreamComplete(() -> cleanRoutes(cloudFoundryClient, routePredicate)))
-            .as(afterStreamComplete(() -> cleanDomains(cloudFoundryClient, domainPredicate)))
-            .as(afterStreamComplete(() -> cleanSpaces(cloudFoundryClient, spacePredicate)))
-            .as(afterStreamComplete(() -> cleanOrganizations(cloudFoundryClient, organizationPredicate)));
+                Predicate<ApplicationResource> applicationPredicate = systemOrganizationId
+                    .map(id -> (Predicate<ApplicationResource>) r -> !systemSpaceIds.contains(ResourceUtils.getEntity(r).getSpaceId()))
+                    .orElse(r -> true);
+
+                Predicate<OrganizationResource> organizationPredicate = systemOrganizationId
+                    .map(id -> (Predicate<OrganizationResource>) r -> !ResourceUtils.getId(r).equals(id))
+                    .orElse(r -> true);
+
+                Predicate<RouteResource> routePredicate = r -> true;
+
+                Predicate<SpaceResource> spacePredicate = systemOrganizationId
+                    .map(id -> (Predicate<SpaceResource>) r -> !ResourceUtils.getEntity(r).getOrganizationId().equals(id))
+                    .orElse(r -> true);
+
+                return cleanApplications(this.cloudFoundryClient, applicationPredicate)
+                    .as(afterStreamComplete(() -> cleanRoutes(this.cloudFoundryClient, routePredicate)))
+                    .as(afterStreamComplete(() -> cleanDomains(this.cloudFoundryClient, domainPredicate)))
+                    .as(afterStreamComplete(() -> cleanSpaces(this.cloudFoundryClient, spacePredicate)))
+                    .as(afterStreamComplete(() -> cleanOrganizations(this.cloudFoundryClient, organizationPredicate)));
+            }))
+            .doOnSubscribe(s -> this.logger.debug(">> CLEANUP <<"))
+            .doOnError(Throwable::printStackTrace)
+            .doOnComplete(() -> this.logger.debug("<< CLEANUP >>"))
+            .after()
+            .get(5, MINUTES);
     }
 
     private static Stream<Void> cleanApplications(CloudFoundryClient cloudFoundryClient, Predicate<ApplicationResource> predicate) {

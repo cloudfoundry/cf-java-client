@@ -20,11 +20,15 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.uaa.accesstokenadministration.GetTokenKeyRequest;
 import org.cloudfoundry.uaa.accesstokenadministration.GetTokenKeyResponse;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public final class AccessTokenAdministrationTest extends AbstractIntegrationTest {
+
+    @Autowired
+    private UaaClient uaaClient;
 
     @Test
     public void getTokenKey() {

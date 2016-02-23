@@ -25,9 +25,9 @@ import org.cloudfoundry.operations.routes.ListRoutesRequest;
 import org.cloudfoundry.operations.routes.MapRouteRequest;
 import org.cloudfoundry.operations.routes.Route;
 import org.cloudfoundry.operations.routes.UnmapRouteRequest;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.rx.Stream;
 
@@ -38,41 +38,26 @@ import static org.cloudfoundry.util.OperationUtils.afterStreamComplete;
 
 public final class RoutesTest extends AbstractIntegrationTest {
 
-    private static final String TEST_APPLICATION_NAME = "application";
+    @Autowired
+    private CloudFoundryOperations cloudFoundryOperations;
 
-    private static final String TEST_DOMAIN_NAME = "test.domain";
+    @Autowired
+    private String organizationName;
 
-    private static final String TEST_HOST = "host";
-
-    private static final String TEST_INVALID_DOMAIN_NAME = "invalid-domain";
-
-    private static final String TEST_PATH = "/path";
-
-    private Mono<Void> route;
-
-    @Before
-    public void before() {
-        this.route = this.cloudFoundryOperations.domains()
-            .create(CreateDomainRequest.builder()
-                .domain(TEST_DOMAIN_NAME)
-                .organization(this.organizationName)
-                .build())
-            .as(afterComplete(() -> this.cloudFoundryOperations.routes()
-                .create(CreateRouteRequest.builder()
-                    .domain(TEST_DOMAIN_NAME)
-                    .host(TEST_HOST)
-                    .path(TEST_PATH)
-                    .space(this.spaceName)
-                    .build())));
-    }
+    @Autowired
+    private String spaceName;
 
     @Test
     public void checkFalse() {
+        String domainName = getDomainName();
+        String host = getHostName();
+        String path = getPath();
+
         this.cloudFoundryOperations.routes()
             .check(CheckRouteRequest.builder()
-                .domain(TEST_INVALID_DOMAIN_NAME)
-                .host(TEST_HOST)
-                .path(TEST_PATH)
+                .domain(domainName)
+                .host(host)
+                .path(path)
                 .build())
             .subscribe(testSubscriber()
                 .assertEquals(false));
@@ -80,12 +65,16 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void checkTrue() {
-        this.route
+        String domainName = getDomainName();
+        String hostName = getHostName();
+        String path = getPath();
+
+        createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
             .as(afterComplete(() -> this.cloudFoundryOperations.routes()
                 .check(CheckRouteRequest.builder()
-                    .domain(TEST_DOMAIN_NAME)
-                    .host(TEST_HOST)
-                    .path(TEST_PATH)
+                    .domain(domainName)
+                    .host(hostName)
+                    .path(path)
                     .build())))
             .subscribe(testSubscriber()
                 .assertEquals(true));
@@ -93,12 +82,16 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void create() {
-        this.route
+        String domainName = getDomainName();
+        String hostName = getHostName();
+        String path = getPath();
+
+        createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
             .as(afterComplete(() -> this.cloudFoundryOperations.routes()
                 .check(CheckRouteRequest.builder()
-                    .domain(TEST_DOMAIN_NAME)
-                    .host(TEST_HOST)
-                    .path(TEST_PATH)
+                    .domain(domainName)
+                    .host(hostName)
+                    .path(path)
                     .build())))
             .subscribe(testSubscriber()
                 .assertEquals(true));
@@ -106,31 +99,39 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void createRouteWithNonExistentDomain() {
+        String domainName = getDomainName();
+        String hostName = getHostName();
+        String path = getPath();
+
         this.cloudFoundryOperations.routes()
-                .create(CreateRouteRequest.builder()
-                    .domain(TEST_INVALID_DOMAIN_NAME)
-                    .host(TEST_HOST)
-                    .path(TEST_PATH)
-                    .space(this.spaceName)
-                    .build())
+            .create(CreateRouteRequest.builder()
+                .domain(domainName)
+                .host(hostName)
+                .path(path)
+                .space(this.spaceName)
+                .build())
             .subscribe(testSubscriber()
                 .assertError(IllegalArgumentException.class));
     }
 
     @Test
     public void delete() {
-        this.route
+        String domainName = getDomainName();
+        String hostName = getHostName();
+        String path = getPath();
+
+        createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
             .as(afterComplete(() -> this.cloudFoundryOperations.routes()
                 .delete(DeleteRouteRequest.builder()
-                    .domain(TEST_DOMAIN_NAME)
-                    .host(TEST_HOST)
-                    .path(TEST_PATH)
+                    .domain(domainName)
+                    .host(hostName)
+                    .path(path)
                     .build())))
             .as(afterComplete(() -> this.cloudFoundryOperations.routes()
                 .check(CheckRouteRequest.builder()
-                    .domain(TEST_DOMAIN_NAME)
-                    .host(TEST_HOST)
-                    .path(TEST_PATH)
+                    .domain(domainName)
+                    .host(hostName)
+                    .path(path)
                     .build())))
             .subscribe(testSubscriber()
                 .assertEquals(false));
@@ -138,27 +139,34 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void deleteInvalidDomain() {
-        this.route
-            .as(afterComplete(() -> this.cloudFoundryOperations.routes()
-                .delete(DeleteRouteRequest.builder()
-                    .domain(TEST_INVALID_DOMAIN_NAME)
-                    .host(TEST_HOST)
-                    .path(TEST_PATH)
-                    .build())))
+        String domainName = getDomainName();
+        String hostName = getHostName();
+        String path = getPath();
+
+        this.cloudFoundryOperations.routes()
+            .delete(DeleteRouteRequest.builder()
+                .domain(domainName)
+                .host(hostName)
+                .path(path)
+                .build())
             .subscribe(testSubscriber()
                 .assertError(IllegalArgumentException.class));
     }
 
     @Test
     public void deleteOrphanedRoutes() {
-        this.route
+        String domainName = getDomainName();
+        String hostName = getHostName();
+        String path = getPath();
+
+        createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
             .as(afterComplete(() -> this.cloudFoundryOperations.routes()
                 .deleteOrphanedRoutes()))
             .as(afterComplete(() -> this.cloudFoundryOperations.routes()
                 .check(CheckRouteRequest.builder()
-                    .domain(TEST_DOMAIN_NAME)
-                    .host(TEST_HOST)
-                    .path(TEST_PATH)
+                    .domain(domainName)
+                    .host(hostName)
+                    .path(path)
                     .build())))
             .subscribe(testSubscriber()
                 .assertEquals(false));
@@ -166,26 +174,34 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void listWithOrganizationLevel() {
-        this.route
+        String domainName = getDomainName();
+        String hostName = getHostName();
+        String path = getPath();
+
+        createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
             .as(Stream::from)
             .as(afterStreamComplete(() -> Stream.from(this.cloudFoundryOperations.routes()
                 .list(ListRoutesRequest.builder()
                     .level(ORGANIZATION)
                     .build()))))
-            .filter(returnedRoute -> routeMatches(returnedRoute, TEST_DOMAIN_NAME, TEST_HOST, TEST_PATH))
+            .filter(returnedRoute -> routeMatches(returnedRoute, domainName, hostName, path))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
 
     @Test
     public void listWithSpaceLevel() {
-        this.route
+        String domainName = getDomainName();
+        String hostName = getHostName();
+        String path = getPath();
+
+        createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
             .as(Stream::from)
             .as(afterStreamComplete(() -> Stream.from(this.cloudFoundryOperations.routes()
                 .list(ListRoutesRequest.builder()
                     .level(SPACE)
                     .build()))))
-            .filter(returnedRoute -> routeMatches(returnedRoute, TEST_DOMAIN_NAME, TEST_HOST, TEST_PATH))
+            .filter(returnedRoute -> routeMatches(returnedRoute, domainName, hostName, path))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -193,13 +209,18 @@ public final class RoutesTest extends AbstractIntegrationTest {
     @Ignore("Needs push application - https://www.pivotaltracker.com/story/show/106155434")
     @Test
     public void map() {
-        this.route
+        String applicationName = getApplicationName();
+        String domainName = getDomainName();
+        String hostName = getHostName();
+        String path = getPath();
+
+        createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
             .as(afterComplete(() -> this.cloudFoundryOperations.routes()
                 .map(MapRouteRequest.builder()
-                    .applicationName(TEST_APPLICATION_NAME)
-                    .domain(TEST_DOMAIN_NAME)
-                    .host(TEST_HOST)
-                    .path(TEST_PATH)
+                    .applicationName(applicationName)
+                    .domain(domainName)
+                    .host(hostName)
+                    .path(path)
                     .build())))
             .subscribe(testSubscriber()
                 .assertCount(1));
@@ -208,16 +229,36 @@ public final class RoutesTest extends AbstractIntegrationTest {
     @Ignore("Needs push application - https://www.pivotaltracker.com/story/show/106155434")
     @Test
     public void unmap() {
-        this.route
+        String applicationName = getApplicationName();
+        String domainName = getDomainName();
+        String hostName = getHostName();
+        String path = getPath();
+
+        createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
             .as(afterComplete(() -> this.cloudFoundryOperations.routes()
                 .unmap(UnmapRouteRequest.builder()
-                    .applicationName(TEST_APPLICATION_NAME)
-                    .domain(TEST_DOMAIN_NAME)
-                    .host(TEST_HOST)
-                    .path(TEST_PATH)
+                    .applicationName(applicationName)
+                    .domain(domainName)
+                    .host(hostName)
+                    .path(path)
                     .build())))
             .subscribe(testSubscriber()
                 .assertCount(1));
+    }
+
+    private static Mono<Void> createRoute(CloudFoundryOperations cloudFoundryOperations, String organizationName, String spaceName, String domainName, String hostName, String path) {
+        return cloudFoundryOperations.domains()
+            .create(CreateDomainRequest.builder()
+                .domain(domainName)
+                .organization(organizationName)
+                .build())
+            .as(afterComplete(() -> cloudFoundryOperations.routes()
+                .create(CreateRouteRequest.builder()
+                    .domain(domainName)
+                    .host(hostName)
+                    .path(path)
+                    .space(spaceName)
+                    .build())));
     }
 
     private static boolean routeMatches(Route returnedRoute, String domainName, String host, String path) {

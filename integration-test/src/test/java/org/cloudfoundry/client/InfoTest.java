@@ -21,11 +21,15 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.cloudfoundry.client.CloudFoundryClient.SUPPORTED_API_VERSION;
 import static org.junit.Assert.assertTrue;
 
 public final class InfoTest extends AbstractIntegrationTest {
+
+    @Autowired
+    private CloudFoundryClient cloudFoundryClient;
 
     @Test
     public void info() {

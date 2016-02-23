@@ -16,44 +16,22 @@
 
 package org.cloudfoundry;
 
-import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.applications.ApplicationResource;
-import org.cloudfoundry.client.v2.domains.DomainResource;
-import org.cloudfoundry.client.v2.organizations.OrganizationResource;
-import org.cloudfoundry.client.v2.routes.RouteResource;
-import org.cloudfoundry.client.v2.spaces.SpaceResource;
-import org.cloudfoundry.logging.LoggingClient;
-import org.cloudfoundry.operations.CloudFoundryOperations;
-import org.cloudfoundry.uaa.UaaClient;
-import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import reactor.core.publisher.Mono;
-import reactor.fn.Predicate;
 import reactor.fn.tuple.Tuple2;
 
-import java.util.List;
-import java.util.Optional;
-
 import static java.util.concurrent.TimeUnit.MINUTES;
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = IntegrationTestConfiguration.class)
 public abstract class AbstractIntegrationTest {
-
-    private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.test");
 
     @Rule
     public final TestName testName = new TestName();
@@ -63,73 +41,7 @@ public abstract class AbstractIntegrationTest {
         .setPerformanceLoggerName(() -> String.format("%s.%s", this.getClass().getSimpleName(), AbstractIntegrationTest.this.testName.getMethodName()));
 
     @Autowired
-    protected CloudFoundryClient cloudFoundryClient;
-
-    @Autowired
-    protected CloudFoundryOperations cloudFoundryOperations;
-
-    @Autowired
-    protected Predicate<DomainResource> domainsPredicate;
-
-    @Autowired
-    protected LoggingClient loggingClient;
-
-    @Autowired
-    protected Mono<String> organizationId;
-
-    @Value("${test.organization}")
-    protected String organizationName;
-
-    @Autowired
-    protected Mono<String> spaceId;
-
-    @Value("${test.space}")
-    protected String spaceName;
-
-    @Autowired
-    protected Mono<String> stackId;
-
-    @Autowired
-    protected Mono<Optional<String>> systemOrganizationId;
-
-    @Autowired
-    protected Mono<List<String>> systemSpaceIds;
-
-    @Autowired
-    protected UaaClient uaaClient;
-
-    @Autowired
-    protected Mono<String> userId;
-
-    @Value("${test.username}")
-    protected String userName;
-
-    @Before
-    public final void cleanup() throws Exception {
-        Mono
-            .when(this.systemOrganizationId, this.systemSpaceIds, this.organizationId, this.spaceId)
-            .flatMap(function((systemOrganizationId, systemSpaceIds, organizationId, spaceId) -> {
-
-                Predicate<ApplicationResource> applicationPredicate = r -> !systemSpaceIds.contains(ResourceUtils.getEntity(r).getSpaceId());
-
-                Predicate<OrganizationResource> organizationPredicate = systemOrganizationId
-                    .map(id -> (Predicate<OrganizationResource>) r -> !ResourceUtils.getId(r).equals(id) && !organizationId.equals(ResourceUtils.getId(r)))
-                    .orElse(r -> !organizationId.equals(ResourceUtils.getId(r)));
-
-                Predicate<RouteResource> routePredicate = r -> true;
-
-                Predicate<SpaceResource> spacePredicate = systemOrganizationId
-                    .map(id -> (Predicate<SpaceResource>) r -> !ResourceUtils.getEntity(r).getOrganizationId().equals(id) && !spaceId.equals(ResourceUtils.getId(r)))
-                    .orElse(r -> !spaceId.equals(ResourceUtils.getId(r)));
-
-                return CloudFoundryCleaner.clean(this.cloudFoundryClient, applicationPredicate, this.domainsPredicate, organizationPredicate, routePredicate, spacePredicate);
-            }))
-            .doOnSubscribe(s -> this.logger.debug(">> CLEANUP <<"))
-            .doOnError(Throwable::printStackTrace)
-            .doOnComplete(() -> this.logger.debug("<< CLEANUP >>"))
-            .after()
-            .get();
-    }
+    private NameFactory nameFactory;
 
     @After
     public final void verify() throws InterruptedException {
@@ -141,6 +53,30 @@ public abstract class AbstractIntegrationTest {
         T expected = tuple.t2;
 
         assertEquals(expected, actual);
+    }
+
+    protected final String getApplicationName() {
+        return this.nameFactory.getName("test-application-");
+    }
+
+    protected final String getDomainName() {
+        return this.nameFactory.getName("test.domain.");
+    }
+
+    protected final String getHostName() {
+        return this.nameFactory.getName("test-host-");
+    }
+
+    protected final String getOrganizationName() {
+        return this.nameFactory.getName("test-organization-");
+    }
+
+    protected final String getPath() {
+        return this.nameFactory.getName("/test-path-");
+    }
+
+    protected final String getSpaceName() {
+        return this.nameFactory.getName("test-space-");
     }
 
     @SuppressWarnings("unchecked")

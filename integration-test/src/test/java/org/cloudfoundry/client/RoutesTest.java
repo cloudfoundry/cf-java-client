@@ -30,43 +30,61 @@ import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.UpdateRouteRequest;
 import org.cloudfoundry.util.JobUtils;
+import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
 import reactor.fn.tuple.Tuple3;
+import reactor.rx.Stream;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public final class RoutesTest extends AbstractIntegrationTest {
 
-    private Mono<String> domainId;
+    @Autowired
+    private CloudFoundryClient cloudFoundryClient;
+
+    @Autowired
+    private Mono<String> organizationId;
+
+    @Autowired
+    private Mono<String> spaceId;
 
     @Test
     public void associateApplication() {
-        Mono
-            .when(this.domainId, this.spaceId)
-            .then(function((domainId, spaceId) -> createApplicationAndRoute(RoutesTest.this.cloudFoundryClient, domainId, spaceId)))
+        String applicationName = getApplicationName();
+        String domainName = getDomainName();
+
+        this.organizationId
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
+            .and(this.spaceId)
+            .then(function((domainId, spaceId) -> createApplicationAndRoute(RoutesTest.this.cloudFoundryClient, domainId, spaceId, applicationName)))
             .then(function((applicationId, routeId) -> associateApplicationWithRoute(RoutesTest.this.cloudFoundryClient, applicationId, routeId)))
-            .flatMap(routeId -> this.cloudFoundryClient.routes()
-                .listApplications(ListRouteApplicationsRequest.builder()
-                    .routeId(routeId)
-                    .build())
-                .flatMap(ResourceUtils::getResources))
+            .flatMap(routeId -> PaginationUtils
+                .requestResources(page -> this.cloudFoundryClient.routes()
+                    .listApplications(ListRouteApplicationsRequest.builder()
+                        .page(page)
+                        .routeId(routeId)
+                        .build())))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
 
     @Test
     public void create() {
-        Mono
-            .when(this.domainId, this.spaceId)
+        String domainName = getDomainName();
+
+        this.organizationId
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
+            .and(this.spaceId)
             .then(function((domainId, spaceId) -> Mono
                 .when(
                     Mono.just(domainId),
@@ -82,22 +100,13 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .assertThat(consumer(RoutesTest::assertDomainIdAndSpaceId)));
     }
 
-    @Before
-    public void createDomain() throws Exception {
-        this.domainId = this.organizationId
-            .then(organizationId -> this.cloudFoundryClient.domains()
-                .create(CreateDomainRequest.builder()
-                    .name("test.domain.name")
-                    .owningOrganizationId(organizationId)
-                    .wildcard(true)
-                    .build()))
-            .map(ResourceUtils::getId);
-    }
-
     @Test
     public void delete() {
-        Mono
-            .when(this.domainId, this.spaceId)
+        String domainName = getDomainName();
+
+        this.organizationId
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
+            .and(this.spaceId)
             .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
                 .create(CreateRouteRequest.builder()
                     .domainId(domainId)
@@ -116,8 +125,11 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void exists() {
-        Mono
-            .when(this.domainId, this.spaceId)
+        String domainName = getDomainName();
+
+        this.organizationId
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
+            .and(this.spaceId)
             .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
                 .create(CreateRouteRequest.builder()
                     .domainId(domainId)
@@ -136,8 +148,11 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void existsDoesNotExist() {
-        Mono
-            .when(this.domainId, this.spaceId)
+        String domainName = getDomainName();
+
+        this.organizationId
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
+            .and(this.spaceId)
             .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
                 .create(CreateRouteRequest.builder()
                     .domainId(domainId)
@@ -156,8 +171,11 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void get() {
-        Mono
-            .when(this.domainId, this.spaceId)
+        String domainName = getDomainName();
+
+        this.organizationId
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
+            .and(this.spaceId)
             .then(function((domainId, spaceId) -> Mono
                 .when(
                     Mono.just(domainId),
@@ -184,102 +202,107 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
-        Mono
-            .when(this.domainId, this.spaceId)
-            .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
-                .create(CreateRouteRequest.builder()
-                    .domainId(domainId)
-                    .spaceId(spaceId)
-                    .build())))
-            .flatMap(response -> this.cloudFoundryClient.routes()
-                .list(ListRoutesRequest.builder()
-                    .build())
-                .flatMap(ResourceUtils::getResources))
-            .subscribe(testSubscriber()
-                .assertCount(1));
-    }
-
-    @Test
     public void listApplications() {
-        Mono
-            .when(this.domainId, this.spaceId)
-            .then(function((domainId, spaceId) -> createApplicationAndRoute(RoutesTest.this.cloudFoundryClient, domainId, spaceId)))
+        String applicationName = getApplicationName();
+        String domainName = getDomainName();
+
+        this.organizationId
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
+            .and(this.spaceId)
+            .then(function((domainId, spaceId) -> createApplicationAndRoute(RoutesTest.this.cloudFoundryClient, domainId, spaceId, applicationName)))
             .then(function((applicationId, routeId) -> associateApplicationWithRoute(RoutesTest.this.cloudFoundryClient, applicationId, routeId)))
-            .flatMap(routeId -> this.cloudFoundryClient.routes()
-                .listApplications(ListRouteApplicationsRequest.builder()
-                    .routeId(routeId)
-                    .build())
-                .flatMap(ResourceUtils::getResources))
+            .flatMap(routeId -> PaginationUtils
+                .requestResources(page -> this.cloudFoundryClient.routes()
+                    .listApplications(ListRouteApplicationsRequest.builder()
+                        .page(page)
+                        .routeId(routeId)
+                        .build())))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
 
     @Test
     public void listApplicationsFilterByDiego() {
-        Mono
-            .when(this.domainId, this.spaceId)
-            .then(function((domainId, spaceId) -> createApplicationAndRoute(RoutesTest.this.cloudFoundryClient, domainId, spaceId)))
-            .then(function((applicationId, routeId) -> associateApplicationWithRoute(RoutesTest.this.cloudFoundryClient, applicationId, routeId)))
-            .flatMap(routeId -> {
-                ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
-                    .diego(true)
-                    .routeId(routeId)
-                    .build();
+        String applicationName = getApplicationName();
+        String domainName = getDomainName();
 
-                return this.cloudFoundryClient.routes().listApplications(request)
-                    .flatMap(ResourceUtils::getResources);
-            })
+        this.organizationId
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
+            .and(this.spaceId)
+            .then(function((domainId, spaceId) -> createApplicationAndRoute(RoutesTest.this.cloudFoundryClient, domainId, spaceId, applicationName)))
+            .then(function((applicationId, routeId) -> associateApplicationWithRoute(RoutesTest.this.cloudFoundryClient, applicationId, routeId)))
+            .flatMap(routeId -> PaginationUtils
+                .requestResources(page -> this.cloudFoundryClient.routes()
+                    .listApplications(ListRouteApplicationsRequest.builder()
+                        .diego(true)
+                        .page(page)
+                        .routeId(routeId)
+                        .build())))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
 
     @Test
     public void listApplicationsFilterByName() {
-        Mono
-            .when(this.domainId, this.spaceId)
-            .then(function((domainId, spaceId) -> createApplicationAndRoute(RoutesTest.this.cloudFoundryClient, domainId, spaceId)))
+        String applicationName = getApplicationName();
+        String domainName = getDomainName();
+
+        this.organizationId
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
+            .and(this.spaceId)
+            .then(function((domainId, spaceId) -> createApplicationAndRoute(RoutesTest.this.cloudFoundryClient, domainId, spaceId, applicationName)))
             .then(function((applicationId, routeId) -> associateApplicationWithRoute(RoutesTest.this.cloudFoundryClient, applicationId, routeId)))
-            .flatMap(routeId -> this.cloudFoundryClient.routes()
-                .listApplications(ListRouteApplicationsRequest.builder()
-                    .routeId(routeId)
-                    .name("test-application-name")
-                    .build())
-                .flatMap(ResourceUtils::getResources))
+            .flatMap(routeId -> PaginationUtils
+                .requestResources(page -> this.cloudFoundryClient.routes()
+                    .listApplications(ListRouteApplicationsRequest.builder()
+                        .name(applicationName)
+                        .page(page)
+                        .routeId(routeId)
+                        .build())))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
 
     @Test
     public void listApplicationsFilterByOrganizationId() {
-        Mono
-            .when(this.domainId, this.spaceId)
-            .then(function((domainId, spaceId) -> createApplicationAndRoute(RoutesTest.this.cloudFoundryClient, domainId, spaceId)))
+        String applicationName = getApplicationName();
+        String domainName = getDomainName();
+
+        this.organizationId
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
+            .and(this.spaceId)
+            .then(function((domainId, spaceId) -> createApplicationAndRoute(RoutesTest.this.cloudFoundryClient, domainId, spaceId, applicationName)))
             .then(function((applicationId, routeId) -> associateApplicationWithRoute(RoutesTest.this.cloudFoundryClient, applicationId, routeId)))
             .and(this.organizationId)
-            .flatMap(function((routeId, organizationId) -> this.cloudFoundryClient.routes()
-                .listApplications(ListRouteApplicationsRequest.builder()
-                    .routeId(routeId)
-                    .organizationId(organizationId)
-                    .build())
-                .flatMap(ResourceUtils::getResources)))
+            .flatMap(function((routeId, organizationId) -> PaginationUtils
+                .requestResources(page -> this.cloudFoundryClient.routes()
+                    .listApplications(ListRouteApplicationsRequest.builder()
+                        .organizationId(organizationId)
+                        .page(page)
+                        .routeId(routeId)
+                        .build()))))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
 
     @Test
     public void listApplicationsFilterBySpaceId() {
-        Mono
-            .when(this.domainId, this.spaceId)
-            .then(function((domainId, spaceId) -> createApplicationAndRoute(RoutesTest.this.cloudFoundryClient, domainId, spaceId)))
+        String applicationName = getApplicationName();
+        String domainName = getDomainName();
+
+        this.organizationId
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
+            .and(this.spaceId)
+            .then(function((domainId, spaceId) -> createApplicationAndRoute(RoutesTest.this.cloudFoundryClient, domainId, spaceId, applicationName)))
             .then(function((applicationId, routeId) -> associateApplicationWithRoute(RoutesTest.this.cloudFoundryClient, applicationId, routeId)))
             .and(this.spaceId)
-            .flatMap(function((routeId, spaceId) -> this.cloudFoundryClient.routes()
-                .listApplications(ListRouteApplicationsRequest.builder()
-                    .routeId(routeId)
-                    .spaceId(spaceId)
-                    .build())
-                .flatMap(ResourceUtils::getResources)))
+            .flatMap(function((routeId, spaceId) -> PaginationUtils
+                .requestResources(page -> this.cloudFoundryClient.routes()
+                    .listApplications(ListRouteApplicationsRequest.builder()
+                        .page(page)
+                        .routeId(routeId)
+                        .spaceId(spaceId)
+                        .build()))))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -292,85 +315,109 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByDomainId() {
-        Mono
-            .when(this.domainId, this.spaceId)
+        String domainName = getDomainName();
+
+        this.organizationId
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
+            .and(this.spaceId)
             .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
                 .create(CreateRouteRequest.builder()
                     .domainId(domainId)
                     .spaceId(spaceId)
                     .build())
                 .map(response -> domainId)))
-            .flatMap(domainId -> this.cloudFoundryClient.routes()
-                .list(ListRoutesRequest.builder()
-                    .domainId(domainId)
-                    .build())
-                .flatMap(ResourceUtils::getResources))
+            .flatMap(domainId -> PaginationUtils
+                .requestResources(page -> this.cloudFoundryClient.routes()
+                    .list(ListRoutesRequest.builder()
+                        .domainId(domainId)
+                        .page(page)
+                        .build())))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
 
     @Test
     public void listFilterByHost() {
-        Mono
-            .when(this.domainId, this.spaceId)
+        String domainName = getDomainName();
+        String host = getHostName();
+
+        this.organizationId
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
+            .and(this.spaceId)
             .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
                 .create(CreateRouteRequest.builder()
                     .domainId(domainId)
-                    .host("test-host")
+                    .host(host)
                     .spaceId(spaceId)
                     .build())))
-            .flatMap(response -> this.cloudFoundryClient.routes()
-                .list(ListRoutesRequest.builder()
-                    .host("test-host")
-                    .build())
-                .flatMap(ResourceUtils::getResources))
+            .flatMap(response -> PaginationUtils
+                .requestResources(page -> this.cloudFoundryClient.routes()
+                    .list(ListRoutesRequest.builder()
+                        .host(host)
+                        .page(page)
+                        .build())))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
 
     @Test
     public void listFilterByOrganizationId() {
-        Mono
-            .when(this.domainId, this.spaceId)
+        String domainName = getDomainName();
+
+        this.organizationId
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
+            .and(this.spaceId)
             .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
                 .create(CreateRouteRequest.builder()
                     .domainId(domainId)
                     .spaceId(spaceId)
                     .build())
                 .then(response -> this.organizationId)))
-            .flatMap(organizationId -> this.cloudFoundryClient.routes()
-                .list(ListRoutesRequest.builder()
-                    .organizationId(organizationId)
-                    .build())
-                .flatMap(ResourceUtils::getResources))
-            .subscribe(testSubscriber()
-                .assertCount(1));
+            .flatMap(organizationId -> PaginationUtils
+                .requestResources(page -> this.cloudFoundryClient.routes()
+                    .list(ListRoutesRequest.builder()
+                        .organizationId(organizationId)
+                        .page(page)
+                        .build())))
+            .as(Stream::from)
+            .count()
+            .subscribe(this.<Long>testSubscriber()
+                .assertThat(count -> assertTrue(count > 1)));
     }
 
     @Test
     public void listFilterByPath() {
-        Mono
-            .when(this.domainId, this.spaceId)
+        String domainName = getDomainName();
+        String path = getPath();
+
+        this.organizationId
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
+            .and(this.spaceId)
             .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
                 .create(CreateRouteRequest.builder()
                     .domainId(domainId)
-                    .path("/test-path")
+                    .path(path)
                     .spaceId(spaceId)
                     .build())))
-            .flatMap(response -> this.cloudFoundryClient.routes()
-                .list(ListRoutesRequest.builder()
-                    .path("/test-path")
-                    .build())
-                .flatMap(ResourceUtils::getResources))
+            .flatMap(response -> PaginationUtils
+                .requestResources(page -> this.cloudFoundryClient.routes()
+                    .list(ListRoutesRequest.builder()
+                        .page(page)
+                        .path(path)
+                        .build())))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
 
     @Test
     public void removeApplication() {
-        Mono
-            .when(this.domainId, this.spaceId)
-            .then(function((domainId, spaceId) -> createApplicationAndRoute(this.cloudFoundryClient, domainId, spaceId)))
+        String applicationName = getApplicationName();
+        String domainName = getDomainName();
+
+        this.organizationId
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
+            .and(this.spaceId)
+            .then(function((domainId, spaceId) -> createApplicationAndRoute(this.cloudFoundryClient, domainId, spaceId, applicationName)))
             .then(function((applicationId, routeId) -> associateApplicationWithRoute(this.cloudFoundryClient, applicationId, routeId)
                 .map(response -> Tuple.of(applicationId, routeId))))
             .then(function((applicationId, routeId) -> this.cloudFoundryClient.routes()
@@ -379,19 +426,23 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .routeId(routeId)
                     .build())
                 .map(response -> routeId)))
-            .flatMap(routeId -> this.cloudFoundryClient.routes()
-                .listApplications(ListRouteApplicationsRequest.builder()
-                    .routeId(routeId)
-                    .build())
-                .flatMap(ResourceUtils::getResources))
+            .flatMap(routeId -> PaginationUtils
+                .requestResources(page -> this.cloudFoundryClient.routes()
+                    .listApplications(ListRouteApplicationsRequest.builder()
+                        .page(page)
+                        .routeId(routeId)
+                        .build())))
             .subscribe(testSubscriber()
                 .assertCount(0));
     }
 
     @Test
     public void update() {
-        Mono
-            .when(this.domainId, this.spaceId)
+        String domainName = getDomainName();
+
+        this.organizationId
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
+            .and(this.spaceId)
             .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
                 .create(CreateRouteRequest.builder()
                     .domainId(domainId)
@@ -422,13 +473,13 @@ public final class RoutesTest extends AbstractIntegrationTest {
             .map(response -> routeId);
     }
 
-    private static Mono<Tuple2<String, String>> createApplicationAndRoute(CloudFoundryClient cloudFoundryClient, String domainId, String spaceId) {
+    private static Mono<Tuple2<String, String>> createApplicationAndRoute(CloudFoundryClient cloudFoundryClient, String domainId, String spaceId, String applicationName) {
         return Mono
             .when(
                 cloudFoundryClient.applicationsV2()
                     .create(CreateApplicationRequest.builder()
                         .diego(true)
-                        .name("test-application-name")
+                        .name(applicationName)
                         .spaceId(spaceId)
                         .build())
                     .map(ResourceUtils::getId),
@@ -439,6 +490,16 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .build())
                     .map(ResourceUtils::getId)
             );
+    }
+
+    private static Mono<String> createDomainId(CloudFoundryClient cloudFoundryClient, String organizationId, String domainName) {
+        return cloudFoundryClient.domains()
+            .create(CreateDomainRequest.builder()
+                .name(domainName)
+                .owningOrganizationId(organizationId)
+                .wildcard(true)
+                .build())
+            .map(ResourceUtils::getId);
     }
 
 }

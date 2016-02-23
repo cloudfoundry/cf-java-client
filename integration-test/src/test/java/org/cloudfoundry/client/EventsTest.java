@@ -23,6 +23,7 @@ import org.cloudfoundry.client.v2.events.GetEventResponse;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
@@ -32,6 +33,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public final class EventsTest extends AbstractIntegrationTest {
+
+    @Autowired
+    private CloudFoundryClient cloudFoundryClient;
 
     @Test
     public void get() {

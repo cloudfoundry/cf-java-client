@@ -16,17 +16,12 @@
 
 package org.cloudfoundry;
 
-import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
-import org.cloudfoundry.client.v2.organizations.OrganizationResource;
-import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
-import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.logging.LoggingClient;
@@ -50,12 +45,11 @@ import reactor.core.publisher.Mono;
 import reactor.fn.Predicate;
 import reactor.rx.Promise;
 
+import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
-import static org.cloudfoundry.util.OperationUtils.afterComplete;
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
+import java.util.Random;
 
 @Configuration
 @EnableAutoConfiguration
@@ -63,48 +57,44 @@ public class IntegrationTestConfiguration {
 
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.test");
 
+    @Bean(initMethod = "clean", destroyMethod = "clean")
+    CloudFoundryCleaner cloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Predicate<DomainResource> domainPredicate, String organizationName, Mono<Optional<String>> systemOrganizationId,
+                                            Mono<List<String>> systemSpaceIds) {
+        return new CloudFoundryCleaner(cloudFoundryClient, domainPredicate, systemOrganizationId, systemSpaceIds);
+    }
+
     @Bean
     SpringCloudFoundryClient cloudFoundryClient(@Value("${test.host}") String host,
                                                 @Value("${test.username}") String username,
                                                 @Value("${test.password}") String password,
-                                                @Value("${test.skipSslValidation:false}") Boolean skipSslValidation,
-                                                List<DeserializationProblemHandler> problemHandlers) {
+                                                @Value("${test.skipSslValidation:false}") Boolean skipSslValidation) {
 
         return SpringCloudFoundryClient.builder()
             .host(host)
             .username(username)
             .password(password)
             .skipSslValidation(skipSslValidation)
-            .problemHandlers(problemHandlers)
+            .problemHandler(new FailingDeserializationProblemHandler())  // Test-only problem handler
             .build();
     }
 
     @Bean
     @DependsOn({"organizationId", "spaceId"})
-    CloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient,
-                                                  LoggingClient loggingClient,
-                                                  UaaClient uaaClient,
-                                                  @Value("${test.organization}") String organization,
-                                                  @Value("${test.space}") String space) {
+    CloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient, LoggingClient loggingClient, UaaClient uaaClient, String organizationName, String spaceName) {
         return new CloudFoundryOperationsBuilder()
             .cloudFoundryClient(cloudFoundryClient)
             .loggingClient(loggingClient)
             .uaaClient(uaaClient)
-            .target(organization, space)
+            .target(organizationName, spaceName)
             .build();
     }
 
     @Bean
-    Predicate<DomainResource> domainsPredicate(@Value("${test.domain}") String domain) {
+    Predicate<DomainResource> domainPredicate(@Value("${test.domain}") String domain) {
         return resource -> {
             String name = ResourceUtils.getEntity(resource).getName();
             return !name.endsWith(domain);
         };
-    }
-
-    @Bean
-    FailingDeserializationProblemHandler failingDeserializationProblemHandler() {
-        return new FailingDeserializationProblemHandler();
     }
 
     @Bean
@@ -115,39 +105,21 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    Mono<String> organizationId(CloudFoundryClient cloudFoundryClient, @Value("${test.organization}") String organization, Mono<Optional<String>> systemOrganizationId,
-                                Mono<List<String>> systemSpaceIds, Predicate<DomainResource> domainsPredicate) throws InterruptedException {
+    RandomNameFactory nameFactory(Random random) {
+        return new RandomNameFactory(random);
+    }
 
-        Mono<String> organizationId = Mono
-            .when(systemOrganizationId, systemSpaceIds)
-            .flatMap(function((systemOrganizationId2, systemSpaceIds2) -> {
-
-                Predicate<ApplicationResource> applicationPredicate = systemOrganizationId2
-                    .map(id -> (Predicate<ApplicationResource>) r -> !systemSpaceIds2.contains(ResourceUtils.getEntity(r).getSpaceId()))
-                    .orElse(r -> true);
-
-                Predicate<OrganizationResource> organizationPredicate = systemOrganizationId2
-                    .map(id -> (Predicate<OrganizationResource>) r -> !ResourceUtils.getId(r).equals(id))
-                    .orElse(r -> true);
-
-                Predicate<RouteResource> routePredicate = r -> true;
-
-                Predicate<SpaceResource> spacePredicate = systemOrganizationId2
-                    .map(id -> (Predicate<SpaceResource>) r -> !ResourceUtils.getEntity(r).getOrganizationId().equals(id))
-                    .orElse(r -> true);
-
-                return CloudFoundryCleaner.clean(cloudFoundryClient, applicationPredicate, domainsPredicate, organizationPredicate, routePredicate, spacePredicate);
-            }))
-            .as(Mono::from)
-            .as(afterComplete(() -> cloudFoundryClient.organizations()
-                .create(CreateOrganizationRequest.builder()
-                    .name(organization)
-                    .build())))
-            .flux()
+    @Bean
+    @DependsOn("cloudFoundryCleaner")
+    Mono<String> organizationId(CloudFoundryClient cloudFoundryClient, String organizationName) throws InterruptedException {
+        Mono<String> organizationId = cloudFoundryClient.organizations()
+            .create(CreateOrganizationRequest.builder()
+                .name(organizationName)
+                .build())
             .map(ResourceUtils::getId)
             .doOnSubscribe(s -> this.logger.debug(">> ORGANIZATION <<"))
             .doOnError(Throwable::printStackTrace)
-            .doOnComplete(() -> this.logger.debug("<< ORGANIZATION >>"))
+            .doOnSuccess(id -> this.logger.debug("<< ORGANIZATION >>"))
             .as(Promise::from);
 
         organizationId.get();
@@ -155,11 +127,21 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    Mono<String> spaceId(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, @Value("${test.space}") String space) throws InterruptedException {
+    String organizationName(NameFactory nameFactory) {
+        return nameFactory.getName("test-organization-");
+    }
+
+    @Bean
+    SecureRandom random() {
+        return new SecureRandom();
+    }
+
+    @Bean
+    Mono<String> spaceId(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, String spaceName) throws InterruptedException {
         Mono<String> spaceId = organizationId
             .then(orgId -> cloudFoundryClient.spaces()
                 .create(CreateSpaceRequest.builder()
-                    .name(space)
+                    .name(spaceName)
                     .organizationId(orgId)
                     .build()))
             .map(ResourceUtils::getId)
@@ -173,11 +155,16 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    Mono<String> stackId(CloudFoundryClient cloudFoundryClient, @Value("${test.stack:cflinuxfs2}") String stack) throws InterruptedException {
+    String spaceName(NameFactory nameFactory) {
+        return nameFactory.getName("test-space-");
+    }
+
+    @Bean
+    Mono<String> stackId(CloudFoundryClient cloudFoundryClient, String stackName) throws InterruptedException {
         Mono<String> stackId = PaginationUtils
             .requestResources(page -> cloudFoundryClient.stacks()
                 .list(ListStacksRequest.builder()
-                    .name(stack)
+                    .name(stackName)
                     .page(page)
                     .build()))
             .single()
@@ -189,6 +176,11 @@ public class IntegrationTestConfiguration {
 
         stackId.get();
         return stackId;
+    }
+
+    @Bean
+    String stackName() {
+        return "cflinuxfs2";
     }
 
     @Bean
@@ -241,13 +233,13 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    Mono<String> userId(CloudFoundryClient cloudFoundryClient, @Value("${test.username}") String user) {  // TODO: Create new user when APIs available
+    Mono<String> userId(CloudFoundryClient cloudFoundryClient, String userName) {  // TODO: Create new user when APIs available
         Mono<String> userId = PaginationUtils
             .requestResources(page -> cloudFoundryClient.users()
                 .list(ListUsersRequest.builder()
                     .page(page)
                     .build()))
-            .filter(resource -> user.equals(ResourceUtils.getEntity(resource).getUsername()))
+            .filter(resource -> userName.equals(ResourceUtils.getEntity(resource).getUsername()))
             .map(ResourceUtils::getId)
             .single()
             .doOnSubscribe(s -> this.logger.debug(">> USER <<"))
@@ -257,6 +249,11 @@ public class IntegrationTestConfiguration {
 
         userId.get();
         return userId;
+    }
+
+    @Bean
+    String userName(@Value("${test.username}") String username) {
+        return username;
     }
 
 }
