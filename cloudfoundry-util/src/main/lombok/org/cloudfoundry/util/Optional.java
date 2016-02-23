@@ -92,6 +92,10 @@ public final class Optional<T> {
         }
         return this.value;
     }
+    
+    public T getOrNull() {
+        return this.value;
+    }
 
     @Override
     public int hashCode() {

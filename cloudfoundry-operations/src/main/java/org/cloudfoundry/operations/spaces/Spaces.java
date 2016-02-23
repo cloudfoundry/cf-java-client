@@ -33,6 +33,14 @@ public interface Spaces {
     Mono<Void> allowSsh(AllowSpaceSshRequest request);
 
     /**
+     * Creates a new space
+     *
+     * @param request the create space request
+     * @return a completion indicator
+     */
+    Mono<Void> create(CreateSpaceRequest request);
+
+    /**
      * Deletes a specific space.
      *
      * @param request the delete space request

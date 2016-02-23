@@ -45,7 +45,7 @@ import static org.mockito.Mockito.when;
 
 public abstract class AbstractOperationsTest {
 
-    protected static final Mono<String> MISSING_ID = Mono.error(new java.lang.IllegalStateException());
+    protected static final Mono<String> MISSING_ID = Mono.error(new java.lang.IllegalStateException("MISSING_ID"));
 
     protected static final String TEST_ORGANIZATION_ID = "test-organization-id";
 
@@ -81,15 +81,15 @@ public abstract class AbstractOperationsTest {
 
     protected final Routes routes = mock(Routes.class, RETURNS_SMART_NULLS);
 
+    protected final ServiceBindings serviceBindings = mock(ServiceBindings.class, RETURNS_SMART_NULLS);
+
+    protected final Services services = mock(Services.class, RETURNS_SMART_NULLS);
+
     protected final SharedDomains sharedDomains = mock(SharedDomains.class, RETURNS_SMART_NULLS);
 
     protected final SpaceQuotaDefinitions spaceQuotaDefinitions = mock(SpaceQuotaDefinitions.class, RETURNS_SMART_NULLS);
 
     protected final Spaces spaces = mock(Spaces.class, RETURNS_SMART_NULLS);
-    
-    protected final Services services = mock(Services.class, RETURNS_SMART_NULLS);
-    
-    protected final ServiceBindings serviceBindings = mock(ServiceBindings.class, RETURNS_SMART_NULLS);
 
     protected final Stacks stacks = mock(Stacks.class, RETURNS_SMART_NULLS);
 
