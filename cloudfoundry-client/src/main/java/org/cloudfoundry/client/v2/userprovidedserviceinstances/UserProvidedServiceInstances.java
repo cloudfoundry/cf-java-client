@@ -50,4 +50,13 @@ public interface UserProvidedServiceInstances {
      */
     Mono<ListUserProvidedServiceInstancesResponse> list(ListUserProvidedServiceInstancesRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/list_all_service_bindings_for_the_user_provided_service_instance.html">List all Service
+     * Bindings for the User Provided Service Instance</a> request
+     *
+     * @param request the List Service Bindings request
+     * @return the response from the List Service Bindings request
+     */
+    Mono<ListUserProvidedServiceInstanceServiceBindingsResponse> listServiceBindings(ListUserProvidedServiceInstanceServiceBindingsRequest request);
+
 }
