@@ -17,9 +17,13 @@
 package org.cloudfoundry.spring.client.v2.userprovidedserviceinstances;
 
 import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
+import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceServiceBindingsRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceServiceBindingsResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceEntity;
@@ -175,6 +179,61 @@ public final class SpringUserProvidedServiceInstancesTest {
         @Override
         protected Mono<ListUserProvidedServiceInstancesResponse> invoke(ListUserProvidedServiceInstancesRequest request) {
             return this.userProvidedServiceInstances.list(request);
+        }
+    }
+
+    public static final class ListServiceBindings extends AbstractApiTest<ListUserProvidedServiceInstanceServiceBindingsRequest, ListUserProvidedServiceInstanceServiceBindingsResponse> {
+
+        private final SpringUserProvidedServiceInstances userProvidedServiceInstances = new SpringUserProvidedServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected ListUserProvidedServiceInstanceServiceBindingsRequest getInvalidRequest() {
+            return ListUserProvidedServiceInstanceServiceBindingsRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("/v2/user_provided_service_instances/16c81612-6a63-4faa-8cd5-acc80771b562/service_bindings?page=-1")
+                .status(OK)
+                .responsePayload("client/v2/user_provided_service_instances/GET_{id}_service_bindings_response.json");
+        }
+
+        @Override
+        protected ListUserProvidedServiceInstanceServiceBindingsResponse getResponse() {
+            return ListUserProvidedServiceInstanceServiceBindingsResponse.builder()
+                .totalPages(1)
+                .totalResults(1)
+                .resource(ServiceBindingResource.builder()
+                    .metadata(Resource.Metadata.builder()
+                            .createdAt("2016-01-26T22:20:16Z")
+                            .id("e6b8d548-e009-47d4-ab79-675e3da6bb52")
+                            .url("/v2/service_bindings/e6b8d548-e009-47d4-ab79-675e3da6bb52")
+                            .build()
+                    )
+                    .entity(ServiceBindingEntity.builder()
+                        .applicationId("a9bbd896-7500-45be-a75a-25e3d254f67c")
+                        .serviceInstanceId("16c81612-6a63-4faa-8cd5-acc80771b562")
+                        .credential("creds-key-29", "creds-val-29")
+                        .gatewayName("")
+                        .applicationUrl("/v2/apps/a9bbd896-7500-45be-a75a-25e3d254f67c")
+                        .serviceInstanceUrl("/v2/user_provided_service_instances/16c81612-6a63-4faa-8cd5-acc80771b562")
+                        .build())
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListUserProvidedServiceInstanceServiceBindingsRequest getValidRequest() throws Exception {
+            return ListUserProvidedServiceInstanceServiceBindingsRequest.builder()
+                .userProvidedServiceInstanceId("16c81612-6a63-4faa-8cd5-acc80771b562")
+                .page(-1)
+                .build();
+        }
+
+        @Override
+        protected Mono<ListUserProvidedServiceInstanceServiceBindingsResponse> invoke(ListUserProvidedServiceInstanceServiceBindingsRequest request) {
+            return this.userProvidedServiceInstances.listServiceBindings(request);
         }
     }
 
