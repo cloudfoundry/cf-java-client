@@ -26,6 +26,8 @@ import org.cloudfoundry.operations.organizations.DefaultOrganizations;
 import org.cloudfoundry.operations.organizations.Organizations;
 import org.cloudfoundry.operations.routes.DefaultRoutes;
 import org.cloudfoundry.operations.routes.Routes;
+import org.cloudfoundry.operations.services.DefaultServices;
+import org.cloudfoundry.operations.services.Services;
 import org.cloudfoundry.operations.spacequotas.DefaultSpaceQuotas;
 import org.cloudfoundry.operations.spacequotas.SpaceQuotas;
 import org.cloudfoundry.operations.spaces.DefaultSpaces;
@@ -43,6 +45,8 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
     private final Organizations organizations;
 
     private final Routes routes;
+    
+    private final Services services;
 
     private final SpaceQuotas spaceQuotas;
 
@@ -55,6 +59,7 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
         this.domains = new DefaultDomains(cloudFoundryClient);
         this.organizations = new DefaultOrganizations(cloudFoundryClient, username);
         this.routes = new DefaultRoutes(cloudFoundryClient, organizationId, spaceId);
+        this.services = new DefaultServices(cloudFoundryClient, spaceId);
         this.spaceQuotas = new DefaultSpaceQuotas(cloudFoundryClient, organizationId);
         this.spaces = new DefaultSpaces(cloudFoundryClient, organizationId);
         this.stacks = new DefaultStacks(cloudFoundryClient);
@@ -78,6 +83,11 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
     @Override
     public Routes routes() {
         return this.routes;
+    }
+
+    @Override
+    public Services services() {
+        return this.services;
     }
 
     @Override
