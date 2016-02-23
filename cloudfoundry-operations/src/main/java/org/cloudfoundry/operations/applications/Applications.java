@@ -26,6 +26,14 @@ import reactor.core.publisher.Mono;
 public interface Applications {
 
     /**
+     * Copy the app source code from this application to another.
+     *
+     * @param request the copy source application request
+     * @return a completion indicator
+     */
+    Mono<Void> copySource(CopySourceApplicationRequest request);
+
+    /**
      * Deletes a specific application and, optionally, all routes mapped to the application.
      *
      * Warning: deleting routes mapped to the application deletes them even if they are mapped to other applications.
