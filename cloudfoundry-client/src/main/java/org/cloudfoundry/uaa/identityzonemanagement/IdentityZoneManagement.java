@@ -14,28 +14,21 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa;
+package org.cloudfoundry.uaa.identityzonemanagement;
 
-import org.cloudfoundry.uaa.accesstokenadministration.AccessTokenAdministration;
-import org.cloudfoundry.uaa.identityzonemanagement.IdentityZoneManagement;
+import reactor.core.publisher.Mono;
 
 /**
- * Main entry point to the UAA Client API
+ * Main entry point to the UAA Identity Zone Management Client API
  */
-public interface UaaClient {
+public interface IdentityZoneManagement {
 
     /**
-     * Main entry point to the UAA Access Token Administration Client API
+     * Makes the <a href="https://github.com/cloudfoundry/uaa/blob/master/docs/UAA-APIs.rst#create-or-update-identity-zones-post-or-put-identity-zones">Create Identity Zone</a> request
      *
-     * @return the UAA Access Token Administration Client API
+     * @param request the Create Identity Zone request
+     * @return the response from the Create Identity Zone request
      */
-    AccessTokenAdministration accessTokenAdministration();
-
-    /**
-     * Main entry point to the UAA Identity Zone Management Client API
-     *
-     * @return the UAA Identity Zone Management Client API
-     */
-    IdentityZoneManagement identityZoneManagement();
+    Mono<CreateIdentityZoneResponse> create(CreateIdentityZoneRequest request);
 
 }
