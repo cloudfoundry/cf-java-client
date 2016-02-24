@@ -22,6 +22,8 @@ import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.GetUserProvidedServiceInstanceRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.GetUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceServiceBindingsRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceServiceBindingsResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
@@ -125,6 +127,56 @@ public final class SpringUserProvidedServiceInstancesTest {
         @Override
         protected Mono<Void> invoke(DeleteUserProvidedServiceInstanceRequest request) {
             return this.userProvidedServiceInstances.delete(request);
+        }
+    }
+
+    public static final class Get extends AbstractApiTest<GetUserProvidedServiceInstanceRequest, GetUserProvidedServiceInstanceResponse> {
+
+        private final SpringUserProvidedServiceInstances userProvidedServiceInstances = new SpringUserProvidedServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected GetUserProvidedServiceInstanceRequest getInvalidRequest() {
+            return GetUserProvidedServiceInstanceRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("/v2/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc")
+                .status(OK)
+                .responsePayload("client/v2/user_provided_service_instances/GET_{id}_response.json");
+        }
+
+        @Override
+        protected GetUserProvidedServiceInstanceResponse getResponse() {
+            return GetUserProvidedServiceInstanceResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .createdAt("2015-07-27T22:43:34Z")
+                    .id("8c12fd06-6639-4844-b5e7-a6831cadbbcc")
+                    .url("/v2/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc")
+                    .build())
+                .entity(UserProvidedServiceInstanceEntity.builder()
+                    .name("name-2361")
+                    .credential("creds-key-662", "creds-val-662")
+                    .spaceId("cebb3962-4e5b-4204-b117-3140ec4a62d9")
+                    .type("user_provided_service_instance")
+                    .syslogDrainUrl("https://foo.com/url-89")
+                    .spaceUrl("/v2/spaces/cebb3962-4e5b-4204-b117-3140ec4a62d9")
+                    .serviceBindingsUrl("/v2/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc/service_bindings")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected GetUserProvidedServiceInstanceRequest getValidRequest() throws Exception {
+            return GetUserProvidedServiceInstanceRequest.builder()
+                .userProvidedServiceInstanceId("8c12fd06-6639-4844-b5e7-a6831cadbbcc")
+                .build();
+        }
+
+        @Override
+        protected Mono<GetUserProvidedServiceInstanceResponse> invoke(GetUserProvidedServiceInstanceRequest request) {
+            return this.userProvidedServiceInstances.get(request);
         }
     }
 

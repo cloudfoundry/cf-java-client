@@ -42,6 +42,15 @@ public interface UserProvidedServiceInstances {
     Mono<Void> delete(DeleteUserProvidedServiceInstanceRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/retrieve_a_particular_user_provided_service_instance.html">Retrieve a Particular User Provided
+     * Service Instance</a> request
+     *
+     * @param request the Get User Provided Service Instance request
+     * @return the response from the Get User Provided Service Instance request
+     */
+    Mono<GetUserProvidedServiceInstanceResponse> get(GetUserProvidedServiceInstanceRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/list_all_user_provided_service_instances.html">List User Provided Service Instances</a>
      * request
      *
