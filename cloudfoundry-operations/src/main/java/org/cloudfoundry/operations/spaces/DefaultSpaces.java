@@ -20,15 +20,28 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.domains.DomainResource;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameResponse;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationResponse;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesResponse;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
+import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
 import org.cloudfoundry.client.v2.services.ServiceResource;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
+import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperByUsernameRequest;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperByUsernameResponse;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerByUsernameRequest;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerByUsernameResponse;
+import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse;
@@ -53,12 +66,14 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.ValidationUtils;
 import org.cloudfoundry.util.tuple.Function2;
+import org.cloudfoundry.util.tuple.Function3;
 import org.cloudfoundry.util.tuple.Function6;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
 import reactor.fn.Predicate;
 import reactor.fn.tuple.Tuple2;
+import reactor.fn.tuple.Tuple3;
 import reactor.fn.tuple.Tuple6;
 import reactor.rx.Stream;
 
@@ -72,9 +87,12 @@ public final class DefaultSpaces implements Spaces {
 
     private final Mono<String> organizationId;
 
-    public DefaultSpaces(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId) {
+    private final Mono<String> username;
+
+    public DefaultSpaces(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, Mono<String> username) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.organizationId = organizationId;
+        this.username = username;
     }
 
     @Override
@@ -97,6 +115,77 @@ public final class DefaultSpaces implements Spaces {
                 }
 
             })
+            .after();
+    }
+
+    @Override
+    public Mono<Void> create(CreateSpaceRequest request) {
+        return ValidationUtils.validate(request)
+            .then(new Function<CreateSpaceRequest, Mono<Tuple2<CreateSpaceRequest, String>>>() {
+
+                @Override
+                public Mono<Tuple2<CreateSpaceRequest, String>> apply(CreateSpaceRequest request) {
+                    return Mono
+                        .when(
+                            Mono.just(request),
+                            request.getOrganization() != null
+                                ? getOrganizationId(DefaultSpaces.this.cloudFoundryClient, request.getOrganization())
+                                : DefaultSpaces.this.organizationId
+                        );
+                }
+
+            })
+            .then(function(new Function2<CreateSpaceRequest, String, Mono<Tuple3<CreateSpaceRequest, String, Optional<String>>>>() {
+
+                @Override
+                public Mono<Tuple3<CreateSpaceRequest, String, Optional<String>>> apply(CreateSpaceRequest request, String organizationId) {
+                    return Mono
+                        .when(
+                            Mono.just(request),
+                            Mono.just(organizationId),
+                            getOptionalSpaceQuotaId(DefaultSpaces.this.cloudFoundryClient, organizationId, request.getSpaceQuota())
+                        );
+                }
+
+            }))
+            .then(function(new Function3<CreateSpaceRequest, String, Optional<String>, Mono<Tuple3<String, String, String>>>() {
+
+                @Override
+                public Mono<Tuple3<String, String, String>> apply(CreateSpaceRequest request, String organizationId, Optional<String> spaceQuotaId) {
+                    return Mono
+                        .when(
+                            Mono.just(organizationId),
+                            requestCreateSpace(DefaultSpaces.this.cloudFoundryClient, organizationId, request.getName(), spaceQuotaId.getOrNull())
+                                .map(ResourceUtils.extractId()),
+                            DefaultSpaces.this.username
+                        );
+                }
+
+            }))
+            .as(thenKeep((function(new Function3<String, String, String, Mono<AssociateOrganizationUserByUsernameResponse>>() {
+
+                @Override
+                public Mono<AssociateOrganizationUserByUsernameResponse> apply(String organizationId, String spaceId, String username) {
+                    return requestAssociateOrganizationUserByUsername(DefaultSpaces.this.cloudFoundryClient, organizationId, username);
+                }
+
+            }))))
+            .as(thenKeep((function(new Function3<String, String, String, Mono<AssociateSpaceManagerByUsernameResponse>>() {
+
+                @Override
+                public Mono<AssociateSpaceManagerByUsernameResponse> apply(String organizationId, String spaceId, String username) {
+                    return requestAssociateSpaceManagerByUsername(DefaultSpaces.this.cloudFoundryClient, spaceId, username);
+                }
+
+            }))))
+            .as(thenKeep((function(new Function3<String, String, String, Mono<AssociateSpaceDeveloperByUsernameResponse>>() {
+
+                @Override
+                public Mono<AssociateSpaceDeveloperByUsernameResponse> apply(String organizationId, String spaceId, String username) {
+                    return requestAssociateSpaceDeveloperByUsername(DefaultSpaces.this.cloudFoundryClient, spaceId, username);
+                }
+
+            }))))
             .after();
     }
 
@@ -321,6 +410,26 @@ public final class DefaultSpaces implements Spaces {
             .defaultIfEmpty(Optional.<SpaceQuota>empty());
     }
 
+    private static Mono<Optional<String>> getOptionalSpaceQuotaId(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceQuota) {
+        if (spaceQuota == null) {
+            return Mono.just(Optional.<String>empty());
+        }
+        return getSpaceQuota(cloudFoundryClient, organizationId, spaceQuota)
+            .map(ResourceUtils.extractId())
+            .map(OptionalUtils.<String>toOptional());
+    }
+
+    private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
+        return requestOrganizations(cloudFoundryClient, organization)
+            .single()
+            .otherwise(ExceptionUtils.<OrganizationResource>convert("Organization %s does not exist", organization));
+    }
+
+    private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
+        return getOrganization(cloudFoundryClient, organization)
+            .map(ResourceUtils.extractId());
+    }
+
     private static Mono<String> getOrganizationName(CloudFoundryClient cloudFoundryClient, SpaceResource resource) {
         return requestOrganization(cloudFoundryClient, ResourceUtils.getEntity(resource).getOrganizationId())
             .map(new Function<GetOrganizationResponse, String>() {
@@ -376,6 +485,45 @@ public final class DefaultSpaces implements Spaces {
             .toList();
     }
 
+    private static Mono<SpaceQuotaDefinitionResource> getSpaceQuota(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceQuota) {
+        return requestOrganizationSpaceQuotas(cloudFoundryClient, organizationId, spaceQuota)
+            .single()
+            .otherwise(ExceptionUtils.<SpaceQuotaDefinitionResource>convert("Space quota definition %s does not exist", spaceQuota));
+    }
+
+    private static Mono<AssociateOrganizationUserByUsernameResponse> requestAssociateOrganizationUserByUsername(CloudFoundryClient cloudFoundryClient, String organizationId, String username) {
+        return cloudFoundryClient.organizations()
+            .associateUserByUsername(AssociateOrganizationUserByUsernameRequest.builder()
+                .organizationId(organizationId)
+                .username(username)
+                .build());
+    }
+
+    private static Mono<AssociateSpaceDeveloperByUsernameResponse> requestAssociateSpaceDeveloperByUsername(CloudFoundryClient cloudFoundryClient, String spaceId, String username) {
+        return cloudFoundryClient.spaces()
+            .associateDeveloperByUsername(AssociateSpaceDeveloperByUsernameRequest.builder()
+                .spaceId(spaceId)
+                .username(username)
+                .build());
+    }
+
+    private static Mono<AssociateSpaceManagerByUsernameResponse> requestAssociateSpaceManagerByUsername(CloudFoundryClient cloudFoundryClient, String spaceId, String username) {
+        return cloudFoundryClient.spaces()
+            .associateManagerByUsername(AssociateSpaceManagerByUsernameRequest.builder()
+                .spaceId(spaceId)
+                .username(username)
+                .build());
+    }
+
+    private static Mono<CreateSpaceResponse> requestCreateSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String space, String spaceQuotaId) {
+        return cloudFoundryClient.spaces()
+            .create(org.cloudfoundry.client.v2.spaces.CreateSpaceRequest.builder()
+                .name(space)
+                .organizationId(organizationId)
+                .spaceQuotaDefinitionId(spaceQuotaId)
+                .build());
+    }
+
     private static Mono<DeleteSpaceResponse> requestDeleteSpace(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return cloudFoundryClient.spaces()
             .delete(org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest.builder()
@@ -391,6 +539,31 @@ public final class DefaultSpaces implements Spaces {
                 .build());
     }
 
+    private static Stream<SpaceQuotaDefinitionResource> requestOrganizationSpaceQuotas(final CloudFoundryClient cloudFoundryClient, final String organizationId, final String spaceQuota) {
+        return PaginationUtils
+            .requestResources(new Function<Integer, Mono<ListOrganizationSpaceQuotaDefinitionsResponse>>() {
+
+                @Override
+                public Mono<ListOrganizationSpaceQuotaDefinitionsResponse> apply(Integer page) {
+                    return cloudFoundryClient.organizations()
+                        .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                            .page(page)
+                            .organizationId(organizationId)
+                            .build()
+                        );
+                }
+
+            })
+            .filter(new Predicate<SpaceQuotaDefinitionResource>() {
+
+                @Override
+                public boolean test(SpaceQuotaDefinitionResource resource) {
+                    return ResourceUtils.getEntity(resource).getName().equals(spaceQuota);
+                }
+
+            });
+    }
+
     private static Stream<SpaceResource> requestOrganizationSpaces(final CloudFoundryClient cloudFoundryClient, final String organizationId, final String space) {
         return PaginationUtils
             .requestResources(new Function<Integer, Mono<ListOrganizationSpacesResponse>>() {
@@ -401,6 +574,22 @@ public final class DefaultSpaces implements Spaces {
                         .listSpaces(ListOrganizationSpacesRequest.builder()
                             .name(space)
                             .organizationId(organizationId)
+                            .page(page)
+                            .build());
+                }
+
+            });
+    }
+
+    private static Stream<OrganizationResource> requestOrganizations(final CloudFoundryClient cloudFoundryClient, final String organizationName) {
+        return PaginationUtils
+            .requestResources(new Function<Integer, Mono<ListOrganizationsResponse>>() {
+
+                @Override
+                public Mono<ListOrganizationsResponse> apply(Integer page) {
+                    return cloudFoundryClient.organizations()
+                        .list(ListOrganizationsRequest.builder()
+                            .name(organizationName)
                             .page(page)
                             .build());
                 }
@@ -520,6 +709,46 @@ public final class DefaultSpaces implements Spaces {
                 return enabled.equals(ResourceUtils.getEntity(resource).getAllowSsh());
             }
 
+        };
+    }
+
+    /**
+     * Produces a Mono transformer that preserves the type of the source {@code Mono<IN>}.
+     *
+     * <p> The Mono produced expects a single element from the source, passes this to the function (as in {@code .then}) and requests an element from the resulting {@code Mono<OUT>}. When successful,
+     * the result is discarded and input value is signalled. </p>
+     *
+     * <p> <b>Summary:</b> does a {@code .then} on the new Mono but keeps the input to pass on unchanged. </p>
+     *
+     * <p> <b>Usage:</b> Can be used inline thus: {@code .as(thenKeep(in -> funcOf(in)))} </p>
+     *
+     * @param thenFunction from source input element to some {@code Mono<OUT>}
+     * @param <IN>         the source element type
+     * @param <OUT>        the element type of the Mono produced by {@code thenFunction}
+     * @return a Mono transformer
+     */
+    private static <IN, OUT> Function<Mono<IN>, Mono<IN>> thenKeep(final Function<IN, Mono<OUT>> thenFunction) {
+        return new Function<Mono<IN>, Mono<IN>>() {
+
+            @Override
+            public Mono<IN> apply(Mono<IN> source) {
+                return source
+                    .then(new Function<IN, Mono<? extends IN>>() {
+
+                        @Override
+                        public Mono<? extends IN> apply(final IN in) {
+                            return thenFunction
+                                .apply(in)
+                                .map(new Function<OUT, IN>() {
+
+                                    @Override
+                                    public IN apply(OUT ignore) {
+                                        return in;
+                                    }
+                                });
+                        }
+                    });
+            }
         };
     }
 

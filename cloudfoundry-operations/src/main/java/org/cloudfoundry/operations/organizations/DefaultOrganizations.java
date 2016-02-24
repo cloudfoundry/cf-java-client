@@ -467,7 +467,6 @@ public final class DefaultOrganizations implements Organizations {
 
                 @Override
                 public Mono<ListOrganizationSpaceQuotaDefinitionsResponse> apply(Integer page) {
-
                     return cloudFoundryClient.organizations()
                         .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
                             .page(page)

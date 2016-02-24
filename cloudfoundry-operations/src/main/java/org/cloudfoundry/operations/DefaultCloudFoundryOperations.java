@@ -45,7 +45,7 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
     private final Organizations organizations;
 
     private final Routes routes;
-    
+
     private final Services services;
 
     private final SpaceQuotas spaceQuotas;
@@ -61,7 +61,7 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
         this.routes = new DefaultRoutes(cloudFoundryClient, organizationId, spaceId);
         this.services = new DefaultServices(cloudFoundryClient, spaceId);
         this.spaceQuotas = new DefaultSpaceQuotas(cloudFoundryClient, organizationId);
-        this.spaces = new DefaultSpaces(cloudFoundryClient, organizationId);
+        this.spaces = new DefaultSpaces(cloudFoundryClient, organizationId, username);
         this.stacks = new DefaultStacks(cloudFoundryClient);
     }
 

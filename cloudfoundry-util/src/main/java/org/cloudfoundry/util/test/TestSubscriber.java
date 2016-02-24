@@ -94,6 +94,23 @@ public final class TestSubscriber<T> implements Subscriber<T> {
         return this;
     }
 
+    public TestSubscriber<T> assertError(final Class<? extends Throwable> expected, final String message) {
+        this.errorExpectation = new Consumer<Throwable>() {
+
+            @Override
+            public void accept(Throwable actual) {
+                StringWriter writer = new StringWriter();
+                actual.printStackTrace(new PrintWriter(writer));
+
+                Assert.assertEquals(String.format("Unexpected error %s", writer.toString()), expected, actual.getClass());
+                Assert.assertEquals("Unexpected exception text", message, actual.getMessage());
+            }
+
+        };
+
+        return this;
+    }
+
     public TestSubscriber<T> assertThat(Consumer<T> expectation) {
         this.expectations.add(expectation);
         return this;
