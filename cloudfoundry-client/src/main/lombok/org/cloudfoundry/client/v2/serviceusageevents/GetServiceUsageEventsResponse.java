@@ -32,8 +32,8 @@ import org.cloudfoundry.client.v2.Resource;
 public class GetServiceUsageEventsResponse extends Resource<ServiceUsageEventsEntity> {
 
     @Builder
-    public GetServiceUsageEventsResponse(@JsonProperty("entity") ServiceUsageEventsEntity entity,
-                                         @JsonProperty("metadata") Metadata metadata) {
+    GetServiceUsageEventsResponse(@JsonProperty("entity") ServiceUsageEventsEntity entity,
+                                  @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 

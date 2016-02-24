@@ -36,7 +36,7 @@ public final class DeleteOrganizationRequest implements Validatable {
     private final String name;
 
     @Builder
-    public DeleteOrganizationRequest(String name) {
+    DeleteOrganizationRequest(String name) {
         this.name = name;
     }
 

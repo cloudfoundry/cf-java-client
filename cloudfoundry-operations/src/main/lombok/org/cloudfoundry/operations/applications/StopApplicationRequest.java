@@ -30,7 +30,7 @@ public final class StopApplicationRequest implements Validatable {
     private final String name;
 
     @Builder
-    public StopApplicationRequest(String name) {
+    StopApplicationRequest(String name) {
         this.name = name;
     }
 

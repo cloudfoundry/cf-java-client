@@ -36,7 +36,7 @@ public final class OrganizationInfoRequest implements Validatable {
     private final String name;
 
     @Builder
-    public OrganizationInfoRequest(String name) {
+    OrganizationInfoRequest(String name) {
         this.name = name;
     }
 

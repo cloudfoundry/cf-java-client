@@ -44,7 +44,7 @@ public final class CreateDomainRequest implements Validatable {
     private final String organization;
 
     @Builder
-    public CreateDomainRequest(String domain, String organization) {
+    CreateDomainRequest(String domain, String organization) {
         this.domain = domain;
         this.organization = organization;
     }

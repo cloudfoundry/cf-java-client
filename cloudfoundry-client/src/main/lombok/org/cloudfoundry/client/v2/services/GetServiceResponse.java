@@ -32,8 +32,9 @@ import org.cloudfoundry.client.v2.Resource;
 public final class GetServiceResponse extends Resource<ServiceEntity> {
 
     @Builder
-    public GetServiceResponse(@JsonProperty("entity") ServiceEntity entity,
-                              @JsonProperty("metadata") Metadata metadata) {
+    GetServiceResponse(@JsonProperty("entity") ServiceEntity entity,
+                       @JsonProperty("metadata") Metadata metadata) {
+
         super(entity, metadata);
     }
 

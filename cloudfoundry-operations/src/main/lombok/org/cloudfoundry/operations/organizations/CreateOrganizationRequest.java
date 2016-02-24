@@ -44,7 +44,7 @@ public final class CreateOrganizationRequest implements Validatable {
     private final String quotaDefinitionName;
 
     @Builder
-    public CreateOrganizationRequest(String organizationName, String quotaDefinitionName) {
+    CreateOrganizationRequest(String organizationName, String quotaDefinitionName) {
         this.organizationName = organizationName;
         this.quotaDefinitionName = quotaDefinitionName;
     }
