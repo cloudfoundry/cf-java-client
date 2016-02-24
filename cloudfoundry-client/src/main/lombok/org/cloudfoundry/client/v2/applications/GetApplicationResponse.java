@@ -21,7 +21,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.cloudfoundry.client.v2.Resource;
 
 /**
  * The response payload for the Get Application operation
@@ -29,7 +28,7 @@ import org.cloudfoundry.client.v2.Resource;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class GetApplicationResponse extends Resource<ApplicationEntity> {
+public final class GetApplicationResponse extends AbstractApplicationResource {
 
     @Builder
     GetApplicationResponse(@JsonProperty("entity") ApplicationEntity entity,

@@ -107,6 +107,15 @@ public interface Applications {
     Flux<LogMessage> logs(LogsRequest request);
 
     /**
+     * Push a specific application
+     *
+     * @param request the push application request
+     * @return a completion indicator
+     */
+    Mono<Void> push(PushApplicationRequest request);
+
+
+    /**
      * Rename a specific application
      *
      * @param request the rename application request

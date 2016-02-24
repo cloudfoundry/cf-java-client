@@ -27,8 +27,12 @@ import org.cloudfoundry.client.v2.applications.ApplicationInstancesResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.ApplicationStatisticsRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationStatisticsResponse;
+import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteRequest;
+import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteResponse;
 import org.cloudfoundry.client.v2.applications.CopyApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CopyApplicationResponse;
+import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
+import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.RestageApplicationResponse;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
@@ -36,16 +40,25 @@ import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
+import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
+import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
 import org.cloudfoundry.client.v2.events.EventEntity;
 import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
+import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
+import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.DeleteRouteResponse;
+import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v2.routes.Route;
+import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstance;
+import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
+import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.client.v2.spaces.GetSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
@@ -55,6 +68,8 @@ import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
+import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
+import org.cloudfoundry.client.v2.stacks.StackResource;
 import org.cloudfoundry.logging.LogMessage;
 import org.cloudfoundry.logging.LoggingClient;
 import org.cloudfoundry.logging.RecentLogsRequest;
@@ -74,6 +89,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple2;
 import reactor.core.tuple.Tuple4;
 
+import java.io.InputStream;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Date;
@@ -84,6 +100,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
+import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
 
@@ -101,10 +118,17 @@ public final class DefaultApplications implements Applications {
 
     private final Mono<String> spaceId;
 
+    private final RandomWords randomWords;
+
     public DefaultApplications(CloudFoundryClient cloudFoundryClient, Mono<LoggingClient> loggingClient, Mono<String> spaceId) {
+        this(cloudFoundryClient, loggingClient, spaceId, new WordListRandomWords());
+    }
+
+    public DefaultApplications(CloudFoundryClient cloudFoundryClient, Mono<LoggingClient> loggingClient, Mono<String> spaceId, RandomWords randomWords) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.loggingClient = loggingClient;
         this.spaceId = spaceId;
+        this.randomWords = randomWords;
     }
 
     @Override
@@ -218,6 +242,31 @@ public final class DefaultApplications implements Applications {
     }
 
     @Override
+    public Mono<Void> push(PushApplicationRequest request) {
+        return ValidationUtils
+            .validate(request)
+            .then(request1 -> Mono
+                .when(
+                    Mono.just(request1),
+                    DefaultApplications.this.spaceId,
+                    getOptionalStackId(this.cloudFoundryClient, request1.getStack())
+                ))
+            .then(function((request1, spaceId, stackId) -> Mono
+                .when(
+                    getApplicationId(this.cloudFoundryClient, request1, spaceId, stackId.orElse(null)),
+                    Mono.just(request1),
+                    Mono.just(spaceId)
+                )))
+            .as(thenKeep(function((applicationId, request1, spaceId) -> prepareDomainsAndRoutes(this.cloudFoundryClient, request1, applicationId, spaceId, this.randomWords))))
+            .map(function((applicationId, request1, spaceId) -> Tuple2.of(applicationId, request1)))
+            .as(thenKeep(function((applicationId, request1) -> uploadApplicationAndWait(this.cloudFoundryClient, applicationId, request1.getApplication()))))
+            .as(thenKeep(function((applicationId, request1) -> stopApplication(this.cloudFoundryClient, applicationId))))
+            .where(predicate((applicationId, request1) -> !Optional.ofNullable(request1.getNoStart()).orElse(false)))
+            .then(function((applicationId, request1) -> startApplicationAndWait(this.cloudFoundryClient, request1.getName(), applicationId)))
+            .after();
+    }
+
+    @Override
     public Mono<Void> rename(RenameApplicationRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
@@ -247,7 +296,7 @@ public final class DefaultApplications implements Applications {
             .when(ValidationUtils.validate(request), this.spaceId)
             .then(function((request1, spaceId) -> getApplication(this.cloudFoundryClient, request1.getName(), spaceId)
                 .and(Mono.just(request1.getName()))))
-            .then(function((resource, application) -> stopApplication(cloudFoundryClient, resource)
+            .then(function((resource, application) -> stopApplicationIfNotStopped(cloudFoundryClient, resource)
                 .then(resource1 -> startApplicationAndWait(this.cloudFoundryClient, application, ResourceUtils.getId(resource1)))))
             .after();
     }
@@ -401,6 +450,18 @@ public final class DefaultApplications implements Applications {
             .after();
     }
 
+    private static String deriveHostname(PushApplicationRequest request, RandomWords randomWords) {
+        if (Optional.ofNullable(request.getNoHostname()).orElse(false)) {
+            return null;
+        } else if (request.getHost() != null) {
+            return request.getHost();
+        } else if (Optional.ofNullable(request.getRandomRoute()).orElse(false)) {
+            return String.join("-", request.getName(), randomWords.getAdjective(), randomWords.getNoun());
+        } else {
+            return request.getName();
+        }
+    }
+
     private static String eventDescription(Map<String, Object> request, String... entryNames) {
         if (request == null) return "";
         boolean first = true;
@@ -430,6 +491,17 @@ public final class DefaultApplications implements Applications {
     private static Mono<String> getApplicationId(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         return getApplication(cloudFoundryClient, application, spaceId)
             .map(ResourceUtils::getId);
+    }
+
+    private static Mono<String> getApplicationId(CloudFoundryClient cloudFoundryClient, PushApplicationRequest request, String spaceId, String stackId) {
+        return requestApplications(cloudFoundryClient, request.getName(), spaceId)
+            .singleOrEmpty()
+            .map(ResourceUtils::getId)
+            .then(applicationId -> requestUpdateApplication(cloudFoundryClient, applicationId, request, stackId)
+                .map(response -> response.getMetadata().getId()))
+            .otherwiseIfEmpty(requestCreateApplication(cloudFoundryClient, request, spaceId, stackId)
+                .map(response -> response.getMetadata().getId())
+            );
     }
 
     private static Mono<String> getApplicationIdFromOrgSpace(CloudFoundryClient cloudFoundryClient, String application, String spaceId, String organization, String space) {
@@ -465,6 +537,19 @@ public final class DefaultApplications implements Applications {
         return Optional
             .ofNullable(response.getBuildpack())
             .orElse(response.getDetectedBuildpack());
+    }
+
+    private static Mono<String> getDomainId(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
+        if (domain == null) {
+            return getSharedDomainIds(cloudFoundryClient)
+                .switchIfEmpty(getPrivateDomainIds(cloudFoundryClient, organizationId))
+                .next()
+                .otherwiseIfEmpty(ExceptionUtils.illegalState("Domain not found"));
+        } else {
+            return getPrivateDomainId(cloudFoundryClient, domain, organizationId)
+                .otherwiseIfEmpty(getSharedDomainId(cloudFoundryClient, domain))
+                .otherwiseIfEmpty(ExceptionUtils.illegalState("Domain %s not found", domain));
+        }
     }
 
     private static Map<String, Object> getEnvironment(AbstractApplicationResource resource) {
@@ -516,6 +601,34 @@ public final class DefaultApplications implements Applications {
             .otherwise(ExceptionUtils.<SpaceResource>convert("Space %s not found", space));
     }
 
+    private static Mono<String> getPrivateDomainId(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
+        return requestPrivateDomain(cloudFoundryClient, domain, organizationId)
+            .map(ResourceUtils::getId)
+            .singleOrEmpty();
+    }
+
+    private static Flux<String> getPrivateDomainIds(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return requestPrivateDomains(cloudFoundryClient, organizationId)
+            .map(ResourceUtils::getId);
+    }
+
+    private static Mono<String> getPushRouteId(CloudFoundryClient cloudFoundryClient, String domainId, PushApplicationRequest request, String spaceId, RandomWords randomWords) {
+        String routePath = request.getRoutePath();
+        String host = deriveHostname(request, randomWords);
+
+        return getRouteId(cloudFoundryClient, domainId, host, routePath)
+            .otherwiseIfEmpty(requestCreateRoute(cloudFoundryClient, domainId, host, routePath, spaceId)
+                .map(ResourceUtils::getId));
+    }
+
+    private static Mono<String> getRouteId(CloudFoundryClient cloudFoundryClient, String domainId, String host, String routePath) {
+        return requestRoutes(cloudFoundryClient, domainId, host, routePath)
+            .filter(resource -> isIdentical(host, ResourceUtils.getEntity(resource).getHost()))
+            .filter(resource -> isIdentical(Optional.ofNullable(routePath).orElse(""), ResourceUtils.getEntity(resource).getPath()))
+            .singleOrEmpty()
+            .map(ResourceUtils::getId);
+    }
+
     private static Mono<List<Route>> getRoutes(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestApplicationSummary(cloudFoundryClient, applicationId)
             .map(SummaryApplicationResponse::getRoutes);
@@ -525,6 +638,17 @@ public final class DefaultApplications implements Applications {
         return getApplicationId(cloudFoundryClient, deleteApplicationRequest.getName(), spaceId)
             .then(applicationId -> getOptionalRoutes(cloudFoundryClient, deleteApplicationRequest.getDeleteRoutes(), applicationId)
                 .and(Mono.just(applicationId)));
+    }
+
+    private static Mono<String> getSharedDomainId(CloudFoundryClient cloudFoundryClient, String domain) {
+        return requestSharedDomain(cloudFoundryClient, domain)
+            .map(ResourceUtils::getId)
+            .singleOrEmpty();
+    }
+
+    private static Flux<String> getSharedDomainIds(CloudFoundryClient cloudFoundryClient) {
+        return requestSharedDomains(cloudFoundryClient)
+            .map(ResourceUtils::getId);
     }
 
     private static Mono<String> getSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
@@ -537,9 +661,23 @@ public final class DefaultApplications implements Applications {
             .map(response -> ResourceUtils.getEntity(response).getOrganizationId());
     }
 
+    private static Mono<Optional<String>> getOptionalStackId(CloudFoundryClient cloudFoundryClient, String stack) {
+        if (stack==null) {
+            return Mono.just(Optional.empty());
+        }
+        return requestStackId(cloudFoundryClient, stack)
+            .map(ResourceUtils::getId)
+            .map(Optional::of)
+            .otherwiseIfEmpty(ExceptionUtils.illegalState("Stack %s not found", stack));
+    }
+
     private static Mono<String> getStackName(CloudFoundryClient cloudFoundryClient, String stackId) {
         return requestStack(cloudFoundryClient, stackId)
             .map(getStackResponse -> getStackResponse.getEntity().getName());
+    }
+
+    private static boolean isIdentical(String s, String t) {
+        return s == null ? t == null : s.equals(t);
     }
 
     private static Predicate<String> isInstanceComplete() {
@@ -569,6 +707,18 @@ public final class DefaultApplications implements Applications {
 
     private static Predicate<String> isStagingComplete() {
         return state -> "STAGED".equals(state) || "FAILED".equals(state);
+    }
+
+    private static Mono<Void> prepareDomainsAndRoutes(CloudFoundryClient cloudFoundryClient, PushApplicationRequest request1, String applicationId, String spaceId, RandomWords randomWords) {
+        if (Optional.ofNullable(request1.getNoRoute()).orElse(false)) {
+            return Mono.empty();
+        }
+
+        return getSpaceOrganizationId(cloudFoundryClient, spaceId)
+            .then(organizationId -> getDomainId(cloudFoundryClient, request1.getDomain(), organizationId))
+            .then(domainId -> getPushRouteId(cloudFoundryClient, domainId, request1, spaceId, randomWords))
+            .then(routeId -> requestAssociateRoute(cloudFoundryClient, applicationId, routeId))
+            .after();
     }
 
     private static Map<String, Object> removeFromEnvironment(Map<String, Object> environment, String variableName) {
@@ -616,11 +766,46 @@ public final class DefaultApplications implements Applications {
             .map(OperationUtils.<ApplicationResource, AbstractApplicationResource>cast());
     }
 
+    private static Mono<AssociateApplicationRouteResponse> requestAssociateRoute(CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
+        return cloudFoundryClient.applicationsV2()
+            .associateRoute(AssociateApplicationRouteRequest.builder()
+                .applicationId(applicationId)
+                .routeId(routeId)
+                .build());
+    }
+
     private static Mono<CopyApplicationResponse> requestCopyBits(CloudFoundryClient cloudFoundryClient, String sourceApplicationId, String targetApplicationId) {
         return cloudFoundryClient.applicationsV2()
             .copy(CopyApplicationRequest.builder()
                 .applicationId(targetApplicationId)
                 .sourceApplicationId(sourceApplicationId)
+                .build());
+    }
+
+    private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, PushApplicationRequest request, String spaceId, String stackId) {
+        return cloudFoundryClient.applicationsV2()
+            .create(CreateApplicationRequest.builder()
+                .buildpack(request.getBuildpack())
+                .command(request.getCommand())
+                .diskQuota(request.getDiskQuota())
+                .dockerImage(request.getDockerImage())
+                .healthCheckTimeout(request.getTimeout())
+                .healthCheckType(request.getHealthCheckType())
+                .instances(request.getInstances())
+                .memory(request.getMemory())
+                .name(request.getName())
+                .spaceId(spaceId)
+                .stackId(stackId)
+                .build());
+    }
+
+    private static Mono<CreateRouteResponse> requestCreateRoute(CloudFoundryClient cloudFoundryClient, String domainId, String host, String routePath, String spaceId) {
+        return cloudFoundryClient.routes()
+            .create(org.cloudfoundry.client.v2.routes.CreateRouteRequest.builder()
+                .domainId(domainId)
+                .host(host)
+                .path(routePath)
+                .spaceId(spaceId)
                 .build());
     }
 
@@ -650,11 +835,12 @@ public final class DefaultApplications implements Applications {
                     .build()));
     }
 
-    private static Mono<GetApplicationResponse> requestGetApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
+    private static Mono<AbstractApplicationResource> requestGetApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return cloudFoundryClient.applicationsV2()
             .get(org.cloudfoundry.client.v2.applications.GetApplicationRequest.builder()
                 .applicationId(applicationId)
-                .build());
+                .build())
+            .map(OperationUtils.<GetApplicationResponse, AbstractApplicationResource>cast());
     }
 
     private static Publisher<LogMessage> requestLogsRecent(Mono<LoggingClient> loggingClient, String applicationId) {
@@ -692,11 +878,66 @@ public final class DefaultApplications implements Applications {
                     .build()));
     }
 
+    private static Flux<PrivateDomainResource> requestPrivateDomain(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.organizations()
+                .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
+                    .name(domain)
+                    .organizationId(organizationId)
+                    .page(page)
+                    .build()));
+    }
+
+    private static Flux<PrivateDomainResource> requestPrivateDomains(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.organizations()
+                .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
+                    .organizationId(organizationId)
+                    .page(page)
+                    .build()));
+    }
+
     private static Mono<RestageApplicationResponse> requestRestageApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return cloudFoundryClient.applicationsV2()
             .restage(org.cloudfoundry.client.v2.applications.RestageApplicationRequest.builder()
                 .applicationId(applicationId)
                 .build());
+    }
+
+    private static Flux<RouteResource> requestRoutes(CloudFoundryClient cloudFoundryClient, String domainId, String host, String routePath) {
+        ListRoutesRequest.ListRoutesRequestBuilder requestBuilder = ListRoutesRequest.builder()
+            .domainId(domainId);
+
+        if (host != null) {
+            requestBuilder.host(host);
+        }
+
+        if (routePath != null) {
+            requestBuilder.path(routePath);
+        }
+
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.routes()
+                .list(requestBuilder
+                    .page(page)
+                    .build()));
+    }
+
+    private static Flux<SharedDomainResource> requestSharedDomain(CloudFoundryClient cloudFoundryClient, String domain) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.sharedDomains()
+                .list(ListSharedDomainsRequest.builder()
+                    .name(domain)
+                    .page(page)
+                    .build()));
+    }
+
+    private static Flux<SharedDomainResource> requestSharedDomains(CloudFoundryClient cloudFoundryClient) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.sharedDomains()
+                .list(ListSharedDomainsRequest.builder()
+                    .page(page)
+                    .build()));
     }
 
     private static Mono<GetSpaceResponse> requestSpace(CloudFoundryClient cloudFoundryClient, String spaceId) {
@@ -720,11 +961,39 @@ public final class DefaultApplications implements Applications {
                 .build());
     }
 
+    private static Mono<StackResource> requestStackId(CloudFoundryClient cloudFoundryClient, String stack) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.stacks()
+                .list(ListStacksRequest.builder()
+                    .page(page)
+                    .name(stack)
+                    .build()))
+            .single()
+            .otherwise(ExceptionUtils.<StackResource>convert("Stack %s does not exist", stack));
+    }
+
     private static Mono<Void> requestTerminateApplicationInstance(CloudFoundryClient cloudFoundryClient, String applicationId, String instanceIndex) {
         return cloudFoundryClient.applicationsV2()
             .terminateInstance(TerminateApplicationInstanceRequest.builder()
                 .applicationId(applicationId)
                 .index(instanceIndex)
+                .build());
+    }
+
+    private static Mono<UpdateApplicationResponse> requestUpdateApplication(CloudFoundryClient cloudFoundryClient, String applicationId, PushApplicationRequest request, String stackId) {
+        return cloudFoundryClient.applicationsV2()
+            .update(UpdateApplicationRequest.builder()
+                .applicationId(applicationId)
+                .buildpack(request.getBuildpack())
+                .command(request.getCommand())
+                .diskQuota(request.getDiskQuota())
+                .dockerImage(request.getDockerImage())
+                .healthCheckTimeout(request.getTimeout())
+                .healthCheckType(request.getHealthCheckType())
+                .instances(request.getInstances())
+                .memory(request.getMemory())
+                .name(request.getName())
+                .stackId(stackId)
                 .build());
     }
 
@@ -773,6 +1042,15 @@ public final class DefaultApplications implements Applications {
             .map(OperationUtils.<UpdateApplicationResponse, AbstractApplicationResource>cast());
     }
 
+    private static Mono<UploadApplicationResponse> requestUploadApplication(CloudFoundryClient cloudFoundryClient, String applicationId, InputStream application) {
+        return cloudFoundryClient.applicationsV2()
+            .upload(UploadApplicationRequest.builder()
+                .applicationId(applicationId)
+                .async(true)
+                .application(application)
+                .build());
+    }
+
     private static Mono<String> restageApplication(CloudFoundryClient cloudFoundryClient, String application, String applicationId) {
         return requestRestageApplication(cloudFoundryClient, applicationId)
             .then(response -> waitForStaging(cloudFoundryClient, application, applicationId))
@@ -790,15 +1068,16 @@ public final class DefaultApplications implements Applications {
 
     private static Mono<String> startApplicationAndWait(CloudFoundryClient cloudFoundryClient, String application, String applicationId) {
         return requestUpdateApplicationState(cloudFoundryClient, applicationId, STARTED_STATE)
-            .then(resource -> waitForRunning(cloudFoundryClient, application, applicationId));
-    }
-
-    private static Mono<AbstractApplicationResource> stopApplication(CloudFoundryClient cloudFoundryClient, AbstractApplicationResource resource) {
-        return isNotIn(resource, STOPPED_STATE) ? stopApplication(cloudFoundryClient, ResourceUtils.getId(resource)) : Mono.just(resource);
+            .then(response -> waitForStaging(cloudFoundryClient, application, applicationId))
+            .then(state -> waitForRunning(cloudFoundryClient, application, applicationId));
     }
 
     private static Mono<AbstractApplicationResource> stopApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestUpdateApplicationState(cloudFoundryClient, applicationId, STOPPED_STATE);
+    }
+
+    private static Mono<AbstractApplicationResource> stopApplicationIfNotStopped(CloudFoundryClient cloudFoundryClient, AbstractApplicationResource resource) {
+        return isNotIn(resource, STOPPED_STATE) ? stopApplication(cloudFoundryClient, ResourceUtils.getId(resource)) : Mono.just(resource);
     }
 
     private static ApplicationDetail toApplicationDetail(ApplicationStatisticsResponse applicationStatisticsResponse, SummaryApplicationResponse summaryApplicationResponse,
@@ -913,6 +1192,13 @@ public final class DefaultApplications implements Applications {
             .map(DefaultApplications::toUrl)
             .toList()
             .get();
+    }
+
+    private static Mono<Void> uploadApplicationAndWait(CloudFoundryClient cloudFoundryClient, String applicationId, InputStream application) {
+        return requestUploadApplication(cloudFoundryClient, applicationId, application)
+            .map(ResourceUtils::getId)
+            .then(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
+
     }
 
     private static Mono<String> waitForRunning(CloudFoundryClient cloudFoundryClient, String application, String applicationId) {
