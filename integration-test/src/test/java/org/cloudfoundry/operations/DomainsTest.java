@@ -20,15 +20,22 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.operations.domains.CreateDomainRequest;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public final class DomainsTest extends AbstractIntegrationTest {
+
+    @Autowired
+    private CloudFoundryOperations cloudFoundryOperations;
+
+    @Autowired
+    private String organizationName;
 
     @Test
     public void create() {
         this.cloudFoundryOperations.domains()
             .create(CreateDomainRequest.builder()
                 .domain("test.domain")
-                .organization(organizationName)
+                .organization(this.organizationName)
                 .build())
             .subscribe(testSubscriber());
     }

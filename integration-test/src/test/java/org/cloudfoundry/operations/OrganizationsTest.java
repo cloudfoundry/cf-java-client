@@ -20,10 +20,18 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.operations.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.util.OperationUtils;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import reactor.core.publisher.Mono;
 import reactor.rx.Stream;
 
 
 public final class OrganizationsTest extends AbstractIntegrationTest {
+
+    @Autowired
+    private CloudFoundryOperations cloudFoundryOperations;
+
+    @Autowired
+    private Mono<String> organizationId;
 
     @Test
     public void create() {

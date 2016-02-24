@@ -18,15 +18,24 @@ package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import reactor.rx.Stream;
+
+import static org.junit.Assert.assertTrue;
 
 public final class SpacesTest extends AbstractIntegrationTest {
 
+    @Autowired
+    private CloudFoundryOperations cloudFoundryOperations;
+
     @Test
     public void list() {
-        this.cloudFoundryOperations.spaces()
-            .list()
-            .subscribe(testSubscriber()
-                .assertCount(1));
+        Stream
+            .from(this.cloudFoundryOperations.spaces()
+                .list())
+            .count()
+            .subscribe(this.<Long>testSubscriber()
+                .assertThat(count -> assertTrue(count > 1)));
     }
 
 }
