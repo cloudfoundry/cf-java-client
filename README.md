@@ -13,12 +13,22 @@ Most projects will need two dependencies; the Operations API and an implementati
     <dependency>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cloudfoundry-client-spring</artifactId>
-        <version>${cf-java-client.version}</version>
+        <version>2.0.0.BUILD-SNAPSHOT</version>
     </dependency>
     <dependency>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cloudfoundry-operations</artifactId>
-        <version>${cf-java-client.version}</version>
+        <version>2.0.0.BUILD-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+        <groupId>io.projectreactor</groupId>
+        <artifactId>reactor-core</artifactId>
+        <version>2.5.0.BUILD-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+        <groupId>io.projectreactor</groupId>
+        <artifactId>reactor-stream</artifactId>
+        <version>2.5.0.BUILD-SNAPSHOT</version>
     </dependency>
     ...
 </dependencies>
@@ -55,8 +65,10 @@ For Gradle, the dependencies would be defined like this:
 
 ```groovy
 dependencies {
-    compile "org.cloudfoundry:cloudfoundry-client-spring:$cfJavaClientVersion"
-    compile "org.cloudfoundry:cloudfoundry-operations:$cfJavaClientVersion"
+    compile "org.cloudfoundry:cloudfoundry-client-spring:2.0.0.BUILD-SNAPSHOT"
+    compile "org.cloudfoundry:cloudfoundry-operations:2.0.0.BUILD-SNAPSHOT"
+    compile "io.projectreactor:reactor-core:2.5.0.BUILD-SNAPSHOT"
+    compile "io.projectreactor:reactor-stream:2.5.0.BUILD-SNAPSHOT"
     ...
 }
 ```
@@ -139,15 +151,16 @@ Once you've got a reference to the `CloudFoundryOperations`, it's time to start 
 1. Prints the name of the each organization to `System.out`
 
 ```java
-Streams
-    .wrap(this.cloudFoundryOperations.organizations().list())
+Stream
+    .from(this.cloudFoundryOperations.organizations()
+        .list())
     .map(Organization::getName)
     .consume(System.out::println);
 ```
 
 To relate the example to the description above the following happens:
 
-1. `Streams.wrap(...)` – Wraps the Reactive Streams `Publisher` (an interoperability type) in the Reactor-native `Stream` type
+1. `Stream.from(...)` – Wraps the Reactive Streams `Publisher` (an interoperability type) in the Reactor-native `Stream` type
 1. `.map(...)` – Maps an input type to an output type.  This example uses a method a reference and the equivalent lambda would look like `organization -> organization.getName()`.
 1. `consume...` – The terminal operation that consumes each item in the stream.  Again, this example uses a method reference and the the equivalent lambda would look like `name -> System.out.println(name)`.
 
@@ -156,25 +169,22 @@ To relate the example to the description above the following happens:
 As mentioned earlier, the `cloudfoundry-operations` implementation builds upon the `cloudfoundry-client` API.  That implementation takes advantage of the same reactive style in the lower-level API.  The implementation of the `Organizations.list()` method (which was demonstrated above) looks like the following (roughly):
 
 ```java
-ListOrganizationsRequest request = ListOrganizationsRequest.builder()
-    .page(1)
-    .build();
-
-Streams
-    .wrap(cloudFoundryClient.organizations().list(request))
-    .flatMap(response -> Streams.from(response.getResources))
-    .map(resource -> {
-        return Organization.builder()
-            .id(resource.getMetadata().getId())
-            .name(resource.getEntity().getName())
-            .build();
-    });
+Stream
+    .from(cloudFoundryClient.organizations()
+        .list(ListOrganizationsRequest.builder()
+            .page(1)
+            .build()))
+    .flatMap(response -> Stream.from(response.getResources))
+    .map(resource -> Organization.builder()
+        .id(resource.getMetadata().getId())
+        .name(resource.getEntity().getName())
+        .build());
 ```
 
 The above example is more complicated:
 
-1.  `Streams.wrap(...)` – Wraps the Reactive Streams `Publisher` in the Reactor-native `Stream` type
-1.  `.flatMap(...)` – substitutes the original stream with a stream of the `Resource`s returned by the requested page
+1. `Stream.from(...)` – Wraps the Reactive Streams `Publisher` in the Reactor-native `Stream` type
+1. `.flatMap(...)` – substitutes the original stream with a stream of the `Resource`s returned by the requested page
 1. `.map(...)` – Maps the `Resource` to an `Organization` type
 
 ### Maven Plugin
@@ -205,11 +215,10 @@ The integration tests require a running instance of Cloud Foundry to test agains
 
 Name | Description
 ---- | -----------
+`TEST_DOMAIN` | The default domain of the Cloud Foundry instance.  Typically something like `local.micropcf.io`.
 `TEST_HOST` | The host of Cloud Foundry instance.  Typically something like `api.local.micropcf.io`.
-`TEST_ORGANIZATION` | The default organization to use for testing
 `TEST_PASSWORD` | The test user's password
 `TEST_SKIPSSLVALIDATION` | Whether to skip SSL validation when connecting to the Cloud Foundry instance.  Typically `true` when connecting to a MicroPCF instance.
-`TEST_SPACE` | The default space to use for testing
 `TEST_USERNAME` | The test user's username
 
 ## Contributing
