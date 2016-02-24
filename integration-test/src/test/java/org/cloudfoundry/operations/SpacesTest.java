@@ -35,7 +35,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .list())
             .count()
             .subscribe(this.<Long>testSubscriber()
-                .assertThat(count -> assertTrue(count > 1)));
+                .assertThat(count -> assertTrue(count > 0)));
     }
 
 }
