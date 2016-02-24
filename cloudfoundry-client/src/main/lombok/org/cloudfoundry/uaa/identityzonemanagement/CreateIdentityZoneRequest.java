@@ -16,15 +16,12 @@
 
 package org.cloudfoundry.uaa.identityzonemanagement;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
-
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 /**
  * The request payload for the create identity zone operation
@@ -47,7 +44,7 @@ public final class CreateIdentityZoneRequest implements Validatable {
      * @param identityZoneId the identity zone id
      * @return the identity zone id
      */
-    @Getter(onMethod = @__({@JsonProperty("id"), @JsonInclude(NON_NULL)}))
+    @Getter(onMethod = @__(@JsonProperty("id")))
     private final String identityZoneId;
 
     /**

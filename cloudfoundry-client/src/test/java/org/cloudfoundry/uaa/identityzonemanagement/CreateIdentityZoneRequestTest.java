@@ -47,7 +47,6 @@ public final class CreateIdentityZoneRequestTest {
         assertEquals("sub domain must be specified", result.getMessages().get(0));
     }
 
-
     @Test
     public void isValid() {
         ValidationResult result = CreateIdentityZoneRequest.builder()
