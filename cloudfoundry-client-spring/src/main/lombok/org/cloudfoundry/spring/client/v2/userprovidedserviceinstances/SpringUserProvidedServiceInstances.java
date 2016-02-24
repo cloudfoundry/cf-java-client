@@ -20,6 +20,8 @@ import lombok.ToString;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.GetUserProvidedServiceInstanceRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.GetUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceServiceBindingsRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceServiceBindingsResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
@@ -68,6 +70,18 @@ public final class SpringUserProvidedServiceInstances extends AbstractSpringOper
     @Override
     public Mono<Void> delete(final DeleteUserProvidedServiceInstanceRequest request) {
         return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId());
+            }
+
+        });
+    }
+
+    @Override
+    public Mono<GetUserProvidedServiceInstanceResponse> get(final GetUserProvidedServiceInstanceRequest request) {
+        return get(request, GetUserProvidedServiceInstanceResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
