@@ -31,7 +31,7 @@ public class IdentityZoneEntity {
      * @param createdAt the creation date
      * @return the creation date
      */
-    private final String createdAt;
+    private final Long createdAt;
 
     /**
      * The description of the identity zone.
@@ -71,7 +71,7 @@ public class IdentityZoneEntity {
      * @param updatedAt the last modification date
      * @return the last modification date
      */
-    private final String updatedAt;
+    private final Long updatedAt;
 
     /**
      * The version of the identity zone.
@@ -81,12 +81,12 @@ public class IdentityZoneEntity {
      */
     private final Integer version;
 
-    protected IdentityZoneEntity(@JsonProperty("created") String createdAt,
+    protected IdentityZoneEntity(@JsonProperty("created") Long createdAt,
                                  @JsonProperty("description") String description,
                                  @JsonProperty("id") String identityZoneId,
                                  @JsonProperty("name") String name,
                                  @JsonProperty("subdomain") String subDomain,
-                                 @JsonProperty("last_modified") String updatedAt,
+                                 @JsonProperty("last_modified") Long updatedAt,
                                  @JsonProperty("version") Integer version) {
         this.createdAt = createdAt;
         this.description = description;
