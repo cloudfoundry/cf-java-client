@@ -26,6 +26,8 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedS
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceServiceBindingsResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesResponse;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstances;
 import org.cloudfoundry.spring.client.v2.FilterBuilder;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
@@ -113,6 +115,18 @@ public final class SpringUserProvidedServiceInstances extends AbstractSpringOper
                 builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId(), "service_bindings");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
+
+    @Override
+    public Mono<UpdateUserProvidedServiceInstanceResponse> update(final UpdateUserProvidedServiceInstanceRequest request) {
+        return put(request, UpdateUserProvidedServiceInstanceResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId());
             }
 
         });

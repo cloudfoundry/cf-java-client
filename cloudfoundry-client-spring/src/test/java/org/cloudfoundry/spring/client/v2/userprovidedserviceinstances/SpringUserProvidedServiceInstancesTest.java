@@ -28,6 +28,8 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedS
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceServiceBindingsResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesResponse;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceEntity;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceResource;
 import org.cloudfoundry.spring.AbstractApiTest;
@@ -36,6 +38,8 @@ import reactor.core.publisher.Mono;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -286,6 +290,59 @@ public final class SpringUserProvidedServiceInstancesTest {
         @Override
         protected Mono<ListUserProvidedServiceInstanceServiceBindingsResponse> invoke(ListUserProvidedServiceInstanceServiceBindingsRequest request) {
             return this.userProvidedServiceInstances.listServiceBindings(request);
+        }
+    }
+
+    public static final class Update extends AbstractApiTest<UpdateUserProvidedServiceInstanceRequest, UpdateUserProvidedServiceInstanceResponse> {
+
+        private final SpringUserProvidedServiceInstances userProvidedServiceInstances = new SpringUserProvidedServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected UpdateUserProvidedServiceInstanceRequest getInvalidRequest() {
+            return UpdateUserProvidedServiceInstanceRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(PUT).path("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d")
+                .requestPayload("client/v2/user_provided_service_instances/PUT_{id}_request.json")
+                .status(ACCEPTED)
+                .responsePayload("client/v2/user_provided_service_instances/PUT_{id}_response.json");
+        }
+
+        @Override
+        protected UpdateUserProvidedServiceInstanceResponse getResponse() {
+            return UpdateUserProvidedServiceInstanceResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .createdAt("2016-02-19T02:04:06Z")
+                    .id("e2c198b1-fa15-414e-a9a4-31537996b39d")
+                    .updatedAt("2016-02-19T02:04:06Z")
+                    .url("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d")
+                    .build())
+                .entity(UserProvidedServiceInstanceEntity.builder()
+                    .name("name-2565")
+                    .credential("somekey", "somenewvalue")
+                    .spaceId("438b5923-fe7a-4459-bbcd-a7c27332bad3")
+                    .type("user_provided_service_instance")
+                    .syslogDrainUrl("https://foo.com/url-91")
+                    .spaceUrl("/v2/spaces/438b5923-fe7a-4459-bbcd-a7c27332bad3")
+                    .serviceBindingsUrl("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d/service_bindings")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected UpdateUserProvidedServiceInstanceRequest getValidRequest() throws Exception {
+            return UpdateUserProvidedServiceInstanceRequest.builder()
+                .credential("somekey", "somenewvalue")
+                .userProvidedServiceInstanceId("e2c198b1-fa15-414e-a9a4-31537996b39d")
+                .build();
+        }
+
+        @Override
+        protected Mono<UpdateUserProvidedServiceInstanceResponse> invoke(UpdateUserProvidedServiceInstanceRequest request) {
+            return this.userProvidedServiceInstances.update(request);
         }
     }
 
