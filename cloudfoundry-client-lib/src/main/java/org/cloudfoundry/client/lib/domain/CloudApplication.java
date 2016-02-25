@@ -16,16 +16,12 @@
 
 package org.cloudfoundry.client.lib.domain;
 
-import static org.cloudfoundry.client.lib.util.CloudUtil.parse;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
+
+import java.util.*;
+
+import static org.cloudfoundry.client.lib.util.CloudUtil.parse;
 
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, creatorVisibility = Visibility.NONE)
 public class CloudApplication extends CloudEntity {
@@ -35,6 +31,7 @@ public class CloudApplication extends CloudEntity {
 	private static final String DETECTED_BUILDPACK_KEY = "detected_buildpack";
 	private static final String MEMORY_KEY = "memory";
 	private static final String DISK_KEY = "disk_quota";
+	public static final String PACKAGE_STATE = "package_state";
 
 	private CloudSpace space;
 	private Staging staging;
@@ -44,6 +41,7 @@ public class CloudApplication extends CloudEntity {
 	private List<String> uris;
 	private List<String> services;
 	private AppState state;
+	private PackageState packageState;
 	private DebugMode debug;
 	private int runningInstances;
 	private List<String> env = new ArrayList<String>();
@@ -54,7 +52,7 @@ public class CloudApplication extends CloudEntity {
 
 	public CloudApplication(String name, String command, String buildpackUrl, int memory, int instances,
 						List<String> uris, List<String> serviceNames,
-						AppState state) {
+						AppState state, PackageState packageState) {
 		super(CloudEntity.Meta.defaultMeta(), name);
 		this.staging = new Staging(command, buildpackUrl);
 		this.memory = memory;
@@ -62,6 +60,7 @@ public class CloudApplication extends CloudEntity {
 		this.uris = uris;
 		this.services = serviceNames;
 		this.state = state;
+		this.packageState = packageState;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -75,6 +74,7 @@ public class CloudApplication extends CloudEntity {
 		uris = (List<String>)attributes.get("uris");
 		services = (List<String>)attributes.get("services");
 		state = AppState.valueOf((String) attributes.get("state"));
+		packageState = PackageState.valueOf((String) attributes.get(PACKAGE_STATE));
 		if (attributes.containsKey("memory")) {
 			memory = (Integer) attributes.get("memory");
 		}
@@ -121,6 +121,10 @@ public class CloudApplication extends CloudEntity {
 
 	public enum AppState {
 		UPDATING, STARTED, STOPPED
+	}
+
+	public enum PackageState {
+		PENDING, STAGED, FAILED
 	}
 
 	public enum DebugMode {
@@ -182,6 +186,14 @@ public class CloudApplication extends CloudEntity {
 
 	public void setState(AppState state) {
 		this.state = state;
+	}
+
+	public PackageState getPackageState() {
+		return packageState;
+	}
+
+	public void setPackageState(PackageState packageState) {
+		this.packageState = packageState;
 	}
 
 	public DebugMode getDebug() {
@@ -249,6 +261,7 @@ public class CloudApplication extends CloudEntity {
 				+ instances + ", name=" + getName() 
 				+ ", memory=" + memory + ", diskQuota=" + diskQuota
 				+ ", state=" + state + ", debug=" + debug + ", uris=" + uris + ", services=" + services
+				+ ", packageState=" + packageState
 				+ ", env=" + env + ", space=" + space.getName() + "]";
 	}
 }
