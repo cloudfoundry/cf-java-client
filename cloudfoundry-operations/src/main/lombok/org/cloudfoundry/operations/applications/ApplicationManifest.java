@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations.applications;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -25,6 +26,8 @@ import lombok.Singular;
 
 import java.util.List;
 import java.util.Map;
+
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 
 /**
  * An application manifest which captures some of the details of how an application is deployed.  See <a href="https://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html">the manifest
@@ -69,7 +72,7 @@ public final class ApplicationManifest {
      * @param domains the collection of domains bound to the application
      * @return the collection of domains bound to the application
      */
-    @Getter(onMethod = @__(@JsonProperty("domains")))
+    @Getter(onMethod = @__({@JsonProperty("domains"), @JsonInclude(NON_EMPTY)}))
     private final List<String> domains;
 
     /**
@@ -78,7 +81,7 @@ public final class ApplicationManifest {
      * @param environmentVariables the environment variables to set on the application
      * @return the environment variables to set on the application
      */
-    @Getter(onMethod = @__(@JsonProperty("env")))
+    @Getter(onMethod = @__({@JsonProperty("env"), @JsonInclude(NON_EMPTY)}))
     private final Map<String, Object> environmentVariables;
 
     /**
@@ -90,7 +93,7 @@ public final class ApplicationManifest {
      * @param hosts the collection of hosts bound to the application
      * @return the collection of hosts bound to the application
      */
-    @Getter(onMethod = @__(@JsonProperty("hosts")))
+    @Getter(onMethod = @__({@JsonProperty("hosts"), @JsonInclude(NON_EMPTY)}))
     private final List<String> hosts;
 
     /**
@@ -126,7 +129,7 @@ public final class ApplicationManifest {
      * @param services the collection of service names bound to the application
      * @return the collection of service names bound to the application
      */
-    @Getter(onMethod = @__(@JsonProperty("services")))
+    @Getter(onMethod = @__({@JsonProperty("services"), @JsonInclude(NON_EMPTY)}))
     private final List<String> services;
 
     /**
