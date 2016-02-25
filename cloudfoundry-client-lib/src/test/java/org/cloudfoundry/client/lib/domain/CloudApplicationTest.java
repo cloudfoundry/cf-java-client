@@ -1,14 +1,14 @@
 package org.cloudfoundry.client.lib.domain;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.nullValue;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.nullValue;
 
 public class CloudApplicationTest {
 	@Test
@@ -18,6 +18,7 @@ public class CloudApplicationTest {
 		attributes.put("instances", 1);
 		attributes.put("name", "Test1");
 		attributes.put("state", CloudApplication.AppState.STOPPED.name());
+		attributes.put("package_state", CloudApplication.PackageState.STAGED.name());
 
 		CloudApplication cloudApplication = new CloudApplication(attributes);
 
@@ -40,6 +41,7 @@ public class CloudApplicationTest {
 		attributes.put("instances", 1);
 		attributes.put("name", "Test1");
 		attributes.put("state", CloudApplication.AppState.STOPPED.name());
+		attributes.put("package_state", CloudApplication.PackageState.STAGED.name());
 
 		CloudApplication cloudApplication = new CloudApplication(attributes);
 
