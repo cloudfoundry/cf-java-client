@@ -76,7 +76,7 @@ public final class SpaceDetail {
      * @param securityGroups the security groups
      * @return the security groups
      */
-    private final List<String> securityGroups;
+    private final List<SecurityGroup> securityGroups;
 
     /**
      * The services
@@ -100,7 +100,7 @@ public final class SpaceDetail {
                 String id,
                 String name,
                 String organization,
-                @Singular List<String> securityGroups,
+                @Singular List<SecurityGroup> securityGroups,
                 @Singular List<String> services,
                 Optional<SpaceQuota> spaceQuota) {
 
@@ -114,4 +114,69 @@ public final class SpaceDetail {
         this.spaceQuota = spaceQuota;
     }
 
+    @Data
+    public static final class SecurityGroup {
+
+        /**
+         * The name
+         *
+         * @param name the name
+         * @return the name
+         */
+        private final String name;
+
+        /**
+         * The rules
+         *
+         * @param rules the rules
+         * @return the rules
+         */
+        private final List<Rule> rules;
+
+        @Builder
+        SecurityGroup(String name,
+                      @Singular List<Rule> rules) {
+
+            this.name = name;
+            this.rules = rules;
+        }
+
+        @Data
+        public static final class Rule {
+
+            /**
+             * The destination
+             *
+             * @param destination the destination
+             * @return the destination
+             */
+            private final String destination;
+
+            /**
+             * The ports
+             *
+             * @param ports the ports
+             * @return the ports
+             */
+            private final String ports;
+
+            /**
+             * The protocol
+             *
+             * @param protocol the protocol
+             * @return the protocol
+             */
+            private final String protocol;
+
+            @Builder
+            Rule(String destination,
+                 String ports,
+                 String protocol) {
+
+                this.destination = destination;
+                this.ports = ports;
+                this.protocol = protocol;
+            }
+        }
+    }
 }

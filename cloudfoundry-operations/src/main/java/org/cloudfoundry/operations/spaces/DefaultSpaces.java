@@ -31,6 +31,7 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
+import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
 import org.cloudfoundry.client.v2.services.ServiceResource;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionRequest;
@@ -59,7 +60,6 @@ import org.cloudfoundry.client.v2.spaces.UpdateSpaceResponse;
 import org.cloudfoundry.operations.spacequotas.SpaceQuota;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.JobUtils;
-import org.cloudfoundry.util.OperationUtils;
 import org.cloudfoundry.util.Optional;
 import org.cloudfoundry.util.OptionalUtils;
 import org.cloudfoundry.util.PaginationUtils;
@@ -74,9 +74,9 @@ import reactor.fn.Function;
 import reactor.fn.Predicate;
 import reactor.fn.tuple.Tuple2;
 import reactor.fn.tuple.Tuple3;
-import reactor.fn.tuple.Tuple6;
 import reactor.rx.Stream;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
@@ -233,30 +233,22 @@ public final class DefaultSpaces implements Spaces {
         return ValidationUtils
             .validate(request)
             .and(this.organizationId)
-            .then(function(new Function2<GetSpaceRequest, String, Mono<Tuple2<SpaceResource, GetSpaceRequest>>>() {
+            .then(function(new Function2<GetSpaceRequest, String, Mono<Tuple2<GetSpaceRequest, SpaceResource>>>() {
 
                 @Override
-                public Mono<Tuple2<SpaceResource, GetSpaceRequest>> apply(GetSpaceRequest request, String organizationId) {
-                    return getOrganizationSpace(DefaultSpaces.this.cloudFoundryClient, organizationId, request.getName())
-                        .and(Mono.just(request));
+                public Mono<Tuple2<GetSpaceRequest, SpaceResource>> apply(GetSpaceRequest request, String organizationId) {
+                    return Mono.just(request)
+                        .and(getOrganizationSpace(DefaultSpaces.this.cloudFoundryClient, organizationId, request.getName()));
                 }
 
             }))
-            .then(function(new Function2<SpaceResource, GetSpaceRequest, Mono<SpaceDetail>>() {
+            .then(function(new Function2<GetSpaceRequest, SpaceResource, Mono<SpaceDetail>>() {
 
                 @Override
-                public Mono<SpaceDetail> apply(final SpaceResource resource, GetSpaceRequest request) {
-                    return getAuxiliaryContent(DefaultSpaces.this.cloudFoundryClient, resource, request)
-                        .map(function(new Function6<List<String>, List<String>, String, List<String>, List<String>, Optional<SpaceQuota>, SpaceDetail>() {
-
-                            @Override
-                            public SpaceDetail apply(List<String> applications, List<String> domains, String organization, List<String> securityGroups, List<String> services, Optional<SpaceQuota>
-                                spaceQuota) {
-                                return toSpaceDetail(applications, domains, organization, resource, securityGroups, services, spaceQuota);
-                            }
-
-                        }));
+                public Mono<SpaceDetail> apply(GetSpaceRequest request, SpaceResource resource) {
+                    return getSpaceDetail(DefaultSpaces.this.cloudFoundryClient, resource, request);
                 }
+
             }));
     }
 
@@ -354,19 +346,6 @@ public final class DefaultSpaces implements Spaces {
             .toList();
     }
 
-    private static Mono<Tuple6<List<String>, List<String>, String, List<String>, List<String>, Optional<SpaceQuota>>> getAuxiliaryContent(CloudFoundryClient cloudFoundryClient,
-                                                                                                                                          SpaceResource resource, GetSpaceRequest request) {
-        return Mono
-            .when(
-                getApplicationNames(cloudFoundryClient, resource),
-                getDomainNames(cloudFoundryClient, resource),
-                getOrganizationName(cloudFoundryClient, resource),
-                getSecurityGroupNames(cloudFoundryClient, resource),
-                getServiceNames(cloudFoundryClient, resource),
-                getOptionalSpaceQuotaDefinition(cloudFoundryClient, request, resource)
-            );
-    }
-
     private static Mono<List<String>> getDomainNames(CloudFoundryClient cloudFoundryClient, SpaceResource resource) {
         return requestSpaceDomains(cloudFoundryClient, ResourceUtils.getId(resource))
             .map(new Function<DomainResource, String>() {
@@ -380,18 +359,14 @@ public final class DefaultSpaces implements Spaces {
             .toList();
     }
 
-    private static Mono<Optional<SpaceQuota>> getOptionalSpaceQuotaDefinition(final CloudFoundryClient cloudFoundryClient, GetSpaceRequest getSpaceRequest, final SpaceResource spaceResource) {
-        return Mono
-            .just(getSpaceRequest.getSecurityGroupRules())
-            .where(OperationUtils.identity())
-            .then(new Function<Boolean, Mono<GetSpaceQuotaDefinitionResponse>>() {
+    private static Mono<Optional<SpaceQuota>> getOptionalSpaceQuotaDefinition(final CloudFoundryClient cloudFoundryClient, final SpaceResource spaceResource) {
+        String spaceQuotaDefinitionId = ResourceUtils.getEntity(spaceResource).getSpaceQuotaDefinitionId();
 
-                @Override
-                public Mono<GetSpaceQuotaDefinitionResponse> apply(Boolean b) {
-                    return requestSpaceQuotaDefinition(cloudFoundryClient, ResourceUtils.getEntity(spaceResource).getSpaceQuotaDefinitionId());
-                }
+        if (spaceQuotaDefinitionId == null) {
+            return Mono.just(Optional.<SpaceQuota>empty());
+        }
 
-            })
+        return requestSpaceQuotaDefinition(cloudFoundryClient, spaceQuotaDefinitionId)
             .map(new Function<GetSpaceQuotaDefinitionResponse, SpaceQuota>() {
 
                 @Override
@@ -400,8 +375,7 @@ public final class DefaultSpaces implements Spaces {
                 }
 
             })
-            .map(OptionalUtils.<SpaceQuota>toOptional())
-            .defaultIfEmpty(Optional.<SpaceQuota>empty());
+            .map(OptionalUtils.<SpaceQuota>toOptional());
     }
 
     private static Mono<Optional<String>> getOptionalSpaceQuotaId(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceQuota) {
@@ -459,16 +433,26 @@ public final class DefaultSpaces implements Spaces {
             .map(ResourceUtils.extractId());
     }
 
-    private static Mono<List<String>> getSecurityGroupNames(final CloudFoundryClient cloudFoundryClient, final SpaceResource resource) {
+    private static Mono<List<SecurityGroupEntity>> getSecurityGroups(final CloudFoundryClient cloudFoundryClient, final SpaceResource resource, final boolean withRules) {
         return requestSpaceSecurityGroups(cloudFoundryClient, ResourceUtils.getId(resource))
-            .map(new Function<SecurityGroupResource, String>() {
+            .map(new Function<SecurityGroupResource, SecurityGroupEntity>() {
 
-                @Override
-                public String apply(SecurityGroupResource resource) {
-                    return ResourceUtils.getEntity(resource).getName();
-                }
+                     @Override
+                     public SecurityGroupEntity apply(SecurityGroupResource resource) {
+                         SecurityGroupEntity entity = ResourceUtils.getEntity(resource);
+                         if (!withRules) {
+                             entity = SecurityGroupEntity.builder()
+                                 .name(entity.getName())
+                                 .runningDefault(entity.getRunningDefault())
+                                 .spacesUrl(entity.getSpacesUrl())
+                                 .stagingDefault(entity.getStagingDefault())
+                                 .build();
+                         }
+                         return entity;
+                     }
+                 }
 
-            })
+            )
             .toList();
     }
 
@@ -483,6 +467,28 @@ public final class DefaultSpaces implements Spaces {
 
             })
             .toList();
+    }
+
+    private static Mono<SpaceDetail> getSpaceDetail(CloudFoundryClient cloudFoundryClient, final SpaceResource resource, GetSpaceRequest request) {
+        return Mono
+            .when(
+                getApplicationNames(cloudFoundryClient, resource),
+                getDomainNames(cloudFoundryClient, resource),
+                getOrganizationName(cloudFoundryClient, resource),
+                getSecurityGroups(cloudFoundryClient, resource, Optional.ofNullable(request.getSecurityGroupRules()).orElse(false)),
+                getServiceNames(cloudFoundryClient, resource),
+                getOptionalSpaceQuotaDefinition(cloudFoundryClient, resource)
+            )
+            .map(function(new Function6<List<String>, List<String>, String, List<SecurityGroupEntity>, List<String>, Optional<SpaceQuota>, SpaceDetail>() {
+
+                @Override
+                public SpaceDetail apply(List<String> applications, List<String> domains, String organization, List<SecurityGroupEntity> securityGroups, List<String> services,
+                                         Optional<SpaceQuota>
+                                             spaceQuota) {
+                    return toSpaceDetail(applications, domains, organization, resource, securityGroups, services, spaceQuota);
+                }
+
+            }));
     }
 
     private static Mono<SpaceQuotaDefinitionResource> getSpaceQuota(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceQuota) {
@@ -752,7 +758,12 @@ public final class DefaultSpaces implements Spaces {
         };
     }
 
-    private static SpaceDetail toSpaceDetail(List<String> applications, List<String> domains, String organization, SpaceResource resource, List<String> securityGroups, List<String> services,
+    private static SpaceDetail toSpaceDetail(List<String> applications,
+                                             List<String> domains,
+                                             String organization,
+                                             SpaceResource resource,
+                                             List<SecurityGroupEntity> securityGroups,
+                                             List<String> services,
                                              Optional<SpaceQuota> spaceQuota) {
         return SpaceDetail.builder()
             .applications(applications)
@@ -760,10 +771,33 @@ public final class DefaultSpaces implements Spaces {
             .id(ResourceUtils.getId(resource))
             .name(ResourceUtils.getEntity(resource).getName())
             .organization(organization)
-            .securityGroups(securityGroups)
+            .securityGroups(toSpaceDetailSecurityGroups(securityGroups))
             .services(services)
             .spaceQuota(spaceQuota)
             .build();
+    }
+
+    private static List<SpaceDetail.SecurityGroup.Rule> toSpaceDetailSecurityGroupRules(List<SecurityGroupEntity.RuleEntity> rules) {
+        List<SpaceDetail.SecurityGroup.Rule> result = new ArrayList<>();
+        for (SecurityGroupEntity.RuleEntity ruleEntity : rules) {
+            result.add(SpaceDetail.SecurityGroup.Rule.builder()
+                .destination(ruleEntity.getDestination())
+                .ports(ruleEntity.getPorts())
+                .protocol(ruleEntity.getProtocol())
+                .build());
+        }
+        return result;
+    }
+
+    private static List<SpaceDetail.SecurityGroup> toSpaceDetailSecurityGroups(List<SecurityGroupEntity> securityGroups) {
+        List<SpaceDetail.SecurityGroup> result = new ArrayList<>();
+        for (SecurityGroupEntity entity : securityGroups) {
+            result.add(SpaceDetail.SecurityGroup.builder()
+                .name(entity.getName())
+                .rules(toSpaceDetailSecurityGroupRules(entity.getRules()))
+                .build());
+        }
+        return result;
     }
 
     private static SpaceQuota toSpaceQuotaDefinition(Resource<SpaceQuotaDefinitionEntity> resource) {
