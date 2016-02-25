@@ -53,6 +53,15 @@ public final class CreateUserProvidedServiceInstanceRequest implements Validatab
     private final String name;
 
     /**
+     * URL to which requests for bound routes will be forwarded
+     *
+     * @param routeServiceUrl the route service url
+     * @return the route service url
+     */
+    @Getter(onMethod = @__(@JsonProperty("route_service_url")))
+    private final String routeServiceUrl;
+
+    /**
      * The space id
      *
      * @param spaceId the space id
@@ -73,10 +82,12 @@ public final class CreateUserProvidedServiceInstanceRequest implements Validatab
     @Builder
     CreateUserProvidedServiceInstanceRequest(@Singular Map<String, Object> credentials,
                                              String name,
+                                             String routeServiceUrl,
                                              String spaceId,
                                              String syslogDrainUrl) {
         this.credentials = credentials;
         this.name = name;
+        this.routeServiceUrl = routeServiceUrl;
         this.spaceId = spaceId;
         this.syslogDrainUrl = syslogDrainUrl;
     }

@@ -47,6 +47,22 @@ public final class UserProvidedServiceInstanceEntity {
     private final String name;
 
     /**
+     * URL to which requests for bound routes will be forwarded
+     *
+     * @param routeServiceUrl the route service url
+     * @return the route service url
+     */
+    private final String routeServiceUrl;
+
+    /**
+     * The routes url
+     *
+     * @param routesUrl the routes url
+     * @return the routes url
+     */
+    private final String routesUrl;
+
+    /**
      * The service bindings url
      *
      * @param serviceBindingsUrl the service bindings url
@@ -89,6 +105,8 @@ public final class UserProvidedServiceInstanceEntity {
     @Builder
     UserProvidedServiceInstanceEntity(@JsonProperty("credentials") @Singular Map<String, Object> credentials,
                                       @JsonProperty("name") String name,
+                                      @JsonProperty("route_service_url") String routeServiceUrl,
+                                      @JsonProperty("routes_url") String routesUrl,
                                       @JsonProperty("service_bindings_url") String serviceBindingsUrl,
                                       @JsonProperty("space_guid") String spaceId,
                                       @JsonProperty("space_url") String spaceUrl,
@@ -96,6 +114,8 @@ public final class UserProvidedServiceInstanceEntity {
                                       @JsonProperty("type") String type) {
         this.credentials = credentials;
         this.name = name;
+        this.routeServiceUrl = routeServiceUrl;
+        this.routesUrl = routesUrl;
         this.serviceBindingsUrl = serviceBindingsUrl;
         this.spaceId = spaceId;
         this.spaceUrl = spaceUrl;

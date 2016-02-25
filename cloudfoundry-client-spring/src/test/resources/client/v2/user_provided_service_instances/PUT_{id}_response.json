@@ -13,7 +13,9 @@
     "space_guid": "438b5923-fe7a-4459-bbcd-a7c27332bad3",
     "type": "user_provided_service_instance",
     "syslog_drain_url": "https://foo.com/url-91",
+    "route_service_url": null,
     "space_url": "/v2/spaces/438b5923-fe7a-4459-bbcd-a7c27332bad3",
-    "service_bindings_url": "/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d/service_bindings"
+    "service_bindings_url": "/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d/service_bindings",
+    "routes_url": "/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d/routes"
   }
 }
