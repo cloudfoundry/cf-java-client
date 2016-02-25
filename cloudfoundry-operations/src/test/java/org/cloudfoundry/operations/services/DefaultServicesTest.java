@@ -65,18 +65,7 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
-    private static void requestBindService(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId) {
-        when(cloudFoundryClient.serviceBindings()
-            .create(CreateServiceBindingRequest.builder()
-                .applicationId(applicationId)
-                .serviceInstanceId(serviceInstanceId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(CreateServiceBindingResponse.builder(), "service-binding-")
-                    .build()));
-    }
-
-    private static void requestBindServiceWithParameters(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId, Map<String, Object> parameters) {
+    private static void requestBindService(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId, Map<String, Object> parameters) {
         when(cloudFoundryClient.serviceBindings()
             .create(CreateServiceBindingRequest.builder()
                 .applicationId(applicationId)
@@ -120,7 +109,7 @@ public final class DefaultServicesTest {
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
             requestSpaceServiceInstances(this.cloudFoundryClient, "test-service-name", TEST_SPACE_ID);
-            requestBindService(this.cloudFoundryClient, "test-application-id", "test-service-instance-id");
+            requestBindService(this.cloudFoundryClient, "test-application-id", "test-service-instance-id", Collections.<String, Object>singletonMap("test-parameter-key", "test-parameter-value"));
         }
 
         @Override
@@ -134,8 +123,10 @@ public final class DefaultServicesTest {
                 .bind(BindServiceRequest.builder()
                     .applicationName("test-application-name")
                     .serviceName("test-service-name")
+                    .parameter("test-parameter-key", "test-parameter-value")
                     .build());
         }
+
     }
 
     public static final class BindServiceNoApplication extends AbstractOperationsApiTest<Void> {
@@ -145,6 +136,7 @@ public final class DefaultServicesTest {
         @Before
         public void setUp() throws Exception {
             requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestSpaceServiceInstances(this.cloudFoundryClient, "test-service-name", TEST_SPACE_ID);
         }
 
         @Override
@@ -162,6 +154,7 @@ public final class DefaultServicesTest {
                     .parameter("test-parameter-key", "test-parameter-value")
                     .build());
         }
+
     }
 
     public static final class BindServiceNoService extends AbstractOperationsApiTest<Void> {
@@ -189,63 +182,7 @@ public final class DefaultServicesTest {
                     .parameter("test-parameter-key", "test-parameter-value")
                     .build());
         }
-    }
 
-    public static final class BindServiceWithEmptyParameters extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
-            requestSpaceServiceInstances(this.cloudFoundryClient, "test-service-name", TEST_SPACE_ID);
-            requestBindService(this.cloudFoundryClient, "test-application-id", "test-service-instance-id");
-        }
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
-            // Expects onComplete() with no onNext()
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .bind(BindServiceRequest.builder()
-                    .applicationName("test-application-name")
-                    .serviceName("test-service-name")
-                    .parameters(Collections.<String, Object>emptyMap())
-                    .build());
-        }
-    }
-
-    public static final class BindServiceWithParameters extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
-            requestSpaceServiceInstances(this.cloudFoundryClient, "test-service-name", TEST_SPACE_ID);
-            requestBindServiceWithParameters(this.cloudFoundryClient,
-                "test-application-id",
-                "test-service-instance-id",
-                Collections.<String, Object>singletonMap("test-parameter-key", "test-parameter-value"));
-        }
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
-            // Expects onComplete() with no onNext()
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .bind(BindServiceRequest.builder()
-                    .applicationName("test-application-name")
-                    .serviceName("test-service-name")
-                    .parameter("test-parameter-key", "test-parameter-value")
-                    .build());
-        }
     }
 
 }
