@@ -35,15 +35,17 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void create() {
+        String organizationName = getOrganizationName();
+
         this.cloudFoundryOperations.organizations()
             .create(CreateOrganizationRequest.builder()
-                .organizationName("test-organization-name")
+                .organizationName(organizationName)
                 .build())
             .as(Stream::from)
             .as(OperationUtils.afterStreamComplete(() -> Stream
                 .from(this.cloudFoundryOperations.organizations()
                     .list())))
-            .filter(organizationSummary -> "test-organization-name".equals(organizationSummary.getName()))
+            .filter(organizationSummary -> organizationName.equals(organizationSummary.getName()))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }

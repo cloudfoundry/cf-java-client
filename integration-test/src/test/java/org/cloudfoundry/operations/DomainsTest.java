@@ -32,9 +32,11 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void create() {
+        String domainName = getDomainName();
+
         this.cloudFoundryOperations.domains()
             .create(CreateDomainRequest.builder()
-                .domain("test.domain")
+                .domain(domainName)
                 .organization(this.organizationName)
                 .build())
             .subscribe(testSubscriber());
