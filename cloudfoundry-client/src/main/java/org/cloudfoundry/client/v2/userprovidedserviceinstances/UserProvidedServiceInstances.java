@@ -68,4 +68,12 @@ public interface UserProvidedServiceInstances {
      */
     Mono<ListUserProvidedServiceInstanceServiceBindingsResponse> listServiceBindings(ListUserProvidedServiceInstanceServiceBindingsRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/updating_a_user_provided_service_instance.html">Update User Provided Service Instance</a> request
+     *
+     * @param request the Update User Provided Service Instance request
+     * @return the response from the Update User Provided Service Instance request
+     */
+    Mono<UpdateUserProvidedServiceInstanceResponse> update(UpdateUserProvidedServiceInstanceRequest request);
+
 }
