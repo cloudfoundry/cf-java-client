@@ -226,14 +226,6 @@ public final class DefaultApplicationsTest {
                     .build()));
     }
 
-    private static void requestApplicationStack(CloudFoundryClient cloudFoundryClient, String stackId) {
-        when(cloudFoundryClient.stacks()
-            .get(GetStackRequest.builder()
-                .stackId(stackId)
-                .build()))
-            .thenReturn(Mono.just(fill(GetStackResponse.builder(), "stack-").build()));
-    }
-
     private static void requestApplicationStats(CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient.applicationsV2()
             .statistics(ApplicationStatisticsRequest.builder()
@@ -1135,7 +1127,7 @@ public final class DefaultApplicationsTest {
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
             requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
-            requestApplicationStack(this.cloudFoundryClient, "test-application-summary-stackId");
+            requestStack(this.cloudFoundryClient, "test-application-summary-stackId");
         }
 
         @Override
@@ -1150,7 +1142,7 @@ public final class DefaultApplicationsTest {
                 .memory(1)
                 .name("test-application-summary-name")
                 .service("test-service-instance-name")
-                .stack("test-stack-name")
+                .stack("test-stack-entity-name")
                 .timeout(1)
                 .build());
         }
@@ -1192,7 +1184,7 @@ public final class DefaultApplicationsTest {
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
             requestApplicationSummaryNoRoutes(this.cloudFoundryClient, "test-application-id");
-            requestApplicationStack(this.cloudFoundryClient, "test-application-summary-stackId");
+            requestStack(this.cloudFoundryClient, "test-application-summary-stackId");
         }
 
         @Override
@@ -1204,7 +1196,7 @@ public final class DefaultApplicationsTest {
                 .instances(1)
                 .memory(1)
                 .name("test-application-summary-name")
-                .stack("test-stack-name")
+                .stack("test-stack-entity-name")
                 .timeout(1)
                 .build());
         }
