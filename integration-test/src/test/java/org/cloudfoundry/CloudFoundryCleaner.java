@@ -56,20 +56,20 @@ final class CloudFoundryCleaner {
 
     private final Predicate<DomainResource> domainPredicate;
 
-    private final Mono<Optional<String>> systemOrganizationId;
+    private final Mono<Optional<String>> protectedOrganizationId;
 
-    private final Mono<List<String>> systemSpaceIds;
+    private final Mono<List<String>> protectedSpaceIds;
 
-    CloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Predicate<DomainResource> domainPredicate, Mono<Optional<String>> systemOrganizationId, Mono<List<String>> systemSpaceIds) {
+    CloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Predicate<DomainResource> domainPredicate, Mono<Optional<String>> protectedOrganizationId, Mono<List<String>> protectedSpaceIds) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.domainPredicate = domainPredicate;
-        this.systemOrganizationId = systemOrganizationId;
-        this.systemSpaceIds = systemSpaceIds;
+        this.protectedOrganizationId = protectedOrganizationId;
+        this.protectedSpaceIds = protectedSpaceIds;
     }
 
     void clean() {
         Mono
-            .when(this.systemOrganizationId, this.systemSpaceIds)
+            .when(this.protectedOrganizationId, this.protectedSpaceIds)
             .flatMap(function((systemOrganizationId, systemSpaceIds) -> {
 
                 Predicate<ApplicationResource> applicationPredicate = systemOrganizationId

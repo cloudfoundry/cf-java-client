@@ -41,9 +41,11 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 import reactor.fn.Predicate;
 import reactor.rx.Promise;
+import reactor.rx.Stream;
 
 import java.security.SecureRandom;
 import java.util.Collections;
@@ -58,9 +60,9 @@ public class IntegrationTestConfiguration {
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.test");
 
     @Bean(initMethod = "clean", destroyMethod = "clean")
-    CloudFoundryCleaner cloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Predicate<DomainResource> domainPredicate, String organizationName, Mono<Optional<String>> systemOrganizationId,
-                                            Mono<List<String>> systemSpaceIds) {
-        return new CloudFoundryCleaner(cloudFoundryClient, domainPredicate, systemOrganizationId, systemSpaceIds);
+    CloudFoundryCleaner cloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Predicate<DomainResource> domainPredicate, String organizationName, Mono<Optional<String>> protectedOrganizationId,
+                                            Mono<List<String>> protectedSpaceIds) {
+        return new CloudFoundryCleaner(cloudFoundryClient, domainPredicate, protectedOrganizationId, protectedSpaceIds);
     }
 
     @Bean
@@ -132,6 +134,52 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
+    Mono<Optional<String>> protectedOrganizationId(CloudFoundryClient cloudFoundryClient, @Value("${test.protected.organization:}") String protectedOrganization) {
+        Mono<Optional<String>> systemOrganizationId = Mono
+            .just(protectedOrganization)
+            .where(StringUtils::hasText)
+            .flatMap(protectedOrganization2 -> PaginationUtils
+                .requestResources(page -> cloudFoundryClient.organizations()
+                    .list(ListOrganizationsRequest.builder()
+                        .name(protectedOrganization2)
+                        .page(page)
+                        .build())))
+            .as(Stream::from)
+            .singleOrEmpty()
+            .map(ResourceUtils::getId)
+            .map(Optional::of)
+            .otherwiseIfEmpty(Mono.just(Optional.empty()))
+            .doOnSubscribe(s -> this.logger.debug(">> PROTECTED ORGANIZATION <<"))
+            .doOnError(Throwable::printStackTrace)
+            .doOnSuccess(id -> this.logger.debug("<< PROTECTED ORGANIZATION >>"))
+            .as(Promise::from);
+
+        systemOrganizationId.get();
+        return systemOrganizationId;
+    }
+
+    @Bean
+    Mono<List<String>> protectedSpaceIds(CloudFoundryClient cloudFoundryClient, Mono<Optional<String>> protectedOrganizationId) {
+        Mono<List<String>> systemSpaceIds = protectedOrganizationId
+            .then(systemOrganizationId2 -> systemOrganizationId2
+                .map(id -> PaginationUtils
+                    .requestResources(page -> cloudFoundryClient.spaces()
+                        .list(ListSpacesRequest.builder()
+                            .organizationId(id)
+                            .build()))
+                    .map(ResourceUtils::getId)
+                    .toList())
+                .orElse(Mono.just(Collections.emptyList())))
+            .doOnSubscribe(s -> this.logger.debug(">> PROTECTED SPACES <<"))
+            .doOnError(Throwable::printStackTrace)
+            .doOnSuccess(id -> this.logger.debug("<< PROTECTED SPACES >>"))
+            .as(Promise::from);
+
+        systemSpaceIds.get();
+        return systemSpaceIds;
+    }
+
+    @Bean
     SecureRandom random() {
         return new SecureRandom();
     }
@@ -181,48 +229,6 @@ public class IntegrationTestConfiguration {
     @Bean
     String stackName() {
         return "cflinuxfs2";
-    }
-
-    @Bean
-    Mono<Optional<String>> systemOrganizationId(CloudFoundryClient cloudFoundryClient) {
-        Mono<Optional<String>> systemOrganizationId = PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizations()
-                .list(ListOrganizationsRequest.builder()
-                    .name("system")
-                    .page(page)
-                    .build()))
-            .singleOrEmpty()
-            .map(ResourceUtils::getId)
-            .map(Optional::of)
-            .otherwiseIfEmpty(Mono.just(Optional.empty()))
-            .doOnSubscribe(s -> this.logger.debug(">> SYSTEM ORGANIZATION <<"))
-            .doOnError(Throwable::printStackTrace)
-            .doOnSuccess(id -> this.logger.debug("<< SYSTEM ORGANIZATION >>"))
-            .as(Promise::from);
-
-        systemOrganizationId.get();
-        return systemOrganizationId;
-    }
-
-    @Bean
-    Mono<List<String>> systemSpaceIds(CloudFoundryClient cloudFoundryClient, Mono<Optional<String>> systemOrganizationId) {
-        Mono<List<String>> systemSpaceIds = systemOrganizationId
-            .then(systemOrganizationId2 -> systemOrganizationId2
-                .map(id -> PaginationUtils
-                    .requestResources(page -> cloudFoundryClient.spaces()
-                        .list(ListSpacesRequest.builder()
-                            .organizationId(id)
-                            .build()))
-                    .map(ResourceUtils::getId)
-                    .toList())
-                .orElse(Mono.just(Collections.emptyList())))
-            .doOnSubscribe(s -> this.logger.debug(">> SYSTEM SPACES <<"))
-            .doOnError(Throwable::printStackTrace)
-            .doOnSuccess(id -> this.logger.debug("<< SYSTEM SPACES >>"))
-            .as(Promise::from);
-
-        systemSpaceIds.get();
-        return systemSpaceIds;
     }
 
     @Bean
