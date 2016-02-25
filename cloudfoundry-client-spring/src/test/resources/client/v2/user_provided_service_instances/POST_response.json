@@ -13,7 +13,9 @@
     "space_guid": "0d45d43f-7d50-43c6-9981-b32ce8d5a373",
     "type": "user_provided_service_instance",
     "syslog_drain_url": "syslog://example.com",
+    "route_service_url": "https://logger.example.com",
     "space_url": "/v2/spaces/0d45d43f-7d50-43c6-9981-b32ce8d5a373",
-    "service_bindings_url": "/v2/user_provided_service_instances/34d5500e-712d-49ef-8bbe-c9ac349532da/service_bindings"
+    "service_bindings_url": "/v2/user_provided_service_instances/34d5500e-712d-49ef-8bbe-c9ac349532da/service_bindings",
+    "routes_url": "/v2/user_provided_service_instances/34d5500e-712d-49ef-8bbe-c9ac349532da/routes"
   }
 }

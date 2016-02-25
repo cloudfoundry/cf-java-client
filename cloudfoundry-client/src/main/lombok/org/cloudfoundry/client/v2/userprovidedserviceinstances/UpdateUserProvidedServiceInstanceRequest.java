@@ -53,6 +53,15 @@ public final class UpdateUserProvidedServiceInstanceRequest implements Validatab
     private final String name;
 
     /**
+     * URL to which requests for bound routes will be forwarded
+     *
+     * @param routeServiceUrl the route service url
+     * @return the route service url
+     */
+    @Getter(onMethod = @__(@JsonProperty("route_service_url")))
+    private final String routeServiceUrl;
+
+    /**
      * The url for the syslog_drain to direct to
      *
      * @param syslogDrainUrl the syslog drain url
@@ -73,10 +82,12 @@ public final class UpdateUserProvidedServiceInstanceRequest implements Validatab
     @Builder
     UpdateUserProvidedServiceInstanceRequest(@Singular Map<String, Object> credentials,
                                              String name,
+                                             String routeServiceUrl,
                                              String syslogDrainUrl,
                                              String userProvidedServiceInstanceId) {
         this.credentials = credentials;
         this.name = name;
+        this.routeServiceUrl = routeServiceUrl;
         this.syslogDrainUrl = syslogDrainUrl;
         this.userProvidedServiceInstanceId = userProvidedServiceInstanceId;
     }
