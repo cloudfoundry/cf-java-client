@@ -65,6 +65,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
+import reactor.fn.Function;
 import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
 
@@ -235,13 +236,15 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void create() {
+        String organizationName = getOrganizationName();
+
         this.cloudFoundryClient.organizations()
             .create(CreateOrganizationRequest.builder()
-                .name("test-organization")
+                .name(organizationName)
                 .build())
             .map(ResourceUtils::getEntity)
             .subscribe(this.<OrganizationEntity>testSubscriber()
-                .assertThat(entity -> assertEquals("test-organization", entity.getName())));
+                .assertThat(entity -> assertEquals(organizationName, entity.getName())));
     }
 
     @Test
@@ -451,12 +454,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String spaceName = getSpaceName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> this.cloudFoundryClient.spaces()
+            .as(thenKeep(organizationId -> this.cloudFoundryClient.spaces()
                 .create(CreateSpaceRequest.builder()
                     .name(spaceName)
                     .organizationId(organizationId)
-                    .build())
-                .map(r -> organizationId))
+                    .build())))
             .flatMap(organizationId -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.organizations()
                     .listSpaces(ListOrganizationSpacesRequest.builder()
@@ -717,6 +719,28 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .wildcard(false)
                 .build())
             .map(ResourceUtils::getId);
+    }
+
+    /**
+     * Produces a Mono transformer that preserves the type of the source {@code Mono<IN>}.
+     *
+     * <p> The Mono produced expects a single element from the source, passes this to the function (as in {@code .then}) and requests an element from the resulting {@code Mono<OUT>}. When successful,
+     * the result is discarded and input value is signalled. </p>
+     *
+     * <p> <b>Summary:</b> does a {@code .then} on the new Mono but keeps the input to pass on unchanged. </p>
+     *
+     * <p> <b>Usage:</b> Can be used inline thus: {@code .as(thenKeep(in -> funcOf(in)))} </p>
+     *
+     * @param thenFunction from source input element to some {@code Mono<OUT>}
+     * @param <IN>         the source element type
+     * @param <OUT>        the element type of the Mono produced by {@code thenFunction}
+     * @return a Mono transformer
+     */
+    private static <IN, OUT> Function<Mono<IN>, Mono<IN>> thenKeep(Function<IN, Mono<OUT>> thenFunction) {
+        return source -> source
+            .then(in -> thenFunction
+                .apply(in)
+                .map(ignore -> in));
     }
 
 }

@@ -18,11 +18,12 @@ package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.operations.organizations.CreateOrganizationRequest;
-import org.cloudfoundry.util.OperationUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.rx.Stream;
+
+import static org.cloudfoundry.util.OperationUtils.afterStreamComplete;
 
 
 public final class OrganizationsTest extends AbstractIntegrationTest {
@@ -42,7 +43,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .organizationName(organizationName)
                 .build())
             .as(Stream::from)
-            .as(OperationUtils.afterStreamComplete(() -> Stream
+            .as(afterStreamComplete(() -> Stream
                 .from(this.cloudFoundryOperations.organizations()
                     .list())))
             .filter(organizationSummary -> organizationName.equals(organizationSummary.getName()))
