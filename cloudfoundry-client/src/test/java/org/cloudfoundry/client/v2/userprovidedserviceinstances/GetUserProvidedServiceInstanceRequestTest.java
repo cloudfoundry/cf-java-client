@@ -26,6 +26,16 @@ import static org.junit.Assert.assertEquals;
 public final class GetUserProvidedServiceInstanceRequestTest {
 
     @Test
+    public void isNotValidNoId() {
+        ValidationResult result = GetUserProvidedServiceInstanceRequest.builder()
+            .build()
+            .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("user provided service instance id must be specified", result.getMessages().get(0));
+    }
+
+    @Test
     public void isValid() {
         ValidationResult result = GetUserProvidedServiceInstanceRequest.builder()
             .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
@@ -33,16 +43,6 @@ public final class GetUserProvidedServiceInstanceRequestTest {
             .isValid();
 
         assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidNoId() {
-        ValidationResult result = GetUserProvidedServiceInstanceRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("user provided service instance id must be specified", result.getMessages().get(0));
     }
 
 }

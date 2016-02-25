@@ -78,8 +78,10 @@ public final class SpringUserProvidedServiceInstancesTest {
                     .spaceId("0d45d43f-7d50-43c6-9981-b32ce8d5a373")
                     .type("user_provided_service_instance")
                     .syslogDrainUrl("syslog://example.com")
+                    .routeServiceUrl("https://logger.example.com")
                     .spaceUrl("/v2/spaces/0d45d43f-7d50-43c6-9981-b32ce8d5a373")
                     .serviceBindingsUrl("/v2/user_provided_service_instances/34d5500e-712d-49ef-8bbe-c9ac349532da/service_bindings")
+                    .routesUrl("/v2/user_provided_service_instances/34d5500e-712d-49ef-8bbe-c9ac349532da/routes")
                     .build())
                 .build();
         }
@@ -90,6 +92,7 @@ public final class SpringUserProvidedServiceInstancesTest {
                 .spaceId("0d45d43f-7d50-43c6-9981-b32ce8d5a373")
                 .name("my-user-provided-instance")
                 .credential("somekey", "somevalue")
+                .routeServiceUrl("https://logger.example.com")
                 .syslogDrainUrl("syslog://example.com")
                 .build();
         }
@@ -167,6 +170,7 @@ public final class SpringUserProvidedServiceInstancesTest {
                     .syslogDrainUrl("https://foo.com/url-89")
                     .spaceUrl("/v2/spaces/cebb3962-4e5b-4204-b117-3140ec4a62d9")
                     .serviceBindingsUrl("/v2/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc/service_bindings")
+                    .routesUrl("/v2/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc/routes")
                     .build())
                 .build();
         }
@@ -220,6 +224,7 @@ public final class SpringUserProvidedServiceInstancesTest {
                         .syslogDrainUrl("https://foo.com/url-90")
                         .spaceUrl("/v2/spaces/2fff6e71-d329-4991-9c89-7fa8abca70df")
                         .serviceBindingsUrl("/v2/user_provided_service_instances/8db6d37b-1ca8-4d0a-b1d3-2a6aaceae866/service_bindings")
+                        .routesUrl("/v2/user_provided_service_instances/8db6d37b-1ca8-4d0a-b1d3-2a6aaceae866/routes")
                         .build())
                     .build())
                 .build();
@@ -328,6 +333,7 @@ public final class SpringUserProvidedServiceInstancesTest {
                     .syslogDrainUrl("https://foo.com/url-91")
                     .spaceUrl("/v2/spaces/438b5923-fe7a-4459-bbcd-a7c27332bad3")
                     .serviceBindingsUrl("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d/service_bindings")
+                    .routesUrl("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d/routes")
                     .build())
                 .build();
         }
