@@ -1,0 +1,9 @@
+{
+  "id": "identity-zone-id",
+  "subdomain": "test",
+  "name": "test",
+  "version": 0,
+  "description": "The test zone",
+  "created": 946710000000,
+  "last_modified": 946710000000
+}
