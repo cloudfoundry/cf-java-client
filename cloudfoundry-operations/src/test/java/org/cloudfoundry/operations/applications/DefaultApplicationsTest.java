@@ -92,35 +92,6 @@ import static org.mockito.Mockito.when;
 
 public final class DefaultApplicationsTest {
 
-    private static void requestApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        when(cloudFoundryClient.applicationsV2()
-            .get(org.cloudfoundry.client.v2.applications.GetApplicationRequest.builder()
-                .applicationId(applicationId)
-                .build()))
-            .thenReturn(Mono
-                .defer(new Supplier<Mono<GetApplicationResponse>>() {
-
-                    private final Queue<GetApplicationResponse> responses = new LinkedList<>(Arrays.asList(
-                        fill(GetApplicationResponse.builder(), "job-")
-                            .entity(fill(ApplicationEntity.builder())
-                                .packageState("STAGING")
-                                .build())
-                            .build(),
-                        fill(GetApplicationResponse.builder(), "job-")
-                            .entity(fill(ApplicationEntity.builder())
-                                .packageState("STAGED")
-                                .build())
-                            .build()
-                    ));
-
-                    @Override
-                    public Mono<GetApplicationResponse> get() {
-                        return Mono.just(responses.poll());
-                    }
-
-                }));
-    }
-
     private static void requestApplicationEnvironment(CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient.applicationsV2()
             .environment(ApplicationEnvironmentRequest.builder()
@@ -133,42 +104,6 @@ public final class DefaultApplicationsTest {
                     .stagingEnvironmentJson("staging-env-name", "staging-env-value")
                     .environmentJson("env-name", "env-value")
                     .systemEnvironmentJson("system-env-name", "system-env-value")
-                    .build()));
-    }
-
-    private static void requestApplicationEvents(CloudFoundryClient cloudFoundryClient, String applicationId, EventEntity... entities) {
-        final ListEventsResponse.ListEventsResponseBuilder responseBuilder = fillPage(ListEventsResponse.builder());
-
-        for (EventEntity entity : entities) {
-            responseBuilder.resource(EventResource.builder()
-                .metadata(Resource.Metadata.builder().id("test-event-id").build())
-                .entity(entity)
-                .build());
-        }
-
-        when(cloudFoundryClient.events()
-            .list(ListEventsRequest.builder()
-                .actee(applicationId)
-                .orderDirection(PaginatedRequest.OrderDirection.DESC)
-                .resultsPerPage(50)
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(responseBuilder
-                    .totalPages(1)
-                    .build()));
-    }
-
-    private static void requestApplicationFailing(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        when(cloudFoundryClient.applicationsV2()
-            .get(org.cloudfoundry.client.v2.applications.GetApplicationRequest.builder()
-                .applicationId(applicationId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(GetApplicationResponse.builder())
-                    .entity(fill(ApplicationEntity.builder())
-                        .packageState("FAILED")
-                        .build())
                     .build()));
     }
 
@@ -301,7 +236,7 @@ public final class DefaultApplicationsTest {
                     .build()));
     }
 
-    private static void requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId, String applicationId) {
+    private static void requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         when(cloudFoundryClient.spaces()
             .listApplications(ListSpaceApplicationsRequest.builder()
                 .name(application)
@@ -311,8 +246,7 @@ public final class DefaultApplicationsTest {
             .thenReturn(Mono
                 .just(fillPage(ListSpaceApplicationsResponse.builder())
                     .resource(ApplicationResource.builder()
-                        .metadata(Resource.Metadata.builder()
-                            .id(applicationId)
+                        .metadata(fill(Resource.Metadata.builder(), "metadata-")
                             .build())
                         .entity(fill(ApplicationEntity.builder(), "application-")
                             .environmentJson("test-var", "test-value")
@@ -406,6 +340,71 @@ public final class DefaultApplicationsTest {
                     .build()));
     }
 
+    private static void requestEvents(CloudFoundryClient cloudFoundryClient, String applicationId, EventEntity... entities) {
+        final ListEventsResponse.ListEventsResponseBuilder responseBuilder = fillPage(ListEventsResponse.builder());
+
+        for (EventEntity entity : entities) {
+            responseBuilder.resource(EventResource.builder()
+                .metadata(Resource.Metadata.builder().id("test-event-id").build())
+                .entity(entity)
+                .build());
+        }
+
+        when(cloudFoundryClient.events()
+            .list(ListEventsRequest.builder()
+                .actee(applicationId)
+                .orderDirection(PaginatedRequest.OrderDirection.DESC)
+                .resultsPerPage(50)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(responseBuilder
+                    .totalPages(1)
+                    .build()));
+    }
+
+    private static void requestGetApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .get(org.cloudfoundry.client.v2.applications.GetApplicationRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .defer(new Supplier<Mono<GetApplicationResponse>>() {
+
+                    private final Queue<GetApplicationResponse> responses = new LinkedList<>(Arrays.asList(
+                        fill(GetApplicationResponse.builder(), "job-")
+                            .entity(fill(ApplicationEntity.builder())
+                                .packageState("STAGING")
+                                .build())
+                            .build(),
+                        fill(GetApplicationResponse.builder(), "job-")
+                            .entity(fill(ApplicationEntity.builder())
+                                .packageState("STAGED")
+                                .build())
+                            .build()
+                    ));
+
+                    @Override
+                    public Mono<GetApplicationResponse> get() {
+                        return Mono.just(responses.poll());
+                    }
+
+                }));
+    }
+
+    private static void requestGetApplicationFailing(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .get(org.cloudfoundry.client.v2.applications.GetApplicationRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(GetApplicationResponse.builder())
+                    .entity(fill(ApplicationEntity.builder())
+                        .packageState("FAILED")
+                        .build())
+                    .build()));
+    }
+
     private static void requestJobFailure(CloudFoundryClient cloudFoundryClient, String jobId) {
         when(cloudFoundryClient.jobs()
             .get(GetJobRequest.builder()
@@ -466,16 +465,6 @@ public final class DefaultApplicationsTest {
                 }));
     }
 
-    private static void requestLogs(LoggingClient loggingClient, String applicationId) {
-        when(loggingClient
-            .stream(StreamLogsRequest.builder()
-                .applicationId(applicationId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(LogMessage.builder(), "log-message-")
-                    .build()));
-    }
-
     private static void requestLogsRecent(LoggingClient loggingClient, String applicationId) {
         when(loggingClient
             .recent(RecentLogsRequest.builder()
@@ -486,38 +475,17 @@ public final class DefaultApplicationsTest {
                     .build()));
     }
 
-    private static void requestOrganizationByName(CloudFoundryClient cloudFoundryClient, String organization, String organizationId) {
-        when(cloudFoundryClient.organizations()
-            .list(ListOrganizationsRequest.builder()
-                .name(organization)
-                .page(1)
+    private static void requestLogsStream(LoggingClient loggingClient, String applicationId) {
+        when(loggingClient
+            .stream(StreamLogsRequest.builder()
+                .applicationId(applicationId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationsResponse.builder())
-                    .resource(OrganizationResource.builder()
-                        .metadata(Resource.Metadata.builder()
-                            .id(organizationId)
-                            .build())
-                        .entity(fill(OrganizationEntity.builder())
-                            .build())
-                        .build())
-                    .totalPages(1)
+                .just(fill(LogMessage.builder(), "log-message-")
                     .build()));
     }
 
-    private static void requestOrganizationNotFound(CloudFoundryClient cloudFoundryClient, String organization) {
-        when(cloudFoundryClient.organizations()
-            .list(ListOrganizationsRequest.builder()
-                .name(organization)
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fillPage(ListOrganizationsResponse.builder())
-                    .totalPages(1)
-                    .build()));
-    }
-
-    private static void requestOrganizationSpaceByName(CloudFoundryClient cloudFoundryClient, String organizationId, String space, String spaceId) {
+    private static void requestOrganizationSpacesByName(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         when(cloudFoundryClient.organizations()
             .listSpaces(ListOrganizationSpacesRequest.builder()
                 .organizationId(organizationId)
@@ -527,8 +495,7 @@ public final class DefaultApplicationsTest {
             .thenReturn(Mono
                 .just(fillPage(ListOrganizationSpacesResponse.builder())
                     .resource(SpaceResource.builder()
-                        .metadata(Resource.Metadata.builder()
-                            .id(spaceId)
+                        .metadata(fill(Resource.Metadata.builder(), "space-resource-metadata-")
                             .build())
                         .entity(fill(SpaceEntity.builder())
                             .build())
@@ -537,7 +504,7 @@ public final class DefaultApplicationsTest {
                     .build()));
     }
 
-    private static void requestOrganizationSpaceNotFound(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
+    private static void requestOrganizationSpacesByNameNotFound(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         when(cloudFoundryClient.organizations()
             .listSpaces(ListOrganizationSpacesRequest.builder()
                 .organizationId(organizationId)
@@ -550,7 +517,37 @@ public final class DefaultApplicationsTest {
                     .build()));
     }
 
-    private static void requestRestage(CloudFoundryClient cloudFoundryClient, String applicationId) {
+    private static void requestOrganizations(CloudFoundryClient cloudFoundryClient, String organization) {
+        when(cloudFoundryClient.organizations()
+            .list(ListOrganizationsRequest.builder()
+                .name(organization)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListOrganizationsResponse.builder())
+                    .resource(OrganizationResource.builder()
+                        .metadata(fill(Resource.Metadata.builder(), "organization-resource-metadata-")
+                            .build())
+                        .entity(fill(OrganizationEntity.builder())
+                            .build())
+                        .build())
+                    .totalPages(1)
+                    .build()));
+    }
+
+    private static void requestOrganizationsNotFound(CloudFoundryClient cloudFoundryClient, String organization) {
+        when(cloudFoundryClient.organizations()
+            .list(ListOrganizationsRequest.builder()
+                .name(organization)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListOrganizationsResponse.builder())
+                    .totalPages(1)
+                    .build()));
+    }
+
+    private static void requestRestageApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient.applicationsV2()
             .restage(org.cloudfoundry.client.v2.applications.RestageApplicationRequest.builder()
                 .applicationId(applicationId)
@@ -606,19 +603,6 @@ public final class DefaultApplicationsTest {
             thenReturn(Mono.<Void>empty());
     }
 
-    private static void requestUpdateApplicationEnableSsh(CloudFoundryClient cloudFoundryClient, String applicationId, Boolean enabled) {
-        when(cloudFoundryClient.applicationsV2()
-            .update(UpdateApplicationRequest.builder()
-                .applicationId(applicationId)
-                .enableSsh(enabled)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(UpdateApplicationResponse.builder())
-                    .entity(fill(ApplicationEntity.builder(), "application-entity-")
-                        .build())
-                    .build()));
-    }
-
     private static void requestUpdateApplicationEnvironment(CloudFoundryClient cloudFoundryClient, String applicationId, Map<String, Object> environment) {
         when(cloudFoundryClient.applicationsV2()
             .update(UpdateApplicationRequest.builder()
@@ -652,6 +636,19 @@ public final class DefaultApplicationsTest {
             .thenReturn(Mono
                 .just(fill(UpdateApplicationResponse.builder())
                     .entity(fill(ApplicationEntity.builder())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestUpdateApplicationSsh(CloudFoundryClient cloudFoundryClient, String applicationId, Boolean enabled) {
+        when(cloudFoundryClient.applicationsV2()
+            .update(UpdateApplicationRequest.builder()
+                .applicationId(applicationId)
+                .enableSsh(enabled)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(UpdateApplicationResponse.builder())
+                    .entity(fill(ApplicationEntity.builder(), "application-entity-")
                         .build())
                     .build()));
     }
@@ -699,12 +696,12 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
             requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, "test-organization-id");
-            requestOrganizationByName(this.cloudFoundryClient, "test-target-organization", "test-target-organization-id");
-            requestOrganizationSpaceByName(this.cloudFoundryClient, "test-target-organization-id", "test-target-space", "test-target-space-id");
-            requestApplications(this.cloudFoundryClient, "test-target-application-name", "test-target-space-id", "test-target-application-id");
-            requestCopyBits(this.cloudFoundryClient, "test-application-id", "test-target-application-id");
+            requestOrganizations(this.cloudFoundryClient, "test-target-organization");
+            requestOrganizationSpacesByName(this.cloudFoundryClient, "test-organization-resource-metadata-id", "test-target-space");
+            requestApplications(this.cloudFoundryClient, "test-target-application-name", "test-space-resource-metadata-id");
+            requestCopyBits(this.cloudFoundryClient, "test-metadata-id", "test-metadata-id");
             requestJobSuccess(this.cloudFoundryClient, "test-copy-bits-id");
         }
 
@@ -732,11 +729,11 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
             requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, "test-organization-id");
-            requestOrganizationSpaceByName(this.cloudFoundryClient, "test-organization-id", "test-target-space", "test-target-space-id");
-            requestApplications(this.cloudFoundryClient, "test-target-application-name", "test-target-space-id", "test-target-application-id");
-            requestCopyBits(this.cloudFoundryClient, "test-application-id", "test-target-application-id");
+            requestOrganizationSpacesByName(this.cloudFoundryClient, "test-organization-id", "test-target-space");
+            requestApplications(this.cloudFoundryClient, "test-target-application-name", "test-space-resource-metadata-id");
+            requestCopyBits(this.cloudFoundryClient, "test-metadata-id", "test-metadata-id");
             requestJobSuccess(this.cloudFoundryClient, "test-copy-bits-id");
         }
 
@@ -763,9 +760,9 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
             requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, "test-organization-id");
-            requestOrganizationNotFound(this.cloudFoundryClient, "test-target-organization");
+            requestOrganizationsNotFound(this.cloudFoundryClient, "test-target-organization");
         }
 
         @Override
@@ -793,14 +790,14 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
             requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, "test-organization-id");
-            requestApplications(this.cloudFoundryClient, "test-target-application-name", TEST_SPACE_ID, "test-target-application-id");
-            requestCopyBits(this.cloudFoundryClient, "test-application-id", "test-target-application-id");
+            requestApplications(this.cloudFoundryClient, "test-target-application-name", TEST_SPACE_ID);
+            requestCopyBits(this.cloudFoundryClient, "test-metadata-id", "test-metadata-id");
             requestJobSuccess(this.cloudFoundryClient, "test-copy-bits-id");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-target-application-id", "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-target-application-id", "STARTED");
-            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-target-application-id");
+            requestUpdateApplicationState(this.cloudFoundryClient, "test-metadata-id", "STOPPED");
+            requestUpdateApplicationState(this.cloudFoundryClient, "test-metadata-id", "STARTED");
+            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-metadata-id");
         }
 
         @Override
@@ -826,9 +823,9 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-application-name", "test-space-id");
             requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, "test-organization-id");
-            requestOrganizationSpaceNotFound(this.cloudFoundryClient, "test-organization-id", "test-target-space");
+            requestOrganizationSpacesByNameNotFound(this.cloudFoundryClient, "test-organization-id", "test-target-space");
         }
 
         @Override
@@ -855,10 +852,10 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-application-id");
-            requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
             requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-            requestDeleteApplication(this.cloudFoundryClient, "test-application-id");
+            requestDeleteApplication(this.cloudFoundryClient, "test-metadata-id");
             requestJobSuccess(this.cloudFoundryClient, "test-id");
         }
 
@@ -882,10 +879,10 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-application-id");
-            requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
             requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-            requestDeleteApplication(this.cloudFoundryClient, "test-application-id");
+            requestDeleteApplication(this.cloudFoundryClient, "test-metadata-id");
             requestJobFailure(this.cloudFoundryClient, "test-id");
         }
 
@@ -910,9 +907,9 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-application-id");
-            requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
-            requestDeleteApplication(this.cloudFoundryClient, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+            requestApplicationSummary(this.cloudFoundryClient, "test-metdata-id");
+            requestDeleteApplication(this.cloudFoundryClient, "test-metadata-id");
         }
 
         @Override
@@ -936,8 +933,8 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-application-id");
-            requestUpdateApplicationEnableSsh(this.cloudFoundryClient, "test-application-id", false);
+            requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+            requestUpdateApplicationSsh(this.cloudFoundryClient, "test-metadata-id", false);
         }
 
         @Override
@@ -1010,8 +1007,8 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-application-id");
-            requestUpdateApplicationEnableSsh(this.cloudFoundryClient, "test-application-id", true);
+            requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+            requestUpdateApplicationSsh(this.cloudFoundryClient, "test-application-id", true);
         }
 
         @Override
@@ -1084,11 +1081,11 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
-            requestApplicationStats(this.cloudFoundryClient, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestApplicationStats(this.cloudFoundryClient, "test-metadata-id");
             requestStack(this.cloudFoundryClient, "test-application-stackId");
-            requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstances(this.cloudFoundryClient, "test-application-id");
+            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+            requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
         }
 
         @Override
@@ -1125,8 +1122,8 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
-            requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
             requestStack(this.cloudFoundryClient, "test-application-summary-stackId");
         }
 
@@ -1182,8 +1179,8 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
-            requestApplicationSummaryNoRoutes(this.cloudFoundryClient, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestApplicationSummaryNoRoutes(this.cloudFoundryClient, "test-metadata-id");
             requestStack(this.cloudFoundryClient, "test-application-summary-stackId");
         }
 
@@ -1217,11 +1214,11 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
-            requestApplicationStats(this.cloudFoundryClient, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestApplicationStats(this.cloudFoundryClient, "test-metadata-id");
             requestStack(this.cloudFoundryClient, "test-application-stackId");
-            requestApplicationSummaryDetectedBuildpack(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstances(this.cloudFoundryClient, "test-application-id");
+            requestApplicationSummaryDetectedBuildpack(this.cloudFoundryClient, "test-metadata-id");
+            requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
         }
 
         @Override
@@ -1258,8 +1255,8 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
-            requestApplicationEnvironment(this.cloudFoundryClient, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestApplicationEnvironment(this.cloudFoundryClient, "test-metadata-id");
         }
 
         @Override
@@ -1322,9 +1319,8 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
-            requestApplicationEvents(this.cloudFoundryClient,
-                "test-application-id",
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestEvents(this.cloudFoundryClient, "test-metadata-id",
                 fill(EventEntity.builder(), "event-")
                     .timestamp("2016-02-08T15:45:59Z")
                     .metadata("request", StringMap.builder()
@@ -1363,9 +1359,8 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
-            requestApplicationEvents(this.cloudFoundryClient,
-                "test-application-id",
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestEvents(this.cloudFoundryClient, "test-metadata-id",
                 fill(EventEntity.builder(), "event-")
                     .timestamp("BAD-TIMESTAMP")
                     .metadata("request", StringMap.builder()
@@ -1402,8 +1397,8 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
-            requestApplicationEvents(this.cloudFoundryClient, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestEvents(this.cloudFoundryClient, "test-metadata-id");
         }
 
         @Override
@@ -1427,9 +1422,8 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
-            requestApplicationEvents(this.cloudFoundryClient,
-                "test-application-id",
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestEvents(this.cloudFoundryClient, "test-metadata-id",
                 fill(EventEntity.builder(), "event-")
                     .timestamp("2016-02-08T15:45:59Z")
                     .metadata("request", StringMap.builder()
@@ -1463,9 +1457,8 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
-            requestApplicationEvents(this.cloudFoundryClient,
-                "test-application-id",
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestEvents(this.cloudFoundryClient, "test-metadata-id",
                 fill(EventEntity.builder(), "event-")
                     .timestamp("2016-02-08T15:45:59Z")
                     .metadata("request", StringMap.builder()
@@ -1518,11 +1511,11 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
-            requestApplicationStats(this.cloudFoundryClient, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestApplicationStats(this.cloudFoundryClient, "test-metadata-id");
             requestStack(this.cloudFoundryClient, "test-application-stackId");
-            requestApplicationSummaryNoBuildpack(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstances(this.cloudFoundryClient, "test-application-id");
+            requestApplicationSummaryNoBuildpack(this.cloudFoundryClient, "test-metadata-id");
+            requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
         }
 
         @Override
@@ -1585,8 +1578,8 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-application-id");
-            requestLogs(this.loggingClient, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestLogsStream(this.loggingClient, "test-metadata-id");
         }
 
         @Override
@@ -1638,8 +1631,8 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-application-id");
-            requestLogsRecent(this.loggingClient, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestLogsRecent(this.loggingClient, "test-metadata-id");
         }
 
         @Override
@@ -1667,8 +1660,8 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-application-id");
-            requestLogs(this.loggingClient, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestLogsStream(this.loggingClient, "test-metadata-id");
         }
 
         @Override
@@ -1694,8 +1687,8 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-application-id");
-            requestUpdateApplicationRename(this.cloudFoundryClient, "test-application-id", "test-new-app-name");
+            requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+            requestUpdateApplicationRename(this.cloudFoundryClient, "test-metadata-id", "test-new-app-name");
 
         }
 
@@ -1747,10 +1740,10 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-application-id");
-            requestRestage(this.cloudFoundryClient, "test-application-id");
-            requestApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
+            requestGetApplication(this.cloudFoundryClient, "test-metadata-id");
+            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-metadata-id");
         }
 
         @Override
@@ -1799,9 +1792,9 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-application-id");
-            requestRestage(this.cloudFoundryClient, "test-application-id");
-            requestApplicationFailing(this.cloudFoundryClient, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
+            requestGetApplicationFailing(this.cloudFoundryClient, "test-metadata-id");
         }
 
         @Override
@@ -1826,10 +1819,10 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-application-id");
-            requestRestage(this.cloudFoundryClient, "test-application-id");
-            requestApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesFailingPartial(this.cloudFoundryClient, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
+            requestGetApplication(this.cloudFoundryClient, "test-metadata-id");
+            requestApplicationInstancesFailingPartial(this.cloudFoundryClient, "test-metadata-id");
         }
 
         @Override
@@ -1853,10 +1846,10 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-application-id");
-            requestRestage(this.cloudFoundryClient, "test-application-id");
-            requestApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesFailingTotal(this.cloudFoundryClient, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
+            requestGetApplication(this.cloudFoundryClient, "test-metadata-id");
+            requestApplicationInstancesFailingTotal(this.cloudFoundryClient, "test-metadata-id");
         }
 
         @Override
@@ -1936,8 +1929,8 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-application-id");
-            requestTerminateApplicationInstance(this.cloudFoundryClient, "test-application-id", "0");
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestTerminateApplicationInstance(this.cloudFoundryClient, "test-metadata-id", "0");
         }
 
         @Override
@@ -2123,8 +2116,8 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-application-id");
-            requestUpdateApplicationScale(this.cloudFoundryClient, "test-application-id", null, 2, null);
+            requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+            requestUpdateApplicationScale(this.cloudFoundryClient, "test-metadata-id", null, 2, null);
         }
 
         @Override
@@ -2175,7 +2168,7 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
         }
 
         @Override
@@ -2199,8 +2192,8 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
-            requestUpdateApplicationEnvironment(this.cloudFoundryClient, "test-application-id", StringMap.builder()
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestUpdateApplicationEnvironment(this.cloudFoundryClient, "test-metadata-id", StringMap.builder()
                 .entry("test-var", "test-value")
                 .entry("test-var-name", "test-var-value")
                 .build());
@@ -2256,7 +2249,7 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-application-id");
+            requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
         }
 
         @Override
@@ -2500,8 +2493,8 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
-            requestUpdateApplicationEnvironment(this.cloudFoundryClient, "test-application-id", StringMap.builder().build());
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestUpdateApplicationEnvironment(this.cloudFoundryClient, "test-metadata-id", StringMap.builder().build());
         }
 
         @Override
