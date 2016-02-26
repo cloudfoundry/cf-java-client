@@ -79,19 +79,7 @@ public final class TestSubscriber<T> implements Subscriber<T> {
     }
 
     public TestSubscriber<T> assertError(final Class<? extends Throwable> expected) {
-        this.errorExpectation = new Consumer<Throwable>() {
-
-            @Override
-            public void accept(Throwable actual) {
-                StringWriter writer = new StringWriter();
-                actual.printStackTrace(new PrintWriter(writer));
-
-                Assert.assertEquals(String.format("Unexpected error %s", writer.toString()), expected, actual.getClass());
-            }
-
-        };
-
-        return this;
+        return this.assertError(expected, null);
     }
 
     public TestSubscriber<T> assertError(final Class<? extends Throwable> expected, final String message) {
@@ -103,7 +91,8 @@ public final class TestSubscriber<T> implements Subscriber<T> {
                 actual.printStackTrace(new PrintWriter(writer));
 
                 Assert.assertEquals(String.format("Unexpected error %s", writer.toString()), expected, actual.getClass());
-                Assert.assertEquals("Unexpected exception text", message, actual.getMessage());
+                if (message != null)
+                    Assert.assertEquals("Unexpected exception text", message, actual.getMessage());
             }
 
         };
