@@ -82,12 +82,12 @@ public final class DefaultSpaceQuotasTest {
 
     public static final class GetNoOrganization extends AbstractOperationsApiTest<SpaceQuota> {
 
-        private final DefaultSpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, MISSING_ID);
+        private final DefaultSpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, MISSING_ORGANIZATION_ID);
 
         @Override
         protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override
@@ -112,7 +112,7 @@ public final class DefaultSpaceQuotasTest {
         @Override
         protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Space Quota test-space-quota-definition-name does not exist");
         }
 
         @Override
@@ -151,12 +151,12 @@ public final class DefaultSpaceQuotasTest {
 
     public static final class ListNoOrganization extends AbstractOperationsApiTest<SpaceQuota> {
 
-        private final DefaultSpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, MISSING_ID);
+        private final DefaultSpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, MISSING_ORGANIZATION_ID);
 
         @Override
         protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override

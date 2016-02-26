@@ -70,7 +70,7 @@ public final class LoggregatorMessageHandlerTest {
         this.messageHandler.onMessage(new byte[0]);
 
         this.testSubscriber
-            .assertError(InvalidProtocolBufferException.class)
+            .assertError(InvalidProtocolBufferException.class, "Message missing required fields: message, message_type, timestamp, app_id")
             .verify(5, SECONDS);
     }
 

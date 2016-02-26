@@ -142,7 +142,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Application test-application-name does not exist");
         }
 
         @Override
@@ -170,7 +170,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Service test-service-name does not exist");
         }
 
         @Override

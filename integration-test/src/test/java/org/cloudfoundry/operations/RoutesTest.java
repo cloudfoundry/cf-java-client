@@ -111,7 +111,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .space(this.spaceName)
                 .build())
             .subscribe(testSubscriber()
-                .assertError(IllegalArgumentException.class));
+                .assertError(IllegalArgumentException.class, "Domain " + domainName + " does not exist"));
     }
 
     @Test
@@ -150,7 +150,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .path(path)
                 .build())
             .subscribe(testSubscriber()
-                .assertError(IllegalArgumentException.class));
+                .assertError(IllegalArgumentException.class, "Domain " + domainName + " does not exist"));
     }
 
     @Test
