@@ -330,7 +330,7 @@ public final class DefaultOrganizationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(RequestValidationException.class);
+                .assertError(RequestValidationException.class, "Request is invalid: organization name must be specified");
         }
 
         @Override
@@ -435,7 +435,7 @@ public final class DefaultOrganizationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(CloudFoundryException.class);
+                .assertError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
         }
 
         @Override
@@ -544,7 +544,7 @@ public final class DefaultOrganizationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(RequestValidationException.class);
+                .assertError(RequestValidationException.class, "Request is invalid: name must be specified, new name must be specified");
         }
 
         @Override

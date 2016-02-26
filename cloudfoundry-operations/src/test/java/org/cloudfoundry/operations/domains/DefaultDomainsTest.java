@@ -104,7 +104,7 @@ public final class DefaultDomainsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Organization test-organization does not exist");
         }
 
         @Override

@@ -677,7 +677,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(RequestValidationException.class);
+                .assertError(RequestValidationException.class, "Request is invalid: target application name must be specified");
         }
 
         @Override
@@ -768,7 +768,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Organization test-target-organization not found");
         }
 
         @Override
@@ -831,7 +831,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Space test-target-space not found");
         }
 
         @Override
@@ -889,7 +889,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(CloudFoundryException.class);
+                .assertError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
         }
 
         @Override
@@ -988,7 +988,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Application test-app-name does not exist");
         }
 
         @Override
@@ -1062,7 +1062,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Application test-app-name does not exist");
         }
 
         @Override
@@ -1161,7 +1161,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<ApplicationManifest> testSubscriber) throws Exception {
             testSubscriber.
-                assertError(RequestValidationException.class);
+                assertError(RequestValidationException.class, "Request is invalid: name must be specified");
         }
 
         @Override
@@ -1300,7 +1300,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<ApplicationEnvironments> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Application test-app does not exist");
         }
 
         @Override
@@ -1612,7 +1612,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<LogMessage> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Application test-application-name does not exist");
         }
 
         @Override
@@ -1720,7 +1720,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Application test-app-name does not exist");
         }
 
         @Override
@@ -1773,7 +1773,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Application test-application-name does not exist");
         }
 
         @Override
@@ -1800,7 +1800,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class, "Application test-application-name failed during staging");
         }
 
         @Override
@@ -1855,7 +1855,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class, "Application test-application-name failed during start");
         }
 
         @Override
@@ -1910,7 +1910,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class, "Application test-app-name failed during start");
         }
 
         @Override
@@ -1961,7 +1961,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Application test-non-existent-app-name does not exist");
         }
 
         @Override
@@ -2148,7 +2148,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Application test-app-name does not exist");
         }
 
         @Override
@@ -2228,7 +2228,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Application test-app does not exist");
         }
 
         @Override
@@ -2280,7 +2280,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Application test-app-name does not exist");
         }
 
         @Override
@@ -2332,7 +2332,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class, "Application test-application-name failed during start");
         }
 
         @Override
@@ -2356,7 +2356,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Application test-application-name does not exist");
         }
 
         @Override
@@ -2428,7 +2428,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Application test-application-name does not exist");
         }
 
         @Override
@@ -2525,7 +2525,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Application test-app does not exist");
         }
 
         @Override

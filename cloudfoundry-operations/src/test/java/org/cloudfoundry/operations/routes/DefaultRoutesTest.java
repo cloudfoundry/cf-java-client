@@ -419,7 +419,7 @@ public final class DefaultRoutesTest {
 
     public static final class CheckRouteInvalidDomain extends AbstractOperationsApiTest<Boolean> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -446,7 +446,7 @@ public final class DefaultRoutesTest {
 
     public static final class CheckRouteInvalidHost extends AbstractOperationsApiTest<Boolean> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -474,12 +474,12 @@ public final class DefaultRoutesTest {
 
     public static final class CheckRouteNoOrganization extends AbstractOperationsApiTest<Boolean> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ID, MISSING_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_SPACE_ID);
 
         @Override
         protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override
@@ -496,7 +496,7 @@ public final class DefaultRoutesTest {
 
     public static final class CheckRoutePrivateDomain extends AbstractOperationsApiTest<Boolean> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -524,7 +524,7 @@ public final class DefaultRoutesTest {
 
     public static final class CheckRouteSharedDomain extends AbstractOperationsApiTest<Boolean> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -553,7 +553,7 @@ public final class DefaultRoutesTest {
 
     public static final class CreateRouteInvalidDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -565,7 +565,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Domain test-domain does not exist");
         }
 
         @Override
@@ -582,7 +582,7 @@ public final class DefaultRoutesTest {
 
     public static final class CreateRouteInvalidSpace extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -592,7 +592,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
 
         @Override
@@ -610,12 +610,12 @@ public final class DefaultRoutesTest {
 
     public static final class CreateRouteNoOrganization extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ID, MISSING_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_SPACE_ID);
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override
@@ -633,7 +633,7 @@ public final class DefaultRoutesTest {
 
     public static final class CreateRoutePrivateDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -676,7 +676,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(CloudFoundryException.class);
+                .assertError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
         }
 
         @Override
@@ -704,7 +704,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Domain test-domain does not exist");
         }
 
         @Override
@@ -726,7 +726,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(RequestValidationException.class);
+                .assertError(RequestValidationException.class, "Request is invalid: domain must be specified");
         }
 
         @Override
@@ -751,7 +751,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Route test-host.test-domain does not exist");
         }
 
         @Override
@@ -768,12 +768,12 @@ public final class DefaultRoutesTest {
 
     public static final class DeleteNoOrganization extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ID, Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, Mono.just(TEST_SPACE_ID));
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override
@@ -852,7 +852,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(CloudFoundryException.class);
+                .assertError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
         }
 
         @Override
@@ -947,12 +947,12 @@ public final class DefaultRoutesTest {
 
     public static final class ListCurrentOrganizationNoOrganization extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ID, Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, Mono.just(TEST_SPACE_ID));
 
         @Override
         protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override
@@ -966,12 +966,12 @@ public final class DefaultRoutesTest {
 
     public static final class ListCurrentOrganizationNoOrganizationNoSpace extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ID, MISSING_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_SPACE_ID);
 
         @Override
         protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override
@@ -985,7 +985,7 @@ public final class DefaultRoutesTest {
 
     public static final class ListCurrentOrganizationNoSpace extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -1019,7 +1019,7 @@ public final class DefaultRoutesTest {
 
     public static final class ListCurrentOrganizationNoSpaceNoRoutes extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -1079,7 +1079,7 @@ public final class DefaultRoutesTest {
 
     public static final class ListCurrentSpaceNoOrganization extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ID, Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1113,12 +1113,12 @@ public final class DefaultRoutesTest {
 
     public static final class ListCurrentSpaceNoOrganizationNoSpace extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ID, MISSING_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_SPACE_ID);
 
         @Override
         protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class, "MISSING_SPACE_ID");
         }
 
         @Override
@@ -1132,12 +1132,12 @@ public final class DefaultRoutesTest {
 
     public static final class ListCurrentSpaceNoSpace extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Override
         protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class, "MISSING_SPACE_ID");
         }
 
         @Override
@@ -1193,7 +1193,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Application test-application-name does not exist");
         }
 
         @Override
@@ -1222,7 +1222,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Domain test-domain does not exist");
         }
 
         @Override
@@ -1239,7 +1239,7 @@ public final class DefaultRoutesTest {
 
     public static final class MapRouteNoOrganization extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ID, Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1249,7 +1249,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override
@@ -1266,12 +1266,12 @@ public final class DefaultRoutesTest {
 
     public static final class MapRouteNoSpace extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class, "MISSING_SPACE_ID");
         }
 
         @Override
@@ -1359,7 +1359,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Application test-application-name does not exist");
         }
 
         @Override
@@ -1387,7 +1387,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Domain test-domain does not exist");
         }
 
         @Override
@@ -1415,7 +1415,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Route test-host.test-domain does not exist");
         }
 
         @Override
@@ -1432,12 +1432,12 @@ public final class DefaultRoutesTest {
 
     public static final class UnmapRouteNoOrganization extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ID, Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, Mono.just(TEST_SPACE_ID));
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override
@@ -1453,12 +1453,12 @@ public final class DefaultRoutesTest {
 
     public static final class UnmapRouteNoSpace extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class, "MISSING_SPACE_ID");
         }
 
         @Override

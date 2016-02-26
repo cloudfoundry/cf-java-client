@@ -78,10 +78,6 @@ public final class TestSubscriber<T> implements Subscriber<T> {
         return this;
     }
 
-    public TestSubscriber<T> assertError(final Class<? extends Throwable> expected) {
-        return this.assertError(expected, null);
-    }
-
     public TestSubscriber<T> assertError(final Class<? extends Throwable> expected, final String message) {
         this.errorExpectation = new Consumer<Throwable>() {
 

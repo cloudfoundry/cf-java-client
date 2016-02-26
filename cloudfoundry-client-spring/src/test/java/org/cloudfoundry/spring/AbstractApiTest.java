@@ -16,8 +16,8 @@
 
 package org.cloudfoundry.spring;
 
-import org.cloudfoundry.util.RequestValidationException;
 import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.util.RequestValidationException;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Test;
 import org.reactivestreams.Publisher;
@@ -43,7 +43,7 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
     @Test
     public final void error() throws Exception {
         mockRequest(getRequestContext().errorResponse());
-        this.testSubscriber.assertError(CloudFoundryException.class);
+        this.testSubscriber.assertError(CloudFoundryException.class, "CF-UnprocessableEntity(10008): The request is semantically invalid: space_guid and name unique");
         invoke(getValidRequest()).subscribe(this.testSubscriber);
 
         this.testSubscriber.verify(5, SECONDS);
@@ -57,7 +57,7 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
             return;
         }
 
-        this.testSubscriber.assertError(RequestValidationException.class);
+        this.testSubscriber.assertError(RequestValidationException.class, null); // ignore message
         invoke(request).subscribe(this.testSubscriber);
 
         this.testSubscriber.verify(5, SECONDS);

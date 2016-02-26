@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.spring.client.v3.applications;
 
-import org.cloudfoundry.spring.AbstractApiTest;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Relationship;
@@ -53,6 +52,7 @@ import org.cloudfoundry.client.v3.applications.TerminateApplicationInstanceReque
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v3.processes.ProcessUsage;
+import org.cloudfoundry.spring.AbstractApiTest;
 import org.cloudfoundry.util.StringMap;
 import reactor.core.publisher.Mono;
 
