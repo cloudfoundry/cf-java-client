@@ -20,6 +20,8 @@ import lombok.ToString;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.uaa.identityzonemanagement.CreateIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzonemanagement.CreateIdentityZoneResponse;
+import org.cloudfoundry.uaa.identityzonemanagement.GetIdentityZoneRequest;
+import org.cloudfoundry.uaa.identityzonemanagement.GetIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzonemanagement.IdentityZoneManagement;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -53,6 +55,18 @@ public final class SpringIdentityZoneManagement extends AbstractSpringOperations
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("identity-zones");
+            }
+
+        });
+    }
+
+    @Override
+    public Mono<GetIdentityZoneResponse> get(final GetIdentityZoneRequest request) {
+        return get(request, GetIdentityZoneResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("identity-zones", request.getIdentityZoneId());
             }
 
         });
