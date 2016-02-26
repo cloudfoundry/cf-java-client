@@ -128,9 +128,7 @@ public final class DefaultSpaces implements Spaces {
                     return Mono
                         .when(
                             Mono.just(request),
-                            request.getOrganization() != null
-                                ? getOrganizationId(DefaultSpaces.this.cloudFoundryClient, request.getOrganization())
-                                : DefaultSpaces.this.organizationId
+                            getOrganizationOrDefault(DefaultSpaces.this.cloudFoundryClient, request, DefaultSpaces.this.organizationId)
                         );
                 }
 
@@ -155,7 +153,7 @@ public final class DefaultSpaces implements Spaces {
                     return Mono
                         .when(
                             Mono.just(organizationId),
-                            requestCreateSpace(DefaultSpaces.this.cloudFoundryClient, organizationId, request.getName(), spaceQuotaId.getOrNull())
+                            requestCreateSpace(DefaultSpaces.this.cloudFoundryClient, organizationId, request.getName(), spaceQuotaId.orElse(null))
                                 .map(ResourceUtils.extractId()),
                             DefaultSpaces.this.username
                         );
@@ -170,19 +168,15 @@ public final class DefaultSpaces implements Spaces {
                 }
 
             }))))
-            .as(thenKeep((function(new Function3<String, String, String, Mono<AssociateSpaceManagerByUsernameResponse>>() {
+            .as(thenKeep((function(new Function3<String, String, String, Mono<Tuple2<AssociateSpaceManagerByUsernameResponse, AssociateSpaceDeveloperByUsernameResponse>>>() {
 
                 @Override
-                public Mono<AssociateSpaceManagerByUsernameResponse> apply(String organizationId, String spaceId, String username) {
-                    return requestAssociateSpaceManagerByUsername(DefaultSpaces.this.cloudFoundryClient, spaceId, username);
-                }
-
-            }))))
-            .as(thenKeep((function(new Function3<String, String, String, Mono<AssociateSpaceDeveloperByUsernameResponse>>() {
-
-                @Override
-                public Mono<AssociateSpaceDeveloperByUsernameResponse> apply(String organizationId, String spaceId, String username) {
-                    return requestAssociateSpaceDeveloperByUsername(DefaultSpaces.this.cloudFoundryClient, spaceId, username);
+                public Mono<Tuple2<AssociateSpaceManagerByUsernameResponse, AssociateSpaceDeveloperByUsernameResponse>> apply(String organizationId, String spaceId, String username) {
+                    return Mono
+                        .when(
+                            requestAssociateSpaceManagerByUsername(DefaultSpaces.this.cloudFoundryClient, spaceId, username),
+                            requestAssociateSpaceDeveloperByUsername(DefaultSpaces.this.cloudFoundryClient, spaceId, username)
+                        );
                 }
 
             }))))
@@ -440,6 +434,12 @@ public final class DefaultSpaces implements Spaces {
                 }
 
             });
+    }
+
+    private static Mono<String> getOrganizationOrDefault(CloudFoundryClient cloudFoundryClient, CreateSpaceRequest request, Mono<String> organizationId) {
+        return request.getOrganization() != null
+            ? getOrganizationId(cloudFoundryClient, request.getOrganization())
+            : organizationId;
     }
 
     private static Mono<SpaceResource> getOrganizationSpace(final CloudFoundryClient cloudFoundryClient, final String organizationId, final String space) {

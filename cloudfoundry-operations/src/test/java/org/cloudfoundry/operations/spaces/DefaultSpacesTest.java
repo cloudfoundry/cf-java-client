@@ -394,7 +394,7 @@ public final class DefaultSpacesTest {
 
     public static final class AllowSsh extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -419,7 +419,7 @@ public final class DefaultSpacesTest {
 
     public static final class AllowSshAlreadyAllowed extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -443,7 +443,7 @@ public final class DefaultSpacesTest {
 
     public static final class AllowSshNoSpace extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -453,7 +453,7 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
 
         @Override
@@ -468,7 +468,7 @@ public final class DefaultSpacesTest {
 
     public static final class CreateInvalid extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, MISSING_ID, MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_USERNAME);
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
@@ -629,7 +629,7 @@ public final class DefaultSpacesTest {
 
     public static final class Delete extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() {
@@ -654,7 +654,7 @@ public final class DefaultSpacesTest {
 
     public static final class DeleteFailure extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() {
@@ -667,7 +667,7 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(CloudFoundryException.class);
+                .assertError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
         }
 
         @Override
@@ -682,12 +682,12 @@ public final class DefaultSpacesTest {
 
     public static final class DeleteInvalidRequest extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, MISSING_ID, MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_USERNAME);
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(RequestValidationException.class);
+                .assertError(RequestValidationException.class, "Request is invalid: name must be specified");
         }
 
         @Override
@@ -701,7 +701,7 @@ public final class DefaultSpacesTest {
 
     public static final class DeleteInvalidSpace extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() {
@@ -711,7 +711,7 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
 
         @Override
@@ -726,12 +726,12 @@ public final class DefaultSpacesTest {
 
     public static final class DeleteNoOrganization extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, MISSING_ID, MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_USERNAME);
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override
@@ -746,7 +746,7 @@ public final class DefaultSpacesTest {
 
     public static final class DisallowSsh extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -771,7 +771,7 @@ public final class DefaultSpacesTest {
 
     public static final class DisallowSshAlreadyDisallowed extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -795,7 +795,7 @@ public final class DefaultSpacesTest {
 
     public static final class DisallowSshNoSpace extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -805,7 +805,7 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
 
         @Override
@@ -820,7 +820,7 @@ public final class DefaultSpacesTest {
 
     public static final class Get extends AbstractOperationsApiTest<SpaceDetail> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -863,12 +863,12 @@ public final class DefaultSpacesTest {
 
     public static final class GetNoOrganization extends AbstractOperationsApiTest<SpaceDetail> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, MISSING_ID, MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_USERNAME);
 
         @Override
         protected void assertions(TestSubscriber<SpaceDetail> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override
@@ -882,7 +882,7 @@ public final class DefaultSpacesTest {
 
     public static final class GetNoSpaceQuota extends AbstractOperationsApiTest<SpaceDetail> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -921,7 +921,7 @@ public final class DefaultSpacesTest {
 
     public static final class List extends AbstractOperationsApiTest<SpaceSummary> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -945,12 +945,12 @@ public final class DefaultSpacesTest {
 
     public static final class ListNoOrganization extends AbstractOperationsApiTest<SpaceSummary> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, MISSING_ID, MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_USERNAME);
 
         @Override
         protected void assertions(TestSubscriber<SpaceSummary> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override
@@ -963,7 +963,7 @@ public final class DefaultSpacesTest {
 
     public static final class Rename extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -989,12 +989,12 @@ public final class DefaultSpacesTest {
 
     public static final class RenameInvalid extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(RequestValidationException.class);
+                .assertError(RequestValidationException.class, "Request is invalid: name must be specified, new name must be specified");
         }
 
         @Override
@@ -1008,7 +1008,7 @@ public final class DefaultSpacesTest {
 
     public static final class RenameNoSpace extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -1018,7 +1018,7 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
 
         @Override
@@ -1034,7 +1034,7 @@ public final class DefaultSpacesTest {
 
     public static final class SshAllowed extends AbstractOperationsApiTest<Boolean> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -1059,7 +1059,7 @@ public final class DefaultSpacesTest {
 
     public static final class SshAllowedNoSpace extends AbstractOperationsApiTest<Boolean> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -1069,7 +1069,7 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
 
         @Override

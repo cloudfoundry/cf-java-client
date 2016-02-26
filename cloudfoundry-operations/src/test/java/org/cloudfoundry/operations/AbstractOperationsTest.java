@@ -47,6 +47,12 @@ public abstract class AbstractOperationsTest {
 
     protected static final Mono<String> MISSING_ID = Mono.error(new java.lang.IllegalStateException("MISSING_ID"));
 
+    protected static final Mono<String> MISSING_ORGANIZATION_ID = Mono.error(new java.lang.IllegalStateException("MISSING_ORGANIZATION_ID"));
+
+    protected static final Mono<String> MISSING_SPACE_ID = Mono.error(new java.lang.IllegalStateException("MISSING_SPACE_ID"));
+
+    protected static final Mono<String> MISSING_USERNAME = Mono.error(new java.lang.IllegalStateException("MISSING_USERNAME"));
+
     protected static final String TEST_ORGANIZATION_ID = "test-organization-id";
 
     protected static final String TEST_ORGANIZATION_NAME = "test-organization-name";
