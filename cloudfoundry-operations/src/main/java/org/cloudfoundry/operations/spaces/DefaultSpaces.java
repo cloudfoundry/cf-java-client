@@ -160,15 +160,15 @@ public final class DefaultSpaces implements Spaces {
                 }
 
             }))
-            .as(thenKeep((function(new Function3<String, String, String, Mono<AssociateOrganizationUserByUsernameResponse>>() {
+            .as(thenKeep(function(new Function3<String, String, String, Mono<AssociateOrganizationUserByUsernameResponse>>() {
 
                 @Override
                 public Mono<AssociateOrganizationUserByUsernameResponse> apply(String organizationId, String spaceId, String username) {
                     return requestAssociateOrganizationUserByUsername(DefaultSpaces.this.cloudFoundryClient, organizationId, username);
                 }
 
-            }))))
-            .as(thenKeep((function(new Function3<String, String, String, Mono<Tuple2<AssociateSpaceManagerByUsernameResponse, AssociateSpaceDeveloperByUsernameResponse>>>() {
+            })))
+            .then(function(new Function3<String, String, String, Mono<Tuple2<AssociateSpaceManagerByUsernameResponse, AssociateSpaceDeveloperByUsernameResponse>>>() {
 
                 @Override
                 public Mono<Tuple2<AssociateSpaceManagerByUsernameResponse, AssociateSpaceDeveloperByUsernameResponse>> apply(String organizationId, String spaceId, String username) {
@@ -179,7 +179,7 @@ public final class DefaultSpaces implements Spaces {
                         );
                 }
 
-            }))))
+            }))
             .after();
     }
 

@@ -17,16 +17,39 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.operations.spaces.CreateSpaceRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.rx.Stream;
 
+import static org.cloudfoundry.util.OperationUtils.afterStreamComplete;
 import static org.junit.Assert.assertTrue;
 
 public final class SpacesTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryOperations cloudFoundryOperations;
+
+    @Autowired
+    private String organizationName;
+
+    @Test
+    public void create() {
+        String spaceName = getSpaceName();
+
+        this.cloudFoundryOperations.spaces()
+            .create(CreateSpaceRequest.builder()
+                .name(spaceName)
+                .organization(this.organizationName)
+                .build())
+            .as(Stream::from)
+            .as(afterStreamComplete(() -> Stream
+                .from(this.cloudFoundryOperations.spaces()
+                    .list())))
+            .filter(spaceSummary -> spaceName.equals(spaceSummary.getName()))
+            .subscribe(testSubscriber()
+                .assertCount(1));
+    }
 
     @Test
     public void list() {
