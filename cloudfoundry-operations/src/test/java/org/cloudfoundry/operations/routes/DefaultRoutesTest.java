@@ -58,11 +58,11 @@ import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
-import reactor.fn.Supplier;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.function.Supplier;
 
 import static org.cloudfoundry.util.test.TestObjects.fill;
 import static org.cloudfoundry.util.test.TestObjects.fillPage;

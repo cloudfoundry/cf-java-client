@@ -17,19 +17,17 @@
 package org.cloudfoundry.spring.client.v2.events;
 
 import lombok.ToString;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.QueryBuilder;
-import org.cloudfoundry.spring.client.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.events.Events;
 import org.cloudfoundry.client.v2.events.GetEventRequest;
 import org.cloudfoundry.client.v2.events.GetEventResponse;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.client.v2.events.ListEventsResponse;
+import org.cloudfoundry.spring.client.v2.FilterBuilder;
+import org.cloudfoundry.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -51,28 +49,16 @@ public final class SpringEvents extends AbstractSpringOperations implements Even
     }
 
     @Override
-    public Mono<GetEventResponse> get(final GetEventRequest request) {
-        return get(request, GetEventResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "events", request.getEventId());
-            }
-
-        });
+    public Mono<GetEventResponse> get(GetEventRequest request) {
+        return get(request, GetEventResponse.class, builder -> builder.pathSegment("v2", "events", request.getEventId()));
     }
 
     @Override
-    public Mono<ListEventsResponse> list(final ListEventsRequest request) {
-        return get(request, ListEventsResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "events");
-                FilterBuilder.augment(builder, request);
-                QueryBuilder.augment(builder, request);
-            }
-
+    public Mono<ListEventsResponse> list(ListEventsRequest request) {
+        return get(request, ListEventsResponse.class, builder -> {
+            builder.pathSegment("v2", "events");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
         });
     }
 

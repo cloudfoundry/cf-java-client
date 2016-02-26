@@ -28,9 +28,9 @@ public final class GetProcessDetailedStatisticsRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = GetProcessDetailedStatisticsRequest.builder()
-                .processId("test-id")
-                .build()
-                .isValid();
+            .processId("test-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -38,8 +38,8 @@ public final class GetProcessDetailedStatisticsRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = GetProcessDetailedStatisticsRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("process id must be specified", result.getMessages().get(0));

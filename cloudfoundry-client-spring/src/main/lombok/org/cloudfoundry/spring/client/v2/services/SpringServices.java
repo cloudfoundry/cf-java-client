@@ -17,9 +17,6 @@
 package org.cloudfoundry.spring.client.v2.services;
 
 import lombok.ToString;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.QueryBuilder;
-import org.cloudfoundry.spring.client.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.services.DeleteServiceRequest;
 import org.cloudfoundry.client.v2.services.DeleteServiceResponse;
 import org.cloudfoundry.client.v2.services.GetServiceRequest;
@@ -29,11 +26,12 @@ import org.cloudfoundry.client.v2.services.ListServiceServicePlansResponse;
 import org.cloudfoundry.client.v2.services.ListServicesRequest;
 import org.cloudfoundry.client.v2.services.ListServicesResponse;
 import org.cloudfoundry.client.v2.services.Services;
+import org.cloudfoundry.spring.client.v2.FilterBuilder;
+import org.cloudfoundry.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -56,55 +54,33 @@ public final class SpringServices extends AbstractSpringOperations implements Se
     }
 
     @Override
-    public Mono<DeleteServiceResponse> delete(final DeleteServiceRequest request) {
-        return delete(request, DeleteServiceResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "services", request.getServiceId());
-                QueryBuilder.augment(builder, request);
-            }
-
+    public Mono<DeleteServiceResponse> delete(DeleteServiceRequest request) {
+        return delete(request, DeleteServiceResponse.class, builder -> {
+            builder.pathSegment("v2", "services", request.getServiceId());
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
-    public Mono<GetServiceResponse> get(final GetServiceRequest request) {
-        return get(request, GetServiceResponse.class, new Consumer<UriComponentsBuilder>() {
+    public Mono<GetServiceResponse> get(GetServiceRequest request) {
+        return get(request, GetServiceResponse.class, builder -> builder.pathSegment("v2", "services", request.getServiceId()));
+    }
 
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "services", request.getServiceId());
-            }
-
+    @Override
+    public Mono<ListServicesResponse> list(ListServicesRequest request) {
+        return get(request, ListServicesResponse.class, builder -> {
+            builder.pathSegment("v2", "services");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
-    public Mono<ListServicesResponse> list(final ListServicesRequest request) {
-        return get(request, ListServicesResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "services");
-                FilterBuilder.augment(builder, request);
-                QueryBuilder.augment(builder, request);
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<ListServiceServicePlansResponse> listServicePlans(final ListServiceServicePlansRequest request) {
-        return get(request, ListServiceServicePlansResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "services", request.getServiceId(), "service_plans");
-                FilterBuilder.augment(builder, request);
-                QueryBuilder.augment(builder, request);
-            }
-
+    public Mono<ListServiceServicePlansResponse> listServicePlans(ListServiceServicePlansRequest request) {
+        return get(request, ListServiceServicePlansResponse.class, builder -> {
+            builder.pathSegment("v2", "services", request.getServiceId(), "service_plans");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
         });
     }
 

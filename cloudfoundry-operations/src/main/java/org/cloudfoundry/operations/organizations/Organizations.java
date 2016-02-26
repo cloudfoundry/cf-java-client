@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.operations.organizations;
 
-import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -53,7 +53,7 @@ public interface Organizations {
      *
      * @return the organizations
      */
-    Publisher<OrganizationSummary> list();
+    Flux<OrganizationSummary> list();
 
     /**
      * Renames a specific organization

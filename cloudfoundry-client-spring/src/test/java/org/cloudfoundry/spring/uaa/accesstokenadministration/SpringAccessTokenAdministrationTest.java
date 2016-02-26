@@ -40,7 +40,7 @@ public final class SpringAccessTokenAdministrationTest {
             return new RequestContext()
                 .method(GET).path("/token_key")
                 .status(OK)
-                .responsePayload("uaa/token_key/GET_response.json");
+                .responsePayload("fixtures/uaa/token_key/GET_response.json");
         }
 
         @Override

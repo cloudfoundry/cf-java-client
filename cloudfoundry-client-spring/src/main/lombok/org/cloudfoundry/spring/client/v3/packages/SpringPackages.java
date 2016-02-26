@@ -17,9 +17,6 @@
 package org.cloudfoundry.spring.client.v3.packages;
 
 import lombok.ToString;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.CollectionUtils;
-import org.cloudfoundry.spring.util.QueryBuilder;
 import org.cloudfoundry.client.v3.packages.CopyPackageRequest;
 import org.cloudfoundry.client.v3.packages.CopyPackageResponse;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
@@ -35,15 +32,14 @@ import org.cloudfoundry.client.v3.packages.StagePackageRequest;
 import org.cloudfoundry.client.v3.packages.StagePackageResponse;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
-import org.reactivestreams.Publisher;
+import org.cloudfoundry.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.spring.util.CollectionUtils;
+import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
-import reactor.fn.Supplier;
 
 import java.net.URI;
 
@@ -66,106 +62,47 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
 
     @Override
     public Mono<CopyPackageResponse> copy(final CopyPackageRequest request) {
-        return post(request, CopyPackageResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getApplicationId(), "packages");
-                QueryBuilder.augment(builder, request);
-            }
-
+        return post(request, CopyPackageResponse.class, builder -> {
+            builder.pathSegment("v3", "apps", request.getApplicationId(), "packages");
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
     public Mono<CreatePackageResponse> create(final CreatePackageRequest request) {
-        return post(request, CreatePackageResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getApplicationId(), "packages");
-            }
-
-        });
+        return post(request, CreatePackageResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "packages"));
     }
 
     @Override
     public Mono<Void> delete(final DeletePackageRequest request) {
-        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "packages", request.getPackageId());
-            }
-
-        });
+        return delete(request, Void.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId()));
     }
 
     @Override
-    public Publisher<byte[]> download(final DownloadPackageRequest request) {
-        return getStream(request, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "packages", request.getPackageId(), "download");
-            }
-
-        });
+    public Flux<byte[]> download(final DownloadPackageRequest request) {
+        return getStream(request, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "download"))
+            .as(Flux::from);
     }
 
     @Override
     public Mono<GetPackageResponse> get(final GetPackageRequest request) {
-        return get(request, GetPackageResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "packages", request.getPackageId());
-            }
-
-        });
+        return get(request, GetPackageResponse.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId()));
     }
 
     @Override
     public Mono<ListPackagesResponse> list(final ListPackagesRequest request) {
-        return get(request, ListPackagesResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "packages");
-            }
-
-        });
+        return get(request, ListPackagesResponse.class, builder -> builder.pathSegment("v3", "packages"));
     }
 
     @Override
     public Mono<StagePackageResponse> stage(final StagePackageRequest request) {
-        return post(request, StagePackageResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "packages", request.getPackageId(), "droplets");
-            }
-
-        });
+        return post(request, StagePackageResponse.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "droplets"));
     }
 
     @Override
     public Mono<UploadPackageResponse> upload(final UploadPackageRequest request) {
-        return postWithBody(request, new Supplier<MultiValueMap<String, InputStreamResource>>() {
-
-            @Override
-            public MultiValueMap<String, InputStreamResource> get() {
-                return CollectionUtils.singletonMultiValueMap("bits", new InputStreamResource(request.getBits()));
-            }
-
-        }, UploadPackageResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "packages", request.getPackageId(), "upload");
-            }
-
-        });
+        return postWithBody(request, () -> CollectionUtils.singletonMultiValueMap("bits", new InputStreamResource(request.getBits())), UploadPackageResponse.class, builder -> builder.pathSegment
+            ("v3", "packages", request.getPackageId(), "upload"));
     }
 
 }

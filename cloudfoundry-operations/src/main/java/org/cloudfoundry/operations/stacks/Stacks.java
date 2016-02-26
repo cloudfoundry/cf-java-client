@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.operations.stacks;
 
-import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -37,6 +37,6 @@ public interface Stacks {
      *
      * @return a list of {@link Stack}s
      */
-    Publisher<Stack> list();
+    Flux<Stack> list();
 
 }

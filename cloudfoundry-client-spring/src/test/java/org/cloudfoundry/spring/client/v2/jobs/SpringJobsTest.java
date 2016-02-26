@@ -43,7 +43,7 @@ public final class SpringJobsTest {
             return new RequestContext()
                 .method(GET).path("/v2/jobs/test-job-id")
                 .status(OK)
-                .responsePayload("client/v2/jobs/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v2/jobs/GET_{id}_response.json");
         }
 
         @Override

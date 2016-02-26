@@ -18,16 +18,14 @@ package org.cloudfoundry.operations.stacks;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
-import org.cloudfoundry.client.v2.stacks.ListStacksResponse;
 import org.cloudfoundry.client.v2.stacks.StackResource;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.ValidationUtils;
-import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.fn.Function;
-import reactor.rx.Stream;
+import reactor.rx.Fluxion;
 
 public final class DefaultStacks implements Stacks {
 
@@ -41,72 +39,38 @@ public final class DefaultStacks implements Stacks {
     public Mono<Stack> get(GetStackRequest request) {
         return ValidationUtils
             .validate(request)
-            .then(new Function<GetStackRequest, Mono<StackResource>>() {
-
-                @Override
-                public Mono<StackResource> apply(GetStackRequest getStackRequest) {
-                    return getStack(DefaultStacks.this.cloudFoundryClient, getStackRequest.getName());
-                }
-
-            })
-            .map(new Function<StackResource, Stack>() {
-
-                @Override
-                public Stack apply(StackResource resource) {
-                    return toStack(resource);
-                }
-
-            });
+            .then(getStackRequest -> getStack(this.cloudFoundryClient, getStackRequest.getName()))
+            .map(this::toStack);
     }
 
     @Override
-    public Publisher<Stack> list() {
+    public Flux<Stack> list() {
         return requestStacks(this.cloudFoundryClient)
-            .map(new Function<StackResource, Stack>() {
-
-                @Override
-                public Stack apply(StackResource resource) {
-                    return toStack(resource);
-                }
-
-            });
+            .map(this::toStack)
+            .as(Flux::from);
     }
 
-    private static Mono<StackResource> getStack(final CloudFoundryClient cloudFoundryClient, final String stack) {
+    private static Mono<StackResource> getStack(CloudFoundryClient cloudFoundryClient, String stack) {
         return requestStack(cloudFoundryClient, stack)
             .single()
             .otherwise(ExceptionUtils.<StackResource>convert("Stack %s does not exist", stack));
     }
 
-    private static Stream<StackResource> requestStack(final CloudFoundryClient cloudFoundryClient, final String stack) {
+    private static Fluxion<StackResource> requestStack(CloudFoundryClient cloudFoundryClient, String stack) {
         return PaginationUtils
-            .requestResources(new Function<Integer, Mono<ListStacksResponse>>() {
-
-                @Override
-                public Mono<ListStacksResponse> apply(Integer page) {
-                    return cloudFoundryClient.stacks().list(
-                        ListStacksRequest.builder()
-                            .name(stack)
-                            .page(page)
-                            .build());
-                }
-
-            });
+            .requestResources(page -> cloudFoundryClient.stacks().list(
+                ListStacksRequest.builder()
+                    .name(stack)
+                    .page(page)
+                    .build()));
     }
 
-    private static Stream<StackResource> requestStacks(final CloudFoundryClient cloudFoundryClient) {
+    private static Fluxion<StackResource> requestStacks(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
-            .requestResources(new Function<Integer, Mono<ListStacksResponse>>() {
-
-                @Override
-                public Mono<ListStacksResponse> apply(Integer page) {
-                    return cloudFoundryClient.stacks().list(
-                        ListStacksRequest.builder()
-                            .page(page)
-                            .build());
-                }
-
-            });
+            .requestResources(page -> cloudFoundryClient.stacks().list(
+                ListStacksRequest.builder()
+                    .page(page)
+                    .build()));
     }
 
     private Stack toStack(StackResource stackResource) {

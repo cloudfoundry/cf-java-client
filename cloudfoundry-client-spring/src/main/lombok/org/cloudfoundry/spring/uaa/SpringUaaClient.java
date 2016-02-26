@@ -37,7 +37,6 @@ import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Function;
 
 import java.net.URI;
 
@@ -87,22 +86,8 @@ public final class SpringUaaClient implements UaaClient {
 
     private static URI getRoot(CloudFoundryClient cloudFoundryClient, SslCertificateTruster sslCertificateTruster) {
         URI uri = requestInfo(cloudFoundryClient)
-            .map(new Function<GetInfoResponse, String>() {
-
-                @Override
-                public String apply(GetInfoResponse response) {
-                    return response.getTokenEndpoint();
-                }
-
-            })
-            .map(new Function<String, URI>() {
-
-                @Override
-                public URI apply(String uri) {
-                    return URI.create(uri);
-                }
-
-            })
+            .map(GetInfoResponse::getTokenEndpoint)
+            .map(URI::create)
             .get(5, SECONDS);
 
         sslCertificateTruster.trust(uri.getHost(), uri.getPort(), 5, SECONDS);

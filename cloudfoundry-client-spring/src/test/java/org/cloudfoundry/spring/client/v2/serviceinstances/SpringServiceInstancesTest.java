@@ -65,9 +65,9 @@ public final class SpringServiceInstancesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PUT).path("/v2/service_instances/test-service-instance-id/routes/route-id")
-                .requestPayload("client/v2/service_instances/PUT_{id}_routes_request.json")
+                .requestPayload("fixtures/client/v2/service_instances/PUT_{id}_routes_request.json")
                 .status(CREATED)
-                .responsePayload("client/v2/service_instances/PUT_{id}_routes_response.json");
+                .responsePayload("fixtures/client/v2/service_instances/PUT_{id}_routes_response.json");
         }
 
         @Override
@@ -123,9 +123,9 @@ public final class SpringServiceInstancesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(POST).path("/v2/service_instances?accepts_incomplete=true")
-                .requestPayload("client/v2/service_instances/POST_request.json")
+                .requestPayload("fixtures/client/v2/service_instances/POST_request.json")
                 .status(CREATED)
-                .responsePayload("client/v2/service_instances/POST_response.json");
+                .responsePayload("fixtures/client/v2/service_instances/POST_response.json");
         }
 
         @Override
@@ -232,7 +232,7 @@ public final class SpringServiceInstancesTest {
             return new RequestContext()
                 .method(GET).path("/v2/service_instances/test-service-instance-id")
                 .status(OK)
-                .responsePayload("client/v2/service_instances/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v2/service_instances/GET_{id}_response.json");
         }
 
         @Override
@@ -296,7 +296,7 @@ public final class SpringServiceInstancesTest {
             return new RequestContext()
                 .method(GET).path("/v2/service_instances/test-service-instance-id/permissions")
                 .status(OK)
-                .responsePayload("client/v2/service_instances/GET_{id}_permissions_response.json");
+                .responsePayload("fixtures/client/v2/service_instances/GET_{id}_permissions_response.json");
         }
 
         @Override
@@ -335,7 +335,7 @@ public final class SpringServiceInstancesTest {
             return new RequestContext()
                 .method(GET).path("/v2/service_instances?q=name%20IN%20test-name&page=-1")
                 .status(OK)
-                .responsePayload("client/v2/service_instances/GET_response.json");
+                .responsePayload("fixtures/client/v2/service_instances/GET_response.json");
         }
 
         @Override
@@ -406,7 +406,7 @@ public final class SpringServiceInstancesTest {
                 .method(GET)
                 .path("v2/service_instances/test-service-instance-id/service_bindings?q=app_guid%20IN%20test-application-id&page=-1")
                 .status(OK)
-                .responsePayload("client/v2/service_instances/GET_{id}_service_bindings_response.json");
+                .responsePayload("fixtures/client/v2/service_instances/GET_{id}_service_bindings_response.json");
         }
 
         @Override
@@ -462,9 +462,9 @@ public final class SpringServiceInstancesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PUT).path("/v2/service_instances/test-service-instance-id?accepts_incomplete=true")
-                .requestPayload("client/v2/service_instances/PUT_{id}_request.json")
+                .requestPayload("fixtures/client/v2/service_instances/PUT_{id}_request.json")
                 .status(CREATED)
-                .responsePayload("client/v2/service_instances/PUT_{id}_response.json");
+                .responsePayload("fixtures/client/v2/service_instances/PUT_{id}_response.json");
         }
 
         @Override

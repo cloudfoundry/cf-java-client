@@ -81,13 +81,13 @@ public class IdentityZoneEntity {
      */
     private final Integer version;
 
-    protected IdentityZoneEntity(@JsonProperty("created") Long createdAt,
-                                 @JsonProperty("description") String description,
-                                 @JsonProperty("id") String identityZoneId,
-                                 @JsonProperty("name") String name,
-                                 @JsonProperty("subdomain") String subDomain,
-                                 @JsonProperty("last_modified") Long updatedAt,
-                                 @JsonProperty("version") Integer version) {
+    IdentityZoneEntity(@JsonProperty("created") Long createdAt,
+                       @JsonProperty("description") String description,
+                       @JsonProperty("id") String identityZoneId,
+                       @JsonProperty("name") String name,
+                       @JsonProperty("subdomain") String subDomain,
+                       @JsonProperty("last_modified") Long updatedAt,
+                       @JsonProperty("version") Integer version) {
         this.createdAt = createdAt;
         this.description = description;
         this.identityZoneId = identityZoneId;

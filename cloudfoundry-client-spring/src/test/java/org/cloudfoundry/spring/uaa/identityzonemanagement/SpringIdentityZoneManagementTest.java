@@ -43,9 +43,9 @@ public final class SpringIdentityZoneManagementTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(POST).path("/identity-zones")
-                .requestPayload("uaa/identity-zones/POST_request.json")
+                .requestPayload("fixtures/uaa/identity-zones/POST_request.json")
                 .status(CREATED)
-                .responsePayload("uaa/identity-zones/POST_response.json");
+                .responsePayload("fixtures/uaa/identity-zones/POST_response.json");
         }
 
         @Override
@@ -90,7 +90,7 @@ public final class SpringIdentityZoneManagementTest {
             return new RequestContext()
                 .method(GET).path("/identity-zones/identity-zone-id")
                 .status(OK)
-                .responsePayload("uaa/identity-zones/GET_{id}_response.json");
+                .responsePayload("fixtures/uaa/identity-zones/GET_{id}_response.json");
         }
 
         @Override

@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v2.applications;
 
-import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -63,7 +63,7 @@ public interface ApplicationsV2 {
      * @param request the Download Application request
      * @return the response from the Download Application request
      */
-    Publisher<byte[]> download(DownloadApplicationRequest request);
+    Flux<byte[]> download(DownloadApplicationRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps/downloads_the_staged_droplet_for_an_app.html">Downloads the staged droplet for an App</a> request
@@ -71,7 +71,7 @@ public interface ApplicationsV2 {
      * @param request the Download Droplet request
      * @return the response from the Download Droplet request
      */
-    Publisher<byte[]> downloadDroplet(DownloadApplicationDropletRequest request);
+    Flux<byte[]> downloadDroplet(DownloadApplicationDropletRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps/get_the_env_for_an_app.html">Get the env for an App</a> request

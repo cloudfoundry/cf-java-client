@@ -51,9 +51,9 @@ public final class SpringServiceKeysTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(POST).path("/v2/service_keys")
-                .requestPayload("client/v2/service_keys/POST_request.json")
+                .requestPayload("fixtures/client/v2/service_keys/POST_request.json")
                 .status(CREATED)
-                .responsePayload("client/v2/service_keys/POST_response.json");
+                .responsePayload("fixtures/client/v2/service_keys/POST_response.json");
         }
 
         @Override
@@ -135,7 +135,7 @@ public final class SpringServiceKeysTest {
             return new RequestContext()
                 .method(GET).path("/v2/service_keys/test-service-key-id")
                 .status(OK)
-                .responsePayload("client/v2/service_keys/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v2/service_keys/GET_{id}_response.json");
         }
 
         @Override
@@ -182,7 +182,7 @@ public final class SpringServiceKeysTest {
             return new RequestContext()
                 .method(GET).path("/v2/service_keys?q=name%20IN%20test-name&page=-1")
                 .status(OK)
-                .responsePayload("client/v2/service_keys/GET_response.json");
+                .responsePayload("fixtures/client/v2/service_keys/GET_response.json");
         }
 
         @Override

@@ -40,7 +40,7 @@ public final class SpringInfoTest {
             return new RequestContext()
                 .method(GET).path("/v2/info")
                 .status(OK)
-                .responsePayload("client/v2/info/GET_response.json");
+                .responsePayload("fixtures/client/v2/info/GET_response.json");
         }
 
         @Override

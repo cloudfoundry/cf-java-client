@@ -17,9 +17,9 @@
 package org.cloudfoundry.util;
 
 import reactor.core.publisher.Mono;
-import reactor.fn.Function;
 
 import java.util.NoSuchElementException;
+import java.util.function.Function;
 
 /**
  * Utilities for dealing with {@link Exception}s
@@ -42,18 +42,13 @@ public final class ExceptionUtils {
      * @return a function that converts errors
      */
     public static <T> Function<Throwable, Mono<T>> convert(final String format, final Object... args) {
-        return new Function<Throwable, Mono<T>>() {
-
-            @Override
-            public Mono<T> apply(Throwable throwable) {
-                if (throwable instanceof NoSuchElementException) {
-                    String message = String.format(format, args);
-                    return Mono.error(new IllegalArgumentException(message, throwable));
-                } else {
-                    return Mono.error(throwable);
-                }
+        return throwable -> {
+            if (throwable instanceof NoSuchElementException) {
+                String message = String.format(format, args);
+                return Mono.error(new IllegalArgumentException(message, throwable));
+            } else {
+                return Mono.error(throwable);
             }
-
         };
     }
 

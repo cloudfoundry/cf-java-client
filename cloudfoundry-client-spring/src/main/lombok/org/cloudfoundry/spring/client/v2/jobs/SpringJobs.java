@@ -17,15 +17,13 @@
 package org.cloudfoundry.spring.client.v2.jobs;
 
 import lombok.ToString;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.v2.job.GetJobRequest;
 import org.cloudfoundry.client.v2.job.GetJobResponse;
 import org.cloudfoundry.client.v2.job.Jobs;
+import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -47,15 +45,8 @@ public final class SpringJobs extends AbstractSpringOperations implements Jobs {
     }
 
     @Override
-    public Mono<GetJobResponse> get(final GetJobRequest request) {
-        return get(request, GetJobResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder uriComponentsBuilder) {
-                uriComponentsBuilder.pathSegment("v2", "jobs", request.getJobId());
-            }
-
-        });
+    public Mono<GetJobResponse> get(GetJobRequest request) {
+        return get(request, GetJobResponse.class, uriComponentsBuilder -> uriComponentsBuilder.pathSegment("v2", "jobs", request.getJobId()));
     }
 
 }

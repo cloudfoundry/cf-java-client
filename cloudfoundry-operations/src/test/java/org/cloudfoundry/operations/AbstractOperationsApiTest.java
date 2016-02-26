@@ -21,7 +21,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 import org.reactivestreams.Publisher;
-import reactor.fn.Supplier;
+
+import java.util.function.Supplier;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -50,13 +51,6 @@ public abstract class AbstractOperationsApiTest<T> extends AbstractOperationsTes
     protected abstract Publisher<T> invoke();
 
     private Supplier<String> getScanningLoggerName() {
-        return new Supplier<String>() {
-
-            @Override
-            public String get() {
-                return String.format("%s.%s", AbstractOperationsApiTest.this.getClass().getSimpleName(), AbstractOperationsApiTest.this.testName.getMethodName());
-            }
-
-        };
+        return () -> String.format("%s.%s", this.getClass().getSimpleName(), this.testName.getMethodName());
     }
 }

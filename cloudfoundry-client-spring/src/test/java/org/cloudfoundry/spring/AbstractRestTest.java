@@ -151,7 +151,7 @@ public abstract class AbstractRestTest {
 
         public RequestContext errorResponse() {
             status(UNPROCESSABLE_ENTITY);
-            responsePayload("client/v2/error_response.json");
+            responsePayload("fixtures/client/v2/error_response.json");
             return this;
         }
 

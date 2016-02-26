@@ -90,14 +90,14 @@ public final class SpaceQuota {
     private final Integer totalServiceInstances;
 
     @Builder
-    private SpaceQuota(String id,
-                       Integer instanceMemoryLimit,
-                       String name,
-                       String organizationId,
-                       Boolean paidServicePlans,
-                       Integer totalMemoryLimit,
-                       Integer totalRoutes,
-                       Integer totalServiceInstances) {
+    SpaceQuota(String id,
+               Integer instanceMemoryLimit,
+               String name,
+               String organizationId,
+               Boolean paidServicePlans,
+               Integer totalMemoryLimit,
+               Integer totalRoutes,
+               Integer totalServiceInstances) {
         this.id = id;
         this.instanceMemoryLimit = instanceMemoryLimit;
         this.name = name;

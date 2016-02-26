@@ -56,9 +56,9 @@ public final class SpringServiceBrokersTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(POST).path("/v2/service_brokers")
-                .requestPayload("client/v2/service_brokers/POST_request.json")
+                .requestPayload("fixtures/client/v2/service_brokers/POST_request.json")
                 .status(CREATED)
-                .responsePayload("client/v2/service_brokers/POST_response.json");
+                .responsePayload("fixtures/client/v2/service_brokers/POST_response.json");
         }
 
         @Override
@@ -143,7 +143,7 @@ public final class SpringServiceBrokersTest {
             return new RequestContext()
                 .method(GET).path("/v2/service_brokers/test-service-broker-id")
                 .status(OK)
-                .responsePayload("client/v2/service_brokers/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v2/service_brokers/GET_{id}_response.json");
         }
 
         @Override
@@ -191,7 +191,7 @@ public final class SpringServiceBrokersTest {
             return new RequestContext()
                 .method(GET).path("/v2/service_brokers?q=name%20IN%20test-name&page=-1")
                 .status(OK)
-                .responsePayload("client/v2/service_brokers/GET_response.json");
+                .responsePayload("fixtures/client/v2/service_brokers/GET_response.json");
         }
 
         @Override
@@ -267,9 +267,9 @@ public final class SpringServiceBrokersTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PUT).path("/v2/service_brokers/test-service-broker-id")
-                .requestPayload("client/v2/service_brokers/PUT_{id}_request.json")
+                .requestPayload("fixtures/client/v2/service_brokers/PUT_{id}_request.json")
                 .status(OK)
-                .responsePayload("client/v2/service_brokers/PUT_{id}_response.json");
+                .responsePayload("fixtures/client/v2/service_brokers/PUT_{id}_response.json");
         }
 
         @Override

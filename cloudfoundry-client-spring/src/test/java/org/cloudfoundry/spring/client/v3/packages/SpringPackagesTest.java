@@ -69,7 +69,7 @@ public final class SpringPackagesTest {
             return new RequestContext()
                 .method(POST).path("/v3/apps/test-application-id/packages?source_package_guid=test-source-package-id")
                 .status(OK)
-                .responsePayload("client/v3/apps/POST_{id}_packages_copy_response.json");
+                .responsePayload("fixtures/client/v3/apps/POST_{id}_packages_copy_response.json");
         }
 
         @Override
@@ -122,9 +122,9 @@ public final class SpringPackagesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(POST).path("/v3/apps/test-application-id/packages")
-                .requestPayload("client/v3/apps/POST_{id}_packages_request.json")
+                .requestPayload("fixtures/client/v3/apps/POST_{id}_packages_request.json")
                 .status(CREATED)
-                .responsePayload("client/v3/apps/POST_{id}_packages_response.json");
+                .responsePayload("fixtures/client/v3/apps/POST_{id}_packages_response.json");
         }
 
         @Override
@@ -221,12 +221,12 @@ public final class SpringPackagesTest {
             return new RequestContext()
                 .method(GET).path("/v3/packages/test-package-id/download")
                 .status(OK)
-                .responsePayload("client/v3/packages/GET_{id}_download_response.bin");
+                .responsePayload("fixtures/client/v3/packages/GET_{id}_download_response.bin");
         }
 
         @Override
         protected byte[] getResponse() {
-            return getContents(new ClassPathResource("client/v3/packages/GET_{id}_download_response.bin"));
+            return getContents(new ClassPathResource("fixtures/client/v3/packages/GET_{id}_download_response.bin"));
         }
 
         @Override
@@ -258,7 +258,7 @@ public final class SpringPackagesTest {
             return new RequestContext()
                 .method(GET).path("/v3/packages/test-package-id")
                 .status(OK)
-                .responsePayload("client/v3/packages/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v3/packages/GET_{id}_response.json");
         }
 
         @Override
@@ -324,7 +324,7 @@ public final class SpringPackagesTest {
             return new RequestContext()
                 .method(GET).path("/v3/packages")
                 .status(OK)
-                .responsePayload("client/v3/packages/GET_response.json");
+                .responsePayload("fixtures/client/v3/packages/GET_response.json");
         }
 
         @Override
@@ -419,9 +419,9 @@ public final class SpringPackagesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(POST).path("/v3/packages/test-package-id/droplets")
-                .requestPayload("client/v3/packages/POST_{id}_droplets_request.json")
+                .requestPayload("fixtures/client/v3/packages/POST_{id}_droplets_request.json")
                 .status(CREATED)
-                .responsePayload("client/v3/packages/POST_{id}_droplets_response.json");
+                .responsePayload("fixtures/client/v3/packages/POST_{id}_droplets_response.json");
         }
 
         @Override
@@ -511,7 +511,7 @@ public final class SpringPackagesTest {
                 .requestMatcher(header("Content-Type", startsWith(MULTIPART_FORM_DATA_VALUE)))
                 .anyRequestPayload()
                 .status(CREATED)
-                .responsePayload("client/v3/packages/POST_{id}_upload_response.json");
+                .responsePayload("fixtures/client/v3/packages/POST_{id}_upload_response.json");
         }
 
         @Override
@@ -551,7 +551,7 @@ public final class SpringPackagesTest {
         @Override
         protected UploadPackageRequest getValidRequest() throws Exception {
             return UploadPackageRequest.builder()
-                .bits(new ClassPathResource("client/v3/packages/test-file").getInputStream())
+                .bits(new ClassPathResource("fixtures/client/v3/packages/test-file").getInputStream())
                 .packageId("test-package-id")
                 .build();
         }

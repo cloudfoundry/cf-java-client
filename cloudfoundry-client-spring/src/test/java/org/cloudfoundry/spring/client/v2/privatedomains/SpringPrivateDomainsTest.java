@@ -42,9 +42,9 @@ public final class SpringPrivateDomainsTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(POST).path("/v2/private_domains")
-                .requestPayload("client/v2/private_domains/POST_request.json")
+                .requestPayload("fixtures/client/v2/private_domains/POST_request.json")
                 .status(OK)
-                .responsePayload("client/v2/private_domains/POST_response.json");
+                .responsePayload("fixtures/client/v2/private_domains/POST_response.json");
         }
 
         @Override

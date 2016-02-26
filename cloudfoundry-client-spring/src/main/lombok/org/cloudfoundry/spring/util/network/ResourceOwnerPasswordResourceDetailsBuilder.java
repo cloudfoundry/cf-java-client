@@ -19,10 +19,10 @@ package org.cloudfoundry.spring.util.network;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.cloudfoundry.util.Optional;
 import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordResourceDetails;
 
 import java.net.URI;
+import java.util.Optional;
 
 @Accessors(chain = true, fluent = true)
 @Setter

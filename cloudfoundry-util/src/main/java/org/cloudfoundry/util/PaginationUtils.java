@@ -19,8 +19,9 @@ package org.cloudfoundry.util;
 import org.cloudfoundry.client.v2.PaginatedResponse;
 import org.cloudfoundry.client.v2.Resource;
 import reactor.core.publisher.Mono;
-import reactor.fn.Function;
-import reactor.rx.Stream;
+import reactor.rx.Fluxion;
+
+import java.util.function.Function;
 
 /**
  * A utility class to provide functions for handling {@link PaginatedResponse}s and those containing lists of {@link Resource}s.
@@ -37,11 +38,11 @@ public final class PaginationUtils {
      * @param <U>          the type of {@link PaginatedResponse}.
      * @return a stream of <code>U</code> objects.
      */
-    public static <U extends PaginatedResponse<?>> Stream<U> requestPages(final Function<Integer, Mono<U>> pageSupplier) {
+    public static <U extends PaginatedResponse<?>> Fluxion<U> requestPages(final Function<Integer, Mono<U>> pageSupplier) {
         return pageSupplier
             .apply(1)
             .flatMap(requestAdditionalPages(pageSupplier))
-            .as(OperationUtils.<U>stream());
+            .as(Fluxion::from);
     }
 
     /**
@@ -52,38 +53,22 @@ public final class PaginationUtils {
      * @param <U>          the type of {@link PaginatedResponse}.
      * @return a stream of <code>R</code> objects.
      */
-    public static <R extends Resource<?>, U extends PaginatedResponse<R>> Stream<R> requestResources(final Function<Integer, Mono<U>> pageSupplier) {
+    public static <R extends Resource<?>, U extends PaginatedResponse<R>> Fluxion<R> requestResources(final Function<Integer, Mono<U>> pageSupplier) {
         return requestPages(pageSupplier)
-            .flatMap(ResourceUtils.<R, U>extractResources());
+            .flatMap(ResourceUtils::getResources);
     }
 
-    private static <U extends PaginatedResponse<?>> Function<U, Stream<U>> requestAdditionalPages(final Function<Integer, Mono<U>> pageSupplier) {
-        return new Function<U, Stream<U>>() {
-
-            @Override
-            public Stream<U> apply(U response) {
-                Integer totalPages = response.getTotalPages();
-                if (totalPages == null) {
-                    throw new IllegalStateException(String.format("Page response (class %s) has no total pages set", response.getClass().getCanonicalName()));
-                }
-
-                return Stream
-                    .range(2, totalPages - 1)
-                    .flatMap(requestPage(pageSupplier))
-                    .startWith(response);
+    private static <U extends PaginatedResponse<?>> Function<U, Fluxion<U>> requestAdditionalPages(final Function<Integer, Mono<U>> pageSupplier) {
+        return response -> {
+            Integer totalPages = response.getTotalPages();
+            if (totalPages == null) {
+                throw new IllegalStateException(String.format("Page response (class %s) has no total pages set", response.getClass().getCanonicalName()));
             }
 
-        };
-    }
-
-    private static <U extends PaginatedResponse<?>> Function<Integer, Mono<U>> requestPage(final Function<Integer, Mono<U>> pageSupplier) {
-        return new Function<Integer, Mono<U>>() {
-
-            @Override
-            public Mono<U> apply(Integer page) {
-                return pageSupplier.apply(page);
-            }
-
+            return Fluxion
+                .range(2, totalPages - 1)
+                .flatMap(pageSupplier::apply)
+                .startWith(response);
         };
     }
 

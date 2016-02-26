@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.util.tuple;
 
-import reactor.fn.Function;
+import java.util.function.Function;
 
 public interface Function1<T1, R> extends Function<T1, R> {
 

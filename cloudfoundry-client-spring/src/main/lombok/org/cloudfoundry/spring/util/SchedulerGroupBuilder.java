@@ -19,9 +19,10 @@ package org.cloudfoundry.spring.util;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.cloudfoundry.util.Optional;
 import reactor.core.publisher.SchedulerGroup;
 import reactor.core.util.PlatformDependent;
+
+import java.util.Optional;
 
 @Accessors(chain = true, fluent = true)
 @Setter

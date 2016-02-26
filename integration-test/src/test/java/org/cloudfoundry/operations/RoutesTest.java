@@ -29,7 +29,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
-import reactor.rx.Stream;
+import reactor.rx.Fluxion;
 
 import static org.cloudfoundry.operations.routes.ListRoutesRequest.Level.ORGANIZATION;
 import static org.cloudfoundry.operations.routes.ListRoutesRequest.Level.SPACE;
@@ -179,11 +179,12 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = getPath();
 
         createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
-            .as(Stream::from)
-            .as(afterStreamComplete(() -> Stream.from(this.cloudFoundryOperations.routes()
+            .as(Fluxion::from)
+            .as(afterStreamComplete(() -> this.cloudFoundryOperations.routes()
                 .list(ListRoutesRequest.builder()
                     .level(ORGANIZATION)
-                    .build()))))
+                    .build())
+                .as(Fluxion::from)))
             .filter(returnedRoute -> routeMatches(returnedRoute, domainName, hostName, path))
             .subscribe(testSubscriber()
                 .assertCount(1));
@@ -196,11 +197,12 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = getPath();
 
         createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
-            .as(Stream::from)
-            .as(afterStreamComplete(() -> Stream.from(this.cloudFoundryOperations.routes()
+            .as(Fluxion::from)
+            .as(afterStreamComplete(() -> this.cloudFoundryOperations.routes()
                 .list(ListRoutesRequest.builder()
                     .level(SPACE)
-                    .build()))))
+                    .build())
+                .as(Fluxion::from)))
             .filter(returnedRoute -> routeMatches(returnedRoute, domainName, hostName, path))
             .subscribe(testSubscriber()
                 .assertCount(1));

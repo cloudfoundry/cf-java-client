@@ -18,64 +18,11 @@ package org.cloudfoundry.util;
 
 import org.cloudfoundry.client.v2.PaginatedResponse;
 import org.cloudfoundry.client.v2.Resource;
-import reactor.fn.Function;
-import reactor.rx.Stream;
+import reactor.rx.Fluxion;
 
 public final class ResourceUtils {
 
     private ResourceUtils() {
-    }
-
-    /**
-     * Returns a function to extract the entity of a resource
-     *
-     * @param <R> The resource type to extract the entity from
-     * @param <T> The entity type to be extracted
-     * @return a function to extract the entity of a resource
-     */
-    public static <R extends Resource<T>, T> Function<R, T> extractEntity() {
-        return new Function<R, T>() {
-
-            @Override
-            public T apply(R resource) {
-                return getEntity(resource);
-            }
-
-        };
-    }
-
-    /**
-     * Returns a function to extract the id of a resource
-     *
-     * @return the function to extract the id of a resource
-     */
-    public static Function<Resource<?>, String> extractId() {
-        return new Function<Resource<?>, String>() {
-
-            @Override
-            public String apply(Resource<?> resource) {
-                return getId(resource);
-            }
-
-        };
-    }
-
-    /**
-     * Returns a function to extract the resources from a response
-     *
-     * @param <R> the resource type
-     * @param <U> the response type
-     * @return the function to extract the resources from the response
-     */
-    public static <R extends Resource<?>, U extends PaginatedResponse<R>> Function<U, Stream<R>> extractResources() {
-        return new Function<U, Stream<R>>() {
-
-            @Override
-            public Stream<R> apply(U pageResponse) {
-                return getResources(pageResponse);
-            }
-
-        };
     }
 
     /**
@@ -107,8 +54,8 @@ public final class ResourceUtils {
      * @param <U>      the response type
      * @return a stream of resources from the response
      */
-    public static <R extends Resource<?>, U extends PaginatedResponse<R>> Stream<R> getResources(U response) {
-        return Stream.fromIterable(response.getResources());
+    public static <R extends Resource<?>, U extends PaginatedResponse<R>> Fluxion<R> getResources(U response) {
+        return Fluxion.fromIterable(response.getResources());
     }
 
 }

@@ -88,7 +88,7 @@ public final class SpringDropletsTest {
             return new RequestContext()
                 .method(GET).path("/v3/droplets/test-droplet-id")
                 .status(OK)
-                .responsePayload("client/v3/droplets/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v3/droplets/GET_{id}_response.json");
         }
 
         @Override
@@ -159,7 +159,7 @@ public final class SpringDropletsTest {
             return new RequestContext()
                 .method(GET).path("/v3/droplets")
                 .status(OK)
-                .responsePayload("client/v3/droplets/GET_response.json");
+                .responsePayload("fixtures/client/v3/droplets/GET_response.json");
         }
 
         @Override

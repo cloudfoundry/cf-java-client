@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.operations.spacequotas;
 
-import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -37,6 +37,6 @@ public interface SpaceQuotas {
      *
      * @return the space quotas
      */
-    Publisher<SpaceQuota> list();
+    Flux<SpaceQuota> list();
 
 }

@@ -17,9 +17,6 @@
 package org.cloudfoundry.spring.client.v2.servicekeys;
 
 import lombok.ToString;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.QueryBuilder;
-import org.cloudfoundry.spring.client.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyRequest;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyResponse;
@@ -29,11 +26,12 @@ import org.cloudfoundry.client.v2.servicekeys.GetServiceKeyResponse;
 import org.cloudfoundry.client.v2.servicekeys.ListServiceKeysRequest;
 import org.cloudfoundry.client.v2.servicekeys.ListServiceKeysResponse;
 import org.cloudfoundry.client.v2.servicekeys.ServiceKeys;
+import org.cloudfoundry.spring.client.v2.FilterBuilder;
+import org.cloudfoundry.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -55,52 +53,26 @@ public final class SpringServiceKeys extends AbstractSpringOperations implements
     }
 
     @Override
-    public Mono<CreateServiceKeyResponse> create(final CreateServiceKeyRequest request) {
-        return post(request, CreateServiceKeyResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_keys");
-            }
-
-        });
+    public Mono<CreateServiceKeyResponse> create(CreateServiceKeyRequest request) {
+        return post(request, CreateServiceKeyResponse.class, builder -> builder.pathSegment("v2", "service_keys"));
     }
 
     @Override
-    public Mono<Void> delete(final DeleteServiceKeyRequest request) {
-        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_keys", request.getServiceKeyId());
-            }
-
-        });
+    public Mono<Void> delete(DeleteServiceKeyRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "service_keys", request.getServiceKeyId()));
     }
 
     @Override
-    public Mono<GetServiceKeyResponse> get(final GetServiceKeyRequest request) {
-        return get(request, GetServiceKeyResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_keys", request.getServiceKeyId());
-            }
-
-        });
+    public Mono<GetServiceKeyResponse> get(GetServiceKeyRequest request) {
+        return get(request, GetServiceKeyResponse.class, builder -> builder.pathSegment("v2", "service_keys", request.getServiceKeyId()));
     }
 
     @Override
-    public Mono<ListServiceKeysResponse> list(final ListServiceKeysRequest request) {
-        return get(request, ListServiceKeysResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_keys");
-                FilterBuilder.augment(builder, request);
-                QueryBuilder.augment(builder, request);
-            }
-
+    public Mono<ListServiceKeysResponse> list(ListServiceKeysRequest request) {
+        return get(request, ListServiceKeysResponse.class, builder -> {
+            builder.pathSegment("v2", "service_keys");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
         });
     }
 

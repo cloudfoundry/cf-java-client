@@ -47,7 +47,7 @@ public final class SpringStacksTest {
             return new RequestContext()
                 .method(GET).path("/v2/stacks/test-stack-id")
                 .status(OK)
-                .responsePayload("client/v2/stacks/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v2/stacks/GET_{id}_response.json");
         }
 
         @Override
@@ -93,7 +93,7 @@ public final class SpringStacksTest {
             return new RequestContext()
                 .method(GET).path("/v2/stacks?q=name%20IN%20test-name&page=-1")
                 .status(OK)
-                .responsePayload("client/v2/stacks/GET_response.json");
+                .responsePayload("fixtures/client/v2/stacks/GET_response.json");
         }
 
         @Override

@@ -17,9 +17,6 @@
 package org.cloudfoundry.spring.client.v2.domains;
 
 import lombok.ToString;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.QueryBuilder;
-import org.cloudfoundry.spring.client.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v2.domains.CreateDomainResponse;
 import org.cloudfoundry.client.v2.domains.DeleteDomainRequest;
@@ -31,11 +28,12 @@ import org.cloudfoundry.client.v2.domains.ListDomainSpacesRequest;
 import org.cloudfoundry.client.v2.domains.ListDomainSpacesResponse;
 import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v2.domains.ListDomainsResponse;
+import org.cloudfoundry.spring.client.v2.FilterBuilder;
+import org.cloudfoundry.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -57,67 +55,38 @@ public final class SpringDomains extends AbstractSpringOperations implements Dom
     }
 
     @Override
-    public Mono<CreateDomainResponse> create(final CreateDomainRequest request) {
-        return post(request, CreateDomainResponse.class, new Consumer<UriComponentsBuilder>() {
+    public Mono<CreateDomainResponse> create(CreateDomainRequest request) {
+        return post(request, CreateDomainResponse.class, builder -> builder.pathSegment("v2", "domains"));
+    }
 
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "domains");
-            }
-
+    @Override
+    public Mono<DeleteDomainResponse> delete(DeleteDomainRequest request) {
+        return delete(request, DeleteDomainResponse.class, builder -> {
+            builder.pathSegment("v2", "domains", request.getDomainId());
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
-    public Mono<DeleteDomainResponse> delete(final DeleteDomainRequest request) {
-        return delete(request, DeleteDomainResponse.class, new Consumer<UriComponentsBuilder>() {
+    public Mono<GetDomainResponse> get(GetDomainRequest request) {
+        return get(request, GetDomainResponse.class, uriComponentsBuilder -> uriComponentsBuilder.pathSegment("v2", "domains", request.getDomainId()));
+    }
 
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "domains", request.getDomainId());
-                QueryBuilder.augment(builder, request);
-            }
-
+    @Override
+    public Mono<ListDomainsResponse> list(ListDomainsRequest request) {
+        return get(request, ListDomainsResponse.class, builder -> {
+            builder.pathSegment("v2", "domains");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
-    public Mono<GetDomainResponse> get(final GetDomainRequest request) {
-        return get(request, GetDomainResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder uriComponentsBuilder) {
-                uriComponentsBuilder.pathSegment("v2", "domains", request.getDomainId());
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<ListDomainsResponse> list(final ListDomainsRequest request) {
-        return get(request, ListDomainsResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "domains");
-                FilterBuilder.augment(builder, request);
-                QueryBuilder.augment(builder, request);
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<ListDomainSpacesResponse> listSpaces(final ListDomainSpacesRequest request) {
-        return get(request, ListDomainSpacesResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "domains", request.getDomainId(), "spaces");
-                FilterBuilder.augment(builder, request);
-                QueryBuilder.augment(builder, request);
-            }
-
+    public Mono<ListDomainSpacesResponse> listSpaces(ListDomainSpacesRequest request) {
+        return get(request, ListDomainSpacesResponse.class, builder -> {
+            builder.pathSegment("v2", "domains", request.getDomainId(), "spaces");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
         });
     }
 

@@ -36,16 +36,6 @@ public class GetFeatureFlagRequestTest {
     }
 
     @Test
-    public void isValidNoName() throws Exception {
-        ValidationResult result = GetFeatureFlagRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
     public void isValidBadName1() throws Exception {
         ValidationResult result = GetFeatureFlagRequest.builder()
             .name("mustn't have spaces or / chars (or quotes, or parentheses, or commas)")
@@ -76,5 +66,15 @@ public class GetFeatureFlagRequestTest {
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("name must consist only of alphabetic characters and underscores", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isValidNoName() throws Exception {
+        ValidationResult result = GetFeatureFlagRequest.builder()
+            .build()
+            .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("name must be specified", result.getMessages().get(0));
     }
 }

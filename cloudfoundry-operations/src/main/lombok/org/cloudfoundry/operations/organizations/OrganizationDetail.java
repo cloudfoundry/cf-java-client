@@ -78,12 +78,12 @@ public final class OrganizationDetail {
     private final List<SpaceQuota> spacesQuotas;
 
     @Builder
-    private OrganizationDetail(@Singular List<String> domains,
-                               String id,
-                               String name,
-                               OrganizationQuota quota,
-                               @Singular List<SpaceQuota> spacesQuotas,
-                               @Singular List<String> spaces) {
+    OrganizationDetail(@Singular List<String> domains,
+                       String id,
+                       String name,
+                       OrganizationQuota quota,
+                       @Singular List<SpaceQuota> spacesQuotas,
+                       @Singular List<String> spaces) {
         this.domains = domains;
         this.id = id;
         this.name = name;

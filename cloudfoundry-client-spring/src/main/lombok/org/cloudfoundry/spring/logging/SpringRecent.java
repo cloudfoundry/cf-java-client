@@ -20,13 +20,10 @@ import lombok.ToString;
 import org.cloudfoundry.logging.LogMessage;
 import org.cloudfoundry.logging.RecentLogsRequest;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
-import reactor.fn.Function;
-import reactor.rx.Stream;
+import reactor.rx.Fluxion;
 
 import java.net.URI;
 import java.util.List;
@@ -48,25 +45,10 @@ public final class SpringRecent extends AbstractSpringOperations {
         super(restOperations, root, schedulerGroup);
     }
 
-    @SuppressWarnings("rawtypes")
-    public Publisher<LogMessage> recent(final RecentLogsRequest request) {
-        return get(request, List.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("recent").queryParam("app", request.getApplicationId());
-            }
-
-        })
-            .flatMap(new Function<List, Stream<LogMessage>>() {
-
-                @Override
-                @SuppressWarnings("unchecked")
-                public Stream<LogMessage> apply(List messages) {
-                    return Stream.fromIterable(messages);
-                }
-
-            });
+    @SuppressWarnings("unchecked")
+    public Flux<LogMessage> recent(final RecentLogsRequest request) {
+        return get(request, List.class, builder -> builder.pathSegment("recent").queryParam("app", request.getApplicationId()))
+            .flatMap(Fluxion::fromIterable);
     }
 
 }

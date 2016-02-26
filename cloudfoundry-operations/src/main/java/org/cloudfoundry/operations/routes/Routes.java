@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.operations.routes;
 
-import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -63,7 +63,7 @@ public interface Routes {
      * @param request the List Routes request
      * @return the routes and the applications bound to those routes
      */
-    Publisher<Route> list(ListRoutesRequest request);
+    Flux<Route> list(ListRoutesRequest request);
 
     /**
      * Add a URL route to an application

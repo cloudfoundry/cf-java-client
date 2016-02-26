@@ -215,9 +215,9 @@ The integration tests require a running instance of Cloud Foundry to test agains
 
 Name | Description
 ---- | -----------
-`TEST_DOMAIN` | The default domain of the Cloud Foundry instance.  Typically something like `local.micropcf.io`.
 `TEST_HOST` | The host of Cloud Foundry instance.  Typically something like `api.local.micropcf.io`.
 `TEST_PASSWORD` | The test user's password
+`TEST_PROTECTED_DOMAIN` | A domain that will not be cleaned up
 `TEST_PROTECTED_ORGANIZATION` | An organization who's contents will not be cleaned up
 `TEST_SKIPSSLVALIDATION` | Whether to skip SSL validation when connecting to the Cloud Foundry instance.  Typically `true` when connecting to a MicroPCF instance.
 `TEST_USERNAME` | The test user's username

@@ -18,9 +18,6 @@ package org.cloudfoundry.spring.client.v2.serviceplans;
 
 
 import lombok.ToString;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.QueryBuilder;
-import org.cloudfoundry.spring.client.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.serviceplans.DeleteServicePlanRequest;
 import org.cloudfoundry.client.v2.serviceplans.DeleteServicePlanResponse;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanRequest;
@@ -32,11 +29,12 @@ import org.cloudfoundry.client.v2.serviceplans.ListServicePlansResponse;
 import org.cloudfoundry.client.v2.serviceplans.MigrateServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceplans.MigrateServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlans;
+import org.cloudfoundry.spring.client.v2.FilterBuilder;
+import org.cloudfoundry.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 /**
  * The Spring-based implementation of {@link ServicePlans}
@@ -56,66 +54,39 @@ public final class SpringServicePlans extends AbstractSpringOperations implement
     }
 
     @Override
-    public Mono<DeleteServicePlanResponse> delete(final DeleteServicePlanRequest request) {
-        return delete(request, DeleteServicePlanResponse.class, new Consumer<UriComponentsBuilder>() {
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_plans", request.getServicePlanId());
-                QueryBuilder.augment(builder, request);
-            }
+    public Mono<DeleteServicePlanResponse> delete(DeleteServicePlanRequest request) {
+        return delete(request, DeleteServicePlanResponse.class, builder -> {
+            builder.pathSegment("v2", "service_plans", request.getServicePlanId());
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
-    public Mono<GetServicePlanResponse> get(final GetServicePlanRequest request) {
-        return get(request, GetServicePlanResponse.class, new Consumer<UriComponentsBuilder>() {
+    public Mono<GetServicePlanResponse> get(GetServicePlanRequest request) {
+        return get(request, GetServicePlanResponse.class, builder -> builder.pathSegment("v2", "service_plans", request.getServicePlanId()));
+    }
 
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_plans", request.getServicePlanId());
-            }
-
+    @Override
+    public Mono<ListServicePlansResponse> list(ListServicePlansRequest request) {
+        return get(request, ListServicePlansResponse.class, builder -> {
+            builder.pathSegment("v2", "service_plans");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
-    public Mono<ListServicePlansResponse> list(final ListServicePlansRequest request) {
-        return get(request, ListServicePlansResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_plans");
-                FilterBuilder.augment(builder, request);
-                QueryBuilder.augment(builder, request);
-            }
-
+    public Mono<ListServicePlanServiceInstancesResponse> listServiceInstances(ListServicePlanServiceInstancesRequest request) {
+        return get(request, ListServicePlanServiceInstancesResponse.class, builder -> {
+            builder.pathSegment("v2", "service_plans", request.getServicePlanId(), "service_instances");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
-    public Mono<ListServicePlanServiceInstancesResponse> listServiceInstances(final ListServicePlanServiceInstancesRequest request) {
-        return get(request, ListServicePlanServiceInstancesResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_plans", request.getServicePlanId(), "service_instances");
-                FilterBuilder.augment(builder, request);
-                QueryBuilder.augment(builder, request);
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<MigrateServiceInstancesResponse> migrateServiceInstances(final MigrateServiceInstancesRequest request) {
-        return put(request, MigrateServiceInstancesResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_plans", request.getCurrentServicePlanId(), "service_instances");
-            }
-
-        });
+    public Mono<MigrateServiceInstancesResponse> migrateServiceInstances(MigrateServiceInstancesRequest request) {
+        return put(request, MigrateServiceInstancesResponse.class, builder -> builder.pathSegment("v2", "service_plans", request.getCurrentServicePlanId(), "service_instances"));
     }
 
 }

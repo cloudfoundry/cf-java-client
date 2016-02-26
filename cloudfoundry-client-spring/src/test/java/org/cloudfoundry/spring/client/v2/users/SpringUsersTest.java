@@ -43,7 +43,7 @@ public final class SpringUsersTest {
             return new RequestContext()
                 .method(GET).path("/v2/users?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/users/GET_response.json");
+                .responsePayload("fixtures/client/v2/users/GET_response.json");
         }
 
         @Override

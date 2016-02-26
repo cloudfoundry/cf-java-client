@@ -67,6 +67,16 @@
                 <artifactId>jjwt</artifactId>
                 <version>${jjwt.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.projectreactor</groupId>
+                <artifactId>reactor-core</artifactId>
+                <version>${reactor.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.projectreactor</groupId>
+                <artifactId>reactor-stream</artifactId>
+                <version>${reactor.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -76,7 +86,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.5</version>
+                    <version>3.5.1</version>
                     <configuration>
                         <compilerArgs>
                             <arg>-Werror</arg>
@@ -85,8 +95,8 @@
                             <arg>-Xlint:-processing</arg>
                         </compilerArgs>
                         <showWarnings>true</showWarnings>
-                        <source>1.7</source>
-                        <target>1.7</target>
+                        <source>1.8</source>
+                        <target>1.8</target>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -95,7 +105,6 @@
                     <version>2.10.3</version>
                     <configuration>
                         <links>
-                            <link>http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/</link>
                             <link>http://projectreactor.io/core/docs/api/</link>
                         </links>
                         <quiet>true</quiet>
@@ -112,7 +121,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>2.4</version>
+                    <version>3.0.0</version>
                     <executions>
                         <execution>
                             <id>attach-sources</id>
@@ -133,27 +142,6 @@
                         </includes>
                         <runOrder>random</runOrder>
                     </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>animal-sniffer-maven-plugin</artifactId>
-                    <version>1.14</version>
-                    <configuration>
-                        <signature>
-                            <groupId>org.codehaus.mojo.signature</groupId>
-                            <artifactId>java17</artifactId>
-                            <version>1.0</version>
-                        </signature>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>check-api-compatibility</id>
-                            <phase>test</phase>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.projectlombok</groupId>
@@ -199,6 +187,14 @@
     </build>
 
     <repositories>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>http://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
         <repository>
             <id>spring-snapshots</id>
             <name>Spring Snapshots</name>

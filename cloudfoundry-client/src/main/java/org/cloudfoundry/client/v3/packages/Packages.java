@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v3.packages;
 
-import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -54,7 +54,7 @@ public interface Packages {
      * @param request the Download Package request
      * @return the response from the Download Package request
      */
-    Publisher<byte[]> download(DownloadPackageRequest request);
+    Flux<byte[]> download(DownloadPackageRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/packages_(experimental)/get_a_package.html">Get Package</a> request

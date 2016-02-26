@@ -24,10 +24,8 @@ import org.cloudfoundry.uaa.identityzonemanagement.GetIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzonemanagement.GetIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzonemanagement.IdentityZoneManagement;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -50,26 +48,12 @@ public final class SpringIdentityZoneManagement extends AbstractSpringOperations
 
     @Override
     public Mono<CreateIdentityZoneResponse> create(CreateIdentityZoneRequest request) {
-        return post(request, CreateIdentityZoneResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("identity-zones");
-            }
-
-        });
+        return post(request, CreateIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones"));
     }
 
     @Override
     public Mono<GetIdentityZoneResponse> get(final GetIdentityZoneRequest request) {
-        return get(request, GetIdentityZoneResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("identity-zones", request.getIdentityZoneId());
-            }
-
-        });
+        return get(request, GetIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones", request.getIdentityZoneId()));
     }
 
 }

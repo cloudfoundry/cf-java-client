@@ -72,14 +72,14 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
-import reactor.fn.Function;
-import reactor.fn.Predicate;
-import reactor.fn.tuple.Tuple2;
-import reactor.rx.Stream;
+import reactor.core.tuple.Tuple2;
+import reactor.rx.Fluxion;
 
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static java.time.temporal.ChronoUnit.HOURS;
 import static org.cloudfoundry.util.OperationUtils.afterComplete;
@@ -528,7 +528,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                         .spaceId(spaceId)
                         .page(page)
                         .build()))))
-            .as(Stream::from)
+            .as(Fluxion::from)
             .filter(domainResource -> domainName.equals(ResourceUtils.getEntity(domainResource).getName()))
             .subscribe(testSubscriber()
                 .assertCount(1));

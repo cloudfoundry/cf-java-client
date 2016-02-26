@@ -17,9 +17,6 @@
 package org.cloudfoundry.spring.client.v2.applications;
 
 import lombok.ToString;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.QueryBuilder;
-import org.cloudfoundry.spring.client.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
@@ -55,7 +52,9 @@ import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
-import org.reactivestreams.Publisher;
+import org.cloudfoundry.spring.client.v2.FilterBuilder;
+import org.cloudfoundry.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
@@ -64,11 +63,9 @@ import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
-import reactor.fn.Supplier;
 
 import java.net.URI;
 import java.util.List;
@@ -91,261 +88,125 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Mono<AssociateApplicationRouteResponse> associateRoute(final AssociateApplicationRouteRequest request) {
-        return put(request, AssociateApplicationRouteResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getApplicationId(), "routes", request.getRouteId());
-            }
-
-        });
+    public Mono<AssociateApplicationRouteResponse> associateRoute(AssociateApplicationRouteRequest request) {
+        return put(request, AssociateApplicationRouteResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "routes", request.getRouteId()));
     }
 
     @Override
-    public Mono<CopyApplicationResponse> copy(final CopyApplicationRequest request) {
-        return post(request, CopyApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getApplicationId(), "copy_bits");
-            }
-
-        });
+    public Mono<CopyApplicationResponse> copy(CopyApplicationRequest request) {
+        return post(request, CopyApplicationResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "copy_bits"));
     }
 
     @Override
     public Mono<CreateApplicationResponse> create(CreateApplicationRequest request) {
-        return post(request, CreateApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
+        return post(request, CreateApplicationResponse.class, builder -> builder.pathSegment("v2", "apps"));
+    }
 
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps");
-            }
+    @Override
+    public Mono<Void> delete(DeleteApplicationRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId()));
+    }
 
+    @Override
+    public Flux<byte[]> download(DownloadApplicationRequest request) {
+        return getStream(request, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "download"))
+            .as(Flux::from);
+    }
+
+    @Override
+    public Flux<byte[]> downloadDroplet(DownloadApplicationDropletRequest request) {
+        return getStream(request, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "droplet", "download"))
+            .as(Flux::from);
+    }
+
+    @Override
+    public Mono<ApplicationEnvironmentResponse> environment(ApplicationEnvironmentRequest request) {
+        return get(request, ApplicationEnvironmentResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "env"));
+    }
+
+    @Override
+    public Mono<GetApplicationResponse> get(GetApplicationRequest request) {
+        return get(request, GetApplicationResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId()));
+    }
+
+    @Override
+    public Mono<ApplicationInstancesResponse> instances(ApplicationInstancesRequest request) {
+        return get(request, ApplicationInstancesResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "instances"));
+    }
+
+    @Override
+    public Mono<ListApplicationsResponse> list(ListApplicationsRequest request) {
+        return get(request, ListApplicationsResponse.class, builder -> {
+            builder.pathSegment("v2", "apps");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
-    public Mono<Void> delete(final DeleteApplicationRequest request) {
-        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getApplicationId());
-            }
-
+    public Mono<ListApplicationRoutesResponse> listRoutes(ListApplicationRoutesRequest request) {
+        return get(request, ListApplicationRoutesResponse.class, builder -> {
+            builder.pathSegment("v2", "apps", request.getApplicationId(), "routes");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
-    public Publisher<byte[]> download(final DownloadApplicationRequest request) {
-        return getStream(request, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getApplicationId(), "download");
-            }
-
+    public Mono<ListApplicationServiceBindingsResponse> listServiceBindings(ListApplicationServiceBindingsRequest request) {
+        return get(request, ListApplicationServiceBindingsResponse.class, builder -> {
+            builder.pathSegment("v2", "apps", request.getApplicationId(), "service_bindings");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
-    public Publisher<byte[]> downloadDroplet(final DownloadApplicationDropletRequest request) {
-        return getStream(request, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getApplicationId(), "droplet", "download");
-            }
-
-        });
+    public Mono<Void> removeRoute(RemoveApplicationRouteRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "routes", request.getRouteId()));
     }
 
     @Override
-    public Mono<ApplicationEnvironmentResponse> environment(final ApplicationEnvironmentRequest request) {
-        return get(request, ApplicationEnvironmentResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getApplicationId(), "env");
-            }
-
-        });
+    public Mono<Void> removeServiceBinding(RemoveApplicationServiceBindingRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "service_bindings", request.getServiceBindingId()));
     }
 
     @Override
-    public Mono<GetApplicationResponse> get(final GetApplicationRequest request) {
-        return get(request, GetApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getApplicationId());
-            }
-
-        });
+    public Mono<RestageApplicationResponse> restage(RestageApplicationRequest request) {
+        return post(request, RestageApplicationResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "restage"));
     }
 
     @Override
-    public Mono<ApplicationInstancesResponse> instances(final ApplicationInstancesRequest request) {
-        return get(request, ApplicationInstancesResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getApplicationId(), "instances");
-            }
-
-        });
+    public Mono<ApplicationStatisticsResponse> statistics(ApplicationStatisticsRequest request) {
+        return get(request, ApplicationStatisticsResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "stats"));
     }
 
     @Override
-    public Mono<ListApplicationsResponse> list(final ListApplicationsRequest request) {
-        return get(request, ListApplicationsResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps");
-                FilterBuilder.augment(builder, request);
-                QueryBuilder.augment(builder, request);
-            }
-
-        });
+    public Mono<SummaryApplicationResponse> summary(SummaryApplicationRequest request) {
+        return get(request, SummaryApplicationResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "summary"));
     }
 
     @Override
-    public Mono<ListApplicationRoutesResponse> listRoutes(final ListApplicationRoutesRequest request) {
-        return get(request, ListApplicationRoutesResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getApplicationId(), "routes");
-                FilterBuilder.augment(builder, request);
-                QueryBuilder.augment(builder, request);
-            }
-
-        });
+    public Mono<Void> terminateInstance(TerminateApplicationInstanceRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "instances", request.getIndex()));
     }
 
     @Override
-    public Mono<ListApplicationServiceBindingsResponse> listServiceBindings(final ListApplicationServiceBindingsRequest request) {
-        return get(request, ListApplicationServiceBindingsResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getApplicationId(), "service_bindings");
-                FilterBuilder.augment(builder, request);
-                QueryBuilder.augment(builder, request);
-            }
-
-        });
+    public Mono<UpdateApplicationResponse> update(UpdateApplicationRequest request) {
+        return put(request, UpdateApplicationResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId()));
     }
 
     @Override
-    public Mono<Void> removeRoute(final RemoveApplicationRouteRequest request) {
-        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getApplicationId(), "routes", request.getRouteId());
-            }
-
+    public Mono<UploadApplicationResponse> upload(UploadApplicationRequest request) {
+        return putWithBody(request, () -> {
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("resources", getResourcesPart(request));
+            body.add("application", getApplicationPart(request));
+            return body;
+        }, UploadApplicationResponse.class, builder -> {
+            builder.pathSegment("v2", "apps", request.getApplicationId(), "bits");
+            QueryBuilder.augment(builder, request);
         });
-    }
-
-    @Override
-    public Mono<Void> removeServiceBinding(final RemoveApplicationServiceBindingRequest request) {
-        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getApplicationId(), "service_bindings", request.getServiceBindingId());
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<RestageApplicationResponse> restage(final RestageApplicationRequest request) {
-        return post(request, RestageApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getApplicationId(), "restage");
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<ApplicationStatisticsResponse> statistics(final ApplicationStatisticsRequest request) {
-        return get(request, ApplicationStatisticsResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getApplicationId(), "stats");
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<SummaryApplicationResponse> summary(final SummaryApplicationRequest request) {
-        return get(request, SummaryApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getApplicationId(), "summary");
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<Void> terminateInstance(final TerminateApplicationInstanceRequest request) {
-        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getApplicationId(), "instances", request.getIndex());
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<UpdateApplicationResponse> update(final UpdateApplicationRequest request) {
-        return put(request, UpdateApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getApplicationId());
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<UploadApplicationResponse> upload(final UploadApplicationRequest request) {
-        return putWithBody(request, new Supplier<MultiValueMap<String, Object>>() {
-
-                @Override
-                public MultiValueMap<String, Object> get() {
-                    MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-                    body.add("resources", getResourcesPart(request));
-                    body.add("application", getApplicationPart(request));
-                    return body;
-                }
-
-            }, UploadApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
-
-                @Override
-                public void accept(UriComponentsBuilder builder) {
-                    builder.pathSegment("v2", "apps", request.getApplicationId(), "bits");
-                    QueryBuilder.augment(builder, request);
-                }
-
-            }
-        );
     }
 
     private static HttpEntity<Resource> getApplicationPart(UploadApplicationRequest request) {

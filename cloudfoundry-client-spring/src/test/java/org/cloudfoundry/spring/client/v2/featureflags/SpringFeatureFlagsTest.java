@@ -42,7 +42,7 @@ public class SpringFeatureFlagsTest {
             return new RequestContext()
                 .method(GET).path("/v2/config/feature_flags/set_roles_by_username")
                 .status(OK)
-                .responsePayload("client/v2/feature_flags/GET_set_user_roles_flag_response.json");
+                .responsePayload("fixtures/client/v2/feature_flags/GET_set_user_roles_flag_response.json");
         }
 
         @Override
@@ -83,7 +83,7 @@ public class SpringFeatureFlagsTest {
             return new RequestContext()
                 .method(GET).path("/v2/config/feature_flags/app_scaling")
                 .status(OK)
-                .responsePayload("client/v2/feature_flags/GET_app_scaling_flag_response.json");
+                .responsePayload("fixtures/client/v2/feature_flags/GET_app_scaling_flag_response.json");
         }
 
         @Override

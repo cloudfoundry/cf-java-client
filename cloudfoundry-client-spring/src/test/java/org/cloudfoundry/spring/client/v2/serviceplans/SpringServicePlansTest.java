@@ -96,7 +96,7 @@ public final class SpringServicePlansTest {
                 .method(DELETE)
                 .path("v2/service_plans/test-service-plan-id?async=true")
                 .status(ACCEPTED)
-                .responsePayload("client/v2/service_plans/DELETE_{id}_async_response.json");
+                .responsePayload("fixtures/client/v2/service_plans/DELETE_{id}_async_response.json");
         }
 
         @Override
@@ -144,7 +144,7 @@ public final class SpringServicePlansTest {
                 .method(GET)
                 .path("v2/service_plans/test-service-plan-id")
                 .status(OK)
-                .responsePayload("client/v2/service_plans/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v2/service_plans/GET_{id}_response.json");
         }
 
         @Override
@@ -197,7 +197,7 @@ public final class SpringServicePlansTest {
                 .method(GET)
                 .path("v2/service_plans?q=service_guid%20IN%20test-service-id&page=-1")
                 .status(OK)
-                .responsePayload("client/v2/service_plans/GET_response.json");
+                .responsePayload("fixtures/client/v2/service_plans/GET_response.json");
         }
 
         @Override
@@ -256,7 +256,7 @@ public final class SpringServicePlansTest {
                 .method(GET)
                 .path("v2/service_plans/test-service-plan-id/service_instances?q=space_guid%20IN%20test-space-id&page=-1")
                 .status(OK)
-                .responsePayload("client/v2/service_plans/GET_{id}_service_instances_response.json");
+                .responsePayload("fixtures/client/v2/service_plans/GET_{id}_service_instances_response.json");
         }
 
         @Override
@@ -315,9 +315,9 @@ public final class SpringServicePlansTest {
             return new RequestContext()
                 .method(PUT)
                 .path("v2/service_plans/ed66be44-0c9d-40f9-93b9-4e9c062a345c/service_instances")
-                .requestPayload("client/v2/service_plans/PUT_{id}_service_instances_request.json")
+                .requestPayload("fixtures/client/v2/service_plans/PUT_{id}_service_instances_request.json")
                 .status(OK)
-                .responsePayload("client/v2/service_plans/PUT_{id}_service_instances_response.json");
+                .responsePayload("fixtures/client/v2/service_plans/PUT_{id}_service_instances_response.json");
         }
 
         @Override

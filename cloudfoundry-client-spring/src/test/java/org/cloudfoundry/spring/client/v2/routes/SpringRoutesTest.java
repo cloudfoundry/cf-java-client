@@ -67,7 +67,7 @@ public final class SpringRoutesTest {
             return new RequestContext()
                 .method(PUT).path("/v2/routes/test-route-id/apps/test-app-id")
                 .status(OK)
-                .responsePayload("client/v2/routes/PUT_{id}_apps_{app-id}_response.json");
+                .responsePayload("fixtures/client/v2/routes/PUT_{id}_apps_{app-id}_response.json");
         }
 
         @Override
@@ -120,9 +120,9 @@ public final class SpringRoutesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(POST).path("/v2/routes")
-                .requestPayload("client/v2/routes/POST_request.json")
+                .requestPayload("fixtures/client/v2/routes/POST_request.json")
                 .status(OK)
-                .responsePayload("client/v2/routes/POST_response.json");
+                .responsePayload("fixtures/client/v2/routes/POST_response.json");
         }
 
         @Override
@@ -213,7 +213,7 @@ public final class SpringRoutesTest {
             return new RequestContext()
                 .method(DELETE).path("/v2/routes/test-route-id?async=true")
                 .status(ACCEPTED)
-                .responsePayload("client/v2/routes/DELETE_{id}_async_response.json");
+                .responsePayload("fixtures/client/v2/routes/DELETE_{id}_async_response.json");
         }
 
         @Override
@@ -298,7 +298,7 @@ public final class SpringRoutesTest {
             return new RequestContext()
                 .method(GET).path("/v2/routes/test-route-id")
                 .status(OK)
-                .responsePayload("client/v2/routes/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v2/routes/GET_{id}_response.json");
         }
 
         @Override
@@ -352,7 +352,7 @@ public final class SpringRoutesTest {
             return new RequestContext()
                 .method(GET).path("/v2/routes?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/routes/GET_response.json");
+                .responsePayload("fixtures/client/v2/routes/GET_response.json");
         }
 
         @Override
@@ -408,7 +408,7 @@ public final class SpringRoutesTest {
             return new RequestContext()
                 .method(GET).path("/v2/routes/test-route-id/apps?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/routes/GET_{id}_apps_response.json");
+                .responsePayload("fixtures/client/v2/routes/GET_{id}_apps_response.json");
         }
 
         @Override
@@ -517,9 +517,9 @@ public final class SpringRoutesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PUT).path("/v2/routes/test-route-id")
-                .requestPayload("client/v2/routes/PUT_{id}_request.json")
+                .requestPayload("fixtures/client/v2/routes/PUT_{id}_request.json")
                 .status(CREATED)
-                .responsePayload("client/v2/routes/PUT_{id}_response.json");
+                .responsePayload("fixtures/client/v2/routes/PUT_{id}_response.json");
         }
 
         @Override

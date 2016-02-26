@@ -92,7 +92,7 @@ public final class SpringServicesTest {
             return new RequestContext()
                 .method(DELETE).path("/v2/services/test-service-id?async=true")
                 .status(ACCEPTED)
-                .responsePayload("client/v2/services/DELETE_{id}_async_response.json");
+                .responsePayload("fixtures/client/v2/services/DELETE_{id}_async_response.json");
         }
 
         @Override
@@ -140,7 +140,7 @@ public final class SpringServicesTest {
             return new RequestContext()
                 .method(GET).path("/v2/services/test-service-id")
                 .status(OK)
-                .responsePayload("client/v2/services/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v2/services/GET_{id}_response.json");
         }
 
         @Override
@@ -192,7 +192,7 @@ public final class SpringServicesTest {
             return new RequestContext()
                 .method(GET).path("/v2/services?q=label%20IN%20test-label&page=-1")
                 .status(OK)
-                .responsePayload("client/v2/services/GET_response.json");
+                .responsePayload("fixtures/client/v2/services/GET_response.json");
         }
 
         @Override
@@ -249,7 +249,7 @@ public final class SpringServicesTest {
             return new RequestContext()
                 .method(GET).path("/v2/services/f1b0edbe-fac4-4512-9071-8b26045413bb/service_plans?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/services/GET_{id}_service_plans_response.json");
+                .responsePayload("fixtures/client/v2/services/GET_{id}_service_plans_response.json");
         }
 
         @Override

@@ -16,20 +16,16 @@
 
 package org.cloudfoundry.util;
 
-import org.cloudfoundry.util.tuple.Function2;
 import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.fn.Consumer;
-import reactor.fn.Function;
-import reactor.fn.Predicate;
-import reactor.fn.tuple.Tuple;
-import reactor.rx.Stream;
+import reactor.core.tuple.Tuple;
+import reactor.rx.Fluxion;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -52,67 +48,10 @@ public final class DelayUtils {
      * @param maxRetries  the maximum number of retries
      * @return a delayed {@link Mono}
      */
-    public static Function<Stream<Long>, Publisher<?>> exponentialBackOff(final long minDuration, final long maxDuration, final TimeUnit timeUnit, final int maxRetries) {
-        return new Function<Stream<Long>, Publisher<?>>() {
-
-            @Override
-            public Publisher<?> apply(Stream<Long> count) {
-                return Flux
-                    .zip(Tuple.<Long, Integer>fn2(), 1, getTest(count), getRetryCounter(maxRetries))  // TODO: Convert to Stream.zip once prefetch option is available
-                    .flatMap(function(new Function2<Long, Integer, Publisher<?>>() {
-
-                        @Override
-                        public Publisher<?> apply(Long itemCount, Integer retryCount) {
-                            return getDelay(minDuration, maxDuration, timeUnit, retryCount);
-                        }
-
-                    }));
-            }
-
-        };
-    }
-
-    /**
-     * Implements a fixed delay if the incoming count is 0
-     *
-     * @param duration the duration of the delay
-     * @param timeUnit the time unit of the duration
-     * @return a delayed {@link Mono}
-     */
-    public static Function<Stream<Long>, Publisher<?>> fixed(final long duration, final TimeUnit timeUnit) {
-        return new Function<Stream<Long>, Publisher<?>>() {
-
-            @Override
-            public Publisher<?> apply(Stream<Long> volumes) {
-                return volumes
-                    .takeWhile(new Predicate<Long>() {
-
-                        @Override
-                        public boolean test(Long count) {
-                            return count == 0;
-                        }
-
-                    })
-                    .flatMap(new Function<Long, Publisher<Long>>() {
-
-                        @Override
-                        public Publisher<Long> apply(Long count) {
-                            return Mono
-                                .delay(duration, timeUnit)
-                                .doOnSubscribe(new Consumer<Subscription>() {
-
-                                    @Override
-                                    public void accept(Subscription subscription) {
-                                        LOGGER.debug("Delaying {} {}", duration, timeUnit);
-                                    }
-
-                                });
-                        }
-
-                    });
-            }
-
-        };
+    public static Function<Fluxion<Long>, Publisher<?>> exponentialBackOff(final long minDuration, final long maxDuration, final TimeUnit timeUnit, final int maxRetries) {
+        return count -> Flux
+            .zip(Tuple.<Long, Integer>fn2(), 1, getTest(count), getRetryCounter(maxRetries))  // TODO: Convert to Stream.zip once prefetch option is available
+            .flatMap(function((itemCount, retryCount) -> getDelay(minDuration, maxDuration, timeUnit, retryCount)));
     }
 
     private static long calculateDuration(long minDuration, long maxDuration, Integer retryCount) {
@@ -125,32 +64,18 @@ public final class DelayUtils {
 
         return Mono
             .delay(duration, timeUnit)
-            .doOnSubscribe(new Consumer<Subscription>() {
-
-                @Override
-                public void accept(Subscription subscription) {
-                    LOGGER.debug("Delaying {} {}", duration, timeUnit.toString().toLowerCase());
-                }
-
-            });
+            .doOnSubscribe(subscription -> LOGGER.debug("Delaying {} {}", duration, timeUnit.toString().toLowerCase()));
     }
 
-    private static Stream<Integer> getRetryCounter(int maxRetries) {
-        return Stream
+    private static Fluxion<Integer> getRetryCounter(int maxRetries) {
+        return Fluxion
             .range(0, maxRetries)
-            .concatWith(Stream.<Integer>error(new IllegalStateException("Exceeded maximum number of retries"), true));
+            .concatWith(Fluxion.error(new IllegalStateException("Exceeded maximum number of retries"), true));
     }
 
-    private static Stream<Long> getTest(Stream<Long> count) {
+    private static Fluxion<Long> getTest(Fluxion<Long> count) {
         return count
-            .takeWhile(new Predicate<Long>() {
-
-                @Override
-                public boolean test(Long count) {
-                    return count == 0;
-                }
-
-            });
+            .takeWhile(count1 -> count1 == 0);
     }
 
 }

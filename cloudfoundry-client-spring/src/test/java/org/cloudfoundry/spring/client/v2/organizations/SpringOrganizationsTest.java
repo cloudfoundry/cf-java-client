@@ -128,7 +128,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                 .method(PUT).path("/v2/organizations/test-organization-id/auditors/uaa-id-71")
                 .status(CREATED)
-                .responsePayload("client/v2/organizations/PUT_{id}_auditors_{auditor-id}_response.json");
+                .responsePayload("fixtures/client/v2/organizations/PUT_{id}_auditors_{auditor-id}_response.json");
         }
 
         @Override
@@ -187,9 +187,9 @@ public final class SpringOrganizationsTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PUT).path("/v2/organizations/test-organization-id/auditors")
-                .requestPayload("client/v2/organizations/PUT_{id}_auditors_request.json")
+                .requestPayload("fixtures/client/v2/organizations/PUT_{id}_auditors_request.json")
                 .status(OK)
-                .responsePayload("client/v2/organizations/PUT_{id}_auditors_response.json");
+                .responsePayload("fixtures/client/v2/organizations/PUT_{id}_auditors_response.json");
         }
 
         @Override
@@ -249,7 +249,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                 .method(PUT).path("/v2/organizations/test-organization-id/billing_managers/test-billing-manager-id")
                 .status(OK)
-                .responsePayload("client/v2/organizations/PUT_{id}_billing_managers_{billing-manager-id}_response.json");
+                .responsePayload("fixtures/client/v2/organizations/PUT_{id}_billing_managers_{billing-manager-id}_response.json");
         }
 
         @Override
@@ -309,9 +309,9 @@ public final class SpringOrganizationsTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PUT).path("/v2/organizations/test-organization-id/billing_managers")
-                .requestPayload("client/v2/organizations/PUT_{id}_billing_managers_request.json")
+                .requestPayload("fixtures/client/v2/organizations/PUT_{id}_billing_managers_request.json")
                 .status(OK)
-                .responsePayload("client/v2/organizations/PUT_{id}_billing_managers_response.json");
+                .responsePayload("fixtures/client/v2/organizations/PUT_{id}_billing_managers_response.json");
         }
 
         @Override
@@ -371,7 +371,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                 .method(PUT).path("/v2/organizations/test-organization-id/managers/test-manager-id")
                 .status(OK)
-                .responsePayload("client/v2/organizations/PUT_{id}_managers_{manager-id}_response.json");
+                .responsePayload("fixtures/client/v2/organizations/PUT_{id}_managers_{manager-id}_response.json");
         }
 
         @Override
@@ -430,9 +430,9 @@ public final class SpringOrganizationsTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PUT).path("/v2/organizations/test-organization-id/managers")
-                .requestPayload("client/v2/organizations/PUT_{id}_managers_request.json")
+                .requestPayload("fixtures/client/v2/organizations/PUT_{id}_managers_request.json")
                 .status(OK)
-                .responsePayload("client/v2/organizations/PUT_{id}_managers_response.json");
+                .responsePayload("fixtures/client/v2/organizations/PUT_{id}_managers_response.json");
         }
 
         @Override
@@ -492,7 +492,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                 .method(PUT).path("/v2/organizations/test-organization-id/users/test-user-id")
                 .status(OK)
-                .responsePayload("client/v2/organizations/PUT_{id}_users_{user-id}_response.json");
+                .responsePayload("fixtures/client/v2/organizations/PUT_{id}_users_{user-id}_response.json");
         }
 
         @Override
@@ -551,9 +551,9 @@ public final class SpringOrganizationsTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PUT).path("/v2/organizations/test-organization-id/users")
-                .requestPayload("client/v2/organizations/PUT_{id}_users_request.json")
+                .requestPayload("fixtures/client/v2/organizations/PUT_{id}_users_request.json")
                 .status(OK)
-                .responsePayload("client/v2/organizations/PUT_{id}_users_response.json");
+                .responsePayload("fixtures/client/v2/organizations/PUT_{id}_users_response.json");
         }
 
         @Override
@@ -613,7 +613,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                 .method(PUT).path("/v2/organizations/test-organization-id/private_domains/test-private-domain-id")
                 .status(OK)
-                .responsePayload("client/v2/organizations/PUT_{id}_private_domains_{private-domain-id}_response.json");
+                .responsePayload("fixtures/client/v2/organizations/PUT_{id}_private_domains_{private-domain-id}_response.json");
         }
 
         @Override
@@ -672,9 +672,9 @@ public final class SpringOrganizationsTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(POST).path("/v2/organizations")
-                .requestPayload("client/v2/organizations/POST_request.json")
+                .requestPayload("fixtures/client/v2/organizations/POST_request.json")
                 .status(OK)
-                .responsePayload("client/v2/organizations/POST_response.json");
+                .responsePayload("fixtures/client/v2/organizations/POST_response.json");
         }
 
         @Override
@@ -770,7 +770,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                 .method(DELETE).path("/v2/organizations/test-organization-id?async=true")
                 .status(ACCEPTED)
-                .responsePayload("client/v2/routes/DELETE_{id}_async_response.json");
+                .responsePayload("fixtures/client/v2/routes/DELETE_{id}_async_response.json");
         }
 
         @Override
@@ -818,7 +818,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                 .method(GET).path("/v2/organizations/test-organization-id")
                 .status(OK)
-                .responsePayload("client/v2/organizations/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v2/organizations/GET_{id}_response.json");
         }
 
         @Override
@@ -877,7 +877,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                 .method(GET).path("/v2/organizations/test-organization-id/instance_usage")
                 .status(OK)
-                .responsePayload("client/v2/organizations/GET_{id}_instance_usage_response.json");
+                .responsePayload("fixtures/client/v2/organizations/GET_{id}_instance_usage_response.json");
         }
 
         @Override
@@ -916,7 +916,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                 .method(GET).path("/v2/organizations/test-organization-id/memory_usage")
                 .status(OK)
-                .responsePayload("client/v2/organizations/GET_{id}_memory_usage_response.json");
+                .responsePayload("fixtures/client/v2/organizations/GET_{id}_memory_usage_response.json");
         }
 
         @Override
@@ -955,7 +955,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                 .method(GET).path("/v2/organizations/test-organization-id/user_roles?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/organizations/GET_{id}_user_roles_response.json");
+                .responsePayload("fixtures/client/v2/organizations/GET_{id}_user_roles_response.json");
         }
 
         @Override
@@ -1020,7 +1020,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                 .method(GET).path("/v2/organizations?q=name%20IN%20test-name&page=-1")
                 .status(OK)
-                .responsePayload("client/v2/organizations/GET_response.json");
+                .responsePayload("fixtures/client/v2/organizations/GET_response.json");
         }
 
         @Override
@@ -1084,7 +1084,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                 .method(GET).path("/v2/organizations/test-organization-id/auditors?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/organizations/GET_{id}_auditors_response.json");
+                .responsePayload("fixtures/client/v2/organizations/GET_{id}_auditors_response.json");
         }
 
         @Override
@@ -1145,7 +1145,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                 .method(GET).path("/v2/organizations/test-organization-id/billing_managers?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/organizations/GET_{id}_billing_managers_response.json");
+                .responsePayload("fixtures/client/v2/organizations/GET_{id}_billing_managers_response.json");
         }
 
         @Override
@@ -1206,7 +1206,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                 .method(GET).path("/v2/organizations/test-organization-id/managers?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/organizations/GET_{id}_managers_response.json");
+                .responsePayload("fixtures/client/v2/organizations/GET_{id}_managers_response.json");
         }
 
         @Override
@@ -1286,7 +1286,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                 .method(GET).path("/v2/organizations/test-organization-id/private_domains?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/organizations/GET_{id}_private_domains_response.json");
+                .responsePayload("fixtures/client/v2/organizations/GET_{id}_private_domains_response.json");
         }
 
         @Override
@@ -1341,7 +1341,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                 .method(GET).path("/v2/organizations/test-organization-id/domains?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/organizations/GET_{id}_domains_response.json");
+                .responsePayload("fixtures/client/v2/organizations/GET_{id}_domains_response.json");
         }
 
         @Override
@@ -1402,7 +1402,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                 .method(GET).path("/v2/organizations/test-organization-id/services?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/organizations/GET_{id}_services_response.json");
+                .responsePayload("fixtures/client/v2/organizations/GET_{id}_services_response.json");
         }
 
         @Override
@@ -1460,7 +1460,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                 .method(GET).path("/v2/organizations/test-organization-id/space_quota_definitions?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/organizations/GET_{id}_space_quota_definitions_response.json");
+                .responsePayload("fixtures/client/v2/organizations/GET_{id}_space_quota_definitions_response.json");
         }
 
         @Override
@@ -1519,7 +1519,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                 .method(GET).path("/v2/organizations/test-organization-id/spaces?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/organizations/GET_{id}_spaces_response.json");
+                .responsePayload("fixtures/client/v2/organizations/GET_{id}_spaces_response.json");
         }
 
         @Override
@@ -1584,7 +1584,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                 .method(GET).path("/v2/organizations/test-organization-id/users?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/organizations/GET_{id}_users_response.json");
+                .responsePayload("fixtures/client/v2/organizations/GET_{id}_users_response.json");
         }
 
         @Override
@@ -1681,7 +1681,7 @@ public final class SpringOrganizationsTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(DELETE).path("/v2/organizations/test-organization-id/auditors")
-                .requestPayload("client/v2/organizations/DELETE_{id}_auditors_request.json")
+                .requestPayload("fixtures/client/v2/organizations/DELETE_{id}_auditors_request.json")
                 .status(NO_CONTENT);
         }
 
@@ -1793,7 +1793,7 @@ public final class SpringOrganizationsTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(DELETE).path("/v2/organizations/test-organization-id/billing_managers")
-                .requestPayload("client/v2/organizations/DELETE_{id}_billing_managers_request.json")
+                .requestPayload("fixtures/client/v2/organizations/DELETE_{id}_billing_managers_request.json")
                 .status(NO_CONTENT);
         }
 
@@ -1831,7 +1831,7 @@ public final class SpringOrganizationsTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(DELETE).path("/v2/organizations/test-organization-id/managers")
-                .requestPayload("client/v2/organizations/DELETE_{id}_managers_request.json")
+                .requestPayload("fixtures/client/v2/organizations/DELETE_{id}_managers_request.json")
                 .status(NO_CONTENT);
         }
 
@@ -1941,7 +1941,7 @@ public final class SpringOrganizationsTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(DELETE).path("/v2/organizations/test-organization-id/users")
-                .requestPayload("client/v2/organizations/DELETE_{id}_users_request.json")
+                .requestPayload("fixtures/client/v2/organizations/DELETE_{id}_users_request.json")
                 .status(NO_CONTENT);
         }
 
@@ -1980,7 +1980,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                 .method(GET).path("/v2/organizations/test-organization-id/summary")
                 .status(OK)
-                .responsePayload("client/v2/organizations/GET_{id}_summary_response.json");
+                .responsePayload("fixtures/client/v2/organizations/GET_{id}_summary_response.json");
         }
 
         @Override
@@ -2028,9 +2028,9 @@ public final class SpringOrganizationsTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PUT).path("/v2/organizations/test-organization-id")
-                .requestPayload("client/v2/organizations/PUT_{id}_request.json")
+                .requestPayload("fixtures/client/v2/organizations/PUT_{id}_request.json")
                 .status(OK)
-                .responsePayload("client/v2/organizations/PUT_{id}_response.json");
+                .responsePayload("fixtures/client/v2/organizations/PUT_{id}_response.json");
         }
 
         @Override

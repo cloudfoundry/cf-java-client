@@ -20,8 +20,8 @@ import org.cloudfoundry.logging.LogMessage;
 import org.cloudfoundry.logging.RecentLogsRequest;
 import org.cloudfoundry.spring.AbstractApiTest;
 import org.cloudfoundry.util.test.TestSubscriber;
-import org.reactivestreams.Publisher;
 import org.springframework.http.MediaType;
+import reactor.core.publisher.Flux;
 
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
@@ -51,7 +51,7 @@ public final class SpringRecentTest {
             return new RequestContext()
                 .method(GET).path("/recent?app=test-application-id")
                 .status(OK)
-                .contentType(MEDIA_TYPE).responsePayload("logging/loggregator_response.bin");
+                .contentType(MEDIA_TYPE).responsePayload("fixtures/logging/loggregator_response.bin");
         }
 
         @Override
@@ -67,7 +67,7 @@ public final class SpringRecentTest {
         }
 
         @Override
-        protected Publisher<LogMessage> invoke(RecentLogsRequest request) {
+        protected Flux<LogMessage> invoke(RecentLogsRequest request) {
             return this.recent.recent(request);
         }
 

@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.cloudfoundry.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.ClientHttpRequestFactory;
@@ -33,12 +32,12 @@ import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResour
 import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordAccessTokenProvider;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
-import reactor.fn.Consumer;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
@@ -92,6 +91,12 @@ public final class OAuth2RestTemplateBuilder {
         }
     }
 
+    private static ResourceOwnerPasswordAccessTokenProvider getAccessTokenProvider(ClientHttpRequestFactory requestFactory) {
+        ResourceOwnerPasswordAccessTokenProvider accessTokenProvider = new ResourceOwnerPasswordAccessTokenProvider();
+        accessTokenProvider.setRequestFactory(requestFactory);
+        return accessTokenProvider;
+    }
+
     private static Optional<ObjectMapper> getObjectMapper(RestTemplate restTemplate) {
         for (HttpMessageConverter<?> messageConverter : restTemplate.getMessageConverters()) {
             if (messageConverter instanceof MappingJackson2HttpMessageConverter) {
@@ -110,21 +115,12 @@ public final class OAuth2RestTemplateBuilder {
         return new OAuth2RestTemplate(protectedResourceDetails, clientContext);
     }
 
-    private static void modifyObjectMapper(Optional<ObjectMapper> objectMapper, final List<DeserializationProblemHandler> problemHandlers, final Logger logger) {
+    private static void modifyObjectMapper(Optional<ObjectMapper> objectMapper, List<DeserializationProblemHandler> problemHandlers, Logger logger) {
         objectMapper
-            .ifPresent(new Consumer<ObjectMapper>() {
-
-                @Override
-                public void accept(ObjectMapper objectMapper) {
-                    logger.debug("Modifying ObjectMapper configuration");
-
-                    objectMapper.setSerializationInclusion(NON_NULL);
-
-                    for (DeserializationProblemHandler problemHandler : problemHandlers) {
-                        objectMapper.addHandler(problemHandler);
-                    }
-                }
-
+            .ifPresent(objectMapper1 -> {
+                logger.debug("Modifying ObjectMapper configuration");
+                objectMapper1.setSerializationInclusion(NON_NULL);
+                problemHandlers.forEach(objectMapper1::addHandler);
             });
     }
 
@@ -135,12 +131,6 @@ public final class OAuth2RestTemplateBuilder {
             restTemplate.setRequestFactory(requestFactory);
             restTemplate.setAccessTokenProvider(getAccessTokenProvider(requestFactory));
         }
-    }
-
-    private static ResourceOwnerPasswordAccessTokenProvider getAccessTokenProvider(ClientHttpRequestFactory requestFactory) {
-        ResourceOwnerPasswordAccessTokenProvider accessTokenProvider = new ResourceOwnerPasswordAccessTokenProvider();
-        accessTokenProvider.setRequestFactory(requestFactory);
-        return accessTokenProvider;
     }
 
 }

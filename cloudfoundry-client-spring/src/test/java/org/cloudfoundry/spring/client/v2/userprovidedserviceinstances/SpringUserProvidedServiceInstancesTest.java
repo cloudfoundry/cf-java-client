@@ -59,9 +59,9 @@ public final class SpringUserProvidedServiceInstancesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(POST).path("/v2/user_provided_service_instances")
-                .requestPayload("client/v2/user_provided_service_instances/POST_request.json")
+                .requestPayload("fixtures/client/v2/user_provided_service_instances/POST_request.json")
                 .status(CREATED)
-                .responsePayload("client/v2/user_provided_service_instances/POST_response.json");
+                .responsePayload("fixtures/client/v2/user_provided_service_instances/POST_response.json");
         }
 
         @Override
@@ -151,7 +151,7 @@ public final class SpringUserProvidedServiceInstancesTest {
             return new RequestContext()
                 .method(GET).path("/v2/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc")
                 .status(OK)
-                .responsePayload("client/v2/user_provided_service_instances/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v2/user_provided_service_instances/GET_{id}_response.json");
         }
 
         @Override
@@ -202,7 +202,7 @@ public final class SpringUserProvidedServiceInstancesTest {
             return new RequestContext()
                 .method(GET).path("/v2/user_provided_service_instances?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/user_provided_service_instances/GET_response.json");
+                .responsePayload("fixtures/client/v2/user_provided_service_instances/GET_response.json");
         }
 
         @Override
@@ -257,7 +257,7 @@ public final class SpringUserProvidedServiceInstancesTest {
             return new RequestContext()
                 .method(GET).path("/v2/user_provided_service_instances/16c81612-6a63-4faa-8cd5-acc80771b562/service_bindings?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/user_provided_service_instances/GET_{id}_service_bindings_response.json");
+                .responsePayload("fixtures/client/v2/user_provided_service_instances/GET_{id}_service_bindings_response.json");
         }
 
         @Override
@@ -311,9 +311,9 @@ public final class SpringUserProvidedServiceInstancesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PUT).path("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d")
-                .requestPayload("client/v2/user_provided_service_instances/PUT_{id}_request.json")
+                .requestPayload("fixtures/client/v2/user_provided_service_instances/PUT_{id}_request.json")
                 .status(ACCEPTED)
-                .responsePayload("client/v2/user_provided_service_instances/PUT_{id}_response.json");
+                .responsePayload("fixtures/client/v2/user_provided_service_instances/PUT_{id}_response.json");
         }
 
         @Override

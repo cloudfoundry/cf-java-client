@@ -48,7 +48,7 @@ public final class SpringServiceUsageEventsTest {
             return new RequestContext()
                 .method(GET).path("/v2/service_usage_events/9470627d-0488-4d9a-8564-f97571487893")
                 .status(OK)
-                .responsePayload("client/v2/service_usage_events/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v2/service_usage_events/GET_{id}_response.json");
         }
 
         @Override
@@ -102,7 +102,7 @@ public final class SpringServiceUsageEventsTest {
             return new RequestContext()
                 .method(GET).path("/v2/service_usage_events?after_guid=e5defac2-4ae1-44ac-a3d0-1684ae657453&page=-1")
                 .status(OK)
-                .responsePayload("client/v2/service_usage_events/GET_response.json");
+                .responsePayload("fixtures/client/v2/service_usage_events/GET_response.json");
         }
 
         @Override

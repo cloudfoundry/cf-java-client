@@ -17,9 +17,6 @@
 package org.cloudfoundry.spring.client.v2.routes;
 
 import lombok.ToString;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.QueryBuilder;
-import org.cloudfoundry.spring.client.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationResponse;
@@ -38,12 +35,12 @@ import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.routes.UpdateRouteRequest;
 import org.cloudfoundry.client.v2.routes.UpdateRouteResponse;
+import org.cloudfoundry.spring.client.v2.FilterBuilder;
+import org.cloudfoundry.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
-import reactor.fn.Function;
 
 import java.net.URI;
 
@@ -67,131 +64,73 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
     }
 
     @Override
-    public Mono<AssociateRouteApplicationResponse> associateApplication(final AssociateRouteApplicationRequest request) {
-        return put(request, AssociateRouteApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
+    public Mono<AssociateRouteApplicationResponse> associateApplication(AssociateRouteApplicationRequest request) {
+        return put(request, AssociateRouteApplicationResponse.class, builder -> builder.pathSegment("v2", "routes", request.getRouteId(), "apps", request.getApplicationId()));
+    }
 
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "routes", request.getRouteId(), "apps", request.getApplicationId());
-            }
-
+    @Override
+    public Mono<CreateRouteResponse> create(CreateRouteRequest request) {
+        return post(request, CreateRouteResponse.class, builder -> {
+            builder.pathSegment("v2", "routes");
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
-    public Mono<CreateRouteResponse> create(final CreateRouteRequest request) {
-        return post(request, CreateRouteResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "routes");
-                QueryBuilder.augment(builder, request);
-            }
-
+    public Mono<DeleteRouteResponse> delete(DeleteRouteRequest request) {
+        return delete(request, DeleteRouteResponse.class, builder -> {
+            builder.pathSegment("v2", "routes", request.getRouteId());
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
-    public Mono<DeleteRouteResponse> delete(final DeleteRouteRequest request) {
-        return delete(request, DeleteRouteResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "routes", request.getRouteId());
-                QueryBuilder.augment(builder, request);
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<Boolean> exists(final RouteExistsRequest request) {
-        return get(request, Boolean.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "routes", "reserved", "domain", request.getDomainId(), "host", request.getHost());
-                QueryBuilder.augment(builder, request);
-            }
-
+    public Mono<Boolean> exists(RouteExistsRequest request) {
+        return get(request, Boolean.class, builder -> {
+            builder.pathSegment("v2", "routes", "reserved", "domain", request.getDomainId(), "host", request.getHost());
+            QueryBuilder.augment(builder, request);
         })
             .defaultIfEmpty(true)
-            .otherwise(new Function<Throwable, Mono<? extends Boolean>>() {
-
-                @Override
-                public Mono<? extends Boolean> apply(Throwable throwable) {
-                    if (throwable instanceof CloudFoundryException && ((CloudFoundryException) throwable).getCode() == CF_NOT_FOUND) {
-                        return Mono.just(false);
-                    } else {
-                        return Mono.error(throwable);
-                    }
+            .otherwise(throwable -> {
+                if (throwable instanceof CloudFoundryException && ((CloudFoundryException) throwable).getCode() == CF_NOT_FOUND) {
+                    return Mono.just(false);
+                } else {
+                    return Mono.error(throwable);
                 }
-
             });
     }
 
     @Override
-    public Mono<GetRouteResponse> get(final GetRouteRequest request) {
-        return get(request, GetRouteResponse.class, new Consumer<UriComponentsBuilder>() {
+    public Mono<GetRouteResponse> get(GetRouteRequest request) {
+        return get(request, GetRouteResponse.class, builder -> builder.pathSegment("v2", "routes", request.getRouteId()));
+    }
 
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "routes", request.getRouteId());
-            }
-
+    @Override
+    public Mono<ListRoutesResponse> list(ListRoutesRequest request) {
+        return get(request, ListRoutesResponse.class, builder -> {
+            builder.pathSegment("v2", "routes");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
-    public Mono<ListRoutesResponse> list(final ListRoutesRequest request) {
-        return get(request, ListRoutesResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "routes");
-                FilterBuilder.augment(builder, request);
-                QueryBuilder.augment(builder, request);
-            }
-
+    public Mono<ListRouteApplicationsResponse> listApplications(ListRouteApplicationsRequest request) {
+        return get(request, ListRouteApplicationsResponse.class, builder -> {
+            builder.pathSegment("v2", "routes", request.getRouteId(), "apps");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
-    public Mono<ListRouteApplicationsResponse> listApplications(final ListRouteApplicationsRequest request) {
-        return get(request, ListRouteApplicationsResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "routes", request.getRouteId(), "apps");
-                FilterBuilder.augment(builder, request);
-                QueryBuilder.augment(builder, request);
-            }
-
-        });
+    public Mono<Void> removeApplication(RemoveRouteApplicationRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "routes", request.getRouteId(), "apps", request.getApplicationId()));
     }
 
     @Override
-    public Mono<Void> removeApplication(final RemoveRouteApplicationRequest request) {
-        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "routes", request.getRouteId(), "apps", request.getApplicationId());
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<UpdateRouteResponse> update(final UpdateRouteRequest request) {
-        return put(request, UpdateRouteResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "routes", request.getRouteId());
-            }
-
-        });
+    public Mono<UpdateRouteResponse> update(UpdateRouteRequest request) {
+        return put(request, UpdateRouteResponse.class, builder -> builder.pathSegment("v2", "routes", request.getRouteId()));
     }
 
 }

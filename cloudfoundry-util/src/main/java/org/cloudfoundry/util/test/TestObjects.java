@@ -160,7 +160,7 @@ public abstract class TestObjects {
 
         if (clazz == Boolean.class) return (O) Boolean.valueOf(true);
         if (clazz == Integer.class) return (O) Integer.valueOf(1);
-        if (clazz == Long.class) return (O) Long.valueOf(1l);
+        if (clazz == Long.class) return (O) Long.valueOf(1L);
         if (clazz == Float.class) return (O) Float.valueOf(1.0f);
         if (clazz == Double.class) return (O) Double.valueOf(1.0d);
         if (clazz == String.class) return (O) String.valueOf("test-" + modifier + m.getName());
@@ -196,6 +196,7 @@ public abstract class TestObjects {
                     return builtType;
                 }
             } catch (NoSuchMethodException e) {
+                // Swallow exception
             }
         }
         if (failIfNotBuilder) {
@@ -218,17 +219,12 @@ public abstract class TestObjects {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T, V> T invokeSetter(T builder, Method m, V parmValue) {
+    private static <T, V> void invokeSetter(T builder, Method m, V parmValue) {
         try {
-            builder = (T) m.invoke(builder, parmValue);
+            m.invoke(builder, parmValue);
         } catch (IllegalAccessException | InvocationTargetException e) {
             fail("test object cannot be filled at method " + m + ". Exception " + e);
         }
-        return builder;
-    }
-
-    private static boolean isBuilderType(Class<?> clazz) {
-        return (null != getBuiltType(clazz, false));
     }
 
     private static boolean isPaginatedType(Class<?> builtType) {

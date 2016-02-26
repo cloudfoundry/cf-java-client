@@ -20,7 +20,7 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.operations.spaces.CreateSpaceRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import reactor.rx.Stream;
+import reactor.rx.Fluxion;
 
 import static org.cloudfoundry.util.OperationUtils.afterStreamComplete;
 import static org.junit.Assert.assertTrue;
@@ -42,10 +42,10 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .name(spaceName)
                 .organization(this.organizationName)
                 .build())
-            .as(Stream::from)
-            .as(afterStreamComplete(() -> Stream
-                .from(this.cloudFoundryOperations.spaces()
-                    .list())))
+            .as(Fluxion::from)
+            .as(afterStreamComplete(() -> this.cloudFoundryOperations.spaces()
+                .list()
+                .as(Fluxion::from)))
             .filter(spaceSummary -> spaceName.equals(spaceSummary.getName()))
             .subscribe(testSubscriber()
                 .assertCount(1));
@@ -53,9 +53,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void list() {
-        Stream
-            .from(this.cloudFoundryOperations.spaces()
-                .list())
+        this.cloudFoundryOperations.spaces()
+            .list()
+            .as(Fluxion::from)
             .count()
             .subscribe(this.<Long>testSubscriber()
                 .assertThat(count -> assertTrue(count > 0)));

@@ -19,28 +19,24 @@ package org.cloudfoundry.spring.util;
 import lombok.ToString;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.spring.client.v2.CloudFoundryExceptionBuilder;
-import org.cloudfoundry.util.OperationUtils;
 import org.cloudfoundry.util.ValidationUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
 import reactor.core.subscriber.SignalEmitter;
 import reactor.core.util.Exceptions;
-import reactor.fn.Consumer;
-import reactor.fn.Function;
-import reactor.fn.Supplier;
-import reactor.rx.Stream;
+import reactor.rx.Fluxion;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.PATCH;
@@ -63,172 +59,111 @@ public abstract class AbstractSpringOperations {
         this.schedulerGroup = schedulerGroup;
     }
 
-    protected final <T> Mono<T> delete(final Validatable request, final Class<T> responseType, final Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, new Function<SignalEmitter<T>, T>() {
+    protected final <T> Mono<T> delete(Validatable request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(request, (Function<SignalEmitter<T>, T>) signalEmitter -> {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
+            builderCallback.accept(builder);
+            URI uri = builder.build().encode().toUri();
 
-            @Override
-            public T apply(SignalEmitter<T> signalEmitter) {
-                UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
-                builderCallback.accept(builder);
-                URI uri = builder.build().encode().toUri();
-
-                return AbstractSpringOperations.this.restOperations.exchange(new RequestEntity<>(request, DELETE, uri), responseType).getBody();
-            }
-
+            return this.restOperations.exchange(new RequestEntity<>(request, DELETE, uri), responseType).getBody();
         })
             .next();
     }
 
-    protected final <T, V extends Validatable> Stream<T> exchange(V request, final Function<SignalEmitter<T>, T> exchange) {
+    protected final <T, V extends Validatable> Fluxion<T> exchange(V request, Function<SignalEmitter<T>, T> exchange) {
         return ValidationUtils
             .validate(request)
-            .flatMap(new Function<V, Stream<T>>() {
+            .flatMap(request1 -> Fluxion
+                .yield((Consumer<SignalEmitter<T>>) signalEmitter -> {
+                    try {
+                        T result = exchange.apply(signalEmitter);
+                        if (result != null) {
+                            signalEmitter.onNext(result);
+                        }
 
-                @Override
-                public Stream<T> apply(V request) {
-                    return Stream
-                        .yield(new Consumer<SignalEmitter<T>>() {
-
-                            @Override
-                            public void accept(SignalEmitter<T> signalEmitter) {
-                                try {
-                                    T result = exchange.apply(signalEmitter);
-                                    if (result != null) {
-                                        signalEmitter.onNext(result);
-                                    }
-
-                                    signalEmitter.onComplete();
-                                } catch (HttpStatusCodeException e) {
-                                    signalEmitter.onError(CloudFoundryExceptionBuilder.build(e));
-                                } catch (Throwable t) {
-                                    Exceptions.throwIfFatal(t);
-                                    signalEmitter.onError(t);
-                                }
-                            }
-
-                        });
-                }
-
-            })
-            .as(OperationUtils.<T>stream())
+                        signalEmitter.onComplete();
+                    } catch (HttpStatusCodeException e) {
+                        signalEmitter.onError(CloudFoundryExceptionBuilder.build(e));
+                    } catch (Throwable t) {
+                        Exceptions.throwIfFatal(t);
+                        signalEmitter.onError(t);
+                    }
+                }))
+            .as(Fluxion::from)
             .publishOn(this.schedulerGroup)
             .onBackpressureBlock();
     }
 
-    protected final <T> Mono<T> get(Validatable request, final Class<T> responseType, final Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, new Function<SignalEmitter<T>, T>() {
+    protected final <T> Mono<T> get(Validatable request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(request, (Function<SignalEmitter<T>, T>) signalEmitter -> {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
+            builderCallback.accept(builder);
+            URI uri = builder.build().encode().toUri();
 
-            @Override
-            public T apply(SignalEmitter<T> signalEmitter) {
-                UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
-                builderCallback.accept(builder);
-                URI uri = builder.build().encode().toUri();
-
-                return AbstractSpringOperations.this.restOperations.getForObject(uri, responseType);
-            }
-
+            return this.restOperations.getForObject(uri, responseType);
         })
             .next();
     }
 
-    protected final Stream<byte[]> getStream(final Validatable request, final Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, new Function<SignalEmitter<byte[]>, byte[]>() {
+    protected final Fluxion<byte[]> getStream(Validatable request, Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(request, (Function<SignalEmitter<byte[]>, byte[]>) signalEmitter -> {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
+            builderCallback.accept(builder);
+            URI uri = builder.build().encode().toUri();
 
-            @Override
-            public byte[] apply(final SignalEmitter<byte[]> signalEmitter) {
-                UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
-                builderCallback.accept(builder);
-                URI uri = builder.build().encode().toUri();
+            return this.restOperations.execute(uri, HttpMethod.GET, null, response -> {
+                try (InputStream in = response.getBody()) {
+                    int len;
+                    byte[] buffer = new byte[BYTE_ARRAY_BUFFER_LENGTH];
 
-                return AbstractSpringOperations.this.restOperations.execute(uri, HttpMethod.GET, null, new ResponseExtractor<byte[]>() {
-
-                    @Override
-                    public byte[] extractData(ClientHttpResponse response) throws IOException {
-                        try (InputStream in = response.getBody()) {
-                            int len;
-                            byte[] buffer = new byte[BYTE_ARRAY_BUFFER_LENGTH];
-
-                            SignalEmitter.Emission emission = SignalEmitter.Emission.OK;
-                            while (emission.isOk() && (len = in.read(buffer)) != -1) {
-                                emission = signalEmitter.emit(Arrays.copyOf(buffer, len));
-                            }
-
-                            return null;
-                        }
+                    SignalEmitter.Emission emission = SignalEmitter.Emission.OK;
+                    while (emission.isOk() && (len = in.read(buffer)) != -1) {
+                        emission = signalEmitter.emit(Arrays.copyOf(buffer, len));
                     }
 
-                });
-            }
-
+                    return null;
+                }
+            });
         });
     }
 
-    protected final <T> Mono<T> patch(final Validatable request, final Class<T> responseType, final Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, new Function<SignalEmitter<T>, T>() {
+    protected final <T> Mono<T> patch(Validatable request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(request, (Function<SignalEmitter<T>, T>) signalEmitter -> {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
+            builderCallback.accept(builder);
+            URI uri = builder.build().encode().toUri();
 
-            @Override
-            public T apply(SignalEmitter<T> signalEmitter) {
-                UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
-                builderCallback.accept(builder);
-                URI uri = builder.build().encode().toUri();
-
-                return AbstractSpringOperations.this.restOperations.exchange(new RequestEntity<>(request, PATCH, uri), responseType).getBody();
-            }
-
+            return this.restOperations.exchange(new RequestEntity<>(request, PATCH, uri), responseType).getBody();
         })
             .next();
     }
 
-    protected final <T> Mono<T> post(final Validatable request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
-        return postWithBody(request, new Supplier<Validatable>() {
-
-            @Override
-            public Validatable get() {
-                return request;
-            }
-
-        }, responseType, builderCallback);
+    protected final <T> Mono<T> post(Validatable request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
+        return postWithBody(request, () -> request, responseType, builderCallback);
     }
 
-    protected final <T, B> Mono<T> postWithBody(Validatable request, final Supplier<B> bodySupplier, final Class<T> responseType, final Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, new Function<SignalEmitter<T>, T>() {
+    protected final <T, B> Mono<T> postWithBody(Validatable request, Supplier<B> bodySupplier, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(request, (Function<SignalEmitter<T>, T>) signalEmitter -> {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
+            builderCallback.accept(builder);
+            URI uri = builder.build().encode().toUri();
 
-            @Override
-            public T apply(SignalEmitter<T> signalEmitter) {
-                UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
-                builderCallback.accept(builder);
-                URI uri = builder.build().encode().toUri();
-
-                return AbstractSpringOperations.this.restOperations.postForObject(uri, bodySupplier.get(), responseType);
-            }
-
+            return this.restOperations.postForObject(uri, bodySupplier.get(), responseType);
         })
             .next();
     }
 
-    protected final <T> Mono<T> put(final Validatable request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
-        return putWithBody(request, new Supplier<Validatable>() {
-
-            @Override
-            public Validatable get() {
-                return request;
-            }
-
-        }, responseType, builderCallback);
+    protected final <T> Mono<T> put(Validatable request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
+        return putWithBody(request, () -> request, responseType, builderCallback);
     }
 
-    protected final <T, B> Mono<T> putWithBody(Validatable request, final Supplier<B> bodySupplier, final Class<T> responseType, final Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, new Function<SignalEmitter<T>, T>() {
+    protected final <T, B> Mono<T> putWithBody(Validatable request, Supplier<B> bodySupplier, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(request, (Function<SignalEmitter<T>, T>) signalEmitter -> {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
+            builderCallback.accept(builder);
+            URI uri = builder.build().encode().toUri();
 
-            @Override
-            public T apply(SignalEmitter<T> signalEmitter) {
-                UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
-                builderCallback.accept(builder);
-                URI uri = builder.build().encode().toUri();
-
-                return AbstractSpringOperations.this.restOperations.exchange(new RequestEntity<>(bodySupplier.get(), null, PUT, uri), responseType).getBody();
-            }
-
+            return this.restOperations.exchange(new RequestEntity<>(bodySupplier.get(), null, PUT, uri), responseType).getBody();
         })
             .next();
     }

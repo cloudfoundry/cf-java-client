@@ -34,7 +34,7 @@ public final class CloudFoundryExceptionBuilderTest {
 
     @Test
     public void build() throws IOException {
-        byte[] body = Files.readAllBytes(Paths.get(new ClassPathResource("client/v2/error_response.json").getURI()));
+        byte[] body = Files.readAllBytes(Paths.get(new ClassPathResource("fixtures/client/v2/error_response.json").getURI()));
         HttpStatusCodeException cause = new HttpClientErrorException(UNPROCESSABLE_ENTITY, UNPROCESSABLE_ENTITY.getReasonPhrase(), body, Charset.defaultCharset());
 
         CloudFoundryException exception = CloudFoundryExceptionBuilder.build(cause);

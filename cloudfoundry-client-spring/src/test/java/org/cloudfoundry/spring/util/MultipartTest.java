@@ -20,9 +20,9 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
-import reactor.fn.Function;
 
 import java.io.IOException;
+import java.util.function.Function;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.cloudfoundry.logging.LoggregatorProtocolBuffers.LogMessage;
@@ -35,7 +35,7 @@ public final class MultipartTest {
     public void test() throws IOException, InterruptedException {
         TestSubscriber<LogMessage> testSubscriber = new TestSubscriber<>();
 
-        Multipart.from(new ClassPathResource("logging/loggregator_response.bin").getInputStream(), BOUNDARY)
+        Multipart.from(new ClassPathResource("fixtures/logging/loggregator_response.bin").getInputStream(), BOUNDARY)
             .map(toLogMessage())
             .subscribe(testSubscriber
                 .assertCount(14));
@@ -44,17 +44,12 @@ public final class MultipartTest {
     }
 
     private Function<byte[], LogMessage> toLogMessage() {
-        return new Function<byte[], LogMessage>() {
-
-            @Override
-            public LogMessage apply(byte[] part) {
-                try {
-                    return LogMessage.parseFrom(part);
-                } catch (InvalidProtocolBufferException e) {
-                    throw new RuntimeException(e);
-                }
+        return part -> {
+            try {
+                return LogMessage.parseFrom(part);
+            } catch (InvalidProtocolBufferException e) {
+                throw new RuntimeException(e);
             }
-
         };
     }
 

@@ -77,14 +77,15 @@ import org.cloudfoundry.util.StringMap;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.fn.Supplier;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.function.Supplier;
 
 import static org.cloudfoundry.util.test.TestObjects.fill;
 import static org.cloudfoundry.util.test.TestObjects.fillPage;
@@ -470,7 +471,7 @@ public final class DefaultApplicationsTest {
             .recent(RecentLogsRequest.builder()
                 .applicationId(applicationId)
                 .build()))
-            .thenReturn(Mono
+            .thenReturn(Flux
                 .just(fill(LogMessage.builder(), "log-message-")
                     .build()));
     }
@@ -480,7 +481,7 @@ public final class DefaultApplicationsTest {
             .stream(StreamLogsRequest.builder()
                 .applicationId(applicationId)
                 .build()))
-            .thenReturn(Mono
+            .thenReturn(Flux
                 .just(fill(LogMessage.builder(), "log-message-")
                     .build()));
     }

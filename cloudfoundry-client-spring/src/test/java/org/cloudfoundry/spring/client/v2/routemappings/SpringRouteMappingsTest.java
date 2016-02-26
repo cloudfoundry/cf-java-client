@@ -41,9 +41,9 @@ public final class SpringRouteMappingsTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(POST).path("/v2/route_mappings")
-                .requestPayload("client/v2/route_mappings/POST_request.json")
+                .requestPayload("fixtures/client/v2/route_mappings/POST_request.json")
                 .status(CREATED)
-                .responsePayload("client/v2/route_mappings/POST_response.json");
+                .responsePayload("fixtures/client/v2/route_mappings/POST_response.json");
         }
 
         @Override
