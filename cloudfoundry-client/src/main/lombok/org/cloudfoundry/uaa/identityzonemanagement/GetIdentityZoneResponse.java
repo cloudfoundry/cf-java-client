@@ -23,21 +23,21 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * The response from the create identity zone request
+ * The resource response payload for the Get Identity Zone Response
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class CreateIdentityZoneResponse extends IdentityZoneEntity {
+public final class GetIdentityZoneResponse extends IdentityZoneEntity {
 
     @Builder
-    CreateIdentityZoneResponse(@JsonProperty("created") Long createdAt,
-                               @JsonProperty("description") String description,
-                               @JsonProperty("id") String identityZoneId,
-                               @JsonProperty("name") String name,
-                               @JsonProperty("subdomain") String subDomain,
-                               @JsonProperty("last_modified") Long updatedAt,
-                               @JsonProperty("version") Integer version) {
+    GetIdentityZoneResponse(@JsonProperty("created") Long createdAt,
+                            @JsonProperty("description") String description,
+                            @JsonProperty("id") String identityZoneId,
+                            @JsonProperty("name") String name,
+                            @JsonProperty("subdomain") String subDomain,
+                            @JsonProperty("last_modified") Long updatedAt,
+                            @JsonProperty("version") Integer version) {
         super(createdAt, description, identityZoneId, name, subDomain, updatedAt, version);
     }
 

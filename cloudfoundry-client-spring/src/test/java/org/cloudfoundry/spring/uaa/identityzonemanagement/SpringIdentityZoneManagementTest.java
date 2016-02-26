@@ -19,10 +19,16 @@ package org.cloudfoundry.spring.uaa.identityzonemanagement;
 import org.cloudfoundry.spring.AbstractApiTest;
 import org.cloudfoundry.uaa.identityzonemanagement.CreateIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzonemanagement.CreateIdentityZoneResponse;
+import org.cloudfoundry.uaa.identityzonemanagement.GetIdentityZoneRequest;
+import org.cloudfoundry.uaa.identityzonemanagement.GetIdentityZoneResponse;
 import reactor.core.publisher.Mono;
 
+import java.util.Date;
+
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringIdentityZoneManagementTest {
 
@@ -47,7 +53,7 @@ public final class SpringIdentityZoneManagementTest {
         @Override
         protected CreateIdentityZoneResponse getResponse() {
             return CreateIdentityZoneResponse.builder()
-                .createdAt("2015-07-27T22:43:20Z")
+                .createdAt(1426258488910L)
                 .description("Like the Twilight Zone but tastier[testzone1].")
                 .identityZoneId("testzone1")
                 .name("The Twiglet Zone[testzone1]")
@@ -69,6 +75,49 @@ public final class SpringIdentityZoneManagementTest {
         @Override
         protected Mono<CreateIdentityZoneResponse> invoke(CreateIdentityZoneRequest request) {
             return this.identityZoneManagement.create(request);
+        }
+    }
+
+    public static final class Get extends AbstractApiTest<GetIdentityZoneRequest, GetIdentityZoneResponse> {
+
+        private final SpringIdentityZoneManagement identityZoneManagement = new SpringIdentityZoneManagement(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected GetIdentityZoneRequest getInvalidRequest() {
+            return GetIdentityZoneRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("/identity-zones/identity-zone-id")
+                .status(OK)
+                .responsePayload("uaa/identity-zones/GET_{id}_response.json");
+        }
+
+        @Override
+        protected GetIdentityZoneResponse getResponse() {
+            return GetIdentityZoneResponse.builder()
+                .createdAt(946710000000L)
+                .description("The test zone")
+                .identityZoneId("identity-zone-id")
+                .name("test")
+                .subDomain("test")
+                .updatedAt(946710000000L)
+                .version(0)
+                .build();
+        }
+
+        @Override
+        protected GetIdentityZoneRequest getValidRequest() throws Exception {
+            return GetIdentityZoneRequest.builder()
+                .identityZoneId("identity-zone-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<GetIdentityZoneResponse> invoke(GetIdentityZoneRequest request) {
+            return this.identityZoneManagement.get(request);
         }
     }
 
