@@ -21,13 +21,11 @@ import lombok.Data;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
-import java.nio.file.Path;
-
 /**
  * The request options for the get application manifest operation
  */
 @Data
-public class GetApplicationManifestRequest implements Validatable {
+public final class GetApplicationManifestRequest implements Validatable {
 
     private final String name;
 
