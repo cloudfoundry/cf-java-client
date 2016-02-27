@@ -18,7 +18,6 @@ package org.cloudfoundry.operations.domains;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
-import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
@@ -26,11 +25,8 @@ import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.ValidationUtils;
-import org.cloudfoundry.util.tuple.Function2;
 import reactor.core.publisher.Mono;
-import reactor.fn.Function;
-import reactor.fn.tuple.Tuple2;
-import reactor.rx.Stream;
+import reactor.rx.Fluxion;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -45,31 +41,21 @@ public final class DefaultDomains implements Domains {
     public Mono<Void> create(CreateDomainRequest request) {
         return ValidationUtils
             .validate(request)
-            .then(new Function<CreateDomainRequest, Mono<Tuple2<String, CreateDomainRequest>>>() {
-
-                @Override
-                public Mono<Tuple2<String, CreateDomainRequest>> apply(CreateDomainRequest request) {
-                    return getOrganizationId(DefaultDomains.this.cloudFoundryClient, request.getOrganization())
-                        .and(Mono.just(request));
-                }
-
-            })
-            .then(function(new Function2<String, CreateDomainRequest, Mono<CreatePrivateDomainResponse>>() {
-
-                @Override
-                public Mono<CreatePrivateDomainResponse> apply(String domainId, CreateDomainRequest request) {
-                    return requestCreateDomain(DefaultDomains.this.cloudFoundryClient, request.getDomain(), domainId);
-                }
-
-            }))
+            .then(request1 -> getOrganizationId(this.cloudFoundryClient, request1.getOrganization())
+                .and(Mono.just(request1)))
+            .then(function((domainId, request1) -> requestCreateDomain(this.cloudFoundryClient, request1.getDomain(), domainId)))
             .after();
     }
 
-    private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
+    private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
         return requestOrganizations(cloudFoundryClient, organization)
             .single()
-            .otherwise(ExceptionUtils.<OrganizationResource>convert("Organization %s does not exist", organization))
-            .map(ResourceUtils.extractId());
+            .otherwise(ExceptionUtils.<OrganizationResource>convert("Organization %s does not exist", organization));
+    }
+
+    private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
+        return getOrganization(cloudFoundryClient, organization)
+            .map(ResourceUtils::getId);
     }
 
     private static Mono<CreatePrivateDomainResponse> requestCreateDomain(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
@@ -80,21 +66,13 @@ public final class DefaultDomains implements Domains {
                 .build());
     }
 
-    private static Stream<OrganizationResource> requestOrganizations(final CloudFoundryClient cloudFoundryClient, final String organization) {
+    private static Fluxion<OrganizationResource> requestOrganizations(CloudFoundryClient cloudFoundryClient, String organization) {
         return PaginationUtils
-            .requestResources(new Function<Integer, Mono<ListOrganizationsResponse>>() {
-
-                @Override
-                public Mono<ListOrganizationsResponse> apply(Integer page) {
-                    return cloudFoundryClient.organizations().list(
-                        ListOrganizationsRequest.builder()
-                            .name(organization)
-                            .page(page)
-                            .build());
-                }
-
-            });
+            .requestResources(page -> cloudFoundryClient.organizations().list(
+                ListOrganizationsRequest.builder()
+                    .name(organization)
+                    .page(page)
+                    .build()));
     }
-
 
 }

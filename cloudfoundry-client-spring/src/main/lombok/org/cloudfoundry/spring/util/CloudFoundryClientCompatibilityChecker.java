@@ -19,10 +19,7 @@ package org.cloudfoundry.spring.util;
 import com.github.zafarkhaja.semver.Version;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
-import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.cloudfoundry.client.v2.info.Info;
-import org.cloudfoundry.util.tuple.Consumer2;
-import org.cloudfoundry.util.tuple.Function1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
@@ -44,23 +41,9 @@ public final class CloudFoundryClientCompatibilityChecker implements Compatibili
         this.info
             .get(GetInfoRequest.builder()
                 .build())
-            .map(new Function1<GetInfoResponse, Version>() {
-
-                @Override
-                public Version apply(GetInfoResponse response) {
-                    return Version.valueOf(response.getApiVersion());
-                }
-
-            })
+            .map(response -> Version.valueOf(response.getApiVersion()))
             .and(Mono.just(Version.valueOf(CloudFoundryClient.SUPPORTED_API_VERSION)))
-            .doOnSuccess(consumer(new Consumer2<Version, Version>() {
-
-                @Override
-                public void accept(Version server, Version supported) {
-                    logCompatibility(server, supported, logger);
-                }
-
-            }))
+            .doOnSuccess(consumer((server, supported) -> logCompatibility(server, supported, this.logger)))
             .subscribe();
     }
 

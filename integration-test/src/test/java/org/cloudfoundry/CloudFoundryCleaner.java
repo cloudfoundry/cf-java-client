@@ -38,11 +38,11 @@ import org.cloudfoundry.util.ResourceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
-import reactor.fn.Predicate;
-import reactor.rx.Stream;
+import reactor.rx.Fluxion;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.cloudfoundry.util.OperationUtils.afterStreamComplete;
@@ -54,35 +54,39 @@ final class CloudFoundryCleaner {
 
     private final CloudFoundryClient cloudFoundryClient;
 
-    private final Predicate<DomainResource> domainPredicate;
+    private final Mono<Optional<String>> protectedDomainId;
 
     private final Mono<Optional<String>> protectedOrganizationId;
 
     private final Mono<List<String>> protectedSpaceIds;
 
-    CloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Predicate<DomainResource> domainPredicate, Mono<Optional<String>> protectedOrganizationId, Mono<List<String>> protectedSpaceIds) {
+    CloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Mono<Optional<String>> protectedDomainId, Mono<Optional<String>> protectedOrganizationId, Mono<List<String>> protectedSpaceIds) {
         this.cloudFoundryClient = cloudFoundryClient;
-        this.domainPredicate = domainPredicate;
+        this.protectedDomainId = protectedDomainId;
         this.protectedOrganizationId = protectedOrganizationId;
         this.protectedSpaceIds = protectedSpaceIds;
     }
 
     void clean() {
         Mono
-            .when(this.protectedOrganizationId, this.protectedSpaceIds)
-            .flatMap(function((systemOrganizationId, systemSpaceIds) -> {
+            .when(this.protectedDomainId, this.protectedOrganizationId, this.protectedSpaceIds)
+            .flatMap(function((protectedDomainId, protectedOrganizationId, protectedSpaceIds) -> {
 
-                Predicate<ApplicationResource> applicationPredicate = systemOrganizationId
-                    .map(id -> (Predicate<ApplicationResource>) r -> !systemSpaceIds.contains(ResourceUtils.getEntity(r).getSpaceId()))
+                Predicate<ApplicationResource> applicationPredicate = protectedOrganizationId
+                    .map(id -> (Predicate<ApplicationResource>) r -> !protectedSpaceIds.contains(ResourceUtils.getEntity(r).getSpaceId()))
                     .orElse(r -> true);
 
-                Predicate<OrganizationResource> organizationPredicate = systemOrganizationId
+                Predicate<OrganizationResource> organizationPredicate = protectedOrganizationId
                     .map(id -> (Predicate<OrganizationResource>) r -> !ResourceUtils.getId(r).equals(id))
+                    .orElse(r -> true);
+
+                Predicate<DomainResource> domainPredicate = protectedDomainId
+                    .map(id -> (Predicate<DomainResource>) r -> !ResourceUtils.getId(r).equals(id))
                     .orElse(r -> true);
 
                 Predicate<RouteResource> routePredicate = r -> true;
 
-                Predicate<SpaceResource> spacePredicate = systemOrganizationId
+                Predicate<SpaceResource> spacePredicate = protectedOrganizationId
                     .map(id -> (Predicate<SpaceResource>) r -> !ResourceUtils.getEntity(r).getOrganizationId().equals(id))
                     .orElse(r -> true);
 
@@ -99,7 +103,7 @@ final class CloudFoundryCleaner {
             .get(5, MINUTES);
     }
 
-    private static Stream<Void> cleanApplications(CloudFoundryClient cloudFoundryClient, Predicate<ApplicationResource> predicate) {
+    private static Fluxion<Void> cleanApplications(CloudFoundryClient cloudFoundryClient, Predicate<ApplicationResource> predicate) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.applicationsV2()
                 .list(ListApplicationsRequest.builder()
@@ -113,7 +117,7 @@ final class CloudFoundryCleaner {
                     .build()));
     }
 
-    private static Stream<Void> cleanDomains(CloudFoundryClient cloudFoundryClient, Predicate<DomainResource> predicate) {
+    private static Fluxion<Void> cleanDomains(CloudFoundryClient cloudFoundryClient, Predicate<DomainResource> predicate) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.domains()
                 .list(ListDomainsRequest.builder()
@@ -130,7 +134,7 @@ final class CloudFoundryCleaner {
             .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
     }
 
-    private static Stream<Void> cleanOrganizations(CloudFoundryClient cloudFoundryClient, Predicate<OrganizationResource> predicate) {
+    private static Fluxion<Void> cleanOrganizations(CloudFoundryClient cloudFoundryClient, Predicate<OrganizationResource> predicate) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.organizations()
                 .list(ListOrganizationsRequest.builder()
@@ -147,7 +151,7 @@ final class CloudFoundryCleaner {
             .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
     }
 
-    private static Stream<Void> cleanRoutes(CloudFoundryClient cloudFoundryClient, Predicate<RouteResource> predicate) {
+    private static Fluxion<Void> cleanRoutes(CloudFoundryClient cloudFoundryClient, Predicate<RouteResource> predicate) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.routes()
                 .list(ListRoutesRequest.builder()
@@ -164,7 +168,7 @@ final class CloudFoundryCleaner {
             .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
     }
 
-    private static Stream<Void> cleanSpaces(CloudFoundryClient cloudFoundryClient, Predicate<SpaceResource> predicate) {
+    private static Fluxion<Void> cleanSpaces(CloudFoundryClient cloudFoundryClient, Predicate<SpaceResource> predicate) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .list(ListSpacesRequest.builder()

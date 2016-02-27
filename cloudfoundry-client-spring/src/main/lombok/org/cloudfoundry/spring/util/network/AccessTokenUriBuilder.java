@@ -19,12 +19,12 @@ package org.cloudfoundry.spring.util.network;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.cloudfoundry.util.Optional;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 

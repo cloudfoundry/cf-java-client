@@ -17,18 +17,16 @@
 package org.cloudfoundry.spring.client.v3.droplets;
 
 import lombok.ToString;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.v3.droplets.DeleteDropletRequest;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.droplets.GetDropletRequest;
 import org.cloudfoundry.client.v3.droplets.GetDropletResponse;
 import org.cloudfoundry.client.v3.droplets.ListDropletsRequest;
 import org.cloudfoundry.client.v3.droplets.ListDropletsResponse;
+import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -51,38 +49,17 @@ public final class SpringDroplets extends AbstractSpringOperations implements Dr
 
     @Override
     public Mono<Void> delete(final DeleteDropletRequest request) {
-        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "droplets", request.getDropletId());
-            }
-
-        });
+        return delete(request, Void.class, builder -> builder.pathSegment("v3", "droplets", request.getDropletId()));
     }
 
     @Override
     public Mono<GetDropletResponse> get(final GetDropletRequest request) {
-        return get(request, GetDropletResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "droplets", request.getDropletId());
-            }
-
-        });
+        return get(request, GetDropletResponse.class, builder -> builder.pathSegment("v3", "droplets", request.getDropletId()));
     }
 
     @Override
     public Mono<ListDropletsResponse> list(ListDropletsRequest request) {
-        return get(request, ListDropletsResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "droplets");
-            }
-
-        });
+        return get(request, ListDropletsResponse.class, builder -> builder.pathSegment("v3", "droplets"));
     }
 
 }

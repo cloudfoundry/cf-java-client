@@ -42,7 +42,7 @@ public final class OrganizationSummary {
     private final String name;
 
     @Builder
-    private OrganizationSummary(String id, String name) {
+    OrganizationSummary(String id, String name) {
         this.id = id;
         this.name = name;
     }

@@ -17,7 +17,7 @@
 package org.cloudfoundry;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.domains.DomainResource;
+import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
@@ -43,9 +43,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
-import reactor.fn.Predicate;
+import reactor.rx.Fluxion;
 import reactor.rx.Promise;
-import reactor.rx.Stream;
 
 import java.security.SecureRandom;
 import java.util.Collections;
@@ -60,9 +59,9 @@ public class IntegrationTestConfiguration {
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.test");
 
     @Bean(initMethod = "clean", destroyMethod = "clean")
-    CloudFoundryCleaner cloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Predicate<DomainResource> domainPredicate, String organizationName, Mono<Optional<String>> protectedOrganizationId,
-                                            Mono<List<String>> protectedSpaceIds) {
-        return new CloudFoundryCleaner(cloudFoundryClient, domainPredicate, protectedOrganizationId, protectedSpaceIds);
+    CloudFoundryCleaner cloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Mono<Optional<String>> protectedDomainId, Mono<Optional<String>> protectedOrganizationId, Mono<List<String>>
+        protectedSpaceIds) {
+        return new CloudFoundryCleaner(cloudFoundryClient, protectedDomainId, protectedOrganizationId, protectedSpaceIds);
     }
 
     @Bean
@@ -89,14 +88,6 @@ public class IntegrationTestConfiguration {
             .uaaClient(uaaClient)
             .target(organizationName, spaceName)
             .build();
-    }
-
-    @Bean
-    Predicate<DomainResource> domainPredicate(@Value("${test.domain}") String domain) {
-        return resource -> {
-            String name = ResourceUtils.getEntity(resource).getName();
-            return !name.endsWith(domain);
-        };
     }
 
     @Bean
@@ -134,17 +125,43 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    Mono<Optional<String>> protectedOrganizationId(CloudFoundryClient cloudFoundryClient, @Value("${test.protected.organization:}") String protectedOrganization) {
-        Mono<Optional<String>> systemOrganizationId = Mono
-            .just(protectedOrganization)
+    Mono<Optional<String>> protectedDomainId(CloudFoundryClient cloudFoundryClient, @Value("${test.protected.domain:}") String protectedDomain) {
+        Mono<Optional<String>> protectedDomainId = Mono
+            .just(protectedDomain)
             .where(StringUtils::hasText)
-            .flatMap(protectedOrganization2 -> PaginationUtils
-                .requestResources(page -> cloudFoundryClient.organizations()
-                    .list(ListOrganizationsRequest.builder()
-                        .name(protectedOrganization2)
+            .flatMap(protectedDomain1 -> PaginationUtils
+                .requestResources(page -> cloudFoundryClient.domains()
+                    .list(ListDomainsRequest.builder()
+                        .name(protectedDomain1)
                         .page(page)
                         .build())))
-            .as(Stream::from)
+            .as(Fluxion::from)
+            .singleOrEmpty()
+            .map(ResourceUtils::getId)
+            .map(Optional::of)
+            .otherwiseIfEmpty(Mono.just(Optional.empty()))
+            .doOnSubscribe(s -> this.logger.debug(">> PROTECTED DOMAIN <<"))
+            .doOnError(Throwable::printStackTrace)
+            .doOnSuccess(id -> this.logger.debug("<< PROTECTED DOMAIN >>"))
+            .as(Promise::from);
+
+        protectedDomainId.get();
+        return protectedDomainId;
+    }
+
+
+    @Bean
+    Mono<Optional<String>> protectedOrganizationId(CloudFoundryClient cloudFoundryClient, @Value("${test.protected.organization:}") String protectedOrganization) {
+        Mono<Optional<String>> protectedOrganizationId = Mono
+            .just(protectedOrganization)
+            .where(StringUtils::hasText)
+            .flatMap(protectedOrganization1 -> PaginationUtils
+                .requestResources(page -> cloudFoundryClient.organizations()
+                    .list(ListOrganizationsRequest.builder()
+                        .name(protectedOrganization1)
+                        .page(page)
+                        .build())))
+            .as(Fluxion::from)
             .singleOrEmpty()
             .map(ResourceUtils::getId)
             .map(Optional::of)
@@ -154,14 +171,14 @@ public class IntegrationTestConfiguration {
             .doOnSuccess(id -> this.logger.debug("<< PROTECTED ORGANIZATION >>"))
             .as(Promise::from);
 
-        systemOrganizationId.get();
-        return systemOrganizationId;
+        protectedOrganizationId.get();
+        return protectedOrganizationId;
     }
 
     @Bean
     Mono<List<String>> protectedSpaceIds(CloudFoundryClient cloudFoundryClient, Mono<Optional<String>> protectedOrganizationId) {
-        Mono<List<String>> systemSpaceIds = protectedOrganizationId
-            .then(systemOrganizationId2 -> systemOrganizationId2
+        Mono<List<String>> protectedSpaceIds = protectedOrganizationId
+            .then(protectedOrganizationId1 -> protectedOrganizationId1
                 .map(id -> PaginationUtils
                     .requestResources(page -> cloudFoundryClient.spaces()
                         .list(ListSpacesRequest.builder()
@@ -175,8 +192,8 @@ public class IntegrationTestConfiguration {
             .doOnSuccess(id -> this.logger.debug("<< PROTECTED SPACES >>"))
             .as(Promise::from);
 
-        systemSpaceIds.get();
-        return systemSpaceIds;
+        protectedSpaceIds.get();
+        return protectedSpaceIds;
     }
 
     @Bean

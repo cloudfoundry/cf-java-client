@@ -48,15 +48,6 @@ public final class ListOrganizationDomainsRequest extends PaginatedRequest imple
     private final List<String> names;
 
     /**
-     * The owning organization ids
-     *
-     * @param owningOrganizationIds the owning organization ids
-     * @return the owning organization ids
-     */
-    @Getter(onMethod = @__(@InFilterParameter("owning_organization_guid")))
-    private final List<String> owningOrganizationIds;
-
-    /**
      * The organization id
      *
      * @param organizationId the organization id
@@ -64,6 +55,15 @@ public final class ListOrganizationDomainsRequest extends PaginatedRequest imple
      */
     @Getter(onMethod = @__(@JsonIgnore))
     private final String organizationId;
+
+    /**
+     * The owning organization ids
+     *
+     * @param owningOrganizationIds the owning organization ids
+     * @return the owning organization ids
+     */
+    @Getter(onMethod = @__(@InFilterParameter("owning_organization_guid")))
+    private final List<String> owningOrganizationIds;
 
     @Builder
     ListOrganizationDomainsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,

@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.logging;
 
-import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 
 /**
  * Main entry point to the Logging Client API
@@ -29,7 +29,7 @@ public interface LoggingClient {
      * @param request the Recent Logs request
      * @return the response from the Recent Logs request
      */
-    Publisher<LogMessage> recent(RecentLogsRequest request);
+    Flux<LogMessage> recent(RecentLogsRequest request);
 
     /**
      * Makes the Stream Logs request
@@ -37,6 +37,6 @@ public interface LoggingClient {
      * @param request the Stream Logs request
      * @return the response from the Stream Logs request
      */
-    Publisher<LogMessage> stream(StreamLogsRequest request);
+    Flux<LogMessage> stream(StreamLogsRequest request);
 
 }

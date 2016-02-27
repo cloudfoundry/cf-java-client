@@ -50,7 +50,7 @@ public final class LoggregatorMessageHttpMessageConverterTest {
 
     @Test
     public void readInternal() throws IOException, InterruptedException {
-        MockHttpInputMessage inputMessage = new MockHttpInputMessage(new ClassPathResource("logging/loggregator_response.bin").getInputStream());
+        MockHttpInputMessage inputMessage = new MockHttpInputMessage(new ClassPathResource("fixtures/logging/loggregator_response.bin").getInputStream());
         inputMessage.getHeaders().setContentType(MEDIA_TYPE);
 
         List<LogMessage> messages = this.messageConverter.readInternal(null, inputMessage);

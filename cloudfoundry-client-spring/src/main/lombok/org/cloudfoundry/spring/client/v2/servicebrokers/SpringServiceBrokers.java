@@ -17,9 +17,6 @@
 package org.cloudfoundry.spring.client.v2.servicebrokers;
 
 import lombok.ToString;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.QueryBuilder;
-import org.cloudfoundry.spring.client.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerRequest;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerResponse;
 import org.cloudfoundry.client.v2.servicebrokers.DeleteServiceBrokerRequest;
@@ -30,11 +27,12 @@ import org.cloudfoundry.client.v2.servicebrokers.ListServiceBrokersResponse;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokers;
 import org.cloudfoundry.client.v2.servicebrokers.UpdateServiceBrokerRequest;
 import org.cloudfoundry.client.v2.servicebrokers.UpdateServiceBrokerResponse;
+import org.cloudfoundry.spring.client.v2.FilterBuilder;
+import org.cloudfoundry.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -56,64 +54,32 @@ public final class SpringServiceBrokers extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Mono<CreateServiceBrokerResponse> create(final CreateServiceBrokerRequest request) {
-        return post(request, CreateServiceBrokerResponse.class, new Consumer<UriComponentsBuilder>() {
+    public Mono<CreateServiceBrokerResponse> create(CreateServiceBrokerRequest request) {
+        return post(request, CreateServiceBrokerResponse.class, builder -> builder.pathSegment("v2", "service_brokers"));
+    }
 
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_brokers");
-            }
+    @Override
+    public Mono<Void> delete(DeleteServiceBrokerRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "service_brokers", request.getServiceBrokerId()));
+    }
 
+    @Override
+    public Mono<GetServiceBrokerResponse> get(GetServiceBrokerRequest request) {
+        return get(request, GetServiceBrokerResponse.class, builder -> builder.pathSegment("v2", "service_brokers", request.getServiceBrokerId()));
+    }
+
+    @Override
+    public Mono<ListServiceBrokersResponse> list(ListServiceBrokersRequest request) {
+        return get(request, ListServiceBrokersResponse.class, builder -> {
+            builder.pathSegment("v2", "service_brokers");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
-    public Mono<Void> delete(final DeleteServiceBrokerRequest request) {
-        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_brokers", request.getServiceBrokerId());
-            }
-        });
-    }
-
-    @Override
-    public Mono<GetServiceBrokerResponse> get(final GetServiceBrokerRequest request) {
-        return get(request, GetServiceBrokerResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_brokers", request.getServiceBrokerId());
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<ListServiceBrokersResponse> list(final ListServiceBrokersRequest request) {
-        return get(request, ListServiceBrokersResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_brokers");
-                FilterBuilder.augment(builder, request);
-                QueryBuilder.augment(builder, request);
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<UpdateServiceBrokerResponse> update(final UpdateServiceBrokerRequest request) {
-        return put(request, UpdateServiceBrokerResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_brokers", request.getServiceBrokerId());
-            }
-
-        });
+    public Mono<UpdateServiceBrokerResponse> update(UpdateServiceBrokerRequest request) {
+        return put(request, UpdateServiceBrokerResponse.class, builder -> builder.pathSegment("v2", "service_brokers", request.getServiceBrokerId()));
     }
 
 }

@@ -17,8 +17,6 @@
 package org.cloudfoundry.spring.client.v3.processes;
 
 import lombok.ToString;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.QueryBuilder;
 import org.cloudfoundry.client.v3.processes.GetProcessDetailedStatisticsRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessDetailedStatisticsResponse;
 import org.cloudfoundry.client.v3.processes.GetProcessRequest;
@@ -31,11 +29,11 @@ import org.cloudfoundry.client.v3.processes.ScaleProcessResponse;
 import org.cloudfoundry.client.v3.processes.TerminateProcessInstanceRequest;
 import org.cloudfoundry.client.v3.processes.UpdateProcessRequest;
 import org.cloudfoundry.client.v3.processes.UpdateProcessResponse;
+import org.cloudfoundry.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -58,76 +56,38 @@ public final class SpringProcesses extends AbstractSpringOperations implements P
 
     @Override
     public Mono<GetProcessResponse> get(final GetProcessRequest request) {
-        return get(request, GetProcessResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "processes", request.getProcessId());
-            }
-
-        });
+        return get(request, GetProcessResponse.class, builder -> builder.pathSegment("v3", "processes", request.getProcessId()));
     }
 
     @Override
     public Mono<GetProcessDetailedStatisticsResponse> getDetailedStatistics(final GetProcessDetailedStatisticsRequest request) {
-        return get(request, GetProcessDetailedStatisticsResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "processes", request.getProcessId(), "stats");
-                QueryBuilder.augment(builder, request);
-            }
-
+        return get(request, GetProcessDetailedStatisticsResponse.class, builder -> {
+            builder.pathSegment("v3", "processes", request.getProcessId(), "stats");
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
     public Mono<ListProcessesResponse> list(final ListProcessesRequest request) {
-        return get(request, ListProcessesResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "processes");
-                QueryBuilder.augment(builder, request);
-            }
-
+        return get(request, ListProcessesResponse.class, builder -> {
+            builder.pathSegment("v3", "processes");
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
     public Mono<ScaleProcessResponse> scale(final ScaleProcessRequest request) {
-        return put(request, ScaleProcessResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "processes", request.getProcessId(), "scale");
-            }
-
-        });
+        return put(request, ScaleProcessResponse.class, builder -> builder.pathSegment("v3", "processes", request.getProcessId(), "scale"));
     }
 
     @Override
     public Mono<Void> terminateInstance(final TerminateProcessInstanceRequest request) {
-        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "processes", request.getProcessId(), "instances", request.getIndex());
-            }
-
-        });
+        return delete(request, Void.class, builder -> builder.pathSegment("v3", "processes", request.getProcessId(), "instances", request.getIndex()));
     }
 
     @Override
     public Mono<UpdateProcessResponse> update(final UpdateProcessRequest request) {
-        return patch(request, UpdateProcessResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "processes", request.getProcessId());
-            }
-
-        });
+        return patch(request, UpdateProcessResponse.class, builder -> builder.pathSegment("v3", "processes", request.getProcessId()));
     }
 
 }

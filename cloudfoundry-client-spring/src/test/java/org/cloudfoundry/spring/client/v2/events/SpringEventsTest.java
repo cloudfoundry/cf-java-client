@@ -48,7 +48,7 @@ public final class SpringEventsTest {
             return new RequestContext()
                 .method(GET).path("/v2/events/test-event-id")
                 .status(OK)
-                .responsePayload("client/v2/events/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v2/events/GET_{id}_response.json");
         }
 
         @Override
@@ -103,7 +103,7 @@ public final class SpringEventsTest {
             return new RequestContext()
                 .method(GET).path("/v2/events?q=actee%20IN%20test-actee&page=-1")
                 .status(OK)
-                .responsePayload("client/v2/events/GET_response.json");
+                .responsePayload("fixtures/client/v2/events/GET_response.json");
         }
 
         @Override

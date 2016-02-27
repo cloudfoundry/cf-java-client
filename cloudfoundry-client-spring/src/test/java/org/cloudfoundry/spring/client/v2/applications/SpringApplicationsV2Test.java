@@ -101,7 +101,7 @@ public final class SpringApplicationsV2Test {
             return new RequestContext()
                 .method(PUT).path("/v2/apps/test-application-id/routes/test-route-id")
                 .status(OK)
-                .responsePayload("client/v2/apps/PUT_{id}_routes_{route-id}_response.json");
+                .responsePayload("fixtures/client/v2/apps/PUT_{id}_routes_{route-id}_response.json");
         }
 
         @Override
@@ -169,9 +169,9 @@ public final class SpringApplicationsV2Test {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(POST).path("/v2/apps/test-application-id/copy_bits")
-                .requestPayload("client/v2/apps/POST_{id}_copy_bits_request.json")
+                .requestPayload("fixtures/client/v2/apps/POST_{id}_copy_bits_request.json")
                 .status(OK)
-                .responsePayload("client/v2/apps/POST_{id}_copy_bits_response.json");
+                .responsePayload("fixtures/client/v2/apps/POST_{id}_copy_bits_response.json");
         }
 
         @Override
@@ -217,9 +217,9 @@ public final class SpringApplicationsV2Test {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(POST).path("/v2/apps")
-                .requestPayload("client/v2/apps/POST_request.json")
+                .requestPayload("fixtures/client/v2/apps/POST_request.json")
                 .status(CREATED)
-                .responsePayload("client/v2/apps/POST_response.json");
+                .responsePayload("fixtures/client/v2/apps/POST_response.json");
         }
 
         @Override
@@ -331,12 +331,12 @@ public final class SpringApplicationsV2Test {
             return new RequestContext()
                 .method(GET).path("/v2/apps/test-application-id/download")
                 .status(OK)
-                .responsePayload("client/v2/apps/GET_{id}_download_response.bin");
+                .responsePayload("fixtures/client/v2/apps/GET_{id}_download_response.bin");
         }
 
         @Override
         protected byte[] getResponse() {
-            return getContents(new ClassPathResource("client/v2/apps/GET_{id}_download_response.bin"));
+            return getContents(new ClassPathResource("fixtures/client/v2/apps/GET_{id}_download_response.bin"));
         }
 
         @Override
@@ -374,12 +374,12 @@ public final class SpringApplicationsV2Test {
             return new RequestContext()
                 .method(GET).path("/v2/apps/test-application-id/droplet/download")
                 .status(OK)
-                .responsePayload("client/v2/apps/GET_{id}_download_response.bin");
+                .responsePayload("fixtures/client/v2/apps/GET_{id}_download_response.bin");
         }
 
         @Override
         protected byte[] getResponse() {
-            return getContents(new ClassPathResource("client/v2/apps/GET_{id}_download_response.bin"));
+            return getContents(new ClassPathResource("fixtures/client/v2/apps/GET_{id}_download_response.bin"));
         }
 
         @Override
@@ -410,7 +410,7 @@ public final class SpringApplicationsV2Test {
             return new RequestContext()
                 .method(GET).path("/v2/apps/test-application-id/env")
                 .status(OK)
-                .responsePayload("client/v2/apps/GET_{id}_env_response.json");
+                .responsePayload("fixtures/client/v2/apps/GET_{id}_env_response.json");
         }
 
         @Override
@@ -469,7 +469,7 @@ public final class SpringApplicationsV2Test {
             return new RequestContext()
                 .method(GET).path("/v2/apps/test-application-id")
                 .status(OK)
-                .responsePayload("client/v2/apps/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v2/apps/GET_{id}_response.json");
         }
 
         @Override
@@ -537,7 +537,7 @@ public final class SpringApplicationsV2Test {
             return new RequestContext()
                 .method(GET).path("/v2/apps/test-application-id/instances")
                 .status(OK)
-                .responsePayload("client/v2/apps/GET_{id}_instances_response.json");
+                .responsePayload("fixtures/client/v2/apps/GET_{id}_instances_response.json");
         }
 
         @Override
@@ -579,7 +579,7 @@ public final class SpringApplicationsV2Test {
             return new RequestContext()
                 .method(GET).path("/v2/apps?q=name%20IN%20test-name&page=-1")
                 .status(OK)
-                .responsePayload("client/v2/apps/GET_apps_response.json");
+                .responsePayload("fixtures/client/v2/apps/GET_apps_response.json");
         }
 
         @Override
@@ -719,7 +719,7 @@ public final class SpringApplicationsV2Test {
             return new RequestContext()
                 .method(GET).path("/v2/apps/test-application-id/routes?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/apps/GET_{id}_routes_response.json");
+                .responsePayload("fixtures/client/v2/apps/GET_{id}_routes_response.json");
         }
 
         @Override
@@ -777,7 +777,7 @@ public final class SpringApplicationsV2Test {
                 .method(GET)
                 .path("v2/apps/test-application-id/service_bindings?q=service_instance_guid%20IN%20test-instance-id&page=-1")
                 .status(OK)
-                .responsePayload("client/v2/apps/GET_{id}_service_bindings_response.json");
+                .responsePayload("fixtures/client/v2/apps/GET_{id}_service_bindings_response.json");
         }
 
         @Override
@@ -907,7 +907,7 @@ public final class SpringApplicationsV2Test {
             return new RequestContext()
                 .method(POST).path("/v2/apps/test-application-id/restage")
                 .status(OK)
-                .responsePayload("client/v2/apps/POST_{id}_restage_response.json");
+                .responsePayload("fixtures/client/v2/apps/POST_{id}_restage_response.json");
         }
 
         @Override
@@ -970,7 +970,7 @@ public final class SpringApplicationsV2Test {
             return new RequestContext()
                 .method(GET).path("/v2/apps/test-application-id/stats")
                 .status(OK)
-                .responsePayload("client/v2/apps/GET_{id}_stats_response.json");
+                .responsePayload("fixtures/client/v2/apps/GET_{id}_stats_response.json");
         }
 
         @Override
@@ -980,8 +980,8 @@ public final class SpringApplicationsV2Test {
                     .state("RUNNING")
                     .statistics(ApplicationStatisticsResponse.InstanceStats.Statistics.builder()
                         .usage(ApplicationStatisticsResponse.InstanceStats.Statistics.Usage.builder()
-                            .disk(66392064l)
-                            .memory(29880320l)
+                            .disk(66392064L)
+                            .memory(29880320L)
                             .cpu(0.13511219703079957d)
                             .time("2014-06-19 22:37:58 +0000")
                             .build())
@@ -989,9 +989,9 @@ public final class SpringApplicationsV2Test {
                         .uri("app_name.example.com")
                         .host("10.0.0.1")
                         .port(61035)
-                        .uptime(65007l)
-                        .memoryQuota(536870912l)
-                        .diskQuota(1073741824l)
+                        .uptime(65007L)
+                        .memoryQuota(536870912L)
+                        .diskQuota(1073741824L)
                         .fdsQuota(16384)
                         .build())
                     .build())
@@ -1027,7 +1027,7 @@ public final class SpringApplicationsV2Test {
             return new RequestContext()
                 .method(GET).path("/v2/apps/test-application-id/summary")
                 .status(OK)
-                .responsePayload("client/v2/apps/GET_{id}_summary_response.json");
+                .responsePayload("fixtures/client/v2/apps/GET_{id}_summary_response.json");
         }
 
         @Override
@@ -1155,9 +1155,9 @@ public final class SpringApplicationsV2Test {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PUT).path("/v2/apps/test-application-id")
-                .requestPayload("client/v2/apps/PUT_{id}_request.json")
+                .requestPayload("fixtures/client/v2/apps/PUT_{id}_request.json")
                 .status(CREATED)
-                .responsePayload("client/v2/apps/PUT_{id}_response.json");
+                .responsePayload("fixtures/client/v2/apps/PUT_{id}_response.json");
         }
 
         @Override
@@ -1229,7 +1229,7 @@ public final class SpringApplicationsV2Test {
                 .requestMatcher(header("Content-Type", startsWith(MULTIPART_FORM_DATA_VALUE)))
                 .anyRequestPayload()
                 .status(CREATED)
-                .responsePayload("client/v2/apps/PUT_{id}_bits_response.json");
+                .responsePayload("fixtures/client/v2/apps/PUT_{id}_bits_response.json");
         }
 
         @Override
@@ -1250,7 +1250,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected UploadApplicationRequest getValidRequest() throws Exception {
             return UploadApplicationRequest.builder()
-                .application(new ClassPathResource("client/v2/apps/application.zip").getInputStream())
+                .application(new ClassPathResource("fixtures/client/v2/apps/application.zip").getInputStream())
                 .applicationId("test-application-id")
                 .resource(UploadApplicationRequest.Resource.builder()
                     .hash("b907173290db6a155949ab4dc9b2d019dea0c901")

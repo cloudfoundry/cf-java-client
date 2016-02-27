@@ -37,7 +37,7 @@ public final class CreateTaskResponse extends Task {
     @Builder
     CreateTaskResponse(@JsonProperty("command") String command,
                        @JsonProperty("created_at") String createdAt,
-                       @JsonProperty("result") @Singular Map<String, Object> results,                                    
+                       @JsonProperty("result") @Singular Map<String, Object> results,
                        @JsonProperty("environment_variables") @Singular Map<String, String> environmentVariables,
                        @JsonProperty("guid") String id,
                        @JsonProperty("name") String name,

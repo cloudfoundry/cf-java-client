@@ -22,7 +22,7 @@ import lombok.Data;
  * General feature flag payload.
  */
 @Data
-abstract class AbstractFeatureFlag {
+public abstract class AbstractFeatureFlag {
 
     /**
      * The state of the feature flag
@@ -56,7 +56,7 @@ abstract class AbstractFeatureFlag {
      */
     private final String url;
 
-    protected AbstractFeatureFlag(Boolean enabled,
+    AbstractFeatureFlag(Boolean enabled,
                                   String errorMessage,
                                   String name,
                                   String url) {

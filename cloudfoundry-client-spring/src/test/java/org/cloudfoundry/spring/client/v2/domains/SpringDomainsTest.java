@@ -61,9 +61,9 @@ public final class SpringDomainsTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(POST).path("/v2/domains")
-                .requestPayload("client/v2/domains/POST_request.json")
+                .requestPayload("fixtures/client/v2/domains/POST_request.json")
                 .status(OK)
-                .responsePayload("client/v2/domains/POST_response.json");
+                .responsePayload("fixtures/client/v2/domains/POST_response.json");
         }
 
         @Override
@@ -149,7 +149,7 @@ public final class SpringDomainsTest {
             return new RequestContext()
                 .method(DELETE).path("/v2/domains/test-domain-id?async=true")
                 .status(ACCEPTED)
-                .responsePayload("client/v2/domains/DELETE_{id}_async_response.json");
+                .responsePayload("fixtures/client/v2/domains/DELETE_{id}_async_response.json");
         }
 
         @Override
@@ -196,7 +196,7 @@ public final class SpringDomainsTest {
             return new RequestContext()
                 .method(GET).path("/v2/domains/test-domain-id")
                 .status(OK)
-                .responsePayload("client/v2/domains/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v2/domains/GET_{id}_response.json");
         }
 
         @Override
@@ -241,7 +241,7 @@ public final class SpringDomainsTest {
             return new RequestContext()
                 .method(GET).path("/v2/domains?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/domains/GET_response.json");
+                .responsePayload("fixtures/client/v2/domains/GET_response.json");
         }
 
         @Override
@@ -323,7 +323,7 @@ public final class SpringDomainsTest {
             return new RequestContext()
                 .method(GET).path("/v2/domains/test-domain-id/spaces?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/domains/GET_{id}_spaces_response.json");
+                .responsePayload("fixtures/client/v2/domains/GET_{id}_spaces_response.json");
         }
 
         @Override

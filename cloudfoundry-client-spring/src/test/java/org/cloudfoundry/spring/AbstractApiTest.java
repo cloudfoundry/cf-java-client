@@ -22,16 +22,16 @@ import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Test;
 import org.reactivestreams.Publisher;
 import org.springframework.core.io.Resource;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.util.Exceptions;
-import reactor.fn.BiFunction;
-import reactor.fn.Consumer;
-import reactor.fn.Function;
-import reactor.rx.Stream;
+import reactor.rx.Fluxion;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertArrayEquals;
@@ -77,14 +77,7 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
     }
 
     protected static Consumer<byte[]> arrayEqualsExpectation(final byte[] expected) {
-        return new Consumer<byte[]>() {
-
-            @Override
-            public void accept(byte[] actual) {
-                assertArrayEquals(expected, actual);
-            }
-
-        };
+        return actual -> assertArrayEquals(expected, actual);
     }
 
     protected void assertions(TestSubscriber<RSP> testSubscriber, RSP expected) {
@@ -93,11 +86,11 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
         }
     }
 
-    protected final Mono<byte[]> getContents(Publisher<byte[]> publisher) {
-        return Stream
-            .from(publisher)
+    protected final Mono<byte[]> getContents(Flux<byte[]> flux) {
+        return flux
+            .as(Fluxion::from)
             .reduce(new ByteArrayOutputStream(), collectIntoByteArrayInputStream())
-            .map(toByteArray());
+            .map(ByteArrayOutputStream::toByteArray);
     }
 
     protected final byte[] getContents(Resource resource) {
@@ -126,29 +119,13 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
     protected abstract Publisher<RSP> invoke(REQ request);
 
     private static BiFunction<ByteArrayOutputStream, byte[], ByteArrayOutputStream> collectIntoByteArrayInputStream() {
-        return new BiFunction<ByteArrayOutputStream, byte[], ByteArrayOutputStream>() {
-
-            @Override
-            public ByteArrayOutputStream apply(ByteArrayOutputStream out, byte[] bytes) {
-
-                try {
-                    out.write(bytes);
-                    return out;
-                } catch (IOException e) {
-                    throw new Exceptions.UpstreamException(e);
-                }
+        return (out, bytes) -> {
+            try {
+                out.write(bytes);
+                return out;
+            } catch (IOException e) {
+                throw new Exceptions.UpstreamException(e);
             }
-        };
-    }
-
-    private static Function<ByteArrayOutputStream, byte[]> toByteArray() {
-        return new Function<ByteArrayOutputStream, byte[]>() {
-
-            @Override
-            public byte[] apply(ByteArrayOutputStream out) {
-                return out.toByteArray();
-            }
-
         };
     }
 

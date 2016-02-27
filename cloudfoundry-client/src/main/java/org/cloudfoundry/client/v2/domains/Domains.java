@@ -25,8 +25,8 @@ public interface Domains {
 
     /**
      * Makes the deprecated <a href="http://apidocs.cloudfoundry.org/latest-release/domains_%28deprecated%29/create_a_domain_owned_by_the_given_organization_%28deprecated%29.html">Create a Domain
-     * owned by the given Organization</a> request and the the deprecated <a
-     * href="http://apidocs.cloudfoundry.org/latest-release/domains_%28deprecated%29/create_a_shared_domain_%28deprecated%29.html">Create a Shared Domain</a> request
+     * owned by the given Organization</a> request and the the deprecated <a href="http://apidocs.cloudfoundry.org/latest-release/domains_%28deprecated%29/create_a_shared_domain_%28deprecated%29.html">
+     * Create a Shared Domain</a> request
      *
      * @param request the Create a Domain request
      * @return the response from the Create a Domain request

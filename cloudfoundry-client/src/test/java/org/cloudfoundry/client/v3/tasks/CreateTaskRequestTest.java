@@ -50,18 +50,6 @@ public final class CreateTaskRequestTest {
     }
 
     @Test
-    public void isValidNoName() {
-        ValidationResult result = CreateTaskRequest.builder()
-            .applicationId("test-application-id")
-            .command("test-command")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
     public void isValidNoCommand() {
         ValidationResult result = CreateTaskRequest.builder()
             .applicationId("test-application-id")
@@ -71,6 +59,18 @@ public final class CreateTaskRequestTest {
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("command must be specified", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isValidNoName() {
+        ValidationResult result = CreateTaskRequest.builder()
+            .applicationId("test-application-id")
+            .command("test-command")
+            .build()
+            .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("name must be specified", result.getMessages().get(0));
     }
 
 }

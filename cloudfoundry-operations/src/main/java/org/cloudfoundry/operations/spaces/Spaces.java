@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.operations.spaces;
 
-import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -69,7 +69,7 @@ public interface Spaces {
      *
      * @return the spaces
      */
-    Publisher<SpaceSummary> list();
+    Flux<SpaceSummary> list();
 
     /**
      * Renames a specific space

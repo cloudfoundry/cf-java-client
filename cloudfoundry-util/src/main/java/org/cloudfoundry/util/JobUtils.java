@@ -22,8 +22,6 @@ import org.cloudfoundry.client.v2.job.GetJobRequest;
 import org.cloudfoundry.client.v2.job.GetJobResponse;
 import org.cloudfoundry.client.v2.job.JobEntity;
 import reactor.core.publisher.Mono;
-import reactor.fn.Function;
-import reactor.fn.Predicate;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -44,38 +42,11 @@ public final class JobUtils {
      */
     public static Mono<Void> waitForCompletion(CloudFoundryClient cloudFoundryClient, String jobId) {
         return requestJob(cloudFoundryClient, jobId)
-            .map(new Function<GetJobResponse, JobEntity>() {
-
-                @Override
-                public JobEntity apply(GetJobResponse response) {
-                    return response.getEntity();
-                }
-            })
-            .where(new Predicate<JobEntity>() {
-
-                @Override
-                public boolean test(JobEntity entity) {
-                    return isComplete(entity);
-                }
-
-            })
-            .as(OperationUtils.<JobEntity>repeatWhen(DelayUtils.exponentialBackOff(1, 10, SECONDS, 10)))  // TODO: Remove once Mono.repeatWhen()
-            .where(new Predicate<JobEntity>() {
-
-                @Override
-                public boolean test(JobEntity entity) {
-                    return "failed".equals(entity.getStatus());
-                }
-
-            })
-            .flatMap(new Function<JobEntity, Mono<Void>>() {
-
-                @Override
-                public Mono<Void> apply(JobEntity entity) {
-                    return getError(entity);
-                }
-
-            })
+            .map(GetJobResponse::getEntity)
+            .where(JobUtils::isComplete)
+            .as(OperationUtils.repeatWhen(DelayUtils.exponentialBackOff(1, 10, SECONDS, 10)))  // TODO: Remove once Mono.repeatWhen()
+            .where(entity -> "failed".equals(entity.getStatus()))
+            .flatMap(JobUtils::getError)
             .after();
     }
 

@@ -20,11 +20,13 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.ToString;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
-import org.cloudfoundry.logging.LoggingClient;
+import org.cloudfoundry.client.v2.info.GetInfoRequest;
+import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.cloudfoundry.logging.LogMessage;
+import org.cloudfoundry.logging.LoggingClient;
 import org.cloudfoundry.logging.RecentLogsRequest;
 import org.cloudfoundry.logging.StreamLogsRequest;
+import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
 import org.cloudfoundry.spring.util.SchedulerGroupBuilder;
 import org.cloudfoundry.spring.util.network.AuthorizationConfigurator;
 import org.cloudfoundry.spring.util.network.ConnectionContext;
@@ -32,15 +34,12 @@ import org.cloudfoundry.spring.util.network.FallbackHttpMessageConverter;
 import org.cloudfoundry.spring.util.network.OAuth2RestOperationsOAuth2TokenProvider;
 import org.cloudfoundry.spring.util.network.OAuth2RestTemplateBuilder;
 import org.cloudfoundry.spring.util.network.SslCertificateTruster;
-import org.cloudfoundry.client.v2.info.GetInfoRequest;
-import org.cloudfoundry.client.v2.info.GetInfoResponse;
-import org.reactivestreams.Publisher;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Function;
 
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.ContainerProvider;
@@ -83,12 +82,12 @@ public final class SpringLoggingClient implements LoggingClient {
     }
 
     @Override
-    public Publisher<LogMessage> recent(RecentLogsRequest request) {
+    public Flux<LogMessage> recent(RecentLogsRequest request) {
         return this.recent.recent(request);
     }
 
     @Override
-    public Publisher<LogMessage> stream(StreamLogsRequest request) {
+    public Flux<LogMessage> stream(StreamLogsRequest request) {
         return this.stream.stream(request);
     }
 
@@ -101,22 +100,8 @@ public final class SpringLoggingClient implements LoggingClient {
 
     private static URI getLoggingEndpoint(CloudFoundryClient cloudFoundryClient) {
         return requestInfo(cloudFoundryClient)
-            .map(new Function<GetInfoResponse, String>() {
-
-                @Override
-                public String apply(GetInfoResponse response) {
-                    return response.getLoggingEndpoint();
-                }
-
-            })
-            .map(new Function<String, URI>() {
-
-                @Override
-                public URI apply(String uri) {
-                    return URI.create(uri);
-                }
-
-            })
+            .map(GetInfoResponse::getLoggingEndpoint)
+            .map(URI::create)
             .get(5, SECONDS);
     }
 

@@ -27,9 +27,7 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.accesstokenadministration.GetTokenKeyRequest;
 import org.cloudfoundry.uaa.accesstokenadministration.GetTokenKeyResponse;
-import org.cloudfoundry.util.tuple.Function2;
 import reactor.core.publisher.Mono;
-import reactor.fn.Function;
 
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
@@ -59,15 +57,7 @@ final class UsernameBuilder {
                 getSigningKey(this.uaaClient),
                 this.cloudFoundryClient.getAccessToken()
             )
-            .map(function(new Function2<PublicKey, String, String>() {
-
-                @SuppressWarnings("rawtypes")
-                @Override
-                public String apply(PublicKey publicKey, String token) {
-                    return getUsername(publicKey, token);
-                }
-
-            }));
+            .map(function(UsernameBuilder::getUsername));
     }
 
     private static PublicKey generateKey(String pem) {
@@ -82,29 +72,9 @@ final class UsernameBuilder {
 
     private static Mono<PublicKey> getSigningKey(UaaClient uaaClient) {
         return requestTokenKey(uaaClient)
-            .map(new Function<GetTokenKeyResponse, String>() {
-
-                @Override
-                public String apply(GetTokenKeyResponse response) {
-                    return response.getValue();
-                }
-
-            })
-            .map(new Function<String, String>() {
-
-                @Override
-                public String apply(String pem) {
-                    return pem.replace(BEGIN, "").replace(END, "").trim();
-                }
-            })
-            .map(new Function<String, PublicKey>() {
-
-                @Override
-                public PublicKey apply(String pem) {
-                    return generateKey(pem);
-                }
-
-            });
+            .map(GetTokenKeyResponse::getValue)
+            .map(pem -> pem.replace(BEGIN, "").replace(END, "").trim())
+            .map(UsernameBuilder::generateKey);
     }
 
     private static String getUsername(PublicKey publicKey, String token) {

@@ -18,7 +18,6 @@ package org.cloudfoundry.spring.util.network;
 
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import reactor.core.publisher.Mono;
-import reactor.fn.Supplier;
 
 public final class OAuth2RestOperationsOAuth2TokenProvider implements OAuth2TokenProvider {
 
@@ -30,14 +29,7 @@ public final class OAuth2RestOperationsOAuth2TokenProvider implements OAuth2Toke
 
     @Override
     public Mono<String> getToken() {
-        return Mono.defer(new Supplier<Mono<String>>() {
-
-            @Override
-            public Mono<String> get() {
-                return Mono.just(OAuth2RestOperationsOAuth2TokenProvider.this.restOperations.getAccessToken().getValue());
-            }
-
-        });
+        return Mono.defer(() -> Mono.just(this.restOperations.getAccessToken().getValue()));
     }
 
 }

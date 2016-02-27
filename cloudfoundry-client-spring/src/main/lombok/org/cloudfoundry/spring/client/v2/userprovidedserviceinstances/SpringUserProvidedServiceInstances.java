@@ -33,10 +33,8 @@ import org.cloudfoundry.spring.client.v2.FilterBuilder;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -58,78 +56,40 @@ public final class SpringUserProvidedServiceInstances extends AbstractSpringOper
     }
 
     @Override
-    public Mono<CreateUserProvidedServiceInstanceResponse> create(final CreateUserProvidedServiceInstanceRequest request) {
-        return post(request, CreateUserProvidedServiceInstanceResponse.class, new Consumer<UriComponentsBuilder>() {
+    public Mono<CreateUserProvidedServiceInstanceResponse> create(CreateUserProvidedServiceInstanceRequest request) {
+        return post(request, CreateUserProvidedServiceInstanceResponse.class, builder -> builder.pathSegment("v2", "user_provided_service_instances"));
+    }
 
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "user_provided_service_instances");
-            }
+    @Override
+    public Mono<Void> delete(DeleteUserProvidedServiceInstanceRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId()));
+    }
 
+    @Override
+    public Mono<GetUserProvidedServiceInstanceResponse> get(GetUserProvidedServiceInstanceRequest request) {
+        return get(request, GetUserProvidedServiceInstanceResponse.class, builder -> builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId()));
+    }
+
+    @Override
+    public Mono<ListUserProvidedServiceInstancesResponse> list(ListUserProvidedServiceInstancesRequest request) {
+        return get(request, ListUserProvidedServiceInstancesResponse.class, builder -> {
+            builder.pathSegment("v2", "user_provided_service_instances");
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
-    public Mono<Void> delete(final DeleteUserProvidedServiceInstanceRequest request) {
-        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId());
-            }
-
+    public Mono<ListUserProvidedServiceInstanceServiceBindingsResponse> listServiceBindings(ListUserProvidedServiceInstanceServiceBindingsRequest request) {
+        return get(request, ListUserProvidedServiceInstanceServiceBindingsResponse.class, builder -> {
+            builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId(), "service_bindings");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
-    public Mono<GetUserProvidedServiceInstanceResponse> get(final GetUserProvidedServiceInstanceRequest request) {
-        return get(request, GetUserProvidedServiceInstanceResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId());
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<ListUserProvidedServiceInstancesResponse> list(final ListUserProvidedServiceInstancesRequest request) {
-        return get(request, ListUserProvidedServiceInstancesResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "user_provided_service_instances");
-                QueryBuilder.augment(builder, request);
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<ListUserProvidedServiceInstanceServiceBindingsResponse> listServiceBindings(final ListUserProvidedServiceInstanceServiceBindingsRequest request) {
-        return get(request, ListUserProvidedServiceInstanceServiceBindingsResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId(), "service_bindings");
-                FilterBuilder.augment(builder, request);
-                QueryBuilder.augment(builder, request);
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<UpdateUserProvidedServiceInstanceResponse> update(final UpdateUserProvidedServiceInstanceRequest request) {
-        return put(request, UpdateUserProvidedServiceInstanceResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId());
-            }
-
-        });
+    public Mono<UpdateUserProvidedServiceInstanceResponse> update(UpdateUserProvidedServiceInstanceRequest request) {
+        return put(request, UpdateUserProvidedServiceInstanceResponse.class, builder -> builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId()));
     }
 
 }

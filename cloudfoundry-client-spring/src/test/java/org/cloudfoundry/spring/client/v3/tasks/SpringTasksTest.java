@@ -50,9 +50,9 @@ public final class SpringTasksTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(POST).path("/v3/apps/test-application-id/tasks")
-                .requestPayload("client/v3/tasks/POST_apps_{id}_tasks_request.json")
+                .requestPayload("fixtures/client/v3/tasks/POST_apps_{id}_tasks_request.json")
                 .status(OK)
-                .responsePayload("client/v3/tasks/POST_apps_{id}_tasks_response.json");
+                .responsePayload("fixtures/client/v3/tasks/POST_apps_{id}_tasks_response.json");
         }
 
         @Override
@@ -108,7 +108,7 @@ public final class SpringTasksTest {
             return new RequestContext()
                 .method(GET).path("/v3/tasks/test-id")
                 .status(OK)
-                .responsePayload("client/v3/tasks/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v3/tasks/GET_{id}_response.json");
         }
 
         @Override
@@ -162,7 +162,7 @@ public final class SpringTasksTest {
             return new RequestContext()
                 .method(GET).path("/v3/tasks?page=1")
                 .status(OK)
-                .responsePayload("client/v3/tasks/GET_response.json");
+                .responsePayload("fixtures/client/v3/tasks/GET_response.json");
         }
 
         @Override

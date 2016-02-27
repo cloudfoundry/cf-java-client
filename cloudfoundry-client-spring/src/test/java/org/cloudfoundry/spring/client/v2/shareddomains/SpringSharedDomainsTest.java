@@ -43,7 +43,7 @@ public final class SpringSharedDomainsTest {
             return new RequestContext()
                 .method(GET).path("/v2/shared_domains?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/shared_domains/GET_response.json");
+                .responsePayload("fixtures/client/v2/shared_domains/GET_response.json");
         }
 
         @Override

@@ -24,10 +24,10 @@ import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.util.TypeUtils;
-import reactor.fn.Function;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Function;
 
 public final class LoggregatorMessageHttpMessageConverter extends AbstractHttpMessageConverter<List<LogMessage>> {
 
@@ -62,18 +62,13 @@ public final class LoggregatorMessageHttpMessageConverter extends AbstractHttpMe
     }
 
     private static Function<byte[], LogMessage> toLoggregatorMessage() {
-        return new Function<byte[], LogMessage>() {
-
-            @Override
-            public LogMessage apply(byte[] part) {
-                try {
-                    org.cloudfoundry.logging.LoggregatorProtocolBuffers.LogMessage logMessage = org.cloudfoundry.logging.LoggregatorProtocolBuffers.LogMessage.parseFrom(part);
-                    return LogMessage.from(logMessage);
-                } catch (InvalidProtocolBufferException e) {
-                    throw new RuntimeException(e);
-                }
+        return part -> {
+            try {
+                org.cloudfoundry.logging.LoggregatorProtocolBuffers.LogMessage logMessage = org.cloudfoundry.logging.LoggregatorProtocolBuffers.LogMessage.parseFrom(part);
+                return LogMessage.from(logMessage);
+            } catch (InvalidProtocolBufferException e) {
+                throw new RuntimeException(e);
             }
-
         };
     }
 

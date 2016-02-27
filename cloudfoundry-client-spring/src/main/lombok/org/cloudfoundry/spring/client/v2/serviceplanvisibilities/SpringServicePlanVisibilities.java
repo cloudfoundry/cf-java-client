@@ -17,9 +17,6 @@
 package org.cloudfoundry.spring.client.v2.serviceplanvisibilities;
 
 
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.QueryBuilder;
-import org.cloudfoundry.spring.client.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.CreateServicePlanVisibilityRequest;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.CreateServicePlanVisibilityResponse;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.DeleteServicePlanVisibilityRequest;
@@ -31,11 +28,12 @@ import org.cloudfoundry.client.v2.serviceplanvisibilities.ListServicePlanVisibil
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilities;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.UpdateServicePlanVisibilityRequest;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.UpdateServicePlanVisibilityResponse;
+import org.cloudfoundry.spring.client.v2.FilterBuilder;
+import org.cloudfoundry.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 public final class SpringServicePlanVisibilities extends AbstractSpringOperations implements ServicePlanVisibilities {
 
@@ -51,66 +49,35 @@ public final class SpringServicePlanVisibilities extends AbstractSpringOperation
     }
 
     @Override
-    public Mono<CreateServicePlanVisibilityResponse> create(final CreateServicePlanVisibilityRequest request) {
-        return post(request, CreateServicePlanVisibilityResponse.class, new Consumer<UriComponentsBuilder>() {
+    public Mono<CreateServicePlanVisibilityResponse> create(CreateServicePlanVisibilityRequest request) {
+        return post(request, CreateServicePlanVisibilityResponse.class, builder -> builder.pathSegment("v2", "service_plan_visibilities"));
+    }
 
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_plan_visibilities");
-            }
-
+    @Override
+    public Mono<DeleteServicePlanVisibilityResponse> delete(DeleteServicePlanVisibilityRequest request) {
+        return delete(request, DeleteServicePlanVisibilityResponse.class, builder -> {
+            builder.pathSegment("v2", "service_plan_visibilities", request.getServicePlanVisibilityId());
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
-    public Mono<DeleteServicePlanVisibilityResponse> delete(final DeleteServicePlanVisibilityRequest request) {
-        return delete(request, DeleteServicePlanVisibilityResponse.class, new Consumer<UriComponentsBuilder>() {
+    public Mono<GetServicePlanVisibilityResponse> get(GetServicePlanVisibilityRequest request) {
+        return get(request, GetServicePlanVisibilityResponse.class, builder -> builder.pathSegment("v2", "service_plan_visibilities", request.getServicePlanVisibilityId()));
+    }
 
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_plan_visibilities", request.getServicePlanVisibilityId());
-                QueryBuilder.augment(builder, request);
-            }
-
+    @Override
+    public Mono<ListServicePlanVisibilitiesResponse> list(ListServicePlanVisibilitiesRequest request) {
+        return get(request, ListServicePlanVisibilitiesResponse.class, builder -> {
+            builder.pathSegment("v2", "service_plan_visibilities");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
-    public Mono<GetServicePlanVisibilityResponse> get(final GetServicePlanVisibilityRequest request) {
-        return get(request, GetServicePlanVisibilityResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_plan_visibilities", request.getServicePlanVisibilityId());
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<ListServicePlanVisibilitiesResponse> list(final ListServicePlanVisibilitiesRequest request) {
-        return get(request, ListServicePlanVisibilitiesResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_plan_visibilities");
-                FilterBuilder.augment(builder, request);
-                QueryBuilder.augment(builder, request);
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<UpdateServicePlanVisibilityResponse> update(final UpdateServicePlanVisibilityRequest request) {
-        return put(request, UpdateServicePlanVisibilityResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_plan_visibilities", request.getServicePlanVisibilityId());
-            }
-
-        });
+    public Mono<UpdateServicePlanVisibilityResponse> update(UpdateServicePlanVisibilityRequest request) {
+        return put(request, UpdateServicePlanVisibilityResponse.class, builder -> builder.pathSegment("v2", "service_plan_visibilities", request.getServicePlanVisibilityId()));
     }
 
 }

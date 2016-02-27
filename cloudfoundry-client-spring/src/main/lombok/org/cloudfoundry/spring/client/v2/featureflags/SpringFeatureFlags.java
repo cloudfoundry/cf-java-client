@@ -17,15 +17,13 @@
 package org.cloudfoundry.spring.client.v2.featureflags;
 
 import lombok.ToString;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.v2.featureflags.FeatureFlags;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagRequest;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagResponse;
+import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -47,15 +45,8 @@ public final class SpringFeatureFlags extends AbstractSpringOperations implement
     }
 
     @Override
-    public Mono<GetFeatureFlagResponse> get(final GetFeatureFlagRequest request) {
-        return get(request, GetFeatureFlagResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "config", "feature_flags", request.getName());
-            }
-
-        });
+    public Mono<GetFeatureFlagResponse> get(GetFeatureFlagRequest request) {
+        return get(request, GetFeatureFlagResponse.class, builder -> builder.pathSegment("v2", "config", "feature_flags", request.getName()));
     }
 
 }

@@ -35,9 +35,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
-import reactor.fn.tuple.Tuple;
-import reactor.fn.tuple.Tuple2;
-import reactor.rx.Stream;
+import reactor.core.tuple.Tuple;
+import reactor.core.tuple.Tuple2;
+import reactor.rx.Fluxion;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
@@ -112,7 +112,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                     .list(ListDomainsRequest.builder()
                         .page(page)
                         .build())))
-            .as(Stream::from)
+            .as(Fluxion::from)
             .count()
             .subscribe(this.<Long>testSubscriber()
                 .assertThat(count -> assertTrue(count > 2)));
@@ -248,7 +248,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                         .owningOrganizationId(organizationId)
                         .page(page)
                         .build())))
-            .as(Stream::from)
+            .as(Fluxion::from)
             .count()
             .subscribe(this.<Long>testSubscriber()
                 .assertThat(count -> assertTrue(count > 1)));

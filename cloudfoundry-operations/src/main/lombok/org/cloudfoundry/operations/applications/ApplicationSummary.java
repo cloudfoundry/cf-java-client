@@ -33,14 +33,14 @@ import java.util.List;
 public final class ApplicationSummary extends AbstractApplicationSummary {
 
     @Builder
-    private ApplicationSummary(Integer diskQuota,
-                               String id,
-                               Integer instances,
-                               Integer memoryLimit,
-                               String name,
-                               String requestedState,
-                               Integer runningInstances,
-                               @Singular List<String> urls) {
+    ApplicationSummary(Integer diskQuota,
+                       String id,
+                       Integer instances,
+                       Integer memoryLimit,
+                       String name,
+                       String requestedState,
+                       Integer runningInstances,
+                       @Singular List<String> urls) {
         super(diskQuota, id, instances, memoryLimit, name, requestedState, runningInstances, urls);
     }
 

@@ -59,9 +59,9 @@ public final class SpringServicePlanVisibilitiesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(POST).path("/v2/service_plan_visibilities")
-                .requestPayload("client/v2/service_plan_visibilities/POST_request.json")
+                .requestPayload("fixtures/client/v2/service_plan_visibilities/POST_request.json")
                 .status(CREATED)
-                .responsePayload("client/v2/service_plan_visibilities/POST_response.json");
+                .responsePayload("fixtures/client/v2/service_plan_visibilities/POST_response.json");
         }
 
         @Override
@@ -143,7 +143,7 @@ public final class SpringServicePlanVisibilitiesTest {
             return new RequestContext()
                 .method(DELETE).path("/v2/service_plan_visibilities/test-service-plan-visibility-id?async=true")
                 .status(ACCEPTED)
-                .responsePayload("client/v2/routes/DELETE_{id}_async_response.json");
+                .responsePayload("fixtures/client/v2/routes/DELETE_{id}_async_response.json");
         }
 
         @Override
@@ -189,7 +189,7 @@ public final class SpringServicePlanVisibilitiesTest {
             return new RequestContext()
                 .method(GET).path("/v2/service_plan_visibilities/test-service-plan-visibility-id")
                 .status(OK)
-                .responsePayload("client/v2/service_plan_visibilities/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v2/service_plan_visibilities/GET_{id}_response.json");
         }
 
         @Override
@@ -236,7 +236,7 @@ public final class SpringServicePlanVisibilitiesTest {
             return new RequestContext()
                 .method(GET).path("/v2/service_plan_visibilities?q=organization_guid%20IN%20test-organization-id&page=-1")
                 .status(OK)
-                .responsePayload("client/v2/service_plan_visibilities/GET_response.json");
+                .responsePayload("fixtures/client/v2/service_plan_visibilities/GET_response.json");
         }
 
         @Override
@@ -287,9 +287,9 @@ public final class SpringServicePlanVisibilitiesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PUT).path("/v2/service_plan_visibilities/test-service-plan-visibility-id")
-                .requestPayload("client/v2/service_plan_visibilities/PUT_{id}_request.json")
+                .requestPayload("fixtures/client/v2/service_plan_visibilities/PUT_{id}_request.json")
                 .status(CREATED)
-                .responsePayload("client/v2/service_plan_visibilities/PUT_{id}_response.json");
+                .responsePayload("fixtures/client/v2/service_plan_visibilities/PUT_{id}_response.json");
         }
 
         @Override

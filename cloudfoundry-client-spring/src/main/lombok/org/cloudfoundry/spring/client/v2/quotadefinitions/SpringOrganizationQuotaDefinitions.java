@@ -17,19 +17,17 @@
 package org.cloudfoundry.spring.client.v2.quotadefinitions;
 
 import lombok.ToString;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.QueryBuilder;
-import org.cloudfoundry.spring.client.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitions;
+import org.cloudfoundry.spring.client.v2.FilterBuilder;
+import org.cloudfoundry.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -51,28 +49,16 @@ public final class SpringOrganizationQuotaDefinitions extends AbstractSpringOper
     }
 
     @Override
-    public Mono<GetOrganizationQuotaDefinitionResponse> get(final GetOrganizationQuotaDefinitionRequest request) {
-        return get(request, GetOrganizationQuotaDefinitionResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "quota_definitions", request.getOrganizationQuotaDefinitionId());
-            }
-
-        });
+    public Mono<GetOrganizationQuotaDefinitionResponse> get(GetOrganizationQuotaDefinitionRequest request) {
+        return get(request, GetOrganizationQuotaDefinitionResponse.class, builder -> builder.pathSegment("v2", "quota_definitions", request.getOrganizationQuotaDefinitionId()));
     }
 
     @Override
-    public Mono<ListOrganizationQuotaDefinitionsResponse> list(final ListOrganizationQuotaDefinitionsRequest request) {
-        return get(request, ListOrganizationQuotaDefinitionsResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "quota_definitions");
-                FilterBuilder.augment(builder, request);
-                QueryBuilder.augment(builder, request);
-            }
-
+    public Mono<ListOrganizationQuotaDefinitionsResponse> list(ListOrganizationQuotaDefinitionsRequest request) {
+        return get(request, ListOrganizationQuotaDefinitionsResponse.class, builder -> {
+            builder.pathSegment("v2", "quota_definitions");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
         });
     }
 

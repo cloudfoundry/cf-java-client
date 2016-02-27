@@ -22,12 +22,10 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.tuple.Tuple;
+import reactor.core.tuple.Tuple2;
 import reactor.core.util.Exceptions;
 import reactor.core.util.ReactiveStateUtils;
-import reactor.fn.Consumer;
-import reactor.fn.Supplier;
-import reactor.fn.tuple.Tuple;
-import reactor.fn.tuple.Tuple2;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -35,12 +33,15 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.junit.Assert.fail;
 
 public final class TestSubscriber<T> implements Subscriber<T> {
 
-    private final Queue<T> actuals = new LinkedList<T>();
+    private final Queue<T> actuals = new LinkedList<>();
 
     private final Queue<Consumer<T>> expectations = new LinkedList<>();
 
@@ -65,32 +66,20 @@ public final class TestSubscriber<T> implements Subscriber<T> {
         return this;
     }
 
-    public TestSubscriber<T> assertEquals(final T expected) {
-        assertThat(new Consumer<T>() {
-
-            @Override
-            public void accept(T actual) {
-                Assert.assertEquals(expected, actual);
-            }
-
-        });
-
+    public TestSubscriber<T> assertEquals(T expected) {
+        assertThat(actual -> Assert.assertEquals(expected, actual));
         return this;
     }
 
-    public TestSubscriber<T> assertError(final Class<? extends Throwable> expected, final String message) {
-        this.errorExpectation = new Consumer<Throwable>() {
+    public TestSubscriber<T> assertError(Class<? extends Throwable> expected, String message) {
+        this.errorExpectation = actual -> {
+            StringWriter writer = new StringWriter();
+            actual.printStackTrace(new PrintWriter(writer));
 
-            @Override
-            public void accept(Throwable actual) {
-                StringWriter writer = new StringWriter();
-                actual.printStackTrace(new PrintWriter(writer));
-
-                Assert.assertEquals(String.format("Unexpected error %s", writer.toString()), expected, actual.getClass());
-                if (message != null)
-                    Assert.assertEquals("Unexpected exception text", message, actual.getMessage());
+            Assert.assertEquals(String.format("Unexpected error %s", writer.toString()), expected, actual.getClass());
+            if (message != null) {
+                Assert.assertEquals("Unexpected exception text", message, actual.getMessage());
             }
-
         };
 
         return this;
@@ -135,21 +124,14 @@ public final class TestSubscriber<T> implements Subscriber<T> {
         return this;
     }
 
-    public TestSubscriber<T> setPerformanceLoggerName(final Supplier<String> name) {
-        return setPerformanceCallback(new Consumer<Tuple2<Long, Long>>() {
+    public TestSubscriber<T> setPerformanceLoggerName(Supplier<String> name) {
+        return setPerformanceCallback(consumer((startTime, finishTime) -> {
+            Logger logger = LoggerFactory.getLogger(String.format("cloudfoundry-client.performance.%s", name.get()));
 
-            @Override
-            public void accept(Tuple2<Long, Long> tuple) {
-                Long startTime = tuple.t1;
-                Long finishTime = tuple.t2;
-
-                Logger logger = LoggerFactory.getLogger(String.format("cloudfoundry-client.performance.%s", name.get()));
-                if (logger.isDebugEnabled()) {
-                    logger.debug("{} ms", finishTime - startTime);
-                }
+            if (logger.isDebugEnabled()) {
+                logger.debug("{} ms", finishTime - startTime);
             }
-
-        });
+        }));
     }
 
     public TestSubscriber<T> setScanningCallback(Consumer<Subscription> scanningCallback) {
@@ -157,18 +139,13 @@ public final class TestSubscriber<T> implements Subscriber<T> {
         return this;
     }
 
-    public TestSubscriber<T> setScanningLoggerName(final Supplier<String> name) {
-        return setScanningCallback(new Consumer<Subscription>() {
+    public TestSubscriber<T> setScanningLoggerName(Supplier<String> name) {
+        return setScanningCallback(subscription -> {
+            Logger logger = LoggerFactory.getLogger(String.format("cloudfoundry-client.scan.%s", name.get()));
 
-            @Override
-            public void accept(Subscription subscription) {
-                Logger logger = LoggerFactory.getLogger(String.format("cloudfoundry-client.scan.%s", name.get()));
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug(ReactiveStateUtils.scan(subscription).toString());
-                }
+            if (logger.isDebugEnabled()) {
+                logger.debug(ReactiveStateUtils.scan(subscription).toString());
             }
-
         });
     }
 

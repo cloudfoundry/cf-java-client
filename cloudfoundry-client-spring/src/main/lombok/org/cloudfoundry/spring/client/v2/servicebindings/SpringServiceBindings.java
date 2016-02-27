@@ -17,9 +17,6 @@
 package org.cloudfoundry.spring.client.v2.servicebindings;
 
 import lombok.ToString;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.QueryBuilder;
-import org.cloudfoundry.spring.client.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingRequest;
@@ -28,11 +25,12 @@ import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.ListServiceBindingsRequest;
 import org.cloudfoundry.client.v2.servicebindings.ListServiceBindingsResponse;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindings;
+import org.cloudfoundry.spring.client.v2.FilterBuilder;
+import org.cloudfoundry.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -54,50 +52,26 @@ public final class SpringServiceBindings extends AbstractSpringOperations implem
     }
 
     @Override
-    public Mono<CreateServiceBindingResponse> create(final CreateServiceBindingRequest request) {
-        return post(request, CreateServiceBindingResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_bindings");
-            }
-
-        });
+    public Mono<CreateServiceBindingResponse> create(CreateServiceBindingRequest request) {
+        return post(request, CreateServiceBindingResponse.class, builder -> builder.pathSegment("v2", "service_bindings"));
     }
 
     @Override
-    public Mono<Void> delete(final DeleteServiceBindingRequest request) {
-        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_bindings", request.getServiceBindingId());
-            }
-
-        });
+    public Mono<Void> delete(DeleteServiceBindingRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "service_bindings", request.getServiceBindingId()));
     }
 
     @Override
-    public Mono<GetServiceBindingResponse> get(final GetServiceBindingRequest request) {
-        return get(request, GetServiceBindingResponse.class, new Consumer<UriComponentsBuilder>() {
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_bindings", request.getServiceBindingId());
-            }
-        });
+    public Mono<GetServiceBindingResponse> get(GetServiceBindingRequest request) {
+        return get(request, GetServiceBindingResponse.class, builder -> builder.pathSegment("v2", "service_bindings", request.getServiceBindingId()));
     }
 
     @Override
-    public Mono<ListServiceBindingsResponse> list(final ListServiceBindingsRequest request) {
-        return get(request, ListServiceBindingsResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_bindings");
-                FilterBuilder.augment(builder, request);
-                QueryBuilder.augment(builder, request);
-            }
-
+    public Mono<ListServiceBindingsResponse> list(ListServiceBindingsRequest request) {
+        return get(request, ListServiceBindingsResponse.class, builder -> {
+            builder.pathSegment("v2", "service_bindings");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
         });
     }
 

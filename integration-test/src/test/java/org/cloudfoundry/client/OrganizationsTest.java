@@ -65,9 +65,10 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
-import reactor.fn.Function;
-import reactor.fn.tuple.Tuple;
-import reactor.fn.tuple.Tuple2;
+import reactor.core.tuple.Tuple;
+import reactor.core.tuple.Tuple2;
+
+import java.util.function.Function;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;

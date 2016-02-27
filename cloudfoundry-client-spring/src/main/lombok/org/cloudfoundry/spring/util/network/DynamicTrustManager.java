@@ -17,11 +17,10 @@
 package org.cloudfoundry.spring.util.network;
 
 import lombok.ToString;
-import org.cloudfoundry.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.fn.tuple.Tuple;
-import reactor.fn.tuple.Tuple2;
+import reactor.core.tuple.Tuple;
+import reactor.core.tuple.Tuple2;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -40,6 +39,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -67,8 +67,8 @@ public final class DynamicTrustManager implements HostnameVerifier, SslCertifica
     public DynamicTrustManager(Boolean trustCertificates) {
         this.delegate = new AtomicReference<>(getTrustManager(getTrustManagerFactory(null)));
         this.trustCertificates = Optional.ofNullable(trustCertificates).orElse(false);
-        this.trustedHosts = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
-        this.trustedHostsAndPorts = Collections.newSetFromMap(new ConcurrentHashMap<Tuple2<String, Integer>, Boolean>());
+        this.trustedHosts = Collections.newSetFromMap(new ConcurrentHashMap<>());
+        this.trustedHostsAndPorts = Collections.newSetFromMap(new ConcurrentHashMap<>());
     }
 
     @Override

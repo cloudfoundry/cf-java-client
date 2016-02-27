@@ -24,7 +24,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import reactor.fn.tuple.Tuple2;
+import reactor.core.tuple.Tuple2;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.junit.Assert.assertEquals;
@@ -37,8 +37,8 @@ public abstract class AbstractIntegrationTest {
     public final TestName testName = new TestName();
 
     private final TestSubscriber<?> testSubscriber = new TestSubscriber<>()
-        .setScanningLoggerName(() -> String.format("%s.%s", this.getClass().getSimpleName(), AbstractIntegrationTest.this.testName.getMethodName()))
-        .setPerformanceLoggerName(() -> String.format("%s.%s", this.getClass().getSimpleName(), AbstractIntegrationTest.this.testName.getMethodName()));
+        .setScanningLoggerName(() -> String.format("%s.%s", this.getClass().getSimpleName(), this.testName.getMethodName()))
+        .setPerformanceLoggerName(() -> String.format("%s.%s", this.getClass().getSimpleName(), this.testName.getMethodName()));
 
     @Autowired
     private NameFactory nameFactory;

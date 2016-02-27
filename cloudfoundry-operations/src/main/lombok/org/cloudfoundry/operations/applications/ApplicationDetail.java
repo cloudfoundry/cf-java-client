@@ -74,18 +74,18 @@ public final class ApplicationDetail extends AbstractApplicationSummary {
     private final String stack;
 
     @Builder
-    private ApplicationDetail(String buildpack,
-                              Integer diskQuota,
-                              String id,
-                              @Singular List<InstanceDetail> instanceDetails,
-                              Integer instances,
-                              Date lastUploaded,
-                              Integer memoryLimit,
-                              String name,
-                              String requestedState,
-                              Integer runningInstances,
-                              String stack,
-                              @Singular List<String> urls) {
+    ApplicationDetail(String buildpack,
+                      Integer diskQuota,
+                      String id,
+                      @Singular List<InstanceDetail> instanceDetails,
+                      Integer instances,
+                      Date lastUploaded,
+                      Integer memoryLimit,
+                      String name,
+                      String requestedState,
+                      Integer runningInstances,
+                      String stack,
+                      @Singular List<String> urls) {
         super(diskQuota, id, instances, memoryLimit, name, requestedState, runningInstances, urls);
         this.buildpack = buildpack;
         this.instanceDetails = instanceDetails;
@@ -157,7 +157,7 @@ public final class ApplicationDetail extends AbstractApplicationSummary {
         private final String state;
 
         @Builder
-        private InstanceDetail(Double cpu, Long diskQuota, Long diskUsage, Long memoryQuota, Long memoryUsage, Date since, String state) {
+        InstanceDetail(Double cpu, Long diskQuota, Long diskUsage, Long memoryQuota, Long memoryUsage, Date since, String state) {
             this.cpu = cpu;
             this.diskQuota = diskQuota;
             this.diskUsage = diskUsage;

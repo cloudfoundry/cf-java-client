@@ -22,10 +22,8 @@ import org.cloudfoundry.client.v2.routemappings.CreateRouteMappingResponse;
 import org.cloudfoundry.client.v2.routemappings.RouteMappings;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -47,15 +45,8 @@ public final class SpringRouteMappings extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Mono<CreateRouteMappingResponse> create(final CreateRouteMappingRequest request) {
-        return post(request, CreateRouteMappingResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "route_mappings");
-            }
-
-        });
+    public Mono<CreateRouteMappingResponse> create(CreateRouteMappingRequest request) {
+        return post(request, CreateRouteMappingResponse.class, builder -> builder.pathSegment("v2", "route_mappings"));
     }
 
 }

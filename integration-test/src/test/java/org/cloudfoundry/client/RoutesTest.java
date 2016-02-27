@@ -37,10 +37,10 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
-import reactor.fn.tuple.Tuple;
-import reactor.fn.tuple.Tuple2;
-import reactor.fn.tuple.Tuple3;
-import reactor.rx.Stream;
+import reactor.core.tuple.Tuple;
+import reactor.core.tuple.Tuple2;
+import reactor.core.tuple.Tuple3;
+import reactor.rx.Fluxion;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
@@ -66,8 +66,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
         this.organizationId
             .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
             .and(this.spaceId)
-            .then(function((domainId, spaceId) -> createApplicationAndRoute(RoutesTest.this.cloudFoundryClient, domainId, spaceId, applicationName)))
-            .then(function((applicationId, routeId) -> associateApplicationWithRoute(RoutesTest.this.cloudFoundryClient, applicationId, routeId)))
+            .then(function((domainId, spaceId) -> createApplicationAndRoute(this.cloudFoundryClient, domainId, spaceId, applicationName)))
+            .then(function((applicationId, routeId) -> associateApplicationWithRoute(this.cloudFoundryClient, applicationId, routeId)))
             .flatMap(routeId -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.routes()
                     .listApplications(ListRouteApplicationsRequest.builder()
@@ -209,8 +209,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
         this.organizationId
             .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
             .and(this.spaceId)
-            .then(function((domainId, spaceId) -> createApplicationAndRoute(RoutesTest.this.cloudFoundryClient, domainId, spaceId, applicationName)))
-            .then(function((applicationId, routeId) -> associateApplicationWithRoute(RoutesTest.this.cloudFoundryClient, applicationId, routeId)))
+            .then(function((domainId, spaceId) -> createApplicationAndRoute(this.cloudFoundryClient, domainId, spaceId, applicationName)))
+            .then(function((applicationId, routeId) -> associateApplicationWithRoute(this.cloudFoundryClient, applicationId, routeId)))
             .flatMap(routeId -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.routes()
                     .listApplications(ListRouteApplicationsRequest.builder()
@@ -229,8 +229,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
         this.organizationId
             .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
             .and(this.spaceId)
-            .then(function((domainId, spaceId) -> createApplicationAndRoute(RoutesTest.this.cloudFoundryClient, domainId, spaceId, applicationName)))
-            .then(function((applicationId, routeId) -> associateApplicationWithRoute(RoutesTest.this.cloudFoundryClient, applicationId, routeId)))
+            .then(function((domainId, spaceId) -> createApplicationAndRoute(this.cloudFoundryClient, domainId, spaceId, applicationName)))
+            .then(function((applicationId, routeId) -> associateApplicationWithRoute(this.cloudFoundryClient, applicationId, routeId)))
             .flatMap(routeId -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.routes()
                     .listApplications(ListRouteApplicationsRequest.builder()
@@ -250,8 +250,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
         this.organizationId
             .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
             .and(this.spaceId)
-            .then(function((domainId, spaceId) -> createApplicationAndRoute(RoutesTest.this.cloudFoundryClient, domainId, spaceId, applicationName)))
-            .then(function((applicationId, routeId) -> associateApplicationWithRoute(RoutesTest.this.cloudFoundryClient, applicationId, routeId)))
+            .then(function((domainId, spaceId) -> createApplicationAndRoute(this.cloudFoundryClient, domainId, spaceId, applicationName)))
+            .then(function((applicationId, routeId) -> associateApplicationWithRoute(this.cloudFoundryClient, applicationId, routeId)))
             .flatMap(routeId -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.routes()
                     .listApplications(ListRouteApplicationsRequest.builder()
@@ -271,8 +271,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
         this.organizationId
             .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
             .and(this.spaceId)
-            .then(function((domainId, spaceId) -> createApplicationAndRoute(RoutesTest.this.cloudFoundryClient, domainId, spaceId, applicationName)))
-            .then(function((applicationId, routeId) -> associateApplicationWithRoute(RoutesTest.this.cloudFoundryClient, applicationId, routeId)))
+            .then(function((domainId, spaceId) -> createApplicationAndRoute(this.cloudFoundryClient, domainId, spaceId, applicationName)))
+            .then(function((applicationId, routeId) -> associateApplicationWithRoute(this.cloudFoundryClient, applicationId, routeId)))
             .and(this.organizationId)
             .flatMap(function((routeId, organizationId) -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.routes()
@@ -293,8 +293,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
         this.organizationId
             .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
             .and(this.spaceId)
-            .then(function((domainId, spaceId) -> createApplicationAndRoute(RoutesTest.this.cloudFoundryClient, domainId, spaceId, applicationName)))
-            .then(function((applicationId, routeId) -> associateApplicationWithRoute(RoutesTest.this.cloudFoundryClient, applicationId, routeId)))
+            .then(function((domainId, spaceId) -> createApplicationAndRoute(this.cloudFoundryClient, domainId, spaceId, applicationName)))
+            .then(function((applicationId, routeId) -> associateApplicationWithRoute(this.cloudFoundryClient, applicationId, routeId)))
             .and(this.spaceId)
             .flatMap(function((routeId, spaceId) -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.routes()
@@ -379,7 +379,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .organizationId(organizationId)
                         .page(page)
                         .build())))
-            .as(Stream::from)
+            .as(Fluxion::from)
             .count()
             .subscribe(this.<Long>testSubscriber()
                 .assertThat(count -> assertTrue(count > 1)));

@@ -18,19 +18,15 @@ package org.cloudfoundry.operations.spacequotas;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
-import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.ValidationUtils;
-import org.cloudfoundry.util.tuple.Function2;
-import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.fn.Function;
-import reactor.fn.Predicate;
-import reactor.rx.Stream;
+import reactor.rx.Fluxion;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -46,77 +42,35 @@ public final class DefaultSpaceQuotas implements SpaceQuotas {
     }
 
     @Override
-    public Mono<SpaceQuota> get(GetSpaceQuotaRequest getSpaceQuotaRequest) {
+    public Mono<SpaceQuota> get(GetSpaceQuotaRequest request) {
         return ValidationUtils
-            .validate(getSpaceQuotaRequest)
+            .validate(request)
             .and(this.organizationId)
-            .then(function(new Function2<GetSpaceQuotaRequest, String, Mono<SpaceQuotaDefinitionResource>>() {
-
-                @Override
-                public Mono<SpaceQuotaDefinitionResource> apply(GetSpaceQuotaRequest request, String organizationId) {
-                    return getSpaceQuotaDefinition(DefaultSpaceQuotas.this.cloudFoundryClient, organizationId, request.getName());
-                }
-
-            }))
-            .map(new Function<SpaceQuotaDefinitionResource, SpaceQuota>() {
-
-                @Override
-                public SpaceQuota apply(SpaceQuotaDefinitionResource resource) {
-                    return toSpaceQuota(resource);
-                }
-
-            });
+            .then(function((request1, organizationId) -> getSpaceQuotaDefinition(this.cloudFoundryClient, organizationId, request1.getName())))
+            .map(DefaultSpaceQuotas::toSpaceQuota);
     }
 
     @Override
-    public Publisher<SpaceQuota> list() {
+    public Flux<SpaceQuota> list() {
         return this.organizationId
-            .flatMap(new Function<String, Stream<SpaceQuotaDefinitionResource>>() {
-
-                @Override
-                public Stream<SpaceQuotaDefinitionResource> apply(String organizationId) {
-                    return requestSpaceQuotaDefinitions(DefaultSpaceQuotas.this.cloudFoundryClient, organizationId);
-                }
-
-            })
-            .map(new Function<SpaceQuotaDefinitionResource, SpaceQuota>() {
-
-                @Override
-                public SpaceQuota apply(SpaceQuotaDefinitionResource resource) {
-                    return toSpaceQuota(resource);
-                }
-
-            });
+            .flatMap(organizationId1 -> requestSpaceQuotaDefinitions(this.cloudFoundryClient, organizationId1))
+            .map(DefaultSpaceQuotas::toSpaceQuota);
     }
 
-    private static Mono<SpaceQuotaDefinitionResource> getSpaceQuotaDefinition(CloudFoundryClient cloudFoundryClient, String organizationId, final String name) {
+    private static Mono<SpaceQuotaDefinitionResource> getSpaceQuotaDefinition(CloudFoundryClient cloudFoundryClient, String organizationId, String name) {
         return requestSpaceQuotaDefinitions(cloudFoundryClient, organizationId)
-            .filter(new Predicate<SpaceQuotaDefinitionResource>() {
-
-                @Override
-                public boolean test(SpaceQuotaDefinitionResource resource) {
-                    return name.equals(ResourceUtils.getEntity(resource).getName());
-                }
-
-            })
+            .filter(resource -> name.equals(ResourceUtils.getEntity(resource).getName()))
             .single()
             .otherwise(ExceptionUtils.<SpaceQuotaDefinitionResource>convert("Space Quota %s does not exist", name));
     }
 
-    private static Stream<SpaceQuotaDefinitionResource> requestSpaceQuotaDefinitions(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
+    private static Fluxion<SpaceQuotaDefinitionResource> requestSpaceQuotaDefinitions(CloudFoundryClient cloudFoundryClient, String organizationId) {
         return PaginationUtils
-            .requestResources(new Function<Integer, Mono<ListOrganizationSpaceQuotaDefinitionsResponse>>() {
-
-                @Override
-                public Mono<ListOrganizationSpaceQuotaDefinitionsResponse> apply(Integer page) {
-                    return cloudFoundryClient.organizations()
-                        .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
-                            .organizationId(organizationId)
-                            .page(page)
-                            .build());
-                }
-
-            });
+            .requestResources(page -> cloudFoundryClient.organizations()
+                .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                    .organizationId(organizationId)
+                    .page(page)
+                    .build()));
     }
 
     private static SpaceQuota toSpaceQuota(SpaceQuotaDefinitionResource resource) {

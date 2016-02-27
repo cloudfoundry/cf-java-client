@@ -18,11 +18,11 @@ package org.cloudfoundry.util;
 
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
-import reactor.fn.Function;
-import reactor.fn.Predicate;
-import reactor.fn.Supplier;
-import reactor.rx.Promise;
-import reactor.rx.Stream;
+import reactor.rx.Fluxion;
+
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * Utilities with operations that do not (yet) exist
@@ -43,21 +43,7 @@ public final class OperationUtils {
      * @return a Mono transformer
      */
     public static <IN, OUT> Function<Mono<? extends IN>, Mono<OUT>> afterComplete(final Supplier<Mono<OUT>> supplier) {
-        return new Function<Mono<? extends IN>, Mono<OUT>>() {
-
-            @Override
-            public Mono<OUT> apply(Mono<? extends IN> source) {
-                return source.flatMap(new Function<IN, Publisher<? extends OUT>>() {
-
-                    @Override
-                    public Publisher<? extends OUT> apply(IN x) {
-                        return Mono.empty();
-                    }
-
-                }, null, supplier).next();
-            }
-
-        };
+        return source -> source.flatMap(x -> Mono.empty(), null, supplier).next();
     }
 
     /**
@@ -70,22 +56,8 @@ public final class OperationUtils {
      * @param <OUT>    the element type of the resulting {@code Stream}.
      * @return a Stream transformer
      */
-    public static <IN, OUT> Function<Stream<IN>, Stream<OUT>> afterStreamComplete(final Supplier<Stream<OUT>> supplier) {
-        return new Function<Stream<IN>, Stream<OUT>>() {
-
-            @Override
-            public Stream<OUT> apply(Stream<IN> source) {
-                return source.flatMap(new Function<IN, Publisher<? extends OUT>>() {
-
-                    @Override
-                    public Publisher<? extends OUT> apply(IN x) {
-                        return Stream.empty();
-                    }
-
-                }, null, supplier);
-            }
-
-        };
+    public static <IN, OUT> Function<Fluxion<IN>, Fluxion<OUT>> afterStreamComplete(final Supplier<Fluxion<OUT>> supplier) {
+        return source -> source.flatMap(x -> Fluxion.empty(), null, supplier);
     }
 
     /**
@@ -99,16 +71,11 @@ public final class OperationUtils {
      */
     @SafeVarargs
     public static <T> Predicate<T> and(final Predicate<T>... predicates) {
-        return new Predicate<T>() {
-
-            @Override
-            public boolean test(T t) {
-                for (Predicate<T> predicate : predicates) {
-                    if (!predicate.test(t)) return false;
-                }
-                return true;
+        return t -> {
+            for (Predicate<T> predicate : predicates) {
+                if (!predicate.test(t)) return false;
             }
-
+            return true;
         };
     }
 
@@ -120,14 +87,7 @@ public final class OperationUtils {
      * @return the same instance
      */
     public static <IN extends OUT, OUT> Function<IN, OUT> cast() {
-        return new Function<IN, OUT>() {
-
-            @Override
-            public OUT apply(IN in) {
-                return in;
-            }
-
-        };
+        return in -> in;
     }
 
     /**
@@ -136,14 +96,7 @@ public final class OperationUtils {
      * @return the value
      */
     public static Predicate<Boolean> identity() {
-        return new Predicate<Boolean>() {
-
-            @Override
-            public boolean test(Boolean b) {
-                return b;
-            }
-
-        };
+        return b -> b;
     }
 
     /**
@@ -154,14 +107,7 @@ public final class OperationUtils {
      * @return the negating predicate
      */
     public static <T> Predicate<T> not(final Predicate<T> predicate) {
-        return new Predicate<T>() {
-
-            @Override
-            public boolean test(T t) {
-                return !predicate.test(t);
-            }
-
-        };
+        return t -> !predicate.test(t);
     }
 
     /**
@@ -175,33 +121,11 @@ public final class OperationUtils {
      */
     @SafeVarargs
     public static <T> Predicate<T> or(final Predicate<T>... predicates) {
-        return new Predicate<T>() {
-
-            @Override
-            public boolean test(T t) {
-                for (Predicate<T> predicate : predicates) {
-                    if (predicate.test(t)) return true;
-                }
-                return false;
+        return t -> {
+            for (Predicate<T> predicate : predicates) {
+                if (predicate.test(t)) return true;
             }
-
-        };
-    }
-
-    /**
-     * Converts a {@link Publisher} into a {@link Promise}
-     *
-     * @param <T> the type published
-     * @return the promise
-     */
-    public static <T> Function<Publisher<T>, Promise<T>> promise() {
-        return new Function<Publisher<T>, Promise<T>>() {
-
-            @Override
-            public Promise<T> apply(Publisher<T> publisher) {
-                return Promise.from(publisher);
-            }
-
+            return false;
         };
     }
 
@@ -212,35 +136,11 @@ public final class OperationUtils {
      * @param <T> the type of the stream
      * @return the {@code Mono} after it has been waited for
      */
-    public static <T> Function<Mono<T>, Mono<T>> repeatWhen(final Function<Stream<Long>, ? extends Publisher<?>> f) { // TODO: Remove once Mono.repeatWhen()
-        return new Function<Mono<T>, Mono<T>>() {
-
-            @Override
-            public Mono<T> apply(Mono<T> mono) {
-                return mono
-                    .as(OperationUtils.<T>stream())
-                    .repeatWhen(f)
-                    .single();
-            }
-
-        };
-    }
-
-    /**
-     * Converts a {@link Publisher} into a {@link Stream}
-     *
-     * @param <T> the type published
-     * @return the stream
-     */
-    public static <T> Function<Publisher<T>, Stream<T>> stream() {
-        return new Function<Publisher<T>, Stream<T>>() {
-
-            @Override
-            public Stream<T> apply(Publisher<T> publisher) {
-                return Stream.from(publisher);
-            }
-
-        };
+    public static <T> Function<Mono<T>, Mono<T>> repeatWhen(final Function<Fluxion<Long>, ? extends Publisher<?>> f) { // TODO: Remove once Mono.repeatWhen()
+        return mono -> mono
+            .as(Fluxion::from)
+            .repeatWhen(f)
+            .single();
     }
 
 

@@ -17,8 +17,6 @@
 package org.cloudfoundry.spring.client.v2.spacequotadefinitions;
 
 import lombok.ToString;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.QueryBuilder;
 import org.cloudfoundry.client.v2.spacequotadefinitions.AssociateSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.AssociateSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionRequest;
@@ -28,11 +26,11 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinition
 import org.cloudfoundry.client.v2.spacequotadefinitions.RemoveSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
+import org.cloudfoundry.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -54,52 +52,27 @@ public final class SpringSpaceQuotaDefinitions extends AbstractSpringOperations 
     }
 
     @Override
-    public Mono<AssociateSpaceQuotaDefinitionResponse> associateSpace(final AssociateSpaceQuotaDefinitionRequest request) {
-        return put(request, AssociateSpaceQuotaDefinitionResponse.class, new Consumer<UriComponentsBuilder>() {
+    public Mono<AssociateSpaceQuotaDefinitionResponse> associateSpace(AssociateSpaceQuotaDefinitionRequest request) {
+        return put(request, AssociateSpaceQuotaDefinitionResponse.class, builder -> builder.pathSegment("v2", "space_quota_definitions", request.getSpaceQuotaDefinitionId(), "spaces",
+            request.getSpaceId()));
+    }
 
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "space_quota_definitions", request.getSpaceQuotaDefinitionId(), "spaces", request.getSpaceId());
-            }
+    @Override
+    public Mono<GetSpaceQuotaDefinitionResponse> get(GetSpaceQuotaDefinitionRequest request) {
+        return get(request, GetSpaceQuotaDefinitionResponse.class, builder -> builder.pathSegment("v2", "space_quota_definitions", request.getSpaceQuotaDefinitionId()));
+    }
 
+    @Override
+    public Mono<ListSpaceQuotaDefinitionsResponse> list(ListSpaceQuotaDefinitionsRequest request) {
+        return get(request, ListSpaceQuotaDefinitionsResponse.class, builder -> {
+            builder.pathSegment("v2", "space_quota_definitions");
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
-    public Mono<GetSpaceQuotaDefinitionResponse> get(final GetSpaceQuotaDefinitionRequest request) {
-        return get(request, GetSpaceQuotaDefinitionResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "space_quota_definitions", request.getSpaceQuotaDefinitionId());
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<ListSpaceQuotaDefinitionsResponse> list(final ListSpaceQuotaDefinitionsRequest request) {
-        return get(request, ListSpaceQuotaDefinitionsResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "space_quota_definitions");
-                QueryBuilder.augment(builder, request);
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<Void> removeSpace(final RemoveSpaceQuotaDefinitionRequest request) {
-        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "space_quota_definitions", request.getSpaceQuotaDefinitionId(), "spaces", request.getSpaceId());
-            }
-
-        });
+    public Mono<Void> removeSpace(RemoveSpaceQuotaDefinitionRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "space_quota_definitions", request.getSpaceQuotaDefinitionId(), "spaces", request.getSpaceId()));
     }
 
 }

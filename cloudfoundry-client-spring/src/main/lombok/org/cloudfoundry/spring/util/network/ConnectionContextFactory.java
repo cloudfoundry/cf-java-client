@@ -19,7 +19,6 @@ package org.cloudfoundry.spring.util.network;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.cloudfoundry.util.Optional;
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
@@ -33,6 +32,7 @@ import javax.net.ssl.TrustManager;
 import java.net.URI;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 
 @Accessors(chain = true, fluent = true)
 @Setter
@@ -49,11 +49,6 @@ public final class ConnectionContextFactory {
 
     private Integer port;
 
-    /**
-     * The bootstrap {@link RestOperations}.  This should not typically be used and is only exposed for testing.
-     *
-     * @param restOperations the bootstrap {@link RestOperations}
-     */
     private RestOperations restOperations;
 
     private Boolean trustCertificates;

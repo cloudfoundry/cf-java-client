@@ -17,7 +17,7 @@
 package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.logging.LogMessage;
-import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -89,14 +89,14 @@ public interface Applications {
      * @param request the get application events request
      * @return the events
      */
-    Publisher<ApplicationEvent> getEvents(GetApplicationEventsRequest request);
+    Flux<ApplicationEvent> getEvents(GetApplicationEventsRequest request);
 
     /**
      * Lists the applications
      *
      * @return the applications
      */
-    Publisher<ApplicationSummary> list();
+    Flux<ApplicationSummary> list();
 
     /**
      * List the applications logs
@@ -104,7 +104,7 @@ public interface Applications {
      * @param request the application logs request
      * @return the applications logs
      */
-    Publisher<LogMessage> logs(LogsRequest request);
+    Flux<LogMessage> logs(LogsRequest request);
 
     /**
      * Rename a specific application

@@ -20,18 +20,15 @@ import lombok.ToString;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.logging.LogMessage;
 import org.cloudfoundry.logging.StreamLogsRequest;
-import org.cloudfoundry.util.OperationUtils;
 import org.cloudfoundry.util.ValidationUtils;
 import org.reactivestreams.Subscriber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.SchedulerGroup;
 import reactor.core.subscriber.SubscriberWithContext;
-import reactor.fn.BiConsumer;
-import reactor.fn.Consumer;
-import reactor.fn.Function;
-import reactor.rx.Stream;
+import reactor.rx.Fluxion;
 
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.DeploymentException;
@@ -41,6 +38,8 @@ import javax.websocket.WebSocketContainer;
 import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 @ToString
 public final class SpringStream {
@@ -62,22 +61,9 @@ public final class SpringStream {
         this.webSocketContainer = webSocketContainer;
     }
 
-    public Stream<LogMessage> stream(final StreamLogsRequest request) {
-        return ws(request, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.path("tail/").queryParam("app", request.getApplicationId());
-            }
-
-        }, new Function<Subscriber<LogMessage>, MessageHandler>() {
-
-            @Override
-            public MessageHandler apply(Subscriber<LogMessage> subscriber) {
-                return new LoggregatorMessageHandler(subscriber);
-            }
-
-        });
+    public Flux<LogMessage> stream(final StreamLogsRequest request) {
+        return ws(request, builder -> builder.path("tail/").queryParam("app", request.getApplicationId()), LoggregatorMessageHandler::new)
+            .as(Flux::from);
     }
 
     private static String toString(String method, URI uri) {
@@ -91,73 +77,50 @@ public final class SpringStream {
     }
 
     @SuppressWarnings("unchecked")
-    private <T, V extends Validatable> Stream<T> exchange(V request, final Consumer<Subscriber<T>> exchange) {
+    private <T, V extends Validatable> Fluxion<T> exchange(V request, final Consumer<Subscriber<T>> exchange) {
         return ValidationUtils
             .validate(request)
-            .flatMap(new Function<V, Stream<T>>() {
+            .flatMap(request1 -> Fluxion
+                .generate((Long n, SubscriberWithContext<T, Void> subscriber) -> {
+                    if (n != Long.MAX_VALUE) {
+                        subscriber.onError(new IllegalArgumentException("Publisher doesn't support back pressure"));
+                    }
 
-                @Override
-                public Stream<T> apply(V request) {
-                    return Stream
-                        .generate(new BiConsumer<Long, SubscriberWithContext<T, Void>>() {
-
-                            @Override
-                            public void accept(Long n, SubscriberWithContext<T, Void> subscriber) {
-                                if (n != Long.MAX_VALUE) {
-                                    subscriber.onError(new IllegalArgumentException("Publisher doesn't support back pressure"));
-                                }
-
-                                exchange.accept(subscriber);
-                            }
-
-                        });
-                }
-
-            })
-            .as(OperationUtils.<T>stream())
+                    exchange.accept(subscriber);
+                }))
             .publishOn(this.schedulerGroup)
+            .as(Fluxion::from)
             .onBackpressureBlock();
     }
 
-    private <T> Stream<T> ws(Validatable request, final Consumer<UriComponentsBuilder> builderCallback, final Function<Subscriber<T>, MessageHandler> messageHandlerCreator) {
+    private <T> Fluxion<T> ws(Validatable request, final Consumer<UriComponentsBuilder> builderCallback, final Function<Subscriber<T>, MessageHandler> messageHandlerCreator) {
         final AtomicReference<Session> session = new AtomicReference<>();
 
-        return exchange(request, new Consumer<Subscriber<T>>() {
+        return exchange(request, (Consumer<Subscriber<T>>) subscriber -> {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
+            builderCallback.accept(builder);
+            URI uri = builder.build().toUri();
 
-            @Override
-            public void accept(Subscriber<T> subscriber) {
-                UriComponentsBuilder builder = UriComponentsBuilder.fromUri(SpringStream.this.root);
-                builderCallback.accept(builder);
-                URI uri = builder.build().toUri();
+            MessageHandler messageHandler = messageHandlerCreator.apply(subscriber);
+            ReactiveEndpoint<T> endpoint = new ReactiveEndpoint<>(messageHandler, subscriber);
 
-                MessageHandler messageHandler = messageHandlerCreator.apply(subscriber);
-                ReactiveEndpoint<T> endpoint = new ReactiveEndpoint<>(messageHandler, subscriber);
+            try {
+                if (this.logger.isDebugEnabled()) {
+                    this.logger.debug(SpringStream.toString("WS", uri));
+                }
 
+                session.set(this.webSocketContainer.connectToServer(endpoint, this.clientEndpointConfig, uri));
+            } catch (DeploymentException | IOException e) {
+                subscriber.onError(e);
+            }
+        }).doOnCancel(() -> {
+            if (session.get() != null) {
                 try {
-                    if (SpringStream.this.logger.isDebugEnabled()) {
-                        SpringStream.this.logger.debug(SpringStream.toString("WS", uri));
-                    }
-
-
-                    session.set(SpringStream.this.webSocketContainer.connectToServer(endpoint, SpringStream.this.clientEndpointConfig, uri));
-                } catch (DeploymentException | IOException e) {
-                    subscriber.onError(e);
+                    session.get().close();
+                } catch (IOException e) {
+                    this.logger.warn("Failure closing session", e);
                 }
             }
-
-        }).doOnCancel(new Runnable() {
-
-            @Override
-            public void run() {
-                if (session.get() != null) {
-                    try {
-                        session.get().close();
-                    } catch (IOException e) {
-                        SpringStream.this.logger.warn("Failure closing session", e);
-                    }
-                }
-            }
-
         });
     }
 

@@ -17,19 +17,17 @@
 package org.cloudfoundry.spring.client.v2.stacks;
 
 import lombok.ToString;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.QueryBuilder;
-import org.cloudfoundry.spring.client.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksResponse;
 import org.cloudfoundry.client.v2.stacks.Stacks;
+import org.cloudfoundry.spring.client.v2.FilterBuilder;
+import org.cloudfoundry.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -51,28 +49,16 @@ public final class SpringStacks extends AbstractSpringOperations implements Stac
     }
 
     @Override
-    public Mono<GetStackResponse> get(final GetStackRequest request) {
-        return get(request, GetStackResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "stacks", request.getStackId());
-            }
-
-        });
+    public Mono<GetStackResponse> get(GetStackRequest request) {
+        return get(request, GetStackResponse.class, builder -> builder.pathSegment("v2", "stacks", request.getStackId()));
     }
 
     @Override
-    public Mono<ListStacksResponse> list(final ListStacksRequest request) {
-        return get(request, ListStacksResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "stacks");
-                FilterBuilder.augment(builder, request);
-                QueryBuilder.augment(builder, request);
-            }
-
+    public Mono<ListStacksResponse> list(ListStacksRequest request) {
+        return get(request, ListStacksResponse.class, builder -> {
+            builder.pathSegment("v2", "stacks");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
         });
     }
 

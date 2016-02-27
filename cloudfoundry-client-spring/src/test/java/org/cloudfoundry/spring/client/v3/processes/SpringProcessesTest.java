@@ -96,7 +96,7 @@ public final class SpringProcessesTest {
             return new RequestContext()
                 .method(GET).path("/v3/processes/test-process-id")
                 .status(OK)
-                .responsePayload("client/v3/processes/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v3/processes/GET_{id}_response.json");
         }
 
         @Override
@@ -154,7 +154,7 @@ public final class SpringProcessesTest {
             return new RequestContext()
                 .method(GET).path("/v3/processes/test-id/stats")
                 .status(OK)
-                .responsePayload("client/v3/processes/GET_{id}_stats_response.json");
+                .responsePayload("fixtures/client/v3/processes/GET_{id}_stats_response.json");
         }
 
         @Override
@@ -217,7 +217,7 @@ public final class SpringProcessesTest {
             return new RequestContext()
                 .method(GET).path("/v3/processes?page=1&per_page=2")
                 .status(OK)
-                .responsePayload("client/v3/processes/GET_response.json");
+                .responsePayload("fixtures/client/v3/processes/GET_response.json");
         }
 
         @Override
@@ -311,9 +311,9 @@ public final class SpringProcessesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PUT).path("/v3/processes/test-process-id/scale")
-                .requestPayload("client/v3/processes/PUT_{id}_scale_request.json")
+                .requestPayload("fixtures/client/v3/processes/PUT_{id}_scale_request.json")
                 .status(OK)
-                .responsePayload("client/v3/processes/PUT_{id}_scale_response.json");
+                .responsePayload("fixtures/client/v3/processes/PUT_{id}_scale_response.json");
         }
 
         @Override
@@ -372,9 +372,9 @@ public final class SpringProcessesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PATCH).path("/v3/processes/test-process-id")
-                .requestPayload("client/v3/processes/PATCH_{id}_request.json")
+                .requestPayload("fixtures/client/v3/processes/PATCH_{id}_request.json")
                 .status(OK)
-                .responsePayload("client/v3/processes/PATCH_{id}_response.json");
+                .responsePayload("fixtures/client/v3/processes/PATCH_{id}_response.json");
         }
 
         @Override

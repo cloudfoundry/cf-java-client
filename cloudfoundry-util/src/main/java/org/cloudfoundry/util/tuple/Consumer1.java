@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.util.tuple;
 
-import reactor.fn.Consumer;
+import java.util.function.Consumer;
 
 public interface Consumer1<T1> extends Consumer<T1> {
 

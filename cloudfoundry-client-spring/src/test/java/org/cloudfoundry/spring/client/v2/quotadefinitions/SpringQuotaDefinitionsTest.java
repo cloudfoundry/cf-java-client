@@ -47,7 +47,7 @@ public final class SpringQuotaDefinitionsTest {
             return new RequestContext()
                 .method(GET).path("/v2/quota_definitions/test-quota-definition-id")
                 .status(OK)
-                .responsePayload("client/v2/quota_definitions/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v2/quota_definitions/GET_{id}_response.json");
         }
 
         @Override
@@ -100,7 +100,7 @@ public final class SpringQuotaDefinitionsTest {
             return new RequestContext()
                 .method(GET).path("/v2/quota_definitions?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/quota_definitions/GET_response.json");
+                .responsePayload("fixtures/client/v2/quota_definitions/GET_response.json");
         }
 
         @Override

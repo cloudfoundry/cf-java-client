@@ -22,10 +22,8 @@ import org.cloudfoundry.uaa.accesstokenadministration.AccessTokenAdministration;
 import org.cloudfoundry.uaa.accesstokenadministration.GetTokenKeyRequest;
 import org.cloudfoundry.uaa.accesstokenadministration.GetTokenKeyResponse;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -45,14 +43,7 @@ public final class SpringAccessTokenAdministration extends AbstractSpringOperati
 
     @Override
     public Mono<GetTokenKeyResponse> getTokenKey(GetTokenKeyRequest request) {
-        return get(request, GetTokenKeyResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("token_key");
-            }
-
-        });
+        return get(request, GetTokenKeyResponse.class, builder -> builder.pathSegment("token_key"));
     }
 
 }

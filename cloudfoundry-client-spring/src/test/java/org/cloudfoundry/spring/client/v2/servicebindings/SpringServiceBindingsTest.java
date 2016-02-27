@@ -55,9 +55,9 @@ public final class SpringServiceBindingsTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(POST).path("/v2/service_bindings")
-                .requestPayload("client/v2/service_bindings/POST_request.json")
+                .requestPayload("fixtures/client/v2/service_bindings/POST_request.json")
                 .status(CREATED)
-                .responsePayload("client/v2/service_bindings/POST_response.json");
+                .responsePayload("fixtures/client/v2/service_bindings/POST_response.json");
         }
 
         @Override
@@ -146,7 +146,7 @@ public final class SpringServiceBindingsTest {
             return new RequestContext()
                 .method(GET).path("/v2/service_bindings/test-service-binding-id")
                 .status(OK)
-                .responsePayload("client/v2/service_bindings/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v2/service_bindings/GET_{id}_response.json");
         }
 
         @Override
@@ -197,7 +197,7 @@ public final class SpringServiceBindingsTest {
             return new RequestContext()
                 .method(GET).path("/v2/service_bindings?q=app_guid%20IN%20dd44fd4f-5e20-4c52-b66d-7af6e201f01e&page=-1")
                 .status(OK)
-                .responsePayload("client/v2/service_bindings/GET_response.json");
+                .responsePayload("fixtures/client/v2/service_bindings/GET_response.json");
         }
 
         @Override

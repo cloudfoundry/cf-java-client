@@ -91,7 +91,6 @@ import org.cloudfoundry.spring.util.network.OAuth2RestOperationsOAuth2TokenProvi
 import org.cloudfoundry.spring.util.network.OAuth2RestTemplateBuilder;
 import org.cloudfoundry.spring.util.network.OAuth2TokenProvider;
 import org.cloudfoundry.spring.util.network.SslCertificateTruster;
-import org.cloudfoundry.util.Optional;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -100,6 +99,7 @@ import reactor.core.publisher.SchedulerGroup;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 

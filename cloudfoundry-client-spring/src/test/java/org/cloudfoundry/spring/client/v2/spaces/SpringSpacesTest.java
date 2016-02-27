@@ -129,7 +129,7 @@ public final class SpringSpacesTest {
             return new RequestContext()
                 .method(PUT).path("/v2/spaces/test-space-id/auditors/test-auditor-id")
                 .status(OK)
-                .responsePayload("client/v2/spaces/PUT_{id}_auditors_{id}_response.json");
+                .responsePayload("fixtures/client/v2/spaces/PUT_{id}_auditors_{id}_response.json");
         }
 
         @Override
@@ -188,9 +188,9 @@ public final class SpringSpacesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PUT).path("/v2/spaces/test-space-id/auditors")
-                .requestPayload("client/v2/spaces/PUT_{id}_auditors_request.json")
+                .requestPayload("fixtures/client/v2/spaces/PUT_{id}_auditors_request.json")
                 .status(OK)
-                .responsePayload("client/v2/spaces/PUT_{id}_auditors_response.json");
+                .responsePayload("fixtures/client/v2/spaces/PUT_{id}_auditors_response.json");
         }
 
         @Override
@@ -250,7 +250,7 @@ public final class SpringSpacesTest {
             return new RequestContext()
                 .method(PUT).path("/v2/spaces/test-space-id/developers/test-developer-id")
                 .status(OK)
-                .responsePayload("client/v2/spaces/PUT_{id}_developers_{id}_response.json");
+                .responsePayload("fixtures/client/v2/spaces/PUT_{id}_developers_{id}_response.json");
         }
 
         @Override
@@ -310,7 +310,7 @@ public final class SpringSpacesTest {
             return new RequestContext()
                 .method(PUT).path("/v2/spaces/test-space-id/managers/test-manager-id")
                 .status(OK)
-                .responsePayload("client/v2/spaces/PUT_{id}_managers_{id}_response.json");
+                .responsePayload("fixtures/client/v2/spaces/PUT_{id}_managers_{id}_response.json");
         }
 
         @Override
@@ -370,7 +370,7 @@ public final class SpringSpacesTest {
             return new RequestContext()
                 .method(PUT).path("/v2/spaces/test-space-id/security_groups/test-security-group-id")
                 .status(OK)
-                .responsePayload("client/v2/spaces/PUT_{id}_security_group_{id}_response.json");
+                .responsePayload("fixtures/client/v2/spaces/PUT_{id}_security_group_{id}_response.json");
         }
 
         @Override
@@ -429,9 +429,9 @@ public final class SpringSpacesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PUT).path("/v2/spaces/test-space-id/developers")
-                .requestPayload("client/v2/spaces/PUT_{id}_developers_request.json")
+                .requestPayload("fixtures/client/v2/spaces/PUT_{id}_developers_request.json")
                 .status(OK)
-                .responsePayload("client/v2/spaces/PUT_{id}_developers_response.json");
+                .responsePayload("fixtures/client/v2/spaces/PUT_{id}_developers_response.json");
         }
 
         @Override
@@ -490,9 +490,9 @@ public final class SpringSpacesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PUT).path("/v2/spaces/test-space-id/managers")
-                .requestPayload("client/v2/spaces/PUT_{id}_managers_request.json")
+                .requestPayload("fixtures/client/v2/spaces/PUT_{id}_managers_request.json")
                 .status(OK)
-                .responsePayload("client/v2/spaces/PUT_{id}_managers_response.json");
+                .responsePayload("fixtures/client/v2/spaces/PUT_{id}_managers_response.json");
         }
 
         @Override
@@ -551,9 +551,9 @@ public final class SpringSpacesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(POST).path("/v2/spaces")
-                .requestPayload("client/v2/spaces/POST_request.json")
+                .requestPayload("fixtures/client/v2/spaces/POST_request.json")
                 .status(OK)
-                .responsePayload("client/v2/spaces/POST_response.json");
+                .responsePayload("fixtures/client/v2/spaces/POST_response.json");
         }
 
         @Override
@@ -649,7 +649,7 @@ public final class SpringSpacesTest {
             return new RequestContext()
                 .method(DELETE).path("/v2/spaces/test-space-id?async=true")
                 .status(ACCEPTED)
-                .responsePayload("client/v2/routes/DELETE_{id}_async_response.json");
+                .responsePayload("fixtures/client/v2/routes/DELETE_{id}_async_response.json");
         }
 
         @Override
@@ -697,7 +697,7 @@ public final class SpringSpacesTest {
             return new RequestContext()
                 .method(GET).path("/v2/spaces/test-space-id")
                 .status(OK)
-                .responsePayload("client/v2/spaces/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v2/spaces/GET_{id}_response.json");
         }
 
         @Override
@@ -756,7 +756,7 @@ public final class SpringSpacesTest {
             return new RequestContext()
                 .method(GET).path("/v2/spaces/test-space-id/summary")
                 .status(OK)
-                .responsePayload("client/v2/spaces/GET_{id}_summary_response.json");
+                .responsePayload("fixtures/client/v2/spaces/GET_{id}_summary_response.json");
         }
 
         @Override
@@ -840,7 +840,7 @@ public final class SpringSpacesTest {
             return new RequestContext()
                 .method(GET).path("/v2/spaces?q=name%20IN%20test-name&page=-1")
                 .status(OK)
-                .responsePayload("client/v2/spaces/GET_response.json");
+                .responsePayload("fixtures/client/v2/spaces/GET_response.json");
         }
 
         @Override
@@ -903,7 +903,7 @@ public final class SpringSpacesTest {
             return new RequestContext()
                 .method(GET).path("/v2/spaces/test-space-id/apps?q=name%20IN%20test-name&page=-1")
                 .status(OK)
-                .responsePayload("client/v2/spaces/GET_{id}_apps_response.json");
+                .responsePayload("fixtures/client/v2/spaces/GET_{id}_apps_response.json");
         }
 
         @Override
@@ -977,7 +977,7 @@ public final class SpringSpacesTest {
             return new RequestContext()
                 .method(GET).path("/v2/spaces/test-space-id/auditors?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/spaces/GET_{id}_auditors_response.json");
+                .responsePayload("fixtures/client/v2/spaces/GET_{id}_auditors_response.json");
         }
 
         @Override
@@ -1037,7 +1037,7 @@ public final class SpringSpacesTest {
             return new RequestContext()
                 .method(GET).path("/v2/spaces/test-space-id/developers?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/spaces/GET_{id}_developers_response.json");
+                .responsePayload("fixtures/client/v2/spaces/GET_{id}_developers_response.json");
         }
 
         @Override
@@ -1098,7 +1098,7 @@ public final class SpringSpacesTest {
             return new RequestContext()
                 .method(GET).path("/v2/spaces/test-space-id/domains?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/spaces/GET_{id}_domains_response.json");
+                .responsePayload("fixtures/client/v2/spaces/GET_{id}_domains_response.json");
         }
 
         @Override
@@ -1158,7 +1158,7 @@ public final class SpringSpacesTest {
             return new RequestContext()
                 .method(GET).path("/v2/spaces/test-space-id/events?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/spaces/GET_{id}_events_response.json");
+                .responsePayload("fixtures/client/v2/spaces/GET_{id}_events_response.json");
         }
 
         @Override
@@ -1223,7 +1223,7 @@ public final class SpringSpacesTest {
             return new RequestContext()
                 .method(GET).path("/v2/spaces/test-space-id/managers?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/spaces/GET_{id}_managers_response.json");
+                .responsePayload("fixtures/client/v2/spaces/GET_{id}_managers_response.json");
         }
 
         @Override
@@ -1284,7 +1284,7 @@ public final class SpringSpacesTest {
             return new RequestContext()
                 .method(GET).path("/v2/spaces/test-space-id/routes?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/spaces/GET_{id}_routes_response.json");
+                .responsePayload("fixtures/client/v2/spaces/GET_{id}_routes_response.json");
         }
 
         @Override
@@ -1341,7 +1341,7 @@ public final class SpringSpacesTest {
             return new RequestContext()
                 .method(GET).path("/v2/spaces/test-space-id/security_groups?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/spaces/GET_{id}_security_groups_response.json");
+                .responsePayload("fixtures/client/v2/spaces/GET_{id}_security_groups_response.json");
         }
 
         @Override
@@ -1400,7 +1400,7 @@ public final class SpringSpacesTest {
             return new RequestContext()
                 .method(GET).path("/v2/spaces/test-space-id/service_instances?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/spaces/GET_{id}_service_instances_response.json");
+                .responsePayload("fixtures/client/v2/spaces/GET_{id}_service_instances_response.json");
         }
 
         @Override
@@ -1462,7 +1462,7 @@ public final class SpringSpacesTest {
             return new RequestContext()
                 .method(GET).path("/v2/spaces/test-space-id/services?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/spaces/GET_{id}_services_response.json");
+                .responsePayload("fixtures/client/v2/spaces/GET_{id}_services_response.json");
         }
 
         @Override
@@ -1521,7 +1521,7 @@ public final class SpringSpacesTest {
             return new RequestContext()
                 .method(GET).path("/v2/spaces/test-space-id/user_roles?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/spaces/GET_{id}_user_roles_response.json");
+                .responsePayload("fixtures/client/v2/spaces/GET_{id}_user_roles_response.json");
         }
 
         @Override
@@ -1621,7 +1621,7 @@ public final class SpringSpacesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(DELETE).path("/v2/spaces/test-space-id/auditors")
-                .requestPayload("client/v2/spaces/DELETE_{id}_auditors_request.json")
+                .requestPayload("fixtures/client/v2/spaces/DELETE_{id}_auditors_request.json")
                 .status(NO_CONTENT);
         }
 
@@ -1695,7 +1695,7 @@ public final class SpringSpacesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(DELETE).path("/v2/spaces/test-space-id/developers")
-                .requestPayload("client/v2/spaces/DELETE_{id}_developers_request.json")
+                .requestPayload("fixtures/client/v2/spaces/DELETE_{id}_developers_request.json")
                 .status(NO_CONTENT);
         }
 
@@ -1770,7 +1770,7 @@ public final class SpringSpacesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(DELETE).path("/v2/spaces/test-space-id/managers")
-                .requestPayload("client/v2/spaces/DELETE_{id}_managers_request.json")
+                .requestPayload("fixtures/client/v2/spaces/DELETE_{id}_managers_request.json")
                 .status(NO_CONTENT);
         }
 
@@ -1845,9 +1845,9 @@ public final class SpringSpacesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PUT).path("/v2/spaces/test-space-id")
-                .requestPayload("client/v2/spaces/PUT_{id}_request.json")
+                .requestPayload("fixtures/client/v2/spaces/PUT_{id}_request.json")
                 .status(OK)
-                .responsePayload("client/v2/spaces/PUT_{id}_response.json");
+                .responsePayload("fixtures/client/v2/spaces/PUT_{id}_response.json");
         }
 
         @Override

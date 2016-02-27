@@ -17,8 +17,6 @@
 package org.cloudfoundry.spring.client.v3.tasks;
 
 import lombok.ToString;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.QueryBuilder;
 import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CreateTaskResponse;
 import org.cloudfoundry.client.v3.tasks.GetTaskRequest;
@@ -26,11 +24,11 @@ import org.cloudfoundry.client.v3.tasks.GetTaskResponse;
 import org.cloudfoundry.client.v3.tasks.ListTasksRequest;
 import org.cloudfoundry.client.v3.tasks.ListTasksResponse;
 import org.cloudfoundry.client.v3.tasks.Tasks;
+import org.cloudfoundry.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -53,38 +51,19 @@ public final class SpringTasks extends AbstractSpringOperations implements Tasks
 
     @Override
     public Mono<CreateTaskResponse> create(final CreateTaskRequest request) {
-        return post(request, CreateTaskResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getApplicationId(), "tasks");
-            }
-
-        });
+        return post(request, CreateTaskResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "tasks"));
     }
 
     @Override
     public Mono<GetTaskResponse> get(final GetTaskRequest request) {
-        return get(request, GetTaskResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "tasks", request.getId());
-            }
-
-        });
+        return get(request, GetTaskResponse.class, builder -> builder.pathSegment("v3", "tasks", request.getId()));
     }
 
     @Override
     public Mono<ListTasksResponse> list(final ListTasksRequest request) {
-        return get(request, ListTasksResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "tasks");
-                QueryBuilder.augment(builder, request);
-            }
-
+        return get(request, ListTasksResponse.class, builder -> {
+            builder.pathSegment("v3", "tasks");
+            QueryBuilder.augment(builder, request);
         });
     }
 

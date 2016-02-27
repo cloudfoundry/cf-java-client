@@ -27,10 +27,8 @@ import org.cloudfoundry.spring.client.v2.FilterBuilder;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -52,41 +50,22 @@ public final class SpringServiceUsageEvents extends AbstractSpringOperations imp
     }
 
     @Override
-    public Mono<GetServiceUsageEventsResponse> get(final GetServiceUsageEventsRequest request) {
-        return get(request, GetServiceUsageEventsResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_usage_events", request.getServiceUsageEventId());
-            }
-
-        });
+    public Mono<GetServiceUsageEventsResponse> get(GetServiceUsageEventsRequest request) {
+        return get(request, GetServiceUsageEventsResponse.class, builder -> builder.pathSegment("v2", "service_usage_events", request.getServiceUsageEventId()));
     }
 
     @Override
-    public Mono<ListServiceUsageEventsResponse> list(final ListServiceUsageEventsRequest request) {
-        return get(request, ListServiceUsageEventsResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_usage_events");
-                FilterBuilder.augment(builder, request);
-                QueryBuilder.augment(builder, request);
-            }
-
+    public Mono<ListServiceUsageEventsResponse> list(ListServiceUsageEventsRequest request) {
+        return get(request, ListServiceUsageEventsResponse.class, builder -> {
+            builder.pathSegment("v2", "service_usage_events");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
     public Mono<Void> purgeAndReseed(PurgeAndReseedServiceUsageEventsRequest request) {
-        return post(request, Void.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_usage_events", "destructively_purge_all_and_reseed_existing_instances");
-            }
-
-        });
+        return post(request, Void.class, builder -> builder.pathSegment("v2", "service_usage_events", "destructively_purge_all_and_reseed_existing_instances"));
     }
 
 }

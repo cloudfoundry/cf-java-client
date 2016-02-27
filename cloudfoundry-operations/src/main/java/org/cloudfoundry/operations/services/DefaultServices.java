@@ -22,19 +22,13 @@ import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
-import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
-import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesResponse;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.ValidationUtils;
-import org.cloudfoundry.util.tuple.Function2;
-import org.cloudfoundry.util.tuple.Function3;
 import reactor.core.publisher.Mono;
-import reactor.fn.Function;
-import reactor.fn.tuple.Tuple3;
-import reactor.rx.Stream;
+import reactor.rx.Fluxion;
 
 import java.util.Map;
 
@@ -55,27 +49,13 @@ public final class DefaultServices implements Services {
     public Mono<Void> bind(BindServiceRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function(new Function2<BindServiceRequest, String, Mono<Tuple3<String, String, BindServiceRequest>>>() {
-
-                @Override
-                public Mono<Tuple3<String, String, BindServiceRequest>> apply(BindServiceRequest request, String spaceId) {
-                    return Mono
-                        .when(
-                            getSpaceServiceInstanceId(DefaultServices.this.cloudFoundryClient, request.getServiceName(), spaceId),
-                            getApplicationId(DefaultServices.this.cloudFoundryClient, request.getApplicationName(), spaceId),
-                            Mono.just(request)
-                        );
-                }
-
-            }))
-            .then(function(new Function3<String, String, BindServiceRequest, Mono<CreateServiceBindingResponse>>() {
-
-                @Override
-                public Mono<CreateServiceBindingResponse> apply(String serviceInstanceId, String applicationId, BindServiceRequest request) {
-                    return requestServiceBinding(DefaultServices.this.cloudFoundryClient, serviceInstanceId, applicationId, request.getParameters());
-                }
-
-            }))
+            .then(function((request1, spaceId) -> Mono
+                .when(
+                    getSpaceServiceInstanceId(this.cloudFoundryClient, request1.getServiceName(), spaceId),
+                    getApplicationId(this.cloudFoundryClient, request1.getApplicationName(), spaceId),
+                    Mono.just(request1)
+                )))
+            .then(function((serviceInstanceId, applicationId, request1) -> requestServiceBinding(this.cloudFoundryClient, serviceInstanceId, applicationId, request1.getParameters())))
             .after();
     }
 
@@ -87,7 +67,7 @@ public final class DefaultServices implements Services {
 
     private static Mono<String> getApplicationId(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
         return getApplication(cloudFoundryClient, applicationName, spaceId)
-            .map(ResourceUtils.extractId());
+            .map(ResourceUtils::getId);
     }
 
     private static Mono<ServiceInstanceResource> getSpaceServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
@@ -96,30 +76,22 @@ public final class DefaultServices implements Services {
             .otherwise(ExceptionUtils.<ServiceInstanceResource>convert("Service %s does not exist", serviceName));
     }
 
-    private static Mono<String> getSpaceServiceInstanceId(final CloudFoundryClient cloudFoundryClient, final String serviceName, final String spaceId) {
+    private static Mono<String> getSpaceServiceInstanceId(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
         return getSpaceServiceInstance(cloudFoundryClient, serviceName, spaceId)
-            .map(ResourceUtils.extractId());
+            .map(ResourceUtils::getId);
     }
 
-    private static Stream<ApplicationResource> requestApplications(final CloudFoundryClient cloudFoundryClient, final String application, final String spaceId) {
+    private static Fluxion<ApplicationResource> requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         return PaginationUtils
-            .requestResources(new Function<Integer, Mono<ListSpaceApplicationsResponse>>() {
-
-                @Override
-                public Mono<ListSpaceApplicationsResponse> apply(Integer page) {
-                    return cloudFoundryClient.spaces()
-                        .listApplications(ListSpaceApplicationsRequest.builder()
-                            .name(application)
-                            .spaceId(spaceId)
-                            .page(page)
-                            .build());
-                }
-
-            });
+            .requestResources(page -> cloudFoundryClient.spaces()
+                .listApplications(ListSpaceApplicationsRequest.builder()
+                    .name(application)
+                    .spaceId(spaceId)
+                    .page(page)
+                    .build()));
     }
 
-    private static Mono<CreateServiceBindingResponse> requestServiceBinding(final CloudFoundryClient cloudFoundryClient, final String serviceInstanceId, final String applicationId,
-                                                                            final Map<String, Object> parameters) {
+    private static Mono<CreateServiceBindingResponse> requestServiceBinding(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String applicationId, Map<String, Object> parameters) {
         return cloudFoundryClient.serviceBindings()
             .create(CreateServiceBindingRequest.builder()
                 .applicationId(applicationId)
@@ -128,22 +100,15 @@ public final class DefaultServices implements Services {
                 .build());
     }
 
-    private static Stream<ServiceInstanceResource> requestSpaceServiceInstances(final CloudFoundryClient cloudFoundryClient, final String serviceName, final String spaceId) {
+    private static Fluxion<ServiceInstanceResource> requestSpaceServiceInstances(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
         return PaginationUtils
-            .requestResources(new Function<Integer, Mono<ListSpaceServiceInstancesResponse>>() {
-
-                @Override
-                public Mono<ListSpaceServiceInstancesResponse> apply(Integer page) {
-                    return cloudFoundryClient.spaces()
-                        .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
-                            .page(page)
-                            .returnUserProvidedServiceInstances(true)
-                            .name(serviceName)
-                            .spaceId(spaceId)
-                            .build());
-                }
-
-            });
+            .requestResources(page -> cloudFoundryClient.spaces()
+                .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
+                    .page(page)
+                    .returnUserProvidedServiceInstances(true)
+                    .name(serviceName)
+                    .spaceId(spaceId)
+                    .build()));
     }
 
 }

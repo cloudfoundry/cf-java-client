@@ -52,9 +52,9 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Mono;
+import reactor.core.tuple.Tuple2;
 import reactor.core.util.Exceptions;
-import reactor.fn.tuple.Tuple2;
-import reactor.rx.Stream;
+import reactor.rx.Fluxion;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -142,7 +142,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .list(ListApplicationsRequest.builder()
                         .page(page)
                         .build())))
-            .as(Stream::from)
+            .as(Fluxion::from)
             .filter(r -> {
                 String name = ResourceUtils.getEntity(r).getName();
                 return applicationName.equals(name) || copyApplicationName.equals(name);
@@ -196,7 +196,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .download(DownloadApplicationRequest.builder()
                     .applicationId(applicationId)
                     .build()))
-            .as(Stream::from)
+            .as(Fluxion::from)
             .reduce(new ByteArrayOutputStream(), ApplicationsTest::collectIntoByteArrayInputStream)
             .map(ByteArrayOutputStream::toByteArray)
             .map(bytes -> {
@@ -223,7 +223,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .downloadDroplet(DownloadApplicationDropletRequest.builder()
                     .applicationId(applicationId)
                     .build()))
-            .as(Stream::from)
+            .as(Fluxion::from)
             .reduceWith(ByteArrayOutputStream::new, ApplicationsTest::collectIntoByteArrayInputStream)
             .map(bytes -> {
                 boolean staticFile = false;
@@ -299,7 +299,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .list(ListApplicationsRequest.builder()
                         .page(page)
                         .build())))
-            .as(Stream::from)
+            .as(Fluxion::from)
             .count()
             .subscribe(this.<Long>testSubscriber()
                 .assertThat(count -> assertTrue(count > 1)));
@@ -317,7 +317,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .diego(true)
                         .page(page)
                         .build())))
-            .as(Stream::from)
+            .as(Fluxion::from)
             .count()
             .subscribe(this.<Long>testSubscriber()
                 .assertThat(count -> assertTrue(count > 1)));
@@ -353,7 +353,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .organizationId(organizationId)
                         .page(page)
                         .build())))
-            .as(Stream::from)
+            .as(Fluxion::from)
             .count()
             .subscribe(this.<Long>testSubscriber()
                 .assertThat(count -> assertTrue(count > 1)));
@@ -372,7 +372,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .page(page)
                         .spaceId(spaceId)
                         .build())))
-            .as(Stream::from)
+            .as(Fluxion::from)
             .count()
             .subscribe(this.<Long>testSubscriber()
                 .assertThat(count -> assertTrue(count > 1)));
@@ -392,7 +392,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .page(page)
                         .stackId(stackId)
                         .build())))
-            .as(Stream::from)
+            .as(Fluxion::from)
             .count()
             .subscribe(this.<Long>testSubscriber()
                 .assertThat(count -> assertTrue(count > 1)));
@@ -786,7 +786,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .build())
             .map(response -> response.getEntity().getPackageState())
             .where("STAGED"::equals)
-            .as(Stream::from)                                               // TODO: Remove once Mono.repeatWhen()
+            .as(Fluxion::from)                                               // TODO: Remove once Mono.repeatWhen()
             .repeatWhen(DelayUtils.exponentialBackOff(1, 10, SECONDS, 10))
             .single()                                                       // TODO: Remove once Mono.repeatWhen()
             .map(state -> applicationId);
@@ -797,8 +797,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .instances(ApplicationInstancesRequest.builder()
                 .applicationId(applicationId)
                 .build())
-            .flatMap(response -> Stream.fromIterable(response.values()))
-            .as(Stream::from)
+            .flatMap(response -> Fluxion.fromIterable(response.values()))
+            .as(Fluxion::from)
             .filter(applicationInstanceInfo -> "RUNNING".equals(applicationInstanceInfo.getState()))
             .repeatWhen(DelayUtils.exponentialBackOff(1, 10, SECONDS, 10))
             .single()

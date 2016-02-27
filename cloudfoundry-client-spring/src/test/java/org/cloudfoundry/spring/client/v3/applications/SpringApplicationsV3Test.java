@@ -85,9 +85,9 @@ public final class SpringApplicationsV3Test {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PUT).path("/v3/apps/test-application-id/current_droplet")
-                .requestPayload("client/v3/apps/PUT_{id}_current_droplet_request.json")
+                .requestPayload("fixtures/client/v3/apps/PUT_{id}_current_droplet_request.json")
                 .status(OK)
-                .responsePayload("client/v3/apps/PUT_{id}_current_droplet_response.json");
+                .responsePayload("fixtures/client/v3/apps/PUT_{id}_current_droplet_response.json");
         }
 
         @Override
@@ -169,9 +169,9 @@ public final class SpringApplicationsV3Test {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(POST).path("/v3/apps")
-                .requestPayload("client/v3/apps/POST_request.json")
+                .requestPayload("fixtures/client/v3/apps/POST_request.json")
                 .status(CREATED)
-                .responsePayload("client/v3/apps/POST_response.json");
+                .responsePayload("fixtures/client/v3/apps/POST_response.json");
         }
 
         @Override
@@ -332,7 +332,7 @@ public final class SpringApplicationsV3Test {
             return new RequestContext()
                 .method(GET).path("/v3/apps/test-application-id")
                 .status(OK)
-                .responsePayload("client/v3/apps/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v3/apps/GET_{id}_response.json");
         }
 
         @Override
@@ -414,7 +414,7 @@ public final class SpringApplicationsV3Test {
             return new RequestContext()
                 .method(GET).path("/v3/apps/test-id/processes/test-type/stats")
                 .status(OK)
-                .responsePayload("client/v3/apps/GET_{id}_processes_{type}_stats_response.json");
+                .responsePayload("fixtures/client/v3/apps/GET_{id}_processes_{type}_stats_response.json");
         }
 
         @Override
@@ -477,7 +477,7 @@ public final class SpringApplicationsV3Test {
             return new RequestContext()
                 .method(GET).path("/v3/apps/test-id/stats")
                 .status(OK)
-                .responsePayload("client/v3/apps/GET_{id}_stats_response.json");
+                .responsePayload("fixtures/client/v3/apps/GET_{id}_stats_response.json");
         }
 
         @Override
@@ -533,7 +533,7 @@ public final class SpringApplicationsV3Test {
             return new RequestContext()
                 .method(GET).path("/v3/apps/test-application-id/env")
                 .status(OK)
-                .responsePayload("client/v3/apps/GET_{id}_env_response.json");
+                .responsePayload("fixtures/client/v3/apps/GET_{id}_env_response.json");
         }
 
         @Override
@@ -586,7 +586,7 @@ public final class SpringApplicationsV3Test {
             return new RequestContext()
                 .method(GET).path("/v3/apps/test-application-id/processes/web")
                 .status(OK)
-                .responsePayload("client/v3/apps/GET_{id}_processes_{type}_response.json");
+                .responsePayload("fixtures/client/v3/apps/GET_{id}_processes_{type}_response.json");
         }
 
         @Override
@@ -646,7 +646,7 @@ public final class SpringApplicationsV3Test {
             return new RequestContext()
                 .method(GET).path("/v3/apps?names=test-name&order_by=%2Bcreated_at&page=1")
                 .status(OK)
-                .responsePayload("client/v3/apps/GET_response.json");
+                .responsePayload("fixtures/client/v3/apps/GET_response.json");
         }
 
         @Override
@@ -783,7 +783,7 @@ public final class SpringApplicationsV3Test {
             return new RequestContext()
                 .method(GET).path("/v3/apps/test-application-id/droplets?order_by=-created_at&page=1&per_page=2")
                 .status(OK)
-                .responsePayload("client/v3/apps/GET_{id}_droplets_response.json");
+                .responsePayload("fixtures/client/v3/apps/GET_{id}_droplets_response.json");
         }
 
         @Override
@@ -894,7 +894,7 @@ public final class SpringApplicationsV3Test {
             return new RequestContext()
                 .method(GET).path("/v3/apps/test-application-id/packages")
                 .status(OK)
-                .responsePayload("client/v3/apps/GET_{id}_packages_response.json");
+                .responsePayload("fixtures/client/v3/apps/GET_{id}_packages_response.json");
         }
 
         @Override
@@ -971,7 +971,7 @@ public final class SpringApplicationsV3Test {
             return new RequestContext()
                 .method(GET).path("/v3/apps/test-application-id/processes")
                 .status(OK)
-                .responsePayload("client/v3/apps/GET_{id}_processes_response.json");
+                .responsePayload("fixtures/client/v3/apps/GET_{id}_processes_response.json");
         }
 
         @Override
@@ -1040,9 +1040,9 @@ public final class SpringApplicationsV3Test {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PUT).path("/v3/apps/test-application-id/processes/web/scale")
-                .requestPayload("client/v3/apps/PUT_{id}_processes_{type}_scale_request.json")
+                .requestPayload("fixtures/client/v3/apps/PUT_{id}_processes_{type}_scale_request.json")
                 .status(OK)
-                .responsePayload("client/v3/apps/PUT_{id}_processes_{type}_scale_response.json");
+                .responsePayload("fixtures/client/v3/apps/PUT_{id}_processes_{type}_scale_response.json");
         }
 
         @Override
@@ -1104,7 +1104,7 @@ public final class SpringApplicationsV3Test {
             return new RequestContext()
                 .method(PUT).path("/v3/apps/test-application-id/start")
                 .status(OK)
-                .responsePayload("client/v3/apps/PUT_{id}_start_response.json");
+                .responsePayload("fixtures/client/v3/apps/PUT_{id}_start_response.json");
         }
 
         @Override
@@ -1186,7 +1186,7 @@ public final class SpringApplicationsV3Test {
             return new RequestContext()
                 .method(PUT).path("/v3/apps/test-application-id/stop")
                 .status(OK)
-                .responsePayload("client/v3/apps/PUT_{id}_stop_response.json");
+                .responsePayload("fixtures/client/v3/apps/PUT_{id}_stop_response.json");
         }
 
         @Override
@@ -1267,9 +1267,9 @@ public final class SpringApplicationsV3Test {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PATCH).path("/v3/apps/test-application-id")
-                .requestPayload("client/v3/apps/PATCH_{id}_request.json")
+                .requestPayload("fixtures/client/v3/apps/PATCH_{id}_request.json")
                 .status(OK)
-                .responsePayload("client/v3/apps/PATCH_{id}_response.json");
+                .responsePayload("fixtures/client/v3/apps/PATCH_{id}_response.json");
         }
 
         @Override

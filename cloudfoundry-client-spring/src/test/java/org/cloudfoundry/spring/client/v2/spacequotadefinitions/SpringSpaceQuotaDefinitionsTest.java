@@ -52,7 +52,7 @@ public final class SpringSpaceQuotaDefinitionsTest {
             return new RequestContext()
                 .method(PUT).path("/v2/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
                 .status(OK)
-                .responsePayload("client/v2/space_quota_definitions/PUT_{id}_spaces_{id}_response.json");
+                .responsePayload("fixtures/client/v2/space_quota_definitions/PUT_{id}_spaces_{id}_response.json");
         }
 
         @Override
@@ -107,7 +107,7 @@ public final class SpringSpaceQuotaDefinitionsTest {
             return new RequestContext()
                 .method(GET).path("/v2/space_quota_definitions/test-space-quota-definition-id")
                 .status(OK)
-                .responsePayload("client/v2/space_quota_definitions/GET_{id}_response.json");
+                .responsePayload("fixtures/client/v2/space_quota_definitions/GET_{id}_response.json");
         }
 
         @Override
@@ -161,7 +161,7 @@ public final class SpringSpaceQuotaDefinitionsTest {
             return new RequestContext()
                 .method(GET).path("/v2/space_quota_definitions?page=-1")
                 .status(OK)
-                .responsePayload("client/v2/space_quota_definitions/GET_response.json");
+                .responsePayload("fixtures/client/v2/space_quota_definitions/GET_response.json");
         }
 
         @Override

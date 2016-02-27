@@ -30,8 +30,8 @@ import org.cloudfoundry.client.v2.Resource;
 @ToString(callSuper = true)
 public abstract class AbstractApplicationResource extends Resource<ApplicationEntity> {
 
-    protected AbstractApplicationResource(@JsonProperty("entity") ApplicationEntity entity,
-                                          @JsonProperty("metadata") Metadata metadata) {
+    AbstractApplicationResource(@JsonProperty("entity") ApplicationEntity entity,
+                                @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 

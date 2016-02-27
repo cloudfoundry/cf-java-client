@@ -17,17 +17,15 @@
 package org.cloudfoundry.spring.client.v2.shareddomains;
 
 import lombok.ToString;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.QueryBuilder;
-import org.cloudfoundry.spring.client.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
+import org.cloudfoundry.spring.client.v2.FilterBuilder;
+import org.cloudfoundry.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -49,16 +47,11 @@ public final class SpringSharedDomains extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Mono<ListSharedDomainsResponse> list(final ListSharedDomainsRequest request) {
-        return get(request, ListSharedDomainsResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "shared_domains");
-                FilterBuilder.augment(builder, request);
-                QueryBuilder.augment(builder, request);
-            }
-
+    public Mono<ListSharedDomainsResponse> list(ListSharedDomainsRequest request) {
+        return get(request, ListSharedDomainsResponse.class, builder -> {
+            builder.pathSegment("v2", "shared_domains");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
         });
     }
 

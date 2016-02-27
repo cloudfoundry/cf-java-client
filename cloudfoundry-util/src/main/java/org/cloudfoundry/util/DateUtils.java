@@ -47,18 +47,6 @@ public final class DateUtils {
     }
 
     /**
-     * Parses a double representing seconds from the epoch to a {@link Date} object
-     *
-     * @param d the double to parse
-     * @return the parsed {@link Date}
-     */
-    public static Date parseSecondsFromEpoch(Double d) {
-        synchronized (MONITOR) {
-            return new Date(SECONDS.toMillis(d.longValue()));
-        }
-    }
-
-    /**
      * Parses a string in {@code ISO8601} format to a {@link Date} object
      *
      * @param s the string to parse
@@ -71,6 +59,18 @@ public final class DateUtils {
             } catch (ParseException e) {
                 throw new IllegalArgumentException("Unable to parse date", e);
             }
+        }
+    }
+
+    /**
+     * Parses a double representing seconds from the epoch to a {@link Date} object
+     *
+     * @param d the double to parse
+     * @return the parsed {@link Date}
+     */
+    public static Date parseSecondsFromEpoch(Double d) {
+        synchronized (MONITOR) {
+            return new Date(SECONDS.toMillis(d.longValue()));
         }
     }
 

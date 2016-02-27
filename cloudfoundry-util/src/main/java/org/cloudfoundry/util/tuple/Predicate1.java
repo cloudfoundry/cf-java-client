@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.util.tuple;
 
-import reactor.fn.Predicate;
+import java.util.function.Predicate;
 
 public interface Predicate1<T1> extends Predicate<T1> {
 

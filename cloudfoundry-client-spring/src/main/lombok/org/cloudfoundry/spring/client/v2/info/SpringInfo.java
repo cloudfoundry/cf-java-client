@@ -18,15 +18,13 @@ package org.cloudfoundry.spring.client.v2.info;
 
 
 import lombok.ToString;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.cloudfoundry.client.v2.info.Info;
+import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -49,14 +47,7 @@ public final class SpringInfo extends AbstractSpringOperations implements Info {
 
     @Override
     public Mono<GetInfoResponse> get(GetInfoRequest request) {
-        return get(request, GetInfoResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "info");
-            }
-
-        });
+        return get(request, GetInfoResponse.class, builder -> builder.pathSegment("v2", "info"));
     }
 
 }
