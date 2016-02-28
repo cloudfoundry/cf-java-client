@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.util.tuple;
 
-import reactor.core.tuple.Tuple1;
 import reactor.core.tuple.Tuple2;
 import reactor.core.tuple.Tuple3;
 import reactor.core.tuple.Tuple4;
@@ -32,10 +31,6 @@ import java.util.function.Predicate;
 public final class TupleUtils {
 
     private TupleUtils() {
-    }
-
-    public static <T1> Consumer<Tuple1<T1>> consumer(final Consumer1<T1> consumer) {
-        return tuple -> consumer.accept(tuple.t1);
     }
 
     public static <T1, T2> Consumer<Tuple2<T1, T2>> consumer(final Consumer2<T1, T2> consumer) {
@@ -66,10 +61,6 @@ public final class TupleUtils {
         return tuple -> consumer.accept(tuple.t1, tuple.t2, tuple.t3, tuple.t4, tuple.t5, tuple.t6, tuple.t7, tuple.t8);
     }
 
-    public static <T1, R> Function<Tuple1<T1>, R> function(final Function1<T1, R> function) {
-        return tuple -> function.apply(tuple.t1);
-    }
-
     public static <T1, T2, R> Function<Tuple2<T1, T2>, R> function(final Function2<T1, T2, R> function) {
         return tuple -> function.apply(tuple.t1, tuple.t2);
     }
@@ -96,10 +87,6 @@ public final class TupleUtils {
 
     public static <T1, T2, T3, T4, T5, T6, T7, T8, R> Function<Tuple8<T1, T2, T3, T4, T5, T6, T7, T8>, R> function(final Function8<T1, T2, T3, T4, T5, T6, T7, T8, R> function) {
         return tuple -> function.apply(tuple.t1, tuple.t2, tuple.t3, tuple.t4, tuple.t5, tuple.t6, tuple.t7, tuple.t8);
-    }
-
-    public static <T1> Predicate<Tuple1<T1>> predicate(final Predicate1<T1> predicate) {
-        return tuple -> predicate.test(tuple.t1);
     }
 
     public static <T1, T2> Predicate<Tuple2<T1, T2>> predicate(final Predicate2<T1, T2> predicate) {
