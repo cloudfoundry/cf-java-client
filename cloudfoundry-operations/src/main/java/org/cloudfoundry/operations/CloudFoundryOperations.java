@@ -33,7 +33,7 @@ public interface CloudFoundryOperations {
     /**
      * The currently supported Cloud Foundry CLI version
      */
-    String SUPPORTED_CLI_VERSION = "6.16.0";
+    String SUPPORTED_CLI_VERSION = "6.16.1";
 
     /**
      * Main entry point to the Cloud Foundry Applications Operations API
