@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
 
 public final class DefaultServicesTest {
 
-    private static void requestApplications(CloudFoundryClient cloudFoundryClient, final String applicationName, final String spaceId) {
+    private static void requestApplications(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
         when(cloudFoundryClient.spaces()
             .listApplications(fillPage(ListSpaceApplicationsRequest.builder())
                 .diego(null)
@@ -53,7 +53,7 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
-    private static void requestApplicationsEmpty(CloudFoundryClient cloudFoundryClient, final String applicationName, final String spaceId) {
+    private static void requestApplicationsEmpty(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
         when(cloudFoundryClient.spaces()
             .listApplications(fillPage(ListSpaceApplicationsRequest.builder())
                 .diego(null)
@@ -77,7 +77,7 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
-    private static void requestSpaceServiceInstances(CloudFoundryClient cloudFoundryClient, final String serviceName, final String spaceId) {
+    private static void requestSpaceServiceInstances(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
         when(cloudFoundryClient.spaces()
             .listServiceInstances(fillPage(ListSpaceServiceInstancesRequest.builder())
                 .spaceId(spaceId)
@@ -90,7 +90,7 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
-    private static void requestSpaceServiceInstancesEmpty(CloudFoundryClient cloudFoundryClient, final String serviceName, final String spaceId) {
+    private static void requestSpaceServiceInstancesEmpty(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
         when(cloudFoundryClient.spaces()
             .listServiceInstances(fillPage(ListSpaceServiceInstancesRequest.builder())
                 .spaceId(spaceId)

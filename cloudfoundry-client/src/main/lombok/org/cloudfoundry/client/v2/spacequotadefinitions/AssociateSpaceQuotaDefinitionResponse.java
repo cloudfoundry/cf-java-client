@@ -29,7 +29,7 @@ import org.cloudfoundry.client.v2.Resource;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class AssociateSpaceQuotaDefinitionResponse extends Resource<SpaceQuotaDefinitionEntity> {
+public final class AssociateSpaceQuotaDefinitionResponse extends Resource<SpaceQuotaDefinitionEntity> {
 
     @Builder
     AssociateSpaceQuotaDefinitionResponse(@JsonProperty("entity") SpaceQuotaDefinitionEntity entity,

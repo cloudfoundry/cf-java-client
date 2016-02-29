@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 
 public final class AuthorizationConfiguratorTest {
 
-    private OAuth2TokenProvider tokenProvider = mock(OAuth2TokenProvider.class, RETURNS_SMART_NULLS);
+    private final OAuth2TokenProvider tokenProvider = mock(OAuth2TokenProvider.class, RETURNS_SMART_NULLS);
 
     private final AuthorizationConfigurator authorizationConfigurator = new AuthorizationConfigurator(this.tokenProvider);
 

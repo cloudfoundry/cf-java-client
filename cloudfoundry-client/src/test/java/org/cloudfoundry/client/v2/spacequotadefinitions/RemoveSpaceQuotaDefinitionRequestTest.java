@@ -23,7 +23,7 @@ import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public class RemoveSpaceQuotaDefinitionRequestTest {
+public final class RemoveSpaceQuotaDefinitionRequestTest {
 
     @Test
     public void isValid() {
@@ -57,4 +57,5 @@ public class RemoveSpaceQuotaDefinitionRequestTest {
         assertEquals(INVALID, result.getStatus());
         assertEquals("space id must be specified", result.getMessages().get(0));
     }
+
 }

@@ -23,8 +23,7 @@ import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-
-public class CreateServiceBindingRequestTest {
+public final class CreateServiceBindingRequestTest {
 
     @Test
     public void isNotValidNoApplicationId() {

@@ -27,7 +27,7 @@ import org.cloudfoundry.ValidationResult;
  * The request payload for the Get Service Usage Events operation
  */
 @Data
-public class GetServiceUsageEventsRequest implements Validatable {
+public final class GetServiceUsageEventsRequest implements Validatable {
 
     /**
      * The service usage event id

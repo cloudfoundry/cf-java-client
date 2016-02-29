@@ -55,12 +55,12 @@ public final class SpringProcesses extends AbstractSpringOperations implements P
     }
 
     @Override
-    public Mono<GetProcessResponse> get(final GetProcessRequest request) {
+    public Mono<GetProcessResponse> get(GetProcessRequest request) {
         return get(request, GetProcessResponse.class, builder -> builder.pathSegment("v3", "processes", request.getProcessId()));
     }
 
     @Override
-    public Mono<GetProcessDetailedStatisticsResponse> getDetailedStatistics(final GetProcessDetailedStatisticsRequest request) {
+    public Mono<GetProcessDetailedStatisticsResponse> getDetailedStatistics(GetProcessDetailedStatisticsRequest request) {
         return get(request, GetProcessDetailedStatisticsResponse.class, builder -> {
             builder.pathSegment("v3", "processes", request.getProcessId(), "stats");
             QueryBuilder.augment(builder, request);
@@ -68,7 +68,7 @@ public final class SpringProcesses extends AbstractSpringOperations implements P
     }
 
     @Override
-    public Mono<ListProcessesResponse> list(final ListProcessesRequest request) {
+    public Mono<ListProcessesResponse> list(ListProcessesRequest request) {
         return get(request, ListProcessesResponse.class, builder -> {
             builder.pathSegment("v3", "processes");
             QueryBuilder.augment(builder, request);
@@ -76,17 +76,17 @@ public final class SpringProcesses extends AbstractSpringOperations implements P
     }
 
     @Override
-    public Mono<ScaleProcessResponse> scale(final ScaleProcessRequest request) {
+    public Mono<ScaleProcessResponse> scale(ScaleProcessRequest request) {
         return put(request, ScaleProcessResponse.class, builder -> builder.pathSegment("v3", "processes", request.getProcessId(), "scale"));
     }
 
     @Override
-    public Mono<Void> terminateInstance(final TerminateProcessInstanceRequest request) {
+    public Mono<Void> terminateInstance(TerminateProcessInstanceRequest request) {
         return delete(request, Void.class, builder -> builder.pathSegment("v3", "processes", request.getProcessId(), "instances", request.getIndex()));
     }
 
     @Override
-    public Mono<UpdateProcessResponse> update(final UpdateProcessRequest request) {
+    public Mono<UpdateProcessResponse> update(UpdateProcessRequest request) {
         return patch(request, UpdateProcessResponse.class, builder -> builder.pathSegment("v3", "processes", request.getProcessId()));
     }
 

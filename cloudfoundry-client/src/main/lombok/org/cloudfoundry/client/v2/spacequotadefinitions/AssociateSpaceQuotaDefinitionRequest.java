@@ -27,7 +27,7 @@ import org.cloudfoundry.ValidationResult;
  * The request payload for the Associate Space with the Space Quota Definition operation
  */
 @Data
-public class AssociateSpaceQuotaDefinitionRequest implements Validatable {
+public final class AssociateSpaceQuotaDefinitionRequest implements Validatable {
 
     /**
      * The space id

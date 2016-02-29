@@ -25,7 +25,7 @@ import org.cloudfoundry.ValidationResult;
  * The request payload for the Purge and Reseed Service Usage Events operation
  */
 @Data
-public class PurgeAndReseedServiceUsageEventsRequest implements Validatable {
+public final class PurgeAndReseedServiceUsageEventsRequest implements Validatable {
 
     @Builder
     PurgeAndReseedServiceUsageEventsRequest() {

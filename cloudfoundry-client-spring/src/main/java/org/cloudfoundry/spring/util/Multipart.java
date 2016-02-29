@@ -32,7 +32,7 @@ public final class Multipart {
 
     private static final String DASHES = "--";
 
-    public static Fluxion<byte[]> from(final InputStream inputStream, final String boundary) {
+    public static Fluxion<byte[]> from(InputStream inputStream, String boundary) {
         return Fluxion
             .create(subscriber -> {
                 try {

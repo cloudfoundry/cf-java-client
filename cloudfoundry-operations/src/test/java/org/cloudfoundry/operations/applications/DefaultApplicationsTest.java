@@ -342,7 +342,7 @@ public final class DefaultApplicationsTest {
     }
 
     private static void requestEvents(CloudFoundryClient cloudFoundryClient, String applicationId, EventEntity... entities) {
-        final ListEventsResponse.ListEventsResponseBuilder responseBuilder = fillPage(ListEventsResponse.builder());
+        ListEventsResponse.ListEventsResponseBuilder responseBuilder = fillPage(ListEventsResponse.builder());
 
         for (EventEntity entity : entities) {
             responseBuilder.resource(EventResource.builder()

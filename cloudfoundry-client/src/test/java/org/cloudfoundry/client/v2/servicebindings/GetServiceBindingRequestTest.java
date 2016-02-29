@@ -23,8 +23,7 @@ import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-
-public class GetServiceBindingRequestTest {
+public final class GetServiceBindingRequestTest {
 
     @Test
     public void isValid() {
@@ -45,4 +44,5 @@ public class GetServiceBindingRequestTest {
         assertEquals(INVALID, result.getStatus());
         assertEquals("service binding id must be specified", result.getMessages().get(0));
     }
+
 }

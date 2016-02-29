@@ -28,7 +28,7 @@ import org.cloudfoundry.ValidationResult;
  * The request payload for the Migrate Service Instances operation
  */
 @Data
-public class MigrateServiceInstancesRequest implements Validatable {
+public final class MigrateServiceInstancesRequest implements Validatable {
 
     /**
      * The current service plan id

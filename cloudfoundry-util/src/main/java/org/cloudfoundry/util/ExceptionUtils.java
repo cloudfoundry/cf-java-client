@@ -41,7 +41,7 @@ public final class ExceptionUtils {
      * @param <T>    the type of the {@link Mono} being converted
      * @return a function that converts errors
      */
-    public static <T> Function<Throwable, Mono<T>> convert(final String format, final Object... args) {
+    public static <T> Function<Throwable, Mono<T>> convert(String format, Object... args) {
         return throwable -> {
             if (throwable instanceof NoSuchElementException) {
                 String message = String.format(format, args);
@@ -62,7 +62,7 @@ public final class ExceptionUtils {
      * @param <T>    the type of the {@link Mono} being converted
      * @return a {@link Mono} containing the error
      */
-    public static <T> Mono<T> illegalState(final String format, final Object... args) {
+    public static <T> Mono<T> illegalState(String format, Object... args) {
         String message = String.format(format, args);
         return Mono.error(new IllegalStateException(message));
     }

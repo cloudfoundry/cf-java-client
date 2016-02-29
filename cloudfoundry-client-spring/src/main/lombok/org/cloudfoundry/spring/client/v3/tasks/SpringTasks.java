@@ -50,17 +50,17 @@ public final class SpringTasks extends AbstractSpringOperations implements Tasks
     }
 
     @Override
-    public Mono<CreateTaskResponse> create(final CreateTaskRequest request) {
+    public Mono<CreateTaskResponse> create(CreateTaskRequest request) {
         return post(request, CreateTaskResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "tasks"));
     }
 
     @Override
-    public Mono<GetTaskResponse> get(final GetTaskRequest request) {
+    public Mono<GetTaskResponse> get(GetTaskRequest request) {
         return get(request, GetTaskResponse.class, builder -> builder.pathSegment("v3", "tasks", request.getId()));
     }
 
     @Override
-    public Mono<ListTasksResponse> list(final ListTasksRequest request) {
+    public Mono<ListTasksResponse> list(ListTasksRequest request) {
         return get(request, ListTasksResponse.class, builder -> {
             builder.pathSegment("v3", "tasks");
             QueryBuilder.augment(builder, request);

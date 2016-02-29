@@ -46,7 +46,7 @@ public final class DelayUtils {
      * @param maxRetries  the maximum number of retries
      * @return a delayed {@link Mono}
      */
-    public static Function<Fluxion<Long>, Publisher<?>> exponentialBackOff(final long minDuration, final long maxDuration, final TimeUnit timeUnit, final int maxRetries) {
+    public static Function<Fluxion<Long>, Publisher<?>> exponentialBackOff(long minDuration, long maxDuration, TimeUnit timeUnit, int maxRetries) {
         return count -> getTest(count)
             .zipWith(getRetryCounter(maxRetries), 1)
             .flatMap(function((itemCount, retryCount) -> getDelay(minDuration, maxDuration, timeUnit, retryCount)));
@@ -57,8 +57,8 @@ public final class DelayUtils {
         return Math.min(candidateDuration, maxDuration);
     }
 
-    private static Publisher<?> getDelay(long minDuration, long maxDuration, final TimeUnit timeUnit, Integer retryCount) {
-        final long duration = calculateDuration(minDuration, maxDuration, retryCount);
+    private static Publisher<?> getDelay(long minDuration, long maxDuration, TimeUnit timeUnit, Integer retryCount) {
+        long duration = calculateDuration(minDuration, maxDuration, retryCount);
 
         return Mono
             .delay(duration, timeUnit)

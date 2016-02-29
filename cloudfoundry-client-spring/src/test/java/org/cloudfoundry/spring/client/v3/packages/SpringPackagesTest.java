@@ -205,7 +205,7 @@ public final class SpringPackagesTest {
         private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
-        protected void assertions(TestSubscriber<byte[]> testSubscriber, final byte[] expected) {
+        protected void assertions(TestSubscriber<byte[]> testSubscriber, byte[] expected) {
             testSubscriber
                 .assertThat(arrayEqualsExpectation(expected));
         }

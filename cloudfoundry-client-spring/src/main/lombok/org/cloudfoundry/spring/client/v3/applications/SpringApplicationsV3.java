@@ -77,7 +77,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Mono<AssignApplicationDropletResponse> assignDroplet(final AssignApplicationDropletRequest request) {
+    public Mono<AssignApplicationDropletResponse> assignDroplet(AssignApplicationDropletRequest request) {
         return put(request, AssignApplicationDropletResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "current_droplet"));
     }
 
@@ -87,27 +87,27 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Mono<Void> delete(final DeleteApplicationRequest request) {
+    public Mono<Void> delete(DeleteApplicationRequest request) {
         return delete(request, Void.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId()));
     }
 
     @Override
-    public Mono<GetApplicationResponse> get(final GetApplicationRequest request) {
+    public Mono<GetApplicationResponse> get(GetApplicationRequest request) {
         return get(request, GetApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId()));
     }
 
     @Override
-    public Mono<GetApplicationEnvironmentResponse> getEnvironment(final GetApplicationEnvironmentRequest request) {
+    public Mono<GetApplicationEnvironmentResponse> getEnvironment(GetApplicationEnvironmentRequest request) {
         return get(request, GetApplicationEnvironmentResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "env"));
     }
 
     @Override
-    public Mono<GetApplicationProcessResponse> getProcess(final GetApplicationProcessRequest request) {
+    public Mono<GetApplicationProcessResponse> getProcess(GetApplicationProcessRequest request) {
         return get(request, GetApplicationProcessResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType()));
     }
 
     @Override
-    public Mono<GetApplicationProcessDetailedStatisticsResponse> getProcessDetailedStatistics(final GetApplicationProcessDetailedStatisticsRequest request) {
+    public Mono<GetApplicationProcessDetailedStatisticsResponse> getProcessDetailedStatistics(GetApplicationProcessDetailedStatisticsRequest request) {
         return get(request, GetApplicationProcessDetailedStatisticsResponse.class, builder -> {
             builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "stats");
             QueryBuilder.augment(builder, request);
@@ -115,12 +115,12 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Mono<GetApplicationStatisticsResponse> getStatistics(final GetApplicationStatisticsRequest request) {
+    public Mono<GetApplicationStatisticsResponse> getStatistics(GetApplicationStatisticsRequest request) {
         return get(request, GetApplicationStatisticsResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "stats"));
     }
 
     @Override
-    public Mono<ListApplicationsResponse> list(final ListApplicationsRequest request) {
+    public Mono<ListApplicationsResponse> list(ListApplicationsRequest request) {
         return get(request, ListApplicationsResponse.class, builder -> {
             builder.pathSegment("v3", "apps");
             FilterBuilder.augment(builder, request);
@@ -129,7 +129,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Mono<ListApplicationDropletsResponse> listDroplets(final ListApplicationDropletsRequest request) {
+    public Mono<ListApplicationDropletsResponse> listDroplets(ListApplicationDropletsRequest request) {
         return get(request, ListApplicationDropletsResponse.class, builder -> {
             builder.pathSegment("v3", "apps", request.getApplicationId(), "droplets");
             FilterBuilder.augment(builder, request);
@@ -138,37 +138,37 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Mono<ListApplicationPackagesResponse> listPackages(final ListApplicationPackagesRequest request) {
+    public Mono<ListApplicationPackagesResponse> listPackages(ListApplicationPackagesRequest request) {
         return get(request, ListApplicationPackagesResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "packages"));
     }
 
     @Override
-    public Mono<ListApplicationProcessesResponse> listProcesses(final ListApplicationProcessesRequest request) {
+    public Mono<ListApplicationProcessesResponse> listProcesses(ListApplicationProcessesRequest request) {
         return get(request, ListApplicationProcessesResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "processes"));
     }
 
     @Override
-    public Mono<ScaleApplicationResponse> scale(final ScaleApplicationRequest request) {
+    public Mono<ScaleApplicationResponse> scale(ScaleApplicationRequest request) {
         return put(request, ScaleApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "scale"));
     }
 
     @Override
-    public Mono<StartApplicationResponse> start(final StartApplicationRequest request) {
+    public Mono<StartApplicationResponse> start(StartApplicationRequest request) {
         return put(request, StartApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "start"));
     }
 
     @Override
-    public Mono<StopApplicationResponse> stop(final StopApplicationRequest request) {
+    public Mono<StopApplicationResponse> stop(StopApplicationRequest request) {
         return put(request, StopApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "stop"));
     }
 
     @Override
-    public Mono<Void> terminateInstance(final TerminateApplicationInstanceRequest request) {
+    public Mono<Void> terminateInstance(TerminateApplicationInstanceRequest request) {
         return delete(request, Void.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "instances", request.getIndex()));
     }
 
     @Override
-    public Mono<UpdateApplicationResponse> update(final UpdateApplicationRequest request) {
+    public Mono<UpdateApplicationResponse> update(UpdateApplicationRequest request) {
         return patch(request, UpdateApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId()));
     }
 

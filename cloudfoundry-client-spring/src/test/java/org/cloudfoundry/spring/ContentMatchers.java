@@ -29,7 +29,7 @@ public final class ContentMatchers {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    public static RequestMatcher jsonPayload(final Resource resource) {
+    public static RequestMatcher jsonPayload(Resource resource) {
         return request -> {
             MockClientHttpRequest mockRequest = (MockClientHttpRequest) request;
 

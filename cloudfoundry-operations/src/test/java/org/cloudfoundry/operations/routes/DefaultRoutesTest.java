@@ -70,7 +70,7 @@ import static org.mockito.Mockito.when;
 
 public final class DefaultRoutesTest {
 
-    private static void requestApplications(CloudFoundryClient cloudFoundryClient, final String routeId) {
+    private static void requestApplications(CloudFoundryClient cloudFoundryClient, String routeId) {
         when(cloudFoundryClient.routes()
             .listApplications(fillPage(ListRouteApplicationsRequest.builder())
                 .diego(null)
@@ -83,7 +83,7 @@ public final class DefaultRoutesTest {
                     .build()));
     }
 
-    private static void requestApplications(CloudFoundryClient cloudFoundryClient, final String application, final String spaceId) {
+    private static void requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         when(cloudFoundryClient.spaces()
             .listApplications(fillPage(ListSpaceApplicationsRequest.builder())
                 .diego(null)
@@ -97,7 +97,7 @@ public final class DefaultRoutesTest {
                     .build()));
     }
 
-    private static void requestApplicationsEmpty(CloudFoundryClient cloudFoundryClient, final String routeId) {
+    private static void requestApplicationsEmpty(CloudFoundryClient cloudFoundryClient, String routeId) {
         when(cloudFoundryClient.routes()
             .listApplications(fillPage(ListRouteApplicationsRequest.builder())
                 .diego(null)
@@ -108,7 +108,7 @@ public final class DefaultRoutesTest {
                     .build()));
     }
 
-    private static void requestApplicationsEmpty(CloudFoundryClient cloudFoundryClient, final String application, final String spaceId) {
+    private static void requestApplicationsEmpty(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         when(cloudFoundryClient.spaces()
             .listApplications(fillPage(ListSpaceApplicationsRequest.builder())
                 .diego(null)

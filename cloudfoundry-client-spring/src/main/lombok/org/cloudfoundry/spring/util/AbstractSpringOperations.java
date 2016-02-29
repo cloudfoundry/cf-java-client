@@ -47,9 +47,9 @@ public abstract class AbstractSpringOperations {
 
     private static final int BYTE_ARRAY_BUFFER_LENGTH = 8192;
 
-    protected final RestOperations restOperations;
+    private final RestOperations restOperations;
 
-    protected final URI root;
+    private final URI root;
 
     private final SchedulerGroup schedulerGroup;
 

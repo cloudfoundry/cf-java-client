@@ -48,12 +48,12 @@ public final class SpringDroplets extends AbstractSpringOperations implements Dr
     }
 
     @Override
-    public Mono<Void> delete(final DeleteDropletRequest request) {
+    public Mono<Void> delete(DeleteDropletRequest request) {
         return delete(request, Void.class, builder -> builder.pathSegment("v3", "droplets", request.getDropletId()));
     }
 
     @Override
-    public Mono<GetDropletResponse> get(final GetDropletRequest request) {
+    public Mono<GetDropletResponse> get(GetDropletRequest request) {
         return get(request, GetDropletResponse.class, builder -> builder.pathSegment("v3", "droplets", request.getDropletId()));
     }
 

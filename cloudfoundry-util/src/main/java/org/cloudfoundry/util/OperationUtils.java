@@ -42,7 +42,7 @@ public final class OperationUtils {
      * @param <OUT>    the element type of the resulting {@code Mono}.
      * @return a Mono transformer
      */
-    public static <IN, OUT> Function<Mono<? extends IN>, Mono<OUT>> afterComplete(final Supplier<Mono<OUT>> supplier) {
+    public static <IN, OUT> Function<Mono<? extends IN>, Mono<OUT>> afterComplete(Supplier<Mono<OUT>> supplier) {
         return source -> source.flatMap(x -> Mono.empty(), null, supplier).next();
     }
 
@@ -56,7 +56,7 @@ public final class OperationUtils {
      * @param <OUT>    the element type of the resulting {@code Stream}.
      * @return a Stream transformer
      */
-    public static <IN, OUT> Function<Fluxion<IN>, Fluxion<OUT>> afterStreamComplete(final Supplier<Fluxion<OUT>> supplier) {
+    public static <IN, OUT> Function<Fluxion<IN>, Fluxion<OUT>> afterStreamComplete(Supplier<Fluxion<OUT>> supplier) {
         return source -> source.flatMap(x -> Fluxion.empty(), null, supplier);
     }
 
@@ -70,7 +70,7 @@ public final class OperationUtils {
      * @return the logical AND predicate
      */
     @SafeVarargs
-    public static <T> Predicate<T> and(final Predicate<T>... predicates) {
+    public static <T> Predicate<T> and(Predicate<T>... predicates) {
         return t -> {
             for (Predicate<T> predicate : predicates) {
                 if (!predicate.test(t)) return false;
@@ -106,7 +106,7 @@ public final class OperationUtils {
      * @param <T>       the type of the test item
      * @return the negating predicate
      */
-    public static <T> Predicate<T> not(final Predicate<T> predicate) {
+    public static <T> Predicate<T> not(Predicate<T> predicate) {
         return t -> !predicate.test(t);
     }
 
@@ -120,7 +120,7 @@ public final class OperationUtils {
      * @return the logical OR predicate
      */
     @SafeVarargs
-    public static <T> Predicate<T> or(final Predicate<T>... predicates) {
+    public static <T> Predicate<T> or(Predicate<T>... predicates) {
         return t -> {
             for (Predicate<T> predicate : predicates) {
                 if (predicate.test(t)) return true;
@@ -136,7 +136,7 @@ public final class OperationUtils {
      * @param <T> the type of the stream
      * @return the {@code Mono} after it has been waited for
      */
-    public static <T> Function<Mono<T>, Mono<T>> repeatWhen(final Function<Fluxion<Long>, ? extends Publisher<?>> f) { // TODO: Remove once Mono.repeatWhen()
+    public static <T> Function<Mono<T>, Mono<T>> repeatWhen(Function<Fluxion<Long>, ? extends Publisher<?>> f) { // TODO: Remove once Mono.repeatWhen()
         return mono -> mono
             .as(Fluxion::from)
             .repeatWhen(f)

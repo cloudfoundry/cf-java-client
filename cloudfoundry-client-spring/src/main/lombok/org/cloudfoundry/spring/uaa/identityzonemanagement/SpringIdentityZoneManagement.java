@@ -54,12 +54,12 @@ public final class SpringIdentityZoneManagement extends AbstractSpringOperations
     }
 
     @Override
-    public Mono<GetIdentityZoneResponse> get(final GetIdentityZoneRequest request) {
+    public Mono<GetIdentityZoneResponse> get(GetIdentityZoneRequest request) {
         return get(request, GetIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones", request.getIdentityZoneId()));
     }
 
     @Override
-    public Mono<ListIdentityZoneResponse> list(final ListIdentityZoneRequest request) {
+    public Mono<ListIdentityZoneResponse> list(ListIdentityZoneRequest request) {
         return get(request, ListIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones"));
     }
 

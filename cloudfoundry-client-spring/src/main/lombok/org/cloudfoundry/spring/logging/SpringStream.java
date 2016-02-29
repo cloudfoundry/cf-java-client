@@ -61,7 +61,7 @@ public final class SpringStream {
         this.webSocketContainer = webSocketContainer;
     }
 
-    public Flux<LogMessage> stream(final StreamLogsRequest request) {
+    public Flux<LogMessage> stream(StreamLogsRequest request) {
         return ws(request, builder -> builder.path("tail/").queryParam("app", request.getApplicationId()), LoggregatorMessageHandler::new)
             .as(Flux::from);
     }
@@ -77,7 +77,7 @@ public final class SpringStream {
     }
 
     @SuppressWarnings("unchecked")
-    private <T, V extends Validatable> Fluxion<T> exchange(V request, final Consumer<Subscriber<T>> exchange) {
+    private <T, V extends Validatable> Fluxion<T> exchange(V request, Consumer<Subscriber<T>> exchange) {
         return ValidationUtils
             .validate(request)
             .flatMap(request1 -> Fluxion
@@ -93,8 +93,8 @@ public final class SpringStream {
             .onBackpressureBlock();
     }
 
-    private <T> Fluxion<T> ws(Validatable request, final Consumer<UriComponentsBuilder> builderCallback, final Function<Subscriber<T>, MessageHandler> messageHandlerCreator) {
-        final AtomicReference<Session> session = new AtomicReference<>();
+    private <T> Fluxion<T> ws(Validatable request, Consumer<UriComponentsBuilder> builderCallback, Function<Subscriber<T>, MessageHandler> messageHandlerCreator) {
+        AtomicReference<Session> session = new AtomicReference<>();
 
         return exchange(request, (Consumer<Subscriber<T>>) subscriber -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);

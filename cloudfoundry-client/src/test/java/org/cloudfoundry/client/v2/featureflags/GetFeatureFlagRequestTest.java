@@ -23,7 +23,7 @@ import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public class GetFeatureFlagRequestTest {
+public final class GetFeatureFlagRequestTest {
 
     @Test
     public void isValid() throws Exception {
@@ -77,4 +77,5 @@ public class GetFeatureFlagRequestTest {
         assertEquals(INVALID, result.getStatus());
         assertEquals("name must be specified", result.getMessages().get(0));
     }
+
 }

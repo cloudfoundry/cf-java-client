@@ -23,7 +23,6 @@ import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-
 public final class UpdateServicePlanVisibilityRequestTest {
 
     @Test

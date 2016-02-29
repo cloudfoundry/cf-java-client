@@ -32,9 +32,9 @@ import static org.mockito.Mockito.when;
 
 public final class AccessTokenUriBuilderTest {
 
-    private RestOperations restOperations = mock(RestOperations.class, RETURNS_SMART_NULLS);
+    private final RestOperations restOperations = mock(RestOperations.class, RETURNS_SMART_NULLS);
 
-    private SslCertificateTruster sslCertificateTruster = mock(SslCertificateTruster.class, RETURNS_SMART_NULLS);
+    private final SslCertificateTruster sslCertificateTruster = mock(SslCertificateTruster.class, RETURNS_SMART_NULLS);
 
     @Test
     public void test() {

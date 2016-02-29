@@ -315,7 +315,7 @@ public final class SpringApplicationsV2Test {
         private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
-        protected void assertions(TestSubscriber<byte[]> testSubscriber, final byte[] expected) {
+        protected void assertions(TestSubscriber<byte[]> testSubscriber, byte[] expected) {
             testSubscriber
                 .assertThat(arrayEqualsExpectation(expected));
         }
@@ -358,7 +358,7 @@ public final class SpringApplicationsV2Test {
         private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
-        protected void assertions(TestSubscriber<byte[]> testSubscriber, final byte[] expected) {
+        protected void assertions(TestSubscriber<byte[]> testSubscriber, byte[] expected) {
             testSubscriber
                 .assertThat(arrayEqualsExpectation(expected));
         }

@@ -27,7 +27,7 @@ import org.cloudfoundry.ValidationResult;
  * The request payload for the Remove Space from the Space Quota Definition operation
  */
 @Data
-public class RemoveSpaceQuotaDefinitionRequest implements Validatable {
+public final class RemoveSpaceQuotaDefinitionRequest implements Validatable {
 
     /**
      * The space id

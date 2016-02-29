@@ -46,7 +46,7 @@ public final class SpringRecent extends AbstractSpringOperations {
     }
 
     @SuppressWarnings("unchecked")
-    public Flux<LogMessage> recent(final RecentLogsRequest request) {
+    public Flux<LogMessage> recent(RecentLogsRequest request) {
         return get(request, List.class, builder -> builder.pathSegment("recent").queryParam("app", request.getApplicationId()))
             .flatMap(Fluxion::fromIterable);
     }

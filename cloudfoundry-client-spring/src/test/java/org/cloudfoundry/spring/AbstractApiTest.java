@@ -76,7 +76,7 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
         verify();
     }
 
-    protected static Consumer<byte[]> arrayEqualsExpectation(final byte[] expected) {
+    protected static Consumer<byte[]> arrayEqualsExpectation(byte[] expected) {
         return actual -> assertArrayEquals(expected, actual);
     }
 

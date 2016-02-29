@@ -25,7 +25,7 @@ import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
 
 
-public class SpringFeatureFlagsTest {
+public final class SpringFeatureFlagsTest {
 
     public static final class GetUserRoles extends AbstractApiTest<GetFeatureFlagRequest, GetFeatureFlagResponse> {
 

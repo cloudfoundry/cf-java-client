@@ -38,7 +38,7 @@ public final class PaginationUtils {
      * @param <U>          the type of {@link PaginatedResponse}.
      * @return a stream of <code>U</code> objects.
      */
-    public static <U extends PaginatedResponse<?>> Fluxion<U> requestPages(final Function<Integer, Mono<U>> pageSupplier) {
+    public static <U extends PaginatedResponse<?>> Fluxion<U> requestPages(Function<Integer, Mono<U>> pageSupplier) {
         return pageSupplier
             .apply(1)
             .flatMap(requestAdditionalPages(pageSupplier))
@@ -53,12 +53,12 @@ public final class PaginationUtils {
      * @param <U>          the type of {@link PaginatedResponse}.
      * @return a stream of <code>R</code> objects.
      */
-    public static <R extends Resource<?>, U extends PaginatedResponse<R>> Fluxion<R> requestResources(final Function<Integer, Mono<U>> pageSupplier) {
+    public static <R extends Resource<?>, U extends PaginatedResponse<R>> Fluxion<R> requestResources(Function<Integer, Mono<U>> pageSupplier) {
         return requestPages(pageSupplier)
             .flatMap(ResourceUtils::getResources);
     }
 
-    private static <U extends PaginatedResponse<?>> Function<U, Fluxion<U>> requestAdditionalPages(final Function<Integer, Mono<U>> pageSupplier) {
+    private static <U extends PaginatedResponse<?>> Function<U, Fluxion<U>> requestAdditionalPages(Function<Integer, Mono<U>> pageSupplier) {
         return response -> {
             Integer totalPages = response.getTotalPages();
             if (totalPages == null) {

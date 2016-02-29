@@ -26,7 +26,7 @@ import org.cloudfoundry.ValidationResult;
 /**
  * The request payload for the Delete Service Plan request.
  */
-public class DeleteServicePlanRequest implements Validatable {
+public final class DeleteServicePlanRequest implements Validatable {
 
     /**
      * The async

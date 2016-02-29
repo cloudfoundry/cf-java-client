@@ -61,7 +61,7 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
     }
 
     @Override
-    public Mono<CopyPackageResponse> copy(final CopyPackageRequest request) {
+    public Mono<CopyPackageResponse> copy(CopyPackageRequest request) {
         return post(request, CopyPackageResponse.class, builder -> {
             builder.pathSegment("v3", "apps", request.getApplicationId(), "packages");
             QueryBuilder.augment(builder, request);
@@ -69,38 +69,38 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
     }
 
     @Override
-    public Mono<CreatePackageResponse> create(final CreatePackageRequest request) {
+    public Mono<CreatePackageResponse> create(CreatePackageRequest request) {
         return post(request, CreatePackageResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "packages"));
     }
 
     @Override
-    public Mono<Void> delete(final DeletePackageRequest request) {
+    public Mono<Void> delete(DeletePackageRequest request) {
         return delete(request, Void.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId()));
     }
 
     @Override
-    public Flux<byte[]> download(final DownloadPackageRequest request) {
+    public Flux<byte[]> download(DownloadPackageRequest request) {
         return getStream(request, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "download"))
             .as(Flux::from);
     }
 
     @Override
-    public Mono<GetPackageResponse> get(final GetPackageRequest request) {
+    public Mono<GetPackageResponse> get(GetPackageRequest request) {
         return get(request, GetPackageResponse.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId()));
     }
 
     @Override
-    public Mono<ListPackagesResponse> list(final ListPackagesRequest request) {
+    public Mono<ListPackagesResponse> list(ListPackagesRequest request) {
         return get(request, ListPackagesResponse.class, builder -> builder.pathSegment("v3", "packages"));
     }
 
     @Override
-    public Mono<StagePackageResponse> stage(final StagePackageRequest request) {
+    public Mono<StagePackageResponse> stage(StagePackageRequest request) {
         return post(request, StagePackageResponse.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "droplets"));
     }
 
     @Override
-    public Mono<UploadPackageResponse> upload(final UploadPackageRequest request) {
+    public Mono<UploadPackageResponse> upload(UploadPackageRequest request) {
         return postWithBody(request, () -> CollectionUtils.singletonMultiValueMap("bits", new InputStreamResource(request.getBits())), UploadPackageResponse.class, builder -> builder.pathSegment
             ("v3", "packages", request.getPackageId(), "upload"));
     }

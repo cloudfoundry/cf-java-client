@@ -29,7 +29,7 @@ import org.cloudfoundry.client.v2.Resource;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class GetServiceUsageEventsResponse extends Resource<ServiceUsageEventsEntity> {
+public final class GetServiceUsageEventsResponse extends Resource<ServiceUsageEventsEntity> {
 
     @Builder
     GetServiceUsageEventsResponse(@JsonProperty("entity") ServiceUsageEventsEntity entity,

@@ -24,7 +24,7 @@ import lombok.Data;
  * The entity response payload for Service Usage Events
  */
 @Data
-public class ServiceUsageEventsEntity {
+public final class ServiceUsageEventsEntity {
 
     /**
      * The organization id
