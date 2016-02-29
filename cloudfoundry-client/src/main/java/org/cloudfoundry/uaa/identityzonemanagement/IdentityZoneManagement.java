@@ -39,4 +39,12 @@ public interface IdentityZoneManagement {
      */
     Mono<GetIdentityZoneResponse> get(GetIdentityZoneRequest request);
 
+    /**
+     * Makes the <a href="https://github.com/cloudfoundry/uaa/blob/master/docs/UAA-APIs.rst#list-identity-zones-get-identity-zones">List Identity Zones</a> request
+     *
+     * @param request the List Identity Zones request
+     * @return the response from the List Identity Zones request
+     */
+    Mono<ListIdentityZoneResponse> list(ListIdentityZoneRequest request);
+
 }

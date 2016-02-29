@@ -21,6 +21,9 @@ import org.cloudfoundry.uaa.identityzonemanagement.CreateIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzonemanagement.CreateIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzonemanagement.GetIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzonemanagement.GetIdentityZoneResponse;
+import org.cloudfoundry.uaa.identityzonemanagement.IdentityZoneResource;
+import org.cloudfoundry.uaa.identityzonemanagement.ListIdentityZoneRequest;
+import org.cloudfoundry.uaa.identityzonemanagement.ListIdentityZoneResponse;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpMethod.GET;
@@ -116,6 +119,59 @@ public final class SpringIdentityZoneManagementTest {
         @Override
         protected Mono<GetIdentityZoneResponse> invoke(GetIdentityZoneRequest request) {
             return this.identityZoneManagement.get(request);
+        }
+    }
+
+    public static final class List extends AbstractApiTest<ListIdentityZoneRequest, ListIdentityZoneResponse> {
+
+        private final SpringIdentityZoneManagement identityZoneManagement = new SpringIdentityZoneManagement(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected ListIdentityZoneRequest getInvalidRequest() {
+            return null;
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("/identity-zones")
+                .status(OK)
+                .responsePayload("fixtures/uaa/identity-zones/GET_response.json");
+        }
+
+        @Override
+        protected ListIdentityZoneResponse getResponse() {
+            return ListIdentityZoneResponse.builder()
+                .identityZone(IdentityZoneResource.builder()
+                    .createdAt(946710000000L)
+                    .description("The system zone for backwards compatibility")
+                    .identityZoneId("uaa")
+                    .name("uaa")
+                    .subDomain("")
+                    .updatedAt(946710000000L)
+                    .version(0)
+                    .build())
+                .identityZone(IdentityZoneResource.builder()
+                    .createdAt(1426260091139L)
+                    .description("Like the Twilight Zone but tastier[testzone1].")
+                    .identityZoneId("testzone1")
+                    .name("The Twiglet Zone[testzone1]")
+                    .subDomain("testzone1")
+                    .updatedAt(1426260091139L)
+                    .version(0)
+                    .build())
+                .build()
+                ;
+        }
+
+        @Override
+        protected ListIdentityZoneRequest getValidRequest() throws Exception {
+            return ListIdentityZoneRequest.builder().build();
+        }
+
+        @Override
+        protected Mono<ListIdentityZoneResponse> invoke(ListIdentityZoneRequest request) {
+            return this.identityZoneManagement.list(request);
         }
     }
 

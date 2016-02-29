@@ -23,7 +23,7 @@ import lombok.Data;
  * The entity response payload for Identity Zone
  */
 @Data
-public class IdentityZoneEntity {
+public abstract class IdentityZoneEntity {
 
     /**
      * The creation date of the identity zone.

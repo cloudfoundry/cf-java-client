@@ -1,0 +1,20 @@
+[
+  {
+    "id": "uaa",
+    "subdomain": "",
+    "name": "uaa",
+    "version": 0,
+    "description": "The system zone for backwards compatibility",
+    "created": 946710000000,
+    "last_modified": 946710000000
+  },
+  {
+    "id": "testzone1",
+    "subdomain": "testzone1",
+    "name": "The Twiglet Zone[testzone1]",
+    "version": 0,
+    "description": "Like the Twilight Zone but tastier[testzone1].",
+    "created": 1426260091139,
+    "last_modified": 1426260091139
+  }
+]
