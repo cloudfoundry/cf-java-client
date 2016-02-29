@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.spring.client.v2.spaces;
 
-import org.cloudfoundry.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
@@ -31,6 +30,7 @@ import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
+import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
 import org.cloudfoundry.client.v2.services.ServiceEntity;
@@ -97,6 +97,7 @@ import org.cloudfoundry.client.v2.spaces.UserSpaceRoleEntity;
 import org.cloudfoundry.client.v2.spaces.UserSpaceRoleResource;
 import org.cloudfoundry.client.v2.users.UserEntity;
 import org.cloudfoundry.client.v2.users.UserResource;
+import org.cloudfoundry.spring.AbstractApiTest;
 import org.cloudfoundry.util.StringMap;
 import reactor.core.publisher.Mono;
 
@@ -762,50 +763,58 @@ public final class SpringSpacesTest {
         @Override
         protected GetSpaceSummaryResponse getResponse() {
             return GetSpaceSummaryResponse.builder()
-                .id("f9c44c5c-9613-40b2-9296-e156c661a0ba")
-                .name("name-649")
+                .id("7c38df44-4ac9-4c77-beaf-faeefc8e08fe")
+                .name("name-533")
                 .application(SpaceApplicationSummary.builder()
-                    .id("e1efe0a2-a931-4604-a419-f76dbe23ad76")
-                    .url("host-11.domain-48.example.com")
+                    .id("16598459-ecb3-48c6-a95a-419ac94b251d")
+                    .url("host-12.domain-12.example.com")
                     .route(Route.builder()
-                        .id("3445e88d-adda-4255-9b9d-6f701fb0de17")
-                        .host("host-11")
+                        .id("db66fede-3abd-4459-9da9-b26fefd741b6")
+                        .host("host-12")
+                        .path("")
                         .domain(Domain.builder()
-                            .id("af154090-baca-4805-a8a2-9db93a16a84b")
-                            .name("domain-48.example.com")
+                            .id("2559743f-1514-4bed-bcdd-a6a036836597")
+                            .name("domain-12.example.com")
                             .build())
                         .build())
                     .serviceCount(1)
-                    .serviceName("name-654")
+                    .serviceName("name-536")
                     .runningInstances(0)
-                    .name("name-652")
+                    .name("name-539")
                     .production(false)
-                    .spaceId("f9c44c5c-9613-40b2-9296-e156c661a0ba")
-                    .stackId("01a9ea88-1028-4d1a-a8ee-d1acc686815c")
+                    .spaceId("7c38df44-4ac9-4c77-beaf-faeefc8e08fe")
+                    .stackId("d60aa116-6ec5-485a-89a7-5aad899fca97")
                     .memory(1024)
                     .instances(1)
                     .diskQuota(1024)
                     .state("STOPPED")
-                    .version("6505d60e-2a6f-475c-8c1d-85c66139447e")
+                    .version("ed926962-2c58-46ad-af5b-97d0412e9c58")
                     .console(false)
                     .packageState("PENDING")
                     .healthCheckType("port")
                     .diego(false)
-                    .packageUpdatedAt("2015-07-27T22:43:19Z")
+                    .packageUpdatedAt("2016-02-19T02:03:47Z")
                     .detectedStartCommand("")
                     .enableSsh(true)
                     .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
                     .build())
                 .service(builder()
-                    .id("83e3713f-5f9b-4168-a43c-02cc66493cc0")
-                    .name("name-654")
+                    .id("408f04f0-3c57-469e-9cb1-639c722e6173")
+                    .name("name-536")
                     .boundApplicationCount(1)
+                    .lastOperation(LastOperation.builder()
+                        .type("create")
+                        .state("succeeded")
+                        .description("description goes here")
+                        .updatedAt("2016-02-19T02:03:47Z")
+                        .createdAt("2016-02-19T02:03:47Z")
+                        .build())
                     .servicePlan(Plan.builder()
-                        .id("67bd9226-6d63-48ac-9114-a756a01bff7c")
-                        .name("name-655")
+                        .id("3fff0d25-f233-4cfb-a00f-5251b82f5905")
+                        .name("name-537")
                         .service(Service.builder()
-                            .id("64ce598e-0c24-4dba-bfa1-594187db7404")
-                            .label("label-23")
+                            .id("d7bd534e-e532-44b6-9468-0ac79f829d5f")
+                            .label("label-16")
                             .build())
                         .build())
                     .build())

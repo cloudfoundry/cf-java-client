@@ -77,6 +77,14 @@ public final class SpaceApplicationSummary extends AbstractApplicationEntity {
     private final String packageUpdatedAt;
 
     /**
+     * The ports
+     *
+     * @param ports the ports
+     * @return the ports
+     */
+    private final List<Integer> ports;
+
+    /**
      * The routes
      *
      * @param routes the routes
@@ -161,6 +169,7 @@ public final class SpaceApplicationSummary extends AbstractApplicationEntity {
                             @JsonProperty("state") String state,
                             @JsonProperty("version") String version,
                             @JsonProperty("guid") String id,
+                            @JsonProperty("ports") @Singular List<Integer> ports,
                             @JsonProperty("routes") @Singular List<Route> routes,
                             @JsonProperty("running_instances") Integer runningInstances,
                             @JsonProperty("service_count") Integer serviceCount,
@@ -168,11 +177,13 @@ public final class SpaceApplicationSummary extends AbstractApplicationEntity {
                             @JsonProperty("urls") @Singular List<String> urls) {
         super(buildpack, command, console, debug, detectedStartCommand, diego, diskQuota, dockerCredentialsJsons, dockerImage, environmentJsons, healthCheckTimeout, healthCheckType, instances,
             memory, name, production, spaceId, stackId, stagingFailedDescription, stagingFailedReason, state);
+
         this.detectedBuildpack = detectedBuildpack;
         this.enableSsh = enableSsh;
         this.id = id;
         this.packageState = packageState;
         this.packageUpdatedAt = packageUpdatedAt;
+        this.ports = ports;
         this.routes = routes;
         this.runningInstances = runningInstances;
         this.serviceCount = serviceCount;
