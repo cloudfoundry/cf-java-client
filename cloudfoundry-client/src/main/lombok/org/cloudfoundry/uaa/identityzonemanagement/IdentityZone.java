@@ -28,16 +28,17 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class IdentityZoneResource extends IdentityZoneEntity {
+public final class IdentityZone extends AbstractIdentityZone {
 
     @Builder
-    IdentityZoneResource(@JsonProperty("created") Long createdAt,
-                         @JsonProperty("description") String description,
-                         @JsonProperty("id") String identityZoneId,
-                         @JsonProperty("name") String name,
-                         @JsonProperty("subdomain") String subDomain,
-                         @JsonProperty("last_modified") Long updatedAt,
-                         @JsonProperty("version") Integer version) {
+    IdentityZone(@JsonProperty("created") Long createdAt,
+                 @JsonProperty("description") String description,
+                 @JsonProperty("id") String identityZoneId,
+                 @JsonProperty("name") String name,
+                 @JsonProperty("subdomain") String subDomain,
+                 @JsonProperty("last_modified") Long updatedAt,
+                 @JsonProperty("version") Integer version) {
+
         super(createdAt, description, identityZoneId, name, subDomain, updatedAt, version);
     }
 

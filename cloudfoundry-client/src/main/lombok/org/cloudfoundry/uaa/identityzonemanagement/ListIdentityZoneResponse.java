@@ -20,22 +20,27 @@ package org.cloudfoundry.uaa.identityzonemanagement;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Singular;
+import lombok.ToString;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * The response from the list identity zones request
  */
 @Data
-public final class ListIdentityZoneResponse {
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public final class ListIdentityZoneResponse extends ArrayList<IdentityZone> {
 
-    private List<IdentityZoneResource> identityZones;
+    private static final long serialVersionUID = -510382178369314818L;
 
-    @JsonCreator
     @Builder
-    ListIdentityZoneResponse(@Singular List<IdentityZoneResource> identityZones) {
-        this.identityZones = identityZones;
+    @JsonCreator
+    ListIdentityZoneResponse(@Singular Collection<IdentityZone> identityZones) {
+        super(identityZones);
     }
 
 }

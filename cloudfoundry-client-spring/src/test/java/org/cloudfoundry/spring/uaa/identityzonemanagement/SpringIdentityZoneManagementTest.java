@@ -21,7 +21,7 @@ import org.cloudfoundry.uaa.identityzonemanagement.CreateIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzonemanagement.CreateIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzonemanagement.GetIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzonemanagement.GetIdentityZoneResponse;
-import org.cloudfoundry.uaa.identityzonemanagement.IdentityZoneResource;
+import org.cloudfoundry.uaa.identityzonemanagement.IdentityZone;
 import org.cloudfoundry.uaa.identityzonemanagement.ListIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzonemanagement.ListIdentityZoneResponse;
 import reactor.core.publisher.Mono;
@@ -142,7 +142,7 @@ public final class SpringIdentityZoneManagementTest {
         @Override
         protected ListIdentityZoneResponse getResponse() {
             return ListIdentityZoneResponse.builder()
-                .identityZone(IdentityZoneResource.builder()
+                .identityZone(IdentityZone.builder()
                     .createdAt(946710000000L)
                     .description("The system zone for backwards compatibility")
                     .identityZoneId("uaa")
@@ -151,7 +151,7 @@ public final class SpringIdentityZoneManagementTest {
                     .updatedAt(946710000000L)
                     .version(0)
                     .build())
-                .identityZone(IdentityZoneResource.builder()
+                .identityZone(IdentityZone.builder()
                     .createdAt(1426260091139L)
                     .description("Like the Twilight Zone but tastier[testzone1].")
                     .identityZoneId("testzone1")
@@ -160,8 +160,7 @@ public final class SpringIdentityZoneManagementTest {
                     .updatedAt(1426260091139L)
                     .version(0)
                     .build())
-                .build()
-                ;
+                .build();
         }
 
         @Override
