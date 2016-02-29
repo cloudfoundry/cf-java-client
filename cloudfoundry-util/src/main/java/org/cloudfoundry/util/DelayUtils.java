@@ -19,9 +19,7 @@ package org.cloudfoundry.util;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.tuple.Tuple;
 import reactor.rx.Fluxion;
 
 import java.util.concurrent.TimeUnit;
@@ -49,8 +47,8 @@ public final class DelayUtils {
      * @return a delayed {@link Mono}
      */
     public static Function<Fluxion<Long>, Publisher<?>> exponentialBackOff(final long minDuration, final long maxDuration, final TimeUnit timeUnit, final int maxRetries) {
-        return count -> Flux
-            .zip(Tuple.<Long, Integer>fn2(), 1, getTest(count), getRetryCounter(maxRetries))  // TODO: Convert to Stream.zip once prefetch option is available
+        return count -> getTest(count)
+            .zipWith(getRetryCounter(maxRetries), 1)
             .flatMap(function((itemCount, retryCount) -> getDelay(minDuration, maxDuration, timeUnit, retryCount)));
     }
 

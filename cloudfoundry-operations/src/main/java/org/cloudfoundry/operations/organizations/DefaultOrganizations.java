@@ -51,7 +51,6 @@ import reactor.core.tuple.Tuple4;
 import reactor.rx.Fluxion;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
@@ -120,10 +119,8 @@ public final class DefaultOrganizations implements Organizations {
     }
 
     private static Mono<String> createOrganization(CloudFoundryClient cloudFoundryClient, CreateOrganizationRequest request) {
-        return Optional                                                                         // TODO: Remove once Mono.justOrEmpty()
-            .ofNullable(request.getQuotaDefinitionName())
-            .map(Mono::just)
-            .orElse(Mono.empty())
+        return Mono
+            .justOrEmpty(request.getQuotaDefinitionName())
             .then(quotaDefinitionName -> getOrganizationQuotaDefinitionId(cloudFoundryClient, quotaDefinitionName))
             .then(organizationQuotaDefinitionId -> getCreateOrganizationId(cloudFoundryClient, request.getOrganizationName(), organizationQuotaDefinitionId))
             .otherwiseIfEmpty(getCreateOrganizationId(cloudFoundryClient, request.getOrganizationName(), null));
