@@ -125,7 +125,6 @@ public final class SpringIdentityZoneManagementTest {
         }
     }
 
-
     public static final class Get extends AbstractApiTest<GetIdentityZoneRequest, GetIdentityZoneResponse> {
 
         private final SpringIdentityZoneManagement identityZoneManagement = new SpringIdentityZoneManagement(this.restTemplate, this.root, PROCESSOR_GROUP);
