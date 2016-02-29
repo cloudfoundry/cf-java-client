@@ -16,9 +16,9 @@
 
 package org.cloudfoundry.spring.logging;
 
-import org.cloudfoundry.spring.AbstractRestTest;
 import org.cloudfoundry.logging.LogMessage;
 import org.cloudfoundry.logging.RecentLogsRequest;
+import org.cloudfoundry.spring.AbstractRestTest;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Test;
 import org.springframework.web.client.RestOperations;

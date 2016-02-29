@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.spring.client.v2.applications;
 
-import org.cloudfoundry.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
@@ -64,6 +63,7 @@ import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstance;
+import org.cloudfoundry.spring.AbstractApiTest;
 import org.cloudfoundry.util.StringMap;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.springframework.core.io.ClassPathResource;

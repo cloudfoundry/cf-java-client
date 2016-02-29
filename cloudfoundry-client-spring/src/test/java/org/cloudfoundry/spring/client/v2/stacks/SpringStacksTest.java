@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.spring.client.v2.stacks;
 
-import org.cloudfoundry.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.Resource.Metadata;
 import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
@@ -24,6 +23,7 @@ import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksResponse;
 import org.cloudfoundry.client.v2.stacks.StackEntity;
 import org.cloudfoundry.client.v2.stacks.StackResource;
+import org.cloudfoundry.spring.AbstractApiTest;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 

@@ -16,8 +16,6 @@
 
 package org.cloudfoundry.spring.client.v3.packages;
 
-import org.cloudfoundry.spring.AbstractApiTest;
-import org.cloudfoundry.util.StringMap;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.PaginatedResponse.Pagination;
@@ -35,6 +33,8 @@ import org.cloudfoundry.client.v3.packages.StagePackageRequest;
 import org.cloudfoundry.client.v3.packages.StagePackageResponse;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
+import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.util.StringMap;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Mono;

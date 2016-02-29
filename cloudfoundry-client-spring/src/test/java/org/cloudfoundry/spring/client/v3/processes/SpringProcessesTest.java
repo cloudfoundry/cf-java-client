@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.spring.client.v3.processes;
 
-import org.cloudfoundry.spring.AbstractApiTest;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.processes.GetProcessDetailedStatisticsRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessDetailedStatisticsResponse;
@@ -30,6 +29,7 @@ import org.cloudfoundry.client.v3.processes.ScaleProcessResponse;
 import org.cloudfoundry.client.v3.processes.TerminateProcessInstanceRequest;
 import org.cloudfoundry.client.v3.processes.UpdateProcessRequest;
 import org.cloudfoundry.client.v3.processes.UpdateProcessResponse;
+import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.client.v3.PaginatedResponse.Pagination;

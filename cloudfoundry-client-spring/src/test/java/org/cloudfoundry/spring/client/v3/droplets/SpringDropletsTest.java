@@ -16,8 +16,6 @@
 
 package org.cloudfoundry.spring.client.v3.droplets;
 
-import org.cloudfoundry.spring.AbstractApiTest;
-import org.cloudfoundry.util.StringMap;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.droplets.DeleteDropletRequest;
@@ -25,6 +23,8 @@ import org.cloudfoundry.client.v3.droplets.GetDropletRequest;
 import org.cloudfoundry.client.v3.droplets.GetDropletResponse;
 import org.cloudfoundry.client.v3.droplets.ListDropletsRequest;
 import org.cloudfoundry.client.v3.droplets.ListDropletsResponse;
+import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.util.StringMap;
 import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.client.v3.PaginatedResponse.Pagination;
