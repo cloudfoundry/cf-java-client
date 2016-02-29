@@ -32,6 +32,14 @@ public interface IdentityZoneManagement {
     Mono<CreateIdentityZoneResponse> create(CreateIdentityZoneRequest request);
 
     /**
+     * Makes the <a href="https://github.com/cloudfoundry/uaa/blob/master/docs/UAA-APIs.rst#delete-single-identity-zone-delete-identity-zones-identityzoneid">Delete the Identity Zone</a> request
+     *
+     * @param request the Delete Identity Zone request
+     * @return the response from the Delete Identity Zone request
+     */
+    Mono<DeleteIdentityZoneResponse> delete(DeleteIdentityZoneRequest request);
+
+    /**
      * Makes the <a href="https://github.com/cloudfoundry/uaa/blob/master/docs/UAA-APIs.rst#get-single-identity-zone-get-identity-zones-identityzoneid">Get Identity Zone</a> request
      *
      * @param request the Get Identity Zone request

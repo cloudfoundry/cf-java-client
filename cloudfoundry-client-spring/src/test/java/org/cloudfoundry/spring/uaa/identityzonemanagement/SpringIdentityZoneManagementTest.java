@@ -19,6 +19,8 @@ package org.cloudfoundry.spring.uaa.identityzonemanagement;
 import org.cloudfoundry.spring.AbstractApiTest;
 import org.cloudfoundry.uaa.identityzonemanagement.CreateIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzonemanagement.CreateIdentityZoneResponse;
+import org.cloudfoundry.uaa.identityzonemanagement.DeleteIdentityZoneRequest;
+import org.cloudfoundry.uaa.identityzonemanagement.DeleteIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzonemanagement.GetIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzonemanagement.GetIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzonemanagement.IdentityZone;
@@ -26,6 +28,7 @@ import org.cloudfoundry.uaa.identityzonemanagement.ListIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzonemanagement.ListIdentityZoneResponse;
 import reactor.core.publisher.Mono;
 
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -76,6 +79,49 @@ public final class SpringIdentityZoneManagementTest {
         @Override
         protected Mono<CreateIdentityZoneResponse> invoke(CreateIdentityZoneRequest request) {
             return this.identityZoneManagement.create(request);
+        }
+    }
+
+    public static final class Delete extends AbstractApiTest<DeleteIdentityZoneRequest, DeleteIdentityZoneResponse> {
+
+        private final SpringIdentityZoneManagement identityZoneManagement = new SpringIdentityZoneManagement(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteIdentityZoneRequest getInvalidRequest() {
+            return DeleteIdentityZoneRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(DELETE).path("/identity-zones/identity-zone-id")
+                .status(OK)
+                .responsePayload("fixtures/uaa/identity-zones/DELETE_{id}_response.json");
+        }
+
+        @Override
+        protected DeleteIdentityZoneResponse getResponse() {
+            return DeleteIdentityZoneResponse.builder()
+                .createdAt(946710000000L)
+                .description("The test zone")
+                .identityZoneId("identity-zone-id")
+                .name("test")
+                .subDomain("test")
+                .updatedAt(946710000000L)
+                .version(0)
+                .build();
+        }
+
+        @Override
+        protected DeleteIdentityZoneRequest getValidRequest() throws Exception {
+            return DeleteIdentityZoneRequest.builder()
+                .identityZoneId("identity-zone-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<DeleteIdentityZoneResponse> invoke(DeleteIdentityZoneRequest request) {
+            return this.identityZoneManagement.delete(request);
         }
     }
 
