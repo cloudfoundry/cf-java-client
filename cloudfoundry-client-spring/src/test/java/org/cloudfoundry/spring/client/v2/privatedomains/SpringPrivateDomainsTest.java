@@ -16,13 +16,17 @@
 
 package org.cloudfoundry.spring.client.v2.privatedomains;
 
-import org.cloudfoundry.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
+import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsRequest;
+import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsResponse;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomainEntity;
+import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
+import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -78,4 +82,56 @@ public final class SpringPrivateDomainsTest {
         }
     }
 
+    public static final class List extends AbstractApiTest<ListPrivateDomainsRequest, ListPrivateDomainsResponse> {
+
+        private final SpringPrivateDomains privateDomains = new SpringPrivateDomains(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected ListPrivateDomainsRequest getInvalidRequest() {
+            return null;
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("/v2/private_domains?q=name%20IN%20test-name.com&page=-1")
+                .status(OK)
+                .responsePayload("fixtures/client/v2/private_domains/GET_response.json");
+        }
+
+        @Override
+        protected ListPrivateDomainsResponse getResponse() {
+            return ListPrivateDomainsResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(PrivateDomainResource.builder()
+                    .metadata(Resource.Metadata.builder()
+                        .id("3de9db5f-8e3b-4d10-a8c9-8137caafe43d")
+                        .url("/v2/private_domains/3de9db5f-8e3b-4d10-a8c9-8137caafe43d")
+                        .createdAt("2016-02-19T02:04:00Z")
+                        .build())
+                    .entity(PrivateDomainEntity.builder()
+                        .name("my-domain.com")
+                        .owningOrganizationId("2f70efed-abb2-4b7a-9f31-d4fe4d849932")
+                        .owningOrganizationUrl("/v2/organizations/2f70efed-abb2-4b7a-9f31-d4fe4d849932")
+                        .sharedOrganizationsUrl("/v2/private_domains/3de9db5f-8e3b-4d10-a8c9-8137caafe43d/shared_organizations")
+                        .build())
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListPrivateDomainsRequest getValidRequest() throws Exception {
+            return ListPrivateDomainsRequest.builder()
+                .name("test-name.com")
+                .page(-1)
+                .build();
+        }
+
+        @Override
+        protected Mono<ListPrivateDomainsResponse> invoke(ListPrivateDomainsRequest request) {
+            return this.privateDomains.list(request);
+        }
+
+    }
 }

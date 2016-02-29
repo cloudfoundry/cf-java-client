@@ -32,4 +32,12 @@ public interface PrivateDomains {
      */
     Mono<CreatePrivateDomainResponse> create(CreatePrivateDomainRequest request);
 
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/private_domains/filtering_private_domains_by_name.html">Filtering Private Domains by name</a> request
+     *
+     * @param request the List Private Domains request
+     * @return the response from the List Private Domains request
+     */
+    Mono<ListPrivateDomainsResponse> list(ListPrivateDomainsRequest request);
 }

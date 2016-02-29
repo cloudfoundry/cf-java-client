@@ -19,8 +19,12 @@ package org.cloudfoundry.spring.client.v2.privatedomains;
 import lombok.ToString;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
+import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsRequest;
+import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsResponse;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomains;
+import org.cloudfoundry.spring.client.v2.FilterBuilder;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
@@ -47,6 +51,15 @@ public final class SpringPrivateDomains extends AbstractSpringOperations impleme
     @Override
     public Mono<CreatePrivateDomainResponse> create(CreatePrivateDomainRequest request) {
         return post(request, CreatePrivateDomainResponse.class, builder -> builder.pathSegment("v2", "private_domains"));
+    }
+
+    @Override
+    public Mono<ListPrivateDomainsResponse> list(ListPrivateDomainsRequest request) {
+        return get(request, ListPrivateDomainsResponse.class, builder -> {
+            builder.pathSegment("v2", "private_domains");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
+        });
     }
 
 }
