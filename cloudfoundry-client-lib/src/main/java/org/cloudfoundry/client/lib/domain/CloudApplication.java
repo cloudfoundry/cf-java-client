@@ -19,6 +19,8 @@ package org.cloudfoundry.client.lib.domain;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.cloudfoundry.client.lib.util.CloudUtil.parse;
@@ -32,6 +34,7 @@ public class CloudApplication extends CloudEntity {
 	private static final String MEMORY_KEY = "memory";
 	private static final String DISK_KEY = "disk_quota";
 	public static final String PACKAGE_STATE = "package_state";
+	public static final String PACKAGE_UPDATED_AT = "package_updated_at";
 
 	private CloudSpace space;
 	private Staging staging;
@@ -42,6 +45,7 @@ public class CloudApplication extends CloudEntity {
 	private List<String> services;
 	private AppState state;
 	private PackageState packageState;
+	private Date packageUpdatedAt;
 	private DebugMode debug;
 	private int runningInstances;
 	private List<String> env = new ArrayList<String>();
@@ -52,7 +56,7 @@ public class CloudApplication extends CloudEntity {
 
 	public CloudApplication(String name, String command, String buildpackUrl, int memory, int instances,
 						List<String> uris, List<String> serviceNames,
-						AppState state, PackageState packageState) {
+						AppState state, PackageState packageState, Date packageUpdatedAt) {
 		super(CloudEntity.Meta.defaultMeta(), name);
 		this.staging = new Staging(command, buildpackUrl);
 		this.memory = memory;
@@ -61,6 +65,7 @@ public class CloudApplication extends CloudEntity {
 		this.services = serviceNames;
 		this.state = state;
 		this.packageState = packageState;
+		this.packageUpdatedAt = packageUpdatedAt;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -75,6 +80,8 @@ public class CloudApplication extends CloudEntity {
 		services = (List<String>)attributes.get("services");
 		state = AppState.valueOf((String) attributes.get("state"));
 		packageState = PackageState.valueOf((String) attributes.get(PACKAGE_STATE));
+		String packageUpdatedAtString = (String) attributes.get(PACKAGE_UPDATED_AT);
+		this.setPackageUpdatedAt(packageUpdatedAtString);
 		if (attributes.containsKey("memory")) {
 			memory = (Integer) attributes.get("memory");
 		}
@@ -196,6 +203,20 @@ public class CloudApplication extends CloudEntity {
 		this.packageState = packageState;
 	}
 
+	public Date getPackageUpdatedAt() {
+		return packageUpdatedAt;
+	}
+
+	public void setPackageUpdatedAt(String packageUpdatedAtString) {
+		if (packageUpdatedAtString != null) {
+			try {
+				this.packageUpdatedAt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").parse(packageUpdatedAtString);
+			} catch (ParseException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
 	public DebugMode getDebug() {
 		return debug;
 	}
@@ -261,7 +282,7 @@ public class CloudApplication extends CloudEntity {
 				+ instances + ", name=" + getName() 
 				+ ", memory=" + memory + ", diskQuota=" + diskQuota
 				+ ", state=" + state + ", debug=" + debug + ", uris=" + uris + ", services=" + services
-				+ ", packageState=" + packageState
+				+ ", packageState=" + packageState + ", packageUpdatedAt=" + packageUpdatedAt
 				+ ", env=" + env + ", space=" + space.getName() + "]";
 	}
 }
