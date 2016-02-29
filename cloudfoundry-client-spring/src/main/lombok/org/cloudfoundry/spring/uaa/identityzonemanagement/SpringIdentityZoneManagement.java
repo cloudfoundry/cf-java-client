@@ -20,6 +20,8 @@ import lombok.ToString;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.uaa.identityzonemanagement.CreateIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzonemanagement.CreateIdentityZoneResponse;
+import org.cloudfoundry.uaa.identityzonemanagement.DeleteIdentityZoneRequest;
+import org.cloudfoundry.uaa.identityzonemanagement.DeleteIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzonemanagement.GetIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzonemanagement.GetIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzonemanagement.IdentityZoneManagement;
@@ -49,8 +51,13 @@ public final class SpringIdentityZoneManagement extends AbstractSpringOperations
     }
 
     @Override
-    public Mono<CreateIdentityZoneResponse> create(CreateIdentityZoneRequest request) {
+    public Mono<CreateIdentityZoneResponse> create(final CreateIdentityZoneRequest request) {
         return post(request, CreateIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones"));
+    }
+
+    @Override
+    public Mono<DeleteIdentityZoneResponse> delete(final DeleteIdentityZoneRequest request) {
+        return delete(request, DeleteIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones", request.getIdentityZoneId()));
     }
 
     @Override
