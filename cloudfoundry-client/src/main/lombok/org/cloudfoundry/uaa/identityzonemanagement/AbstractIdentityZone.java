@@ -23,7 +23,7 @@ import lombok.Data;
  * The entity response payload for Identity Zone
  */
 @Data
-public class IdentityZoneEntity {
+public abstract class AbstractIdentityZone {
 
     /**
      * The creation date of the identity zone.
@@ -81,13 +81,13 @@ public class IdentityZoneEntity {
      */
     private final Integer version;
 
-    IdentityZoneEntity(@JsonProperty("created") Long createdAt,
-                       @JsonProperty("description") String description,
-                       @JsonProperty("id") String identityZoneId,
-                       @JsonProperty("name") String name,
-                       @JsonProperty("subdomain") String subDomain,
-                       @JsonProperty("last_modified") Long updatedAt,
-                       @JsonProperty("version") Integer version) {
+    AbstractIdentityZone(@JsonProperty("created") Long createdAt,
+                         @JsonProperty("description") String description,
+                         @JsonProperty("id") String identityZoneId,
+                         @JsonProperty("name") String name,
+                         @JsonProperty("subdomain") String subDomain,
+                         @JsonProperty("last_modified") Long updatedAt,
+                         @JsonProperty("version") Integer version) {
         this.createdAt = createdAt;
         this.description = description;
         this.identityZoneId = identityZoneId;

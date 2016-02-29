@@ -16,30 +16,31 @@
 
 package org.cloudfoundry.uaa.identityzonemanagement;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Singular;
 import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 /**
- * The response from the create identity zone request
+ * The response from the list identity zones request
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class CreateIdentityZoneResponse extends AbstractIdentityZone {
+public final class ListIdentityZoneResponse extends ArrayList<IdentityZone> {
+
+    private static final long serialVersionUID = -510382178369314818L;
 
     @Builder
-    CreateIdentityZoneResponse(@JsonProperty("created") Long createdAt,
-                               @JsonProperty("description") String description,
-                               @JsonProperty("id") String identityZoneId,
-                               @JsonProperty("name") String name,
-                               @JsonProperty("subdomain") String subDomain,
-                               @JsonProperty("last_modified") Long updatedAt,
-                               @JsonProperty("version") Integer version) {
-
-        super(createdAt, description, identityZoneId, name, subDomain, updatedAt, version);
+    @JsonCreator
+    ListIdentityZoneResponse(@Singular Collection<IdentityZone> identityZones) {
+        super(identityZones);
     }
 
 }
