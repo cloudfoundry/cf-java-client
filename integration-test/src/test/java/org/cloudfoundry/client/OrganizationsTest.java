@@ -17,7 +17,6 @@
 package org.cloudfoundry.client;
 
 import org.cloudfoundry.AbstractIntegrationTest;
-import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerByUsernameRequest;
@@ -57,6 +56,7 @@ import org.cloudfoundry.client.v2.organizations.RemoveOrganizationUserRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
+import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
@@ -68,8 +68,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple;
 import reactor.core.tuple.Tuple2;
 
-import java.util.function.Function;
-
+import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
 
@@ -713,35 +712,12 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     }
 
     private static Mono<String> getPrivateDomainId(CloudFoundryClient cloudFoundryClient, String organizationId, String domainName) {
-        return cloudFoundryClient.domains()
-            .create(CreateDomainRequest.builder()
+        return cloudFoundryClient.privateDomains()
+            .create(CreatePrivateDomainRequest.builder()
                 .name(domainName)
                 .owningOrganizationId(organizationId)
-                .wildcard(false)
                 .build())
             .map(ResourceUtils::getId);
     }
-
-    /**
-     * Produces a Mono transformer that preserves the type of the source {@code Mono<IN>}.
-     *
-     * <p> The Mono produced expects a single element from the source, passes this to the function (as in {@code .then}) and requests an element from the resulting {@code Mono<OUT>}. When successful,
-     * the result is discarded and input value is signalled. </p>
-     *
-     * <p> <b>Summary:</b> does a {@code .then} on the new Mono but keeps the input to pass on unchanged. </p>
-     *
-     * <p> <b>Usage:</b> Can be used inline thus: {@code .as(thenKeep(in -> funcOf(in)))} </p>
-     *
-     * @param thenFunction from source input element to some {@code Mono<OUT>}
-     * @param <IN>         the source element type
-     * @param <OUT>        the element type of the Mono produced by {@code thenFunction}
-     * @return a Mono transformer
-     */
-    private static <IN, OUT> Function<Mono<IN>, Mono<IN>> thenKeep(Function<IN, Mono<OUT>> thenFunction) {
-        return source -> source
-            .then(in -> thenFunction
-                .apply(in)
-                .map(ignore -> in));
-    }
-
+    
 }
