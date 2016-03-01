@@ -19,6 +19,8 @@ package org.cloudfoundry.spring.client.v2.privatedomains;
 import lombok.ToString;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
+import org.cloudfoundry.client.v2.privatedomains.DeletePrivateDomainRequest;
+import org.cloudfoundry.client.v2.privatedomains.DeletePrivateDomainResponse;
 import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsResponse;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomains;
@@ -51,6 +53,14 @@ public final class SpringPrivateDomains extends AbstractSpringOperations impleme
     @Override
     public Mono<CreatePrivateDomainResponse> create(CreatePrivateDomainRequest request) {
         return post(request, CreatePrivateDomainResponse.class, builder -> builder.pathSegment("v2", "private_domains"));
+    }
+
+    @Override
+    public Mono<DeletePrivateDomainResponse> delete(DeletePrivateDomainRequest request) {
+        return delete(request, DeletePrivateDomainResponse.class, builder -> {
+            builder.pathSegment("v2", "private_domains", request.getPrivateDomainId());
+            QueryBuilder.augment(builder, request);
+        });
     }
 
     @Override

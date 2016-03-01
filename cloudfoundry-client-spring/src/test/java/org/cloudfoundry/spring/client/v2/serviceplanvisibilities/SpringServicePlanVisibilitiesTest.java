@@ -143,7 +143,7 @@ public final class SpringServicePlanVisibilitiesTest {
             return new RequestContext()
                 .method(DELETE).path("/v2/service_plan_visibilities/test-service-plan-visibility-id?async=true")
                 .status(ACCEPTED)
-                .responsePayload("fixtures/client/v2/routes/DELETE_{id}_async_response.json");
+                .responsePayload("fixtures/client/v2/service_plan_visibilities/DELETE_{id}_async_response.json");
         }
 
         @Override
