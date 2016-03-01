@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface ServicePlanVisibilities {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/service_keys/create_a_service_key.html">Create Service Plan Visibility</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/service_plan_visibilities/creating_a_service_plan_visibility.html">Create Service Plan Visibility</a> request
      *
      * @param request the Create Service Plan Visibility request
      * @return the response from the Create Service Plan Visibility request

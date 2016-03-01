@@ -90,7 +90,7 @@ public final class SpringStream {
                 }))
             .publishOn(this.schedulerGroup)
             .as(Fluxion::from)
-            .onBackpressureBlock();
+            .onBackpressureBuffer();
     }
 
     private <T> Fluxion<T> ws(Validatable request, Consumer<UriComponentsBuilder> builderCallback, Function<Subscriber<T>, MessageHandler> messageHandlerCreator) {

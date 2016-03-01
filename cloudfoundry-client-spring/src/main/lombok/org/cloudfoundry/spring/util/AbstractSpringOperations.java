@@ -91,7 +91,7 @@ public abstract class AbstractSpringOperations {
                 }))
             .as(Fluxion::from)
             .publishOn(this.schedulerGroup)
-            .onBackpressureBlock();
+            .onBackpressureBuffer();
     }
 
     protected final <T> Mono<T> get(Validatable request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
