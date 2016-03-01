@@ -39,6 +39,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
 
 import java.net.URI;
+import java.time.Duration;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -88,7 +89,7 @@ public final class SpringUaaClient implements UaaClient {
         URI uri = requestInfo(cloudFoundryClient)
             .map(GetInfoResponse::getTokenEndpoint)
             .map(URI::create)
-            .get(5, SECONDS);
+            .get(Duration.ofSeconds(5));
 
         sslCertificateTruster.trust(uri.getHost(), uri.getPort(), 5, SECONDS);
         return uri;
