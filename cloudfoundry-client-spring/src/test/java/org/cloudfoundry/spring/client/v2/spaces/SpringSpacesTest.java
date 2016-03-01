@@ -650,7 +650,7 @@ public final class SpringSpacesTest {
             return new RequestContext()
                 .method(DELETE).path("/v2/spaces/test-space-id?async=true")
                 .status(ACCEPTED)
-                .responsePayload("fixtures/client/v2/routes/DELETE_{id}_async_response.json");
+                .responsePayload("fixtures/client/v2/spaces/DELETE_{id}_async_response.json");
         }
 
         @Override

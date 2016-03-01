@@ -770,7 +770,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                 .method(DELETE).path("/v2/organizations/test-organization-id?async=true")
                 .status(ACCEPTED)
-                .responsePayload("fixtures/client/v2/routes/DELETE_{id}_async_response.json");
+                .responsePayload("fixtures/client/v2/organizations/DELETE_{id}_async_response.json");
         }
 
         @Override

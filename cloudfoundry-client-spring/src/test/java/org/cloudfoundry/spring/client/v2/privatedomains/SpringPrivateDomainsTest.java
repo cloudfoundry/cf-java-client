@@ -17,8 +17,11 @@
 package org.cloudfoundry.spring.client.v2.privatedomains;
 
 import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.job.JobEntity;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
+import org.cloudfoundry.client.v2.privatedomains.DeletePrivateDomainRequest;
+import org.cloudfoundry.client.v2.privatedomains.DeletePrivateDomainResponse;
 import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsResponse;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomainEntity;
@@ -26,8 +29,11 @@ import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpStatus.ACCEPTED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringPrivateDomainsTest {
@@ -80,6 +86,90 @@ public final class SpringPrivateDomainsTest {
         protected Mono<CreatePrivateDomainResponse> invoke(CreatePrivateDomainRequest request) {
             return this.privateDomains.create(request);
         }
+    }
+
+    public static final class Delete extends AbstractApiTest<DeletePrivateDomainRequest, DeletePrivateDomainResponse> {
+
+        private final SpringPrivateDomains privateDomains = new SpringPrivateDomains(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeletePrivateDomainRequest getInvalidRequest() {
+            return DeletePrivateDomainRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(DELETE).path("/v2/private_domains/test-private-domain-id")
+                .status(NO_CONTENT);
+        }
+
+        @Override
+        protected DeletePrivateDomainResponse getResponse() {
+            return null;
+        }
+
+        @Override
+        protected DeletePrivateDomainRequest getValidRequest() throws Exception {
+            return DeletePrivateDomainRequest.builder()
+                .privateDomainId("test-private-domain-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<DeletePrivateDomainResponse> invoke(DeletePrivateDomainRequest request) {
+            return this.privateDomains.delete(request);
+        }
+
+    }
+
+    public static final class DeleteAsync extends AbstractApiTest<DeletePrivateDomainRequest, DeletePrivateDomainResponse> {
+
+        private final SpringPrivateDomains privateDomains = new SpringPrivateDomains(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeletePrivateDomainRequest getInvalidRequest() {
+            return DeletePrivateDomainRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(DELETE).path("/v2/private_domains/test-private-domain-id?async=true")
+                .status(ACCEPTED)
+                .responsePayload("fixtures/client/v2/private_domains/DELETE_{id}_async_response.json");
+        }
+
+        @Override
+        protected DeletePrivateDomainResponse getResponse() {
+            return DeletePrivateDomainResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .createdAt("2016-02-02T17:16:31Z")
+                    .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .build())
+                .entity(JobEntity.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .status("queued")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected DeletePrivateDomainRequest getValidRequest() throws Exception {
+            return DeletePrivateDomainRequest.builder()
+                .async(true)
+                .privateDomainId("test-private-domain-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<DeletePrivateDomainResponse> invoke(DeletePrivateDomainRequest request) {
+            return this.privateDomains.delete(request);
+        }
+
     }
 
     public static final class List extends AbstractApiTest<ListPrivateDomainsRequest, ListPrivateDomainsResponse> {
