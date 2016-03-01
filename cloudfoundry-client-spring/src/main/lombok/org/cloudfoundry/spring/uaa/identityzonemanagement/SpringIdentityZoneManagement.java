@@ -27,6 +27,8 @@ import org.cloudfoundry.uaa.identityzonemanagement.GetIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzonemanagement.IdentityZoneManagement;
 import org.cloudfoundry.uaa.identityzonemanagement.ListIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzonemanagement.ListIdentityZoneResponse;
+import org.cloudfoundry.uaa.identityzonemanagement.UpdateIdentityZoneRequest;
+import org.cloudfoundry.uaa.identityzonemanagement.UpdateIdentityZoneResponse;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
@@ -68,6 +70,11 @@ public final class SpringIdentityZoneManagement extends AbstractSpringOperations
     @Override
     public Mono<ListIdentityZoneResponse> list(ListIdentityZoneRequest request) {
         return get(request, ListIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones"));
+    }
+
+    @Override
+    public Mono<UpdateIdentityZoneResponse> update(UpdateIdentityZoneRequest request) {
+        return put(request, UpdateIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones", request.getIdentityZoneId()));
     }
 
 }
