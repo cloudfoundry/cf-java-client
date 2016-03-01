@@ -61,10 +61,10 @@ import reactor.rx.Fluxion;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class DefaultSpaces implements Spaces {
@@ -449,28 +449,6 @@ public final class DefaultSpaces implements Spaces {
 
     private static Predicate<SpaceResource> sshEnabled(Boolean enabled) {
         return resource -> enabled.equals(ResourceUtils.getEntity(resource).getAllowSsh());
-    }
-
-    /**
-     * Produces a Mono transformer that preserves the type of the source {@code Mono<IN>}.
-     *
-     * <p> The Mono produced expects a single element from the source, passes this to the function (as in {@code .then}) and requests an element from the resulting {@code Mono<OUT>}. When successful,
-     * the result is discarded and input value is signalled. </p>
-     *
-     * <p> <b>Summary:</b> does a {@code .then} on the new Mono but keeps the input to pass on unchanged. </p>
-     *
-     * <p> <b>Usage:</b> Can be used inline thus: {@code .as(thenKeep(in -> funcOf(in)))} </p>
-     *
-     * @param thenFunction from source input element to some {@code Mono<OUT>}
-     * @param <IN>         the source element type
-     * @param <OUT>        the element type of the Mono produced by {@code thenFunction}
-     * @return a Mono transformer
-     */
-    private static <IN, OUT> Function<Mono<IN>, Mono<IN>> thenKeep(Function<IN, Mono<OUT>> thenFunction) {
-        return source -> source
-            .then(in -> thenFunction
-                .apply(in)
-                .map(ignore -> in));
     }
 
     private static SpaceDetail toSpaceDetail(List<String> applications,

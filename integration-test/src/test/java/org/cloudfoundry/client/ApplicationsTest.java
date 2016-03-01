@@ -101,10 +101,9 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
                     );
             }))
-            .then(function((organizationId, spaceId, applicationId) -> {
-                return createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
-                    .map(response -> applicationId);
-            }))
+            .then(function((organizationId, spaceId, applicationId) ->
+                createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
+                    .map(response -> applicationId)))
             .then(applicationId -> this.cloudFoundryClient.applicationsV2()
                 .listRoutes(ListApplicationRoutesRequest.builder()
                     .applicationId(applicationId)
@@ -345,8 +344,9 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         Mono
             .when(this.organizationId, this.spaceId)
-            .then(function((organizationId, spaceId) -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
-                .map(applicationId -> organizationId)))
+            .then(function((organizationId, spaceId) ->
+                createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
+                    .map(applicationId -> organizationId)))
             .flatMap(organizationId -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.applicationsV2()
                     .list(ListApplicationsRequest.builder()
@@ -413,10 +413,9 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
                     );
             }))
-            .then(function((organizationId, spaceId, applicationId) -> {
-                return createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
-                    .map(response -> applicationId);
-            }))
+            .then(function((organizationId, spaceId, applicationId) ->
+                createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
+                    .map(response -> applicationId)))
             .flatMap(applicationId -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.applicationsV2()
                     .listRoutes(ListApplicationRoutesRequest.builder()
