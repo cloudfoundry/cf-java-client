@@ -45,6 +45,7 @@ import javax.websocket.ClientEndpointConfig;
 import javax.websocket.ContainerProvider;
 import javax.websocket.WebSocketContainer;
 import java.net.URI;
+import java.time.Duration;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -102,7 +103,7 @@ public final class SpringLoggingClient implements LoggingClient {
         return requestInfo(cloudFoundryClient)
             .map(GetInfoResponse::getLoggingEndpoint)
             .map(URI::create)
-            .get(5, SECONDS);
+            .get(Duration.ofSeconds(5));
     }
 
     private static URI getRecentRoot(URI loggingEndpoint, SslCertificateTruster sslCertificateTruster) {

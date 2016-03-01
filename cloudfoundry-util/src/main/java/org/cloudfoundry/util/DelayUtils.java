@@ -61,7 +61,7 @@ public final class DelayUtils {
         long duration = calculateDuration(minDuration, maxDuration, retryCount);
 
         return Mono
-            .delay(duration, timeUnit)
+            .delay(TimeUnit.MILLISECONDS.convert(duration, timeUnit))
             .doOnSubscribe(subscription -> LOGGER.debug("Delaying {} {}", duration, timeUnit.toString().toLowerCase()));
     }
 

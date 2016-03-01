@@ -40,11 +40,11 @@ import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 import reactor.rx.Fluxion;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.cloudfoundry.util.OperationUtils.afterStreamComplete;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -100,7 +100,7 @@ final class CloudFoundryCleaner {
             .doOnError(Throwable::printStackTrace)
             .doOnComplete(() -> this.logger.debug("<< CLEANUP >>"))
             .after()
-            .get(5, MINUTES);
+            .get(Duration.ofMinutes(5));
     }
 
     private static Fluxion<Void> cleanApplications(CloudFoundryClient cloudFoundryClient, Predicate<ApplicationResource> predicate) {
