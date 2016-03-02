@@ -28,10 +28,10 @@ import lombok.Data;
 public final class ServicePlanEntity {
 
     /**
-     * The visible flag
+     * The active flag
      *
-     * @param public the visible flag
-     * @return the visible flag
+     * @param active the active flag
+     * @return the active flag
      */
     private final Boolean active;
 
@@ -78,7 +78,7 @@ public final class ServicePlanEntity {
     /**
      * The service instances url
      *
-     * @param serviceUrl the service instances url
+     * @param serviceInstancesUrl the service instances url
      * @return the service instances url
      */
     private final String serviceInstancesUrl;
@@ -94,15 +94,15 @@ public final class ServicePlanEntity {
     /**
      * The unique id in the service broker
      *
-     * @param servicePlanUrl the service plan url
-     * @return the service plan url
+     * @param uniqueId the unique id
+     * @return the unique id
      */
     private final String uniqueId;
 
     /**
      * The visible flag
      *
-     * @param public the visible flag
+     * @param visible the visible flag
      * @return the visible flag
      */
     private final Boolean visible;

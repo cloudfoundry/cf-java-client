@@ -85,7 +85,7 @@ public final class UpdateServiceInstanceRequest implements Validatable {
      */
     @Getter(onMethod = @__({@JsonProperty("tags"), @JsonInclude(NON_EMPTY)}))
     private final List<String> tags;
-    
+
     @Builder
     UpdateServiceInstanceRequest(Boolean acceptsIncomplete,
                                  String name,
