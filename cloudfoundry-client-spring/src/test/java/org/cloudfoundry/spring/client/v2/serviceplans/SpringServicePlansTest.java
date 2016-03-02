@@ -32,6 +32,8 @@ import org.cloudfoundry.client.v2.serviceplans.MigrateServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceplans.MigrateServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlanEntity;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlanResource;
+import org.cloudfoundry.client.v2.serviceplans.UpdateServicePlanRequest;
+import org.cloudfoundry.client.v2.serviceplans.UpdateServicePlanResponse;
 import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
@@ -39,6 +41,7 @@ import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.ACCEPTED;
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -340,6 +343,62 @@ public final class SpringServicePlansTest {
             return this.servicePlans.migrateServiceInstances(request);
         }
 
+    }
+
+    public static final class Update extends AbstractApiTest<UpdateServicePlanRequest, UpdateServicePlanResponse> {
+
+        private final SpringServicePlans servicePlans = new SpringServicePlans(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected UpdateServicePlanRequest getInvalidRequest() {
+            return UpdateServicePlanRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(PUT)
+                .path("/v2/service_plans/195f6bd5-0aa4-4a97-9c8d-5410e5e6d4b6")
+                .requestPayload("fixtures/client/v2/service_plans/PUT_{id}_request.json")
+                .status(CREATED)
+                .responsePayload("fixtures/client/v2/service_plans/PUT_{id}_response.json");
+        }
+
+        @Override
+        protected UpdateServicePlanResponse getResponse() {
+            return UpdateServicePlanResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .createdAt("2016-02-19T02:04:09Z")
+                    .id("195f6bd5-0aa4-4a97-9c8d-5410e5e6d4b6")
+                    .updatedAt("2016-02-19T02:04:09Z")
+                    .url("/v2/service_plans/195f6bd5-0aa4-4a97-9c8d-5410e5e6d4b6")
+                    .build())
+                .entity(ServicePlanEntity.builder()
+                    .name("name-2674")
+                    .free(false)
+                    .description("desc-225")
+                    .serviceId("42bea093-8fe5-491a-8a34-b1943dc3709a")
+                    .uniqueId("7c4f2f8a-aa82-49e9-9f0c-76248aa1036d")
+                    .visible(false)
+                    .active(true)
+                    .serviceUrl("/v2/services/42bea093-8fe5-491a-8a34-b1943dc3709a")
+                    .serviceInstancesUrl("/v2/service_plans/195f6bd5-0aa4-4a97-9c8d-5410e5e6d4b6/service_instances")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected UpdateServicePlanRequest getValidRequest() throws Exception {
+            return UpdateServicePlanRequest.builder()
+                .servicePlanId("195f6bd5-0aa4-4a97-9c8d-5410e5e6d4b6")
+                .visible(false)
+                .build();
+        }
+
+        @Override
+        protected Mono<UpdateServicePlanResponse> invoke(UpdateServicePlanRequest request) {
+            return this.servicePlans.update(request);
+        }
     }
 
 }

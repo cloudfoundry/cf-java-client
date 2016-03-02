@@ -63,4 +63,12 @@ public interface ServicePlans {
      */
     Mono<MigrateServiceInstancesResponse> migrateServiceInstances(MigrateServiceInstancesRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/service_plans/updating_a_service_plan.html">Update Service Plan</a> request
+     *
+     * @param request the Update Service Plan request
+     * @return the response from the Update Service Plan request
+     */
+    Mono<UpdateServicePlanResponse> update(UpdateServicePlanRequest request);
+
 }

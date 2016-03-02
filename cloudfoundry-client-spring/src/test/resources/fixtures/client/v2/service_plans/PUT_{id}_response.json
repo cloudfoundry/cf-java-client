@@ -1,0 +1,20 @@
+{
+  "metadata": {
+    "guid": "195f6bd5-0aa4-4a97-9c8d-5410e5e6d4b6",
+    "url": "/v2/service_plans/195f6bd5-0aa4-4a97-9c8d-5410e5e6d4b6",
+    "created_at": "2016-02-19T02:04:09Z",
+    "updated_at": "2016-02-19T02:04:09Z"
+  },
+  "entity": {
+    "name": "name-2674",
+    "free": false,
+    "description": "desc-225",
+    "service_guid": "42bea093-8fe5-491a-8a34-b1943dc3709a",
+    "extra": null,
+    "unique_id": "7c4f2f8a-aa82-49e9-9f0c-76248aa1036d",
+    "public": false,
+    "active": true,
+    "service_url": "/v2/services/42bea093-8fe5-491a-8a34-b1943dc3709a",
+    "service_instances_url": "/v2/service_plans/195f6bd5-0aa4-4a97-9c8d-5410e5e6d4b6/service_instances"
+  }
+}
