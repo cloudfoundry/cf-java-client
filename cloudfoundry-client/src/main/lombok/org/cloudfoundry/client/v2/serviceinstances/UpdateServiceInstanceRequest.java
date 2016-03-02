@@ -41,7 +41,7 @@ public final class UpdateServiceInstanceRequest implements Validatable {
      * @return the accept incomplete flag
      */
     @Getter(onMethod = @__(@QueryParameter("accepts_incomplete")))
-    private final boolean acceptsIncomplete;
+    private final Boolean acceptsIncomplete;
 
     /**
      * The name
@@ -85,10 +85,9 @@ public final class UpdateServiceInstanceRequest implements Validatable {
      */
     @Getter(onMethod = @__({@JsonProperty("tags"), @JsonInclude(NON_EMPTY)}))
     private final List<String> tags;
-
-
+    
     @Builder
-    UpdateServiceInstanceRequest(boolean acceptsIncomplete,
+    UpdateServiceInstanceRequest(Boolean acceptsIncomplete,
                                  String name,
                                  @Singular Map<String, Object> parameters,
                                  String serviceInstanceId,
