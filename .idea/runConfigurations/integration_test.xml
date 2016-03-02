@@ -21,10 +21,6 @@
       <env name="TEST_PASSWORD" value="admin" />
       <env name="TEST_SKIPSSLVALIDATION" value="true" />
       <env name="TEST_USERNAME" value="admin" />
-      <env name="CLIENT_LOGGING_LEVEL" value="DEBUG" />
-      <env name="TEST_LOGGING_LEVEL" value="DEBUG" />
-      <env name="PERFORMANCE_LOGGING_LEVEL" value="INFO" />
-      <env name="SCAN_LOGGING_LEVEL" value="INFO" />
       <env name="TEST_PROTECTED_DOMAIN" value="local.micropcf.io" />
       <env name="TEST_PROTECTED_ORGANIZATION" value="micropcf-org" />
     </envs>

@@ -23,11 +23,11 @@
         </encoder>
     </appender>
 
-    <logger name="cloudfoundry-client.delay" level="${CLIENT_LOGGING_LEVEL:-INFO}"/>
+    <logger name="cloudfoundry-client.delay" level="${CLIENT_LOGGING_LEVEL:-DEBUG}"/>
     <logger name="cloudfoundry-client.performance" level="${PERFORMANCE_LOGGING_LEVEL:-INFO}"/>
-    <logger name="cloudfoundry-client.request" level="${CLIENT_LOGGING_LEVEL:-INFO}"/>
+    <logger name="cloudfoundry-client.request" level="${CLIENT_LOGGING_LEVEL:-DEBUG}"/>
     <logger name="cloudfoundry-client.scan" level="${SCAN_LOGGING_LEVEL:-INFO}"/>
-    <logger name="cloudfoundry-client.test" level="${TEST_LOGGING_LEVEL:-INFO}"/>
+    <logger name="cloudfoundry-client.test" level="${TEST_LOGGING_LEVEL:-DEBUG}"/>
     <logger name="stream" level="INFO"/>
 
     <root level="WARN">

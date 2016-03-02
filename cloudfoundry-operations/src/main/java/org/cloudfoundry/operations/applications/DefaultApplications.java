@@ -73,8 +73,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple2;
 import reactor.core.tuple.Tuple4;
-import reactor.rx.Fluxion;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -82,13 +82,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.cloudfoundry.util.OperationUtils.afterComplete;
-import static org.cloudfoundry.util.OperationUtils.identity;
-import static org.cloudfoundry.util.OperationUtils.not;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
 
@@ -126,7 +121,7 @@ public final class DefaultApplications implements Applications {
                 .when(
                     Mono.just(request1),
                     copyBits(this.cloudFoundryClient, sourceApplicationId, targetApplicationId)
-                        .as(afterComplete(() -> Mono.just(targetApplicationId)))
+                        .after(() -> Mono.just(targetApplicationId))
                 )))
             .where(predicate((request1, targetApplicationId) -> Optional.ofNullable(request1.getRestart()).orElse(false)))
             .then(function((request1, targetApplicationId) -> restartApplication(this.cloudFoundryClient, request1.getTargetName(), targetApplicationId)))
@@ -139,7 +134,7 @@ public final class DefaultApplications implements Applications {
             .when(ValidationUtils.validate(request), this.spaceId)
             .then(function((request1, spaceId) -> getRoutesAndApplicationId(this.cloudFoundryClient, request1, spaceId)))
             .then(function((routes, applicationId) -> deleteRoutes(this.cloudFoundryClient, routes)
-                .as(afterComplete(() -> Mono.just(applicationId)))))
+                .after(() -> Mono.just(applicationId))))
             .then(applicationId -> requestDeleteApplication(this.cloudFoundryClient, applicationId));
     }
 
@@ -252,9 +247,7 @@ public final class DefaultApplications implements Applications {
             .when(ValidationUtils.validate(request), this.spaceId)
             .then(function((request1, spaceId) -> getApplication(this.cloudFoundryClient, request1.getName(), spaceId)
                 .and(Mono.just(request1.getName()))))
-            .then(function((resource, application) -> Mono
-                .just(resource)
-                .as(ifThen(not(isIn(STOPPED_STATE)), resource1 -> stopApplication(this.cloudFoundryClient, ResourceUtils.getId(resource1))))
+            .then(function((resource, application) -> stopApplication(cloudFoundryClient, resource)
                 .then(resource1 -> startApplicationAndWait(this.cloudFoundryClient, application, ResourceUtils.getId(resource1)))))
             .after();
     }
@@ -321,7 +314,7 @@ public final class DefaultApplications implements Applications {
     public Mono<Void> start(StartApplicationRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((request1, spaceId) -> getApplicationIdWhere(this.cloudFoundryClient, request1.getName(), spaceId, not(isIn(STARTED_STATE)))
+            .then(function((request1, spaceId) -> getApplicationIdWhere(this.cloudFoundryClient, request1.getName(), spaceId, isNotIn(STARTED_STATE))
                 .and(Mono.just(request1.getName()))))
             .then(function((applicationId, application) -> startApplicationAndWait(this.cloudFoundryClient, application, applicationId)))
             .after();
@@ -331,7 +324,7 @@ public final class DefaultApplications implements Applications {
     public Mono<Void> stop(StopApplicationRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((request1, spaceId) -> getApplicationIdWhere(this.cloudFoundryClient, request1.getName(), spaceId, not(isIn(STOPPED_STATE)))))
+            .then(function((request1, spaceId) -> getApplicationIdWhere(this.cloudFoundryClient, request1.getName(), spaceId, isNotIn(STOPPED_STATE))))
             .then(applicationId -> stopApplication(this.cloudFoundryClient, applicationId))
             .after();
     }
@@ -401,8 +394,8 @@ public final class DefaultApplications implements Applications {
 
     private static Mono<Void> deleteRoutes(CloudFoundryClient cloudFoundryClient, Optional<List<Route>> routes) {
         return routes
-            .map(Fluxion::fromIterable)
-            .orElse(Fluxion.<Route>empty())
+            .map(Flux::fromIterable)
+            .orElse(Flux.<Route>empty())
             .map(Route::getId)
             .flatMap(routeId -> deleteRoute(cloudFoundryClient, routeId))
             .after();
@@ -424,8 +417,8 @@ public final class DefaultApplications implements Applications {
         return sb.toString();
     }
 
-    private static Fluxion<SpaceApplicationSummary> extractApplications(GetSpaceSummaryResponse getSpaceSummaryResponse) {
-        return Fluxion.fromIterable(getSpaceSummaryResponse.getApplications());
+    private static Flux<SpaceApplicationSummary> extractApplications(GetSpaceSummaryResponse getSpaceSummaryResponse) {
+        return Flux.fromIterable(getSpaceSummaryResponse.getApplications());
     }
 
     private static Mono<AbstractApplicationResource> getApplication(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
@@ -479,11 +472,11 @@ public final class DefaultApplications implements Applications {
     }
 
     private static Publisher<LogMessage> getLogs(LoggingClient loggingClient, String applicationId, Boolean recent) {
-        return Mono
-            .just(Optional.ofNullable(recent).orElse(false))
-            .where(identity())
-            .flatMap(recent1 -> requestLogsRecent(loggingClient, applicationId))
-            .switchIfEmpty(requestLogsStream(loggingClient, applicationId));
+        if (Optional.ofNullable(recent).orElse(false)) {
+            return requestLogsRecent(loggingClient, applicationId);
+        } else {
+            return requestLogsStream(loggingClient, applicationId);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -498,12 +491,12 @@ public final class DefaultApplications implements Applications {
     }
 
     private static Mono<Optional<List<Route>>> getOptionalRoutes(CloudFoundryClient cloudFoundryClient, boolean deleteRoutes, String applicationId) {
-        return Mono
-            .just(deleteRoutes)
-            .where(identity())
-            .then(deleteRoutes1 -> getRoutes(cloudFoundryClient, applicationId))
-            .map(Optional::of)
-            .defaultIfEmpty(Optional.empty());
+        if (deleteRoutes) {
+            return getRoutes(cloudFoundryClient, applicationId)
+                .map(Optional::of);
+        } else {
+            return Mono.just(Optional.empty());
+        }
     }
 
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
@@ -549,30 +542,16 @@ public final class DefaultApplications implements Applications {
             .map(getStackResponse -> getStackResponse.getEntity().getName());
     }
 
-    /**
-     * Produces a Mono transformer that preserves the type of the source {@code Mono<IN>}.
-     *
-     * <p> The Mono produced expects a single element from the source, passes this to the predicate and, if this returns <b>{@code true}</b>, it builds a {@code Mono<IN>} with the {@code thenFunction}
-     * and returns this. If the predicate returns <b>{@code false}</b> the input value is passed through unchanged.</p>
-     *
-     * <p> <b>Usage:</b> Can be used inline thus: {@code .as(ifThen(in -> test(in), in -> funcOf(in)))} </p>
-     *
-     * @param predicate    from source input element to <b>{@code true}</b> or <b>{@code false}</b>
-     * @param thenFunction from source input element to some {@code Mono<IN>}
-     * @param <IN>         the source element type and the element type of the resulting {@code Mono}.
-     * @return a Mono transformer
-     */
-    private static <IN> Function<Mono<IN>, Mono<IN>> ifThen(Predicate<IN> predicate, Function<IN, Mono<IN>> thenFunction) {
-        return source -> source
-            .then(in -> predicate.test(in) ? thenFunction.apply(in) : Mono.just(in));
-    }
-
-    private static Predicate<AbstractApplicationResource> isIn(String state) {
-        return resource -> state.equals(ResourceUtils.getEntity(resource).getState());
-    }
-
     private static Predicate<String> isInstanceComplete() {
         return state -> "RUNNING".equals(state) || "FAILED".equals(state);
+    }
+
+    private static Predicate<AbstractApplicationResource> isNotIn(String expectedState) {
+        return resource -> isNotIn(resource, expectedState);
+    }
+
+    private static boolean isNotIn(AbstractApplicationResource resource, String expectedState) {
+        return !expectedState.equals(ResourceUtils.getEntity(resource).getState());
     }
 
     private static boolean isRestartRequired(ScaleApplicationRequest request, AbstractApplicationResource applicationResource) {
@@ -626,7 +605,7 @@ public final class DefaultApplications implements Applications {
                 .build());
     }
 
-    private static Fluxion<AbstractApplicationResource> requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
+    private static Flux<AbstractApplicationResource> requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .listApplications(ListSpaceApplicationsRequest.builder()
@@ -660,7 +639,7 @@ public final class DefaultApplications implements Applications {
                 .build());
     }
 
-    private static Fluxion<EventResource> requestEvents(String applicationId, CloudFoundryClient cloudFoundryClient) {
+    private static Flux<EventResource> requestEvents(String applicationId, CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.events()
                 .list(ListEventsRequest.builder()
@@ -692,7 +671,7 @@ public final class DefaultApplications implements Applications {
                 .build());
     }
 
-    private static Fluxion<SpaceResource> requestOrganizationSpacesByName(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
+    private static Flux<SpaceResource> requestOrganizationSpacesByName(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.organizations()
                 .listSpaces(ListOrganizationSpacesRequest.builder()
@@ -702,7 +681,7 @@ public final class DefaultApplications implements Applications {
                     .build()));
     }
 
-    private static Fluxion<OrganizationResource> requestOrganizations(CloudFoundryClient cloudFoundryClient, String organization) {
+    private static Flux<OrganizationResource> requestOrganizations(CloudFoundryClient cloudFoundryClient, String organization) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.organizations()
                 .list(ListOrganizationsRequest.builder()
@@ -812,6 +791,10 @@ public final class DefaultApplications implements Applications {
             .then(resource -> waitForRunning(cloudFoundryClient, application, applicationId));
     }
 
+    private static Mono<AbstractApplicationResource> stopApplication(CloudFoundryClient cloudFoundryClient, AbstractApplicationResource resource) {
+        return isNotIn(resource, STOPPED_STATE) ? stopApplication(cloudFoundryClient, ResourceUtils.getId(resource)) : Mono.just(resource);
+    }
+
     private static Mono<AbstractApplicationResource> stopApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestUpdateApplicationState(cloudFoundryClient, applicationId, STOPPED_STATE);
     }
@@ -908,7 +891,7 @@ public final class DefaultApplications implements Applications {
     }
 
     private static List<ApplicationDetail.InstanceDetail> toInstanceDetailList(ApplicationInstancesResponse instancesResponse, ApplicationStatisticsResponse statisticsResponse) {
-        return Fluxion
+        return Flux
             .fromIterable(instancesResponse.entrySet())
             .map(entry -> toInstanceDetail(entry, statisticsResponse))
             .toList()
@@ -923,7 +906,7 @@ public final class DefaultApplications implements Applications {
     }
 
     private static List<String> toUrls(List<Route> routes) {
-        return Fluxion
+        return Flux
             .fromIterable(routes)
             .map(DefaultApplications::toUrl)
             .toList()
@@ -932,12 +915,11 @@ public final class DefaultApplications implements Applications {
 
     private static Mono<String> waitForRunning(CloudFoundryClient cloudFoundryClient, String application, String applicationId) {
         return requestApplicationInstances(cloudFoundryClient, applicationId)
-            .flatMap(response -> Fluxion.fromIterable(response.values()))
+            .flatMap(response -> Flux.fromIterable(response.values()))
             .map(ApplicationInstanceInfo::getState)
-            .as(Fluxion::from)
             .reduce("UNKNOWN", collectStates())
             .where(isInstanceComplete())
-            .as(OperationUtils.<String>repeatWhen(DelayUtils.exponentialBackOff(1, 10, SECONDS, 10)))  // TODO: Remove once Mono.repeatWhen()
+            .repeatUntilNext(10, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(10)))
             .where(isRunning())
             .otherwiseIfEmpty(ExceptionUtils.<String>illegalState("Application %s failed during start", application));
     }
@@ -946,7 +928,7 @@ public final class DefaultApplications implements Applications {
         return requestGetApplication(cloudFoundryClient, applicationId)
             .map(response -> ResourceUtils.getEntity(response).getPackageState())
             .where(isStagingComplete())
-            .as(OperationUtils.<String>repeatWhen(DelayUtils.exponentialBackOff(1, 10, SECONDS, 10)))  // TODO: Remove once Mono.repeatWhen()
+            .repeatUntilNext(10, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(10)))
             .where(isStaged())
             .otherwiseIfEmpty(ExceptionUtils.<String>illegalState("Application %s failed during staging", application));
     }

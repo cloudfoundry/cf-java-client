@@ -26,9 +26,8 @@ import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.rx.Fluxion;
-import reactor.rx.Promise;
 
 /**
  * A builder API for creating the default implementation of the {@link CloudFoundryOperations}
@@ -133,7 +132,7 @@ public final class CloudFoundryOperationsBuilder {
 
         Mono<String> organizationId = getOrganization(cloudFoundryClient, organization)
             .map(ResourceUtils::getId)
-            .as(Promise::from);
+            .cache();
 
         organizationId.get();
         return organizationId;
@@ -153,7 +152,7 @@ public final class CloudFoundryOperationsBuilder {
         Mono<String> spaceId = organizationId
             .then(organizationId1 -> getSpace(cloudFoundryClient, organizationId1, space))
             .map(ResourceUtils::getId)
-            .as(Promise::from);
+            .cache();
 
         spaceId.get();
         return spaceId;
@@ -166,7 +165,7 @@ public final class CloudFoundryOperationsBuilder {
             .build();
     }
 
-    private static Fluxion<OrganizationResource> requestOrganizations(CloudFoundryClient cloudFoundryClient, String organization) {
+    private static Flux<OrganizationResource> requestOrganizations(CloudFoundryClient cloudFoundryClient, String organization) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.organizations()
                 .list(ListOrganizationsRequest.builder()
@@ -175,7 +174,7 @@ public final class CloudFoundryOperationsBuilder {
                     .build()));
     }
 
-    private static Fluxion<SpaceResource> requestSpaces(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
+    private static Flux<SpaceResource> requestSpaces(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .list(ListSpacesRequest.builder()

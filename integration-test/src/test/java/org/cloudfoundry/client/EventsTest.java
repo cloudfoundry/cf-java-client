@@ -24,9 +24,9 @@ import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple2;
-import reactor.rx.Fluxion;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.junit.Assert.assertEquals;
@@ -116,12 +116,11 @@ public final class EventsTest extends AbstractIntegrationTest {
             .next();
     }
 
-    private static Fluxion<EventResource> listEvents(CloudFoundryClient cloudFoundryClient) {
+    private static Flux<EventResource> listEvents(CloudFoundryClient cloudFoundryClient) {
         return cloudFoundryClient.events()
             .list(ListEventsRequest.builder()
                 .build())
-            .flatMap(ResourceUtils::getResources)
-            .as(Fluxion::from);
+            .flatMap(ResourceUtils::getResources);
     }
 
 }

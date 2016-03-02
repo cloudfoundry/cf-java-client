@@ -24,10 +24,8 @@ import org.cloudfoundry.client.v2.domains.DeleteDomainRequest;
 import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
-import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
-import org.cloudfoundry.client.v2.organizations.RemoveOrganizationPrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.DeletePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
@@ -42,15 +40,14 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.rx.Fluxion;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static org.cloudfoundry.util.OperationUtils.afterStreamComplete;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 final class CloudFoundryCleaner {
@@ -89,7 +86,7 @@ final class CloudFoundryCleaner {
                     .map(id -> (Predicate<DomainResource>) r -> !ResourceUtils.getId(r).equals(id))
                     .orElse(r -> true);
 
-                Predicate<PrivateDomainResource> privateDomainPredicate = pd -> true;
+                Predicate<PrivateDomainResource> privateDomainPredicate = r -> true;
 
                 Predicate<RouteResource> routePredicate = r -> true;
 
@@ -98,11 +95,11 @@ final class CloudFoundryCleaner {
                     .orElse(r -> true);
 
                 return cleanApplications(this.cloudFoundryClient, applicationPredicate)
-                    .as(afterStreamComplete(() -> cleanRoutes(this.cloudFoundryClient, routePredicate)))
-                    .as(afterStreamComplete(() -> cleanDomains(this.cloudFoundryClient, domainPredicate)))
-                    .as(afterStreamComplete(() -> cleanPrivateDomains(this.cloudFoundryClient, privateDomainPredicate)))
-                    .as(afterStreamComplete(() -> cleanSpaces(this.cloudFoundryClient, spacePredicate)))
-                    .as(afterStreamComplete(() -> cleanOrganizations(this.cloudFoundryClient, organizationPredicate, this.logger)));
+                    .after(() -> cleanRoutes(this.cloudFoundryClient, routePredicate))
+                    .after(() -> cleanDomains(this.cloudFoundryClient, domainPredicate))
+                    .after(() -> cleanPrivateDomains(this.cloudFoundryClient, privateDomainPredicate))
+                    .after(() -> cleanSpaces(this.cloudFoundryClient, spacePredicate))
+                    .after(() -> cleanOrganizations(this.cloudFoundryClient, organizationPredicate));
             }))
             .doOnSubscribe(s -> this.logger.debug(">> CLEANUP <<"))
             .doOnError(Throwable::printStackTrace)
@@ -111,7 +108,7 @@ final class CloudFoundryCleaner {
             .get(Duration.ofMinutes(5));
     }
 
-    private static Fluxion<Void> cleanApplications(CloudFoundryClient cloudFoundryClient, Predicate<ApplicationResource> predicate) {
+    private static Flux<Void> cleanApplications(CloudFoundryClient cloudFoundryClient, Predicate<ApplicationResource> predicate) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.applicationsV2()
                 .list(ListApplicationsRequest.builder()
@@ -125,7 +122,7 @@ final class CloudFoundryCleaner {
                     .build()));
     }
 
-    private static Fluxion<Void> cleanDomains(CloudFoundryClient cloudFoundryClient, Predicate<DomainResource> predicate) {
+    private static Flux<Void> cleanDomains(CloudFoundryClient cloudFoundryClient, Predicate<DomainResource> predicate) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.domains()
                 .list(ListDomainsRequest.builder()
@@ -142,7 +139,7 @@ final class CloudFoundryCleaner {
             .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
     }
 
-    private static Fluxion<Void> cleanOrganizations(CloudFoundryClient cloudFoundryClient, Predicate<OrganizationResource> predicate, Logger logger) {
+    private static Flux<Void> cleanOrganizations(CloudFoundryClient cloudFoundryClient, Predicate<OrganizationResource> predicate) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.organizations()
                 .list(ListOrganizationsRequest.builder()
@@ -150,8 +147,6 @@ final class CloudFoundryCleaner {
                     .build()))
             .filter(predicate)
             .map(ResourceUtils::getId)
-            .flatMap(organizationId -> removePrivateDomains(cloudFoundryClient, organizationId, logger)
-                .as(afterStreamComplete(() -> Fluxion.just(organizationId))))
             .flatMap(organizationId -> cloudFoundryClient.organizations()
                 .delete(DeleteOrganizationRequest.builder()
                     .async(true)
@@ -161,7 +156,7 @@ final class CloudFoundryCleaner {
             .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
     }
 
-    private static Fluxion<Void> cleanPrivateDomains(CloudFoundryClient cloudFoundryClient, Predicate<PrivateDomainResource> predicate) {
+    private static Flux<Void> cleanPrivateDomains(CloudFoundryClient cloudFoundryClient, Predicate<PrivateDomainResource> predicate) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.privateDomains()
                 .list(ListPrivateDomainsRequest.builder()
@@ -178,7 +173,7 @@ final class CloudFoundryCleaner {
             .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
     }
 
-    private static Fluxion<Void> cleanRoutes(CloudFoundryClient cloudFoundryClient, Predicate<RouteResource> predicate) {
+    private static Flux<Void> cleanRoutes(CloudFoundryClient cloudFoundryClient, Predicate<RouteResource> predicate) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.routes()
                 .list(ListRoutesRequest.builder()
@@ -195,7 +190,7 @@ final class CloudFoundryCleaner {
             .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
     }
 
-    private static Fluxion<Void> cleanSpaces(CloudFoundryClient cloudFoundryClient, Predicate<SpaceResource> predicate) {
+    private static Flux<Void> cleanSpaces(CloudFoundryClient cloudFoundryClient, Predicate<SpaceResource> predicate) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .list(ListSpacesRequest.builder()
@@ -212,19 +207,4 @@ final class CloudFoundryCleaner {
             .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
     }
 
-    private static Fluxion<Void> removePrivateDomains(CloudFoundryClient cloudFoundryClient, String organizationId, Logger logger) {
-        return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizations()
-                .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
-                    .page(page)
-                    .organizationId(organizationId)
-                    .build()))
-            .map(ResourceUtils::getId)
-            .doOnNext(domainId -> logger.debug("-- REMOVING_PRIVATE_DOMAIN(" + domainId + ")_ORGID(" + organizationId + ") --"))
-            .flatMap(privateDomainId -> cloudFoundryClient.organizations()
-                .removePrivateDomain(RemoveOrganizationPrivateDomainRequest.builder()
-                    .privateDomainId(privateDomainId)
-                    .organizationId(organizationId)
-                    .build()));
-    }
 }

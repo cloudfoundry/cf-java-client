@@ -27,8 +27,8 @@ import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.ValidationUtils;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.rx.Fluxion;
 
 import java.util.Map;
 
@@ -81,7 +81,7 @@ public final class DefaultServices implements Services {
             .map(ResourceUtils::getId);
     }
 
-    private static Fluxion<ApplicationResource> requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
+    private static Flux<ApplicationResource> requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .listApplications(ListSpaceApplicationsRequest.builder()
@@ -100,7 +100,7 @@ public final class DefaultServices implements Services {
                 .build());
     }
 
-    private static Fluxion<ServiceInstanceResource> requestSpaceServiceInstances(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
+    private static Flux<ServiceInstanceResource> requestSpaceServiceInstances(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .listServiceInstances(ListSpaceServiceInstancesRequest.builder()

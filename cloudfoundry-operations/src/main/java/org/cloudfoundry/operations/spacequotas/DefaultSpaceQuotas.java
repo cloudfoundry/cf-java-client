@@ -26,7 +26,6 @@ import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.ValidationUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.rx.Fluxion;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -64,7 +63,7 @@ public final class DefaultSpaceQuotas implements SpaceQuotas {
             .otherwise(ExceptionUtils.<SpaceQuotaDefinitionResource>convert("Space Quota %s does not exist", name));
     }
 
-    private static Fluxion<SpaceQuotaDefinitionResource> requestSpaceQuotaDefinitions(CloudFoundryClient cloudFoundryClient, String organizationId) {
+    private static Flux<SpaceQuotaDefinitionResource> requestSpaceQuotaDefinitions(CloudFoundryClient cloudFoundryClient, String organizationId) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.organizations()
                 .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()

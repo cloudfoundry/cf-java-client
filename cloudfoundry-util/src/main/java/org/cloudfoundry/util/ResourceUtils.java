@@ -18,7 +18,7 @@ package org.cloudfoundry.util;
 
 import org.cloudfoundry.client.v2.PaginatedResponse;
 import org.cloudfoundry.client.v2.Resource;
-import reactor.rx.Fluxion;
+import reactor.core.publisher.Flux;
 
 public final class ResourceUtils {
 
@@ -54,8 +54,8 @@ public final class ResourceUtils {
      * @param <U>      the response type
      * @return a stream of resources from the response
      */
-    public static <R extends Resource<?>, U extends PaginatedResponse<R>> Fluxion<R> getResources(U response) {
-        return Fluxion.fromIterable(response.getResources());
+    public static <R extends Resource<?>, U extends PaginatedResponse<R>> Flux<R> getResources(U response) {
+        return Flux.fromIterable(response.getResources());
     }
 
 }

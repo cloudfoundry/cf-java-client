@@ -109,14 +109,12 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
     @Override
     public Flux<byte[]> download(DownloadApplicationRequest request) {
-        return getStream(request, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "download"))
-            .as(Flux::from);
+        return getStream(request, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "download"));
     }
 
     @Override
     public Flux<byte[]> downloadDroplet(DownloadApplicationDropletRequest request) {
-        return getStream(request, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "droplet", "download"))
-            .as(Flux::from);
+        return getStream(request, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "droplet", "download"));
     }
 
     @Override

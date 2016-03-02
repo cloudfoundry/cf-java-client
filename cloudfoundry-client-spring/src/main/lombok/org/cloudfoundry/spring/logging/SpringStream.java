@@ -28,7 +28,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.SchedulerGroup;
 import reactor.core.subscriber.SubscriberWithContext;
-import reactor.rx.Fluxion;
 
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.DeploymentException;
@@ -62,8 +61,7 @@ public final class SpringStream {
     }
 
     public Flux<LogMessage> stream(StreamLogsRequest request) {
-        return ws(request, builder -> builder.path("tail/").queryParam("app", request.getApplicationId()), LoggregatorMessageHandler::new)
-            .as(Flux::from);
+        return ws(request, builder -> builder.path("tail/").queryParam("app", request.getApplicationId()), LoggregatorMessageHandler::new);
     }
 
     private static String toString(String method, URI uri) {
@@ -77,23 +75,23 @@ public final class SpringStream {
     }
 
     @SuppressWarnings("unchecked")
-    private <T, V extends Validatable> Fluxion<T> exchange(V request, Consumer<Subscriber<T>> exchange) {
+    private <T, V extends Validatable> Flux<T> exchange(V request, Consumer<Subscriber<T>> exchange) {
         return ValidationUtils
             .validate(request)
-            .flatMap(request1 -> Fluxion
+            .flatMap(request1 -> Flux
                 .generate((Long n, SubscriberWithContext<T, Void> subscriber) -> {
                     if (n != Long.MAX_VALUE) {
                         subscriber.onError(new IllegalArgumentException("Publisher doesn't support back pressure"));
                     }
 
                     exchange.accept(subscriber);
-                }))
+                })
+            )
             .publishOn(this.schedulerGroup)
-            .as(Fluxion::from)
             .onBackpressureBuffer();
     }
 
-    private <T> Fluxion<T> ws(Validatable request, Consumer<UriComponentsBuilder> builderCallback, Function<Subscriber<T>, MessageHandler> messageHandlerCreator) {
+    private <T> Flux<T> ws(Validatable request, Consumer<UriComponentsBuilder> builderCallback, Function<Subscriber<T>, MessageHandler> messageHandlerCreator) {
         AtomicReference<Session> session = new AtomicReference<>();
 
         return exchange(request, (Consumer<Subscriber<T>>) subscriber -> {

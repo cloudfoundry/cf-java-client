@@ -18,8 +18,8 @@ package org.cloudfoundry.util;
 
 import org.cloudfoundry.client.v2.PaginatedResponse;
 import org.cloudfoundry.client.v2.Resource;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.rx.Fluxion;
 
 import java.util.function.Function;
 
@@ -38,11 +38,10 @@ public final class PaginationUtils {
      * @param <U>          the type of {@link PaginatedResponse}.
      * @return a stream of <code>U</code> objects.
      */
-    public static <U extends PaginatedResponse<?>> Fluxion<U> requestPages(Function<Integer, Mono<U>> pageSupplier) {
+    public static <U extends PaginatedResponse<?>> Flux<U> requestPages(Function<Integer, Mono<U>> pageSupplier) {
         return pageSupplier
             .apply(1)
-            .flatMap(requestAdditionalPages(pageSupplier))
-            .as(Fluxion::from);
+            .flatMap(requestAdditionalPages(pageSupplier));
     }
 
     /**
@@ -53,19 +52,19 @@ public final class PaginationUtils {
      * @param <U>          the type of {@link PaginatedResponse}.
      * @return a stream of <code>R</code> objects.
      */
-    public static <R extends Resource<?>, U extends PaginatedResponse<R>> Fluxion<R> requestResources(Function<Integer, Mono<U>> pageSupplier) {
+    public static <R extends Resource<?>, U extends PaginatedResponse<R>> Flux<R> requestResources(Function<Integer, Mono<U>> pageSupplier) {
         return requestPages(pageSupplier)
             .flatMap(ResourceUtils::getResources);
     }
 
-    private static <U extends PaginatedResponse<?>> Function<U, Fluxion<U>> requestAdditionalPages(Function<Integer, Mono<U>> pageSupplier) {
+    private static <U extends PaginatedResponse<?>> Function<U, Flux<U>> requestAdditionalPages(Function<Integer, Mono<U>> pageSupplier) {
         return response -> {
             Integer totalPages = response.getTotalPages();
             if (totalPages == null) {
                 throw new IllegalStateException(String.format("Page response (class %s) has no total pages set", response.getClass().getCanonicalName()));
             }
 
-            return Fluxion
+            return Flux
                 .range(2, totalPages - 1)
                 .flatMap(pageSupplier::apply)
                 .startWith(response);

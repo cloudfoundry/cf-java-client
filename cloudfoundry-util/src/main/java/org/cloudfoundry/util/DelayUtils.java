@@ -19,13 +19,11 @@ package org.cloudfoundry.util;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.rx.Fluxion;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 import java.util.function.Function;
-
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
  * Utilities for delaying progress
@@ -40,40 +38,29 @@ public final class DelayUtils {
     /**
      * Implements an exponential backoff delay
      *
-     * @param minDuration the minimum duration of the delay
-     * @param maxDuration the maximum duration of the delay
-     * @param timeUnit    the time unit for the minimum and maximum durations
-     * @param maxRetries  the maximum number of retries
-     * @return a delayed {@link Mono}
+     * @param minimum the minimum duration
+     * @param maximum the maximum duration
+     * @return a delayed {@link Publisher}
      */
-    public static Function<Fluxion<Long>, Publisher<?>> exponentialBackOff(long minDuration, long maxDuration, TimeUnit timeUnit, int maxRetries) {
-        return count -> getTest(count)
-            .zipWith(getRetryCounter(maxRetries), 1)
-            .flatMap(function((itemCount, retryCount) -> getDelay(minDuration, maxDuration, timeUnit, retryCount)));
+    public static Function<Flux<Long>, Publisher<?>> exponentialBackOff(Duration minimum, Duration maximum) {
+        return iteration -> getDelay(minimum, maximum, iteration);
     }
 
-    private static long calculateDuration(long minDuration, long maxDuration, Integer retryCount) {
-        long candidateDuration = minDuration * (long) Math.pow(2, retryCount);
-        return Math.min(candidateDuration, maxDuration);
+    private static Duration calculateDuration(Duration minimum, Duration maximum, Long iteration) {
+        Duration candidate = minimum.multipliedBy((long) Math.pow(2, iteration));
+        return min(candidate, maximum);
     }
 
-    private static Publisher<?> getDelay(long minDuration, long maxDuration, TimeUnit timeUnit, Integer retryCount) {
-        long duration = calculateDuration(minDuration, maxDuration, retryCount);
-
-        return Mono
-            .delay(TimeUnit.MILLISECONDS.convert(duration, timeUnit))
-            .doOnSubscribe(subscription -> LOGGER.debug("Delaying {} {}", duration, timeUnit.toString().toLowerCase()));
+    private static Publisher<?> getDelay(Duration minimum, Duration maximum, Flux<Long> iteration) {
+        return iteration
+            .map(iteration1 -> calculateDuration(minimum, maximum, iteration1))
+            .flatMap((delay) -> Mono
+                .delay(delay)
+                .doOnSubscribe(subscription -> LOGGER.debug("Delaying {} seconds", delay.getSeconds())));
     }
 
-    private static Fluxion<Integer> getRetryCounter(int maxRetries) {
-        return Fluxion
-            .range(0, maxRetries)
-            .concatWith(Fluxion.error(new IllegalStateException("Exceeded maximum number of retries"), true));
-    }
-
-    private static Fluxion<Long> getTest(Fluxion<Long> count) {
-        return count
-            .takeWhile(count1 -> count1 == 0);
+    private static Duration min(Duration a, Duration b) {
+        return (a.compareTo(b) <= 0) ? a : b;
     }
 
 }

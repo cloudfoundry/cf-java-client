@@ -50,7 +50,6 @@ import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.ValidationUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.rx.Fluxion;
 
 import java.util.List;
 
@@ -115,7 +114,6 @@ public final class DefaultRoutes implements Routes {
             .map(ResourceUtils::getId)
             .flatMap(routeId -> getApplications(this.cloudFoundryClient, routeId)
                 .and(Mono.just(routeId)))
-            .as(Fluxion::from)
             .filter(predicate((applicationResources, routeId) -> isOrphan(applicationResources)))
             .flatMap(function((applicationResources, routeId) -> deleteRoute(this.cloudFoundryClient, routeId)))
             .after();
@@ -206,7 +204,7 @@ public final class DefaultRoutes implements Routes {
             .map(response -> ResourceUtils.getEntity(response).getName());
     }
 
-    private static Fluxion<Resource<?>> getDomains(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
+    private static Flux<Resource<?>> getDomains(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
         return requestPrivateDomains(cloudFoundryClient, organizationId, domain)
             .map(OperationUtils.<PrivateDomainResource, Resource<?>>cast())
             .switchIfEmpty(requestSharedDomains(cloudFoundryClient, domain)
@@ -239,15 +237,13 @@ public final class DefaultRoutes implements Routes {
             .map(ResourceUtils::getId);
     }
 
-    private static Fluxion<RouteResource> getRoutes(CloudFoundryClient cloudFoundryClient, ListRoutesRequest request, Mono<String> organizationId, Mono<String> spaceId) {
+    private static Flux<RouteResource> getRoutes(CloudFoundryClient cloudFoundryClient, ListRoutesRequest request, Mono<String> organizationId, Mono<String> spaceId) {
         if (Level.ORGANIZATION == request.getLevel()) {
             return organizationId
-                .flatMap(organizationId1 -> requestOrganizationRoutes(cloudFoundryClient, organizationId1))
-                .as(Fluxion::from);
+                .flatMap(organizationId1 -> requestOrganizationRoutes(cloudFoundryClient, organizationId1));
         } else {
             return spaceId
-                .flatMap(spaceId1 -> requestSpaceRoutes(cloudFoundryClient, spaceId1))
-                .as(Fluxion::from);
+                .flatMap(spaceId1 -> requestSpaceRoutes(cloudFoundryClient, spaceId1));
         }
     }
 
@@ -271,7 +267,7 @@ public final class DefaultRoutes implements Routes {
         return applications.isEmpty();
     }
 
-    private static Fluxion<ApplicationResource> requestApplications(CloudFoundryClient cloudFoundryClient, String routeId) {
+    private static Flux<ApplicationResource> requestApplications(CloudFoundryClient cloudFoundryClient, String routeId) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.routes()
                 .listApplications(ListRouteApplicationsRequest.builder()
@@ -280,7 +276,7 @@ public final class DefaultRoutes implements Routes {
                     .build()));
     }
 
-    private static Fluxion<ApplicationResource> requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
+    private static Flux<ApplicationResource> requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .listApplications(ListSpaceApplicationsRequest.builder()
@@ -323,7 +319,7 @@ public final class DefaultRoutes implements Routes {
                 .build());
     }
 
-    private static Fluxion<RouteResource> requestOrganizationRoutes(CloudFoundryClient cloudFoundryClient, String organizationId) {
+    private static Flux<RouteResource> requestOrganizationRoutes(CloudFoundryClient cloudFoundryClient, String organizationId) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.routes()
                 .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
@@ -332,7 +328,7 @@ public final class DefaultRoutes implements Routes {
                     .build()));
     }
 
-    private static Fluxion<PrivateDomainResource> requestPrivateDomains(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
+    private static Flux<PrivateDomainResource> requestPrivateDomains(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.organizations()
                 .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
@@ -359,7 +355,7 @@ public final class DefaultRoutes implements Routes {
                 .build());
     }
 
-    private static Fluxion<RouteResource> requestRoutes(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
+    private static Flux<RouteResource> requestRoutes(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
         return PaginationUtils.
             requestResources(page -> cloudFoundryClient.routes()
                 .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
@@ -370,7 +366,7 @@ public final class DefaultRoutes implements Routes {
                     .build()));
     }
 
-    private static Fluxion<SharedDomainResource> requestSharedDomains(CloudFoundryClient cloudFoundryClient, String domain) {
+    private static Flux<SharedDomainResource> requestSharedDomains(CloudFoundryClient cloudFoundryClient, String domain) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.sharedDomains()
                 .list(ListSharedDomainsRequest.builder()
@@ -386,7 +382,7 @@ public final class DefaultRoutes implements Routes {
                 .build());
     }
 
-    private static Fluxion<RouteResource> requestSpaceRoutes(CloudFoundryClient cloudFoundryClient, String spaceId) {
+    private static Flux<RouteResource> requestSpaceRoutes(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .listRoutes(ListSpaceRoutesRequest.builder()
@@ -395,7 +391,7 @@ public final class DefaultRoutes implements Routes {
                     .build()));
     }
 
-    private static Fluxion<SpaceResource> requestSpaces(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
+    private static Flux<SpaceResource> requestSpaces(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.organizations()
                 .listSpaces(ListOrganizationSpacesRequest.builder()
