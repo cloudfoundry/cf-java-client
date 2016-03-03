@@ -1,0 +1,12 @@
+{
+  "id": "50cf6125-4372-475e-94e8-c43f84111e75",
+  "originKey": "uaa",
+  "name": "internal",
+  "type": "internal",
+  "config": null,
+  "version": 0,
+  "created": 1426260091149,
+  "active": true,
+  "identityZoneId": "testzone1",
+  "last_modified": 1426260091149
+}

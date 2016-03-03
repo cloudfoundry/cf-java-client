@@ -20,6 +20,7 @@ import lombok.ToString;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.spring.client.v2.CloudFoundryExceptionBuilder;
 import org.cloudfoundry.util.ValidationUtils;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -40,6 +41,7 @@ import java.util.function.Supplier;
 
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.PATCH;
+import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
 
 @ToString
@@ -138,16 +140,28 @@ public abstract class AbstractSpringOperations {
     }
 
     protected final <T> Mono<T> post(Validatable request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
-        return postWithBody(request, () -> request, responseType, builderCallback);
+        return postWithBody(request, () -> request, responseType, builderCallback, null);
     }
 
-    protected final <T, B> Mono<T> postWithBody(Validatable request, Supplier<B> bodySupplier, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
+    protected final <T> Mono<T> post(Validatable request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback, Consumer<HttpHeaders> headerCallback) {
+        return postWithBody(request, () -> request, responseType, builderCallback, headerCallback);
+    }
+
+    protected final <T, B> Mono<T> postWithBody(Validatable request,
+                                                Supplier<B> bodySupplier,
+                                                Class<T> responseType,
+                                                Consumer<UriComponentsBuilder> builderCallback,
+                                                Consumer<HttpHeaders> headerCallback) {
         return exchange(request, (Function<SignalEmitter<T>, T>) signalEmitter -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
             builderCallback.accept(builder);
             URI uri = builder.build().encode().toUri();
-
-            return this.restOperations.postForObject(uri, bodySupplier.get(), responseType);
+            HttpHeaders headers = new HttpHeaders();
+            if (headerCallback != null) {
+                headerCallback.accept(headers);
+            }
+            RequestEntity<B> requestEntity = new RequestEntity<B>(bodySupplier.get(), headers, POST, uri);
+            return this.restOperations.exchange(requestEntity, responseType).getBody();
         })
             .next();
     }

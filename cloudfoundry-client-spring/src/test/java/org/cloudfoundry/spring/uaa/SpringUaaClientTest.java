@@ -31,6 +31,11 @@ public final class SpringUaaClientTest extends AbstractRestTest {
     }
 
     @Test
+    public void identityProviders() {
+        assertNotNull(this.client.identityProviders());
+    }
+
+    @Test
     public void identityZoneManagement() {
         assertNotNull(this.client.identityZoneManagement());
     }

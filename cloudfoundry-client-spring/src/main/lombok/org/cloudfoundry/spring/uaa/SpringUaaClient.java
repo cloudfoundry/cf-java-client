@@ -24,6 +24,7 @@ import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
 import org.cloudfoundry.spring.uaa.accesstokenadministration.SpringAccessTokenAdministration;
+import org.cloudfoundry.spring.uaa.identityproviders.SpringIdentityProviders;
 import org.cloudfoundry.spring.uaa.identityzonemanagement.SpringIdentityZoneManagement;
 import org.cloudfoundry.spring.util.SchedulerGroupBuilder;
 import org.cloudfoundry.spring.util.network.ConnectionContext;
@@ -32,6 +33,7 @@ import org.cloudfoundry.spring.util.network.OAuth2RestTemplateBuilder;
 import org.cloudfoundry.spring.util.network.SslCertificateTruster;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.accesstokenadministration.AccessTokenAdministration;
+import org.cloudfoundry.uaa.identityproviders.IdentityProviders;
 import org.cloudfoundry.uaa.identityzonemanagement.IdentityZoneManagement;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.web.client.RestOperations;
@@ -51,10 +53,13 @@ public final class SpringUaaClient implements UaaClient {
 
     private final SpringAccessTokenAdministration accessTokenAdministration;
 
+    private final SpringIdentityProviders identityProviders;
+
     private final SpringIdentityZoneManagement identityZoneManagement;
 
     SpringUaaClient(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
         this.accessTokenAdministration = new SpringAccessTokenAdministration(restOperations, root, schedulerGroup);
+        this.identityProviders = new SpringIdentityProviders(restOperations, root, schedulerGroup);
         this.identityZoneManagement = new SpringIdentityZoneManagement(restOperations, root, schedulerGroup);
     }
 
@@ -68,6 +73,11 @@ public final class SpringUaaClient implements UaaClient {
     @Override
     public AccessTokenAdministration accessTokenAdministration() {
         return this.accessTokenAdministration;
+    }
+
+    @Override
+    public IdentityProviders identityProviders() {
+        return this.identityProviders;
     }
 
     @Override
