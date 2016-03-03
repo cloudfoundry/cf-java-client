@@ -68,6 +68,14 @@ public final class ServicePlanEntity {
     private final String name;
 
     /**
+     * The public flag
+     *
+     * @param publiclyVisible the public flag
+     * @return the public flag
+     */
+    private final Boolean publiclyVisible;
+
+    /**
      * The service id
      *
      * @param serviceId the service id
@@ -99,35 +107,27 @@ public final class ServicePlanEntity {
      */
     private final String uniqueId;
 
-    /**
-     * The visible flag
-     *
-     * @param visible the visible flag
-     * @return the visible flag
-     */
-    private final Boolean visible;
-
     @Builder
     ServicePlanEntity(@JsonProperty("active") Boolean active,
                       @JsonProperty("description") String description,
                       @JsonProperty("extra") String extra,
                       @JsonProperty("free") Boolean free,
                       @JsonProperty("name") String name,
+                      @JsonProperty("public") Boolean publiclyVisible,
                       @JsonProperty("service_guid") String serviceId,
                       @JsonProperty("service_instances_url") String serviceInstancesUrl,
                       @JsonProperty("service_url") String serviceUrl,
-                      @JsonProperty("unique_id") String uniqueId,
-                      @JsonProperty("public") Boolean visible) {
+                      @JsonProperty("unique_id") String uniqueId) {
         this.active = active;
         this.description = description;
         this.extra = extra;
         this.free = free;
         this.name = name;
+        this.publiclyVisible = publiclyVisible;
         this.serviceId = serviceId;
         this.serviceInstancesUrl = serviceInstancesUrl;
         this.serviceUrl = serviceUrl;
         this.uniqueId = uniqueId;
-        this.visible = visible;
     }
 
 }

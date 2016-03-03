@@ -164,7 +164,7 @@ public final class SpringServicePlansTest {
                     .description("desc-52")
                     .serviceId("8ac39757-0f9d-4295-9b6f-e626f7ee3cd4")
                     .uniqueId("2aa0162c-9c88-4084-ad1d-566a09e8d316")
-                    .visible(true)
+                    .publiclyVisible(true)
                     .active(true)
                     .serviceUrl("/v2/services/8ac39757-0f9d-4295-9b6f-e626f7ee3cd4")
                     .serviceInstancesUrl("/v2/service_plans/f6ceb8a2-e6fc-43d5-a11b-7ced9e1b47c7/service_instances")
@@ -220,7 +220,7 @@ public final class SpringServicePlansTest {
                         .description("desc-54")
                         .serviceId("83dc64ef-eb0a-454c-b3d9-c554921f3bd2")
                         .uniqueId("49aee95b-2108-4bbb-9769-c6197f308acf")
-                        .visible(true)
+                        .publiclyVisible(true)
                         .active(true)
                         .serviceUrl("/v2/services/83dc64ef-eb0a-454c-b3d9-c554921f3bd2")
                         .serviceInstancesUrl("/v2/service_plans/956cb355-3acc-4ced-8161-a57b9b5c7943/service_instances")
@@ -379,7 +379,7 @@ public final class SpringServicePlansTest {
                     .description("desc-225")
                     .serviceId("42bea093-8fe5-491a-8a34-b1943dc3709a")
                     .uniqueId("7c4f2f8a-aa82-49e9-9f0c-76248aa1036d")
-                    .visible(false)
+                    .publiclyVisible(false)
                     .active(true)
                     .serviceUrl("/v2/services/42bea093-8fe5-491a-8a34-b1943dc3709a")
                     .serviceInstancesUrl("/v2/service_plans/195f6bd5-0aa4-4a97-9c8d-5410e5e6d4b6/service_instances")
@@ -391,7 +391,7 @@ public final class SpringServicePlansTest {
         protected UpdateServicePlanRequest getValidRequest() throws Exception {
             return UpdateServicePlanRequest.builder()
                 .servicePlanId("test-service-plan-id")
-                .visible(false)
+                .publiclyVisible(false)
                 .build();
         }
 
