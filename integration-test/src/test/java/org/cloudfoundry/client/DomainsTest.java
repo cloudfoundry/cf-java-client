@@ -242,13 +242,12 @@ public final class DomainsTest extends AbstractIntegrationTest {
     public void listDomainSpacesFilterByOrganizationId() {
         String domainName = getDomainName();
 
-        Mono
-            .when(this.organizationId, this.spaceId)
-            .then(function((organizationId, spaceId) -> Mono
+        this.organizationId
+            .then(organizationId -> Mono
                 .when(
                     Mono.just(organizationId),
                     createDomainId(this.cloudFoundryClient, organizationId, domainName)
-                )))
+                ))
             .flatMap(function((organizationId, domainId) -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.domains()
                     .listSpaces(ListDomainSpacesRequest.builder()
