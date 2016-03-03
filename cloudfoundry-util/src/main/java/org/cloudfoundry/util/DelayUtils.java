@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.util;
 
+import org.atteo.evo.inflector.English;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +57,10 @@ public final class DelayUtils {
             .map(iteration1 -> calculateDuration(minimum, maximum, iteration1))
             .flatMap((delay) -> Mono
                 .delay(delay)
-                .doOnSubscribe(subscription -> LOGGER.debug("Delaying {} seconds", delay.getSeconds())));
+                .doOnSubscribe(subscription -> {
+                    int seconds = (int) delay.getSeconds();
+                    LOGGER.debug("Delaying {} {}", seconds, English.plural("second", seconds));
+                }));
     }
 
     private static Duration min(Duration a, Duration b) {
