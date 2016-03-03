@@ -919,7 +919,7 @@ public final class DefaultApplications implements Applications {
             .map(ApplicationInstanceInfo::getState)
             .reduce("UNKNOWN", collectStates())
             .where(isInstanceComplete())
-            .repeatUntilNext(10, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(10)))
+            .repeatWhenEmpty(10, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(10)))
             .where(isRunning())
             .otherwiseIfEmpty(ExceptionUtils.<String>illegalState("Application %s failed during start", application));
     }
@@ -928,7 +928,7 @@ public final class DefaultApplications implements Applications {
         return requestGetApplication(cloudFoundryClient, applicationId)
             .map(response -> ResourceUtils.getEntity(response).getPackageState())
             .where(isStagingComplete())
-            .repeatUntilNext(10, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(10)))
+            .repeatWhenEmpty(10, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(10)))
             .where(isStaged())
             .otherwiseIfEmpty(ExceptionUtils.<String>illegalState("Application %s failed during staging", application));
     }

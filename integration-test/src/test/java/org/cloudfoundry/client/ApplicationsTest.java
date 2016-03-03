@@ -777,7 +777,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .build())
             .map(response -> response.getEntity().getPackageState())
             .where("STAGED"::equals)
-            .repeatUntilNext(10, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(10)))
+            .repeatWhenEmpty(10, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(10)))
             .map(state -> applicationId);
     }
 
@@ -789,7 +789,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .flatMap(response -> Flux.fromIterable(response.values()))
             .filter(applicationInstanceInfo -> "RUNNING".equals(applicationInstanceInfo.getState()))
             .next()
-            .repeatUntilNext(10, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(10)))
+            .repeatWhenEmpty(10, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(10)))
             .map(info -> applicationId);
     }
 
