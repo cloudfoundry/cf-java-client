@@ -80,8 +80,7 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
 
     @Override
     public Flux<byte[]> download(DownloadPackageRequest request) {
-        return getStream(request, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "download"))
-            .as(Flux::from);
+        return getStream(request, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "download"));
     }
 
     @Override

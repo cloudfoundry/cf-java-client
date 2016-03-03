@@ -20,8 +20,8 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.junit.Test;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.rx.Fluxion;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,8 +36,9 @@ public final class PaginationUtilsTest {
 
         List<SpaceResource> actual = PaginationUtils
             .requestPages(i -> testPaginatedResponsePublisher(i, 3))
-            .flatMap(response -> Fluxion.fromIterable(response.getResources()))
-            .toList().get();
+            .flatMap(response -> Flux.fromIterable(response.getResources()))
+            .toList()
+            .get();
 
         assertEquals(expected, actual);
     }
@@ -58,7 +59,9 @@ public final class PaginationUtilsTest {
         List<SpaceResource> expected = Arrays.asList(testSpaceResource(0), testSpaceResource(1), testSpaceResource(2));
 
         List<SpaceResource> actual = PaginationUtils
-            .requestResources(i -> testPaginatedResponsePublisher(i - 1, 3)).toList().get();
+            .requestResources(i -> testPaginatedResponsePublisher(i - 1, 3))
+            .toList()
+            .get();
 
         assertEquals(expected, actual);
     }

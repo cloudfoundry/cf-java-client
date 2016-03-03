@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.spring.util;
 
-import reactor.rx.Fluxion;
+import reactor.core.publisher.Flux;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,8 +32,8 @@ public final class Multipart {
 
     private static final String DASHES = "--";
 
-    public static Fluxion<byte[]> from(InputStream inputStream, String boundary) {
-        return Fluxion
+    public static Flux<byte[]> from(InputStream inputStream, String boundary) {
+        return Flux
             .create(subscriber -> {
                 try {
                     byte[] part = getPart(inputStream, boundary);

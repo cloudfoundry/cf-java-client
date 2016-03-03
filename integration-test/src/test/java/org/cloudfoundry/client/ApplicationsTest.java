@@ -44,6 +44,7 @@ import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.util.DelayUtils;
 import org.cloudfoundry.util.JobUtils;
+import org.cloudfoundry.util.OperationUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Assert;
@@ -51,22 +52,21 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple2;
 import reactor.core.util.Exceptions;
-import reactor.rx.Fluxion;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipFile;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.cloudfoundry.util.OperationUtils.afterComplete;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
@@ -141,7 +141,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .list(ListApplicationsRequest.builder()
                         .page(page)
                         .build())))
-            .as(Fluxion::from)
             .filter(r -> {
                 String name = ResourceUtils.getEntity(r).getName();
                 return applicationName.equals(name) || copyApplicationName.equals(name);
@@ -195,7 +194,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .download(DownloadApplicationRequest.builder()
                     .applicationId(applicationId)
                     .build()))
-            .as(Fluxion::from)
             .reduce(new ByteArrayOutputStream(), ApplicationsTest::collectIntoByteArrayInputStream)
             .map(ByteArrayOutputStream::toByteArray)
             .map(bytes -> {
@@ -222,7 +220,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .downloadDroplet(DownloadApplicationDropletRequest.builder()
                     .applicationId(applicationId)
                     .build()))
-            .as(Fluxion::from)
             .reduceWith(ByteArrayOutputStream::new, ApplicationsTest::collectIntoByteArrayInputStream)
             .map(bytes -> {
                 boolean staticFile = false;
@@ -298,7 +295,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .list(ListApplicationsRequest.builder()
                         .page(page)
                         .build())))
-            .as(Fluxion::from)
             .count()
             .subscribe(this.<Long>testSubscriber()
                 .assertThat(count -> assertTrue(count > 1)));
@@ -316,7 +312,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .diego(true)
                         .page(page)
                         .build())))
-            .as(Fluxion::from)
             .count()
             .subscribe(this.<Long>testSubscriber()
                 .assertThat(count -> assertTrue(count > 1)));
@@ -353,7 +348,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .organizationId(organizationId)
                         .page(page)
                         .build())))
-            .as(Fluxion::from)
             .count()
             .subscribe(this.<Long>testSubscriber()
                 .assertThat(count -> assertTrue(count > 1)));
@@ -372,7 +366,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .page(page)
                         .spaceId(spaceId)
                         .build())))
-            .as(Fluxion::from)
             .count()
             .subscribe(this.<Long>testSubscriber()
                 .assertThat(count -> assertTrue(count > 1)));
@@ -392,7 +385,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .page(page)
                         .stackId(stackId)
                         .build())))
-            .as(Fluxion::from)
             .count()
             .subscribe(this.<Long>testSubscriber()
                 .assertThat(count -> assertTrue(count > 1)));
@@ -772,7 +764,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build())
                 .map(ResourceUtils::getId)
                 .then(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId))
-                .as(afterComplete(() -> Mono.just(applicationId)));
+                .after(() -> Mono.just(applicationId));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -785,9 +777,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .build())
             .map(response -> response.getEntity().getPackageState())
             .where("STAGED"::equals)
-            .as(Fluxion::from)                                               // TODO: Remove once Mono.repeatWhen()
-            .repeatWhen(DelayUtils.exponentialBackOff(1, 10, SECONDS, 10))
-            .single()                                                       // TODO: Remove once Mono.repeatWhen()
+            .repeatUntilNext(10, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(10)))
             .map(state -> applicationId);
     }
 
@@ -796,11 +786,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .instances(ApplicationInstancesRequest.builder()
                 .applicationId(applicationId)
                 .build())
-            .flatMap(response -> Fluxion.fromIterable(response.values()))
-            .as(Fluxion::from)
+            .flatMap(response -> Flux.fromIterable(response.values()))
             .filter(applicationInstanceInfo -> "RUNNING".equals(applicationInstanceInfo.getState()))
-            .repeatWhen(DelayUtils.exponentialBackOff(1, 10, SECONDS, 10))
-            .single()
+            .next()
+            .repeatUntilNext(10, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(10)))
             .map(info -> applicationId);
     }
 

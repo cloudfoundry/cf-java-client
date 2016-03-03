@@ -25,11 +25,11 @@ import org.springframework.http.RequestEntity;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
 import reactor.core.subscriber.SignalEmitter;
 import reactor.core.util.Exceptions;
-import reactor.rx.Fluxion;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -70,10 +70,10 @@ public abstract class AbstractSpringOperations {
             .next();
     }
 
-    protected final <T, V extends Validatable> Fluxion<T> exchange(V request, Function<SignalEmitter<T>, T> exchange) {
+    protected final <T, V extends Validatable> Flux<T> exchange(V request, Function<SignalEmitter<T>, T> exchange) {
         return ValidationUtils
             .validate(request)
-            .flatMap(request1 -> Fluxion
+            .flatMap(request1 -> Flux
                 .yield((Consumer<SignalEmitter<T>>) signalEmitter -> {
                     try {
                         T result = exchange.apply(signalEmitter);
@@ -89,7 +89,6 @@ public abstract class AbstractSpringOperations {
                         signalEmitter.onError(t);
                     }
                 }))
-            .as(Fluxion::from)
             .publishOn(this.schedulerGroup)
             .onBackpressureBuffer();
     }
@@ -105,7 +104,7 @@ public abstract class AbstractSpringOperations {
             .next();
     }
 
-    protected final Fluxion<byte[]> getStream(Validatable request, Consumer<UriComponentsBuilder> builderCallback) {
+    protected final Flux<byte[]> getStream(Validatable request, Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, (Function<SignalEmitter<byte[]>, byte[]>) signalEmitter -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
             builderCallback.accept(builder);

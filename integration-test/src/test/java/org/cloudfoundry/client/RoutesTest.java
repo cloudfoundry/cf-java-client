@@ -40,7 +40,6 @@ import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple;
 import reactor.core.tuple.Tuple2;
 import reactor.core.tuple.Tuple3;
-import reactor.rx.Fluxion;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
@@ -379,7 +378,6 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .organizationId(organizationId)
                         .page(page)
                         .build())))
-            .as(Fluxion::from)
             .count()
             .subscribe(this.<Long>testSubscriber()
                 .assertThat(count -> assertTrue(count > 1)));

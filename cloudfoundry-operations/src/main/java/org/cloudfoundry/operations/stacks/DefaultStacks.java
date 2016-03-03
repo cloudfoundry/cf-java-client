@@ -25,7 +25,6 @@ import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.ValidationUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.rx.Fluxion;
 
 public final class DefaultStacks implements Stacks {
 
@@ -46,8 +45,7 @@ public final class DefaultStacks implements Stacks {
     @Override
     public Flux<Stack> list() {
         return requestStacks(this.cloudFoundryClient)
-            .map(this::toStack)
-            .as(Flux::from);
+            .map(this::toStack);
     }
 
     private static Mono<StackResource> getStack(CloudFoundryClient cloudFoundryClient, String stack) {
@@ -56,7 +54,7 @@ public final class DefaultStacks implements Stacks {
             .otherwise(ExceptionUtils.<StackResource>convert("Stack %s does not exist", stack));
     }
 
-    private static Fluxion<StackResource> requestStack(CloudFoundryClient cloudFoundryClient, String stack) {
+    private static Flux<StackResource> requestStack(CloudFoundryClient cloudFoundryClient, String stack) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.stacks().list(
                 ListStacksRequest.builder()
@@ -65,7 +63,7 @@ public final class DefaultStacks implements Stacks {
                     .build()));
     }
 
-    private static Fluxion<StackResource> requestStacks(CloudFoundryClient cloudFoundryClient) {
+    private static Flux<StackResource> requestStacks(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.stacks().list(
                 ListStacksRequest.builder()

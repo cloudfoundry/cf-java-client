@@ -25,11 +25,6 @@ Most projects will need two dependencies; the Operations API and an implementati
         <artifactId>reactor-core</artifactId>
         <version>2.5.0.BUILD-SNAPSHOT</version>
     </dependency>
-    <dependency>
-        <groupId>io.projectreactor</groupId>
-        <artifactId>reactor-stream</artifactId>
-        <version>2.5.0.BUILD-SNAPSHOT</version>
-    </dependency>
     ...
 </dependencies>
 ```
@@ -65,10 +60,9 @@ For Gradle, the dependencies would be defined like this:
 
 ```groovy
 dependencies {
-    compile "org.cloudfoundry:cloudfoundry-client-spring:2.0.0.BUILD-SNAPSHOT"
-    compile "org.cloudfoundry:cloudfoundry-operations:2.0.0.BUILD-SNAPSHOT"
-    compile "io.projectreactor:reactor-core:2.5.0.BUILD-SNAPSHOT"
-    compile "io.projectreactor:reactor-stream:2.5.0.BUILD-SNAPSHOT"
+    compile 'org.cloudfoundry:cloudfoundry-client-spring:2.0.0.BUILD-SNAPSHOT'
+    compile 'org.cloudfoundry:cloudfoundry-operations:2.0.0.BUILD-SNAPSHOT'
+    compile 'io.projectreactor:reactor-core:2.5.0.BUILD-SNAPSHOT'
     ...
 }
 ```
@@ -77,14 +71,14 @@ The artifacts can be found in the Spring release and snapshot repositories:
 
 ```groovy
 repositories {
-    maven { url "http://repo.spring.io/release" }
+    maven { url 'http://repo.spring.io/release' }
     ...
 }
 ```
 
 ```groovy
 repositories {
-    maven { url "http://repo.spring.io/snapshot" }
+    maven { url 'http://repo.spring.io/snapshot' }
     ...
 }
 ```

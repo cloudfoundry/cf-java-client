@@ -43,8 +43,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
-import reactor.rx.Fluxion;
-import reactor.rx.Promise;
 
 import java.security.SecureRandom;
 import java.util.Collections;
@@ -113,7 +111,7 @@ public class IntegrationTestConfiguration {
             .doOnSubscribe(s -> this.logger.debug(">> ORGANIZATION <<"))
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(id -> this.logger.debug("<< ORGANIZATION >>"))
-            .as(Promise::from);
+            .cache();
 
         organizationId.get();
         return organizationId;
@@ -135,7 +133,6 @@ public class IntegrationTestConfiguration {
                         .name(protectedDomain1)
                         .page(page)
                         .build())))
-            .as(Fluxion::from)
             .singleOrEmpty()
             .map(ResourceUtils::getId)
             .map(Optional::of)
@@ -143,7 +140,7 @@ public class IntegrationTestConfiguration {
             .doOnSubscribe(s -> this.logger.debug(">> PROTECTED DOMAIN <<"))
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(id -> this.logger.debug("<< PROTECTED DOMAIN >>"))
-            .as(Promise::from);
+            .cache();
 
         protectedDomainId.get();
         return protectedDomainId;
@@ -161,15 +158,14 @@ public class IntegrationTestConfiguration {
                         .name(protectedOrganization1)
                         .page(page)
                         .build())))
-            .as(Fluxion::from)
             .singleOrEmpty()
             .map(ResourceUtils::getId)
             .map(Optional::of)
-            .otherwiseIfEmpty(Mono.just(Optional.empty()))
+            .otherwiseIfEmpty(Mono.just(Optional.<String>empty()))
             .doOnSubscribe(s -> this.logger.debug(">> PROTECTED ORGANIZATION <<"))
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(id -> this.logger.debug("<< PROTECTED ORGANIZATION >>"))
-            .as(Promise::from);
+            .cache();
 
         protectedOrganizationId.get();
         return protectedOrganizationId;
@@ -190,7 +186,7 @@ public class IntegrationTestConfiguration {
             .doOnSubscribe(s -> this.logger.debug(">> PROTECTED SPACES <<"))
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(id -> this.logger.debug("<< PROTECTED SPACES >>"))
-            .as(Promise::from);
+            .cache();
 
         protectedSpaceIds.get();
         return protectedSpaceIds;
@@ -213,7 +209,7 @@ public class IntegrationTestConfiguration {
             .doOnSubscribe(s -> this.logger.debug(">> SPACE <<"))
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(id -> this.logger.debug("<< SPACE >>"))
-            .as(Promise::from);
+            .cache();
 
         spaceId.get();
         return spaceId;
@@ -237,7 +233,7 @@ public class IntegrationTestConfiguration {
             .doOnSubscribe(s -> this.logger.debug(">> STACK <<"))
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(id -> this.logger.debug("<< STACK >>"))
-            .as(Promise::from);
+            .cache();
 
         stackId.get();
         return stackId;
@@ -268,7 +264,7 @@ public class IntegrationTestConfiguration {
             .doOnSubscribe(s -> this.logger.debug(">> USER <<"))
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(id -> this.logger.debug("<< USER >>"))
-            .as(Promise::from);
+            .cache();
 
         userId.get();
         return userId;

@@ -57,7 +57,6 @@ import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.ValidationUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.rx.Fluxion;
 
 import java.util.List;
 import java.util.Optional;
@@ -350,7 +349,7 @@ public final class DefaultSpaces implements Spaces {
                 .build());
     }
 
-    private static Fluxion<SpaceQuotaDefinitionResource> requestOrganizationSpaceQuotas(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceQuota) {
+    private static Flux<SpaceQuotaDefinitionResource> requestOrganizationSpaceQuotas(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceQuota) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.organizations()
                 .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
@@ -360,7 +359,7 @@ public final class DefaultSpaces implements Spaces {
             .filter(resource -> ResourceUtils.getEntity(resource).getName().equals(spaceQuota));
     }
 
-    private static Fluxion<SpaceResource> requestOrganizationSpaces(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
+    private static Flux<SpaceResource> requestOrganizationSpaces(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.organizations()
                 .listSpaces(ListOrganizationSpacesRequest.builder()
@@ -370,7 +369,7 @@ public final class DefaultSpaces implements Spaces {
                     .build()));
     }
 
-    private static Fluxion<OrganizationResource> requestOrganizations(CloudFoundryClient cloudFoundryClient, String organizationName) {
+    private static Flux<OrganizationResource> requestOrganizations(CloudFoundryClient cloudFoundryClient, String organizationName) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.organizations()
                 .list(ListOrganizationsRequest.builder()
@@ -379,7 +378,7 @@ public final class DefaultSpaces implements Spaces {
                     .build()));
     }
 
-    private static Fluxion<ApplicationResource> requestSpaceApplications(CloudFoundryClient cloudFoundryClient, String spaceId) {
+    private static Flux<ApplicationResource> requestSpaceApplications(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .listApplications(ListSpaceApplicationsRequest.builder()
@@ -388,7 +387,7 @@ public final class DefaultSpaces implements Spaces {
                     .build()));
     }
 
-    private static Fluxion<DomainResource> requestSpaceDomains(CloudFoundryClient cloudFoundryClient, String spaceId) {
+    private static Flux<DomainResource> requestSpaceDomains(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .listDomains(ListSpaceDomainsRequest.builder()
@@ -404,7 +403,7 @@ public final class DefaultSpaces implements Spaces {
                 .build());
     }
 
-    private static Fluxion<SecurityGroupResource> requestSpaceSecurityGroups(CloudFoundryClient cloudFoundryClient, String spaceId) {
+    private static Flux<SecurityGroupResource> requestSpaceSecurityGroups(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .listSecurityGroups(ListSpaceSecurityGroupsRequest.builder()
@@ -413,7 +412,7 @@ public final class DefaultSpaces implements Spaces {
                     .build()));
     }
 
-    private static Fluxion<ServiceResource> requestSpaceServices(CloudFoundryClient cloudFoundryClient, String spaceId) {
+    private static Flux<ServiceResource> requestSpaceServices(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .listServices(ListSpaceServicesRequest.builder()
@@ -422,7 +421,7 @@ public final class DefaultSpaces implements Spaces {
                     .build()));
     }
 
-    private static Fluxion<SpaceResource> requestSpaces(CloudFoundryClient cloudFoundryClient, String organizationId) {
+    private static Flux<SpaceResource> requestSpaces(CloudFoundryClient cloudFoundryClient, String organizationId) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .list(ListSpacesRequest.builder()

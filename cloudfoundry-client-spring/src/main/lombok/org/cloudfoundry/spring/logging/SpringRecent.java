@@ -23,7 +23,6 @@ import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.rx.Fluxion;
 
 import java.net.URI;
 import java.util.List;
@@ -48,7 +47,7 @@ public final class SpringRecent extends AbstractSpringOperations {
     @SuppressWarnings("unchecked")
     public Flux<LogMessage> recent(RecentLogsRequest request) {
         return get(request, List.class, builder -> builder.pathSegment("recent").queryParam("app", request.getApplicationId()))
-            .flatMap(Fluxion::fromIterable);
+            .flatMap(Flux::fromIterable);
     }
 
 }

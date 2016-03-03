@@ -25,8 +25,8 @@ import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.ValidationUtils;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.rx.Fluxion;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -66,7 +66,7 @@ public final class DefaultDomains implements Domains {
                 .build());
     }
 
-    private static Fluxion<OrganizationResource> requestOrganizations(CloudFoundryClient cloudFoundryClient, String organization) {
+    private static Flux<OrganizationResource> requestOrganizations(CloudFoundryClient cloudFoundryClient, String organization) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.organizations().list(
                 ListOrganizationsRequest.builder()

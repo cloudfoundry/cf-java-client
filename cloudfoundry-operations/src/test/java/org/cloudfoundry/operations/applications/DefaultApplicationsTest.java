@@ -909,7 +909,7 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-            requestApplicationSummary(this.cloudFoundryClient, "test-metdata-id");
+            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
             requestDeleteApplication(this.cloudFoundryClient, "test-metadata-id");
         }
 

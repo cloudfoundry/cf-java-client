@@ -21,9 +21,6 @@ import org.cloudfoundry.operations.organizations.CreateOrganizationRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
-import reactor.rx.Fluxion;
-
-import static org.cloudfoundry.util.OperationUtils.afterStreamComplete;
 
 
 public final class OrganizationsTest extends AbstractIntegrationTest {
@@ -42,10 +39,9 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .create(CreateOrganizationRequest.builder()
                 .organizationName(organizationName)
                 .build())
-            .as(Fluxion::from)
-            .as(afterStreamComplete(() -> this.cloudFoundryOperations.organizations()
-                .list()
-                .as(Fluxion::from)))
+            .flux()
+            .after(() -> this.cloudFoundryOperations.organizations()
+                .list())
             .filter(organizationSummary -> organizationName.equals(organizationSummary.getName()))
             .subscribe(testSubscriber()
                 .assertCount(1));
@@ -56,7 +52,6 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         this.organizationId
             .flatMap(organizationId -> this.cloudFoundryOperations.organizations()
                 .list()
-                .as(Fluxion::from)
                 .filter(organization -> organization.getId().equals(organizationId)))
             .subscribe(testSubscriber()
                 .assertCount(1));

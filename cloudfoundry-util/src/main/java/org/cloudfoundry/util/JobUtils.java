@@ -23,7 +23,7 @@ import org.cloudfoundry.client.v2.job.GetJobResponse;
 import org.cloudfoundry.client.v2.job.JobEntity;
 import reactor.core.publisher.Mono;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import java.time.Duration;
 
 /**
  * Utilities for Jobs
@@ -44,7 +44,7 @@ public final class JobUtils {
         return requestJob(cloudFoundryClient, jobId)
             .map(GetJobResponse::getEntity)
             .where(JobUtils::isComplete)
-            .as(OperationUtils.repeatWhen(DelayUtils.exponentialBackOff(1, 10, SECONDS, 10)))  // TODO: Remove once Mono.repeatWhen()
+            .repeatUntilNext(10, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(10)))
             .where(entity -> "failed".equals(entity.getStatus()))
             .flatMap(JobUtils::getError)
             .after();

@@ -25,7 +25,6 @@ import org.springframework.core.io.Resource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.util.Exceptions;
-import reactor.rx.Fluxion;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -88,7 +87,6 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
 
     protected final Mono<byte[]> getContents(Flux<byte[]> flux) {
         return flux
-            .as(Fluxion::from)
             .reduce(new ByteArrayOutputStream(), collectIntoByteArrayInputStream())
             .map(ByteArrayOutputStream::toByteArray);
     }

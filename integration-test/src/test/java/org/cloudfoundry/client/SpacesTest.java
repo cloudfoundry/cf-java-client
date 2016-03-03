@@ -73,7 +73,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple2;
-import reactor.rx.Fluxion;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -81,7 +80,6 @@ import java.util.Date;
 import java.util.function.Predicate;
 
 import static java.time.temporal.ChronoUnit.HOURS;
-import static org.cloudfoundry.util.OperationUtils.afterComplete;
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
@@ -271,7 +269,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .build())
                 .map(ResourceUtils::getId)
                 .then(jobId -> JobUtils.waitForCompletion(this.cloudFoundryClient, jobId))
-                .as(afterComplete(() -> Mono.just(spaceId))))
+                .after(() -> Mono.just(spaceId)))
             .flatMap(spaceId -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.spaces()
                     .list(ListSpacesRequest.builder()
@@ -528,7 +526,6 @@ public final class SpacesTest extends AbstractIntegrationTest {
                         .spaceId(spaceId)
                         .page(page)
                         .build()))))
-            .as(Fluxion::from)
             .filter(domainResource -> domainName.equals(ResourceUtils.getEntity(domainResource).getName()))
             .subscribe(testSubscriber()
                 .assertCount(1));
@@ -1385,7 +1382,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .organizationId(organizationId)
                 .username(username)
                 .build())
-            .as(afterComplete(() -> PaginationUtils
+            .after(() -> PaginationUtils
                 .requestResources(page -> cloudFoundryClient.users()
                     .list(ListUsersRequest.builder()
                         .organizationId(organizationId)
@@ -1394,7 +1391,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .filter(resource -> ResourceUtils.getEntity(resource).getUsername().equals(username))
                 .single()
                 .map(ResourceUtils::getId)
-            ));
+            );
     }
 
     private static String getPastTimestamp() {
@@ -1405,5 +1402,5 @@ public final class SpacesTest extends AbstractIntegrationTest {
     private static Predicate<SpaceResource> hasOrganizationId(String organizationId) {
         return spaceResource -> ResourceUtils.getEntity(spaceResource).getOrganizationId().equals(organizationId);
     }
-    
+
 }
