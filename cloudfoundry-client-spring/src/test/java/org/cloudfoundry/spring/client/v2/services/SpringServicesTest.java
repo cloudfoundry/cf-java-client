@@ -269,7 +269,7 @@ public final class SpringServicesTest {
                         .description("desc-218")
                         .serviceId("f1b0edbe-fac4-4512-9071-8b26045413bb")
                         .uniqueId("48fb5a34-1c14-4da5-944e-a14fa1ba5325")
-                        .visible(true)
+                        .publiclyVisible(true)
                         .active(true)
                         .serviceUrl("/v2/services/f1b0edbe-fac4-4512-9071-8b26045413bb")
                         .serviceInstancesUrl("/v2/service_plans/51067400-d79f-4ca5-9400-1f36f5dd09e7/service_instances")

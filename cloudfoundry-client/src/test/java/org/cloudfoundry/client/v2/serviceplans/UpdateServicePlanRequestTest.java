@@ -29,7 +29,7 @@ public final class UpdateServicePlanRequestTest {
     public void isValid() {
         ValidationResult result = UpdateServicePlanRequest.builder()
             .servicePlanId("test-service-plan-id")
-            .visible(false)
+            .publiclyVisible(false)
             .build()
             .isValid();
 
@@ -39,7 +39,7 @@ public final class UpdateServicePlanRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = UpdateServicePlanRequest.builder()
-            .visible(false)
+            .publiclyVisible(false)
             .build()
             .isValid();
 

@@ -27,6 +27,15 @@ import org.cloudfoundry.ValidationResult;
 public final class UpdateServicePlanRequest implements Validatable {
 
     /**
+     * Make the plan visible to all users
+     *
+     * @param publiclyVisible whether to make the plan visible to all users
+     * @return whether to make the plan visible to all users
+     */
+    @Getter(onMethod = @__(@JsonProperty("public")))
+    private final Boolean publiclyVisible;
+
+    /**
      * The service plan id
      *
      * @param servicePlanId the service plan id
@@ -35,19 +44,10 @@ public final class UpdateServicePlanRequest implements Validatable {
     @Getter(onMethod = @__(@JsonIgnore))
     private final String servicePlanId;
 
-    /**
-     * Make the plan visible to all users
-     *
-     * @param visible whether to make the plan visible to all users
-     * @return whether to make the plan visible to all users
-     */
-    @Getter(onMethod = @__(@JsonProperty("public")))
-    private final Boolean visible;
-
     @Builder
-    UpdateServicePlanRequest(Boolean visible,
+    UpdateServicePlanRequest(Boolean publiclyVisible,
                              String servicePlanId) {
-        this.visible = visible;
+        this.publiclyVisible = publiclyVisible;
         this.servicePlanId = servicePlanId;
     }
 
