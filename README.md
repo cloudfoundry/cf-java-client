@@ -145,16 +145,15 @@ Once you've got a reference to the `CloudFoundryOperations`, it's time to start 
 1. Prints the name of the each organization to `System.out`
 
 ```java
-Stream
-    .from(this.cloudFoundryOperations.organizations()
-        .list())
+cloudFoundryOperations.organizations()
+    .list()
     .map(Organization::getName)
     .consume(System.out::println);
 ```
 
 To relate the example to the description above the following happens:
 
-1. `Stream.from(...)` – Wraps the Reactive Streams `Publisher` (an interoperability type) in the Reactor-native `Stream` type
+1. `.list()` – Lists the Cloud Foundry organizations
 1. `.map(...)` – Maps an input type to an output type.  This example uses a method a reference and the equivalent lambda would look like `organization -> organization.getName()`.
 1. `consume...` – The terminal operation that consumes each item in the stream.  Again, this example uses a method reference and the the equivalent lambda would look like `name -> System.out.println(name)`.
 
@@ -163,11 +162,10 @@ To relate the example to the description above the following happens:
 As mentioned earlier, the `cloudfoundry-operations` implementation builds upon the `cloudfoundry-client` API.  That implementation takes advantage of the same reactive style in the lower-level API.  The implementation of the `Organizations.list()` method (which was demonstrated above) looks like the following (roughly):
 
 ```java
-Stream
-    .from(cloudFoundryClient.organizations()
-        .list(ListOrganizationsRequest.builder()
-            .page(1)
-            .build()))
+cloudFoundryClient.organizations()
+    .list(ListOrganizationsRequest.builder()
+        .page(1)
+        .build())
     .flatMap(response -> Stream.from(response.getResources))
     .map(resource -> Organization.builder()
         .id(resource.getMetadata().getId())
@@ -177,8 +175,8 @@ Stream
 
 The above example is more complicated:
 
-1. `Stream.from(...)` – Wraps the Reactive Streams `Publisher` in the Reactor-native `Stream` type
-1. `.flatMap(...)` – substitutes the original stream with a stream of the `Resource`s returned by the requested page
+1. `.list(...)` – Retrieves a page of Cloud Foundry organizations
+1. `.flatMap(...)` – Substitutes the original stream with a stream of the `Resource`s returned by the requested page
 1. `.map(...)` – Maps the `Resource` to an `Organization` type
 
 ### Maven Plugin
@@ -190,7 +188,7 @@ TODO: Document once implemented
 TODO: Document once implemented
 
 ## Development
-The project depends on Java 8 but is built to be Java 7 compatible.  To build from source and install to your local Maven cache, run the following:
+The project depends on Java 8.  To build from source and install to your local Maven cache, run the following:
 
 ```shell
 $ ./mvnw clean install
