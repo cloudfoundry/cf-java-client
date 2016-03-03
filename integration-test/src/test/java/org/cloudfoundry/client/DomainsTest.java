@@ -45,6 +45,7 @@ import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public final class DomainsTest extends AbstractIntegrationTest {
 
@@ -139,26 +140,17 @@ public final class DomainsTest extends AbstractIntegrationTest {
     public void listDomainSpaces() {
         String domainName = getDomainName();
 
-        Mono.when(this.organizationId, this.spaceId)
-            .then(function((organizationId, spaceId) -> Mono
-                .when(
-                    Mono.just(spaceId),
-                    createDomainId(this.cloudFoundryClient, organizationId, domainName)
-                )))
-            .then(function((spaceId, domainId) -> Mono
-                .when(
-                    PaginationUtils
-                        .requestResources(page -> this.cloudFoundryClient.domains()
-                            .listSpaces(ListDomainSpacesRequest.builder()
-                                .domainId(domainId)
-                                .page(page)
-                                .build()))
-                        .single()
-                        .map(ResourceUtils::getId),
-                    Mono.just(spaceId)
-                )))
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+        this.organizationId
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
+            .flatMap(domainId -> PaginationUtils
+                .requestResources(page -> this.cloudFoundryClient.domains()
+                    .listSpaces(ListDomainSpacesRequest.builder()
+                        .domainId(domainId)
+                        .page(page)
+                        .build())))
+            .count()
+            .subscribe(this.<Long>testSubscriber()
+                .assertThat(count -> assertTrue(count > 0)));
     }
 
     @Test
@@ -221,7 +213,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
     public void listDomainSpacesFilterByName() {
         String domainName = getDomainName();
 
-        Mono.when(this.organizationId, this.spaceId)
+        Mono
+            .when(this.organizationId, this.spaceId)
             .then(function((organizationId, spaceId) -> Mono
                 .when(
                     Mono.just(spaceId),
@@ -249,28 +242,23 @@ public final class DomainsTest extends AbstractIntegrationTest {
     public void listDomainSpacesFilterByOrganizationId() {
         String domainName = getDomainName();
 
-        Mono.when(this.organizationId, this.spaceId)
+        Mono
+            .when(this.organizationId, this.spaceId)
             .then(function((organizationId, spaceId) -> Mono
                 .when(
                     Mono.just(organizationId),
-                    Mono.just(spaceId),
                     createDomainId(this.cloudFoundryClient, organizationId, domainName)
                 )))
-            .then(function((organizationId, spaceId, domainId) -> Mono
-                .when(
-                    PaginationUtils
-                        .requestResources(page -> this.cloudFoundryClient.domains()
-                            .listSpaces(ListDomainSpacesRequest.builder()
-                                .domainId(domainId)
-                                .organizationId(organizationId)
-                                .page(page)
-                                .build()))
-                        .single()
-                        .map(ResourceUtils::getId),
-                    Mono.just(spaceId)
-                )))
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+            .flatMap(function((organizationId, domainId) -> PaginationUtils
+                .requestResources(page -> this.cloudFoundryClient.domains()
+                    .listSpaces(ListDomainSpacesRequest.builder()
+                        .domainId(domainId)
+                        .organizationId(organizationId)
+                        .page(page)
+                        .build()))))
+            .count()
+            .subscribe(this.<Long>testSubscriber()
+                .assertThat(count -> assertTrue(count > 0)));
     }
 
     @Test
