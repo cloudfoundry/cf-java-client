@@ -39,6 +39,7 @@ public final class UpdateServicePlanRequest implements Validatable {
      * Make the plan visible to all users
      *
      * @param visible whether to make the plan visible to all users
+     * @return whether to make the plan visible to all users
      */
     @Getter(onMethod = @__(@JsonProperty("public")))
     private final Boolean visible;
