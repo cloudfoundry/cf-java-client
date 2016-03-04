@@ -22,6 +22,8 @@ import org.cloudfoundry.client.v3.PaginatedResponse;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletRequest;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletResponse;
+import org.cloudfoundry.client.v3.applications.CancelApplicationTaskRequest;
+import org.cloudfoundry.client.v3.applications.CancelApplicationTaskResponse;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
@@ -71,6 +73,7 @@ import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PATCH;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -157,6 +160,60 @@ public final class SpringApplicationsV3Test {
         @Override
         protected Mono<AssignApplicationDropletResponse> invoke(AssignApplicationDropletRequest request) {
             return this.applications.assignDroplet(request);
+        }
+
+    }
+
+    public static final class CancelTask extends AbstractApiTest<CancelApplicationTaskRequest, CancelApplicationTaskResponse> {
+
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected CancelApplicationTaskRequest getInvalidRequest() {
+            return CancelApplicationTaskRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(PUT).path("/v3/apps/test-application-id/tasks/test-task-id/cancel")
+                .status(ACCEPTED)
+                .responsePayload("fixtures/client/v3/apps/PUT_{id}_tasks_{id}_cancel_response.json");
+        }
+
+        @Override
+        protected CancelApplicationTaskResponse getResponse() {
+            return CancelApplicationTaskResponse.builder()
+                .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
+                .name("migrate")
+                .command("rake db:migrate")
+                .state(Task.CANCELING_STATE)
+                .memoryInMb(512)
+                .results(Collections.singletonMap("failure_reason", null))
+                .link("self", Link.builder()
+                    .href("/v3/tasks/d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
+                    .build())
+                .link("app", Link.builder()
+                    .href("/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
+                    .build())
+                .link("droplet", Link.builder()
+                    .href("/v3/droplets/740ebd2b-162b-469a-bd72-3edb96fabd9a")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected CancelApplicationTaskRequest getValidRequest() throws Exception {
+            return CancelApplicationTaskRequest.builder()
+                .applicationId("test-application-id")
+                .taskId("test-task-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<CancelApplicationTaskResponse> invoke(CancelApplicationTaskRequest request) {
+            return this.applications.cancelTask(request);
         }
 
     }

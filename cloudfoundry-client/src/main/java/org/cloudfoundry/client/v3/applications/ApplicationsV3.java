@@ -32,6 +32,14 @@ public interface ApplicationsV3 {
     Mono<AssignApplicationDropletResponse> assignDroplet(AssignApplicationDropletRequest request);
 
     /**
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#cancel-an-app-39-s-task">Cancel Application Task</a> request
+     *
+     * @param request the Cancel Application Task request
+     * @return the response from the Cancel Application Task request
+     */
+    Mono<CancelApplicationTaskResponse> cancelTask(CancelApplicationTaskRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps_(experimental)/create_an_app.html">Create Application</a> request
      *
      * @param request the Create Application request
