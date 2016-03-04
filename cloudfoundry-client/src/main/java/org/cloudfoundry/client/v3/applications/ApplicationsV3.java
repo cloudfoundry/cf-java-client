@@ -128,6 +128,14 @@ public interface ApplicationsV3 {
     Mono<ListApplicationProcessesResponse> listProcesses(ListApplicationProcessesRequest request);
 
     /**
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#list-an-app-39-s-tasks">List Application Tasks</a> request
+     *
+     * @param request the List Application Tasks request
+     * @return the response from the List Application Tasks request
+     */
+    Mono<ListApplicationTasksResponse> listTasks(ListApplicationTasksRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps_(experimental)/scaling_a_process_from_its_app.html">Scale Application</a> request
      *
      * @param request the Scale Application request

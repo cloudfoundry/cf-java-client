@@ -41,6 +41,8 @@ import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationProcessesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationProcessesResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationTasksRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationTasksResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v3.applications.ScaleApplicationRequest;
@@ -152,6 +154,11 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     @Override
     public Mono<ListApplicationProcessesResponse> listProcesses(ListApplicationProcessesRequest request) {
         return get(request, ListApplicationProcessesResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "processes"));
+    }
+
+    @Override
+    public Mono<ListApplicationTasksResponse> listTasks(ListApplicationTasksRequest request) {
+        return get(request, ListApplicationTasksResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "tasks"));
     }
 
     @Override
