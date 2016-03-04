@@ -136,7 +136,7 @@ final class CloudFoundryCleaner {
                     .domainId(domainId)
                     .build()))
             .map(ResourceUtils::getId)
-            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId), Integer.MAX_VALUE);
+            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
     }
 
     private static Flux<Void> cleanOrganizations(CloudFoundryClient cloudFoundryClient, Predicate<OrganizationResource> predicate) {
@@ -153,7 +153,7 @@ final class CloudFoundryCleaner {
                     .organizationId(organizationId)
                     .build()))
             .map(ResourceUtils::getId)
-            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId), Integer.MAX_VALUE);
+            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
     }
 
     private static Flux<Void> cleanPrivateDomains(CloudFoundryClient cloudFoundryClient, Predicate<PrivateDomainResource> predicate) {
@@ -170,7 +170,7 @@ final class CloudFoundryCleaner {
                     .privateDomainId(privateDomainId)
                     .build()))
             .map(ResourceUtils::getId)
-            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId), Integer.MAX_VALUE);
+            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
     }
 
     private static Flux<Void> cleanRoutes(CloudFoundryClient cloudFoundryClient, Predicate<RouteResource> predicate) {
@@ -187,7 +187,7 @@ final class CloudFoundryCleaner {
                     .routeId(routeId)
                     .build()))
             .map(ResourceUtils::getId)
-            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId), Integer.MAX_VALUE);
+            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
     }
 
     private static Flux<Void> cleanSpaces(CloudFoundryClient cloudFoundryClient, Predicate<SpaceResource> predicate) {
@@ -204,7 +204,7 @@ final class CloudFoundryCleaner {
                     .spaceId(spaceId)
                     .build()))
             .map(ResourceUtils::getId)
-            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId), Integer.MAX_VALUE);
+            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
     }
 
 }

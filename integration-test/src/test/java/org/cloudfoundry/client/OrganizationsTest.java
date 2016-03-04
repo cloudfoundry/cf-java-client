@@ -256,7 +256,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .organizationId(organizationId)
                     .build()))
             .map(ResourceUtils::getId)
-            .flatMap(jobId -> JobUtils.waitForCompletion(this.cloudFoundryClient, jobId), Integer.MAX_VALUE)
+            .flatMap(jobId -> JobUtils.waitForCompletion(this.cloudFoundryClient, jobId))
             .subscribe(this.testSubscriber());
     }
 
