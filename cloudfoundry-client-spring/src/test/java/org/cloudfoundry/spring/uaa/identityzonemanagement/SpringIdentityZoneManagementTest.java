@@ -64,7 +64,7 @@ public final class SpringIdentityZoneManagementTest {
                 .description("Like the Twilight Zone but tastier[testzone1].")
                 .identityZoneId("testzone1")
                 .name("The Twiglet Zone[testzone1]")
-                .subDomain("testzone1")
+                .subdomain("testzone1")
                 .version(0)
                 .build();
         }
@@ -75,7 +75,7 @@ public final class SpringIdentityZoneManagementTest {
                 .description("Like the Twilight Zone but tastier[testzone1].")
                 .identityZoneId("testzone1")
                 .name("The Twiglet Zone[testzone1]")
-                .subDomain("testzone1")
+                .subdomain("testzone1")
                 .build();
         }
 
@@ -109,7 +109,7 @@ public final class SpringIdentityZoneManagementTest {
                 .description("The test zone")
                 .identityZoneId("identity-zone-id")
                 .name("test")
-                .subDomain("test")
+                .subdomain("test")
                 .updatedAt(946710000000L)
                 .version(0)
                 .build();
@@ -152,7 +152,7 @@ public final class SpringIdentityZoneManagementTest {
                 .description("The test zone")
                 .identityZoneId("identity-zone-id")
                 .name("test")
-                .subDomain("test")
+                .subdomain("test")
                 .updatedAt(946710000000L)
                 .version(0)
                 .build();
@@ -196,7 +196,7 @@ public final class SpringIdentityZoneManagementTest {
                     .description("The system zone for backwards compatibility")
                     .identityZoneId("uaa")
                     .name("uaa")
-                    .subDomain("")
+                    .subdomain("")
                     .updatedAt(946710000000L)
                     .version(0)
                     .build())
@@ -205,7 +205,7 @@ public final class SpringIdentityZoneManagementTest {
                     .description("Like the Twilight Zone but tastier[testzone1].")
                     .identityZoneId("testzone1")
                     .name("The Twiglet Zone[testzone1]")
-                    .subDomain("testzone1")
+                    .subdomain("testzone1")
                     .updatedAt(1426260091139L)
                     .version(0)
                     .build())
@@ -248,7 +248,7 @@ public final class SpringIdentityZoneManagementTest {
                 .description("Like the Twilight Zone but tastier[testzone1].")
                 .identityZoneId("testzone1")
                 .name("The Twiglet Zone[testzone1]")
-                .subDomain("testzone1")
+                .subdomain("testzone1")
                 .version(0)
                 .build();
         }
@@ -259,7 +259,7 @@ public final class SpringIdentityZoneManagementTest {
                 .description("Like the Twilight Zone but tastier[testzone1].")
                 .identityZoneId("testzone1")
                 .name("The Twiglet Zone[testzone1]")
-                .subDomain("testzone1")
+                .subdomain("testzone1")
                 .build();
         }
 

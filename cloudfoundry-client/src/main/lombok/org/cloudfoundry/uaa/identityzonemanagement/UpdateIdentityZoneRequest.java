@@ -64,7 +64,7 @@ public final class UpdateIdentityZoneRequest implements Validatable {
      * @return the subdomain
      */
     @Getter(onMethod = @__(@JsonProperty("subdomain")))
-    private final String subDomain;
+    private final String subdomain;
 
     /**
      * The version of the identity zone.
@@ -79,18 +79,22 @@ public final class UpdateIdentityZoneRequest implements Validatable {
     UpdateIdentityZoneRequest(String description,
                               String identityZoneId,
                               String name,
-                              String subDomain,
+                              String subdomain,
                               Integer version) {
         this.description = description;
         this.identityZoneId = identityZoneId;
         this.name = name;
-        this.subDomain = subDomain;
+        this.subdomain = subdomain;
         this.version = version;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
+
+        if (this.description == null) {
+            builder.message("description must be specified");
+        }
 
         if (this.identityZoneId == null) {
             builder.message("identity zone id must be specified");
@@ -100,7 +104,7 @@ public final class UpdateIdentityZoneRequest implements Validatable {
             builder.message("name must be specified");
         }
 
-        if (this.subDomain == null) {
+        if (this.subdomain == null) {
             builder.message("sub domain must be specified");
         }
 

@@ -26,10 +26,24 @@ import static org.junit.Assert.assertEquals;
 public class UpdateIdentityZoneRequestTest {
 
     @Test
+    public void isNotValidNoDescription() {
+        ValidationResult result = UpdateIdentityZoneRequest.builder()
+            .description("test-description")
+            .identityZoneId("test-id")
+            .name("test-name")
+            .build()
+            .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("sub domain must be specified", result.getMessages().get(0));
+    }
+
+    @Test
     public void isNotValidNoId() {
         ValidationResult result = UpdateIdentityZoneRequest.builder()
+            .description("test-description")
             .name("test-name")
-            .subDomain("test-sub-domain")
+            .subdomain("test-sub-domain")
             .build()
             .isValid();
 
@@ -40,8 +54,9 @@ public class UpdateIdentityZoneRequestTest {
     @Test
     public void isNotValidNoName() {
         ValidationResult result = UpdateIdentityZoneRequest.builder()
+            .description("test-description")
             .identityZoneId("test-id")
-            .subDomain("test-sub-domain")
+            .subdomain("test-sub-domain")
             .build()
             .isValid();
 
@@ -52,6 +67,7 @@ public class UpdateIdentityZoneRequestTest {
     @Test
     public void isNotValidNoSubdomain() {
         ValidationResult result = UpdateIdentityZoneRequest.builder()
+            .description("test-description")
             .identityZoneId("test-id")
             .name("test-name")
             .build()
@@ -64,9 +80,10 @@ public class UpdateIdentityZoneRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = UpdateIdentityZoneRequest.builder()
+            .description("test-description")
             .identityZoneId("test-id")
             .name("test-name")
-            .subDomain("test-sub-domain")
+            .subdomain("test-sub-domain")
             .build()
             .isValid();
 

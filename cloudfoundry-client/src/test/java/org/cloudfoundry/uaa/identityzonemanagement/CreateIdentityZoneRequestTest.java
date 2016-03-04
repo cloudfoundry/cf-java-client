@@ -28,7 +28,7 @@ public final class CreateIdentityZoneRequestTest {
     @Test
     public void isNotValidNoName() {
         ValidationResult result = CreateIdentityZoneRequest.builder()
-            .subDomain("test-sub-domain")
+            .subdomain("test-sub-domain")
             .build()
             .isValid();
 
@@ -51,7 +51,7 @@ public final class CreateIdentityZoneRequestTest {
     public void isValid() {
         ValidationResult result = CreateIdentityZoneRequest.builder()
             .name("test-name")
-            .subDomain("test-sub-domain")
+            .subdomain("test-sub-domain")
             .build()
             .isValid();
 

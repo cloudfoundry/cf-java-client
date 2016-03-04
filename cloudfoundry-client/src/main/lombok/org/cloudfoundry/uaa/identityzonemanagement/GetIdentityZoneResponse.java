@@ -35,11 +35,11 @@ public final class GetIdentityZoneResponse extends AbstractIdentityZone {
                             @JsonProperty("description") String description,
                             @JsonProperty("id") String identityZoneId,
                             @JsonProperty("name") String name,
-                            @JsonProperty("subdomain") String subDomain,
+                            @JsonProperty("subdomain") String subdomain,
                             @JsonProperty("last_modified") Long updatedAt,
                             @JsonProperty("version") Integer version) {
 
-        super(createdAt, description, identityZoneId, name, subDomain, updatedAt, version);
+        super(createdAt, description, identityZoneId, name, subdomain, updatedAt, version);
     }
 
 }
