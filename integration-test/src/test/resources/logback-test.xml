@@ -19,7 +19,7 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%-15thread %-34logger %msg%n</pattern>
+            <pattern>%-16thread %-34logger %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -28,6 +28,7 @@
     <logger name="cloudfoundry-client.request" level="${CLIENT_LOGGING_LEVEL:-DEBUG}"/>
     <logger name="cloudfoundry-client.scan" level="${SCAN_LOGGING_LEVEL:-INFO}"/>
     <logger name="cloudfoundry-client.test" level="${TEST_LOGGING_LEVEL:-DEBUG}"/>
+    <logger name="reactor.io.netty" level="INFO"/>
     <logger name="stream" level="INFO"/>
 
     <root level="WARN">

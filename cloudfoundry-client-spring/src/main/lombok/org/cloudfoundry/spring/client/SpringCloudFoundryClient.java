@@ -55,6 +55,8 @@ import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
 import org.cloudfoundry.client.v3.tasks.Tasks;
+import org.cloudfoundry.reactor.util.ConnectionContextSupplier;
+import org.cloudfoundry.reactor.util.DefaultConnectionContext;
 import org.cloudfoundry.spring.client.v2.applications.SpringApplicationsV2;
 import org.cloudfoundry.spring.client.v2.applicationusageevents.SpringApplicationUsageEvents;
 import org.cloudfoundry.spring.client.v2.buildpacks.SpringBuildpacks;
@@ -113,7 +115,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 /**
  * The Spring-based implementation of {@link CloudFoundryClient}
  */
-public final class SpringCloudFoundryClient implements CloudFoundryClient {
+public final class SpringCloudFoundryClient implements CloudFoundryClient, ConnectionContextSupplier {
 
     private final ApplicationUsageEvents applicationUsageEvents;
 
@@ -148,6 +150,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     private final PrivateDomains privateDomains;
 
     private final Processes processes;
+
+    private final org.cloudfoundry.reactor.util.ConnectionContext reactorConnectionContext;
 
     private final RouteMappings routeMappings;
 
@@ -197,11 +201,12 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
                              @NonNull String password,
                              @Singular List<DeserializationProblemHandler> problemHandlers) {
 
-        this(getConnectionContext(host, port, skipSslValidation, clientId, clientSecret, username, password), host, port, getSchedulerGroup(), problemHandlers);
+        this(getConnectionContext(host, port, skipSslValidation, clientId, clientSecret, username, password), host, port, skipSslValidation, getSchedulerGroup(), problemHandlers);
         new CloudFoundryClientCompatibilityChecker(this.info).check();
     }
 
-    SpringCloudFoundryClient(ConnectionContext connectionContext, RestOperations restOperations, URI root, Scheduler schedulerGroup, OAuth2TokenProvider tokenProvider) {
+    SpringCloudFoundryClient(ConnectionContext connectionContext, String host, Integer port, Boolean skipSslValidation, RestOperations restOperations, URI root, Scheduler schedulerGroup,
+                             OAuth2TokenProvider tokenProvider) {
         this.applicationUsageEvents = new SpringApplicationUsageEvents(restOperations, root, schedulerGroup);
         this.applicationsV2 = new SpringApplicationsV2(restOperations, root, schedulerGroup);
         this.applicationsV3 = new SpringApplicationsV3(restOperations, root, schedulerGroup);
@@ -242,16 +247,28 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
             .build();
 
         this.tokenProvider = tokenProvider;
+
+        this.reactorConnectionContext = DefaultConnectionContext.builder()
+            .authorizationProvider(outbound -> tokenProvider.getToken()
+                .map(token -> String.format("bearer %s", token))
+                .map(token -> outbound.addHeader("Authorization", token)))
+            .host(host)
+            .port(port)
+            .trustCertificates(skipSslValidation)
+            .build();
     }
 
     // Let's take a moment to reflect on the fact that this bridge constructor is needed to counter a useless compiler constraint
-    private SpringCloudFoundryClient(ConnectionContext connectionContext, String host, Integer port, Scheduler schedulerGroup, List<DeserializationProblemHandler> problemHandlers) {
-        this(connectionContext, getRestOperations(connectionContext, problemHandlers), getRoot(host, port, connectionContext.getSslCertificateTruster()), schedulerGroup);
+    private SpringCloudFoundryClient(ConnectionContext connectionContext, String host, Integer port, Boolean skipSslValidation, Scheduler schedulerGroup, List<DeserializationProblemHandler>
+        problemHandlers) {
+        this(connectionContext, host, port, skipSslValidation, getRestOperations(connectionContext, problemHandlers), getRoot(host, port, connectionContext.getSslCertificateTruster()),
+            schedulerGroup);
     }
 
     // Let's take a moment to reflect on the fact that this bridge constructor is needed to counter a useless compiler constraint
-    private SpringCloudFoundryClient(ConnectionContext connectionContext, OAuth2RestOperations restOperations, URI root, Scheduler schedulerGroup) {
-        this(connectionContext, restOperations, root, schedulerGroup, new OAuth2RestOperationsOAuth2TokenProvider(restOperations));
+    private SpringCloudFoundryClient(ConnectionContext connectionContext, String host, Integer port, Boolean skipSslValidation, OAuth2RestOperations restOperations, URI root, Scheduler
+        schedulerGroup) {
+        this(connectionContext, host, port, skipSslValidation, restOperations, root, schedulerGroup, new OAuth2RestOperationsOAuth2TokenProvider(restOperations));
     }
 
     @Override
@@ -311,6 +328,11 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
      */
     public ConnectionContext getConnectionContext() {
         return this.connectionContext;
+    }
+
+    @Override
+    public org.cloudfoundry.reactor.util.ConnectionContext getConnectionContext2() {
+        return this.reactorConnectionContext;
     }
 
     @Override

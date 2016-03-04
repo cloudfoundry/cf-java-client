@@ -68,10 +68,30 @@ public final class ExceptionUtils {
      * @param <T>                 the type of the {@link Mono} being converted
      * @return a function that converts errors
      */
-    public static <T> Function<Throwable, Mono<T>> replace(Class<? extends Exception> exceptionType, Supplier<Mono<T>> replacementSupplier) {
+    public static <T> Function<Throwable, Mono<T>> replace(Class<? extends Throwable> exceptionType, Supplier<Mono<T>> replacementSupplier) {
         return throwable -> {
             if (exceptionType.isAssignableFrom(throwable.getClass())) {
                 return replacementSupplier.get();
+            } else {
+                return Mono.error(throwable);
+            }
+        };
+    }
+
+    /**
+     * Replaces {@link Throwable}s of a given type with an alternate value
+     *
+     * @param exceptionType       the type of exception to convert
+     * @param replacementFunction a transforming function
+     * @param <T>                 the type of the {@link Mono} being converted
+     * @param <U>                 the type of {@link Throwable}
+     * @return a function that converts errors
+     */
+    @SuppressWarnings("unchecked")
+    public static <T, U extends Throwable> Function<Throwable, Mono<T>> replace(Class<U> exceptionType, Function<U, Mono<T>> replacementFunction) {
+        return throwable -> {
+            if (exceptionType.isAssignableFrom(throwable.getClass())) {
+                return replacementFunction.apply((U) throwable);
             } else {
                 return Mono.error(throwable);
             }
