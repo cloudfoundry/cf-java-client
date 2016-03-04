@@ -28,7 +28,7 @@ public final class CancelTaskRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = CancelTaskRequest.builder()
-            .taskId("test-id")
+            .taskId("test-task-id")
             .build()
             .isValid();
 

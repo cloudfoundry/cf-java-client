@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.tasks;
+package org.cloudfoundry.client.v3.applications;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
@@ -24,13 +24,22 @@ import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
 /**
- * The request payload for the Cancel Task endpoint
+ * The request payload for the Get Task endpoint
  */
 @Data
-public final class CancelTaskRequest implements Validatable {
+public final class GetApplicationTaskRequest implements Validatable {
 
     /**
-     * The task id
+     * The application id
+     *
+     * @param applicationId the application id
+     * @return the application id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String applicationId;
+
+    /**
+     * The task taskId
      *
      * @param taskId the task id
      * @return the task id
@@ -39,13 +48,18 @@ public final class CancelTaskRequest implements Validatable {
     private final String taskId;
 
     @Builder
-    CancelTaskRequest(String taskId) {
+    GetApplicationTaskRequest(String applicationId, String taskId) {
+        this.applicationId = applicationId;
         this.taskId = taskId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
+
+        if (this.applicationId == null) {
+            builder.message("application id must be specified");
+        }
 
         if (this.taskId == null) {
             builder.message("task id must be specified");

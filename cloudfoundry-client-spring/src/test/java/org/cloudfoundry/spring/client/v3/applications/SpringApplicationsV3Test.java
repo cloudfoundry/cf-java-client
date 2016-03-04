@@ -34,6 +34,8 @@ import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationStatisticsRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationStatisticsResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationTaskRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationTaskResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationDropletsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationDropletsResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
@@ -52,6 +54,7 @@ import org.cloudfoundry.client.v3.applications.TerminateApplicationInstanceReque
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v3.processes.ProcessUsage;
+import org.cloudfoundry.client.v3.tasks.Task;
 import org.cloudfoundry.spring.AbstractApiTest;
 import org.cloudfoundry.util.StringMap;
 import reactor.core.publisher.Mono;
@@ -626,6 +629,60 @@ public final class SpringApplicationsV3Test {
         @Override
         protected Mono<GetApplicationProcessResponse> invoke(GetApplicationProcessRequest request) {
             return this.applications.getProcess(request);
+        }
+
+    }
+
+    public static final class GetTask extends AbstractApiTest<GetApplicationTaskRequest, GetApplicationTaskResponse> {
+
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected GetApplicationTaskRequest getInvalidRequest() {
+            return GetApplicationTaskRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("/v3/apps/test-application-id/tasks/test-task-id")
+                .status(OK)
+                .responsePayload("fixtures/client/v3/apps/GET_{id}_tasks_{id}_response.json");
+        }
+
+        @Override
+        protected GetApplicationTaskResponse getResponse() {
+            return GetApplicationTaskResponse.builder()
+                .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
+                .name("migrate")
+                .command("rake db:migrate")
+                .state(Task.RUNNING_STATE)
+                .memoryInMb(512)
+                .results(Collections.singletonMap("failure_reason", null))
+                .link("self", Link.builder()
+                    .href("/v3/tasks/d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
+                    .build())
+                .link("app", Link.builder()
+                    .href("/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
+                    .build())
+                .link("droplet", Link.builder()
+                    .href("/v3/droplets/740ebd2b-162b-469a-bd72-3edb96fabd9a")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected GetApplicationTaskRequest getValidRequest() throws Exception {
+            return GetApplicationTaskRequest.builder()
+                .applicationId("test-application-id")
+                .taskId("test-task-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<GetApplicationTaskResponse> invoke(GetApplicationTaskRequest request) {
+            return this.applications.getTask(request);
         }
 
     }

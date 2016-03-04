@@ -1,0 +1,22 @@
+{
+  "guid": "d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa",
+  "name": "migrate",
+  "command": "rake db:migrate",
+  "state": "RUNNING",
+  "memory_in_mb": 512,
+  "environment_variables": {},
+  "result": {
+    "failure_reason": null
+  },
+  "links": {
+    "self": {
+      "href": "/v3/tasks/d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa"
+    },
+    "app": {
+      "href": "/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5"
+    },
+    "droplet": {
+      "href": "/v3/droplets/740ebd2b-162b-469a-bd72-3edb96fabd9a"
+    }
+  }
+}

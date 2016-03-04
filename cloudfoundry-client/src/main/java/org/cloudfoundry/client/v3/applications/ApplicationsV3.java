@@ -88,6 +88,14 @@ public interface ApplicationsV3 {
     Mono<GetApplicationStatisticsResponse> getStatistics(GetApplicationStatisticsRequest request);
 
     /**
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#get-an-app-39-s-task">Get Application Task</a> request
+     *
+     * @param request the Get Application Task request
+     * @return the response from the Get Application Task request
+     */
+    Mono<GetApplicationTaskResponse> getTask(GetApplicationTaskRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps_(experimental)/list_all_apps.html">List Applications</a> request
      *
      * @param request the List Applications request

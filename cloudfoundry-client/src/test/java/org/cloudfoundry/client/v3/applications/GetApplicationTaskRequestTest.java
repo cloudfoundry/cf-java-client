@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.tasks;
+package org.cloudfoundry.client.v3.applications;
 
 import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
@@ -23,11 +23,12 @@ import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class GetTaskRequestTest {
+public final class GetApplicationTaskRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = GetTaskRequest.builder()
+        ValidationResult result = GetApplicationTaskRequest.builder()
+            .applicationId("test-application-id")
             .taskId("test-task-id")
             .build()
             .isValid();
@@ -36,8 +37,20 @@ public final class GetTaskRequestTest {
     }
 
     @Test
+    public void isValidNoApplicationId() {
+        ValidationResult result = GetApplicationTaskRequest.builder()
+            .taskId("test-task-id")
+            .build()
+            .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("application id must be specified", result.getMessages().get(0));
+    }
+
+    @Test
     public void isValidNoTaskId() {
-        ValidationResult result = GetTaskRequest.builder()
+        ValidationResult result = GetApplicationTaskRequest.builder()
+            .applicationId("test-application-id")
             .build()
             .isValid();
 

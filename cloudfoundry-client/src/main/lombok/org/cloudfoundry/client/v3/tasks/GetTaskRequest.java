@@ -30,7 +30,7 @@ import org.cloudfoundry.ValidationResult;
 public final class GetTaskRequest implements Validatable {
 
     /**
-     * The task taskId
+     * The task id
      *
      * @param taskId the task id
      * @return the task id
