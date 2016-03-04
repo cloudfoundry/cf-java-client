@@ -24,6 +24,14 @@ import reactor.core.publisher.Mono;
 public interface Tasks {
 
     /**
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#cancel-a-task">Cancel a Task</a> request
+     *
+     * @param request the Cancel Task request
+     * @return the response from the Cancel Task request
+     */
+    Mono<CancelTaskResponse> cancel(CancelTaskRequest request);
+
+    /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/#create-a-task">Create A Task</a> request
      *
      * @param request the Create Task request

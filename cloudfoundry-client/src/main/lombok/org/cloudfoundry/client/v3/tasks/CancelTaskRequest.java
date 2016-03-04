@@ -24,10 +24,10 @@ import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
 /**
- * The request payload for the Get Task endpoint
+ * The request payload for the Cancel Task endpoint
  */
 @Data
-public final class GetTaskRequest implements Validatable {
+public final class CancelTaskRequest implements Validatable {
 
     /**
      * The task taskId
@@ -39,7 +39,7 @@ public final class GetTaskRequest implements Validatable {
     private final String taskId;
 
     @Builder
-    GetTaskRequest(String taskId) {
+    CancelTaskRequest(String taskId) {
         this.taskId = taskId;
     }
 
