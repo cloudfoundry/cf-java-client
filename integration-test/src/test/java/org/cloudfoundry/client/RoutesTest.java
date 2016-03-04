@@ -37,7 +37,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
-import reactor.core.tuple.Tuple;
 import reactor.core.tuple.Tuple2;
 import reactor.core.tuple.Tuple3;
 
@@ -417,7 +416,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
             .and(this.spaceId)
             .then(function((domainId, spaceId) -> createApplicationAndRoute(this.cloudFoundryClient, domainId, spaceId, applicationName)))
             .then(function((applicationId, routeId) -> associateApplicationWithRoute(this.cloudFoundryClient, applicationId, routeId)
-                .map(response -> Tuple.of(applicationId, routeId))))
+                .map(response -> Tuple2.of(applicationId, routeId))))
             .then(function((applicationId, routeId) -> this.cloudFoundryClient.routes()
                 .removeApplication(RemoveRouteApplicationRequest.builder()
                     .applicationId(applicationId)

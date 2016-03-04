@@ -19,7 +19,6 @@ package org.cloudfoundry.spring.util.network;
 import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.core.tuple.Tuple;
 import reactor.core.tuple.Tuple2;
 
 import javax.net.ssl.HostnameVerifier;
@@ -94,7 +93,7 @@ public final class DynamicTrustManager implements HostnameVerifier, SslCertifica
 
         int resolvedPort = resolvePort(port);
 
-        Tuple2<String, Integer> hostAndPort = Tuple.of(host, resolvedPort);
+        Tuple2<String, Integer> hostAndPort = Tuple2.of(host, resolvedPort);
         if (this.trustedHostsAndPorts.contains(hostAndPort)) {
             return;
         }

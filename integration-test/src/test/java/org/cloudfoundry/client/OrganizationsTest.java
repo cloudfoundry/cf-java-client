@@ -65,7 +65,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
-import reactor.core.tuple.Tuple;
 import reactor.core.tuple.Tuple2;
 
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
@@ -663,7 +662,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .auditorId(userId)
                 .organizationId(organizationId)
                 .build())
-            .map(ignore -> Tuple.of(organizationId, userId));
+            .map(ignore -> Tuple2.of(organizationId, userId));
     }
 
     private static Mono<Tuple2<String, String>> associateBillingManager(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
@@ -672,7 +671,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .billingManagerId(userId)
                 .organizationId(organizationId)
                 .build())
-            .map(ignore -> Tuple.of(organizationId, userId));
+            .map(ignore -> Tuple2.of(organizationId, userId));
     }
 
     private static Mono<Tuple2<String, String>> associateManager(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
@@ -681,7 +680,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .managerId(userId)
                 .organizationId(organizationId)
                 .build())
-            .map(ignore -> Tuple.of(organizationId, userId));
+            .map(ignore -> Tuple2.of(organizationId, userId));
     }
 
     private static Mono<Tuple2<String, String>> associatePrivateDomain(CloudFoundryClient cloudFoundryClient, String defaultOrganizationId, String organizationId, String domainName) {
@@ -700,7 +699,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .userId(userId)
                 .organizationId(organizationId)
                 .build())
-            .map(ignore -> Tuple.of(organizationId, userId));
+            .map(ignore -> Tuple2.of(organizationId, userId));
     }
 
     private static Mono<String> createOrganizationId(CloudFoundryClient cloudFoundryClient, String organizationName) {
@@ -719,5 +718,5 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .build())
             .map(ResourceUtils::getId);
     }
-    
+
 }

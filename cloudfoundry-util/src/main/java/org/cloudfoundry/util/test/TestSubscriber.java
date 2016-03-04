@@ -22,7 +22,6 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.core.tuple.Tuple;
 import reactor.core.tuple.Tuple2;
 import reactor.core.util.Exceptions;
 import reactor.core.util.ReactiveStateUtils;
@@ -155,7 +154,7 @@ public final class TestSubscriber<T> implements Subscriber<T> {
         }
 
         if (this.performanceCallback != null) {
-            this.performanceCallback.accept(Tuple.of(this.startTime, System.currentTimeMillis()));
+            this.performanceCallback.accept(Tuple2.of(this.startTime, System.currentTimeMillis()));
         }
 
         verifyError();
