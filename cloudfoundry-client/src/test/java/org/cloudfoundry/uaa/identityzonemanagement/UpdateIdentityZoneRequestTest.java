@@ -23,11 +23,39 @@ import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class CreateIdentityZoneRequestTest {
+public class UpdateIdentityZoneRequestTest {
+
+    @Test
+    public void isNotValidNoDescription() {
+        ValidationResult result = UpdateIdentityZoneRequest.builder()
+            .description("test-description")
+            .identityZoneId("test-id")
+            .name("test-name")
+            .build()
+            .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("sub domain must be specified", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isNotValidNoId() {
+        ValidationResult result = UpdateIdentityZoneRequest.builder()
+            .description("test-description")
+            .name("test-name")
+            .subdomain("test-sub-domain")
+            .build()
+            .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("identity zone id must be specified", result.getMessages().get(0));
+    }
 
     @Test
     public void isNotValidNoName() {
-        ValidationResult result = CreateIdentityZoneRequest.builder()
+        ValidationResult result = UpdateIdentityZoneRequest.builder()
+            .description("test-description")
+            .identityZoneId("test-id")
             .subdomain("test-sub-domain")
             .build()
             .isValid();
@@ -38,7 +66,9 @@ public final class CreateIdentityZoneRequestTest {
 
     @Test
     public void isNotValidNoSubdomain() {
-        ValidationResult result = CreateIdentityZoneRequest.builder()
+        ValidationResult result = UpdateIdentityZoneRequest.builder()
+            .description("test-description")
+            .identityZoneId("test-id")
             .name("test-name")
             .build()
             .isValid();
@@ -49,7 +79,9 @@ public final class CreateIdentityZoneRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = CreateIdentityZoneRequest.builder()
+        ValidationResult result = UpdateIdentityZoneRequest.builder()
+            .description("test-description")
+            .identityZoneId("test-id")
             .name("test-name")
             .subdomain("test-sub-domain")
             .build()

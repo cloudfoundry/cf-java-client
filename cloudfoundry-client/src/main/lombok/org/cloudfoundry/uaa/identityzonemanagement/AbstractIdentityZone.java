@@ -60,10 +60,10 @@ public abstract class AbstractIdentityZone {
     /**
      * The unique sub domain. It will be converted into lowercase upon creation.
      *
-     * @param subDomain the sub domain
+     * @param subdomain the sub domain
      * @return the sub domain
      */
-    private final String subDomain;
+    private final String subdomain;
 
     /**
      * The last modification date of the identity zone.
@@ -85,14 +85,14 @@ public abstract class AbstractIdentityZone {
                          @JsonProperty("description") String description,
                          @JsonProperty("id") String identityZoneId,
                          @JsonProperty("name") String name,
-                         @JsonProperty("subdomain") String subDomain,
+                         @JsonProperty("subdomain") String subdomain,
                          @JsonProperty("last_modified") Long updatedAt,
                          @JsonProperty("version") Integer version) {
         this.createdAt = createdAt;
         this.description = description;
         this.identityZoneId = identityZoneId;
         this.name = name;
-        this.subDomain = subDomain;
+        this.subdomain = subdomain;
         this.updatedAt = updatedAt;
         this.version = version;
     }

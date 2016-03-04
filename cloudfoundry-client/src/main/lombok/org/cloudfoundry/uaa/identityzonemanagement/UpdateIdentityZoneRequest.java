@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.uaa.identityzonemanagement;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -24,10 +25,10 @@ import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
 /**
- * The request payload for the create identity zone operation
+ * The request payload for the update identity zone operation
  */
 @Data
-public final class CreateIdentityZoneRequest implements Validatable {
+public final class UpdateIdentityZoneRequest implements Validatable {
 
     /**
      * The description of the identity zone.
@@ -44,7 +45,7 @@ public final class CreateIdentityZoneRequest implements Validatable {
      * @param identityZoneId the identity zone id
      * @return the identity zone id
      */
-    @Getter(onMethod = @__(@JsonProperty("id")))
+    @Getter(onMethod = @__(@JsonIgnore))
     private final String identityZoneId;
 
     /**
@@ -75,7 +76,7 @@ public final class CreateIdentityZoneRequest implements Validatable {
     private final Integer version;
 
     @Builder
-    CreateIdentityZoneRequest(String description,
+    UpdateIdentityZoneRequest(String description,
                               String identityZoneId,
                               String name,
                               String subdomain,
@@ -90,6 +91,14 @@ public final class CreateIdentityZoneRequest implements Validatable {
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
+
+        if (this.description == null) {
+            builder.message("description must be specified");
+        }
+
+        if (this.identityZoneId == null) {
+            builder.message("identity zone id must be specified");
+        }
 
         if (this.name == null) {
             builder.message("name must be specified");

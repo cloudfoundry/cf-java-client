@@ -26,11 +26,14 @@ import org.cloudfoundry.uaa.identityzonemanagement.GetIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzonemanagement.IdentityZone;
 import org.cloudfoundry.uaa.identityzonemanagement.ListIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzonemanagement.ListIdentityZoneResponse;
+import org.cloudfoundry.uaa.identityzonemanagement.UpdateIdentityZoneRequest;
+import org.cloudfoundry.uaa.identityzonemanagement.UpdateIdentityZoneResponse;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -61,7 +64,7 @@ public final class SpringIdentityZoneManagementTest {
                 .description("Like the Twilight Zone but tastier[testzone1].")
                 .identityZoneId("testzone1")
                 .name("The Twiglet Zone[testzone1]")
-                .subDomain("testzone1")
+                .subdomain("testzone1")
                 .version(0)
                 .build();
         }
@@ -72,7 +75,7 @@ public final class SpringIdentityZoneManagementTest {
                 .description("Like the Twilight Zone but tastier[testzone1].")
                 .identityZoneId("testzone1")
                 .name("The Twiglet Zone[testzone1]")
-                .subDomain("testzone1")
+                .subdomain("testzone1")
                 .build();
         }
 
@@ -106,7 +109,7 @@ public final class SpringIdentityZoneManagementTest {
                 .description("The test zone")
                 .identityZoneId("identity-zone-id")
                 .name("test")
-                .subDomain("test")
+                .subdomain("test")
                 .updatedAt(946710000000L)
                 .version(0)
                 .build();
@@ -149,7 +152,7 @@ public final class SpringIdentityZoneManagementTest {
                 .description("The test zone")
                 .identityZoneId("identity-zone-id")
                 .name("test")
-                .subDomain("test")
+                .subdomain("test")
                 .updatedAt(946710000000L)
                 .version(0)
                 .build();
@@ -193,7 +196,7 @@ public final class SpringIdentityZoneManagementTest {
                     .description("The system zone for backwards compatibility")
                     .identityZoneId("uaa")
                     .name("uaa")
-                    .subDomain("")
+                    .subdomain("")
                     .updatedAt(946710000000L)
                     .version(0)
                     .build())
@@ -202,7 +205,7 @@ public final class SpringIdentityZoneManagementTest {
                     .description("Like the Twilight Zone but tastier[testzone1].")
                     .identityZoneId("testzone1")
                     .name("The Twiglet Zone[testzone1]")
-                    .subDomain("testzone1")
+                    .subdomain("testzone1")
                     .updatedAt(1426260091139L)
                     .version(0)
                     .build())
@@ -217,6 +220,52 @@ public final class SpringIdentityZoneManagementTest {
         @Override
         protected Mono<ListIdentityZoneResponse> invoke(ListIdentityZoneRequest request) {
             return this.identityZoneManagement.list(request);
+        }
+    }
+
+    public static final class Update extends AbstractApiTest<UpdateIdentityZoneRequest, UpdateIdentityZoneResponse> {
+
+        private final SpringIdentityZoneManagement identityZoneManagement = new SpringIdentityZoneManagement(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected UpdateIdentityZoneRequest getInvalidRequest() {
+            return UpdateIdentityZoneRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(PUT).path("/identity-zones/testzone1")
+                .requestPayload("fixtures/uaa/identity-zones/PUT_request.json")
+                .status(OK)
+                .responsePayload("fixtures/uaa/identity-zones/PUT_response.json");
+        }
+
+        @Override
+        protected UpdateIdentityZoneResponse getResponse() {
+            return UpdateIdentityZoneResponse.builder()
+                .createdAt(1426258488910L)
+                .description("Like the Twilight Zone but tastier[testzone1].")
+                .identityZoneId("testzone1")
+                .name("The Twiglet Zone[testzone1]")
+                .subdomain("testzone1")
+                .version(0)
+                .build();
+        }
+
+        @Override
+        protected UpdateIdentityZoneRequest getValidRequest() throws Exception {
+            return UpdateIdentityZoneRequest.builder()
+                .description("Like the Twilight Zone but tastier[testzone1].")
+                .identityZoneId("testzone1")
+                .name("The Twiglet Zone[testzone1]")
+                .subdomain("testzone1")
+                .build();
+        }
+
+        @Override
+        protected Mono<UpdateIdentityZoneResponse> invoke(UpdateIdentityZoneRequest request) {
+            return this.identityZoneManagement.update(request);
         }
     }
 

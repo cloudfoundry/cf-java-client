@@ -23,15 +23,15 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * The response from the create identity zone request
+ * The response from the update identity zone request
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class CreateIdentityZoneResponse extends AbstractIdentityZone {
+public final class UpdateIdentityZoneResponse extends AbstractIdentityZone {
 
     @Builder
-    CreateIdentityZoneResponse(@JsonProperty("created") Long createdAt,
+    UpdateIdentityZoneResponse(@JsonProperty("created") Long createdAt,
                                @JsonProperty("description") String description,
                                @JsonProperty("id") String identityZoneId,
                                @JsonProperty("name") String name,
