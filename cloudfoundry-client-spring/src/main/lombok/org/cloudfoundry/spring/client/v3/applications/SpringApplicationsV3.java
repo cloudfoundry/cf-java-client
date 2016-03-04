@@ -20,6 +20,8 @@ import lombok.ToString;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletRequest;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletResponse;
+import org.cloudfoundry.client.v3.applications.CancelApplicationTaskRequest;
+import org.cloudfoundry.client.v3.applications.CancelApplicationTaskResponse;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
@@ -83,6 +85,11 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     @Override
     public Mono<AssignApplicationDropletResponse> assignDroplet(AssignApplicationDropletRequest request) {
         return put(request, AssignApplicationDropletResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "current_droplet"));
+    }
+
+    @Override
+    public Mono<CancelApplicationTaskResponse> cancelTask(CancelApplicationTaskRequest request) {
+        return put(request, CancelApplicationTaskResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "tasks", request.getTaskId(), "cancel"));
     }
 
     @Override
