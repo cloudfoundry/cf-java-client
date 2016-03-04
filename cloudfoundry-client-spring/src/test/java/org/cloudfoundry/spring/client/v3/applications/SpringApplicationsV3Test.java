@@ -18,6 +18,7 @@ package org.cloudfoundry.spring.client.v3.applications;
 
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
+import org.cloudfoundry.client.v3.PaginatedResponse;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletRequest;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletResponse;
@@ -42,6 +43,8 @@ import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationProcessesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationProcessesResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationTasksRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationTasksResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v3.applications.ScaleApplicationRequest;
@@ -1079,6 +1082,91 @@ public final class SpringApplicationsV3Test {
         @Override
         protected Mono<ListApplicationProcessesResponse> invoke(ListApplicationProcessesRequest request) {
             return this.applications.listProcesses(request);
+        }
+
+    }
+
+    public static final class ListTasks extends AbstractApiTest<ListApplicationTasksRequest, ListApplicationTasksResponse> {
+
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected ListApplicationTasksRequest getInvalidRequest() {
+            return ListApplicationTasksRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("/v3/apps/test-application-id/tasks")
+                .status(OK)
+                .responsePayload("fixtures/client/v3/apps/GET_{id}_tasks_response.json");
+        }
+
+        @Override
+        protected ListApplicationTasksResponse getResponse() {
+            return ListApplicationTasksResponse.builder()
+                .pagination(PaginatedResponse.Pagination.builder()
+                    .totalResults(3)
+                    .first(Link.builder()
+                        .href("/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/tasks?page=1&per_page=2")
+                        .build())
+                    .last(Link.builder()
+                        .href("/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/tasks?page=2&per_page=2")
+                        .build())
+                    .next(Link.builder()
+                        .href("/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/tasks?page=2&per_page=2")
+                        .build())
+                    .build())
+                .resource(ListApplicationTasksResponse.Resource.builder()
+                    .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
+                    .name("hello")
+                    .command("echo \"hello world\"")
+                    .state(Task.SUCCEEDED_STATE)
+                    .memoryInMb(512)
+                    .results(Collections.singletonMap("failure_reason", null))
+                    .link("self", Link.builder()
+                        .href("/v3/tasks/d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
+                        .build())
+                    .link("app", Link.builder()
+                        .href("/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
+                        .build())
+                    .link("droplet", Link.builder()
+                        .href("/v3/droplets/740ebd2b-162b-469a-bd72-3edb96fabd9a")
+                        .build())
+                    .build())
+                .resource(ListApplicationTasksResponse.Resource.builder()
+                    .id("63b4cd89-fd8b-4bf1-a311-7174fcc907d6")
+                    .name("migrate")
+                    .command("rake db:migrate")
+                    .state(Task.FAILED_STATE)
+                    .memoryInMb(512)
+                    .results(Collections.<String, Object>singletonMap("failure_reason", "Exited with status 1"))
+                    .link("self", Link.builder()
+                        .href("/v3/tasks/63b4cd89-fd8b-4bf1-a311-7174fcc907d6")
+                        .build())
+                    .link("app", Link.builder()
+                        .href("/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
+                        .build())
+                    .link("droplet", Link.builder()
+                        .href("/v3/droplets/740ebd2b-162b-469a-bd72-3edb96fabd9a")
+                        .build())
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListApplicationTasksRequest getValidRequest() throws Exception {
+            return ListApplicationTasksRequest.builder()
+                .page(1)
+                .applicationId("test-application-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<ListApplicationTasksResponse> invoke(ListApplicationTasksRequest request) {
+            return this.applications.listTasks(request);
         }
 
     }
