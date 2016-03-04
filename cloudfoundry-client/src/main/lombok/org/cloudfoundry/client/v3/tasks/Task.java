@@ -29,11 +29,25 @@ import java.util.Map;
 @Data
 public abstract class Task {
 
-    public static String FAILED_STATE = "FAILED";
+    /**
+     * The failed state
+     */
+    public static final String FAILED_STATE = "FAILED";
 
-    public static String RUNNING_STATE = "RUNNING";
+    /**
+     * The pending state
+     */
+    public static final String PENDING_STATE = "PENDING";
 
-    public static String SUCCEEDED_STATE = "SUCCEEDED";
+    /**
+     * The running state
+     */
+    public static final String RUNNING_STATE = "RUNNING";
+
+    /**
+     * The succeeded state
+     */
+    public static final String SUCCEEDED_STATE = "SUCCEEDED";
 
     /**
      * The command
@@ -100,7 +114,7 @@ public abstract class Task {
     private final Map<String, Object> results;
 
     /**
-     * The tasks state, one of RUNNING, FAILED or SUCCEEDED
+     * The tasks state, one of PENDING, RUNNING, SUCCEEDED, or FAILED
      *
      * @param state the state
      * @return the state
