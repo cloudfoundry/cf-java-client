@@ -17,6 +17,8 @@
 package org.cloudfoundry.spring.client.v3.tasks;
 
 import lombok.ToString;
+import org.cloudfoundry.client.v3.tasks.CancelTaskRequest;
+import org.cloudfoundry.client.v3.tasks.CancelTaskResponse;
 import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CreateTaskResponse;
 import org.cloudfoundry.client.v3.tasks.GetTaskRequest;
@@ -50,13 +52,18 @@ public final class SpringTasks extends AbstractSpringOperations implements Tasks
     }
 
     @Override
+    public Mono<CancelTaskResponse> cancel(CancelTaskRequest request) {
+        return put(request, CancelTaskResponse.class, builder -> builder.pathSegment("v3", "tasks", request.getTaskId(), "cancel"));
+    }
+
+    @Override
     public Mono<CreateTaskResponse> create(CreateTaskRequest request) {
         return post(request, CreateTaskResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "tasks"));
     }
 
     @Override
     public Mono<GetTaskResponse> get(GetTaskRequest request) {
-        return get(request, GetTaskResponse.class, builder -> builder.pathSegment("v3", "tasks", request.getId()));
+        return get(request, GetTaskResponse.class, builder -> builder.pathSegment("v3", "tasks", request.getTaskId()));
     }
 
     @Override

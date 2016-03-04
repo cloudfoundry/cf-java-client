@@ -30,6 +30,11 @@ import java.util.Map;
 public abstract class Task {
 
     /**
+     * The canceling state
+     */
+    public static final String CANCELING_STATE = "CANCELING";
+
+    /**
      * The failed state
      */
     public static final String FAILED_STATE = "FAILED";

@@ -23,11 +23,11 @@ import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class GetTaskRequestTest {
+public final class CancelTaskRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = GetTaskRequest.builder()
+        ValidationResult result = CancelTaskRequest.builder()
             .taskId("test-id")
             .build()
             .isValid();
@@ -37,7 +37,7 @@ public final class GetTaskRequestTest {
 
     @Test
     public void isValidNoTaskId() {
-        ValidationResult result = GetTaskRequest.builder()
+        ValidationResult result = CancelTaskRequest.builder()
             .build()
             .isValid();
 

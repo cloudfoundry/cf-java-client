@@ -18,6 +18,8 @@ package org.cloudfoundry.spring.client.v3.tasks;
 
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.PaginatedResponse;
+import org.cloudfoundry.client.v3.tasks.CancelTaskRequest;
+import org.cloudfoundry.client.v3.tasks.CancelTaskResponse;
 import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CreateTaskResponse;
 import org.cloudfoundry.client.v3.tasks.GetTaskRequest;
@@ -32,9 +34,64 @@ import java.util.Collections;
 
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringTasksTest {
+
+    public static final class Cancel extends AbstractApiTest<CancelTaskRequest, CancelTaskResponse> {
+
+        private final SpringTasks tasks = new SpringTasks(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected CancelTaskRequest getInvalidRequest() {
+            return CancelTaskRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(PUT).path("/v3/tasks/test-id/cancel")
+                .status(ACCEPTED)
+                .responsePayload("fixtures/client/v3/tasks/PUT_{id}_cancel_response.json");
+        }
+
+        @Override
+        protected CancelTaskResponse getResponse() {
+            return CancelTaskResponse.builder()
+                .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
+                .name("migrate")
+                .command("rake db:migrate")
+                .state(Task.CANCELING_STATE)
+                .memoryInMb(512)
+                .results(Collections.singletonMap("failure_reason", null))
+                .link("self", Link.builder()
+                    .href("/v3/tasks/d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
+                    .build())
+                .link("app", Link.builder()
+                    .href("/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
+                    .build())
+                .link("droplet", Link.builder()
+                    .href("/v3/droplets/740ebd2b-162b-469a-bd72-3edb96fabd9a")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected CancelTaskRequest getValidRequest() {
+            return CancelTaskRequest.builder()
+                .taskId("test-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<CancelTaskResponse> invoke(CancelTaskRequest request) {
+            return this.tasks.cancel(request);
+        }
+
+    }
 
     public static final class Create extends AbstractApiTest<CreateTaskRequest, CreateTaskResponse> {
 
@@ -135,7 +192,7 @@ public final class SpringTasksTest {
         @Override
         protected GetTaskRequest getValidRequest() {
             return GetTaskRequest.builder()
-                .id("test-id")
+                .taskId("test-id")
                 .build();
         }
 
