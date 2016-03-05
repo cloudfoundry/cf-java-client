@@ -97,11 +97,11 @@ public final class DefaultApplications implements Applications {
 
     private final CloudFoundryClient cloudFoundryClient;
 
-    private final LoggingClient loggingClient;
+    private final Mono<LoggingClient> loggingClient;
 
     private final Mono<String> spaceId;
 
-    public DefaultApplications(CloudFoundryClient cloudFoundryClient, LoggingClient loggingClient, Mono<String> spaceId) {
+    public DefaultApplications(CloudFoundryClient cloudFoundryClient, Mono<LoggingClient> loggingClient, Mono<String> spaceId) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.loggingClient = loggingClient;
         this.spaceId = spaceId;
@@ -471,7 +471,7 @@ public final class DefaultApplications implements Applications {
         return ResourceUtils.getEntity(resource).getEnvironmentJsons();
     }
 
-    private static Publisher<LogMessage> getLogs(LoggingClient loggingClient, String applicationId, Boolean recent) {
+    private static Publisher<LogMessage> getLogs(Mono<LoggingClient> loggingClient, String applicationId, Boolean recent) {
         if (Optional.ofNullable(recent).orElse(false)) {
             return requestLogsRecent(loggingClient, applicationId);
         } else {
@@ -657,18 +657,20 @@ public final class DefaultApplications implements Applications {
                 .build());
     }
 
-    private static Publisher<LogMessage> requestLogsRecent(LoggingClient loggingClient, String applicationId) {
+    private static Publisher<LogMessage> requestLogsRecent(Mono<LoggingClient> loggingClient, String applicationId) {
         return loggingClient
-            .recent(RecentLogsRequest.builder()
-                .applicationId(applicationId)
-                .build());
+            .flatMap(loggingClient1 -> loggingClient1
+                .recent(RecentLogsRequest.builder()
+                    .applicationId(applicationId)
+                    .build()));
     }
 
-    private static Publisher<LogMessage> requestLogsStream(LoggingClient loggingClient, String applicationId) {
+    private static Publisher<LogMessage> requestLogsStream(Mono<LoggingClient> loggingClient, String applicationId) {
         return loggingClient
-            .stream(StreamLogsRequest.builder()
-                .applicationId(applicationId)
-                .build());
+            .flatMap(loggingClient1 -> loggingClient1
+                .stream(StreamLogsRequest.builder()
+                    .applicationId(applicationId)
+                    .build()));
     }
 
     private static Flux<SpaceResource> requestOrganizationSpacesByName(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {

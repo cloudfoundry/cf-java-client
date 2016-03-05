@@ -59,7 +59,7 @@ public final class CloudFoundryOperationsBuilder {
         Mono<String> spaceId = getSpaceId(this.cloudFoundryClient, organizationId, this.space);
         Mono<String> username = getUsername(this.cloudFoundryClient, this.uaaClient);
 
-        return new DefaultCloudFoundryOperations(this.cloudFoundryClient, this.loggingClient, organizationId, spaceId, username);
+        return new DefaultCloudFoundryOperations(this.cloudFoundryClient, getLoggingClient(this.loggingClient), organizationId, spaceId, username);
     }
 
     /**
@@ -119,6 +119,14 @@ public final class CloudFoundryOperationsBuilder {
         return this;
     }
 
+    private static Mono<LoggingClient> getLoggingClient(LoggingClient loggingClient) {
+        if (loggingClient == null) {
+            return Mono.error(new IllegalStateException("LoggingClient must be set"));
+        }
+
+        return Mono.just(loggingClient);
+    }
+
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
         return requestOrganizations(cloudFoundryClient, organization)
             .single()
@@ -159,6 +167,10 @@ public final class CloudFoundryOperationsBuilder {
     }
 
     private static Mono<String> getUsername(CloudFoundryClient cloudFoundryClient, UaaClient uaaClient) {
+        if (uaaClient == null) {
+            return Mono.error(new IllegalStateException("UaaClient must be set"));
+        }
+
         return new UsernameBuilder()
             .cloudFoundryClient(cloudFoundryClient)
             .uaaClient(uaaClient)
