@@ -54,7 +54,7 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
 
     private final DefaultStacks stacks;
 
-    DefaultCloudFoundryOperations(CloudFoundryClient cloudFoundryClient, LoggingClient loggingClient, Mono<String> organizationId, Mono<String> spaceId, Mono<String> username) {
+    DefaultCloudFoundryOperations(CloudFoundryClient cloudFoundryClient, Mono<LoggingClient> loggingClient, Mono<String> organizationId, Mono<String> spaceId, Mono<String> username) {
         this.applications = new DefaultApplications(cloudFoundryClient, loggingClient, spaceId);
         this.domains = new DefaultDomains(cloudFoundryClient);
         this.organizations = new DefaultOrganizations(cloudFoundryClient, username);
