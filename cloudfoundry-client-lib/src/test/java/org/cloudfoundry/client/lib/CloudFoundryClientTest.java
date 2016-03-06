@@ -43,6 +43,7 @@ import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudEntity;
 import org.cloudfoundry.client.lib.domain.CloudEvent;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
+import org.cloudfoundry.client.lib.domain.CloudJob;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudQuota;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
@@ -2197,6 +2198,17 @@ public class CloudFoundryClientTest {
 		connectedClient.deleteSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
 	}
 
+	
+	@Test
+	public void checkUploadAppFinishedStatus() throws IOException {
+		String appName = namespacedAppName("upload-finished-callback");
+		createSpringApplication(appName);
+		File file = SampleProjects.springTravel();
+		FinishedUploadStatusCallback callback = new FinishedUploadStatusCallback();
+		connectedClient.uploadApplication(appName, file, callback);
+		assertEquals(CloudJob.Status.FINISHED.toString(), callback.status);
+	}
+	
 	private boolean isSpaceBoundToSecurityGroup(String spaceName, String securityGroupName) {
 		List<CloudSpace> boundSpaces = connectedClient.getSpacesBoundToSecurityGroup(securityGroupName);
 		for(CloudSpace space: boundSpaces){
@@ -2669,6 +2681,15 @@ public class CloudFoundryClientTest {
 			progressCount++;
 			// unsubscribe after the first report
 			return progressCount == 1;
+		}
+	}
+	
+	private static class FinishedUploadStatusCallback extends NoOpUploadStatusCallback {
+	    public String status;
+
+		public boolean onProgress(String status) {
+			this.status = status;
+			return false;
 		}
 	}
 

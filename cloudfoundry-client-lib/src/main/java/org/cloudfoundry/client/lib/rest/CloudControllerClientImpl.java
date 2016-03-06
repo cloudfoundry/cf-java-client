@@ -1405,12 +1405,14 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 				return;
 			}
 			if (job.getStatus() == CloudJob.Status.FAILED) {
+				callback.onProgress(job.getStatus().toString());
 				return;
 			}
 
 			try {
 				Thread.sleep(JOB_POLLING_PERIOD);
 			} catch (InterruptedException ex) {
+				callback.onProgress(CloudJob.Status.FAILED.toString());
 				return;
 			}
 
@@ -1420,6 +1422,10 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 						new ParameterizedTypeReference<Map<String, Object>>() {});
 			job = resourceMapper.mapResource(jobProgressEntity.getBody(), CloudJob.class);
 		} while (job.getStatus() != CloudJob.Status.FINISHED);
+		
+		if(job.getStatus() == CloudJob.Status.FINISHED){
+			callback.onProgress(job.getStatus().toString());
+		}
 	}
 
 	private CloudResources getKnownRemoteResources(ApplicationArchive archive) throws IOException {
