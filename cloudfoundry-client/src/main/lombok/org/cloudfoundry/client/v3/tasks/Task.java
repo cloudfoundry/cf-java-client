@@ -136,22 +136,22 @@ public abstract class Task {
 
     protected Task(@JsonProperty("command") String command,
                    @JsonProperty("created_at") String createdAt,
-                   @JsonProperty("result") @Singular Map<String, Object> results,
                    @JsonProperty("environment_variables") @Singular Map<String, String> environmentVariables,
                    @JsonProperty("guid") String id,
-                   @JsonProperty("name") String name,
                    @JsonProperty("links") @Singular Map<String, Link> links,
                    @JsonProperty("memory_in_mb") Integer memoryInMb,
+                   @JsonProperty("name") String name,
+                   @JsonProperty("result") @Singular Map<String, Object> results,
                    @JsonProperty("state") String state,
                    @JsonProperty("updated_at") String updatedAt) {
         this.command = command;
         this.createdAt = createdAt;
-        this.results = results;
         this.environmentVariables = environmentVariables;
         this.id = id;
-        this.name = name;
         this.links = links;
         this.memoryInMb = memoryInMb;
+        this.name = name;
+        this.results = results;
         this.state = state;
         this.updatedAt = updatedAt;
     }

@@ -37,15 +37,16 @@ public final class CancelTaskResponse extends Task {
     @Builder
     CancelTaskResponse(@JsonProperty("command") String command,
                        @JsonProperty("created_at") String createdAt,
-                       @JsonProperty("result") @Singular Map<String, Object> results,
                        @JsonProperty("environment_variables") @Singular Map<String, String> environmentVariables,
                        @JsonProperty("guid") String id,
-                       @JsonProperty("name") String name,
                        @JsonProperty("links") @Singular Map<String, Link> links,
                        @JsonProperty("memory_in_mb") Integer memoryInMb,
+                       @JsonProperty("name") String name,
+                       @JsonProperty("result") @Singular Map<String, Object> results,
                        @JsonProperty("state") String state,
                        @JsonProperty("updated_at") String updatedAt) {
-        super(command, createdAt, results, environmentVariables, id, name, links, memoryInMb, state, updatedAt);
+
+        super(command, createdAt, environmentVariables, id, links, memoryInMb, name, results, state, updatedAt);
     }
 
 }

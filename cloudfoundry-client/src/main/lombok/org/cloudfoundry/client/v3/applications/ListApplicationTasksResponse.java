@@ -22,12 +22,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
-import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.PaginatedResponse;
-import org.cloudfoundry.client.v3.tasks.Task;
+import org.cloudfoundry.client.v3.tasks.TaskResource;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * The response payload for the List Application Tasks operation
@@ -35,36 +33,13 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ListApplicationTasksResponse extends PaginatedResponse<ListApplicationTasksResponse.Resource> {
+public final class ListApplicationTasksResponse extends PaginatedResponse<TaskResource> {
 
     @Builder
     ListApplicationTasksResponse(@JsonProperty("pagination") Pagination pagination,
-                                 @JsonProperty("resources") @Singular List<ListApplicationTasksResponse.Resource> resources) {
+                                 @JsonProperty("resources") @Singular List<TaskResource> resources) {
+
         super(pagination, resources);
-    }
-
-    /**
-     * The Resource response payload for the List Application Tasks operation
-     */
-    @Data
-    @EqualsAndHashCode(callSuper = true)
-    @ToString(callSuper = true)
-    public static final class Resource extends Task {
-
-        @Builder
-        Resource(@JsonProperty("command") String command,
-                 @JsonProperty("created_at") String createdAt,
-                 @JsonProperty("result") @Singular Map<String, Object> results,
-                 @JsonProperty("environment_variables") @Singular Map<String, String> environmentVariables,
-                 @JsonProperty("guid") String id,
-                 @JsonProperty("name") String name,
-                 @JsonProperty("links") @Singular Map<String, Link> links,
-                 @JsonProperty("memory_in_mb") Integer memoryInMb,
-                 @JsonProperty("state") String state,
-                 @JsonProperty("updated_at") String updatedAt) {
-            super(command, createdAt, results, environmentVariables, id, name, links, memoryInMb, state, updatedAt);
-        }
-
     }
 
 }

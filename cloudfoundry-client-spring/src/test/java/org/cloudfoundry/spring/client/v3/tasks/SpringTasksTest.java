@@ -27,6 +27,7 @@ import org.cloudfoundry.client.v3.tasks.GetTaskResponse;
 import org.cloudfoundry.client.v3.tasks.ListTasksRequest;
 import org.cloudfoundry.client.v3.tasks.ListTasksResponse;
 import org.cloudfoundry.client.v3.tasks.Task;
+import org.cloudfoundry.client.v3.tasks.TaskResource;
 import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
@@ -237,7 +238,7 @@ public final class SpringTasksTest {
                         .href("/v3/tasks?page=2&per_page=2")
                         .build())
                     .build())
-                .resource(ListTasksResponse.Resource.builder()
+                .resource(TaskResource.builder()
                     .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
                     .name("hello")
                     .command("echo \"hello world\"")
@@ -254,7 +255,7 @@ public final class SpringTasksTest {
                         .href("/v3/droplets/740ebd2b-162b-469a-bd72-3edb96fabd9a")
                         .build())
                     .build())
-                .resource(ListTasksResponse.Resource.builder()
+                .resource(TaskResource.builder()
                     .id("63b4cd89-fd8b-4bf1-a311-7174fcc907d6")
                     .name("migrate")
                     .command("rake db:migrate")
