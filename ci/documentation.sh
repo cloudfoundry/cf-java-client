@@ -9,8 +9,8 @@ PROJECTS=" \
   cloudfoundry-util"
 
 pushd cf-java-client
-  ./mvnw javadoc:javadoc
-  VERSION=$(./mvnw help:evaluate -Dexpression=project.version | grep -v '\[')
+  ./mvnw -q javadoc:javadoc
+  VERSION=$(./mvnw help:evaluate -Dexpression=project.version | grep -v '\[' | grep -v 'Downloaded')
 popd
 
 for PROJECT in $PROJECTS ; do
