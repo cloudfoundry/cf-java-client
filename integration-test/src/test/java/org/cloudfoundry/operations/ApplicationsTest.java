@@ -40,12 +40,12 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void delete() throws IOException {
-        String name = "test-deleteNotStarted";
+        String applicationName = getApplicationName();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), name, false)
+        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
             .after(() -> this.cloudFoundryOperations.applications()
                 .delete(DeleteApplicationRequest.builder()
-                    .name(name)
+                    .name(applicationName)
                     .deleteRoutes(false)
                     .build()))
             .subscribe(testSubscriber());
@@ -53,12 +53,12 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void deleteWithRoutes() throws IOException {
-        String name = "test-deleteWithRoutes";
+        String applicationName = getApplicationName();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), name, false)
+        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
             .after(() -> this.cloudFoundryOperations.applications()
                 .delete(DeleteApplicationRequest.builder()
-                    .name(name)
+                    .name(applicationName)
                     .deleteRoutes(true)
                     .build()))
             .subscribe(testSubscriber());
@@ -66,118 +66,129 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void pushDomainNotFound() {
-        String name = "test-pushDomainNotFound";
+        String applicationName = getApplicationName();
+        String domainName = getDomainName();
 
         this.cloudFoundryOperations.applications()
             .push(PushApplicationRequest.builder()
                 .application(getApplicationBits())
-                .name(name)
-                .domain("unknown-domain")
+                .buildpack("staticfile_buildpack")
+                .domain(domainName)
+                .diskQuota(512)
+                .memory(64)
+                .name(applicationName)
                 .build())
             .subscribe(testSubscriber()
-                .assertError(IllegalStateException.class, "Domain unknown-domain not found"));
+                .assertError(IllegalStateException.class, "Domain %s not found", domainName));
     }
 
     @Test
     public void pushExisting() throws IOException {
-        String name = "test-pushExisting";
+        String applicationName = getApplicationName();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), name, false)
+        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
             .after(() -> this.cloudFoundryOperations.applications()
                 .push(PushApplicationRequest.builder()
                     .application(getApplicationBits())
-                    .name(name)
-                    .diskQuota(257)
+                    .buildpack("staticfile_buildpack")
+                    .diskQuota(512)
+                    .memory(64)
+                    .name(applicationName)
                     .build()))
             .subscribe(testSubscriber());
     }
 
     @Test
     public void pushNew() throws IOException {
-        String name = "test-pushNew";
+        String applicationName = getApplicationName();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), name, false)
+        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
             .subscribe(testSubscriber());
     }
 
     @Test
     public void pushPrivateDomain() {
-        String name = "test-pushPrivateDomain";
-        String domain = "private.domain";
+        String applicationName = getApplicationName();
+        String domainName = getDomainName();
 
         this.cloudFoundryOperations.domains()
             .create(CreateDomainRequest.builder()
-                .domain(domain)
+                .domain(domainName)
                 .organization(this.organizationName)
                 .build())
             .after(() -> this.cloudFoundryOperations.applications()
                 .push(PushApplicationRequest.builder()
                     .application(getApplicationBits())
                     .buildpack("staticfile_buildpack")
-                    .domain(domain)
-                    .name(name)
+                    .diskQuota(512)
+                    .domain(domainName)
+                    .memory(64)
+                    .name(applicationName)
                     .build()))
             .subscribe(testSubscriber());
     }
 
     @Test
     public void pushWithHost() {
-        String name = "test-pushWithHost";
+        String applicationName = getApplicationName();
+        String host = getHostName();
 
         this.cloudFoundryOperations.applications()
             .push(PushApplicationRequest.builder()
                 .application(getApplicationBits())
                 .buildpack("staticfile_buildpack")
-                .host("test-host")
-                .name(name)
+                .diskQuota(512)
+                .host(host)
+                .memory(64)
+                .name(applicationName)
                 .build())
             .subscribe(testSubscriber());
     }
 
     @Test
     public void restartNotStarted() throws IOException {
-        String name = "test-restartNotStarted";
+        String applicationName = getApplicationName();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), name, false)
+        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
             .after(() -> this.cloudFoundryOperations.applications()
                 .restart(RestartApplicationRequest.builder()
-                    .name(name)
+                    .name(applicationName)
                     .build()))
             .subscribe(testSubscriber());
     }
 
     @Test
     public void restartStarted() throws IOException {
-        String name = "test-restartStarted";
+        String applicationName = getApplicationName();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), name, false)
+        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
             .after(() -> this.cloudFoundryOperations.applications()
                 .restart(RestartApplicationRequest.builder()
-                    .name(name)
+                    .name(applicationName)
                     .build()))
             .subscribe(testSubscriber());
     }
 
     @Test
     public void startNotStarted() throws IOException {
-        String name = "test-startNotStarted";
+        String applicationName = getApplicationName();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), name, false)
+        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
             .after(() -> this.cloudFoundryOperations.applications()
                 .start(StartApplicationRequest.builder()
-                    .name(name)
+                    .name(applicationName)
                     .build()))
             .subscribe(testSubscriber());
     }
 
     @Test
     public void startStarted() throws IOException {
-        String name = "test-startStarted";
+        String applicationName = getApplicationName();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), name, false)
+        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
             .after(() -> this.cloudFoundryOperations.applications()
                 .start(StartApplicationRequest.builder()
-                    .name(name)
+                    .name(applicationName)
                     .build()))
             .subscribe(testSubscriber());
     }
@@ -187,8 +198,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .push(PushApplicationRequest.builder()
                 .application(applicationBits)
                 .buildpack("staticfile_buildpack")
-                .diskQuota(32)
-                .memory(32)
+                .diskQuota(512)
+                .memory(64)
                 .name(name)
                 .noStart(noStart)
                 .build());
@@ -196,7 +207,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     private static InputStream getApplicationBits() {
         try {
-            return new ClassPathResource("testApplication.zip").getInputStream();
+            return new ClassPathResource("test-application.zip").getInputStream();
         } catch (IOException e) {
             e.printStackTrace();
         }

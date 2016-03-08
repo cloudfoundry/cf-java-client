@@ -206,7 +206,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 }
             })
             .subscribe(testSubscriber()
-                .assertEquals(new ZipFile(new ClassPathResource("testApplication.zip").getFile()).size()));
+                .assertEquals(new ZipFile(new ClassPathResource("test-application.zip").getFile()).size()));
     }
 
     @Test
@@ -758,7 +758,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         try {
             return cloudFoundryClient.applicationsV2()
                 .upload(UploadApplicationRequest.builder()
-                    .application(new ClassPathResource("testApplication.zip").getInputStream())
+                    .application(new ClassPathResource("test-application.zip").getInputStream())
                     .async(true)
                     .applicationId(applicationId)
                     .build())
