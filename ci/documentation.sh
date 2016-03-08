@@ -10,7 +10,7 @@ PROJECTS=" \
 
 pushd cf-java-client
   VERSION=$(./mvnw help:evaluate -Dexpression=project.version | grep -v '\[')
-  ./mvnw -q javadoc:javadoc
+  ./mvnw javadoc:javadoc
 popd
 
 for PROJECT in $PROJECTS ; do
