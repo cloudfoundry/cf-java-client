@@ -118,7 +118,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <excludePackageNames>org.cloudfoundry.spring.client.*,org.cloudfoundry.spring.logging.*,org.cloudfoundry.spring.uaa.*</excludePackageNames>
+                    <excludePackageNames>org.cloudfoundry.spring.client.*,org.cloudfoundry.spring.logging.*,org.cloudfoundry.spring.uaa.*,org.cloudfoundry.spring.util,org.cloudfoundry.spring.util.*</excludePackageNames>
                 </configuration>
             </plugin>
             <plugin>

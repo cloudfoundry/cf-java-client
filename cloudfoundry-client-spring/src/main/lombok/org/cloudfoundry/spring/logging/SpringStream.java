@@ -41,7 +41,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 @ToString
-public final class SpringStream {
+final class SpringStream {
 
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.request");
 
@@ -53,7 +53,7 @@ public final class SpringStream {
 
     private final WebSocketContainer webSocketContainer;
 
-    public SpringStream(WebSocketContainer webSocketContainer, ClientEndpointConfig clientEndpointConfig, URI root, SchedulerGroup schedulerGroup) {
+    SpringStream(WebSocketContainer webSocketContainer, ClientEndpointConfig clientEndpointConfig, URI root, SchedulerGroup schedulerGroup) {
         this.clientEndpointConfig = clientEndpointConfig;
         this.root = root;
         this.schedulerGroup = schedulerGroup;

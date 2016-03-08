@@ -31,7 +31,7 @@ import java.util.List;
  * The Spring-based implementation of the logging recent API
  */
 @ToString(callSuper = true)
-public final class SpringRecent extends AbstractSpringOperations {
+final class SpringRecent extends AbstractSpringOperations {
 
     /**
      * Creates an instance
@@ -40,7 +40,7 @@ public final class SpringRecent extends AbstractSpringOperations {
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param schedulerGroup The group to use when making requests
      */
-    public SpringRecent(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
+    SpringRecent(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
         super(restOperations, root, schedulerGroup);
     }
 

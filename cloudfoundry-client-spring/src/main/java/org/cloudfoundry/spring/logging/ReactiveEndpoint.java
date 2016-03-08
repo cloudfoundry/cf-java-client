@@ -28,7 +28,7 @@ import javax.websocket.Session;
 /**
  * An implementation of {@link Endpoint} for reactive APIs
  */
-public final class ReactiveEndpoint<T> extends Endpoint {
+final class ReactiveEndpoint<T> extends Endpoint {
 
     private final MessageHandler messageHandler;
 
@@ -40,7 +40,7 @@ public final class ReactiveEndpoint<T> extends Endpoint {
      * @param messageHandler the message handler to attach
      * @param subscriber     the subscriber to signal
      */
-    public ReactiveEndpoint(MessageHandler messageHandler, Subscriber<T> subscriber) {
+    ReactiveEndpoint(MessageHandler messageHandler, Subscriber<T> subscriber) {
         this.messageHandler = messageHandler;
         this.subscriber = subscriber;
     }

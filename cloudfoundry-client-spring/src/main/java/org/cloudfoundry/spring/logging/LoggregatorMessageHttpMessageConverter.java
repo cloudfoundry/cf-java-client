@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.function.Function;
 
-public final class LoggregatorMessageHttpMessageConverter extends AbstractHttpMessageConverter<List<LogMessage>> {
+final class LoggregatorMessageHttpMessageConverter extends AbstractHttpMessageConverter<List<LogMessage>> {
 
     public LoggregatorMessageHttpMessageConverter() {
         super(MediaType.parseMediaType("multipart/x-protobuf"));

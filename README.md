@@ -84,7 +84,7 @@ repositories {
 ```
 
 ## Usage
-Both the `cloudfoundry-operations` and `cloudfoundry-client` projects follow a ["Reactive"][r] design pattern and expose their responses with [Reactive Streams][s] `Publisher`s.  The choice to expose Reactive Streams `Publisher`s gives the project interoperability with the various reactive framework implementations such as [Project Reactor][p] and [RxJava][x].  In the examples that follow, Project Reactor is used, but all reactive frameworks work similarly.
+Both the `cloudfoundry-operations` and `cloudfoundry-client` projects follow a ["Reactive"][r] design pattern and expose their responses with [Project Reactor][p] `Monos`s and `Flux`s.
 
 ### `CloudFoundryClient` and `CloudFoundryOperations` Builders
 
@@ -187,6 +187,14 @@ TODO: Document once implemented
 
 TODO: Document once implemented
 
+## Documentation
+API Documentation for each module can be found at the following locations:
+
+* `cloudfoundry-client` – [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.BUILD-SNAPSHOT/cloudfoundry-client)
+* `cloudfoundry-client-spring` – [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.BUILD-SNAPSHOT/cloudfoundry-client-spring)
+* `cloudfoundry-operations` – [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.BUILD-SNAPSHOT/cloudfoundry-operations)
+* `cloudfoundry-util` – [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.BUILD-SNAPSHOT/cloudfoundry-util)
+
 ## Development
 The project depends on Java 8.  To build from source and install to your local Maven cache, run the following:
 
@@ -229,7 +237,5 @@ This project is released under version 2.0 of the [Apache License][l].
 [m]: https://maven.apache.org
 [p]: https://projectreactor.io
 [r]: http://reactivex.io
-[s]: https://www.reactive-streams.org
 [t]: https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html
 [u]: https://help.github.com/articles/using-pull-requests
-[x]: https://github.com/ReactiveX/RxJava

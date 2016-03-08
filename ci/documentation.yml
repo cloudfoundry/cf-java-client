@@ -1,0 +1,10 @@
+---
+platform: linux
+image: docker:///java#8-jdk
+
+inputs:
+- name: cf-java-client
+- name: cf-java-client-documentation
+
+run:
+  path: cf-java-client/ci/documentation.sh

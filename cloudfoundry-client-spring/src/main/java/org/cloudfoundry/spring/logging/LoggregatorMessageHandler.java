@@ -23,11 +23,11 @@ import org.reactivestreams.Subscriber;
 import javax.websocket.MessageHandler;
 
 
-public final class LoggregatorMessageHandler implements MessageHandler.Whole<byte[]> {
+final class LoggregatorMessageHandler implements MessageHandler.Whole<byte[]> {
 
     private final Subscriber<org.cloudfoundry.logging.LogMessage> subscriber;
 
-    public LoggregatorMessageHandler(Subscriber<org.cloudfoundry.logging.LogMessage> subscriber) {
+    LoggregatorMessageHandler(Subscriber<org.cloudfoundry.logging.LogMessage> subscriber) {
         this.subscriber = subscriber;
     }
 
