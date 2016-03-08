@@ -108,7 +108,7 @@ public final class SpringTasksTest {
             return new RequestContext()
                 .method(POST).path("/v3/apps/test-application-id/tasks")
                 .requestPayload("fixtures/client/v3/tasks/POST_apps_{id}_tasks_request.json")
-                .status(OK)
+                .status(ACCEPTED)
                 .responsePayload("fixtures/client/v3/tasks/POST_apps_{id}_tasks_response.json");
         }
 
