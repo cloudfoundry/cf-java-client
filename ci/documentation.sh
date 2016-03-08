@@ -25,3 +25,9 @@ for PROJECT in $PROJECTS ; do
     cp -r $SOURCE/* $TARGET
   fi
 done
+
+pushd cf-java-client-documentation
+  git config --local user.name "Spring Buildmaster"
+  git config --local user.email "buildmaster@springframework.org"
+  git commit -m "$VERSION Documentation Update"
+popd
