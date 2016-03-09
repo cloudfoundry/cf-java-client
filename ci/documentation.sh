@@ -8,6 +8,8 @@ PROJECTS=" \
   cloudfoundry-operations \
   cloudfoundry-util"
 
+git clone cf-java-client-documentation updated-cf-java-client-documentation
+
 pushd cf-java-client
   ./mvnw -q javadoc:javadoc
   VERSION=$(./mvnw help:evaluate -Dexpression=project.version | grep -v '\[' | grep -v 'Download')
@@ -15,7 +17,7 @@ popd
 
 for PROJECT in $PROJECTS ; do
   SOURCE=cf-java-client/$PROJECT/target/site/apidocs
-  TARGET=cf-java-client-documentation/api/$VERSION/$PROJECT
+  TARGET=updated-cf-java-client-documentation/api/$VERSION/$PROJECT
 
   if [[ -e $SOURCE ]]; then
     echo Copying $SOURCE to $TARGET

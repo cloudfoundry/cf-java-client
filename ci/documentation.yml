@@ -6,5 +6,8 @@ inputs:
 - name: cf-java-client
 - name: cf-java-client-documentation
 
+outputs:
+- name: updated-cf-java-client-documentation
+
 run:
   path: cf-java-client/ci/documentation.sh
