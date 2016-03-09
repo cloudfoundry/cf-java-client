@@ -14,24 +14,20 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.identityzonemanagement;
+package org.cloudfoundry.uaa.identityzones;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import org.cloudfoundry.Validatable;
+import org.cloudfoundry.ValidationResult;
 
 /**
- * The entity response payload for Identity Zone
+ * The request payload for the create identity zone operation
  */
 @Data
-public abstract class AbstractIdentityZone {
-
-    /**
-     * The creation date of the identity zone.
-     *
-     * @param createdAt the creation date
-     * @return the creation date
-     */
-    private final Long createdAt;
+public final class CreateIdentityZoneRequest implements Validatable {
 
     /**
      * The description of the identity zone.
@@ -39,14 +35,16 @@ public abstract class AbstractIdentityZone {
      * @param description the description
      * @return the description
      */
+    @Getter(onMethod = @__(@JsonProperty("description")))
     private final String description;
 
     /**
-     * The id of the identity zone.
+     * The id of the identity zone. When not provided, an identifier will be generated
      *
      * @param identityZoneId the identity zone id
      * @return the identity zone id
      */
+    @Getter(onMethod = @__(@JsonProperty("id")))
     private final String identityZoneId;
 
     /**
@@ -55,23 +53,17 @@ public abstract class AbstractIdentityZone {
      * @param name the name
      * @return the name
      */
+    @Getter(onMethod = @__(@JsonProperty("name")))
     private final String name;
 
     /**
-     * The unique sub domain. It will be converted into lowercase upon creation.
+     * The unique subdomain. It will be converted into lowercase upon creation.
      *
-     * @param subdomain the sub domain
-     * @return the sub domain
+     * @param subdomain the subdomain
+     * @return the subdomain
      */
+    @Getter(onMethod = @__(@JsonProperty("subdomain")))
     private final String subdomain;
-
-    /**
-     * The last modification date of the identity zone.
-     *
-     * @param updatedAt the last modification date
-     * @return the last modification date
-     */
-    private final Long updatedAt;
 
     /**
      * The version of the identity zone.
@@ -79,22 +71,35 @@ public abstract class AbstractIdentityZone {
      * @param version the version
      * @return the version
      */
+    @Getter(onMethod = @__(@JsonProperty("version")))
     private final Integer version;
 
-    AbstractIdentityZone(@JsonProperty("created") Long createdAt,
-                         @JsonProperty("description") String description,
-                         @JsonProperty("id") String identityZoneId,
-                         @JsonProperty("name") String name,
-                         @JsonProperty("subdomain") String subdomain,
-                         @JsonProperty("last_modified") Long updatedAt,
-                         @JsonProperty("version") Integer version) {
-        this.createdAt = createdAt;
+    @Builder
+    CreateIdentityZoneRequest(String description,
+                              String identityZoneId,
+                              String name,
+                              String subdomain,
+                              Integer version) {
         this.description = description;
         this.identityZoneId = identityZoneId;
         this.name = name;
         this.subdomain = subdomain;
-        this.updatedAt = updatedAt;
         this.version = version;
+    }
+
+    @Override
+    public ValidationResult isValid() {
+        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
+
+        if (this.name == null) {
+            builder.message("name must be specified");
+        }
+
+        if (this.subdomain == null) {
+            builder.message("sub domain must be specified");
+        }
+
+        return builder.build();
     }
 
 }

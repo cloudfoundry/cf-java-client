@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.identityzonemanagement;
+package org.cloudfoundry.uaa.identityzones;
 
 import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
@@ -23,35 +23,22 @@ import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class CreateIdentityZoneRequestTest {
+public final class DeleteIdentityZoneRequestTest {
 
     @Test
-    public void isNotValidNoName() {
-        ValidationResult result = CreateIdentityZoneRequest.builder()
-            .subdomain("test-sub-domain")
+    public void isNotValidNoId() {
+        ValidationResult result = DeleteIdentityZoneRequest.builder()
             .build()
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isNotValidNoSubdomain() {
-        ValidationResult result = CreateIdentityZoneRequest.builder()
-            .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("sub domain must be specified", result.getMessages().get(0));
+        assertEquals("identity zone id must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValid() {
-        ValidationResult result = CreateIdentityZoneRequest.builder()
-            .name("test-name")
-            .subdomain("test-sub-domain")
+        ValidationResult result = DeleteIdentityZoneRequest.builder()
+            .identityZoneId("test-identity-zone-id")
             .build()
             .isValid();
 

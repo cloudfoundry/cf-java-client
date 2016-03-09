@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.uaa.identityzonemanagement;
+package org.cloudfoundry.spring.uaa.identityzones;
 
 import org.cloudfoundry.spring.AbstractApiTest;
-import org.cloudfoundry.uaa.identityzonemanagement.CreateIdentityZoneRequest;
-import org.cloudfoundry.uaa.identityzonemanagement.CreateIdentityZoneResponse;
-import org.cloudfoundry.uaa.identityzonemanagement.DeleteIdentityZoneRequest;
-import org.cloudfoundry.uaa.identityzonemanagement.DeleteIdentityZoneResponse;
-import org.cloudfoundry.uaa.identityzonemanagement.GetIdentityZoneRequest;
-import org.cloudfoundry.uaa.identityzonemanagement.GetIdentityZoneResponse;
-import org.cloudfoundry.uaa.identityzonemanagement.IdentityZone;
-import org.cloudfoundry.uaa.identityzonemanagement.ListIdentityZoneRequest;
-import org.cloudfoundry.uaa.identityzonemanagement.ListIdentityZoneResponse;
-import org.cloudfoundry.uaa.identityzonemanagement.UpdateIdentityZoneRequest;
-import org.cloudfoundry.uaa.identityzonemanagement.UpdateIdentityZoneResponse;
+import org.cloudfoundry.uaa.identityzones.CreateIdentityZoneClientRequest;
+import org.cloudfoundry.uaa.identityzones.CreateIdentityZoneRequest;
+import org.cloudfoundry.uaa.identityzones.CreateIdentityZoneResponse;
+import org.cloudfoundry.uaa.identityzones.DeleteIdentityZoneRequest;
+import org.cloudfoundry.uaa.identityzones.DeleteIdentityZoneResponse;
+import org.cloudfoundry.uaa.identityzones.GetIdentityZoneRequest;
+import org.cloudfoundry.uaa.identityzones.GetIdentityZoneResponse;
+import org.cloudfoundry.uaa.identityzones.IdentityZone;
+import org.cloudfoundry.uaa.identityzones.ListIdentityZoneRequest;
+import org.cloudfoundry.uaa.identityzones.ListIdentityZoneResponse;
+import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneRequest;
+import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneResponse;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpMethod.DELETE;
@@ -37,11 +38,11 @@ import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringIdentityZoneManagementTest {
+public final class SpringIdentityZonesTest {
 
     public static final class Create extends AbstractApiTest<CreateIdentityZoneRequest, CreateIdentityZoneResponse> {
 
-        private final SpringIdentityZoneManagement identityZoneManagement = new SpringIdentityZoneManagement(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final SpringIdentityZones identityZoneManagement = new SpringIdentityZones(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected CreateIdentityZoneRequest getInvalidRequest() {
@@ -85,9 +86,50 @@ public final class SpringIdentityZoneManagementTest {
         }
     }
 
+    public static final class CreateClient extends AbstractApiTest<CreateIdentityZoneClientRequest, Void> {
+
+        private final SpringIdentityZones identityZoneManagement = new SpringIdentityZones(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected CreateIdentityZoneClientRequest getInvalidRequest() {
+            return CreateIdentityZoneClientRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(POST).path("/identity-zones/test-zone-id/clients")
+                .requestPayload("fixtures/uaa/identity-zones/POST_{id}_clients_request.json")
+                .status(CREATED);
+        }
+
+        @Override
+        protected Void getResponse() {
+            return null;
+        }
+
+        @Override
+        protected CreateIdentityZoneClientRequest getValidRequest() throws Exception {
+            return CreateIdentityZoneClientRequest.builder()
+                .identityZoneId("test-zone-id")
+                .allowedProvider("uaa")
+                .authority("uaa.resource")
+                .authorizedGrantType("authorization_code")
+                .clientId("limited-client")
+                .clientSecret("limited-client-secret")
+                .scope("openid")
+                .build();
+        }
+
+        @Override
+        protected Mono<Void> invoke(CreateIdentityZoneClientRequest request) {
+            return this.identityZoneManagement.createClient(request);
+        }
+    }
+
     public static final class Delete extends AbstractApiTest<DeleteIdentityZoneRequest, DeleteIdentityZoneResponse> {
 
-        private final SpringIdentityZoneManagement identityZoneManagement = new SpringIdentityZoneManagement(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final SpringIdentityZones identityZoneManagement = new SpringIdentityZones(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected DeleteIdentityZoneRequest getInvalidRequest() {
@@ -130,7 +172,7 @@ public final class SpringIdentityZoneManagementTest {
 
     public static final class Get extends AbstractApiTest<GetIdentityZoneRequest, GetIdentityZoneResponse> {
 
-        private final SpringIdentityZoneManagement identityZoneManagement = new SpringIdentityZoneManagement(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final SpringIdentityZones identityZoneManagement = new SpringIdentityZones(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected GetIdentityZoneRequest getInvalidRequest() {
@@ -173,7 +215,7 @@ public final class SpringIdentityZoneManagementTest {
 
     public static final class List extends AbstractApiTest<ListIdentityZoneRequest, ListIdentityZoneResponse> {
 
-        private final SpringIdentityZoneManagement identityZoneManagement = new SpringIdentityZoneManagement(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final SpringIdentityZones identityZoneManagement = new SpringIdentityZones(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListIdentityZoneRequest getInvalidRequest() {
@@ -225,7 +267,7 @@ public final class SpringIdentityZoneManagementTest {
 
     public static final class Update extends AbstractApiTest<UpdateIdentityZoneRequest, UpdateIdentityZoneResponse> {
 
-        private final SpringIdentityZoneManagement identityZoneManagement = new SpringIdentityZoneManagement(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final SpringIdentityZones identityZoneManagement = new SpringIdentityZones(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected UpdateIdentityZoneRequest getInvalidRequest() {

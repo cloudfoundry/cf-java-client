@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.identityzonemanagement;
+package org.cloudfoundry.uaa.identityzones;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -23,21 +23,21 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * The response from the update identity zone request
+ * The resource response payload for Identity Zones
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class UpdateIdentityZoneResponse extends AbstractIdentityZone {
+public final class IdentityZone extends AbstractIdentityZone {
 
     @Builder
-    UpdateIdentityZoneResponse(@JsonProperty("created") Long createdAt,
-                               @JsonProperty("description") String description,
-                               @JsonProperty("id") String identityZoneId,
-                               @JsonProperty("name") String name,
-                               @JsonProperty("subdomain") String subdomain,
-                               @JsonProperty("last_modified") Long updatedAt,
-                               @JsonProperty("version") Integer version) {
+    IdentityZone(@JsonProperty("created") Long createdAt,
+                 @JsonProperty("description") String description,
+                 @JsonProperty("id") String identityZoneId,
+                 @JsonProperty("name") String name,
+                 @JsonProperty("subdomain") String subdomain,
+                 @JsonProperty("last_modified") Long updatedAt,
+                 @JsonProperty("version") Integer version) {
 
         super(createdAt, description, identityZoneId, name, subdomain, updatedAt, version);
     }

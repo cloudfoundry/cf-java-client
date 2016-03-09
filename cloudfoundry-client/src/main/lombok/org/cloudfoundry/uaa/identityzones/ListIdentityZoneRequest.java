@@ -14,45 +14,26 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.identityzonemanagement;
+package org.cloudfoundry.uaa.identityzones;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
 /**
- * The request payload for the Delete Identity Zone operation
+ * The request payload for the lis identity zones operation
  */
 @Data
-public final class DeleteIdentityZoneRequest implements Validatable {
-
-    /**
-     * The identity zone id
-     *
-     * @param identityZoneId the identity zone id
-     * @return the identity zone id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String identityZoneId;
+public final class ListIdentityZoneRequest implements Validatable {
 
     @Builder
-    DeleteIdentityZoneRequest(String identityZoneId) {
-        this.identityZoneId = identityZoneId;
+    ListIdentityZoneRequest() {
     }
 
     @Override
     public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.identityZoneId == null) {
-            builder.message("identity zone id must be specified");
-        }
-
-        return builder.build();
+        return ValidationResult.builder().build();
     }
 
 }

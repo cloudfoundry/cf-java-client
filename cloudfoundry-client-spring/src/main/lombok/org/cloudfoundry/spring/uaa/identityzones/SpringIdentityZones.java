@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.uaa.identityzonemanagement;
+package org.cloudfoundry.spring.uaa.identityzones;
 
 import lombok.ToString;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.uaa.identityzonemanagement.CreateIdentityZoneRequest;
-import org.cloudfoundry.uaa.identityzonemanagement.CreateIdentityZoneResponse;
-import org.cloudfoundry.uaa.identityzonemanagement.DeleteIdentityZoneRequest;
-import org.cloudfoundry.uaa.identityzonemanagement.DeleteIdentityZoneResponse;
-import org.cloudfoundry.uaa.identityzonemanagement.GetIdentityZoneRequest;
-import org.cloudfoundry.uaa.identityzonemanagement.GetIdentityZoneResponse;
-import org.cloudfoundry.uaa.identityzonemanagement.IdentityZoneManagement;
-import org.cloudfoundry.uaa.identityzonemanagement.ListIdentityZoneRequest;
-import org.cloudfoundry.uaa.identityzonemanagement.ListIdentityZoneResponse;
-import org.cloudfoundry.uaa.identityzonemanagement.UpdateIdentityZoneRequest;
-import org.cloudfoundry.uaa.identityzonemanagement.UpdateIdentityZoneResponse;
+import org.cloudfoundry.uaa.identityzones.CreateIdentityZoneClientRequest;
+import org.cloudfoundry.uaa.identityzones.CreateIdentityZoneRequest;
+import org.cloudfoundry.uaa.identityzones.CreateIdentityZoneResponse;
+import org.cloudfoundry.uaa.identityzones.DeleteIdentityZoneRequest;
+import org.cloudfoundry.uaa.identityzones.DeleteIdentityZoneResponse;
+import org.cloudfoundry.uaa.identityzones.GetIdentityZoneRequest;
+import org.cloudfoundry.uaa.identityzones.GetIdentityZoneResponse;
+import org.cloudfoundry.uaa.identityzones.IdentityZones;
+import org.cloudfoundry.uaa.identityzones.ListIdentityZoneRequest;
+import org.cloudfoundry.uaa.identityzones.ListIdentityZoneResponse;
+import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneRequest;
+import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneResponse;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
@@ -36,10 +37,10 @@ import reactor.core.publisher.SchedulerGroup;
 import java.net.URI;
 
 /**
- * The Spring-based implementation of {@link IdentityZoneManagement}
+ * The Spring-based implementation of {@link IdentityZones}
  */
 @ToString(callSuper = true)
-public final class SpringIdentityZoneManagement extends AbstractSpringOperations implements IdentityZoneManagement {
+public final class SpringIdentityZones extends AbstractSpringOperations implements IdentityZones {
 
     /**
      * Creates an instance
@@ -48,13 +49,18 @@ public final class SpringIdentityZoneManagement extends AbstractSpringOperations
      * @param root           the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
      * @param schedulerGroup The group to use when making requests
      */
-    public SpringIdentityZoneManagement(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
+    public SpringIdentityZones(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
         super(restOperations, root, schedulerGroup);
     }
 
     @Override
     public Mono<CreateIdentityZoneResponse> create(CreateIdentityZoneRequest request) {
         return post(request, CreateIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones"));
+    }
+
+    @Override
+    public Mono<Void> createClient(CreateIdentityZoneClientRequest request) {
+        return post(request, Void.class, builder -> builder.pathSegment("identity-zones", request.getIdentityZoneId(), "clients"));
     }
 
     @Override

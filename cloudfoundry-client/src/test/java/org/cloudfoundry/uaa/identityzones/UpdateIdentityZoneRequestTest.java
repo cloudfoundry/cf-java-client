@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.identityzonemanagement;
+package org.cloudfoundry.uaa.identityzones;
 
 import org.cloudfoundry.ValidationResult;
 import org.junit.Test;

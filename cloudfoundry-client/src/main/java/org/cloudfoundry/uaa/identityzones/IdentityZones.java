@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.identityzonemanagement;
+package org.cloudfoundry.uaa.identityzones;
 
 import reactor.core.publisher.Mono;
 
 /**
- * Main entry point to the UAA Identity Zone Management Client API
+ * Main entry point to the UAA Identity Zones Client API
  */
-public interface IdentityZoneManagement {
+public interface IdentityZones {
 
     /**
      * Makes the <a href="https://github.com/cloudfoundry/uaa/blob/master/docs/UAA-APIs.rst#create-or-update-identity-zones-post-or-put-identity-zones">Create Identity Zone</a> request
@@ -30,6 +30,14 @@ public interface IdentityZoneManagement {
      * @return the response from the Create Identity Zone request
      */
     Mono<CreateIdentityZoneResponse> create(CreateIdentityZoneRequest request);
+
+    /**
+     * Makes the <a href="https://github.com/cloudfoundry/uaa/blob/master/docs/UAA-APIs.rst#identity-zone-clients-api-identity-zones-clients">Create Identity Zone Client</a> request
+     *
+     * @param request the Create Identity Zone Client request
+     * @return the response from the Create Identity Zone Client request
+     */
+    Mono<Void> createClient(CreateIdentityZoneClientRequest request);
 
     /**
      * Makes the <a href="https://github.com/cloudfoundry/uaa/blob/master/docs/UAA-APIs.rst#delete-single-identity-zone-delete-identity-zones-identityzoneid">Delete the Identity Zone</a> request
