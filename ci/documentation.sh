@@ -28,7 +28,7 @@ for PROJECT in $PROJECTS ; do
   fi
 done
 
-pushd cf-java-client-documentation
+pushd updated-cf-java-client-documentation
   git config --local user.name "Spring Buildmaster"
   git config --local user.email "buildmaster@springframework.org"
   git add .
