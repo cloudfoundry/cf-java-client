@@ -53,15 +53,11 @@ public final class ApplicationStatisticsResponse extends HashMap<String, Applica
 
         private final Statistics statistics;
 
-        private final Long uptime;
-
         @Builder
         InstanceStats(@JsonProperty("state") String state,
-                      @JsonProperty("stats") Statistics statistics,
-                      @JsonProperty("uptime") Long uptime) {
+                      @JsonProperty("stats") Statistics statistics) {
             this.state = state;
             this.statistics = statistics;
-            this.uptime = uptime;
         }
 
         @Data
