@@ -1378,6 +1378,25 @@ public class CloudFoundryClientTest {
 
 		connectedClient.deleteServiceBroker("haash-broker");
 	}
+	
+	@Test
+	public void checkHostContainingDomain() throws IOException {
+		connectedClient.addDomain("sandbox.lmig.com");
+		connectedClient.addDomain("pdc.sandbox.lmig.com");
+		
+		String appName = namespacedAppName("add-application");
+		createSpringApplication(appName);
+		File file = SampleProjects.springTravel();
+		connectedClient.uploadApplication(appName, file);
+		
+		List<String> uris = new ArrayList<>();
+		uris.add("stevebspringmusic-pdc.sandbox.lmig.com");
+		connectedClient.updateApplicationUris(appName,uris);
+		
+		List<String> updatedUris = connectedClient.getApplication(appName).getUris();
+		assertEquals("stevebspringmusic-pdc.sandbox.lmig.com", updatedUris.get(0));
+		
+	}
 
 	private boolean ensureApplicationRunning(String appName) {
 		InstancesInfo instances;

@@ -1237,7 +1237,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		URI newUri = URI.create(uri);
 		String authority = newUri.getScheme() != null ? newUri.getAuthority(): newUri.getPath();
 		for (String domain : domains.keySet()) {
-			if (authority != null && authority.endsWith(domain)) {
+			if (authority != null && authority.substring(authority.indexOf(".")+1).equals(domain)) {
 				String previousDomain = uriInfo.get("domainName");
 				if (previousDomain == null || domain.length() > previousDomain.length()) {
 					//Favor most specific subdomains
