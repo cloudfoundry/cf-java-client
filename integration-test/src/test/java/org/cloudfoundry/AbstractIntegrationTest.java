@@ -75,6 +75,10 @@ public abstract class AbstractIntegrationTest {
         return this.nameFactory.getName("/test-path-");
     }
 
+    protected final String getServiceInstanceName() {
+        return this.nameFactory.getName("test-service-instance-");
+    }
+
     protected final String getSpaceName() {
         return this.nameFactory.getName("test-space-");
     }

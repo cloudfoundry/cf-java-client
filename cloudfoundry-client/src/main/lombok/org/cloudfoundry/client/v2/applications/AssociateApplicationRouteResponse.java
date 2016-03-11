@@ -29,7 +29,7 @@ import org.cloudfoundry.client.v2.Resource;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class AssociateApplicationRouteResponse extends Resource<ApplicationEntity> {
+public final class AssociateApplicationRouteResponse extends AbstractApplicationResource {
 
     @Builder
     AssociateApplicationRouteResponse(@JsonProperty("entity") ApplicationEntity entity,

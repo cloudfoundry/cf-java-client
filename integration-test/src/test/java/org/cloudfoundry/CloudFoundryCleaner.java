@@ -19,7 +19,9 @@ package org.cloudfoundry;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
+import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
+import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingRequest;
 import org.cloudfoundry.client.v2.domains.DeleteDomainRequest;
 import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
@@ -32,9 +34,15 @@ import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v2.routes.RouteResource;
+import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
+import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
+import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceResource;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
@@ -78,9 +86,11 @@ final class CloudFoundryCleaner {
                     .map(id -> (Predicate<ApplicationResource>) r -> !protectedSpaceIds.contains(ResourceUtils.getEntity(r).getSpaceId()))
                     .orElse(r -> true);
 
-                Predicate<OrganizationResource> organizationPredicate = protectedOrganizationId
-                    .map(id -> (Predicate<OrganizationResource>) r -> !ResourceUtils.getId(r).equals(id))
-                    .orElse(r -> true);
+                Predicate<ServiceInstanceResource> serviceInstancePredicate = r -> !protectedSpaceIds.contains(ResourceUtils.getEntity(r).getSpaceId());
+
+                Predicate<UserProvidedServiceInstanceResource> userProvidedServiceInstancePredicate = r -> !protectedSpaceIds.contains(ResourceUtils.getEntity(r).getSpaceId());
+
+                Predicate<RouteResource> routePredicate = r -> true;
 
                 Predicate<DomainResource> domainPredicate = protectedDomainId
                     .map(id -> (Predicate<DomainResource>) r -> !ResourceUtils.getId(r).equals(id))
@@ -88,13 +98,18 @@ final class CloudFoundryCleaner {
 
                 Predicate<PrivateDomainResource> privateDomainPredicate = r -> true;
 
-                Predicate<RouteResource> routePredicate = r -> true;
-
                 Predicate<SpaceResource> spacePredicate = protectedOrganizationId
                     .map(id -> (Predicate<SpaceResource>) r -> !ResourceUtils.getEntity(r).getOrganizationId().equals(id))
                     .orElse(r -> true);
 
-                return cleanApplications(this.cloudFoundryClient, applicationPredicate)
+                Predicate<OrganizationResource> organizationPredicate = protectedOrganizationId
+                    .map(id -> (Predicate<OrganizationResource>) r -> !ResourceUtils.getId(r).equals(id))
+                    .orElse(r -> true);
+
+                return Flux.empty()
+                    .after(() -> cleanApplications(this.cloudFoundryClient, applicationPredicate))
+                    .after(() -> cleanServiceInstances(this.cloudFoundryClient, serviceInstancePredicate))
+                    .after(() -> cleanUserProvidedServiceInstances(this.cloudFoundryClient, userProvidedServiceInstancePredicate))
                     .after(() -> cleanRoutes(this.cloudFoundryClient, routePredicate))
                     .after(() -> cleanDomains(this.cloudFoundryClient, domainPredicate))
                     .after(() -> cleanPrivateDomains(this.cloudFoundryClient, privateDomainPredicate))
@@ -116,6 +131,8 @@ final class CloudFoundryCleaner {
                     .build()))
             .filter(predicate)
             .map(ResourceUtils::getId)
+            .flatMap(applicationId -> removeServiceBindings(cloudFoundryClient, applicationId)
+                .after(() -> Flux.just(applicationId)))
             .flatMap(applicationId -> cloudFoundryClient.applicationsV2()
                 .delete(DeleteApplicationRequest.builder()
                     .applicationId(applicationId)
@@ -190,6 +207,20 @@ final class CloudFoundryCleaner {
             .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
     }
 
+    private static Flux<Void> cleanServiceInstances(CloudFoundryClient cloudFoundryClient, Predicate<ServiceInstanceResource> predicate) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.serviceInstances()
+                .list(ListServiceInstancesRequest.builder()
+                    .page(page)
+                    .build()))
+            .filter(predicate)
+            .map(ResourceUtils::getId)
+            .flatMap(serviceInstanceId -> cloudFoundryClient.serviceInstances()
+                .delete(DeleteServiceInstanceRequest.builder()
+                    .serviceInstanceId(serviceInstanceId)
+                    .build()));
+    }
+
     private static Flux<Void> cleanSpaces(CloudFoundryClient cloudFoundryClient, Predicate<SpaceResource> predicate) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
@@ -205,6 +236,35 @@ final class CloudFoundryCleaner {
                     .build()))
             .map(ResourceUtils::getId)
             .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
+    }
+
+    private static Flux<Void> cleanUserProvidedServiceInstances(CloudFoundryClient cloudFoundryClient, Predicate<UserProvidedServiceInstanceResource> predicate) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.userProvidedServiceInstances()
+                .list(ListUserProvidedServiceInstancesRequest.builder()
+                    .page(page)
+                    .build()))
+            .filter(predicate)
+            .map(ResourceUtils::getId)
+            .flatMap(userProvidedServiceInstanceId -> cloudFoundryClient.userProvidedServiceInstances()
+                .delete(DeleteUserProvidedServiceInstanceRequest.builder()
+                    .userProvidedServiceInstanceId(userProvidedServiceInstanceId)
+                    .build()));
+    }
+
+    private static Flux<Void> removeServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.applicationsV2()
+                .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
+                    .page(page)
+                    .applicationId(applicationId)
+                    .build()))
+            .map(ResourceUtils::getId)
+            .flatMap(serviceBindingId -> cloudFoundryClient.applicationsV2()
+                .removeServiceBinding(RemoveApplicationServiceBindingRequest.builder()
+                    .applicationId(applicationId)
+                    .serviceBindingId(serviceBindingId)
+                    .build()));
     }
 
 }

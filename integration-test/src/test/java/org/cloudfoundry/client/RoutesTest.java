@@ -40,6 +40,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple2;
 import reactor.core.tuple.Tuple3;
 
+import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
@@ -128,18 +129,17 @@ public final class RoutesTest extends AbstractIntegrationTest {
         this.organizationId
             .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
             .and(this.spaceId)
-            .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
+            .as(thenKeep(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
                 .create(CreateRouteRequest.builder()
                     .domainId(domainId)
                     .host("test-host")
                     .spaceId(spaceId)
-                    .build())
-                .map(response -> domainId)))
-            .then(domainId -> this.cloudFoundryClient.routes()
+                    .build()))))
+            .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
                 .exists(RouteExistsRequest.builder()
                     .domainId(domainId)
                     .host("test-host")
-                    .build()))
+                    .build())))
             .subscribe(testSubscriber()
                 .assertEquals(true));
     }
@@ -151,18 +151,17 @@ public final class RoutesTest extends AbstractIntegrationTest {
         this.organizationId
             .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
             .and(this.spaceId)
-            .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
+            .as(thenKeep(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
                 .create(CreateRouteRequest.builder()
                     .domainId(domainId)
                     .host("test-host")
                     .spaceId(spaceId)
-                    .build())
-                .map(response -> domainId)))
-            .then(domainId -> this.cloudFoundryClient.routes()
+                    .build()))))
+            .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
                 .exists(RouteExistsRequest.builder()
                     .domainId(domainId)
                     .host("test-host-2")
-                    .build()))
+                    .build())))
             .subscribe(testSubscriber()
                 .assertEquals(false));
     }
@@ -318,18 +317,17 @@ public final class RoutesTest extends AbstractIntegrationTest {
         this.organizationId
             .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
             .and(this.spaceId)
-            .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
+            .as(thenKeep(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
                 .create(CreateRouteRequest.builder()
                     .domainId(domainId)
                     .spaceId(spaceId)
-                    .build())
-                .map(response -> domainId)))
-            .flatMap(domainId -> PaginationUtils
+                    .build()))))
+            .flatMap(function((domainId, spaceId) -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.routes()
                     .list(ListRoutesRequest.builder()
                         .domainId(domainId)
                         .page(page)
-                        .build())))
+                        .build()))))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -415,20 +413,18 @@ public final class RoutesTest extends AbstractIntegrationTest {
             .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName))
             .and(this.spaceId)
             .then(function((domainId, spaceId) -> createApplicationAndRoute(this.cloudFoundryClient, domainId, spaceId, applicationName)))
-            .then(function((applicationId, routeId) -> associateApplicationWithRoute(this.cloudFoundryClient, applicationId, routeId)
-                .map(response -> Tuple2.of(applicationId, routeId))))
-            .then(function((applicationId, routeId) -> this.cloudFoundryClient.routes()
+            .as(thenKeep(function((applicationId, routeId) -> associateApplicationWithRoute(this.cloudFoundryClient, applicationId, routeId))))
+            .as(thenKeep((function((applicationId, routeId) -> this.cloudFoundryClient.routes()
                 .removeApplication(RemoveRouteApplicationRequest.builder()
                     .applicationId(applicationId)
                     .routeId(routeId)
-                    .build())
-                .map(response -> routeId)))
-            .flatMap(routeId -> PaginationUtils
+                    .build())))))
+            .flatMap(function((applicationId, routeId) -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.routes()
                     .listApplications(ListRouteApplicationsRequest.builder()
                         .page(page)
                         .routeId(routeId)
-                        .build())))
+                        .build()))))
             .subscribe(testSubscriber()
                 .assertCount(0));
     }
