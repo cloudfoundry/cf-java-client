@@ -190,10 +190,10 @@ TODO: Document once implemented
 ## Documentation
 API Documentation for each module can be found at the following locations:
 
-* `cloudfoundry-client` – [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.BUILD-SNAPSHOT/cloudfoundry-client)
-* `cloudfoundry-client-spring` – [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.BUILD-SNAPSHOT/cloudfoundry-client-spring)
-* `cloudfoundry-operations` – [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.BUILD-SNAPSHOT/cloudfoundry-operations)
-* `cloudfoundry-util` – [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.BUILD-SNAPSHOT/cloudfoundry-util)
+* `cloudfoundry-client` – [`milestone`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.M1/cloudfoundry-client), [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.BUILD-SNAPSHOT/cloudfoundry-client)
+* `cloudfoundry-client-spring` – [`milestone`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.M1/cloudfoundry-client-spring), [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.BUILD-SNAPSHOT/cloudfoundry-client-spring)
+* `cloudfoundry-operations` – [`milestone`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.M1/cloudfoundry-operations), [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.BUILD-SNAPSHOT/cloudfoundry-operations)
+* `cloudfoundry-util` – [`milestone`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.M1/cloudfoundry-util), [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.BUILD-SNAPSHOT/cloudfoundry-util)
 
 ## Development
 The project depends on Java 8.  To build from source and install to your local Maven cache, run the following:
@@ -228,7 +228,7 @@ Name | Description
 ## License
 This project is released under version 2.0 of the [Apache License][l].
 
-[a]: https://apidocs.cloudfoundry.org/226/
+[a]: https://apidocs.cloudfoundry.org/latest-release/
 [c]: https://github.com/cloudfoundry/cli
 [e]: https://github.com/cloudfoundry/cf-java-client/issues
 [g]: https://gradle.org
