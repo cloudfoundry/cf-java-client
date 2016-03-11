@@ -49,7 +49,7 @@
     <properties>
         <java-semver.version>0.9.0</java-semver.version>
         <jjwt.version>0.6.0</jjwt.version>
-        <lombok.version>1.16.6</lombok.version>
+        <lombok.version>1.16.8</lombok.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <protobuf.version>2.6.1</protobuf.version>
         <reactor.version>2.5.0.M2</reactor.version>
