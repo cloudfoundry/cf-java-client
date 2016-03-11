@@ -155,7 +155,7 @@ To relate the example to the description above the following happens:
 
 1. `.list()` – Lists the Cloud Foundry organizations
 1. `.map(...)` – Maps an input type to an output type.  This example uses a method a reference and the equivalent lambda would look like `organization -> organization.getName()`.
-1. `consume...` – The terminal operation that consumes each item in the stream.  Again, this example uses a method reference and the the equivalent lambda would look like `name -> System.out.println(name)`.
+1. `consume...` – The terminal operation that consumes each item in the `Flux`.  Again, this example uses a method reference and the the equivalent lambda would look like `name -> System.out.println(name)`.
 
 ### `CloudFoundryClient` APIs
 
@@ -166,7 +166,7 @@ cloudFoundryClient.organizations()
     .list(ListOrganizationsRequest.builder()
         .page(1)
         .build())
-    .flatMap(response -> Stream.from(response.getResources))
+    .flatMap(response -> Flux.fromIterable(response.getResources))
     .map(resource -> Organization.builder()
         .id(resource.getMetadata().getId())
         .name(resource.getEntity().getName())
@@ -176,7 +176,7 @@ cloudFoundryClient.organizations()
 The above example is more complicated:
 
 1. `.list(...)` – Retrieves a page of Cloud Foundry organizations
-1. `.flatMap(...)` – Substitutes the original stream with a stream of the `Resource`s returned by the requested page
+1. `.flatMap(...)` – Substitutes the original `Mono` with a `Flux` of the `Resource`s returned by the requested page
 1. `.map(...)` – Maps the `Resource` to an `Organization` type
 
 ### Maven Plugin
