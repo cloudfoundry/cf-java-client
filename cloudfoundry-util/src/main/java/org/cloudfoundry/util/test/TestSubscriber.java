@@ -34,6 +34,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.junit.Assert.fail;
@@ -78,6 +80,23 @@ public final class TestSubscriber<T> implements Subscriber<T> {
             Assert.assertEquals(String.format("Unexpected error %s", writer.toString()), expected, actual.getClass());
             if (format != null) {
                 Assert.assertEquals("Unexpected exception text", String.format(format, args), actual.getMessage());
+            }
+        };
+
+        return this;
+    }
+
+    public TestSubscriber<T> assertErrorMatch(Class<? extends Throwable> expected, String patternString) {
+        this.errorExpectation = actual -> {
+            StringWriter writer = new StringWriter();
+            actual.printStackTrace(new PrintWriter(writer));
+
+            Assert.assertEquals(String.format("Unexpected error %s", writer.toString()), expected, actual.getClass());
+            if (patternString != null) {
+                Matcher matcher = Pattern.compile(patternString).matcher(actual.getMessage());
+                if (!matcher.matches()) {
+                    fail(String.format("Exception text \"%s\" fails to match pattern \"%s\"", actual.getMessage(), patternString));
+                }
             }
         };
 
