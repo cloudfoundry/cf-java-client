@@ -155,7 +155,7 @@ To relate the example to the description above the following happens:
 
 1. `.list()` – Lists the Cloud Foundry organizations
 1. `.map(...)` – Maps an input type to an output type.  This example uses a method a reference and the equivalent lambda would look like `organization -> organization.getName()`.
-1. `consume...` – The terminal operation that consumes each item in the `Flux`.  Again, this example uses a method reference and the the equivalent lambda would look like `name -> System.out.println(name)`.
+1. `consume...` – The terminal operation that consumes each item in the `Flux`.  Again, this example uses a method reference and the equivalent lambda would look like `name -> System.out.println(name)`.
 
 ### `CloudFoundryClient` APIs
 
@@ -202,7 +202,7 @@ The project depends on Java 8.  To build from source and install to your local M
 $ ./mvnw clean install
 ```
 
-To run the the integration tests, run the following:
+To run the integration tests, run the following:
 
 ```shell
 $ ./mvnw -Pintegration-test clean test
