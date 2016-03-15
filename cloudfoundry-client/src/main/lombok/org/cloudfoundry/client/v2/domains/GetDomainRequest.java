@@ -33,7 +33,7 @@ public final class GetDomainRequest implements Validatable {
      * The domain id
      *
      * @param domainId the domain id
-     * @return the fomain id
+     * @return the domain id
      */
     @Getter(onMethod = @__(@JsonIgnore))
     private final String domainId;
