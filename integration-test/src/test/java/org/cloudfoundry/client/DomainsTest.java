@@ -155,7 +155,10 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 )))
             .then(function((domainId, spaceId) -> Mono
                 .when(
-                    getSpaceIdNoFilter(cloudFoundryClient, domainId),
+                    requestListDomainSpaces(cloudFoundryClient, domainId)
+                        .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
+                        .single()
+                        .map(ResourceUtils::getId),
                     Mono.just(spaceId)
                 )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
@@ -181,7 +184,10 @@ public final class DomainsTest extends AbstractIntegrationTest {
             )))
             .then(function((domainId, spaceId, applicationId, routeId) -> Mono
                 .when(
-                    getSpaceIdFromApplicationId(cloudFoundryClient, applicationId, domainId),
+                    requestListDomainSpacesByApplicationId(cloudFoundryClient, applicationId, domainId)
+                        .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
+                        .single()
+                        .map(ResourceUtils::getId),
                     Mono.just(spaceId)
                 )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
@@ -203,6 +209,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 )))
             .as(thenKeep(function((domainId, response, spaceId, userId) -> requestAssociateSpaceDeveloper(cloudFoundryClient, spaceId, userId))))
             .then(function((domainId, response, spaceId, userId) -> requestListSpaceDevelopers(cloudFoundryClient, domainId, userId)
+                .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
                 .single()
                 .map(ResourceUtils::getId)
                 .and(Mono.just(spaceId))))
@@ -225,7 +232,10 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 )))
             .then(function((spaceId, spaceName, domainId) -> Mono
                 .when(
-                    getSpaceIdFromSpaceName(cloudFoundryClient, domainId, spaceName),
+                    requestListDomainSpacesBySpaceName(cloudFoundryClient, domainId, spaceName)
+                        .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
+                        .single()
+                        .map(ResourceUtils::getId),
                     Mono.just(spaceId)
                 )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
@@ -246,7 +256,10 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 )))
             .then(function((domainId, organizationId, spaceId) -> Mono
                 .when(
-                    getSpaceIdFromOrganizationId(cloudFoundryClient, domainId, organizationId),
+                    requestListDomainSpacesByOrganizationId(cloudFoundryClient, domainId, organizationId)
+                        .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
+                        .single()
+                        .map(ResourceUtils::getId),
                     Mono.just(spaceId)
                 )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
@@ -326,30 +339,6 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     private static Mono<String> getRouteId(CloudFoundryClient cloudFoundryClient, String domainId, String spaceId) {
         return requestCreateRoute(cloudFoundryClient, domainId, spaceId)
-            .map(ResourceUtils::getId);
-    }
-
-    private static Mono<String> getSpaceIdFromApplicationId(CloudFoundryClient cloudFoundryClient, String applicationId, String domainId) {
-        return requestListDomainSpacesByApplicationId(cloudFoundryClient, applicationId, domainId)
-            .single()
-            .map(ResourceUtils::getId);
-    }
-
-    private static Mono<String> getSpaceIdFromOrganizationId(CloudFoundryClient cloudFoundryClient, String domainId, String organizationId) {
-        return requestListDomainSpacesByOrganizationId(cloudFoundryClient, domainId, organizationId)
-            .single()
-            .map(ResourceUtils::getId);
-    }
-
-    private static Mono<String> getSpaceIdFromSpaceName(CloudFoundryClient cloudFoundryClient, String domainId, String spaceName) {
-        return requestListDomainSpacesBySpaceName(cloudFoundryClient, domainId, spaceName)
-            .single()
-            .map(ResourceUtils::getId);
-    }
-
-    private static Mono<String> getSpaceIdNoFilter(CloudFoundryClient cloudFoundryClient, String domainId) {
-        return requestListDomainSpaces(cloudFoundryClient, domainId)
-            .single()
             .map(ResourceUtils::getId);
     }
 
