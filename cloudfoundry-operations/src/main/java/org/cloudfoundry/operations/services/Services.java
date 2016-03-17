@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.operations.services;
 
-import org.cloudfoundry.operations.routes.CheckRouteRequest;
 import reactor.core.publisher.Mono;
 
 /**

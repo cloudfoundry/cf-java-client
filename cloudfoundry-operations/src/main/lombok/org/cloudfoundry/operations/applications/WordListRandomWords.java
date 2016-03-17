@@ -39,7 +39,7 @@ final class WordListRandomWords implements RandomWords {
         this(getWordList("adjectives.txt"), getWordList("nouns.txt"), new SecureRandom());
     }
 
-    WordListRandomWords(List<String> adjectives, List<String> nouns, Random random) {
+    private WordListRandomWords(List<String> adjectives, List<String> nouns, Random random) {
         this.adjectives = adjectives;
         this.nouns = nouns;
         this.random = random;

@@ -77,7 +77,7 @@ public final class DefaultDomainsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -102,7 +102,7 @@ public final class DefaultDomainsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Organization test-organization does not exist");
         }

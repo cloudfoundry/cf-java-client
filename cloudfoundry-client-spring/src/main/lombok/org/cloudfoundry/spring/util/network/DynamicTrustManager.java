@@ -45,13 +45,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 @ToString
-public final class DynamicTrustManager implements HostnameVerifier, SslCertificateTruster, X509TrustManager {
+final class DynamicTrustManager implements HostnameVerifier, SslCertificateTruster, X509TrustManager {
 
-    public static final int MAX_PORT = 65535;
+    private static final int MAX_PORT = 65535;
 
-    public static final int MIN_PORT = 1;
+    private static final int MIN_PORT = 1;
 
-    public static final int SSL_PORT = 443;
+    private static final int SSL_PORT = 443;
 
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.trust");
 
@@ -63,7 +63,7 @@ public final class DynamicTrustManager implements HostnameVerifier, SslCertifica
 
     private final Set<Tuple2<String, Integer>> trustedHostsAndPorts;
 
-    public DynamicTrustManager(Boolean trustCertificates) {
+    DynamicTrustManager(Boolean trustCertificates) {
         this.delegate = new AtomicReference<>(getTrustManager(getTrustManagerFactory(null)));
         this.trustCertificates = Optional.ofNullable(trustCertificates).orElse(false);
         this.trustedHosts = Collections.newSetFromMap(new ConcurrentHashMap<>());

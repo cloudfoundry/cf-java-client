@@ -19,7 +19,7 @@ package org.cloudfoundry;
 /**
  * A factory for creating names
  */
-public interface NameFactory {
+interface NameFactory {
 
     /**
      * Creates a name

@@ -169,7 +169,7 @@ public final class DefaultRoutes implements Routes {
     private static Mono<ApplicationResource> getApplication(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         return requestApplications(cloudFoundryClient, application, spaceId)
             .single()
-            .otherwise(ExceptionUtils.<ApplicationResource>convert("Application %s does not exist", application));
+            .otherwise(ExceptionUtils.convert("Application %s does not exist", application));
     }
 
     private static Mono<String> getApplicationId(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
@@ -229,7 +229,7 @@ public final class DefaultRoutes implements Routes {
     private static Mono<RouteResource> getRoute(CloudFoundryClient cloudFoundryClient, String host, String domain, String domainId, String path) {
         return requestRoutes(cloudFoundryClient, domainId, host, path)
             .single()
-            .otherwise(ExceptionUtils.<RouteResource>convert("Route %s.%s does not exist", host, domain));
+            .otherwise(ExceptionUtils.convert("Route %s.%s does not exist", host, domain));
     }
 
     private static Mono<String> getRouteId(CloudFoundryClient cloudFoundryClient, String host, String domain, String domainId, String path) {
@@ -250,7 +250,7 @@ public final class DefaultRoutes implements Routes {
     private static Mono<SpaceResource> getSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         return requestSpaces(cloudFoundryClient, organizationId, space)
             .single()
-            .otherwise(ExceptionUtils.<SpaceResource>convert("Space %s does not exist", space));
+            .otherwise(ExceptionUtils.convert("Space %s does not exist", space));
     }
 
     private static Mono<String> getSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {

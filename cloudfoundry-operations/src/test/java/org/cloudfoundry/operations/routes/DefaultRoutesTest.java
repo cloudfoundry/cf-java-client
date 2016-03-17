@@ -283,7 +283,7 @@ public final class DefaultRoutesTest {
                 .applicationId(applicationId)
                 .routeId(routeId)
                 .build()))
-            .thenReturn(Mono.<Void>empty());
+            .thenReturn(Mono.empty());
     }
 
     private static void requestRouteExistsFalse(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
@@ -428,7 +428,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Boolean> testSubscriber) {
             testSubscriber
                 .assertEquals(false);
         }
@@ -455,7 +455,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Boolean> testSubscriber) {
             testSubscriber
                 .assertEquals(false);
         }
@@ -477,7 +477,7 @@ public final class DefaultRoutesTest {
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_SPACE_ID);
 
         @Override
-        protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Boolean> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
@@ -505,7 +505,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Boolean> testSubscriber) {
             testSubscriber
                 .assertEquals(true);
         }
@@ -534,7 +534,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Boolean> testSubscriber) {
             testSubscriber
                 .assertEquals(true);
         }
@@ -563,7 +563,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Domain test-domain does not exist");
         }
@@ -590,7 +590,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
@@ -613,7 +613,7 @@ public final class DefaultRoutesTest {
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_SPACE_ID);
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
@@ -643,7 +643,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -674,7 +674,7 @@ public final class DefaultRoutesTest {
 
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
         }
@@ -702,7 +702,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Domain test-domain does not exist");
         }
@@ -724,7 +724,7 @@ public final class DefaultRoutesTest {
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(RequestValidationException.class, "Request is invalid: domain must be specified");
         }
@@ -749,7 +749,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Route test-host.test-domain does not exist");
         }
@@ -771,7 +771,7 @@ public final class DefaultRoutesTest {
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, Mono.just(TEST_SPACE_ID));
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
@@ -800,7 +800,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -825,7 +825,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -850,7 +850,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
         }
@@ -873,7 +873,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -899,7 +899,7 @@ public final class DefaultRoutesTest {
 
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
 
         }
 
@@ -929,7 +929,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
 
         }
 
@@ -950,7 +950,7 @@ public final class DefaultRoutesTest {
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, Mono.just(TEST_SPACE_ID));
 
         @Override
-        protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Route> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
@@ -969,7 +969,7 @@ public final class DefaultRoutesTest {
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_SPACE_ID);
 
         @Override
-        protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Route> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
@@ -996,7 +996,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Route> testSubscriber) {
             testSubscriber
                 .assertEquals(fill(Route.builder())
                     .application("test-application-name")
@@ -1030,7 +1030,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Route> testSubscriber) {
             // onComplete and not onNext
         }
 
@@ -1056,7 +1056,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Route> testSubscriber) {
             testSubscriber
                 .assertEquals(fill(Route.builder())
                     .application("test-application-name")
@@ -1090,7 +1090,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Route> testSubscriber) {
             testSubscriber
                 .assertEquals(fill(Route.builder())
                     .application("test-application-name")
@@ -1116,7 +1116,7 @@ public final class DefaultRoutesTest {
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_SPACE_ID);
 
         @Override
-        protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Route> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "MISSING_SPACE_ID");
         }
@@ -1135,7 +1135,7 @@ public final class DefaultRoutesTest {
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Override
-        protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Route> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "MISSING_SPACE_ID");
         }
@@ -1162,7 +1162,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -1191,7 +1191,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Application test-application-name does not exist");
         }
@@ -1220,7 +1220,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Domain test-domain does not exist");
         }
@@ -1247,7 +1247,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
@@ -1269,7 +1269,7 @@ public final class DefaultRoutesTest {
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "MISSING_SPACE_ID");
         }
@@ -1300,7 +1300,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -1331,7 +1331,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -1357,7 +1357,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Application test-application-name does not exist");
         }
@@ -1385,7 +1385,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Domain test-domain does not exist");
         }
@@ -1413,7 +1413,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Route test-host.test-domain does not exist");
         }
@@ -1435,7 +1435,7 @@ public final class DefaultRoutesTest {
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, Mono.just(TEST_SPACE_ID));
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
@@ -1456,7 +1456,7 @@ public final class DefaultRoutesTest {
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "MISSING_SPACE_ID");
         }
@@ -1485,7 +1485,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -1516,7 +1516,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 

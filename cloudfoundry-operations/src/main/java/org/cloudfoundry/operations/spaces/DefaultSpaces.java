@@ -217,7 +217,7 @@ public final class DefaultSpaces implements Spaces {
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
         return requestOrganizations(cloudFoundryClient, organization)
             .single()
-            .otherwise(ExceptionUtils.<OrganizationResource>convert("Organization %s does not exist", organization));
+            .otherwise(ExceptionUtils.convert("Organization %s does not exist", organization));
     }
 
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
@@ -241,7 +241,7 @@ public final class DefaultSpaces implements Spaces {
     private static Mono<SpaceResource> getOrganizationSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         return requestOrganizationSpaces(cloudFoundryClient, organizationId, space)
             .single()
-            .otherwise(ExceptionUtils.<SpaceResource>convert("Space %s does not exist", space));
+            .otherwise(ExceptionUtils.convert("Space %s does not exist", space));
     }
 
     private static Mono<String> getOrganizationSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
@@ -298,7 +298,7 @@ public final class DefaultSpaces implements Spaces {
     private static Mono<SpaceQuotaDefinitionResource> getSpaceQuota(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceQuota) {
         return requestOrganizationSpaceQuotas(cloudFoundryClient, organizationId, spaceQuota)
             .single()
-            .otherwise(ExceptionUtils.<SpaceQuotaDefinitionResource>convert("Space quota definition %s does not exist", spaceQuota));
+            .otherwise(ExceptionUtils.convert("Space quota definition %s does not exist", spaceQuota));
     }
 
     private static Mono<AssociateOrganizationUserByUsernameResponse> requestAssociateOrganizationUserByUsername(CloudFoundryClient cloudFoundryClient, String organizationId, String username) {

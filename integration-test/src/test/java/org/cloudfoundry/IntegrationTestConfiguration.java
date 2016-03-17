@@ -161,7 +161,7 @@ public class IntegrationTestConfiguration {
             .singleOrEmpty()
             .map(ResourceUtils::getId)
             .map(Optional::of)
-            .otherwiseIfEmpty(Mono.just(Optional.<String>empty()))
+            .otherwiseIfEmpty(Mono.just(Optional.empty()))
             .doOnSubscribe(s -> this.logger.debug(">> PROTECTED ORGANIZATION <<"))
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(id -> this.logger.debug("<< PROTECTED ORGANIZATION >>"))

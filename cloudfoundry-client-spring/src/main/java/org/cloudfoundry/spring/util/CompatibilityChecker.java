@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.spring.util;
 
-public interface CompatibilityChecker {
+interface CompatibilityChecker {
 
     void check();
 

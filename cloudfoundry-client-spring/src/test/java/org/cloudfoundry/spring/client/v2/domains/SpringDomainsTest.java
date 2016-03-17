@@ -78,7 +78,7 @@ public final class SpringDomainsTest {
                     .name("exmaple.com")
                     .owningOrganizationId("09e0d56f-4e50-4bff-af83-9bd87a7d7f00")
                     .owningOrganizationUrl("/v2/organizations/09e0d56f-4e50-4bff-af83-9bd87a7d7f00")
-                    .sharedOrganizations(Collections.<String>emptyList())
+                    .sharedOrganizations(Collections.emptyList())
                     .spacesUrl("/v2/domains/abb8338f-eaea-4149-85c0-61888bac0737/spaces")
                     .build())
                 .build();

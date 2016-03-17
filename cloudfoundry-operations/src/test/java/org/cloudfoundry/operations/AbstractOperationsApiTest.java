@@ -40,13 +40,9 @@ public abstract class AbstractOperationsApiTest<T> extends AbstractOperationsTes
 
         invoke().subscribe(testSubscriber);
         testSubscriber.verify(5, SECONDS);
-        extraVerifications();
     }
 
-    protected abstract void assertions(TestSubscriber<T> testSubscriber) throws Exception;
-
-    protected void extraVerifications() throws Exception {
-    }
+    protected abstract void assertions(TestSubscriber<T> testSubscriber);
 
     protected abstract Publisher<T> invoke();
 

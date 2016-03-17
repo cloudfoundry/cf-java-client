@@ -22,7 +22,7 @@ import static org.junit.Assert.assertNotNull;
 
 public final class WordListRandomWordsTest {
 
-    private WordListRandomWords randomWords = new WordListRandomWords();
+    private final WordListRandomWords randomWords = new WordListRandomWords();
 
     @Test
     public void getAdjective() {

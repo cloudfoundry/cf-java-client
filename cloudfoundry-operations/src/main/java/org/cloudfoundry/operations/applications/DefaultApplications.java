@@ -444,7 +444,7 @@ public final class DefaultApplications implements Applications {
     private static Mono<Void> deleteRoutes(CloudFoundryClient cloudFoundryClient, Optional<List<Route>> routes) {
         return routes
             .map(Flux::fromIterable)
-            .orElse(Flux.<Route>empty())
+            .orElse(Flux.empty())
             .map(Route::getId)
             .flatMap(routeId -> deleteRoute(cloudFoundryClient, routeId))
             .after();
@@ -485,7 +485,7 @@ public final class DefaultApplications implements Applications {
     private static Mono<AbstractApplicationResource> getApplication(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         return requestApplications(cloudFoundryClient, application, spaceId)
             .single()
-            .otherwise(ExceptionUtils.<AbstractApplicationResource>convert("Application %s does not exist", application));
+            .otherwise(ExceptionUtils.convert("Application %s does not exist", application));
     }
 
     private static Mono<String> getApplicationId(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
@@ -587,7 +587,7 @@ public final class DefaultApplications implements Applications {
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
         return requestOrganizations(cloudFoundryClient, organization)
             .single()
-            .otherwise(ExceptionUtils.<OrganizationResource>convert("Organization %s not found", organization));
+            .otherwise(ExceptionUtils.convert("Organization %s not found", organization));
     }
 
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
@@ -598,7 +598,7 @@ public final class DefaultApplications implements Applications {
     private static Mono<SpaceResource> getOrganizationSpaceByName(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         return requestOrganizationSpacesByName(cloudFoundryClient, organizationId, space)
             .single()
-            .otherwise(ExceptionUtils.<SpaceResource>convert("Space %s not found", space));
+            .otherwise(ExceptionUtils.convert("Space %s not found", space));
     }
 
     private static Mono<String> getPrivateDomainId(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
@@ -969,7 +969,7 @@ public final class DefaultApplications implements Applications {
                     .name(stack)
                     .build()))
             .single()
-            .otherwise(ExceptionUtils.<StackResource>convert("Stack %s does not exist", stack));
+            .otherwise(ExceptionUtils.convert("Stack %s does not exist", stack));
     }
 
     private static Mono<Void> requestTerminateApplicationInstance(CloudFoundryClient cloudFoundryClient, String applicationId, String instanceIndex) {
@@ -1209,7 +1209,7 @@ public final class DefaultApplications implements Applications {
             .where(isInstanceComplete())
             .repeatWhenEmpty(10, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(10)))
             .where(isRunning())
-            .otherwiseIfEmpty(ExceptionUtils.<String>illegalState("Application %s failed during start", application));
+            .otherwiseIfEmpty(ExceptionUtils.illegalState("Application %s failed during start", application));
     }
 
     private static Mono<String> waitForStaging(CloudFoundryClient cloudFoundryClient, String application, String applicationId) {
@@ -1218,7 +1218,7 @@ public final class DefaultApplications implements Applications {
             .where(isStagingComplete())
             .repeatWhenEmpty(10, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(10)))
             .where(isStaged())
-            .otherwiseIfEmpty(ExceptionUtils.<String>illegalState("Application %s failed during staging", application));
+            .otherwiseIfEmpty(ExceptionUtils.illegalState("Application %s failed during staging", application));
     }
 
 }

@@ -66,7 +66,7 @@ public final class PaginationUtils {
 
             return Flux
                 .range(2, totalPages - 1)
-                .flatMap(pageSupplier::apply)
+                .flatMap(pageSupplier)
                 .startWith(response);
         };
     }

@@ -404,7 +404,7 @@ public final class DefaultApplicationsTest {
             .delete(org.cloudfoundry.client.v2.applications.DeleteApplicationRequest.builder()
                 .applicationId(applicationId)
                 .build())).
-            thenReturn(Mono.<Void>empty());
+            thenReturn(Mono.empty());
     }
 
     private static void requestDeleteRoute(CloudFoundryClient cloudFoundryClient, String routeId) {
@@ -852,7 +852,7 @@ public final class DefaultApplicationsTest {
                 .applicationId(applicationId)
                 .index(instanceIndex)
                 .build())).
-            thenReturn(Mono.<Void>empty());
+            thenReturn(Mono.empty());
     }
 
     private static void requestUpdateApplication(CloudFoundryClient cloudFoundryClient, String applicationId, PushApplicationRequest request, String stackId) {
@@ -965,7 +965,7 @@ public final class DefaultApplicationsTest {
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(RequestValidationException.class, "Request is invalid: target application name must be specified");
         }
@@ -996,7 +996,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -1028,7 +1028,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -1056,7 +1056,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Organization test-target-organization not found");
         }
@@ -1092,7 +1092,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -1120,7 +1120,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Space test-target-space not found");
         }
@@ -1151,7 +1151,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -1178,7 +1178,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
         }
@@ -1204,7 +1204,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -1229,7 +1229,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -1253,7 +1253,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -1277,7 +1277,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Application test-app-name does not exist");
         }
@@ -1303,7 +1303,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -1327,7 +1327,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -1351,7 +1351,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Application test-app-name does not exist");
         }
@@ -1380,7 +1380,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<ApplicationDetail> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<ApplicationDetail> testSubscriber) {
             testSubscriber
                 .assertEquals(fill(ApplicationDetail.builder())
                     .buildpack("test-application-summary-buildpack")
@@ -1419,7 +1419,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<ApplicationManifest> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<ApplicationManifest> testSubscriber) {
             testSubscriber.assertEquals(ApplicationManifest.builder()
                 .buildpack("test-application-summary-buildpack")
                 .command("test-application-summary-command")
@@ -1450,7 +1450,7 @@ public final class DefaultApplicationsTest {
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
 
         @Override
-        protected void assertions(TestSubscriber<ApplicationManifest> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<ApplicationManifest> testSubscriber) {
             testSubscriber.
                 assertError(RequestValidationException.class, "Request is invalid: name must be specified");
         }
@@ -1476,7 +1476,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<ApplicationManifest> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<ApplicationManifest> testSubscriber) {
             testSubscriber.assertEquals(ApplicationManifest.builder()
                 .buildpack("test-application-summary-buildpack")
                 .command("test-application-summary-command")
@@ -1513,7 +1513,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<ApplicationDetail> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<ApplicationDetail> testSubscriber) {
             testSubscriber
                 .assertEquals(fill(ApplicationDetail.builder())
                     .buildpack("test-application-summary-detectedBuildpack")
@@ -1551,7 +1551,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<ApplicationEnvironments> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<ApplicationEnvironments> testSubscriber) {
             testSubscriber
                 .assertEquals(ApplicationEnvironments.builder()
                     .running(StringMap.builder()
@@ -1589,7 +1589,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<ApplicationEnvironments> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<ApplicationEnvironments> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Application test-app does not exist");
         }
@@ -1624,7 +1624,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<ApplicationEvent> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<ApplicationEvent> testSubscriber) {
             testSubscriber
                 .assertEquals(ApplicationEvent.builder()
                     .description("instances: 1, memory: 2, state: test-state, environment_json: test-data")
@@ -1663,7 +1663,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<ApplicationEvent> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<ApplicationEvent> testSubscriber) {
             testSubscriber
                 .assertEquals(ApplicationEvent.builder()
                     .description("memory: 2, state: test-state, environment_json: test-data")
@@ -1693,7 +1693,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<ApplicationEvent> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<ApplicationEvent> testSubscriber) {
             // expect successful empty result
         }
 
@@ -1727,7 +1727,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<ApplicationEvent> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<ApplicationEvent> testSubscriber) {
             // expect successful empty result
         }
 
@@ -1769,7 +1769,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<ApplicationEvent> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<ApplicationEvent> testSubscriber) {
             testSubscriber
                 .assertEquals(ApplicationEvent.builder()
                     .description("instances: 1, memory: 2, state: test-state, environment_json: test-data")
@@ -1810,7 +1810,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<ApplicationDetail> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<ApplicationDetail> testSubscriber) {
             testSubscriber
                 .assertEquals(fill(ApplicationDetail.builder())
                     .buildpack(null)
@@ -1847,7 +1847,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<ApplicationSummary> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<ApplicationSummary> testSubscriber) {
             testSubscriber
                 .assertEquals(fill(ApplicationSummary.builder())
                     .id("test-application-summary-id")
@@ -1874,7 +1874,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<LogMessage> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<LogMessage> testSubscriber) {
             testSubscriber
                 .assertEquals(fill(LogMessage.builder(), "log-message-")
                     .build());
@@ -1901,7 +1901,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<LogMessage> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<LogMessage> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Application test-application-name does not exist");
         }
@@ -1927,7 +1927,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<LogMessage> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<LogMessage> testSubscriber) {
             testSubscriber
                 .assertEquals(fill(LogMessage.builder(), "log-message-")
                     .build());
@@ -1956,7 +1956,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<LogMessage> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<LogMessage> testSubscriber) {
             testSubscriber
                 .assertEquals(fill(LogMessage.builder(), "log-message-")
                     .build());
@@ -1994,7 +1994,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "Domain test-domain not found");
         }
@@ -2037,7 +2037,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -2079,7 +2079,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -2121,7 +2121,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -2138,7 +2138,7 @@ public final class DefaultApplicationsTest {
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(RequestValidationException.class, "Request is invalid: name must be specified, application bits must be specified");
         }
@@ -2164,7 +2164,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Stack invalid-stack does not exist");
         }
@@ -2211,7 +2211,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -2254,7 +2254,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -2297,7 +2297,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -2331,7 +2331,7 @@ public final class DefaultApplicationsTest {
 
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "Domain not found");
         }
@@ -2375,7 +2375,7 @@ public final class DefaultApplicationsTest {
 
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -2417,7 +2417,7 @@ public final class DefaultApplicationsTest {
 
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -2457,7 +2457,7 @@ public final class DefaultApplicationsTest {
 
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -2497,7 +2497,7 @@ public final class DefaultApplicationsTest {
 
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -2543,7 +2543,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -2586,7 +2586,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -2628,7 +2628,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "Application test-name failed during start");
         }
@@ -2670,7 +2670,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "Application test-name failed during staging");
         }
@@ -2709,7 +2709,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
         }
@@ -2733,7 +2733,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -2758,7 +2758,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Application test-app-name does not exist");
         }
@@ -2787,7 +2787,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -2811,7 +2811,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Application test-application-name does not exist");
         }
@@ -2838,7 +2838,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "Application test-application-name failed during staging");
         }
@@ -2866,7 +2866,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -2893,7 +2893,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "Application test-application-name failed during start");
         }
@@ -2922,7 +2922,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // nothing returned on success
         }
 
@@ -2950,7 +2950,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "Application test-app-name failed during start");
         }
@@ -2976,7 +2976,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // nothing returned on success
         }
 
@@ -3001,7 +3001,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Application test-non-existent-app-name does not exist");
         }
@@ -3030,7 +3030,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // nothing returned on success
         }
 
@@ -3058,7 +3058,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // nothing returned on success
         }
 
@@ -3085,7 +3085,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // nothing returned on success
         }
 
@@ -3110,7 +3110,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Nothing returned on success
         }
 
@@ -3139,7 +3139,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // nothing returned on success
         }
 
@@ -3166,7 +3166,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // nothing returned on success
         }
 
@@ -3191,7 +3191,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Application test-app-name does not exist");
         }
@@ -3217,7 +3217,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // nothing returned on success
         }
 
@@ -3245,7 +3245,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Nothing returned on success
         }
 
@@ -3271,7 +3271,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Application test-app does not exist");
         }
@@ -3298,7 +3298,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Boolean> testSubscriber) {
             testSubscriber
                 .assertEquals(true);
         }
@@ -3323,7 +3323,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Boolean> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Application test-app-name does not exist");
         }
@@ -3351,7 +3351,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -3377,7 +3377,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "Application test-application-name failed during start");
         }
@@ -3401,7 +3401,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Application test-application-name does not exist");
         }
@@ -3425,7 +3425,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -3451,7 +3451,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -3474,7 +3474,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Application test-application-name does not exist");
         }
@@ -3499,7 +3499,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -3522,7 +3522,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -3546,7 +3546,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Nothing returned on success
         }
 
@@ -3571,7 +3571,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Application test-app does not exist");
         }

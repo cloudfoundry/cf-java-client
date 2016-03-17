@@ -31,7 +31,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 @Accessors(chain = true, fluent = true)
 @Setter
 @ToString
-public final class AccessTokenUriBuilder {
+final class AccessTokenUriBuilder {
 
     private String host;
 

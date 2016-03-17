@@ -48,7 +48,6 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
-import org.cloudfoundry.client.v2.organizations.UpdateOrganizationResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
@@ -292,8 +291,7 @@ public final class DefaultOrganizationsTest {
                 .name(newName)
                 .organizationId(organizationId)
                 .build()))
-            .thenReturn(Mono
-                .<UpdateOrganizationResponse>empty());
+            .thenReturn(Mono.empty());
     }
 
     public static final class Create extends AbstractOperationsApiTest<Void> {
@@ -309,7 +307,7 @@ public final class DefaultOrganizationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -328,7 +326,7 @@ public final class DefaultOrganizationsTest {
         private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(RequestValidationException.class, "Request is invalid: organization name must be specified");
         }
@@ -353,7 +351,7 @@ public final class DefaultOrganizationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -381,7 +379,7 @@ public final class DefaultOrganizationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -407,7 +405,7 @@ public final class DefaultOrganizationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // onComplete and no onNext
         }
 
@@ -433,7 +431,7 @@ public final class DefaultOrganizationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
         }
@@ -462,7 +460,7 @@ public final class DefaultOrganizationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<OrganizationDetail> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<OrganizationDetail> testSubscriber) {
             testSubscriber
                 .assertEquals(fill(OrganizationDetail.builder())
                     .domain("test-name")
@@ -497,7 +495,7 @@ public final class DefaultOrganizationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<OrganizationSummary> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<OrganizationSummary> testSubscriber) {
             testSubscriber
                 .assertEquals(fill(OrganizationSummary.builder(), "organization-")
                     .build());
@@ -522,7 +520,7 @@ public final class DefaultOrganizationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -542,7 +540,7 @@ public final class DefaultOrganizationsTest {
         private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(RequestValidationException.class, "Request is invalid: name must be specified, new name must be specified");
         }

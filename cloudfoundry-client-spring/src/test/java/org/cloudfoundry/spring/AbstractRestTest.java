@@ -75,7 +75,7 @@ public abstract class AbstractRestTest {
 
     private final MockRestServiceServer mockServer = MockRestServiceServer.createServer(this.restTemplate);
 
-    protected final void mockRequest(RequestContext requestContext) {
+    final void mockRequest(RequestContext requestContext) {
         HttpMethod method = requestContext.getMethod();
         Assert.notNull(method, "method must be set");
 
@@ -116,7 +116,7 @@ public abstract class AbstractRestTest {
         responseActions.andRespond(responseCreator);
     }
 
-    protected final void verify() {
+    final void verify() {
         this.mockServer.verify();
     }
 

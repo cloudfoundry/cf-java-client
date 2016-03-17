@@ -193,7 +193,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .subscribe(testSubscriber());
     }
 
-    private static Mono<Void> createApplication(CloudFoundryOperations cloudFoundryOperations, InputStream applicationBits, String name, Boolean noStart) throws IOException {
+    private static Mono<Void> createApplication(CloudFoundryOperations cloudFoundryOperations, InputStream applicationBits, String name, Boolean noStart) {
         return cloudFoundryOperations.applications()
             .push(PushApplicationRequest.builder()
                 .application(applicationBits)

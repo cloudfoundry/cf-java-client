@@ -19,9 +19,6 @@ package org.cloudfoundry.operations.applications;
 import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;

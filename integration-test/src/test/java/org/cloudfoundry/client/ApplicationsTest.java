@@ -779,7 +779,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void uploadAndDownload() throws IOException {
+    public void uploadAndDownload() {
         String applicationName = getApplicationName();
 
         String testApplicationName = "test-application.zip";

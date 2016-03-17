@@ -109,11 +109,11 @@ public final class DefaultServicesTest {
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
             requestSpaceServiceInstances(this.cloudFoundryClient, "test-service-name", TEST_SPACE_ID);
-            requestBindService(this.cloudFoundryClient, "test-application-id", "test-service-instance-id", Collections.<String, Object>singletonMap("test-parameter-key", "test-parameter-value"));
+            requestBindService(this.cloudFoundryClient, "test-application-id", "test-service-instance-id", Collections.singletonMap("test-parameter-key", "test-parameter-value"));
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -140,7 +140,7 @@ public final class DefaultServicesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Application test-application-name does not exist");
         }
@@ -168,7 +168,7 @@ public final class DefaultServicesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Service test-service-name does not exist");
         }

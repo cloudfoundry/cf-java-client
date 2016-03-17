@@ -149,7 +149,7 @@ public final class CloudFoundryOperationsBuilder {
     private static Mono<SpaceResource> getSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         return requestSpaces(cloudFoundryClient, organizationId, space)
             .single()
-            .otherwise(ExceptionUtils.<SpaceResource>convert("Space %s does not exist", space));
+            .otherwise(ExceptionUtils.convert("Space %s does not exist", space));
     }
 
     private static Mono<String> getSpaceId(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, String space) {

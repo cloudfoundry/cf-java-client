@@ -26,7 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
 
-public final class CustomSslSimpleClientHttpRequestFactory extends SimpleClientHttpRequestFactory {
+final class CustomSslSimpleClientHttpRequestFactory extends SimpleClientHttpRequestFactory {
 
     private final HostnameVerifier hostNameVerifier;
 

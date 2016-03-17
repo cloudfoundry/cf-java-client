@@ -62,7 +62,7 @@ public final class DefaultServices implements Services {
     private static Mono<ApplicationResource> getApplication(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
         return requestApplications(cloudFoundryClient, applicationName, spaceId)
             .single()
-            .otherwise(ExceptionUtils.<ApplicationResource>convert("Application %s does not exist", applicationName));
+            .otherwise(ExceptionUtils.convert("Application %s does not exist", applicationName));
     }
 
     private static Mono<String> getApplicationId(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
@@ -73,7 +73,7 @@ public final class DefaultServices implements Services {
     private static Mono<ServiceInstanceResource> getSpaceServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
         return requestSpaceServiceInstances(cloudFoundryClient, serviceName, spaceId)
             .single()
-            .otherwise(ExceptionUtils.<ServiceInstanceResource>convert("Service %s does not exist", serviceName));
+            .otherwise(ExceptionUtils.convert("Service %s does not exist", serviceName));
     }
 
     private static Mono<String> getSpaceServiceInstanceId(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {

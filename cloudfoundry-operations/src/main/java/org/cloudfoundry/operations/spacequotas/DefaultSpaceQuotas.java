@@ -60,7 +60,7 @@ public final class DefaultSpaceQuotas implements SpaceQuotas {
         return requestSpaceQuotaDefinitions(cloudFoundryClient, organizationId)
             .filter(resource -> name.equals(ResourceUtils.getEntity(resource).getName()))
             .single()
-            .otherwise(ExceptionUtils.<SpaceQuotaDefinitionResource>convert("Space Quota %s does not exist", name));
+            .otherwise(ExceptionUtils.convert("Space Quota %s does not exist", name));
     }
 
     private static Flux<SpaceQuotaDefinitionResource> requestSpaceQuotaDefinitions(CloudFoundryClient cloudFoundryClient, String organizationId) {

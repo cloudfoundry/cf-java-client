@@ -25,7 +25,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public final class ContentMatchers {
+final class ContentMatchers {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 

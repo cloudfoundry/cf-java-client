@@ -161,7 +161,7 @@ public final class DefaultOrganizations implements Organizations {
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
         return requestOrganizations(cloudFoundryClient, organization)
             .single()
-            .otherwise(ExceptionUtils.<OrganizationResource>convert("Organization %s does not exist", organization));
+            .otherwise(ExceptionUtils.convert("Organization %s does not exist", organization));
     }
 
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
@@ -178,7 +178,7 @@ public final class DefaultOrganizations implements Organizations {
     private static Mono<OrganizationQuotaDefinitionResource> getOrganizationQuotaDefinition(CloudFoundryClient cloudFoundryClient, String quotaDefinitionName) {
         return requestOrganizationQuotaDefinitions(cloudFoundryClient, quotaDefinitionName)
             .single()
-            .otherwise(ExceptionUtils.<OrganizationQuotaDefinitionResource>convert("Organization quota %s does not exist", quotaDefinitionName));
+            .otherwise(ExceptionUtils.convert("Organization quota %s does not exist", quotaDefinitionName));
     }
 
     private static Mono<String> getOrganizationQuotaDefinitionId(CloudFoundryClient cloudFoundryClient, String quotaDefinitionName) {

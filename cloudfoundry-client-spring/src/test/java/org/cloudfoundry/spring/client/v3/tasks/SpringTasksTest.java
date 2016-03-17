@@ -261,7 +261,7 @@ public final class SpringTasksTest {
                     .command("rake db:migrate")
                     .state(Task.FAILED_STATE)
                     .memoryInMb(256)
-                    .results(Collections.<String, Object>singletonMap("failure_reason", "Exited with status 1"))
+                    .results(Collections.singletonMap("failure_reason", "Exited with status 1"))
                     .link("self", Link.builder()
                         .href("/v3/tasks/63b4cd89-fd8b-4bf1-a311-7174fcc907d6")
                         .build())

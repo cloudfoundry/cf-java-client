@@ -64,7 +64,7 @@ public final class DefaultSpaceQuotasTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) {
             testSubscriber
                 .assertEquals(fill(SpaceQuota.builder(), "space-quota-definition-")
                     .build());
@@ -85,7 +85,7 @@ public final class DefaultSpaceQuotasTest {
         private final DefaultSpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, MISSING_ORGANIZATION_ID);
 
         @Override
-        protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
@@ -110,7 +110,7 @@ public final class DefaultSpaceQuotasTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Space Quota test-space-quota-definition-name does not exist");
         }
@@ -135,7 +135,7 @@ public final class DefaultSpaceQuotasTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) {
             testSubscriber
                 .assertEquals(fill(SpaceQuota.builder(), "space-quota-definition-")
                     .build());
@@ -154,7 +154,7 @@ public final class DefaultSpaceQuotasTest {
         private final DefaultSpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, MISSING_ORGANIZATION_ID);
 
         @Override
-        protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }

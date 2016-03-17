@@ -27,7 +27,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.net.URI;
 
-public final class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
+final class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
 
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.request");
 

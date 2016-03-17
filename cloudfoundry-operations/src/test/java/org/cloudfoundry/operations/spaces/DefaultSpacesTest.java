@@ -381,8 +381,7 @@ public final class DefaultSpacesTest {
                 .name(newName)
                 .spaceId(spaceId)
                 .build()))
-            .thenReturn(Mono
-                .<UpdateSpaceResponse>empty());
+            .thenReturn(Mono.empty());
     }
 
     private static void requestUpdateSpaceSsh(CloudFoundryClient cloudFoundryClient, String spaceId, Boolean allowed) {
@@ -409,7 +408,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -433,7 +432,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -457,7 +456,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
@@ -477,7 +476,7 @@ public final class DefaultSpacesTest {
         private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_USERNAME);
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(RequestValidationException.class, "Request is invalid: name must be specified");
         }
@@ -506,7 +505,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -534,7 +533,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -559,7 +558,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Space quota definition test-space-quota does not exist");
         }
@@ -585,7 +584,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Organization test-other-organization does not exist");
         }
@@ -617,7 +616,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -645,7 +644,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
         }
 
         @Override
@@ -671,7 +670,7 @@ public final class DefaultSpacesTest {
 
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
         }
@@ -691,7 +690,7 @@ public final class DefaultSpacesTest {
         private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_USERNAME);
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(RequestValidationException.class, "Request is invalid: name must be specified");
         }
@@ -715,7 +714,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
@@ -735,7 +734,7 @@ public final class DefaultSpacesTest {
         private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_USERNAME);
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
@@ -761,7 +760,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -785,7 +784,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -809,7 +808,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
@@ -840,7 +839,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<SpaceDetail> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<SpaceDetail> testSubscriber) {
             testSubscriber
                 .assertEquals(SpaceDetail.builder()
                     .application("test-application-name")
@@ -876,7 +875,7 @@ public final class DefaultSpacesTest {
         private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_USERNAME);
 
         @Override
-        protected void assertions(TestSubscriber<SpaceDetail> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<SpaceDetail> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
@@ -906,7 +905,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<SpaceDetail> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<SpaceDetail> testSubscriber) {
             testSubscriber
                 .assertEquals(SpaceDetail.builder()
                     .application("test-application-name")
@@ -948,7 +947,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<SpaceDetail> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<SpaceDetail> testSubscriber) {
             testSubscriber
                 .assertEquals(SpaceDetail.builder()
                     .application("test-application-name")
@@ -960,7 +959,7 @@ public final class DefaultSpacesTest {
                         .name("test-security-group-name")
                         .build())
                     .service("test-service-label")
-                    .spaceQuota(Optional.<SpaceQuota>empty())
+                    .spaceQuota(Optional.empty())
                     .build());
         }
 
@@ -984,7 +983,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<SpaceSummary> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<SpaceSummary> testSubscriber) {
             testSubscriber
                 .assertEquals(fill(SpaceSummary.builder(), "space-")
                     .build());
@@ -1003,7 +1002,7 @@ public final class DefaultSpacesTest {
         private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_USERNAME);
 
         @Override
-        protected void assertions(TestSubscriber<SpaceSummary> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<SpaceSummary> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
@@ -1027,7 +1026,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
@@ -1047,7 +1046,7 @@ public final class DefaultSpacesTest {
         private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(RequestValidationException.class, "Request is invalid: name must be specified, new name must be specified");
         }
@@ -1071,7 +1070,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
@@ -1097,7 +1096,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Boolean> testSubscriber) {
             testSubscriber
                 .assertEquals(true);
         }
@@ -1122,7 +1121,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Boolean> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Space test-space-name does not exist");
         }

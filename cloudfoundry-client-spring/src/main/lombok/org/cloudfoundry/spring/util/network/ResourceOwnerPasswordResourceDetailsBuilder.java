@@ -27,7 +27,7 @@ import java.util.Optional;
 @Accessors(chain = true, fluent = true)
 @Setter
 @ToString
-public final class ResourceOwnerPasswordResourceDetailsBuilder {
+final class ResourceOwnerPasswordResourceDetailsBuilder {
 
     private URI accessTokenUri;
 
