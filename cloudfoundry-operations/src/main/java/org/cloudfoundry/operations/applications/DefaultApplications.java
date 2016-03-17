@@ -498,9 +498,9 @@ public final class DefaultApplications implements Applications {
             .singleOrEmpty()
             .map(ResourceUtils::getId)
             .then(applicationId -> requestUpdateApplication(cloudFoundryClient, applicationId, request, stackId)
-                .map(response -> response.getMetadata().getId()))
+                .map(ResourceUtils::getId))
             .otherwiseIfEmpty(requestCreateApplication(cloudFoundryClient, request, spaceId, stackId)
-                .map(response -> response.getMetadata().getId())
+                .map(ResourceUtils::getId)
             );
     }
 
