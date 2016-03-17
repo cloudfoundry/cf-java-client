@@ -35,6 +35,9 @@ import org.cloudfoundry.client.v2.applications.CopyApplicationResponse;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
+import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
+import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsResponse;
+import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingRequest;
 import org.cloudfoundry.client.v2.applications.RestageApplicationResponse;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
@@ -67,6 +70,7 @@ import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
 import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteResource;
+import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstance;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
@@ -189,6 +193,32 @@ public final class DefaultApplicationsTest {
                         .state("RUNNING")
                         .build())
                     .build()));
+    }
+
+    private static void requestApplicationServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
+                .applicationId(applicationId)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListApplicationServiceBindingsResponse.builder(), "test-service-binding-")
+                    .resource(ServiceBindingResource.builder()
+                        .metadata(Resource.Metadata.builder()
+                            .id("test-service-binding-id")
+                            .build())
+                        .build())
+                    .totalPages(1)
+                    .build()));
+    }
+
+    private static void requestApplicationServiceBindingsEmpty(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
+                .applicationId(applicationId)
+                .page(1)
+                .build()))
+            .thenReturn(Mono.empty());
     }
 
     private static void requestApplicationStats(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -683,6 +713,15 @@ public final class DefaultApplicationsTest {
                     .build()));
     }
 
+    private static void requestRemoveServiceBinding(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceBindingId) {
+        when(cloudFoundryClient.applicationsV2()
+            .removeServiceBinding(RemoveApplicationServiceBindingRequest.builder()
+                .applicationId(applicationId)
+                .serviceBindingId(serviceBindingId)
+                .build()))
+            .thenReturn(Mono.empty());
+    }
+
     private static void requestRestageApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient.applicationsV2()
             .restage(org.cloudfoundry.client.v2.applications.RestageApplicationRequest.builder()
@@ -1146,6 +1185,7 @@ public final class DefaultApplicationsTest {
             requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-metadata-id");
             requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
             requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
+            requestApplicationServiceBindingsEmpty(this.cloudFoundryClient, "test-metadata-id");
             requestDeleteApplication(this.cloudFoundryClient, "test-metadata-id");
             requestJobSuccess(this.cloudFoundryClient, "test-id");
         }
@@ -1200,6 +1240,7 @@ public final class DefaultApplicationsTest {
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-metadata-id");
             requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+            requestApplicationServiceBindingsEmpty(this.cloudFoundryClient, "test-metadata-id");
             requestDeleteApplication(this.cloudFoundryClient, "test-metadata-id");
         }
 
@@ -1213,6 +1254,35 @@ public final class DefaultApplicationsTest {
             return this.applications
                 .delete(fill(DeleteApplicationRequest.builder())
                     .deleteRoutes(false)
+                    .build());
+        }
+
+    }
+
+    public static final class DeleteWithBoundRoutes extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-metadata-id");
+            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+            requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
+            requestApplicationServiceBindings(this.cloudFoundryClient, "test-metadata-id");
+            requestRemoveServiceBinding(this.cloudFoundryClient, "test-metadata-id", "test-service-binding-id");
+            requestDeleteApplication(this.cloudFoundryClient, "test-metadata-id");
+            requestJobSuccess(this.cloudFoundryClient, "test-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .delete(fill(DeleteApplicationRequest.builder())
                     .build());
         }
 
