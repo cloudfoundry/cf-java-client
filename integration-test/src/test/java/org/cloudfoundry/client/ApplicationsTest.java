@@ -583,16 +583,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .then(spaceId -> Mono
                 .when(
                     createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
-                    createUserServiceInstanceId(cloudFoundryClient, spaceId, serviceInstanceName)
+                    createUserServiceInstanceId(this.cloudFoundryClient, spaceId, serviceInstanceName)
                 ))
-            .as(thenKeep(function((applicationId, serviceInstanceId) -> createServiceBindingId(cloudFoundryClient, applicationId, serviceInstanceId))))
+            .as(thenKeep(function((applicationId, serviceInstanceId) -> createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId))))
             .then(function((applicationId, serviceInstanceId) -> Mono
                 .when(
                     Mono.just(serviceInstanceId),
-                    requestServiceBindings(this.cloudFoundryClient, applicationId)
-                        .single()
-                        .map(ResourceUtils::getEntity)
-                        .map(ServiceBindingEntity::getServiceInstanceId)
+                    getSingleServiceBindingInstanceId(this.cloudFoundryClient, applicationId)
                 )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
@@ -607,7 +604,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .then(spaceId -> Mono
                 .when(
                     createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
-                    createUserServiceInstanceId(cloudFoundryClient, spaceId, serviceInstanceName)
+                    createUserServiceInstanceId(this.cloudFoundryClient, spaceId, serviceInstanceName)
                 ))
             .then(function((applicationId, serviceInstanceId) -> Mono
                 .when(
@@ -935,6 +932,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         return requestRoutes(cloudFoundryClient, applicationId)
             .single()
             .map(ResourceUtils::getId);
+    }
+
+    private static Mono<String> getSingleServiceBindingInstanceId(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return requestServiceBindings(cloudFoundryClient, applicationId)
+            .single()
+            .map(ResourceUtils::getEntity)
+            .map(ServiceBindingEntity::getServiceInstanceId);
     }
 
     @SuppressWarnings("unchecked")
