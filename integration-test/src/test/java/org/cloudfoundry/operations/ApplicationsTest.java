@@ -22,6 +22,8 @@ import org.cloudfoundry.operations.applications.PushApplicationRequest;
 import org.cloudfoundry.operations.applications.RestartApplicationRequest;
 import org.cloudfoundry.operations.applications.StartApplicationRequest;
 import org.cloudfoundry.operations.domains.CreateDomainRequest;
+import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -62,6 +64,12 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .deleteRoutes(true)
                     .build()))
             .subscribe(testSubscriber());
+    }
+
+    @Ignore("TODO: implement once Operations allows user provided services to be created and bound (https://www.pivotaltracker.com/story/show/106155480)")
+    @Test
+    public void deleteWithServiceBindings() throws IOException {
+        Assert.fail();
     }
 
     @Test

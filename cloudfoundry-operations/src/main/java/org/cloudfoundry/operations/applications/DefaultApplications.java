@@ -34,6 +34,8 @@ import org.cloudfoundry.client.v2.applications.CopyApplicationResponse;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
+import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
+import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingRequest;
 import org.cloudfoundry.client.v2.applications.RestageApplicationResponse;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
@@ -56,6 +58,7 @@ import org.cloudfoundry.client.v2.routes.DeleteRouteResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.routes.RouteResource;
+import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstance;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
@@ -116,9 +119,9 @@ public final class DefaultApplications implements Applications {
 
     private final Mono<LoggingClient> loggingClient;
 
-    private final Mono<String> spaceId;
-
     private final RandomWords randomWords;
+
+    private final Mono<String> spaceId;
 
     public DefaultApplications(CloudFoundryClient cloudFoundryClient, Mono<LoggingClient> loggingClient, Mono<String> spaceId) {
         this(cloudFoundryClient, loggingClient, spaceId, new WordListRandomWords());
@@ -159,6 +162,7 @@ public final class DefaultApplications implements Applications {
             .then(function((request1, spaceId) -> getRoutesAndApplicationId(this.cloudFoundryClient, request1, spaceId)))
             .then(function((routes, applicationId) -> deleteRoutes(this.cloudFoundryClient, routes)
                 .after(() -> Mono.just(applicationId))))
+            .as(thenKeep((applicationId -> removeServiceBindings(this.cloudFoundryClient, applicationId))))
             .then(applicationId -> requestDeleteApplication(this.cloudFoundryClient, applicationId));
     }
 
@@ -584,6 +588,16 @@ public final class DefaultApplications implements Applications {
         }
     }
 
+    private static Mono<Optional<String>> getOptionalStackId(CloudFoundryClient cloudFoundryClient, String stack) {
+        if (stack == null) {
+            return Mono.just(Optional.empty());
+        }
+        return requestStackId(cloudFoundryClient, stack)
+            .map(ResourceUtils::getId)
+            .map(Optional::of)
+            .otherwiseIfEmpty(ExceptionUtils.illegalState("Stack %s not found", stack));
+    }
+
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
         return requestOrganizations(cloudFoundryClient, organization)
             .single()
@@ -661,16 +675,6 @@ public final class DefaultApplications implements Applications {
             .map(response -> ResourceUtils.getEntity(response).getOrganizationId());
     }
 
-    private static Mono<Optional<String>> getOptionalStackId(CloudFoundryClient cloudFoundryClient, String stack) {
-        if (stack==null) {
-            return Mono.just(Optional.empty());
-        }
-        return requestStackId(cloudFoundryClient, stack)
-            .map(ResourceUtils::getId)
-            .map(Optional::of)
-            .otherwiseIfEmpty(ExceptionUtils.illegalState("Stack %s not found", stack));
-    }
-
     private static Mono<String> getStackName(CloudFoundryClient cloudFoundryClient, String stackId) {
         return requestStack(cloudFoundryClient, stackId)
             .map(getStackResponse -> getStackResponse.getEntity().getName());
@@ -725,6 +729,13 @@ public final class DefaultApplications implements Applications {
         Map<String, Object> modified = new HashMap<>(environment);
         modified.remove(variableName);
         return modified;
+    }
+
+    private static Mono<Void> removeServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return requestListServiceBindings(cloudFoundryClient, applicationId)
+            .map(ResourceUtils::getId)
+            .flatMap(serviceBindingId -> requestRemoveServiceBinding(cloudFoundryClient, applicationId, serviceBindingId))
+            .after();
     }
 
     private static Mono<ApplicationEnvironmentResponse> requestApplicationEnvironment(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -843,6 +854,15 @@ public final class DefaultApplications implements Applications {
             .map(OperationUtils.<GetApplicationResponse, AbstractApplicationResource>cast());
     }
 
+    private static Flux<ServiceBindingResource> requestListServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.applicationsV2()
+                .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
+                    .applicationId(applicationId)
+                    .page(page)
+                    .build()));
+    }
+
     private static Publisher<LogMessage> requestLogsRecent(Mono<LoggingClient> loggingClient, String applicationId) {
         return loggingClient
             .flatMap(loggingClient1 -> loggingClient1
@@ -895,6 +915,14 @@ public final class DefaultApplications implements Applications {
                     .organizationId(organizationId)
                     .page(page)
                     .build()));
+    }
+
+    private static Mono<Void> requestRemoveServiceBinding(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceBindingId) {
+        return cloudFoundryClient.applicationsV2()
+            .removeServiceBinding(RemoveApplicationServiceBindingRequest.builder()
+                .applicationId(applicationId)
+                .serviceBindingId(serviceBindingId)
+                .build());
     }
 
     private static Mono<RestageApplicationResponse> requestRestageApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
