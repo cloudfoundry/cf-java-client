@@ -39,9 +39,11 @@ public final class TestObjectsTest {
             .command("test-command")
             .console(true)
             .debug(true)
+            .detectedStartCommand("test-detectedStartCommand")
             .diego(true)
             .diskQuota(1)
             .dockerImage("test-dockerImage")
+            .enableSsh(true)
             .healthCheckTimeout(1)
             .healthCheckType("test-healthCheckType")
             .instances(1)
@@ -50,6 +52,8 @@ public final class TestObjectsTest {
             .production(true)
             .spaceId("test-spaceId")
             .stackId("test-stackId")
+            .stagingFailedDescription("test-stagingFailedDescription")
+            .stagingFailedReason("test-stagingFailedReason")
             .state("test-state")
             .build();
 
