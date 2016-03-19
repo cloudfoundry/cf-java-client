@@ -36,6 +36,10 @@ import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.spring.util.CollectionUtils;
 import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -98,10 +102,22 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
         return post(request, StagePackageResponse.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "droplets"));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Mono<UploadPackageResponse> upload(UploadPackageRequest request) {
-        return postWithBody(request, () -> CollectionUtils.singletonMultiValueMap("bits", new InputStreamResource(request.getBits())), UploadPackageResponse.class, builder -> builder.pathSegment
-            ("v3", "packages", request.getPackageId(), "upload"));
+        return postWithBody(request, () -> CollectionUtils.singletonMultiValueMap("bits", getApplicationPart(request)), UploadPackageResponse.class,
+            builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "upload"));
+    }
+
+    private static HttpEntity<Resource> getApplicationPart(UploadPackageRequest request) {
+        Resource body = new InputStreamResource(request.getBits());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDispositionFormData("bits", "application.zip");
+        headers.setContentType(MediaType.parseMediaType("application/zip"));
+        headers.setContentType(MediaType.parseMediaType("application/zip"));
+
+        return new HttpEntity<>(body, headers);
     }
 
 }
