@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client;
+package org.cloudfoundry.client.v2;
 
 import com.github.zafarkhaja.semver.Version;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.junit.Test;
