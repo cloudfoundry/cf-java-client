@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
+import org.cloudfoundry.QueryParameter;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
@@ -29,6 +30,15 @@ import org.cloudfoundry.ValidationResult;
  */
 @Data
 public final class DeleteServiceBindingRequest implements Validatable {
+
+    /**
+     * The async flag
+     *
+     * @param async Will run the delete request in a background job. Recommended: 'true'.
+     * @return the async flag
+     */
+    @Getter(onMethod = @__(@QueryParameter("async")))
+    private final Boolean async;
 
     /**
      * The service binding id
@@ -40,7 +50,9 @@ public final class DeleteServiceBindingRequest implements Validatable {
     private final String serviceBindingId;
 
     @Builder
-    DeleteServiceBindingRequest(String serviceBindingId) {
+    DeleteServiceBindingRequest(Boolean async,
+                                String serviceBindingId) {
+        this.async = async;
         this.serviceBindingId = serviceBindingId;
     }
 

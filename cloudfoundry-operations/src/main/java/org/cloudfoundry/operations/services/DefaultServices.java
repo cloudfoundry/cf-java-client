@@ -18,12 +18,16 @@ package org.cloudfoundry.operations.services;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
+import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingResponse;
+import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingRequest;
+import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
 import org.cloudfoundry.util.ExceptionUtils;
+import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.ValidationUtils;
@@ -46,16 +50,32 @@ public final class DefaultServices implements Services {
     }
 
     @Override
-    public Mono<Void> bind(BindServiceRequest request) {
+    public Mono<Void> bind(BindServiceInstanceRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
             .then(function((request1, spaceId) -> Mono
                 .when(
-                    getSpaceServiceInstanceId(this.cloudFoundryClient, request1.getServiceName(), spaceId),
                     getApplicationId(this.cloudFoundryClient, request1.getApplicationName(), spaceId),
+                    getSpaceServiceInstanceId(this.cloudFoundryClient, request1.getServiceInstanceName(), spaceId),
                     Mono.just(request1)
                 )))
-            .then(function((serviceInstanceId, applicationId, request1) -> requestServiceBinding(this.cloudFoundryClient, serviceInstanceId, applicationId, request1.getParameters())))
+            .then(function((applicationId, serviceInstanceId, request1) -> requestServiceBinding(this.cloudFoundryClient, applicationId, serviceInstanceId, request1.getParameters())))
+            .after();
+    }
+
+    @Override
+    public Mono<Void> unbind(UnbindServiceInstanceRequest request) {
+        return Mono
+            .when(ValidationUtils.validate(request), this.spaceId)
+            .then(function((request1, spaceId) -> Mono
+                .when(
+                    Mono.just(request1.getServiceInstanceName()),
+                    getApplicationId(this.cloudFoundryClient, request1.getApplicationName(), spaceId),
+                    getSpaceServiceInstanceId(this.cloudFoundryClient, request1.getServiceInstanceName(), spaceId)
+                )))
+            .then(function((serviceInstanceName, applicationId, serviceInstanceId) -> getServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)
+                .otherwiseIfEmpty(ExceptionUtils.illegalState("Service instance %s is not bound to application", serviceInstanceName))))
+            .then(serviceBindingId -> requestDeleteServiceBinding(this.cloudFoundryClient, serviceBindingId))
             .after();
     }
 
@@ -70,14 +90,20 @@ public final class DefaultServices implements Services {
             .map(ResourceUtils::getId);
     }
 
-    private static Mono<ServiceInstanceResource> getSpaceServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
-        return requestSpaceServiceInstances(cloudFoundryClient, serviceName, spaceId)
-            .single()
-            .otherwise(ExceptionUtils.convert("Service %s does not exist", serviceName));
+    private static Mono<String> getServiceBindingId(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId) {
+        return requestListApplicationServiceBindings(cloudFoundryClient, applicationId, serviceInstanceId)
+            .singleOrEmpty()
+            .map(ResourceUtils::getId);
     }
 
-    private static Mono<String> getSpaceServiceInstanceId(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
-        return getSpaceServiceInstance(cloudFoundryClient, serviceName, spaceId)
+    private static Mono<ServiceInstanceResource> getSpaceServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
+        return requestSpaceServiceInstances(cloudFoundryClient, serviceInstanceName, spaceId)
+            .single()
+            .otherwise(ExceptionUtils.convert("Service instance %s does not exist", serviceInstanceName));
+    }
+
+    private static Mono<String> getSpaceServiceInstanceId(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
+        return getSpaceServiceInstance(cloudFoundryClient, serviceInstanceName, spaceId)
             .map(ResourceUtils::getId);
     }
 
@@ -91,7 +117,27 @@ public final class DefaultServices implements Services {
                     .build()));
     }
 
-    private static Mono<CreateServiceBindingResponse> requestServiceBinding(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String applicationId, Map<String, Object> parameters) {
+    private static Mono<Void> requestDeleteServiceBinding(CloudFoundryClient cloudFoundryClient, String serviceBindingId) {
+        return cloudFoundryClient.serviceBindings()
+            .delete(DeleteServiceBindingRequest.builder()
+                .serviceBindingId(serviceBindingId)
+                .async(true)
+                .build())
+            .map(ResourceUtils::getId)
+            .then(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
+    }
+
+    private static Flux<ServiceBindingResource> requestListApplicationServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.applicationsV2()
+                .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
+                    .page(page)
+                    .applicationId(applicationId)
+                    .serviceInstanceId(serviceInstanceId)
+                    .build()));
+    }
+
+    private static Mono<CreateServiceBindingResponse> requestServiceBinding(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId, Map<String, Object> parameters) {
         return cloudFoundryClient.serviceBindings()
             .create(CreateServiceBindingRequest.builder()
                 .applicationId(applicationId)
@@ -100,13 +146,13 @@ public final class DefaultServices implements Services {
                 .build());
     }
 
-    private static Flux<ServiceInstanceResource> requestSpaceServiceInstances(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
+    private static Flux<ServiceInstanceResource> requestSpaceServiceInstances(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
                     .page(page)
                     .returnUserProvidedServiceInstances(true)
-                    .name(serviceName)
+                    .name(serviceInstanceName)
                     .spaceId(spaceId)
                     .build()));
     }

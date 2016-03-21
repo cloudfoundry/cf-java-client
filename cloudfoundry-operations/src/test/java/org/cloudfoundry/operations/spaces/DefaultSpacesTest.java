@@ -668,7 +668,6 @@ public final class DefaultSpacesTest {
             requestJobFailure(this.cloudFoundryClient, "test-id");
         }
 
-
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
