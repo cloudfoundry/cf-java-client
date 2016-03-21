@@ -1,7 +1,6 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 set -e
 
-pushd cf-java-client
-  ./mvnw -q -Dmaven.test.skip=true deploy
-popd
+cd cf-java-client
+./mvnw -q -Dmaven.test.skip=true deploy

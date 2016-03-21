@@ -1,7 +1,6 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 set -e
 
-pushd cf-java-client
-  ./mvnw -q -P integration-test test
-popd
+cd cf-java-client
+./mvnw -q -P integration-test test

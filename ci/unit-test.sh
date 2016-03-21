@@ -1,7 +1,6 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 set -e
 
-pushd cf-java-client
-  ./mvnw -q package
-popd
+cd cf-java-client
+./mvnw -q package
