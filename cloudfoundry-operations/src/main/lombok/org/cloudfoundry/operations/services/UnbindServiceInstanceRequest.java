@@ -18,20 +18,17 @@ package org.cloudfoundry.operations.services;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.Singular;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
-import java.util.Map;
-
 /**
- * The request options for the bind service operation
+ * The request options for the unbind service instance operation
  */
 @Data
-public final class BindServiceRequest implements Validatable {
+public final class UnbindServiceInstanceRequest implements Validatable {
 
     /**
-     * The name of the application to bind
+     * The name of the application to unbind
      *
      * @param applicationName the name of the application
      * @return the name of the application
@@ -39,26 +36,17 @@ public final class BindServiceRequest implements Validatable {
     private final String applicationName;
 
     /**
-     * The name of the service to bind
+     * The name of the service instance to unbind
      *
-     * @param serviceName the name of the service
-     * @return the name of the service
+     * @param serviceInstanceName the name of the service instance
+     * @return the name of the service instance
      */
-    private final String serviceName;
-
-    /**
-     * The parameters for the service binding
-     *
-     * @param parameters the service binding parameters 
-     * @return the service binding parameters
-     */
-    private final Map<String, Object> parameters;
+    private final String serviceInstanceName;
 
     @Builder
-    BindServiceRequest(String applicationName, String serviceName, @Singular Map<String, Object> parameters) {
+    UnbindServiceInstanceRequest(String applicationName, String serviceInstanceName) {
         this.applicationName = applicationName;
-        this.serviceName = serviceName;
-        this.parameters = parameters;
+        this.serviceInstanceName = serviceInstanceName;
     }
 
     @Override
@@ -69,8 +57,8 @@ public final class BindServiceRequest implements Validatable {
             builder.message("application name must be specified");
         }
 
-        if (this.serviceName == null) {
-            builder.message("service name must be specified");
+        if (this.serviceInstanceName == null) {
+            builder.message("service instance name must be specified");
         }
 
         return builder.build();

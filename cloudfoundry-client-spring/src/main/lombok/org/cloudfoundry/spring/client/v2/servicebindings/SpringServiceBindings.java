@@ -20,6 +20,7 @@ import lombok.ToString;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingRequest;
+import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.ListServiceBindingsRequest;
@@ -57,8 +58,11 @@ public final class SpringServiceBindings extends AbstractSpringOperations implem
     }
 
     @Override
-    public Mono<Void> delete(DeleteServiceBindingRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "service_bindings", request.getServiceBindingId()));
+    public Mono<DeleteServiceBindingResponse> delete(DeleteServiceBindingRequest request) {
+        return delete(request, DeleteServiceBindingResponse.class, builder -> {
+            builder.pathSegment("v2", "service_bindings", request.getServiceBindingId());
+            QueryBuilder.augment(builder, request);
+        });
     }
 
     @Override

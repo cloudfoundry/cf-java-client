@@ -23,13 +23,13 @@ import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class BindServiceRequestTest {
+public final class BindServiceInstanceRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = BindServiceRequest.builder()
+        ValidationResult result = BindServiceInstanceRequest.builder()
             .applicationName("test-application-name")
-            .serviceName("test-service-name")
+            .serviceInstanceName("test-service-instance-name")
             .parameter("foo", "bar")
             .build()
             .isValid();
@@ -38,25 +38,25 @@ public final class BindServiceRequestTest {
     }
 
     @Test
-    public void isValidNoServiceName() {
-        ValidationResult result = BindServiceRequest.builder()
-            .applicationName("test-application-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
     public void isValidNoApplicationName() {
-        ValidationResult result = BindServiceRequest.builder()
-            .serviceName("test-service-name")
+        ValidationResult result = BindServiceInstanceRequest.builder()
+            .serviceInstanceName("test-service-instance-name")
             .build()
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("application name must be specified", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isValidNoServiceInstanceName() {
+        ValidationResult result = BindServiceInstanceRequest.builder()
+            .applicationName("test-application-name")
+            .build()
+            .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("service instance name must be specified", result.getMessages().get(0));
     }
 
 }

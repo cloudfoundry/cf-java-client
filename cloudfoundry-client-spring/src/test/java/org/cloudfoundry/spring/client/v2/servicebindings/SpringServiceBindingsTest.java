@@ -18,9 +18,11 @@ package org.cloudfoundry.spring.client.v2.servicebindings;
 
 
 import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.job.JobEntity;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingRequest;
+import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.ListServiceBindingsRequest;
@@ -35,6 +37,7 @@ import java.util.Collections;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -95,7 +98,7 @@ public final class SpringServiceBindingsTest {
 
     }
 
-    public static final class Delete extends AbstractApiTest<DeleteServiceBindingRequest, Void> {
+    public static final class Delete extends AbstractApiTest<DeleteServiceBindingRequest, DeleteServiceBindingResponse> {
 
         private final SpringServiceBindings serviceBindings = new SpringServiceBindings(this.restTemplate, this.root, PROCESSOR_GROUP);
 
@@ -113,7 +116,7 @@ public final class SpringServiceBindingsTest {
         }
 
         @Override
-        protected Void getResponse() {
+        protected DeleteServiceBindingResponse getResponse() {
             return null;
         }
 
@@ -125,7 +128,55 @@ public final class SpringServiceBindingsTest {
         }
 
         @Override
-        protected Mono<Void> invoke(DeleteServiceBindingRequest request) {
+        protected Mono<DeleteServiceBindingResponse> invoke(DeleteServiceBindingRequest request) {
+            return this.serviceBindings.delete(request);
+        }
+
+    }
+
+    public static final class DeleteAsync extends AbstractApiTest<DeleteServiceBindingRequest, DeleteServiceBindingResponse> {
+
+        private final SpringServiceBindings serviceBindings = new SpringServiceBindings(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteServiceBindingRequest getInvalidRequest() {
+            return DeleteServiceBindingRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(DELETE).path("/v2/service_bindings/test-service-binding-id?async=true")
+                .status(ACCEPTED)
+                .responsePayload("fixtures/client/v2/service_bindings/DELETE_{id}_async_response.json");
+        }
+
+        @Override
+        protected DeleteServiceBindingResponse getResponse() {
+            return DeleteServiceBindingResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .id("c4faac01-5bbd-494f-8849-256a3bab06b8")
+                    .createdAt("2016-03-14T22:30:51Z")
+                    .url("/v2/jobs/c4faac01-5bbd-494f-8849-256a3bab06b8")
+                    .build())
+                .entity(JobEntity.builder()
+                    .id("c4faac01-5bbd-494f-8849-256a3bab06b8")
+                    .status("queued")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected DeleteServiceBindingRequest getValidRequest() {
+            return DeleteServiceBindingRequest.builder()
+                .async(true)
+                .serviceBindingId("test-service-binding-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<DeleteServiceBindingResponse> invoke(DeleteServiceBindingRequest request) {
             return this.serviceBindings.delete(request);
         }
 

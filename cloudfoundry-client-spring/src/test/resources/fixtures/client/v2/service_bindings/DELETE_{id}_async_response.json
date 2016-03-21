@@ -1,0 +1,11 @@
+{
+  "metadata": {
+    "guid": "c4faac01-5bbd-494f-8849-256a3bab06b8",
+    "created_at": "2016-03-14T22:30:51Z",
+    "url": "/v2/jobs/c4faac01-5bbd-494f-8849-256a3bab06b8"
+  },
+  "entity": {
+    "guid": "c4faac01-5bbd-494f-8849-256a3bab06b8",
+    "status": "queued"
+  }
+}

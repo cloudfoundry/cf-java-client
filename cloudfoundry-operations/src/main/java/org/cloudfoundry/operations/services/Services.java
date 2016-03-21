@@ -24,11 +24,19 @@ import reactor.core.publisher.Mono;
 public interface Services {
 
     /**
-     * Bind a service to an application
+     * Bind a service instance to an application
      *
-     * @param request the bind service request
+     * @param request the bind service instance request
      * @return a completion indicator
      */
-    Mono<Void> bind(BindServiceRequest request);
+    Mono<Void> bind(BindServiceInstanceRequest request);
+
+    /**
+     * Unbind a service instance from an application
+     *
+     * @param request the unbind service instance request
+     * @return a completion indicator
+     */
+    Mono<Void> unbind(UnbindServiceInstanceRequest request);
 
 }
