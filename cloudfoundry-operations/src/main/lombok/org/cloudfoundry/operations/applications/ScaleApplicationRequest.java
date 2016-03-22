@@ -23,6 +23,8 @@ import lombok.Getter;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
+import java.time.Duration;
+
 /**
  * The request options for the scale application operation
  */
@@ -73,11 +75,29 @@ public final class ScaleApplicationRequest implements Validatable {
      */
     private final String name;
 
+    /**
+     * How long to wait for staging
+     *
+     * @param stagingTimeout how long to wait for staging
+     * @return how long to wait for staging
+     */
+    private final Duration stagingTimeout;
+
+    /**
+     * How long to wait for startup
+     *
+     * @param startupTimeout how long to wait for startup
+     * @return how long to wait for startup
+     */
+    private final Duration startupTimeout;
+
     @Builder
     ScaleApplicationRequest(String diskLimit,
                             Integer instances,
                             String memoryLimit,
-                            String name) {
+                            String name,
+                            Duration stagingTimeout,
+                            Duration startupTimeout) {
         this.diskLimitInput = diskLimit;
         this.diskLimit = parseForMb(diskLimit);
         this.diskLimitInvalid = null == this.diskLimit;
@@ -89,6 +109,8 @@ public final class ScaleApplicationRequest implements Validatable {
         this.memoryLimitInvalid = null == this.memoryLimit;
 
         this.name = name;
+        this.stagingTimeout = stagingTimeout;
+        this.startupTimeout = startupTimeout;
     }
 
     @Override

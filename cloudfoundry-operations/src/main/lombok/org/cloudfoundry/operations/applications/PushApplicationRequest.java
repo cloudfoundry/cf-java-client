@@ -22,6 +22,7 @@ import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
 import java.io.InputStream;
+import java.time.Duration;
 
 /**
  * The request options for the push application operation
@@ -174,10 +175,26 @@ public final class PushApplicationRequest implements Validatable {
     private final String stack;
 
     /**
-     * The startup timeout in seconds for the application
+     * How long to wait for staging
      *
-     * @param timeout the startup timeout in seconds for the application
-     * @return the startup timeout in seconds for the application
+     * @param stagingTimeout how long to wait for staging
+     * @return how long to wait for staging
+     */
+    private final Duration stagingTimeout;
+
+    /**
+     * How long to wait for startup
+     *
+     * @param startupTimeout how long to wait for startup
+     * @return how long to wait for startup
+     */
+    private final Duration startupTimeout;
+
+    /**
+     * The health check timeout
+     *
+     * @param timeout the health check timeout
+     * @return the health check timeout
      */
     private final Integer timeout;
 
@@ -199,8 +216,10 @@ public final class PushApplicationRequest implements Validatable {
                            String path,
                            Boolean randomRoute,
                            String routePath,
-                           Integer timeout,
-                           String stack) {
+                           String stack,
+                           Duration stagingTimeout,
+                           Duration startupTimeout,
+                           Integer timeout) {
         this.application = application;
         this.buildpack = buildpack;
         this.command = command;
@@ -218,8 +237,10 @@ public final class PushApplicationRequest implements Validatable {
         this.path = path;
         this.randomRoute = randomRoute;
         this.routePath = routePath;
-        this.timeout = timeout;
         this.stack = stack;
+        this.stagingTimeout = stagingTimeout;
+        this.startupTimeout = startupTimeout;
+        this.timeout = timeout;
     }
 
     @Override

@@ -106,6 +106,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
@@ -191,6 +192,19 @@ public final class DefaultApplicationsTest {
                 .just(fill(ApplicationInstancesResponse.builder(), "application-instances-")
                     .instance("instance-0", fill(ApplicationInstanceInfo.builder(), "application-instance-info-")
                         .state("RUNNING")
+                        .build())
+                    .build()));
+    }
+
+    private static void requestApplicationInstancesTimeout(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .instances(ApplicationInstancesRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ApplicationInstancesResponse.builder(), "application-instances-")
+                    .instance("instance-0", fill(ApplicationInstanceInfo.builder(), "application-instance-info-")
+                        .state("STARTING")
                         .build())
                     .build()));
     }
@@ -511,6 +525,19 @@ public final class DefaultApplicationsTest {
                 .just(fill(GetApplicationResponse.builder())
                     .entity(fill(ApplicationEntity.builder())
                         .packageState("FAILED")
+                        .build())
+                    .build()));
+    }
+
+    private static void requestGetApplicationTimeout(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .get(org.cloudfoundry.client.v2.applications.GetApplicationRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(GetApplicationResponse.builder())
+                    .entity(fill(ApplicationEntity.builder())
+                        .packageState("STAGING")
                         .build())
                     .build()));
     }
@@ -2978,6 +3005,34 @@ public final class DefaultApplicationsTest {
 
     }
 
+    public static final class RestageTimeout extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
+            requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
+            requestGetApplicationTimeout(this.cloudFoundryClient, "test-metadata-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            testSubscriber
+                .assertError(IllegalStateException.class, "Application test-application-name timed out during staging");
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .restage(RestageApplicationRequest.builder()
+                    .name("test-application-name")
+                    .stagingTimeout(Duration.ofSeconds(1))
+                    .build());
+        }
+
+    }
+
     public static final class RestartFailurePartial extends AbstractOperationsApiTest<Void> {
 
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
@@ -3456,6 +3511,34 @@ public final class DefaultApplicationsTest {
         protected Mono<Void> invoke() {
             return this.applications
                 .start(fill(StartApplicationRequest.builder(), "application-")
+                    .build());
+        }
+
+    }
+
+    public static final class StartApplicationTimeout extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplicationsSpecificState(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
+            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+            requestGetApplication(this.cloudFoundryClient, "test-application-id");
+            requestApplicationInstancesTimeout(this.cloudFoundryClient, "test-application-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            testSubscriber
+                .assertError(IllegalStateException.class, "Application test-application-name timed out during start");
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .start(fill(StartApplicationRequest.builder(), "application-")
+                    .startupTimeout(Duration.ofSeconds(1))
                     .build());
         }
 
