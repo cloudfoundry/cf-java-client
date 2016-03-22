@@ -19,6 +19,7 @@ package org.cloudfoundry.operations.applications;
 import lombok.ToString;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.SecureRandom;
 import java.util.List;
@@ -55,8 +56,13 @@ final class WordListRandomWords implements RandomWords {
         return this.nouns.get(this.random.nextInt(this.nouns.size()));
     }
 
+    private static BufferedReader getFileReader(String filename) {
+        InputStream inputStream = WordListRandomWords.class.getClassLoader().getResourceAsStream(filename);
+        return new BufferedReader(new InputStreamReader(inputStream));
+    }
+
     private static List<String> getWordList(String filename) {
-        try (Stream<String> stream = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResourceAsStream(filename))).lines()) {
+        try (Stream<String> stream = getFileReader(filename).lines()) {
             return stream
                 .map(String::trim)
                 .collect(Collectors.toList());
