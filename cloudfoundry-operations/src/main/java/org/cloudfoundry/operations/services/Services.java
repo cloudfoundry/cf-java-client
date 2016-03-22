@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.operations.services;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -32,11 +33,17 @@ public interface Services {
     Mono<Void> bind(BindServiceInstanceRequest request);
 
     /**
+     * List the service instances in the targeted space
+     *
+     * @return the service instances
+     */
+    Flux<ServiceInstance> listInstances();
+
+    /**
      * Unbind a service instance from an application
      *
      * @param request the unbind service instance request
      * @return a completion indicator
      */
     Mono<Void> unbind(UnbindServiceInstanceRequest request);
-
 }

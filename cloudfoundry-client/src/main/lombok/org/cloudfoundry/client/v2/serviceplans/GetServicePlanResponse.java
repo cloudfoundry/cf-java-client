@@ -21,7 +21,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.cloudfoundry.client.v2.Resource;
 
 /**
  * The resource response payload for the Get Service Plan Response
@@ -29,7 +28,7 @@ import org.cloudfoundry.client.v2.Resource;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class GetServicePlanResponse extends Resource<ServicePlanEntity> {
+public final class GetServicePlanResponse extends AbstractServicePlanResource {
 
     @Builder
     GetServicePlanResponse(@JsonProperty("entity") ServicePlanEntity entity,
