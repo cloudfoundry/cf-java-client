@@ -24,6 +24,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.function.Function;
 
 /**
@@ -43,8 +44,9 @@ public final class DelayUtils {
      * @param maximum the maximum duration
      * @return a delayed {@link Publisher}
      */
-    public static Function<Flux<Long>, Publisher<?>> exponentialBackOff(Duration minimum, Duration maximum) {
-        return iteration -> getDelay(minimum, maximum, iteration);
+    public static Function<Flux<Long>, Publisher<?>> exponentialBackOff(Duration minimum, Duration maximum, Duration timeout) {
+        Instant finish = Instant.now().plus(timeout);
+        return iterations -> getDelay(minimum, maximum, finish, iterations);
     }
 
     private static Duration calculateDuration(Duration minimum, Duration maximum, Long iteration) {
@@ -52,10 +54,19 @@ public final class DelayUtils {
         return min(candidate, maximum);
     }
 
-    private static Publisher<?> getDelay(Duration minimum, Duration maximum, Flux<Long> iteration) {
-        return iteration
-            .map(iteration1 -> calculateDuration(minimum, maximum, iteration1))
-            .flatMap((delay) -> Mono
+    private static Long checkForTimeout(Instant finish, Long iteration) {
+        if (Instant.now().isAfter(finish)) {
+            throw new IllegalStateException("Timer expired");
+        }
+
+        return iteration;
+    }
+
+    private static Publisher<?> getDelay(Duration minimum, Duration maximum, Instant finish, Flux<Long> iterations) {
+        return iterations
+            .map(iteration -> checkForTimeout(finish, iteration))
+            .map(iteration -> calculateDuration(minimum, maximum, iteration))
+            .flatMap(delay -> Mono
                 .delay(delay)
                 .doOnSubscribe(subscription -> {
                     int seconds = (int) delay.getSeconds();

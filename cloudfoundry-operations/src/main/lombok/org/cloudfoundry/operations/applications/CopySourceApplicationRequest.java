@@ -21,6 +21,8 @@ import lombok.Data;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
+import java.time.Duration;
+
 /**
  * The request options for the copy source application operation
  */
@@ -44,6 +46,14 @@ public final class CopySourceApplicationRequest implements Validatable {
     private final Boolean restart;
 
     /**
+     * How long to wait for startup
+     *
+     * @param startupTimeout how long to wait for startup
+     * @return how long to wait for startup
+     */
+    private final Duration startupTimeout;
+
+    /**
      * The name of the target application
      *
      * @param targetName the name of the target application
@@ -60,6 +70,14 @@ public final class CopySourceApplicationRequest implements Validatable {
     private final String targetOrganization;
 
     /**
+     * How long to wait for staging
+     *
+     * @param stagingTimeout how long to wait for staging
+     * @return how long to wait for staging
+     */
+    private final Duration stagingTimeout;
+
+    /**
      * The space of the target application
      *
      * @param targetSpace the space of the target application
@@ -68,15 +86,19 @@ public final class CopySourceApplicationRequest implements Validatable {
     private final String targetSpace;
 
     @Builder
-    CopySourceApplicationRequest(String name, 
+    CopySourceApplicationRequest(String name,
                                  Boolean restart,
+                                 Duration startupTimeout,
                                  String targetName,
                                  String targetOrganization,
+                                 Duration stagingTimeout,
                                  String targetSpace) {
         this.name = name;
         this.restart = restart;
+        this.startupTimeout = startupTimeout;
         this.targetName = targetName;
         this.targetOrganization = targetOrganization;
+        this.stagingTimeout = stagingTimeout;
         this.targetSpace = targetSpace;
     }
 
@@ -91,7 +113,7 @@ public final class CopySourceApplicationRequest implements Validatable {
         if (this.targetName == null) {
             builder.message("target application name must be specified");
         }
-        
+
         if (this.targetOrganization != null && this.targetSpace == null) {
             builder.message("target space must be specified with target organization");
         }

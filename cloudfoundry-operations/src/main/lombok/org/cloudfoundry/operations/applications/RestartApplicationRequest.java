@@ -21,17 +21,43 @@ import lombok.Data;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
+import java.time.Duration;
+
 /**
  * The request options for the restart application operation
  */
 @Data
 public final class RestartApplicationRequest implements Validatable {
 
+    /**
+     * The name of the application
+     *
+     * @param name the name of the application
+     * @return the name of the application
+     */
     private final String name;
 
+    /**
+     * How long to wait for staging
+     *
+     * @param stagingTimeout how long to wait for staging
+     * @return how long to wait for staging
+     */
+    private final Duration stagingTimeout;
+
+    /**
+     * How long to wait for startup
+     *
+     * @param startupTimeout how long to wait for startup
+     * @return how long to wait for startup
+     */
+    private final Duration startupTimeout;
+
     @Builder
-    RestartApplicationRequest(String name) {
+    RestartApplicationRequest(String name, Duration stagingTimeout, Duration startupTimeout) {
         this.name = name;
+        this.stagingTimeout = stagingTimeout;
+        this.startupTimeout = startupTimeout;
     }
 
     @Override
