@@ -55,10 +55,18 @@ public final class EventsTest extends AbstractIntegrationTest {
 
     @Test
     public void list() {
-        listEvents(this.cloudFoundryClient)
-            .count()
-            .subscribe(this.<Long>testSubscriber()
-                .assertThat(count -> assertTrue(count > 0)));
+        getFirstEvent(this.cloudFoundryClient)
+            .then(resource -> Mono
+                .when(
+                    Mono.just(resource),
+                    this.cloudFoundryClient.events()
+                        .list(ListEventsRequest.builder()
+                            .build())
+                        .flatMap(ResourceUtils::getResources)
+                        .next()
+                ))
+            .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
+                .assertThat(this::assertTupleEquality));
     }
 
     @Test
