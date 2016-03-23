@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.appusageevents;
+package org.cloudfoundry.client.v2.applicationusageevents;
 
 import lombok.Builder;
 import lombok.Data;
@@ -47,6 +47,7 @@ public final class ListApplicationUsageEventsRequest extends PaginatedRequest im
     @Builder
     ListApplicationUsageEventsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                                       String afterApplicationUsageEventId) {
+
         super(orderDirection, page, resultsPerPage);
         this.afterApplicationUsageEventId = afterApplicationUsageEventId;
     }

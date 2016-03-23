@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.appusageevents;
+package org.cloudfoundry.client.v2.applicationusageevents;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;

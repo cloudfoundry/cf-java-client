@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.appusageevents;
+package org.cloudfoundry.spring.client.v2.applicationusageevents;
 
 import org.cloudfoundry.client.v2.Resource;
-import org.cloudfoundry.client.v2.appusageevents.ApplicationUsageEventEntity;
-import org.cloudfoundry.client.v2.appusageevents.ApplicationUsageEventResource;
-import org.cloudfoundry.client.v2.appusageevents.ListApplicationUsageEventsRequest;
-import org.cloudfoundry.client.v2.appusageevents.ListApplicationUsageEventsResponse;
+import org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEventEntity;
+import org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEventResource;
+import org.cloudfoundry.client.v2.applicationusageevents.ListApplicationUsageEventsRequest;
+import org.cloudfoundry.client.v2.applicationusageevents.ListApplicationUsageEventsResponse;
 import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 

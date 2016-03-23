@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.appusageevents;
+package org.cloudfoundry.client.v2.applicationusageevents;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -40,6 +40,7 @@ public final class ListApplicationUsageEventsResponse extends PaginatedResponse<
                                        @JsonProperty("resources") @Singular List<ApplicationUsageEventResource> resources,
                                        @JsonProperty("total_pages") Integer totalPages,
                                        @JsonProperty("total_results") Integer totalResults) {
+
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 

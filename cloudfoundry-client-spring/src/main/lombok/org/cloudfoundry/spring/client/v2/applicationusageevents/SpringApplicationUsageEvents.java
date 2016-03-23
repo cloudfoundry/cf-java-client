@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.appusageevents;
+package org.cloudfoundry.spring.client.v2.applicationusageevents;
 
 import lombok.ToString;
-import org.cloudfoundry.client.v2.appusageevents.ApplicationUsageEvents;
-import org.cloudfoundry.client.v2.appusageevents.ListApplicationUsageEventsRequest;
-import org.cloudfoundry.client.v2.appusageevents.ListApplicationUsageEventsResponse;
+import org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEvents;
+import org.cloudfoundry.client.v2.applicationusageevents.ListApplicationUsageEventsRequest;
+import org.cloudfoundry.client.v2.applicationusageevents.ListApplicationUsageEventsResponse;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;

@@ -17,7 +17,7 @@
 package org.cloudfoundry.client;
 
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
-import org.cloudfoundry.client.v2.appusageevents.ApplicationUsageEvents;
+import org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEvents;
 import org.cloudfoundry.client.v2.domains.Domains;
 import org.cloudfoundry.client.v2.events.Events;
 import org.cloudfoundry.client.v2.featureflags.FeatureFlags;
