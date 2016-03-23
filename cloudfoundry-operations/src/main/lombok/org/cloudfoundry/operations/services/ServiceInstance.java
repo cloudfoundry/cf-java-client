@@ -37,14 +37,6 @@ public final class ServiceInstance {
     private final List<String> applications;
 
     /**
-     * The url for the service instance's dashboard
-     *
-     * @param dashboardUri the url for the service instance's dashboard
-     * @return the url for the service instance's dashboard
-     */
-    private final String dashboardUri;
-
-    /**
      * The id
      *
      * @param id the id
@@ -94,7 +86,6 @@ public final class ServiceInstance {
 
     @Builder
     ServiceInstance(@Singular List<String> applications,
-                    String dashboardUri,
                     String id,
                     String lastOperation,
                     String name,
@@ -102,7 +93,6 @@ public final class ServiceInstance {
                     String service,
                     String type) {
         this.applications = applications;
-        this.dashboardUri = dashboardUri;
         this.id = id;
         this.lastOperation = lastOperation;
         this.name = name;

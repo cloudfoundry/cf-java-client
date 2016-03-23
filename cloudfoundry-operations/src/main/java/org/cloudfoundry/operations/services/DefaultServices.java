@@ -275,7 +275,6 @@ public final class DefaultServices implements Services {
         Optional<String> plan = serviceAndPlan.t2;
 
         return ServiceInstance.builder()
-            .dashboardUri(entity.getDashboardUrl())
             .id(ResourceUtils.getId(resource))
             .lastOperation(Optional.ofNullable(entity.getLastOperation()).map(DefaultServices::convertLastOperation).orElse(null))
             .name(entity.getName())
