@@ -27,6 +27,8 @@ import org.cloudfoundry.util.ValidationUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.NoSuchElementException;
+
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class DefaultSpaceQuotas implements SpaceQuotas {
@@ -60,7 +62,7 @@ public final class DefaultSpaceQuotas implements SpaceQuotas {
         return requestSpaceQuotaDefinitions(cloudFoundryClient, organizationId)
             .filter(resource -> name.equals(ResourceUtils.getEntity(resource).getName()))
             .single()
-            .otherwise(ExceptionUtils.convert("Space Quota %s does not exist", name));
+            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Space Quota %s does not exist", name)));
     }
 
     private static Flux<SpaceQuotaDefinitionResource> requestSpaceQuotaDefinitions(CloudFoundryClient cloudFoundryClient, String organizationId) {

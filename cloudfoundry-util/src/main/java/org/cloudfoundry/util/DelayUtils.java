@@ -54,24 +54,21 @@ public final class DelayUtils {
         return min(candidate, maximum);
     }
 
-    private static Long checkForTimeout(Instant finish, Long iteration) {
-        if (Instant.now().isAfter(finish)) {
-            throw new IllegalStateException("Timer expired");
-        }
-
-        return iteration;
-    }
-
-    private static Publisher<?> getDelay(Duration minimum, Duration maximum, Instant finish, Flux<Long> iterations) {
+    private static Flux<?> getDelay(Duration minimum, Duration maximum, Instant finish, Flux<Long> iterations) {
         return iterations
-            .map(iteration -> checkForTimeout(finish, iteration))
             .map(iteration -> calculateDuration(minimum, maximum, iteration))
-            .flatMap(delay -> Mono
-                .delay(delay)
-                .doOnSubscribe(subscription -> {
-                    int seconds = (int) delay.getSeconds();
-                    LOGGER.debug("Delaying {} {}", seconds, English.plural("second", seconds));
-                }));
+            .flatMap(delay -> {
+                if (Instant.now().isAfter(finish)) {
+                    return Mono.error(new DelayTimeoutException());
+                }
+
+                return Mono
+                    .delay(delay)
+                    .doOnSubscribe(subscription -> {
+                        int seconds = (int) delay.getSeconds();
+                        LOGGER.debug("Delaying {} {}", seconds, English.plural("second", seconds));
+                    });
+            });
     }
 
     private static Duration min(Duration a, Duration b) {

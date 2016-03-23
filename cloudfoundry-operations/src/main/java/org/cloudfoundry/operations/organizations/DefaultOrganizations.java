@@ -50,6 +50,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple4;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
@@ -161,7 +162,7 @@ public final class DefaultOrganizations implements Organizations {
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
         return requestOrganizations(cloudFoundryClient, organization)
             .single()
-            .otherwise(ExceptionUtils.convert("Organization %s does not exist", organization));
+            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Organization %s does not exist", organization)));
     }
 
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
@@ -178,7 +179,7 @@ public final class DefaultOrganizations implements Organizations {
     private static Mono<OrganizationQuotaDefinitionResource> getOrganizationQuotaDefinition(CloudFoundryClient cloudFoundryClient, String quotaDefinitionName) {
         return requestOrganizationQuotaDefinitions(cloudFoundryClient, quotaDefinitionName)
             .single()
-            .otherwise(ExceptionUtils.convert("Organization quota %s does not exist", quotaDefinitionName));
+            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Organization quota %s does not exist", quotaDefinitionName)));
     }
 
     private static Mono<String> getOrganizationQuotaDefinitionId(CloudFoundryClient cloudFoundryClient, String quotaDefinitionName) {

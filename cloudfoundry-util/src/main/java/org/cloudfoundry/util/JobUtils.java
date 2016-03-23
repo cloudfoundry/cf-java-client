@@ -25,6 +25,8 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 
+import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
+
 /**
  * Utilities for Jobs
  */
@@ -44,7 +46,7 @@ public final class JobUtils {
         return requestJob(cloudFoundryClient, jobId)
             .map(GetJobResponse::getEntity)
             .where(JobUtils::isComplete)
-            .repeatWhenEmpty(Integer.MAX_VALUE -1, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(10), Duration.ofSeconds(90)))
+            .repeatWhenEmpty(Integer.MAX_VALUE - 1, exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
             .where(entity -> "failed".equals(entity.getStatus()))
             .flatMap(JobUtils::getError)
             .after();

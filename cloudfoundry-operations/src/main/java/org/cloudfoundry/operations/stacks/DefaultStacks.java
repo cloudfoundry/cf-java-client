@@ -26,6 +26,8 @@ import org.cloudfoundry.util.ValidationUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.NoSuchElementException;
+
 public final class DefaultStacks implements Stacks {
 
     private final CloudFoundryClient cloudFoundryClient;
@@ -51,7 +53,7 @@ public final class DefaultStacks implements Stacks {
     private static Mono<StackResource> getStack(CloudFoundryClient cloudFoundryClient, String stack) {
         return requestStack(cloudFoundryClient, stack)
             .single()
-            .otherwise(ExceptionUtils.convert("Stack %s does not exist", stack));
+            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Stack %s does not exist", stack)));
     }
 
     private static Flux<StackResource> requestStack(CloudFoundryClient cloudFoundryClient, String stack) {

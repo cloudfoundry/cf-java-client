@@ -29,6 +29,8 @@ import org.cloudfoundry.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.NoSuchElementException;
+
 /**
  * A builder API for creating the default implementation of the {@link CloudFoundryOperations}
  */
@@ -130,7 +132,7 @@ public final class CloudFoundryOperationsBuilder {
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
         return requestOrganizations(cloudFoundryClient, organization)
             .single()
-            .otherwise(ExceptionUtils.convert("Organization %s does not exist", organization));
+            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Organization %s does not exist", organization)));
     }
 
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
@@ -149,7 +151,7 @@ public final class CloudFoundryOperationsBuilder {
     private static Mono<SpaceResource> getSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         return requestSpaces(cloudFoundryClient, organizationId, space)
             .single()
-            .otherwise(ExceptionUtils.convert("Space %s does not exist", space));
+            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Space %s does not exist", space)));
     }
 
     private static Mono<String> getSpaceId(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, String space) {

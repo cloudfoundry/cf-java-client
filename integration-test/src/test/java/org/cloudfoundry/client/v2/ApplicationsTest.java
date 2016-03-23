@@ -57,7 +57,6 @@ import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
-import org.cloudfoundry.util.DelayUtils;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
@@ -84,6 +83,7 @@ import java.util.function.Consumer;
 import java.util.zip.GZIPInputStream;
 
 import static org.cloudfoundry.client.CompareZips.zipAssertEquivalent;
+import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
@@ -1061,7 +1061,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     private static Mono<ApplicationInstanceInfo> waitForInstanceRestart(CloudFoundryClient cloudFoundryClient, String applicationId, String instanceName, Optional<Double> optionalSince) {
         return getInstanceInfo(cloudFoundryClient, applicationId, instanceName)
             .where(info -> !isIdentical(info.getSince(), optionalSince.orElse(null)))
-            .repeatWhenEmpty(Integer.MAX_VALUE - 1, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(8), Duration.ofSeconds(90)));
+            .repeatWhenEmpty(Integer.MAX_VALUE - 1, exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
     }
 
     private static Mono<String> waitForStaging(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -1072,7 +1072,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     private static Mono<AbstractApplicationResource> waitForStagingApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestGetApplication(cloudFoundryClient, applicationId)
             .where(response -> "STAGED".equals(response.getEntity().getPackageState()))
-            .repeatWhenEmpty(Integer.MAX_VALUE - 1, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(8), Duration.ofSeconds(90)));
+            .repeatWhenEmpty(Integer.MAX_VALUE - 1, exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
     }
 
     private static Mono<String> waitForStarting(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -1083,7 +1083,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .flatMap(response -> Flux.fromIterable(response.values()))
             .filter(applicationInstanceInfo -> "RUNNING".equals(applicationInstanceInfo.getState()))
             .next()
-            .repeatWhenEmpty(Integer.MAX_VALUE - 1, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(8), Duration.ofSeconds(90)))
+            .repeatWhenEmpty(Integer.MAX_VALUE - 1, exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
             .map(info -> applicationId);
     }
 
