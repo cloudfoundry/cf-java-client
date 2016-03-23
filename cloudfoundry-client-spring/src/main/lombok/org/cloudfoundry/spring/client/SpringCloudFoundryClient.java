@@ -23,6 +23,7 @@ import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
+import org.cloudfoundry.client.v2.appusageevents.ApplicationUsageEvents;
 import org.cloudfoundry.client.v2.domains.Domains;
 import org.cloudfoundry.client.v2.events.Events;
 import org.cloudfoundry.client.v2.featureflags.FeatureFlags;
@@ -53,6 +54,7 @@ import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
 import org.cloudfoundry.client.v3.tasks.Tasks;
 import org.cloudfoundry.spring.client.v2.applications.SpringApplicationsV2;
+import org.cloudfoundry.spring.client.v2.appusageevents.SpringApplicationUsageEvents;
 import org.cloudfoundry.spring.client.v2.domains.SpringDomains;
 import org.cloudfoundry.spring.client.v2.events.SpringEvents;
 import org.cloudfoundry.spring.client.v2.featureflags.SpringFeatureFlags;
@@ -108,6 +110,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  */
 @ToString
 public final class SpringCloudFoundryClient implements CloudFoundryClient {
+
+    private final ApplicationUsageEvents applicationUsageEvents;
 
     private final ApplicationsV2 applicationsV2;
 
@@ -188,6 +192,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     }
 
     SpringCloudFoundryClient(ConnectionContext connectionContext, RestOperations restOperations, URI root, SchedulerGroup schedulerGroup, OAuth2TokenProvider tokenProvider) {
+        this.applicationUsageEvents = new SpringApplicationUsageEvents(restOperations, root, schedulerGroup);
         this.applicationsV2 = new SpringApplicationsV2(restOperations, root, schedulerGroup);
         this.applicationsV3 = new SpringApplicationsV3(restOperations, root, schedulerGroup);
         this.domains = new SpringDomains(restOperations, root, schedulerGroup);
@@ -234,6 +239,11 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     // Let's take a moment to reflect on the fact that this bridge constructor is needed to counter a useless compiler constraint
     private SpringCloudFoundryClient(ConnectionContext connectionContext, OAuth2RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
         this(connectionContext, restOperations, root, schedulerGroup, new OAuth2RestOperationsOAuth2TokenProvider(restOperations));
+    }
+
+    @Override
+    public ApplicationUsageEvents applicationUsageEvents() {
+        return applicationUsageEvents;
     }
 
     @Override
