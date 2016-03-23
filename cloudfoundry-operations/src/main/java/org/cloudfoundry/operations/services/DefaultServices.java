@@ -35,6 +35,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -82,7 +83,7 @@ public final class DefaultServices implements Services {
     private static Mono<ApplicationResource> getApplication(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
         return requestApplications(cloudFoundryClient, applicationName, spaceId)
             .single()
-            .otherwise(ExceptionUtils.convert("Application %s does not exist", applicationName));
+            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Application %s does not exist", applicationName)));
     }
 
     private static Mono<String> getApplicationId(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
@@ -99,7 +100,7 @@ public final class DefaultServices implements Services {
     private static Mono<ServiceInstanceResource> getSpaceServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
         return requestSpaceServiceInstances(cloudFoundryClient, serviceInstanceName, spaceId)
             .single()
-            .otherwise(ExceptionUtils.convert("Service instance %s does not exist", serviceInstanceName));
+            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Service instance %s does not exist", serviceInstanceName)));
     }
 
     private static Mono<String> getSpaceServiceInstanceId(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {

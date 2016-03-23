@@ -20,6 +20,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.NoSuchElementException;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Utilities for dealing with {@link Exception}s
@@ -30,26 +31,18 @@ public final class ExceptionUtils {
     }
 
     /**
-     * Converts {@link Throwable}s to more descriptive exception types, attaching the original {@link Throwable} as the new cause.
-     *
-     * <ul> <li>{@link NoSuchElementException} to {@link IllegalArgumentException}</li> </ul>
+     * Returns a {@link Mono} containing an {@link IllegalArgumentException} with the configured message
      *
      * @param format A <a href="../util/Formatter.html#syntax">format string</a>
      * @param args   Arguments referenced by the format specifiers in the format string.  If there are more arguments than format specifiers, the extra arguments are ignored.  The number of arguments
      *               is variable and may be zero.  The maximum number of arguments is limited by the maximum dimension of a Java array as defined by <cite>The Java&trade; Virtual Machine
      *               Specification</cite>. The behaviour on a {@code null} argument depends on the <a href="../util/Formatter.html#syntax">conversion</a>.
      * @param <T>    the type of the {@link Mono} being converted
-     * @return a function that converts errors
+     * @return a {@link Mono} containing the error
      */
-    public static <T> Function<Throwable, Mono<T>> convert(String format, Object... args) {
-        return throwable -> {
-            if (throwable instanceof NoSuchElementException) {
-                String message = String.format(format, args);
-                return Mono.error(new IllegalArgumentException(message, throwable));
-            } else {
-                return Mono.error(throwable);
-            }
-        };
+    public static <T> Mono<T> illegalArgument(String format, Object... args) {
+        String message = String.format(format, args);
+        return Mono.error(new IllegalArgumentException(message));
     }
 
     /**
@@ -65,6 +58,26 @@ public final class ExceptionUtils {
     public static <T> Mono<T> illegalState(String format, Object... args) {
         String message = String.format(format, args);
         return Mono.error(new IllegalStateException(message));
+    }
+
+    /**
+     * Converts {@link Throwable}s to more descriptive exception types, attaching the original {@link Throwable} as the new cause.
+     *
+     * <ul> <li>{@link NoSuchElementException} to {@link IllegalArgumentException}</li> </ul>
+     *
+     * @param exceptionType       the type of exception to convert
+     * @param replacementSupplier a supplier of a replacement exception
+     * @param <T>                 the type of the {@link Mono} being converted
+     * @return a function that converts errors
+     */
+    public static <T> Function<Throwable, Mono<T>> replace(Class<? extends Exception> exceptionType, Supplier<Mono<T>> replacementSupplier) {
+        return throwable -> {
+            if (exceptionType.isAssignableFrom(throwable.getClass())) {
+                return replacementSupplier.get();
+            } else {
+                return Mono.error(throwable);
+            }
+        };
     }
 
 }

@@ -21,7 +21,6 @@ import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteRequest;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteResponse;
-import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.domains.GetDomainRequest;
 import org.cloudfoundry.client.v2.domains.GetDomainResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
@@ -52,6 +51,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
@@ -169,7 +169,7 @@ public final class DefaultRoutes implements Routes {
     private static Mono<ApplicationResource> getApplication(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         return requestApplications(cloudFoundryClient, application, spaceId)
             .single()
-            .otherwise(ExceptionUtils.convert("Application %s does not exist", application));
+            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Application %s does not exist", application)));
     }
 
     private static Mono<String> getApplicationId(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
@@ -191,7 +191,7 @@ public final class DefaultRoutes implements Routes {
     private static Mono<Resource<?>> getDomain(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
         return getDomains(cloudFoundryClient, organizationId, domain)
             .single()
-            .otherwise(ExceptionUtils.<DomainResource>convert("Domain %s does not exist", domain));
+            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Domain %s does not exist", domain)));
     }
 
     private static Mono<String> getDomainId(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
@@ -229,7 +229,7 @@ public final class DefaultRoutes implements Routes {
     private static Mono<RouteResource> getRoute(CloudFoundryClient cloudFoundryClient, String host, String domain, String domainId, String path) {
         return requestRoutes(cloudFoundryClient, domainId, host, path)
             .single()
-            .otherwise(ExceptionUtils.convert("Route %s.%s does not exist", host, domain));
+            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Route %s.%s does not exist", host, domain)));
     }
 
     private static Mono<String> getRouteId(CloudFoundryClient cloudFoundryClient, String host, String domain, String domainId, String path) {
@@ -250,7 +250,7 @@ public final class DefaultRoutes implements Routes {
     private static Mono<SpaceResource> getSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         return requestSpaces(cloudFoundryClient, organizationId, space)
             .single()
-            .otherwise(ExceptionUtils.convert("Space %s does not exist", space));
+            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Space %s does not exist", space)));
     }
 
     private static Mono<String> getSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
