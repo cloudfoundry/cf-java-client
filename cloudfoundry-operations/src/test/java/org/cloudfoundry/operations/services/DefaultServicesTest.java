@@ -442,12 +442,14 @@ public final class DefaultServicesTest {
         protected void assertions(TestSubscriber<ServiceInstance> testSubscriber) {
             testSubscriber
                 .assertEquals(ServiceInstance.builder()
+                    .dashboardUri("test-dashboardUrl")
                     .id("test-service-instance1-id")
                     .name("test-service-instance1")
                     .type("user-provided")
                     .build())
                 .assertEquals(ServiceInstance.builder()
                     .application("test-application")
+                    .dashboardUri("test-dashboardUrl")
                     .id("test-service-instance2-id")
                     .lastOperation("create successful")
                     .name("test-service-instance2")
