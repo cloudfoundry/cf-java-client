@@ -408,6 +408,7 @@ public final class DefaultRoutes implements Routes {
             .applications(applications)
             .domain(domain)
             .host(entity.getHost())
+            .id(ResourceUtils.getId(resource))
             .path(entity.getPath())
             .routeId(ResourceUtils.getId(resource))
             .space(space)

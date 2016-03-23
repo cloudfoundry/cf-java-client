@@ -53,6 +53,14 @@ public final class Route {
     private final String host;
 
     /**
+     * The id
+     *
+     * @param id the id
+     * @return the id
+     */
+    private final String id;
+
+    /**
      * The path of this route
      *
      * @param path the path
@@ -81,12 +89,14 @@ public final class Route {
           @Singular List<String> applications,
           String domain,
           String host,
+          String id,
           String path,
           String space) {
         this.routeId = routeId;
         this.applications = applications;
         this.domain = domain;
         this.host = host;
+        this.id = id;
         this.path = path;
         this.space = space;
     }

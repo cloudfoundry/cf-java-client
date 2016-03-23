@@ -27,22 +27,56 @@ import java.util.Date;
 @Data
 public final class ApplicationEvent {
 
+    /**
+     * The actor
+     *
+     * @param actor the actor
+     * @return the actor
+     */
     private final String actor;
 
+    /**
+     * The description
+     *
+     * @param description the description
+     * @return the description
+     */
     private final String description;
 
+    /**
+     * The event
+     *
+     * @param event the event
+     * @return the event
+     */
     private final String event;
 
+    /**
+     * The id
+     *
+     * @param id the id
+     * @return the id
+     */
+    private final String id;
+
+    /**
+     * The time
+     *
+     * @param time the time
+     * @return the time
+     */
     private final Date time;
 
     @Builder
     ApplicationEvent(String actor,
                      String description,
                      String event,
+                     String id,
                      Date time) {
         this.actor = actor;
         this.description = description;
         this.event = event;
+        this.id = id;
         this.time = time;
     }
 }

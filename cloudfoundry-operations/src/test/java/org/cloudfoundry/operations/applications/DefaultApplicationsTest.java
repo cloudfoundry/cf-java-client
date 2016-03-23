@@ -1724,9 +1724,10 @@ public final class DefaultApplicationsTest {
         protected void assertions(TestSubscriber<ApplicationEvent> testSubscriber) {
             testSubscriber
                 .assertEquals(ApplicationEvent.builder()
+                    .actor("test-event-actorName")
                     .description("instances: 1, memory: 2, state: test-state, environment_json: test-data")
                     .event("test-event-type")
-                    .actor("test-event-actorName")
+                    .id("test-event-id")
                     .time(DateUtils.parseFromIso8601("2016-02-08T15:45:59Z"))
                     .build());
         }
@@ -1763,9 +1764,10 @@ public final class DefaultApplicationsTest {
         protected void assertions(TestSubscriber<ApplicationEvent> testSubscriber) {
             testSubscriber
                 .assertEquals(ApplicationEvent.builder()
+                    .actor("test-event-actorName")
                     .description("memory: 2, state: test-state, environment_json: test-data")
                     .event("test-event-type")
-                    .actor("test-event-actorName")
+                    .id("test-event-id")
                     .build());
         }
 
@@ -1869,15 +1871,17 @@ public final class DefaultApplicationsTest {
         protected void assertions(TestSubscriber<ApplicationEvent> testSubscriber) {
             testSubscriber
                 .assertEquals(ApplicationEvent.builder()
+                    .actor("test-event-actorName")
                     .description("instances: 1, memory: 2, state: test-state, environment_json: test-data")
                     .event("test-event-type")
-                    .actor("test-event-actorName")
+                    .id("test-event-id")
                     .time(DateUtils.parseFromIso8601("2016-02-08T15:45:59Z"))
                     .build())
                 .assertEquals(ApplicationEvent.builder()
+                    .actor("test-event-actorName")
                     .description("state: test-state-two")
                     .event("test-event-type")
-                    .actor("test-event-actorName")
+                    .id("test-event-id")
                     .time(DateUtils.parseFromIso8601("2016-02-08T15:49:07Z"))
                     .build())
             ;

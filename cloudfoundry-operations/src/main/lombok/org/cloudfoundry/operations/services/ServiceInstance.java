@@ -37,6 +37,14 @@ public final class ServiceInstance {
     private final List<String> applications;
 
     /**
+     * The id
+     *
+     * @param id the id
+     * @return the id
+     */
+    private final String id;
+
+    /**
      * The last operation
      *
      * @param lastOperation the last operation
@@ -78,12 +86,14 @@ public final class ServiceInstance {
 
     @Builder
     ServiceInstance(@Singular List<String> applications,
+                    String id,
                     String lastOperation,
                     String name,
                     String plan,
                     String service,
                     String type) {
         this.applications = applications;
+        this.id = id;
         this.lastOperation = lastOperation;
         this.name = name;
         this.plan = plan;

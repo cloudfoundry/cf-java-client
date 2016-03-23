@@ -34,6 +34,14 @@ public final class Stack {
     private final String description;
 
     /**
+     * The id
+     *
+     * @param id the id
+     * @return the id
+     */
+    private final String id;
+
+    /**
      * The name of this stack
      *
      * @param name the name
@@ -42,8 +50,9 @@ public final class Stack {
     private final String name;
 
     @Builder
-    Stack(String description, String name) {
+    Stack(String description, String id, String name) {
         this.description = description;
+        this.id = id;
         this.name = name;
     }
 

@@ -76,6 +76,7 @@ public final class DefaultStacks implements Stacks {
     private Stack toStack(StackResource stackResource) {
         return Stack.builder()
             .description(ResourceUtils.getEntity(stackResource).getDescription())
+            .id(ResourceUtils.getId(stackResource))
             .name(ResourceUtils.getEntity(stackResource).getName())
             .build();
     }

@@ -82,14 +82,13 @@ public final class DefaultServices implements Services {
     @Override
     public Flux<ServiceInstance> listInstances() {
         return this.spaceId
-            .flatMap(spaceId -> requestSpaceServiceInstances(this.cloudFoundryClient, spaceId)
-                .map(resource -> Tuple2.of(spaceId, resource)))
-            .flatMap(function((spaceId, resource) -> Mono
+            .flatMap(spaceId -> requestSpaceServiceInstances(this.cloudFoundryClient, spaceId))
+            .flatMap(resource -> Mono
                 .when(
                     Mono.just(resource),
                     getBoundApplications(this.cloudFoundryClient, ResourceUtils.getId(resource)),
                     getServiceAndPlan(this.cloudFoundryClient, ResourceUtils.getEntity(resource).getServicePlanId())
-                )))
+                ))
             .map(function(DefaultServices::toServiceInstance));
     }
 
@@ -183,9 +182,10 @@ public final class DefaultServices implements Services {
     }
 
     private static Mono<GetApplicationResponse> requestApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient.applicationsV2().get(GetApplicationRequest.builder()
-            .applicationId(applicationId)
-            .build());
+        return cloudFoundryClient.applicationsV2()
+            .get(GetApplicationRequest.builder()
+                .applicationId(applicationId)
+                .build());
     }
 
     private static Flux<ApplicationResource> requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
@@ -275,6 +275,7 @@ public final class DefaultServices implements Services {
         Optional<String> plan = serviceAndPlan.t2;
 
         return ServiceInstance.builder()
+            .id(ResourceUtils.getId(resource))
             .lastOperation(Optional.ofNullable(entity.getLastOperation()).map(DefaultServices::convertLastOperation).orElse(null))
             .name(entity.getName())
             .plan(plan.orElse(null))

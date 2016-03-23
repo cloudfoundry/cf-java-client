@@ -434,6 +434,7 @@ public final class DefaultApplications implements Applications {
         return ApplicationEvent.builder()
             .actor(entity.getActorName())
             .description(eventDescription(getMetadataRequest(entity), "instances", "memory", "state", "environment_json"))
+            .id(ResourceUtils.getId(resource))
             .event(entity.getType())
             .time(timestamp)
             .build();
