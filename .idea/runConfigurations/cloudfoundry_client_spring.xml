@@ -16,7 +16,9 @@
     <option name="TEST_SEARCH_SCOPE">
       <value defaultName="singleModule" />
     </option>
-    <envs />
+    <envs>
+      <env name="CLIENT_LOGGING_LEVEL" value="DEBUG" />
+    </envs>
     <patterns />
     <method />
   </configuration>
