@@ -1252,7 +1252,6 @@ public final class DefaultApplications implements Applications {
 
         return requestGetApplication(cloudFoundryClient, applicationId)
             .map(response -> ResourceUtils.getEntity(response).getPackageState())
-            .log("stream.here")
             .where(isStagingComplete())
             .repeatWhenEmpty(Integer.MAX_VALUE -1, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(16), timeout))
             .where(isStaged())
