@@ -25,6 +25,7 @@ import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsReq
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingRequest;
+import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.ListServiceBindingsRequest;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
@@ -103,7 +104,7 @@ public final class DefaultServices implements Services {
                     getSpaceServiceInstanceId(this.cloudFoundryClient, request1.getServiceInstanceName(), spaceId)
                 )))
             .then(function((serviceInstanceName, applicationId, serviceInstanceId) -> getServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId, serviceInstanceName)))
-            .then(serviceBindingId -> requestDeleteServiceBinding(this.cloudFoundryClient, serviceBindingId))
+            .then(serviceBindingId -> deleteServiceBinding(this.cloudFoundryClient, serviceBindingId))
             .after();
     }
 
@@ -115,6 +116,12 @@ public final class DefaultServices implements Services {
 
     private static String convertLastOperation(LastOperation lastOperation) {
         return String.format("%s %s", lastOperation.getType(), lastOperation.getState());
+    }
+
+    private static Mono<Void> deleteServiceBinding(CloudFoundryClient cloudFoundryClient, String serviceBindingId) {
+        return requestDeleteServiceBinding(cloudFoundryClient, serviceBindingId)
+            .map(ResourceUtils::getId)
+            .then(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
     }
 
     private static Mono<ApplicationResource> getApplication(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
@@ -191,14 +198,12 @@ public final class DefaultServices implements Services {
                     .build()));
     }
 
-    private static Mono<Void> requestDeleteServiceBinding(CloudFoundryClient cloudFoundryClient, String serviceBindingId) {
+    private static Mono<DeleteServiceBindingResponse> requestDeleteServiceBinding(CloudFoundryClient cloudFoundryClient, String serviceBindingId) {
         return cloudFoundryClient.serviceBindings()
             .delete(DeleteServiceBindingRequest.builder()
                 .serviceBindingId(serviceBindingId)
                 .async(true)
-                .build())
-            .map(ResourceUtils::getId)
-            .then(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
+                .build());
     }
 
     private static Flux<ServiceBindingResource> requestListApplicationServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId) {
