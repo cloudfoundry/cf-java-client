@@ -16,16 +16,24 @@
 
 package org.cloudfoundry.client.v2.serviceplans;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.cloudfoundry.client.v2.Resource;
 
-public final class UpdateServicePlanResponse extends AbstractServicePlanResource {
+/**
+ * The core resource in Service Plan responses
+ */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public abstract class AbstractServicePlanResource extends Resource<ServicePlanEntity> {
 
-    @Builder
-    UpdateServicePlanResponse(@JsonProperty("entity") ServicePlanEntity entity,
-                              @JsonProperty("metadata") Metadata metadata) {
+    AbstractServicePlanResource(@JsonProperty("entity") ServicePlanEntity entity,
+                                @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 
 }
+
