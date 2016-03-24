@@ -57,9 +57,9 @@ public abstract class AbstractFeatureFlag {
     private final String url;
 
     AbstractFeatureFlag(Boolean enabled,
-                                  String errorMessage,
-                                  String name,
-                                  String url) {
+                        String errorMessage,
+                        String name,
+                        String url) {
         this.enabled = enabled;
         this.errorMessage = errorMessage;
         this.name = name;
