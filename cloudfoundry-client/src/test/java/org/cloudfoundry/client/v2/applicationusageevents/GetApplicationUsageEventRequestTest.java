@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.serviceusageevents;
+package org.cloudfoundry.client.v2.applicationusageevents;
 
 import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
@@ -23,26 +23,26 @@ import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class GetServiceUsageEventsRequestTest {
+public final class GetApplicationUsageEventRequestTest {
 
     @Test
-    public void isValid() {
-        ValidationResult result = GetServiceUsageEventsRequest.builder()
-            .serviceUsageEventId("test-service-usage-event-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidNoId() {
-        ValidationResult result = GetServiceUsageEventsRequest.builder()
+    public void isNotValidNoId() {
+        ValidationResult result = GetApplicationUsageEventRequest.builder()
             .build()
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("service usage event id must be specified", result.getMessages().get(0));
+        assertEquals("application usage event id must be specified", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isValid() {
+        ValidationResult result = GetApplicationUsageEventRequest.builder()
+            .applicationUsageEventId("test-application-usage-event-id")
+            .build()
+            .isValid();
+
+        assertEquals(VALID, result.getStatus());
     }
 
 }
