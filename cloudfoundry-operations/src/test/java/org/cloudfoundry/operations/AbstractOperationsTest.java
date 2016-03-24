@@ -27,6 +27,7 @@ import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomains;
 import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindings;
+import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlans;
 import org.cloudfoundry.client.v2.services.Services;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
@@ -90,6 +91,8 @@ public abstract class AbstractOperationsTest {
 
     protected final ServiceBindings serviceBindings = mock(ServiceBindings.class, RETURNS_SMART_NULLS);
 
+    protected final ServiceInstances serviceInstances = mock(ServiceInstances.class, RETURNS_SMART_NULLS);
+
     protected final ServicePlans servicePlans = mock(ServicePlans.class, RETURNS_SMART_NULLS);
 
     protected final Services services = mock(Services.class, RETURNS_SMART_NULLS);
@@ -118,6 +121,7 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.privateDomains()).thenReturn(this.privateDomains);
         when(this.cloudFoundryClient.routes()).thenReturn(this.routes);
         when(this.cloudFoundryClient.serviceBindings()).thenReturn(this.serviceBindings);
+        when(this.cloudFoundryClient.serviceInstances()).thenReturn(this.serviceInstances);
         when(this.cloudFoundryClient.servicePlans()).thenReturn(this.servicePlans);
         when(this.cloudFoundryClient.services()).thenReturn(this.services);
         when(this.cloudFoundryClient.sharedDomains()).thenReturn(this.sharedDomains);

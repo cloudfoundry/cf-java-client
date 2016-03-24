@@ -20,6 +20,7 @@ package org.cloudfoundry.client.v2.serviceinstances;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Singular;
 import org.cloudfoundry.QueryParameter;
@@ -34,6 +35,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 /**
  * The request payload for the Create Service Instance
  */
+@Data
 public final class CreateServiceInstanceRequest implements Validatable {
 
     /**

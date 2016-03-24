@@ -21,7 +21,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.cloudfoundry.client.v2.Resource;
 
 /**
  * The response payload for the the Bind Service Instance To Route request.
@@ -29,7 +28,7 @@ import org.cloudfoundry.client.v2.Resource;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class BindServiceInstanceToRouteResponse extends Resource<ServiceInstanceEntity> {
+public final class BindServiceInstanceToRouteResponse extends AbstractServiceInstanceResource {
 
     @Builder
     BindServiceInstanceToRouteResponse(@JsonProperty("entity") ServiceInstanceEntity entity,

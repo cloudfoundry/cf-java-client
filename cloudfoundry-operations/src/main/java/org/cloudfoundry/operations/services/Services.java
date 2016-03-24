@@ -33,6 +33,14 @@ public interface Services {
     Mono<Void> bind(BindServiceInstanceRequest request);
 
     /**
+     * Create a service instance
+     * 
+     * @param request the create service instance request
+     * @return a completion indicator
+     */
+    Mono<Void> createInstance(CreateServiceInstanceRequest request);
+    
+    /**
      * List the service instances in the targeted space
      *
      * @return the service instances
