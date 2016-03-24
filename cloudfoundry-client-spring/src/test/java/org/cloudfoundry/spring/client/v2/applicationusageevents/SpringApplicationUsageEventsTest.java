@@ -23,10 +23,13 @@ import org.cloudfoundry.client.v2.applicationusageevents.GetApplicationUsageEven
 import org.cloudfoundry.client.v2.applicationusageevents.GetApplicationUsageEventResponse;
 import org.cloudfoundry.client.v2.applicationusageevents.ListApplicationUsageEventsRequest;
 import org.cloudfoundry.client.v2.applicationusageevents.ListApplicationUsageEventsResponse;
+import org.cloudfoundry.client.v2.applicationusageevents.PurgeAndReseedApplicationUsageEventsRequest;
 import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringApplicationUsageEventsTest {
@@ -144,6 +147,38 @@ public final class SpringApplicationUsageEventsTest {
         @Override
         protected Mono<ListApplicationUsageEventsResponse> invoke(ListApplicationUsageEventsRequest request) {
             return this.applicationUsageEvents.list(request);
+        }
+    }
+
+    public static final class PurgeAndReseed extends AbstractApiTest<PurgeAndReseedApplicationUsageEventsRequest, Void> {
+
+        private final SpringApplicationUsageEvents applicationUsageEvents = new SpringApplicationUsageEvents(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected PurgeAndReseedApplicationUsageEventsRequest getInvalidRequest() {
+            return null;
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(POST).path("/v2/app_usage_events/destructively_purge_all_and_reseed_started_apps")
+                .status(NO_CONTENT);
+        }
+
+        @Override
+        protected Void getResponse() {
+            return null;
+        }
+
+        @Override
+        protected PurgeAndReseedApplicationUsageEventsRequest getValidRequest() throws Exception {
+            return PurgeAndReseedApplicationUsageEventsRequest.builder().build();
+        }
+
+        @Override
+        protected Mono<Void> invoke(PurgeAndReseedApplicationUsageEventsRequest request) {
+            return this.applicationUsageEvents.purgeAndReseed(request);
         }
     }
 
