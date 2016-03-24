@@ -39,4 +39,12 @@ public interface ApplicationUsageEvents {
      */
     Mono<ListApplicationUsageEventsResponse> list(ListApplicationUsageEventsRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/app_usage_events/purge_and_reseed_app_usage_events.html">Purge and Reseed Application Usage Events</a> request
+     *
+     * @param request the Purge and Reseed Application Usage Events
+     * @return the response from the Purge and Reseed Application Usage Events request
+     */
+    Mono<Void> purgeAndReseed(PurgeAndReseedApplicationUsageEventsRequest request);
+
 }

@@ -22,6 +22,7 @@ import org.cloudfoundry.client.v2.applicationusageevents.GetApplicationUsageEven
 import org.cloudfoundry.client.v2.applicationusageevents.GetApplicationUsageEventResponse;
 import org.cloudfoundry.client.v2.applicationusageevents.ListApplicationUsageEventsRequest;
 import org.cloudfoundry.client.v2.applicationusageevents.ListApplicationUsageEventsResponse;
+import org.cloudfoundry.client.v2.applicationusageevents.PurgeAndReseedApplicationUsageEventsRequest;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
@@ -58,6 +59,11 @@ public final class SpringApplicationUsageEvents extends AbstractSpringOperations
             builder.pathSegment("v2", "app_usage_events");
             QueryBuilder.augment(builder, request);
         });
+    }
+
+    @Override
+    public Mono<Void> purgeAndReseed(PurgeAndReseedApplicationUsageEventsRequest request) {
+        return post(request, Void.class, builder -> builder.pathSegment("v2", "app_usage_events", "destructively_purge_all_and_reseed_started_apps"));
     }
 
 }
