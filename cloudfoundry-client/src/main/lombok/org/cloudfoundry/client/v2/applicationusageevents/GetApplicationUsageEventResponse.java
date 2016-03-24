@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.serviceusageevents;
+package org.cloudfoundry.client.v2.applicationusageevents;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -24,16 +24,16 @@ import lombok.ToString;
 import org.cloudfoundry.client.v2.Resource;
 
 /**
- * The resource response payload for the Get Service Usage Events Response
+ * The resource response payload for the Get Application Usage Events Response
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class GetServiceUsageEventsResponse extends Resource<ServiceUsageEventsEntity> {
+public final class GetApplicationUsageEventResponse extends Resource<ApplicationUsageEventEntity> {
 
     @Builder
-    GetServiceUsageEventsResponse(@JsonProperty("entity") ServiceUsageEventsEntity entity,
-                                  @JsonProperty("metadata") Metadata metadata) {
+    GetApplicationUsageEventResponse(@JsonProperty("entity") ApplicationUsageEventEntity entity,
+                                     @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 

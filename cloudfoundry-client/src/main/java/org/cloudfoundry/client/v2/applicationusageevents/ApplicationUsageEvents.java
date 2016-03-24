@@ -24,6 +24,14 @@ import reactor.core.publisher.Mono;
 public interface ApplicationUsageEvents {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/app_usage_events/retrieve_a_particular_app_usage_event.html">Get an Application Usage Event</a> request
+     *
+     * @param request the Get Application Usage Event request
+     * @return the response from the Get all Application Usage Event request
+     */
+    Mono<GetApplicationUsageEventResponse> get(GetApplicationUsageEventRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/app_usage_events/list_all_app_usage_events.html">List all Application Usage Events</a> request
      *
      * @param request the List all Application Usage Events request
