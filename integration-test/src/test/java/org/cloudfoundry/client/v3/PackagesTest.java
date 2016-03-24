@@ -32,6 +32,8 @@ import reactor.core.util.Exceptions;
 
 import java.io.IOException;
 
+import static org.junit.Assert.assertTrue;
+
 public final class PackagesTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -77,7 +79,7 @@ public final class PackagesTest extends AbstractIntegrationTest {
                     .build()))
             .map(Package::getState)
             .subscribe(testSubscriber()
-                .assertEquals("PROCESSING_UPLOAD"));
+                .assertThat(state -> assertTrue(state.equals("PROCESSING_UPLOAD") || state.equals("READY"))));
     }
 
 }
