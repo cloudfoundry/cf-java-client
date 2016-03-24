@@ -1,0 +1,25 @@
+{
+  "metadata": {
+    "guid": "caac0ed4-febf-48a4-951f-c0a7fadf6a68",
+    "url": "/v2/app_usage_events/caac0ed4-febf-48a4-951f-c0a7fadf6a68",
+    "created_at": "2016-03-17T21:41:21Z"
+  },
+  "entity": {
+    "state": "STARTED",
+    "memory_in_mb_per_instance": 564,
+    "instance_count": 1,
+    "app_guid": "guid-8cdd38d1-2c13-46a5-8f5e-e91a6cc4b060",
+    "app_name": "name-1103",
+    "space_guid": "guid-9c4485f6-7579-45da-8c07-f62e1bc8c499",
+    "space_name": "name-1104",
+    "org_guid": "guid-1ed968f6-a9f7-469b-a04f-ed1ebc2df1e7",
+    "buildpack_guid": "guid-1ffac859-4635-41fd-91bb-3ba07768a5ec",
+    "buildpack_name": "name-1105",
+    "package_state": "STAGED",
+    "parent_app_guid": null,
+    "parent_app_name": null,
+    "process_type": "web",
+    "task_name": null,
+    "task_guid": null
+  }
+}

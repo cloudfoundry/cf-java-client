@@ -19,6 +19,8 @@ package org.cloudfoundry.spring.client.v2.applicationusageevents;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEventEntity;
 import org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEventResource;
+import org.cloudfoundry.client.v2.applicationusageevents.GetApplicationUsageEventRequest;
+import org.cloudfoundry.client.v2.applicationusageevents.GetApplicationUsageEventResponse;
 import org.cloudfoundry.client.v2.applicationusageevents.ListApplicationUsageEventsRequest;
 import org.cloudfoundry.client.v2.applicationusageevents.ListApplicationUsageEventsResponse;
 import org.cloudfoundry.spring.AbstractApiTest;
@@ -28,6 +30,61 @@ import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringApplicationUsageEventsTest {
+
+    public static final class Get extends AbstractApiTest<GetApplicationUsageEventRequest, GetApplicationUsageEventResponse> {
+
+        private SpringApplicationUsageEvents applicationUsageEvents = new SpringApplicationUsageEvents(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected GetApplicationUsageEventRequest getInvalidRequest() {
+            return GetApplicationUsageEventRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("/v2/app_usage_events/caac0ed4-febf-48a4-951f-c0a7fadf6a68")
+                .status(OK)
+                .responsePayload("fixtures/client/v2/app_usage_events/GET_{id}_response.json");
+        }
+
+        @Override
+        protected GetApplicationUsageEventResponse getResponse() {
+            return GetApplicationUsageEventResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .createdAt("2016-03-17T21:41:21Z")
+                    .id("caac0ed4-febf-48a4-951f-c0a7fadf6a68")
+                    .url("/v2/app_usage_events/caac0ed4-febf-48a4-951f-c0a7fadf6a68")
+                    .build())
+                .entity(ApplicationUsageEventEntity.builder()
+                    .applicationId("guid-8cdd38d1-2c13-46a5-8f5e-e91a6cc4b060")
+                    .applicationName("name-1103")
+                    .buildpackId("guid-1ffac859-4635-41fd-91bb-3ba07768a5ec")
+                    .buildpackName("name-1105")
+                    .instanceCount(1)
+                    .memoryInMbPerInstances(564)
+                    .organizationId("guid-1ed968f6-a9f7-469b-a04f-ed1ebc2df1e7")
+                    .packageState("STAGED")
+                    .processType("web")
+                    .spaceId("guid-9c4485f6-7579-45da-8c07-f62e1bc8c499")
+                    .spaceName("name-1104")
+                    .state("STARTED")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected GetApplicationUsageEventRequest getValidRequest() throws Exception {
+            return GetApplicationUsageEventRequest.builder()
+                .applicationUsageEventId("caac0ed4-febf-48a4-951f-c0a7fadf6a68")
+                .build();
+        }
+
+        @Override
+        protected Mono<GetApplicationUsageEventResponse> invoke(GetApplicationUsageEventRequest request) {
+            return this.applicationUsageEvents.get(request);
+        }
+    }
 
     public static final class List extends AbstractApiTest<ListApplicationUsageEventsRequest, ListApplicationUsageEventsResponse> {
 

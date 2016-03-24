@@ -17,8 +17,8 @@
 package org.cloudfoundry.spring.client.v2.serviceusageevents;
 
 import lombok.ToString;
-import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventsRequest;
-import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventsResponse;
+import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventRequest;
+import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventResponse;
 import org.cloudfoundry.client.v2.serviceusageevents.ListServiceUsageEventsRequest;
 import org.cloudfoundry.client.v2.serviceusageevents.ListServiceUsageEventsResponse;
 import org.cloudfoundry.client.v2.serviceusageevents.PurgeAndReseedServiceUsageEventsRequest;
@@ -50,8 +50,8 @@ public final class SpringServiceUsageEvents extends AbstractSpringOperations imp
     }
 
     @Override
-    public Mono<GetServiceUsageEventsResponse> get(GetServiceUsageEventsRequest request) {
-        return get(request, GetServiceUsageEventsResponse.class, builder -> builder.pathSegment("v2", "service_usage_events", request.getServiceUsageEventId()));
+    public Mono<GetServiceUsageEventResponse> get(GetServiceUsageEventRequest request) {
+        return get(request, GetServiceUsageEventResponse.class, builder -> builder.pathSegment("v2", "service_usage_events", request.getServiceUsageEventId()));
     }
 
     @Override

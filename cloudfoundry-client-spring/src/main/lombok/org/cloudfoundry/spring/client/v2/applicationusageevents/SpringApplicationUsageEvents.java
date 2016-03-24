@@ -18,6 +18,8 @@ package org.cloudfoundry.spring.client.v2.applicationusageevents;
 
 import lombok.ToString;
 import org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEvents;
+import org.cloudfoundry.client.v2.applicationusageevents.GetApplicationUsageEventRequest;
+import org.cloudfoundry.client.v2.applicationusageevents.GetApplicationUsageEventResponse;
 import org.cloudfoundry.client.v2.applicationusageevents.ListApplicationUsageEventsRequest;
 import org.cloudfoundry.client.v2.applicationusageevents.ListApplicationUsageEventsResponse;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
@@ -43,6 +45,11 @@ public final class SpringApplicationUsageEvents extends AbstractSpringOperations
      */
     public SpringApplicationUsageEvents(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
         super(restOperations, root, schedulerGroup);
+    }
+
+    @Override
+    public Mono<GetApplicationUsageEventResponse> get(GetApplicationUsageEventRequest request) {
+        return get(request, GetApplicationUsageEventResponse.class, builder -> builder.pathSegment("v2", "app_usage_events", request.getApplicationUsageEventId()));
     }
 
     @Override

@@ -24,7 +24,7 @@ import lombok.Data;
  * The entity response payload for Service Usage Events
  */
 @Data
-public final class ServiceUsageEventsEntity {
+public final class ServiceUsageEventEntity {
 
     /**
      * The organization id
@@ -115,17 +115,17 @@ public final class ServiceUsageEventsEntity {
     private final String state;
 
     @Builder
-    ServiceUsageEventsEntity(@JsonProperty("org_guid") String organizationId,
-                             @JsonProperty("service_guid") String serviceId,
-                             @JsonProperty("service_instance_guid") String serviceInstanceId,
-                             @JsonProperty("service_instance_name") String serviceInstanceName,
-                             @JsonProperty("service_instance_type") String serviceInstanceType,
-                             @JsonProperty("service_label") String serviceLabel,
-                             @JsonProperty("service_plan_guid") String servicePlanId,
-                             @JsonProperty("service_plan_name") String servicePlanName,
-                             @JsonProperty("space_guid") String spaceId,
-                             @JsonProperty("space_name") String spaceName,
-                             @JsonProperty("state") String state) {
+    ServiceUsageEventEntity(@JsonProperty("org_guid") String organizationId,
+                            @JsonProperty("service_guid") String serviceId,
+                            @JsonProperty("service_instance_guid") String serviceInstanceId,
+                            @JsonProperty("service_instance_name") String serviceInstanceName,
+                            @JsonProperty("service_instance_type") String serviceInstanceType,
+                            @JsonProperty("service_label") String serviceLabel,
+                            @JsonProperty("service_plan_guid") String servicePlanId,
+                            @JsonProperty("service_plan_name") String servicePlanName,
+                            @JsonProperty("space_guid") String spaceId,
+                            @JsonProperty("space_name") String spaceName,
+                            @JsonProperty("state") String state) {
         this.organizationId = organizationId;
         this.serviceId = serviceId;
         this.serviceInstanceId = serviceInstanceId;

@@ -24,8 +24,7 @@ import reactor.core.publisher.Mono;
 public interface ServiceInstances {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/service_instances/binding_a_service_instance_to_a_route_%28experimental%29.html">Bind Service Instance To a Route
-     * (experimental)</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/233/service_instances/binding_a_service_instance_to_a_route.html">Bind Service Instance To a Route</a> request
      *
      * @param request the Bind Service Instance To Route request
      * @return the response from the Bind Service Instance To Route request
