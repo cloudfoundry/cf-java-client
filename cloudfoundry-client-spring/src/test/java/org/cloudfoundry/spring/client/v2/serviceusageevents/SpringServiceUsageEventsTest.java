@@ -17,13 +17,13 @@
 package org.cloudfoundry.spring.client.v2.serviceusageevents;
 
 import org.cloudfoundry.client.v2.Resource;
-import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventsRequest;
-import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventsResponse;
+import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventRequest;
+import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventResponse;
 import org.cloudfoundry.client.v2.serviceusageevents.ListServiceUsageEventsRequest;
 import org.cloudfoundry.client.v2.serviceusageevents.ListServiceUsageEventsResponse;
 import org.cloudfoundry.client.v2.serviceusageevents.PurgeAndReseedServiceUsageEventsRequest;
+import org.cloudfoundry.client.v2.serviceusageevents.ServiceUsageEventEntity;
 import org.cloudfoundry.client.v2.serviceusageevents.ServiceUsageEventResource;
-import org.cloudfoundry.client.v2.serviceusageevents.ServiceUsageEventsEntity;
 import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
@@ -34,13 +34,13 @@ import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringServiceUsageEventsTest {
 
-    public static final class Get extends AbstractApiTest<GetServiceUsageEventsRequest, GetServiceUsageEventsResponse> {
+    public static final class Get extends AbstractApiTest<GetServiceUsageEventRequest, GetServiceUsageEventResponse> {
 
         private final SpringServiceUsageEvents serviceUsageEvents = new SpringServiceUsageEvents(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
-        protected GetServiceUsageEventsRequest getInvalidRequest() {
-            return GetServiceUsageEventsRequest.builder().build();
+        protected GetServiceUsageEventRequest getInvalidRequest() {
+            return GetServiceUsageEventRequest.builder().build();
         }
 
         @Override
@@ -52,14 +52,14 @@ public final class SpringServiceUsageEventsTest {
         }
 
         @Override
-        protected GetServiceUsageEventsResponse getResponse() {
-            return GetServiceUsageEventsResponse.builder()
+        protected GetServiceUsageEventResponse getResponse() {
+            return GetServiceUsageEventResponse.builder()
                 .metadata(Resource.Metadata.builder()
                     .createdAt("2015-07-27T22:43:30Z")
                     .id("9470627d-0488-4d9a-8564-f97571487893")
                     .url("/v2/service_usage_events/9470627d-0488-4d9a-8564-f97571487893")
                     .build())
-                .entity(ServiceUsageEventsEntity.builder()
+                .entity(ServiceUsageEventEntity.builder()
                     .state("CREATED")
                     .organizationId("guid-3f19bc03-d183-4189-bdeb-9f33468181da")
                     .spaceId("guid-d565b0c4-3c38-41dd-a102-1c113c759fbf")
@@ -76,14 +76,14 @@ public final class SpringServiceUsageEventsTest {
         }
 
         @Override
-        protected GetServiceUsageEventsRequest getValidRequest() throws Exception {
-            return GetServiceUsageEventsRequest.builder()
+        protected GetServiceUsageEventRequest getValidRequest() throws Exception {
+            return GetServiceUsageEventRequest.builder()
                 .serviceUsageEventId("9470627d-0488-4d9a-8564-f97571487893")
                 .build();
         }
 
         @Override
-        protected Mono<GetServiceUsageEventsResponse> invoke(GetServiceUsageEventsRequest request) {
+        protected Mono<GetServiceUsageEventResponse> invoke(GetServiceUsageEventRequest request) {
             return this.serviceUsageEvents.get(request);
         }
     }
@@ -116,7 +116,7 @@ public final class SpringServiceUsageEventsTest {
                         .id("0c9c59b8-3462-4acf-be39-aa987f087146")
                         .url("/v2/service_usage_events/0c9c59b8-3462-4acf-be39-aa987f087146")
                         .build())
-                    .entity(ServiceUsageEventsEntity.builder()
+                    .entity(ServiceUsageEventEntity.builder()
                         .state("CREATED")
                         .organizationId("guid-4dd5a051-3460-4246-a842-1dc2d5983c51")
                         .spaceId("guid-76bd662b-fd5b-4b5c-a393-d65e67f99d53")

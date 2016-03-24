@@ -24,17 +24,16 @@ import lombok.ToString;
 import org.cloudfoundry.client.v2.Resource;
 
 /**
- * The resource response payload for Service Usage Events
+ * The resource response payload for the Get Service Usage Events Response
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ServiceUsageEventResource extends Resource<ServiceUsageEventEntity> {
+public final class GetServiceUsageEventResponse extends Resource<ServiceUsageEventEntity> {
 
     @Builder
-    ServiceUsageEventResource(@JsonProperty("entity") ServiceUsageEventEntity entity,
-                              @JsonProperty("metadata") Metadata metadata) {
-
+    GetServiceUsageEventResponse(@JsonProperty("entity") ServiceUsageEventEntity entity,
+                                 @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 
