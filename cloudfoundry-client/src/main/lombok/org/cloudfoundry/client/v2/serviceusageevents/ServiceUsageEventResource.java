@@ -34,6 +34,7 @@ public final class ServiceUsageEventResource extends Resource<ServiceUsageEventE
     @Builder
     ServiceUsageEventResource(@JsonProperty("entity") ServiceUsageEventEntity entity,
                               @JsonProperty("metadata") Metadata metadata) {
+
         super(entity, metadata);
     }
 

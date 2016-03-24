@@ -22,8 +22,8 @@ import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventRespons
 import org.cloudfoundry.client.v2.serviceusageevents.ListServiceUsageEventsRequest;
 import org.cloudfoundry.client.v2.serviceusageevents.ListServiceUsageEventsResponse;
 import org.cloudfoundry.client.v2.serviceusageevents.PurgeAndReseedServiceUsageEventsRequest;
-import org.cloudfoundry.client.v2.serviceusageevents.ServiceUsageEventResource;
 import org.cloudfoundry.client.v2.serviceusageevents.ServiceUsageEventEntity;
+import org.cloudfoundry.client.v2.serviceusageevents.ServiceUsageEventResource;
 import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
