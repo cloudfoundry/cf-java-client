@@ -190,10 +190,10 @@ TODO: Document once implemented
 ## Documentation
 API Documentation for each module can be found at the following locations:
 
-* `cloudfoundry-client` – [`milestone`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.M1/cloudfoundry-client), [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.BUILD-SNAPSHOT/cloudfoundry-client)
-* `cloudfoundry-client-spring` – [`milestone`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.M1/cloudfoundry-client-spring), [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.BUILD-SNAPSHOT/cloudfoundry-client-spring)
-* `cloudfoundry-operations` – [`milestone`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.M1/cloudfoundry-operations), [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.BUILD-SNAPSHOT/cloudfoundry-operations)
-* `cloudfoundry-util` – [`milestone`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.M1/cloudfoundry-util), [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/2.0.0.BUILD-SNAPSHOT/cloudfoundry-util)
+* `cloudfoundry-client` – [`release`](http://cloudfoundry.github.io/cf-java-client/api/latest-release/cloudfoundry-client), [`milestone`](http://cloudfoundry.github.io/cf-java-client/api/latest-milestone/cloudfoundry-client), [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/latest-snapshot/cloudfoundry-client)
+* `cloudfoundry-client-spring` – [`release`](http://cloudfoundry.github.io/cf-java-client/api/latest-release/cloudfoundry-client-spring), [`milestone`](http://cloudfoundry.github.io/cf-java-client/api/latest-milestone/cloudfoundry-client-spring), [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/latest-snapshot/cloudfoundry-client-spring)
+* `cloudfoundry-operations` – [`release`](http://cloudfoundry.github.io/cf-java-client/api/latest-release/cloudfoundry-operations), [`milestone`](http://cloudfoundry.github.io/cf-java-client/api/latest-milestone/cloudfoundry-operations), [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/latest-snapshot/cloudfoundry-operations)
+* `cloudfoundry-util` – [`release`](http://cloudfoundry.github.io/cf-java-client/api/latest-release/cloudfoundry-util), [`milestone`](http://cloudfoundry.github.io/cf-java-client/api/latest-milestone/cloudfoundry-util), [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/latest-snapshot/cloudfoundry-util)
 
 ## Development
 The project depends on Java 8.  To build from source and install to your local Maven cache, run the following:
