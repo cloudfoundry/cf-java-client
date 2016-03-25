@@ -18,6 +18,8 @@ package org.cloudfoundry.spring.client.v2.environmentvariablegroups;
 
 import lombok.ToString;
 import org.cloudfoundry.client.v2.environmentvariablegroups.EnvironmentVariableGroups;
+import org.cloudfoundry.client.v2.environmentvariablegroups.GetRunningEnvironmentVariablesRequest;
+import org.cloudfoundry.client.v2.environmentvariablegroups.GetRunningEnvironmentVariablesResponse;
 import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateRunningEnvironmentVariablesRequest;
 import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateRunningEnvironmentVariablesResponse;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
@@ -42,6 +44,11 @@ public final class SpringEnvironmentVariableGroups extends AbstractSpringOperati
      */
     public SpringEnvironmentVariableGroups(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
         super(restOperations, root, schedulerGroup);
+    }
+
+    @Override
+    public Mono<GetRunningEnvironmentVariablesResponse> getRunningEnvironmentVariables(GetRunningEnvironmentVariablesRequest request) {
+        return get(request, GetRunningEnvironmentVariablesResponse.class, builder -> builder.pathSegment("v2", "config", "environment_variable_groups", "running"));
     }
 
     @Override
