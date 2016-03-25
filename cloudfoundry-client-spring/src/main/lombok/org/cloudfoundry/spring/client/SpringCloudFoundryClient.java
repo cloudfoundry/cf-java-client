@@ -25,6 +25,7 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEvents;
 import org.cloudfoundry.client.v2.domains.Domains;
+import org.cloudfoundry.client.v2.environmentvariablegroups.EnvironmentVariableGroups;
 import org.cloudfoundry.client.v2.events.Events;
 import org.cloudfoundry.client.v2.featureflags.FeatureFlags;
 import org.cloudfoundry.client.v2.info.Info;
@@ -56,6 +57,7 @@ import org.cloudfoundry.client.v3.tasks.Tasks;
 import org.cloudfoundry.spring.client.v2.applications.SpringApplicationsV2;
 import org.cloudfoundry.spring.client.v2.applicationusageevents.SpringApplicationUsageEvents;
 import org.cloudfoundry.spring.client.v2.domains.SpringDomains;
+import org.cloudfoundry.spring.client.v2.environmentvariablegroups.SpringEnvironmentVariableGroups;
 import org.cloudfoundry.spring.client.v2.events.SpringEvents;
 import org.cloudfoundry.spring.client.v2.featureflags.SpringFeatureFlags;
 import org.cloudfoundry.spring.client.v2.info.SpringInfo;
@@ -122,6 +124,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     private final Domains domains;
 
     private final Droplets droplets;
+
+    private final EnvironmentVariableGroups environmentVariableGroups;
 
     private final Events events;
 
@@ -197,6 +201,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.applicationsV3 = new SpringApplicationsV3(restOperations, root, schedulerGroup);
         this.domains = new SpringDomains(restOperations, root, schedulerGroup);
         this.droplets = new SpringDroplets(restOperations, root, schedulerGroup);
+        this.environmentVariableGroups = new SpringEnvironmentVariableGroups(restOperations, root, schedulerGroup);
         this.events = new SpringEvents(restOperations, root, schedulerGroup);
         this.featureFlags = new SpringFeatureFlags(restOperations, root, schedulerGroup);
         this.info = new SpringInfo(restOperations, root, schedulerGroup);
@@ -264,6 +269,11 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     @Override
     public Droplets droplets() {
         return this.droplets;
+    }
+
+    @Override
+    public EnvironmentVariableGroups environmentVariableGroups() {
+        return this.environmentVariableGroups;
     }
 
     @Override

@@ -19,6 +19,7 @@ package org.cloudfoundry.client;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEvents;
 import org.cloudfoundry.client.v2.domains.Domains;
+import org.cloudfoundry.client.v2.environmentvariablegroups.EnvironmentVariableGroups;
 import org.cloudfoundry.client.v2.events.Events;
 import org.cloudfoundry.client.v2.featureflags.FeatureFlags;
 import org.cloudfoundry.client.v2.info.Info;
@@ -94,13 +95,20 @@ public interface CloudFoundryClient {
      */
     Droplets droplets();
 
+    /***
+     * Main entry point to the Cloud Foundry Environment Variable Groups Client API
+     *
+     * @return the Cloud Foundry Environment Variable Groups Client API
+     */
+    EnvironmentVariableGroups environmentVariableGroups();
+
     /**
      * Main entry point to the Cloud Foundry Events Client API
      *
      * @return the Cloud Foundry Application Events Client API
      */
     Events events();
-
+    
     /**
      * Main entry point to the Cloud Foundry Feature Flags Client API
      *
