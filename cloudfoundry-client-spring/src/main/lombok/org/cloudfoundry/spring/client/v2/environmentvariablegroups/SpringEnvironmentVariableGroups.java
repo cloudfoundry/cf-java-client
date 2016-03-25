@@ -19,6 +19,7 @@ package org.cloudfoundry.spring.client.v2.environmentvariablegroups;
 import lombok.ToString;
 import org.cloudfoundry.client.v2.environmentvariablegroups.EnvironmentVariableGroups;
 import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateRunningEnvironmentVariablesRequest;
+import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateRunningEnvironmentVariablesResponse;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
@@ -44,8 +45,8 @@ public final class SpringEnvironmentVariableGroups extends AbstractSpringOperati
     }
 
     @Override
-    public Mono<Void> updateRunningEnvironmentVariables(UpdateRunningEnvironmentVariablesRequest request) {
-        return put(request, Void.class, builder -> builder.pathSegment("v2", "config", "environment_variable_groups", "running"));
+    public Mono<UpdateRunningEnvironmentVariablesResponse> updateRunningEnvironmentVariables(UpdateRunningEnvironmentVariablesRequest request) {
+        return put(request, UpdateRunningEnvironmentVariablesResponse.class, builder -> builder.pathSegment("v2", "config", "environment_variable_groups", "running"));
     }
 
 }

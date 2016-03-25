@@ -17,6 +17,7 @@
 package org.cloudfoundry.spring.client.v2.environmentvariablegroups;
 
 import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateRunningEnvironmentVariablesRequest;
+import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateRunningEnvironmentVariablesResponse;
 import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
@@ -25,7 +26,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 public class SpringEnvironmentVariableGroupsTest {
 
-    public static final class UpdateEnvironmentVariables extends AbstractApiTest<UpdateRunningEnvironmentVariablesRequest, Void> {
+    public static final class UpdateEnvironmentVariables extends AbstractApiTest<UpdateRunningEnvironmentVariablesRequest, UpdateRunningEnvironmentVariablesResponse> {
 
         private SpringEnvironmentVariableGroups environmentVariableGroups = new SpringEnvironmentVariableGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
 
@@ -44,8 +45,11 @@ public class SpringEnvironmentVariableGroupsTest {
         }
 
         @Override
-        protected Void getResponse() {
-            return null;
+        protected UpdateRunningEnvironmentVariablesResponse getResponse() {
+            return UpdateRunningEnvironmentVariablesResponse.builder()
+                .environmentVariable("abc", 123)
+                .environmentVariable("do-re-me", "far-so-la-tee")
+                .build();
         }
 
         @Override
@@ -57,7 +61,7 @@ public class SpringEnvironmentVariableGroupsTest {
         }
 
         @Override
-        protected Mono<Void> invoke(UpdateRunningEnvironmentVariablesRequest request) {
+        protected Mono<UpdateRunningEnvironmentVariablesResponse> invoke(UpdateRunningEnvironmentVariablesRequest request) {
             return this.environmentVariableGroups.updateRunningEnvironmentVariables(request);
         }
     }

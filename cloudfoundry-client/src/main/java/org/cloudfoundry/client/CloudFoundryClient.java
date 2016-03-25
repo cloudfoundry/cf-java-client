@@ -108,7 +108,7 @@ public interface CloudFoundryClient {
      * @return the Cloud Foundry Application Events Client API
      */
     Events events();
-    
+
     /**
      * Main entry point to the Cloud Foundry Feature Flags Client API
      *

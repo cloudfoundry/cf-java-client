@@ -21,8 +21,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,18 +31,17 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class UpdateRunningEnvironmentVariablesRequest extends HashMap<String, Object> implements Validatable {
+public final class UpdateRunningEnvironmentVariablesResponse extends HashMap<String, Object> {
 
-    private static final long serialVersionUID = -465586100187265372L;
+    private static final long serialVersionUID = -6230817096913577054L;
 
-    @Builder
-    UpdateRunningEnvironmentVariablesRequest(@Singular Map<String, Object> environmentVariables) {
-        super(environmentVariables);
+    UpdateRunningEnvironmentVariablesResponse() {
+        super();
     }
 
-    @Override
-    public ValidationResult isValid() {
-        return ValidationResult.builder().build();
+    @Builder
+    UpdateRunningEnvironmentVariablesResponse(@Singular Map<String, Object> environmentVariables) {
+        super(environmentVariables);
     }
 
 }

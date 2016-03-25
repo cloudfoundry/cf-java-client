@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The reponse payload for the Get the instance information operation.
+ * The response payload for the Get the instance information operation.
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

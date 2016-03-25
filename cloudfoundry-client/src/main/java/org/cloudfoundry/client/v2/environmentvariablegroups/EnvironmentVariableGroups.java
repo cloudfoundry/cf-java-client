@@ -30,6 +30,6 @@ public interface EnvironmentVariableGroups {
      * @param request the Update Running Environment Variables request
      * @return the response from the Update Running Environment Variables request
      */
-    Mono<Void> updateRunningEnvironmentVariables(UpdateRunningEnvironmentVariablesRequest request);
+    Mono<UpdateRunningEnvironmentVariablesResponse> updateRunningEnvironmentVariables(UpdateRunningEnvironmentVariablesRequest request);
 
 }
