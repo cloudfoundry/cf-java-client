@@ -14,34 +14,37 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.applications;
+package org.cloudfoundry.client.v2.environmentvariablegroups;
 
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
+import org.cloudfoundry.Validatable;
+import org.cloudfoundry.ValidationResult;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The response payload for the Get the instance information operation.
+ * The request payload for the update running environment variable group
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ApplicationInstancesResponse extends HashMap<String, ApplicationInstanceInfo> {
+public final class UpdateRunningEnvironmentVariablesRequest extends HashMap<String, Object> implements Validatable {
 
-    private static final long serialVersionUID = 7561486569934101780L;
-
-    ApplicationInstancesResponse() {
-        super();
-    }
+    private static final long serialVersionUID = -465586100187265372L;
 
     @Builder
-    ApplicationInstancesResponse(@Singular Map<String, ApplicationInstanceInfo> instances) {
-        super(instances);
+    UpdateRunningEnvironmentVariablesRequest(@Singular Map<String, Object> environmentVariables) {
+        super(environmentVariables);
+    }
+
+    @Override
+    public ValidationResult isValid() {
+        return ValidationResult.builder().build();
     }
 
 }

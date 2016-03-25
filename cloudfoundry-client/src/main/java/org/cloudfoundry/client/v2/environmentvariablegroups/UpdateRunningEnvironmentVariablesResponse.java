@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.applications;
+package org.cloudfoundry.client.v2.environmentvariablegroups;
 
 import lombok.Builder;
 import lombok.Data;
@@ -26,22 +26,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The response payload for the Get the instance information operation.
+ * The request payload for the update running environment variable group
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ApplicationInstancesResponse extends HashMap<String, ApplicationInstanceInfo> {
+public final class UpdateRunningEnvironmentVariablesResponse extends HashMap<String, Object> {
 
-    private static final long serialVersionUID = 7561486569934101780L;
+    private static final long serialVersionUID = -6230817096913577054L;
 
-    ApplicationInstancesResponse() {
+    UpdateRunningEnvironmentVariablesResponse() {
         super();
     }
 
     @Builder
-    ApplicationInstancesResponse(@Singular Map<String, ApplicationInstanceInfo> instances) {
-        super(instances);
+    UpdateRunningEnvironmentVariablesResponse(@Singular Map<String, Object> environmentVariables) {
+        super(environmentVariables);
     }
 
 }
