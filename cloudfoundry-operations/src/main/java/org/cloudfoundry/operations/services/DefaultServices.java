@@ -28,16 +28,25 @@ import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.ListServiceBindingsRequest;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
+import org.cloudfoundry.client.v2.serviceinstances.AbstractServiceInstanceResource;
+import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanRequest;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanResponse;
+import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
+import org.cloudfoundry.client.v2.serviceplans.ServicePlanResource;
 import org.cloudfoundry.client.v2.services.GetServiceRequest;
 import org.cloudfoundry.client.v2.services.GetServiceResponse;
 import org.cloudfoundry.client.v2.services.ServiceEntity;
+import org.cloudfoundry.client.v2.services.ServiceResource;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceServicesRequest;
+import org.cloudfoundry.util.DelayUtils;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
@@ -47,10 +56,13 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple2;
 
+import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -76,6 +88,27 @@ public final class DefaultServices implements Services {
                     Mono.just(request1)
                 )))
             .then(function((applicationId, serviceInstanceId, request1) -> requestServiceBinding(this.cloudFoundryClient, applicationId, serviceInstanceId, request1.getParameters())))
+            .after();
+    }
+
+    @Override
+    public Mono<Void> createInstance(CreateServiceInstanceRequest createRequest) {
+        return Mono
+            .when(ValidationUtils.validate(createRequest), this.spaceId)
+            .then(function((request, spaceId) -> Mono
+                .when(
+                    Mono.just(request),
+                    Mono.just(spaceId),
+                    getServiceIdByName(this.cloudFoundryClient, spaceId, request.getService())
+                )))
+            .then(function((request, spaceId, serviceId) -> Mono
+                .when(
+                    Mono.just(request),
+                    Mono.just(spaceId),
+                    getServicePlanIdByName(this.cloudFoundryClient, serviceId, request.getPlan())
+                )))
+            .then(function((request, spaceId, planId) -> createServiceInstance(this.cloudFoundryClient, spaceId, planId, request)))
+            .as(waitForCreateInstance(this.cloudFoundryClient))
             .after();
     }
 
@@ -115,6 +148,11 @@ public final class DefaultServices implements Services {
 
     private static String convertLastOperation(LastOperation lastOperation) {
         return String.format("%s %s", lastOperation.getType(), lastOperation.getState());
+    }
+
+    private static Mono<AbstractServiceInstanceResource> createServiceInstance(CloudFoundryClient cloudFoundryClient, String spaceId, String planId, CreateServiceInstanceRequest request) {
+        return requestCreateServiceInstance(cloudFoundryClient, spaceId, planId, request.getServiceInstance(), request.getParameters(), request.getTags())
+            .cast(AbstractServiceInstanceResource.class);
     }
 
     private static Mono<Void> deleteServiceBinding(CloudFoundryClient cloudFoundryClient, String serviceBindingId) {
@@ -164,10 +202,25 @@ public final class DefaultServices implements Services {
             .map(ResourceUtils::getId);
     }
 
+    private static Mono<String> getServiceIdByName(CloudFoundryClient cloudFoundryClient, String spaceId, String service) {
+        return requestSpaceServices(cloudFoundryClient, spaceId, builder -> builder.label(service))
+            .single()
+            .map(ResourceUtils::getId)
+            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Service %s does not exist", service)));
+    }
+
     private static Mono<String> getServiceName(CloudFoundryClient cloudFoundryClient, String serviceId) {
         return requestService(cloudFoundryClient, serviceId)
             .map(ResourceUtils::getEntity)
             .map(ServiceEntity::getLabel);
+    }
+
+    private static Mono<String> getServicePlanIdByName(CloudFoundryClient cloudFoundryClient, String serviceId, String plan) {
+        return requestServicePlans(cloudFoundryClient, builder -> builder.serviceId(serviceId))
+            .filter(resource -> plan.equals(ResourceUtils.getEntity(resource).getName()))
+            .single()
+            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Service plan %s does not exist", plan)))
+            .map(ResourceUtils::getId);
     }
 
     private static Mono<ServiceInstanceResource> getSpaceServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
@@ -196,6 +249,23 @@ public final class DefaultServices implements Services {
                     .spaceId(spaceId)
                     .page(page)
                     .build()));
+    }
+
+    private static Mono<CreateServiceInstanceResponse> requestCreateServiceInstance(CloudFoundryClient cloudFoundryClient,
+                                                                                    String spaceId,
+                                                                                    String planId,
+                                                                                    String serviceInstance,
+                                                                                    Map<String, Object> parameters,
+                                                                                    List<String> tags) {
+        return cloudFoundryClient.serviceInstances()
+            .create(org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceRequest.builder()
+                .acceptsIncomplete(true)
+                .name(serviceInstance)
+                .servicePlanId(planId)
+                .spaceId(spaceId)
+                .parameters(parameters)
+                .tags(tags)
+                .build());
     }
 
     private static Mono<DeleteServiceBindingResponse> requestDeleteServiceBinding(CloudFoundryClient cloudFoundryClient, String serviceBindingId) {
@@ -241,11 +311,27 @@ public final class DefaultServices implements Services {
                 .build());
     }
 
+    private static Mono<GetServiceInstanceResponse> requestServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
+        return cloudFoundryClient.serviceInstances()
+            .get(GetServiceInstanceRequest.builder()
+                .serviceInstanceId(serviceInstanceId)
+                .build());
+    }
+
     private static Mono<GetServicePlanResponse> requestServicePlan(CloudFoundryClient cloudFoundryClient, String servicePlanId) {
         return cloudFoundryClient.servicePlans()
             .get(GetServicePlanRequest.builder()
                 .servicePlanId(servicePlanId)
                 .build());
+    }
+
+    private static Flux<ServicePlanResource> requestServicePlans(CloudFoundryClient cloudFoundryClient,
+                                                                 Function<ListServicePlansRequest.ListServicePlansRequestBuilder, ListServicePlansRequest.ListServicePlansRequestBuilder> filter) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.servicePlans()
+                .list(filter.apply(ListServicePlansRequest.builder())
+                    .page(page)
+                    .build()));
     }
 
     private static Flux<ServiceInstanceResource> requestSpaceServiceInstances(CloudFoundryClient cloudFoundryClient, String spaceId) {
@@ -269,6 +355,17 @@ public final class DefaultServices implements Services {
                     .build()));
     }
 
+    private static Flux<ServiceResource> requestSpaceServices(CloudFoundryClient cloudFoundryClient,
+                                                              String spaceId,
+                                                              Function<ListSpaceServicesRequest.ListSpaceServicesRequestBuilder, ListSpaceServicesRequest.ListSpaceServicesRequestBuilder> filter) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.spaces()
+                .listServices(filter.apply(ListSpaceServicesRequest.builder())
+                    .spaceId(spaceId)
+                    .page(page)
+                    .build()));
+    }
+
     private static ServiceInstance toServiceInstance(ServiceInstanceResource resource, List<String> applications, Tuple2<Optional<String>, Optional<String>> serviceAndPlan) {
         ServiceInstanceEntity entity = resource.getEntity();
         Optional<String> service = serviceAndPlan.t1;
@@ -283,6 +380,20 @@ public final class DefaultServices implements Services {
             .service(service.orElse(null))
             .applications(applications)
             .build();
+    }
+
+    private static Function<Mono<AbstractServiceInstanceResource>, Mono<AbstractServiceInstanceResource>> waitForCreateInstance(CloudFoundryClient cloudFoundryClient) {
+        List<String> pollStates = Collections.singletonList("in progress");
+        return mono -> mono
+            .then(resource -> {
+                if (!pollStates.contains(ResourceUtils.getEntity(resource).getLastOperation().getState())) {
+                    return Mono.just(resource);
+                }
+                return requestServiceInstance(cloudFoundryClient, ResourceUtils.getId(resource))
+                    .cast(AbstractServiceInstanceResource.class)
+                    .where(resourceInProgress -> !pollStates.contains(ResourceUtils.getEntity(resourceInProgress).getLastOperation().getState()))
+                    .repeatWhenEmpty(Integer.MAX_VALUE - 1, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
+            });
     }
 
 }

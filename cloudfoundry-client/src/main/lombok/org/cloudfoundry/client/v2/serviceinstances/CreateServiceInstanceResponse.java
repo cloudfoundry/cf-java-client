@@ -22,7 +22,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.cloudfoundry.client.v2.Resource;
 
 /**
  * The response payload for the the Create Service Instance request.
@@ -30,7 +29,7 @@ import org.cloudfoundry.client.v2.Resource;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class CreateServiceInstanceResponse extends Resource<ServiceInstanceEntity> {
+public final class CreateServiceInstanceResponse extends AbstractServiceInstanceResource {
 
 
     @Builder
