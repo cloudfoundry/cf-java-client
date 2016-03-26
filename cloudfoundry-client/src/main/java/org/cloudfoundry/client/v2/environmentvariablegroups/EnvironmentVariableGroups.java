@@ -32,7 +32,6 @@ public interface EnvironmentVariableGroups {
      */
     Mono<GetRunningEnvironmentVariablesResponse> getRunningEnvironmentVariables(GetRunningEnvironmentVariablesRequest request);
 
-
     /**
      * Makes the <a href="apidocs.cloudfoundry.org/latest-release/environment_variable_groups/updating_the_contents_of_the_running_environment_variable_group.html">Update the Running Environment
      * Variables</a> request

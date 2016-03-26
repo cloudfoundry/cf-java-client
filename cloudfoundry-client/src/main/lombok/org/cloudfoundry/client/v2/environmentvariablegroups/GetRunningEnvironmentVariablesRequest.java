@@ -18,7 +18,6 @@ package org.cloudfoundry.client.v2.environmentvariablegroups;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.ToString;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
@@ -26,7 +25,6 @@ import org.cloudfoundry.ValidationResult;
  * The request payload for the get running environment variable group
  */
 @Data
-@ToString
 public final class GetRunningEnvironmentVariablesRequest implements Validatable {
 
 
