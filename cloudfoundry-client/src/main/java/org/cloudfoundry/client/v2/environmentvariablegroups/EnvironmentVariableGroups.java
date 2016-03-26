@@ -24,6 +24,15 @@ import reactor.core.publisher.Mono;
 public interface EnvironmentVariableGroups {
 
     /**
+     * Makes the <a href="apidocs.cloudfoundry.org/latest-release/environment_variable_groups/getting_the_contents_of_the_running_environment_variable_group.html">Get the Running Environment
+     * Variables</a> request
+     *
+     * @param request the Get Running Environment Variables request
+     * @return the response from the Get Running Environment Variables request
+     */
+    Mono<GetRunningEnvironmentVariablesResponse> getRunningEnvironmentVariables(GetRunningEnvironmentVariablesRequest request);
+
+    /**
      * Makes the <a href="apidocs.cloudfoundry.org/latest-release/environment_variable_groups/updating_the_contents_of_the_running_environment_variable_group.html">Update the Running Environment
      * Variables</a> request
      *

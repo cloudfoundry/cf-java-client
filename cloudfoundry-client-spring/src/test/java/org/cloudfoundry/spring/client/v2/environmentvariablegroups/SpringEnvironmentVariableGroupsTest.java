@@ -16,15 +16,55 @@
 
 package org.cloudfoundry.spring.client.v2.environmentvariablegroups;
 
+import org.cloudfoundry.client.v2.environmentvariablegroups.GetRunningEnvironmentVariablesRequest;
+import org.cloudfoundry.client.v2.environmentvariablegroups.GetRunningEnvironmentVariablesResponse;
 import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateRunningEnvironmentVariablesRequest;
 import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateRunningEnvironmentVariablesResponse;
 import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.OK;
 
 public class SpringEnvironmentVariableGroupsTest {
+
+    public static final class GetEnvironmentVariables extends AbstractApiTest<GetRunningEnvironmentVariablesRequest, GetRunningEnvironmentVariablesResponse> {
+
+        private SpringEnvironmentVariableGroups environmentVariableGroups = new SpringEnvironmentVariableGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected GetRunningEnvironmentVariablesRequest getInvalidRequest() {
+            return null;
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("/v2/config/environment_variable_groups/running")
+                .status(OK)
+                .responsePayload("fixtures/client/v2/environment_variable_groups/GET_running_response.json");
+        }
+
+        @Override
+        protected GetRunningEnvironmentVariablesResponse getResponse() {
+            return GetRunningEnvironmentVariablesResponse.builder()
+                .environmentVariable("abc", 123)
+                .environmentVariable("do-re-me", "far-so-la-tee")
+                .build();
+        }
+
+        @Override
+        protected GetRunningEnvironmentVariablesRequest getValidRequest() throws Exception {
+            return GetRunningEnvironmentVariablesRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected Mono<GetRunningEnvironmentVariablesResponse> invoke(GetRunningEnvironmentVariablesRequest request) {
+            return this.environmentVariableGroups.getRunningEnvironmentVariables(request);
+        }
+    }
 
     public static final class UpdateEnvironmentVariables extends AbstractApiTest<UpdateRunningEnvironmentVariablesRequest, UpdateRunningEnvironmentVariablesResponse> {
 
