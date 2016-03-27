@@ -33,6 +33,15 @@ public interface EnvironmentVariableGroups {
     Mono<GetRunningEnvironmentVariablesResponse> getRunningEnvironmentVariables(GetRunningEnvironmentVariablesRequest request);
 
     /**
+     * Makes the <a href="apidocs.cloudfoundry.org/latest-release/environment_variable_groups/getting_the_contents_of_the_staging_environment_variable_group.html">Get the Staging Environment
+     * Variables</a> request
+     *
+     * @param request the Get Staging Environment Variables request
+     * @return the response from the Get Staging Environment Variables request
+     */
+    Mono<GetStagingEnvironmentVariablesResponse> getStagingEnvironmentVariables(GetStagingEnvironmentVariablesRequest request);
+
+    /**
      * Makes the <a href="apidocs.cloudfoundry.org/latest-release/environment_variable_groups/updating_the_contents_of_the_running_environment_variable_group.html">Update the Running Environment
      * Variables</a> request
      *

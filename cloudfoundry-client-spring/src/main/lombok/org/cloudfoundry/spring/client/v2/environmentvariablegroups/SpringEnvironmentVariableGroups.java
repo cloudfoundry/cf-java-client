@@ -20,6 +20,8 @@ import lombok.ToString;
 import org.cloudfoundry.client.v2.environmentvariablegroups.EnvironmentVariableGroups;
 import org.cloudfoundry.client.v2.environmentvariablegroups.GetRunningEnvironmentVariablesRequest;
 import org.cloudfoundry.client.v2.environmentvariablegroups.GetRunningEnvironmentVariablesResponse;
+import org.cloudfoundry.client.v2.environmentvariablegroups.GetStagingEnvironmentVariablesRequest;
+import org.cloudfoundry.client.v2.environmentvariablegroups.GetStagingEnvironmentVariablesResponse;
 import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateRunningEnvironmentVariablesRequest;
 import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateRunningEnvironmentVariablesResponse;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
@@ -49,6 +51,11 @@ public final class SpringEnvironmentVariableGroups extends AbstractSpringOperati
     @Override
     public Mono<GetRunningEnvironmentVariablesResponse> getRunningEnvironmentVariables(GetRunningEnvironmentVariablesRequest request) {
         return get(request, GetRunningEnvironmentVariablesResponse.class, builder -> builder.pathSegment("v2", "config", "environment_variable_groups", "running"));
+    }
+
+    @Override
+    public Mono<GetStagingEnvironmentVariablesResponse> getStagingEnvironmentVariables(GetStagingEnvironmentVariablesRequest request) {
+        return get(request, GetStagingEnvironmentVariablesResponse.class, builder -> builder.pathSegment("v2", "config", "environment_variable_groups", "staging"));
     }
 
     @Override
