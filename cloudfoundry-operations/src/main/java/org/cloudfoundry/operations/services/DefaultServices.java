@@ -57,7 +57,6 @@ import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple2;
 
 import java.time.Duration;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -108,7 +107,7 @@ public final class DefaultServices implements Services {
                     getServicePlanIdByName(this.cloudFoundryClient, serviceId, request.getPlan())
                 )))
             .then(function((request, spaceId, planId) -> createServiceInstance(this.cloudFoundryClient, spaceId, planId, request)))
-            .as(waitForCreateInstance(this.cloudFoundryClient))
+            .then(serviceInstance -> waitForCreateInstance(this.cloudFoundryClient, serviceInstance))
             .after();
     }
 
@@ -159,6 +158,10 @@ public final class DefaultServices implements Services {
         return requestDeleteServiceBinding(cloudFoundryClient, serviceBindingId)
             .map(ResourceUtils::getId)
             .then(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
+    }
+
+    private static String extractState(AbstractServiceInstanceResource serviceInstance) {
+        return ResourceUtils.getEntity(serviceInstance).getLastOperation().getState();
     }
 
     private static Mono<ApplicationResource> getApplication(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
@@ -219,8 +222,8 @@ public final class DefaultServices implements Services {
         return requestServicePlans(cloudFoundryClient, builder -> builder.serviceId(serviceId))
             .filter(resource -> plan.equals(ResourceUtils.getEntity(resource).getName()))
             .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Service plan %s does not exist", plan)))
-            .map(ResourceUtils::getId);
+            .map(ResourceUtils::getId)
+            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Service plan %s does not exist", plan)));
     }
 
     private static Mono<ServiceInstanceResource> getSpaceServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
@@ -232,6 +235,10 @@ public final class DefaultServices implements Services {
     private static Mono<String> getSpaceServiceInstanceId(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
         return getSpaceServiceInstance(cloudFoundryClient, serviceInstanceName, spaceId)
             .map(ResourceUtils::getId);
+    }
+
+    private static boolean isNotInProgress(String state) {
+        return !state.equals("in progress");
     }
 
     private static Mono<GetApplicationResponse> requestApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -382,18 +389,16 @@ public final class DefaultServices implements Services {
             .build();
     }
 
-    private static Function<Mono<AbstractServiceInstanceResource>, Mono<AbstractServiceInstanceResource>> waitForCreateInstance(CloudFoundryClient cloudFoundryClient) {
-        List<String> pollStates = Collections.singletonList("in progress");
-        return mono -> mono
-            .then(resource -> {
-                if (!pollStates.contains(ResourceUtils.getEntity(resource).getLastOperation().getState())) {
-                    return Mono.just(resource);
-                }
-                return requestServiceInstance(cloudFoundryClient, ResourceUtils.getId(resource))
-                    .cast(AbstractServiceInstanceResource.class)
-                    .where(resourceInProgress -> !pollStates.contains(ResourceUtils.getEntity(resourceInProgress).getLastOperation().getState()))
-                    .repeatWhenEmpty(Integer.MAX_VALUE - 1, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
-            });
+    private static Mono<Void> waitForCreateInstance(CloudFoundryClient cloudFoundryClient, AbstractServiceInstanceResource serviceInstance) {
+        if (isNotInProgress(extractState(serviceInstance))) {
+            return Mono.empty();
+        }
+
+        return requestServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance))
+            .map(DefaultServices::extractState)
+            .where(DefaultServices::isNotInProgress)
+            .repeatWhenEmpty(Integer.MAX_VALUE - 1, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
+            .after();
     }
 
 }

@@ -71,7 +71,6 @@ public final class CreateServiceInstanceRequest implements Validatable {
      */
     private final List<String> tags;
 
-
     @Builder
     CreateServiceInstanceRequest(@Singular Map<String, Object> parameters,
                                  String plan,
