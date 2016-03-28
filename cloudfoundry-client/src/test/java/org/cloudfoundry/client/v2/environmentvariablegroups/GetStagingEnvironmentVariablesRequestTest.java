@@ -16,24 +16,17 @@
 
 package org.cloudfoundry.client.v2.environmentvariablegroups;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
+import org.junit.Test;
 
-/**
- * The request payload for the get running environment variable group
- */
-@Data
-public final class GetRunningEnvironmentVariablesRequest implements Validatable {
+import static org.junit.Assert.assertEquals;
 
-    @Builder
-    GetRunningEnvironmentVariablesRequest() {
-    }
+public final class GetStagingEnvironmentVariablesRequestTest {
 
-    @Override
-    public ValidationResult isValid() {
-        return ValidationResult.builder().build();
+    @Test
+    public void isValid() {
+        assertEquals(ValidationResult.Status.VALID,
+            GetStagingEnvironmentVariablesRequest.builder().build().isValid().getStatus());
     }
 
 }
