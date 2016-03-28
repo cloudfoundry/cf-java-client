@@ -18,22 +18,30 @@ package org.cloudfoundry.client.v2.environmentvariablegroups;
 
 import lombok.Builder;
 import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import lombok.EqualsAndHashCode;
+import lombok.Singular;
+import lombok.ToString;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * The request payload for the get running environment variable group
+ * The request payload for the get staging environment variable group
  */
 @Data
-public final class GetRunningEnvironmentVariablesRequest implements Validatable {
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public final class GetStagingEnvironmentVariablesResponse extends HashMap<String, Object> {
 
-    @Builder
-    GetRunningEnvironmentVariablesRequest() {
+    private static final long serialVersionUID = 6542766712013649160L;
+
+    GetStagingEnvironmentVariablesResponse() {
+        super();
     }
 
-    @Override
-    public ValidationResult isValid() {
-        return ValidationResult.builder().build();
+    @Builder
+    GetStagingEnvironmentVariablesResponse(@Singular Map<String, Object> environmentVariables) {
+        super(environmentVariables);
     }
 
 }

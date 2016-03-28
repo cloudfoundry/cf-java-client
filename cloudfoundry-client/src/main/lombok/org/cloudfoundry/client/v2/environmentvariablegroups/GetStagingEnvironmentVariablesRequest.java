@@ -22,13 +22,13 @@ import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
 /**
- * The request payload for the get running environment variable group
+ * The request payload for the get staging environment variable group
  */
 @Data
-public final class GetRunningEnvironmentVariablesRequest implements Validatable {
+public final class GetStagingEnvironmentVariablesRequest implements Validatable {
 
     @Builder
-    GetRunningEnvironmentVariablesRequest() {
+    GetStagingEnvironmentVariablesRequest() {
     }
 
     @Override
