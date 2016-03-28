@@ -26,7 +26,7 @@ import org.cloudfoundry.ValidationResult;
  */
 @Data
 public final class GetStagingEnvironmentVariablesRequest implements Validatable {
-    
+
     @Builder
     GetStagingEnvironmentVariablesRequest() {
     }
