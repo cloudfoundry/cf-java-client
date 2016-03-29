@@ -31,4 +31,12 @@ public interface SharedDomains {
      */
     Mono<ListSharedDomainsResponse> list(ListSharedDomainsRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/private_domains/create_a_shared_domain.html">Create a Shared Domain</a> request
+     *
+     * @param request the Create a Shared Domain request
+     * @return the response from the Create a Shared Domain request
+     */
+    Mono<CreateSharedDomainResponse> create(CreateSharedDomainRequest request);
+
 }
