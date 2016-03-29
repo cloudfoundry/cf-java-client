@@ -446,6 +446,7 @@ public final class SpringRoutesTest {
                         .eventsUrl("/v2/apps/f1243da8-e613-490a-8a0e-21ef1bcce952/events")
                         .serviceBindingsUrl("/v2/apps/f1243da8-e613-490a-8a0e-21ef1bcce952/service_bindings")
                         .routesUrl("/v2/apps/f1243da8-e613-490a-8a0e-21ef1bcce952/routes")
+                        .routeMappingsUrl("/v2/apps/f1243da8-e613-490a-8a0e-21ef1bcce952/route_mappings")
                         .build())
                     .build())
                 .build();

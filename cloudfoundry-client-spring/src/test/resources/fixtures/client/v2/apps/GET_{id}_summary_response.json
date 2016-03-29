@@ -7,7 +7,8 @@
       "host": "host-18",
       "domain": {
         "guid": "011461ec-476b-444d-a048-b0e2a3ff0f30",
-        "name": "domain-55.example.com"
+        "name": "domain-55.example.com",
+        "router_group_types": []
       }
     }
   ],
@@ -35,15 +36,18 @@
     {
       "guid": "011461ec-476b-444d-a048-b0e2a3ff0f30",
       "name": "domain-55.example.com",
-      "owning_organization_guid": "aadb707d-bf3b-4a0e-8b22-c06aabad53c4"
+      "owning_organization_guid": "aadb707d-bf3b-4a0e-8b22-c06aabad53c4",
+      "router_group_types": []
     },
     {
       "guid": "7c4e943b-5e9b-44ac-85ce-fcff57134d3b",
-      "name": "customer-app-domain1.com"
+      "name": "customer-app-domain1.com",
+      "router_group_types": []
     },
     {
       "guid": "1477a304-2af6-48d0-9e8f-6e2cdf06a9a2",
-      "name": "customer-app-domain2.com"
+      "name": "customer-app-domain2.com",
+      "router_group_types": []
     }
   ],
   "production": false,

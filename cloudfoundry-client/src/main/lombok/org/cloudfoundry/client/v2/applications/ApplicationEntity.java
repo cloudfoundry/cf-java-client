@@ -83,6 +83,14 @@ public final class ApplicationEntity extends AbstractApplicationEntity {
     private final List<Integer> ports;
 
     /**
+     * The route mappings url
+     *
+     * @param routeMappingsUrl the route mappings url
+     * @return the route mappings url
+     */
+    private final String routeMappingsUrl;
+
+    /**
      * The routes url
      *
      * @param routesUrl the routes url
@@ -152,6 +160,7 @@ public final class ApplicationEntity extends AbstractApplicationEntity {
                       @JsonProperty("package_state") String packageState,
                       @JsonProperty("package_updated_at") String packageUpdatedAt,
                       @JsonProperty("production") @Deprecated Boolean production,
+                      @JsonProperty("route_mappings_url") String routeMappingsUrl,
                       @JsonProperty("routes_url") String routesUrl,
                       @JsonProperty("service_bindings_url") String serviceBindingsUrl,
                       @JsonProperty("space_guid") String spaceId,
@@ -171,6 +180,7 @@ public final class ApplicationEntity extends AbstractApplicationEntity {
         this.eventsUrl = eventsUrl;
         this.packageState = packageState;
         this.packageUpdatedAt = packageUpdatedAt;
+        this.routeMappingsUrl = routeMappingsUrl;
         this.routesUrl = routesUrl;
         this.serviceBindingsUrl = serviceBindingsUrl;
         this.spaceUrl = spaceUrl;

@@ -46,7 +46,8 @@
         "stack_url": "/v2/stacks/0ef84d2a-4fdd-43ba-afbc-074a5e19ea66",
         "events_url": "/v2/apps/f1243da8-e613-490a-8a0e-21ef1bcce952/events",
         "service_bindings_url": "/v2/apps/f1243da8-e613-490a-8a0e-21ef1bcce952/service_bindings",
-        "routes_url": "/v2/apps/f1243da8-e613-490a-8a0e-21ef1bcce952/routes"
+        "routes_url": "/v2/apps/f1243da8-e613-490a-8a0e-21ef1bcce952/routes",
+        "route_mappings_url": "/v2/apps/f1243da8-e613-490a-8a0e-21ef1bcce952/route_mappings"
       }
     }
   ]
