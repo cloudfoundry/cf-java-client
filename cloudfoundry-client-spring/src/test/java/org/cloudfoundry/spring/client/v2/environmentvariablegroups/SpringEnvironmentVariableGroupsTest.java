@@ -22,6 +22,8 @@ import org.cloudfoundry.client.v2.environmentvariablegroups.GetStagingEnvironmen
 import org.cloudfoundry.client.v2.environmentvariablegroups.GetStagingEnvironmentVariablesResponse;
 import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateRunningEnvironmentVariablesRequest;
 import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateRunningEnvironmentVariablesResponse;
+import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateStagingEnvironmentVariablesRequest;
+import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateStagingEnvironmentVariablesResponse;
 import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
@@ -105,7 +107,7 @@ public class SpringEnvironmentVariableGroupsTest {
         }
     }
 
-    public static final class UpdateEnvironmentVariables extends AbstractApiTest<UpdateRunningEnvironmentVariablesRequest, UpdateRunningEnvironmentVariablesResponse> {
+    public static final class UpdateRunningEnvironmentVariables extends AbstractApiTest<UpdateRunningEnvironmentVariablesRequest, UpdateRunningEnvironmentVariablesResponse> {
 
         private SpringEnvironmentVariableGroups environmentVariableGroups = new SpringEnvironmentVariableGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
 
@@ -142,6 +144,46 @@ public class SpringEnvironmentVariableGroupsTest {
         @Override
         protected Mono<UpdateRunningEnvironmentVariablesResponse> invoke(UpdateRunningEnvironmentVariablesRequest request) {
             return this.environmentVariableGroups.updateRunningEnvironmentVariables(request);
+        }
+    }
+
+    public static final class UpdateStagingEnvironmentVariables extends AbstractApiTest<UpdateStagingEnvironmentVariablesRequest, UpdateStagingEnvironmentVariablesResponse> {
+
+        private SpringEnvironmentVariableGroups environmentVariableGroups = new SpringEnvironmentVariableGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected UpdateStagingEnvironmentVariablesRequest getInvalidRequest() {
+            return null;
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(PUT).path("/v2/config/environment_variable_groups/staging")
+                .requestPayload("fixtures/client/v2/environment_variable_groups/PUT_staging_request.json")
+                .status(OK)
+                .responsePayload("fixtures/client/v2/environment_variable_groups/PUT_staging_response.json");
+        }
+
+        @Override
+        protected UpdateStagingEnvironmentVariablesResponse getResponse() {
+            return UpdateStagingEnvironmentVariablesResponse.builder()
+                .environmentVariable("abc", 123)
+                .environmentVariable("do-re-me", "far-so-la-tee")
+                .build();
+        }
+
+        @Override
+        protected UpdateStagingEnvironmentVariablesRequest getValidRequest() throws Exception {
+            return UpdateStagingEnvironmentVariablesRequest.builder()
+                .environmentVariable("abc", 123)
+                .environmentVariable("do-re-me", "far-so-la-tee")
+                .build();
+        }
+
+        @Override
+        protected Mono<UpdateStagingEnvironmentVariablesResponse> invoke(UpdateStagingEnvironmentVariablesRequest request) {
+            return this.environmentVariableGroups.updateStagingEnvironmentVariables(request);
         }
     }
 
