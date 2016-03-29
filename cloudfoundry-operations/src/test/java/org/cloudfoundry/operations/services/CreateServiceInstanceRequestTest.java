@@ -28,9 +28,9 @@ public final class CreateServiceInstanceRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = CreateServiceInstanceRequest.builder()
-            .plan("test-plan-name")
-            .service("test-service-name")
-            .serviceInstance("test-service-instance-name")
+            .planName("test-plan-name")
+            .serviceName("test-service-name")
+            .serviceInstanceName("test-service-instance-name")
             .build()
             .isValid();
 
@@ -40,9 +40,9 @@ public final class CreateServiceInstanceRequestTest {
     @Test
     public void isValidAll() {
         ValidationResult result = CreateServiceInstanceRequest.builder()
-            .plan("test-plan-name")
-            .service("test-service-name")
-            .serviceInstance("test-service-instance-name")
+            .planName("test-plan-name")
+            .serviceName("test-service-name")
+            .serviceInstanceName("test-service-instance-name")
             .parameter("test-parameter", "test-parameter-value")
             .tag("test-tag")
             .build()
@@ -54,37 +54,37 @@ public final class CreateServiceInstanceRequestTest {
     @Test
     public void isValidNoPlan() {
         ValidationResult result = CreateServiceInstanceRequest.builder()
-            .service("test-service-name")
-            .serviceInstance("test-service-instance-name")
+            .serviceName("test-service-name")
+            .serviceInstanceName("test-service-instance-name")
             .build()
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("service plan must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoServiceInstance() {
-        ValidationResult result = CreateServiceInstanceRequest.builder()
-            .plan("test-plan-name")
-            .service("test-service-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service instance must be specified", result.getMessages().get(0));
+        assertEquals("service plan name must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValidNoService() {
         ValidationResult result = CreateServiceInstanceRequest.builder()
-            .plan("test-plan-name")
-            .serviceInstance("test-service-instance-name")
+            .planName("test-plan-name")
+            .serviceInstanceName("test-service-instance-name")
             .build()
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("service must be specified", result.getMessages().get(0));
+        assertEquals("service name must be specified", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isValidNoServiceInstance() {
+        ValidationResult result = CreateServiceInstanceRequest.builder()
+            .planName("test-plan-name")
+            .serviceName("test-service-name")
+            .build()
+            .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("service instance name must be specified", result.getMessages().get(0));
     }
 
 }

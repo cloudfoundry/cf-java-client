@@ -98,13 +98,13 @@ public final class DefaultServices implements Services {
                 .when(
                     Mono.just(request),
                     Mono.just(spaceId),
-                    getServiceIdByName(this.cloudFoundryClient, spaceId, request.getService())
+                    getServiceIdByName(this.cloudFoundryClient, spaceId, request.getServiceName())
                 )))
             .then(function((request, spaceId, serviceId) -> Mono
                 .when(
                     Mono.just(request),
                     Mono.just(spaceId),
-                    getServicePlanIdByName(this.cloudFoundryClient, serviceId, request.getPlan())
+                    getServicePlanIdByName(this.cloudFoundryClient, serviceId, request.getPlanName())
                 )))
             .then(function((request, spaceId, planId) -> createServiceInstance(this.cloudFoundryClient, spaceId, planId, request)))
             .then(serviceInstance -> waitForCreateInstance(this.cloudFoundryClient, serviceInstance))
@@ -150,7 +150,7 @@ public final class DefaultServices implements Services {
     }
 
     private static Mono<AbstractServiceInstanceResource> createServiceInstance(CloudFoundryClient cloudFoundryClient, String spaceId, String planId, CreateServiceInstanceRequest request) {
-        return requestCreateServiceInstance(cloudFoundryClient, spaceId, planId, request.getServiceInstance(), request.getParameters(), request.getTags())
+        return requestCreateServiceInstance(cloudFoundryClient, spaceId, planId, request.getServiceInstanceName(), request.getParameters(), request.getTags())
             .cast(AbstractServiceInstanceResource.class);
     }
 
