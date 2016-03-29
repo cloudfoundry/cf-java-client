@@ -31,8 +31,8 @@ import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
 import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
-import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
-import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
+import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceEntity;
+import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceResource;
 import org.cloudfoundry.client.v2.services.ServiceEntity;
 import org.cloudfoundry.client.v2.services.ServiceResource;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorByUsernameRequest;
@@ -1420,13 +1420,13 @@ public final class SpringSpacesTest {
             return ListSpaceServiceInstancesResponse.builder()
                 .totalResults(1)
                 .totalPages(1)
-                .resource(ServiceInstanceResource.builder()
+                .resource(UnionServiceInstanceResource.builder()
                     .metadata(Metadata.builder()
                         .id("7046d37c-8a50-49d5-ba53-abb103a92142")
                         .url("/v2/service_instances/7046d37c-8a50-49d5-ba53-abb103a92142")
                         .createdAt("2015-07-27T22:43:08Z")
                         .build())
-                    .entity(ServiceInstanceEntity.builder()
+                    .entity(UnionServiceInstanceEntity.builder()
                         .name("name-97")
                         .credential("creds-key-52", "creds-val-52")
                         .servicePlanId("77157c85-203a-4fac-b9a3-003988ff879a")

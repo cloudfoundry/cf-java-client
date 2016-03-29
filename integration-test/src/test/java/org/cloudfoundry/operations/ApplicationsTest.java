@@ -29,9 +29,9 @@ import org.cloudfoundry.operations.applications.SetEnvironmentVariableApplicatio
 import org.cloudfoundry.operations.applications.StartApplicationRequest;
 import org.cloudfoundry.operations.applications.UnsetEnvironmentVariableApplicationRequest;
 import org.cloudfoundry.operations.domains.CreateDomainRequest;
+import org.cloudfoundry.operations.services.BindServiceInstanceRequest;
+import org.cloudfoundry.operations.services.CreateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.util.StringMap;
-import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -49,7 +49,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     private String organizationName;
 
     @Test
-    public void delete() throws IOException {
+    public void deleteApplication() throws IOException {
         String applicationName = getApplicationName();
 
         createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
@@ -61,7 +61,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteWithRoutes() throws IOException {
+    public void deleteApplicationAndRoutes() throws IOException {
         String applicationName = getApplicationName();
 
         createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
@@ -73,10 +73,19 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .subscribe(testSubscriber());
     }
 
-    @Ignore("TODO: implement once Operations allows user provided services to be created and bound (https://www.pivotaltracker.com/story/show/106155480)")
     @Test
-    public void deleteWithServiceBindings() throws IOException {
-        Assert.fail();
+    public void deleteApplicationWithServiceBindings() throws IOException {
+        String applicationName = getApplicationName();
+        String serviceInstanceName = getServiceInstanceName();
+
+        Mono.empty()
+            .after(() -> createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false))
+            .after(() -> bindServiceToApplication(this.cloudFoundryOperations, applicationName, serviceInstanceName))
+            .after(() -> this.cloudFoundryOperations.applications()
+                .delete(DeleteApplicationRequest.builder()
+                    .name(applicationName)
+                    .build()))
+            .subscribe(testSubscriber());
     }
 
     @Test
@@ -282,6 +291,18 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .name(applicationName)
                     .build()))
             .subscribe(testSubscriber());
+    }
+
+    private static Mono<Void> bindServiceToApplication(CloudFoundryOperations cloudFoundryOperations, String applicationName, String serviceInstanceName) {
+        return cloudFoundryOperations.services()
+            .createUserProvidedInstance(CreateUserProvidedServiceInstanceRequest.builder()
+                .name(serviceInstanceName)
+                .build())
+            .after(cloudFoundryOperations.services()
+                .bind(BindServiceInstanceRequest.builder()
+                    .serviceInstanceName(serviceInstanceName)
+                    .applicationName(applicationName)
+                    .build()));
     }
 
     private static Mono<Void> createApplication(CloudFoundryOperations cloudFoundryOperations, InputStream applicationBits, String name, Boolean noStart) {

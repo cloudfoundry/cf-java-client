@@ -20,7 +20,10 @@ package org.cloudfoundry.client.v2.userprovidedserviceinstances;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Singular;
+import lombok.ToString;
+import org.cloudfoundry.client.v2.serviceinstances.BaseServiceInstanceEntity;
 
 import java.util.Map;
 
@@ -28,23 +31,9 @@ import java.util.Map;
  * The entity response payload for User Provided Service Instances
  */
 @Data
-public final class UserProvidedServiceInstanceEntity {
-
-    /**
-     * The credentials
-     *
-     * @param credentials the credentials
-     * @return the credentials
-     */
-    private final Map<String, Object> credentials;
-
-    /**
-     * The name
-     *
-     * @param name the name
-     * @return the name
-     */
-    private final String name;
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public final class UserProvidedServiceInstanceEntity extends BaseServiceInstanceEntity {
 
     /**
      * URL to which requests for bound routes will be forwarded
@@ -55,52 +44,12 @@ public final class UserProvidedServiceInstanceEntity {
     private final String routeServiceUrl;
 
     /**
-     * The routes url
-     *
-     * @param routesUrl the routes url
-     * @return the routes url
-     */
-    private final String routesUrl;
-
-    /**
-     * The service bindings url
-     *
-     * @param serviceBindingsUrl the service bindings url
-     * @return the service bindings url
-     */
-    private final String serviceBindingsUrl;
-
-    /**
-     * The space id
-     *
-     * @param spaceId the space id
-     * @return the space id
-     */
-    private final String spaceId;
-
-    /**
-     * The space url
-     *
-     * @param spaceUrl the space url
-     * @return the space url
-     */
-    private final String spaceUrl;
-
-    /**
      * The url for the syslog_drain to direct to
      *
      * @param syslogDrainUrl the syslog drain url
      * @return the syslog drain url
      */
     private final String syslogDrainUrl;
-
-    /**
-     * The type
-     *
-     * @param type the type
-     * @return the type
-     */
-    private final String type;
 
     @Builder
     UserProvidedServiceInstanceEntity(@JsonProperty("credentials") @Singular Map<String, Object> credentials,
@@ -112,15 +61,11 @@ public final class UserProvidedServiceInstanceEntity {
                                       @JsonProperty("space_url") String spaceUrl,
                                       @JsonProperty("syslog_drain_url") String syslogDrainUrl,
                                       @JsonProperty("type") String type) {
-        this.credentials = credentials;
-        this.name = name;
+
+        super(credentials, name, routesUrl, serviceBindingsUrl, spaceId, spaceUrl, type);
+
         this.routeServiceUrl = routeServiceUrl;
-        this.routesUrl = routesUrl;
-        this.serviceBindingsUrl = serviceBindingsUrl;
-        this.spaceId = spaceId;
-        this.spaceUrl = spaceUrl;
         this.syslogDrainUrl = syslogDrainUrl;
-        this.type = type;
     }
 
 }
