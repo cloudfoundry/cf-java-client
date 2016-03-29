@@ -540,9 +540,9 @@ public final class DefaultServicesTest {
         protected Mono<Void> invoke() {
             return this.services
                 .createInstance(CreateServiceInstanceRequest.builder()
-                    .serviceInstance("test-service-instance")
-                    .service("test-service")
-                    .plan("test-plan")
+                    .serviceInstanceName("test-service-instance")
+                    .serviceName("test-service")
+                    .planName("test-plan")
                     .build());
         }
 
@@ -570,9 +570,9 @@ public final class DefaultServicesTest {
         protected Mono<Void> invoke() {
             return this.services
                 .createInstance(CreateServiceInstanceRequest.builder()
-                    .serviceInstance("test-service-instance")
-                    .service("test-service")
-                    .plan("test-plan")
+                    .serviceInstanceName("test-service-instance")
+                    .serviceName("test-service")
+                    .planName("test-plan")
                     .parameter("test-parameter-key", "test-parameter-value")
                     .tag("test-tag")
                     .build());
@@ -587,15 +587,15 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(RequestValidationException.class, "Request is invalid: service must be specified");
+                .assertError(RequestValidationException.class, "Request is invalid: service name must be specified");
         }
 
         @Override
         protected Mono<Void> invoke() {
             return this.services
                 .createInstance(CreateServiceInstanceRequest.builder()
-                    .serviceInstance("test-service-instance")
-                    .plan("test-plan")
+                    .serviceInstanceName("test-service-instance")
+                    .planName("test-plan")
                     .parameter("test-parameter-key", "test-parameter-value")
                     .tag("test-tag")
                     .build());
@@ -617,9 +617,9 @@ public final class DefaultServicesTest {
         protected Mono<Void> invoke() {
             return this.services
                 .createInstance(CreateServiceInstanceRequest.builder()
-                    .serviceInstance("test-service-instance")
-                    .service("test-service")
-                    .plan("test-plan")
+                    .serviceInstanceName("test-service-instance")
+                    .serviceName("test-service")
+                    .planName("test-plan")
                     .parameter("test-parameter-key", "test-parameter-value")
                     .tag("test-tag")
                     .build());

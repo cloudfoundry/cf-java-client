@@ -40,28 +40,28 @@ public final class CreateServiceInstanceRequest implements Validatable {
     private final Map<String, Object> parameters;
 
     /**
-     * The service plan
+     * The name of the service plan to use
      *
-     * @param plan the service plan
-     * @return the service plan
+     * @param planName the name of the service plan
+     * @return the name of the service plan
      */
-    private final String plan;
+    private final String planName;
 
     /**
-     * The service
+     * The name of the service instance to create
      *
-     * @param service the service
+     * @param serviceInstanceName the name of the service instance
+     * @return the name of the service instance
+     */
+    private final String serviceInstanceName;
+
+    /**
+     * The name of the service
+     *
+     * @param serviceName the name of the service
      * @return the name of the service
      */
-    private final String service;
-
-    /**
-     * The service instance to create
-     *
-     * @param serviceInstance the service instance
-     * @return the service instance
-     */
-    private final String serviceInstance;
+    private final String serviceName;
 
     /**
      * The tags
@@ -73,14 +73,14 @@ public final class CreateServiceInstanceRequest implements Validatable {
 
     @Builder
     CreateServiceInstanceRequest(@Singular Map<String, Object> parameters,
-                                 String plan,
-                                 String service,
-                                 String serviceInstance,
+                                 String planName,
+                                 String serviceName,
+                                 String serviceInstanceName,
                                  @Singular List<String> tags) {
         this.parameters = parameters;
-        this.plan = plan;
-        this.service = service;
-        this.serviceInstance = serviceInstance;
+        this.planName = planName;
+        this.serviceName = serviceName;
+        this.serviceInstanceName = serviceInstanceName;
         this.tags = tags;
     }
 
@@ -88,16 +88,16 @@ public final class CreateServiceInstanceRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.plan == null) {
-            builder.message("service plan must be specified");
+        if (this.planName == null) {
+            builder.message("service plan name must be specified");
         }
 
-        if (this.service == null) {
-            builder.message("service must be specified");
+        if (this.serviceName == null) {
+            builder.message("service name must be specified");
         }
 
-        if (this.serviceInstance == null) {
-            builder.message("service instance must be specified");
+        if (this.serviceInstanceName == null) {
+            builder.message("service instance name must be specified");
         }
 
         return builder.build();
