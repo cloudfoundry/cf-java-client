@@ -17,6 +17,8 @@
 package org.cloudfoundry.spring.client.v2.shareddomains;
 
 import lombok.ToString;
+import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest;
+import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
@@ -27,6 +29,7 @@ import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
 
+import java.lang.Override;
 import java.net.URI;
 
 /**
@@ -55,4 +58,9 @@ public final class SpringSharedDomains extends AbstractSpringOperations implemen
         });
     }
 
+    @Override
+    public Mono<CreateSharedDomainResponse> create(CreateSharedDomainRequest request) {
+        return post(request, CreateSharedDomainResponse.class, builder ->
+                builder.pathSegment("v2", "shared_domains"));
+    }
 }

@@ -1,0 +1,12 @@
+{
+  "metadata": {
+    "guid": "5e9d838e-6d4f-42cd-ba13-789bfae2277c",
+    "url": "/v2/shared_domains/5e9d838e-6d4f-42cd-ba13-789bfae2277c",
+    "created_at": "2015-12-22T18:28:19Z",
+    "updated_at": null
+  },
+  "entity": {
+    "name": "shared-domain.com",
+    "router_group_guid": "random-guid"
+  }
+}
