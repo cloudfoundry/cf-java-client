@@ -46,6 +46,7 @@
         "events_url": "/v2/apps/3d294ed0-105c-4ccd-8f79-5605d6b7198c/events",
         "service_bindings_url": "/v2/apps/3d294ed0-105c-4ccd-8f79-5605d6b7198c/service_bindings",
         "routes_url": "/v2/apps/3d294ed0-105c-4ccd-8f79-5605d6b7198c/routes",
+        "route_mappings_url": "/v2/apps/3d294ed0-105c-4ccd-8f79-5605d6b7198c/route_mappings",
         "ports": []
       }
     },
@@ -91,6 +92,7 @@
         "events_url": "/v2/apps/522c5382-29e9-48aa-9db0-9f6cfa643ec1/events",
         "service_bindings_url": "/v2/apps/522c5382-29e9-48aa-9db0-9f6cfa643ec1/service_bindings",
         "routes_url": "/v2/apps/522c5382-29e9-48aa-9db0-9f6cfa643ec1/routes",
+        "route_mappings_url": "/v2/apps/522c5382-29e9-48aa-9db0-9f6cfa643ec1/route_mappings",
         "ports": []
       }
     },
@@ -136,6 +138,7 @@
         "events_url": "/v2/apps/ec31bfbd-ab5c-490d-8e83-3c1ea5d1bedf/events",
         "service_bindings_url": "/v2/apps/ec31bfbd-ab5c-490d-8e83-3c1ea5d1bedf/service_bindings",
         "routes_url": "/v2/apps/ec31bfbd-ab5c-490d-8e83-3c1ea5d1bedf/routes",
+        "route_mappings_url": "/v2/apps/ec31bfbd-ab5c-490d-8e83-3c1ea5d1bedf/route_mappings",
         "ports": []
       }
     }

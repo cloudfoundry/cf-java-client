@@ -91,6 +91,7 @@ public final class TestObjectsTest {
             .packageState("test-1packageState")
             .packageUpdatedAt("test-1packageUpdatedAt")
             .routesUrl("test-1routesUrl")
+            .routeMappingsUrl("test-1routeMappingsUrl")
             .serviceBindingsUrl("test-1serviceBindingsUrl")
             .spaceUrl("test-1spaceUrl")
             .stackUrl("test-1stackUrl")

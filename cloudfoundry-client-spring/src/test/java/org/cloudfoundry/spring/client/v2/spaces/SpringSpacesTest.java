@@ -950,6 +950,7 @@ public final class SpringSpacesTest {
                         .eventsUrl("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/events")
                         .serviceBindingsUrl("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/service_bindings")
                         .routesUrl("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/routes")
+                        .routeMappingsUrl("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/route_mappings")
                         .build())
                     .build())
                 .build();

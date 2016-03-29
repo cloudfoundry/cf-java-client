@@ -19,6 +19,9 @@ package org.cloudfoundry.client.v2.domains;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Singular;
+
+import java.util.List;
 
 /**
  * The domain
@@ -58,15 +61,25 @@ public final class Domain {
      */
     private final String routerGroupId;
 
+    /**
+     * The router group types
+     *
+     * @param routerGroupTypes the router group types
+     * @return the router group types
+     */
+    private final List<String> routerGroupTypes;
+
     @Builder
     Domain(@JsonProperty("guid") String id,
            @JsonProperty("name") String name,
            @JsonProperty("owning_organization_guid") String owningOrganizationId,
-           @JsonProperty("router_group_guid") String routerGroupId) {
+           @JsonProperty("router_group_guid") String routerGroupId,
+           @JsonProperty("router_group_types") @Singular List<String> routerGroupTypes) {
         this.id = id;
         this.name = name;
         this.owningOrganizationId = owningOrganizationId;
         this.routerGroupId = routerGroupId;
+        this.routerGroupTypes = routerGroupTypes;
     }
 
 }

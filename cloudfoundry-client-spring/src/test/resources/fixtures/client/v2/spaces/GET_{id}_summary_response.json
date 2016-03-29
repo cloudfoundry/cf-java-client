@@ -14,7 +14,8 @@
           "path": "",
           "domain": {
             "guid": "2559743f-1514-4bed-bcdd-a6a036836597",
-            "name": "domain-12.example.com"
+            "name": "domain-12.example.com",
+            "router_group_types": []
           }
         }
       ],

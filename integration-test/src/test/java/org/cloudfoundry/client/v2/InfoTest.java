@@ -42,7 +42,8 @@ public final class InfoTest extends AbstractIntegrationTest {
                     Version expected = Version.valueOf(SUPPORTED_API_VERSION);
                     Version actual = Version.valueOf(response.getApiVersion());
 
-                    assertTrue(expected.greaterThanOrEqualTo(actual));
+                    assertTrue(String.format("Supported API version %s < actual API version %s", SUPPORTED_API_VERSION, response.getApiVersion()),
+                        expected.greaterThanOrEqualTo(actual));
                 }));
     }
 

@@ -46,6 +46,7 @@
         "events_url": "/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/events",
         "service_bindings_url": "/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/service_bindings",
         "routes_url": "/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/routes",
+        "route_mappings_url": "/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/route_mappings",
         "ports": []
       }
     }
