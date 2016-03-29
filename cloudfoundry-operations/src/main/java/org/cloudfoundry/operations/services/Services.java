@@ -34,12 +34,20 @@ public interface Services {
 
     /**
      * Create a service instance
-     * 
+     *
      * @param request the create service instance request
      * @return a completion indicator
      */
     Mono<Void> createInstance(CreateServiceInstanceRequest request);
-    
+
+    /**
+     * Get a service instance
+     *
+     * @param request the get service instance request
+     * @return the service instance
+     */
+    Mono<ServiceInstance> get(GetServiceInstanceRequest request);
+
     /**
      * List the service instances in the targeted space
      *
