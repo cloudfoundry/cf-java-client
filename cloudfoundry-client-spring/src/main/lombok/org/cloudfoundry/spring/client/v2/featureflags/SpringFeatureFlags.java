@@ -20,6 +20,8 @@ import lombok.ToString;
 import org.cloudfoundry.client.v2.featureflags.FeatureFlags;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagRequest;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagResponse;
+import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsRequest;
+import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsResponse;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
@@ -49,4 +51,9 @@ public final class SpringFeatureFlags extends AbstractSpringOperations implement
         return get(request, GetFeatureFlagResponse.class, builder -> builder.pathSegment("v2", "config", "feature_flags", request.getName()));
     }
 
+    @Override
+    public Mono<ListFeatureFlagsResponse> list(ListFeatureFlagsRequest request) {
+        return get(request, ListFeatureFlagsResponse.class, builder -> builder.pathSegment("v2", "config", "feature_flags"));
+    }
+    
 }
