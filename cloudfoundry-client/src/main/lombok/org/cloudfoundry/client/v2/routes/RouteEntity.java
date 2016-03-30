@@ -75,6 +75,14 @@ public final class RouteEntity {
     private final Integer port;
 
     /**
+     * The route mappings url
+     *
+     * @param route mappings url the route mappings url
+     * @return the route mappings url
+     */
+    private final String routeMappingsUrl;
+
+    /**
      * The service instance id
      *
      * @param serviceInstanceId the service instance id
@@ -113,6 +121,7 @@ public final class RouteEntity {
                 @JsonProperty("host") String host,
                 @JsonProperty("path") String path,
                 @JsonProperty("port") Integer port,
+                @JsonProperty("route_mappings_url") String routeMappingsUrl,
                 @JsonProperty("service_instance_guid") String serviceInstanceId,
                 @JsonProperty("service_instance_url") String serviceInstanceUrl,
                 @JsonProperty("space_guid") String spaceId,
@@ -123,6 +132,7 @@ public final class RouteEntity {
         this.host = host;
         this.path = path;
         this.port = port;
+        this.routeMappingsUrl = routeMappingsUrl;
         this.serviceInstanceId = serviceInstanceId;
         this.serviceInstanceUrl = serviceInstanceUrl;
         this.spaceId = spaceId;
