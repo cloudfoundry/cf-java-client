@@ -259,8 +259,11 @@ final class CloudFoundryCleaner {
             .map(ResourceUtils::getId)
             .flatMap(serviceInstanceId -> cloudFoundryClient.serviceInstances()
                 .delete(DeleteServiceInstanceRequest.builder()
+                    .async(true)
                     .serviceInstanceId(serviceInstanceId)
-                    .build()));
+                    .build()))
+            .map(ResourceUtils::getId)
+            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
     }
 
     private static Flux<Void> cleanSpaces(CloudFoundryClient cloudFoundryClient, Predicate<SpaceResource> predicate) {

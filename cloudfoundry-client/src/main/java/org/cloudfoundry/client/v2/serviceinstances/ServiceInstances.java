@@ -45,7 +45,7 @@ public interface ServiceInstances {
      * @param request the Delete Service Instance request
      * @return the response from the Delete Service Instance request
      */
-    Mono<Void> delete(DeleteServiceInstanceRequest request);
+    Mono<DeleteServiceInstanceResponse> delete(DeleteServiceInstanceRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/service_instances/retrieve_a_particular_service_instance.html">Retrieve a Particular Service Instance</a> request

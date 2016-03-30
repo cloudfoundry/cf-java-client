@@ -41,6 +41,15 @@ public final class DeleteServiceInstanceRequest implements Validatable {
     private final Boolean acceptsIncomplete;
 
     /**
+     * The async flag
+     *
+     * @param async Will run the delete request in a background job. Recommended: 'true'.
+     * @return the async flag
+     */
+    @Getter(onMethod = @__(@QueryParameter("async")))
+    private final Boolean async;
+
+    /**
      * The purge flag
      *
      * @param purge (experimental) Recursively remove a service instance and child objects from Cloud Foundry database without making requests to a service broker .
@@ -48,6 +57,15 @@ public final class DeleteServiceInstanceRequest implements Validatable {
      */
     @Getter(onMethod = @__(@QueryParameter("purge")))
     private final Boolean purge;
+
+    /**
+     * The recursive flag
+     *
+     * @param recursive Will delete service bindings, service keys, and routes associated with the service instance
+     * @return the recursive flag
+     */
+    @Getter(onMethod = @__(@QueryParameter("recursive")))
+    private final Boolean recursive;
 
     /**
      * The service instance id
@@ -60,10 +78,14 @@ public final class DeleteServiceInstanceRequest implements Validatable {
 
     @Builder
     DeleteServiceInstanceRequest(Boolean acceptsIncomplete,
+                                 Boolean async,
                                  Boolean purge,
+                                 Boolean recursive,
                                  String serviceInstanceId) {
         this.acceptsIncomplete = acceptsIncomplete;
+        this.async = async;
         this.purge = purge;
+        this.recursive = recursive;
         this.serviceInstanceId = serviceInstanceId;
     }
 
