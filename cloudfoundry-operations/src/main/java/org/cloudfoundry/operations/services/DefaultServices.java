@@ -30,7 +30,6 @@ import org.cloudfoundry.client.v2.servicebindings.ListServiceBindingsRequest;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.serviceinstances.AbstractServiceInstanceResource;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse;
-import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
@@ -109,6 +108,20 @@ public final class DefaultServices implements Services {
             .then(function((request, spaceId, planId) -> createServiceInstance(this.cloudFoundryClient, spaceId, planId, request)))
             .then(serviceInstance -> waitForCreateInstance(this.cloudFoundryClient, serviceInstance))
             .after();
+    }
+
+    @Override
+    public Mono<ServiceInstance> get(GetServiceInstanceRequest getRequest) {
+        return Mono
+            .when(ValidationUtils.validate(getRequest), this.spaceId)
+            .then(function((request, spaceId) -> getServiceInstance(cloudFoundryClient, request.getName(), spaceId)))
+            .then(resource -> Mono
+                .when(
+                    Mono.just(resource),
+                    getBoundApplications(this.cloudFoundryClient, ResourceUtils.getId(resource)),
+                    getServiceAndPlan(this.cloudFoundryClient, ResourceUtils.getEntity(resource).getServicePlanId())
+                ))
+            .map(function(DefaultServices::toServiceInstance));
     }
 
     @Override
@@ -210,6 +223,12 @@ public final class DefaultServices implements Services {
             .single()
             .map(ResourceUtils::getId)
             .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Service %s does not exist", service)));
+    }
+
+    private static Mono<ServiceInstanceResource> getServiceInstance(CloudFoundryClient cloudFoundryClient, String name, String spaceId) {
+        return requestSpaceServiceInstancesByName(cloudFoundryClient, name, spaceId)
+            .single()
+            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Service %s does not exist", name)));
     }
 
     private static Mono<String> getServiceName(CloudFoundryClient cloudFoundryClient, String serviceId) {
@@ -320,7 +339,7 @@ public final class DefaultServices implements Services {
 
     private static Mono<GetServiceInstanceResponse> requestServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
         return cloudFoundryClient.serviceInstances()
-            .get(GetServiceInstanceRequest.builder()
+            .get(org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest.builder()
                 .serviceInstanceId(serviceInstanceId)
                 .build());
     }
