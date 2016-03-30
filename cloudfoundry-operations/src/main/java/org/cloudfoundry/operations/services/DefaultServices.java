@@ -169,8 +169,7 @@ public final class DefaultServices implements Services {
 
     private static Mono<Void> deleteServiceBinding(CloudFoundryClient cloudFoundryClient, String serviceBindingId) {
         return requestDeleteServiceBinding(cloudFoundryClient, serviceBindingId)
-            .map(ResourceUtils::getId)
-            .then(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
+            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
     private static String extractState(AbstractServiceInstanceResource serviceInstance) {

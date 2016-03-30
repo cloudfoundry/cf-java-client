@@ -179,8 +179,7 @@ final class CloudFoundryCleaner {
                     .async(true)
                     .domainId(domainId)
                     .build()))
-            .map(ResourceUtils::getId)
-            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
+            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
     private static Flux<Void> cleanOrganizations(CloudFoundryClient cloudFoundryClient, Predicate<OrganizationResource> predicate) {
@@ -196,8 +195,7 @@ final class CloudFoundryCleaner {
                     .async(true)
                     .organizationId(organizationId)
                     .build()))
-            .map(ResourceUtils::getId)
-            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
+            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
     private static Flux<Void> cleanPackages(CloudFoundryClient cloudFoundryClient, Predicate<ListPackagesResponse.Resource> predicate) {
@@ -228,8 +226,7 @@ final class CloudFoundryCleaner {
                     .async(true)
                     .privateDomainId(privateDomainId)
                     .build()))
-            .map(ResourceUtils::getId)
-            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
+            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
     private static Flux<Void> cleanRoutes(CloudFoundryClient cloudFoundryClient, Predicate<RouteResource> predicate) {
@@ -245,8 +242,7 @@ final class CloudFoundryCleaner {
                     .async(true)
                     .routeId(routeId)
                     .build()))
-            .map(ResourceUtils::getId)
-            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
+            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
     private static Flux<Void> cleanServiceInstances(CloudFoundryClient cloudFoundryClient, Predicate<ServiceInstanceResource> predicate) {
@@ -262,8 +258,7 @@ final class CloudFoundryCleaner {
                     .async(true)
                     .serviceInstanceId(serviceInstanceId)
                     .build()))
-            .map(ResourceUtils::getId)
-            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
+            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
     private static Flux<Void> cleanSpaces(CloudFoundryClient cloudFoundryClient, Predicate<SpaceResource> predicate) {
@@ -279,8 +274,7 @@ final class CloudFoundryCleaner {
                     .async(true)
                     .spaceId(spaceId)
                     .build()))
-            .map(ResourceUtils::getId)
-            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
+            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
     private static Flux<Void> cleanUserProvidedServiceInstances(CloudFoundryClient cloudFoundryClient, Predicate<UserProvidedServiceInstanceResource> predicate) {

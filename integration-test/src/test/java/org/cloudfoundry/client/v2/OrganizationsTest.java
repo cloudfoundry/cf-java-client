@@ -256,8 +256,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .delete(DeleteOrganizationRequest.builder()
                     .organizationId(organizationId)
                     .build()))
-            .map(ResourceUtils::getId)
-            .flatMap(jobId -> JobUtils.waitForCompletion(this.cloudFoundryClient, jobId))
+            .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))
             .subscribe(this.testSubscriber());
     }
 

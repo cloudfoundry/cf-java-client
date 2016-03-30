@@ -1019,9 +1019,11 @@ public final class DefaultApplicationsTest {
                 .application(application)
                 .build()))
             .thenReturn(Mono
-                .just(UploadApplicationResponse.builder()
+                .just(fill(UploadApplicationResponse.builder())
                     .metadata(Resource.Metadata.builder()
                         .id(jobId)
+                        .build())
+                    .entity(fill(JobEntity.builder(), "job-entity-")
                         .build())
                     .build()));
     }

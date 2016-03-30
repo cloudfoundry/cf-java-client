@@ -145,8 +145,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .applicationId(targetId)
                     .sourceApplicationId(sourceId)
                     .build())
-                .map(ResourceUtils::getId)
-                .then(jobId -> JobUtils.waitForCompletion(this.cloudFoundryClient, jobId))
+                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))
             )))
             .then(function((sourceId, targetId) -> Mono
                 .when(
@@ -1050,8 +1049,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .async(true)
                     .applicationId(applicationId)
                     .build())
-                .map(ResourceUtils::getId)
-                .then(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId))
+                .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job))
                 .after(() -> Mono.just(applicationId));
         } catch (IOException e) {
             throw new RuntimeException(e);

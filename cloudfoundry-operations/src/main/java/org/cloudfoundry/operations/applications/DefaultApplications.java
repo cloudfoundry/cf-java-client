@@ -442,14 +442,12 @@ public final class DefaultApplications implements Applications {
 
     private static Mono<Void> copyBits(CloudFoundryClient cloudFoundryClient, String sourceApplicationId, String targetApplicationId) {
         return requestCopyBits(cloudFoundryClient, sourceApplicationId, targetApplicationId)
-            .map(ResourceUtils::getId)
-            .then(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
+            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
     private static Mono<Void> deleteRoute(CloudFoundryClient cloudFoundryClient, String routeId) {
         return requestDeleteRoute(cloudFoundryClient, routeId)
-            .map(ResourceUtils::getId)
-            .then(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
+            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
     private static Mono<Void> deleteRoutes(CloudFoundryClient cloudFoundryClient, Optional<List<Route>> routes) {
@@ -655,7 +653,8 @@ public final class DefaultApplications implements Applications {
             .map(SummaryApplicationResponse::getRoutes);
     }
 
-    private static Mono<Tuple2<Optional<List<Route>>, String>> getRoutesAndApplicationId(CloudFoundryClient cloudFoundryClient, DeleteApplicationRequest deleteApplicationRequest, String spaceId, boolean deleteRoutes) {
+    private static Mono<Tuple2<Optional<List<Route>>, String>> getRoutesAndApplicationId(CloudFoundryClient cloudFoundryClient, DeleteApplicationRequest deleteApplicationRequest, String spaceId,
+                                                                                         boolean deleteRoutes) {
         return getApplicationId(cloudFoundryClient, deleteApplicationRequest.getName(), spaceId)
             .then(applicationId -> getOptionalRoutes(cloudFoundryClient, deleteRoutes, applicationId)
                 .and(Mono.just(applicationId)));
@@ -1231,9 +1230,7 @@ public final class DefaultApplications implements Applications {
 
     private static Mono<Void> uploadApplicationAndWait(CloudFoundryClient cloudFoundryClient, String applicationId, InputStream application) {
         return requestUploadApplication(cloudFoundryClient, applicationId, application)
-            .map(ResourceUtils::getId)
-            .then(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
-
+            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
     private static Mono<String> waitForRunning(CloudFoundryClient cloudFoundryClient, String application, String applicationId, Duration startupTimeout) {
