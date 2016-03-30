@@ -1225,7 +1225,9 @@ public final class DefaultApplicationsTest {
         @Override
         protected Mono<Void> invoke() {
             return this.applications
-                .delete(fill(DeleteApplicationRequest.builder())
+                .delete(DeleteApplicationRequest.builder()
+                    .deleteRoutes(true)
+                    .name("test-name")
                     .build());
         }
 
@@ -1253,7 +1255,9 @@ public final class DefaultApplicationsTest {
         @Override
         protected Mono<Void> invoke() {
             return this.applications
-                .delete(fill(DeleteApplicationRequest.builder())
+                .delete(DeleteApplicationRequest.builder()
+                    .deleteRoutes(true)
+                    .name("test-name")
                     .build());
         }
 
@@ -1279,8 +1283,8 @@ public final class DefaultApplicationsTest {
         @Override
         protected Mono<Void> invoke() {
             return this.applications
-                .delete(fill(DeleteApplicationRequest.builder())
-                    .deleteRoutes(false)
+                .delete(DeleteApplicationRequest.builder()
+                    .name("test-name")
                     .build());
         }
 
@@ -1309,7 +1313,9 @@ public final class DefaultApplicationsTest {
         @Override
         protected Mono<Void> invoke() {
             return this.applications
-                .delete(fill(DeleteApplicationRequest.builder())
+                .delete(DeleteApplicationRequest.builder()
+                    .deleteRoutes(true)
+                    .name("test-name")
                     .build());
         }
 
