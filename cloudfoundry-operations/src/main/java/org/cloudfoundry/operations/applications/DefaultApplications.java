@@ -1244,7 +1244,7 @@ public final class DefaultApplications implements Applications {
             .map(ApplicationInstanceInfo::getState)
             .reduce("UNKNOWN", collectStates())
             .where(isInstanceComplete())
-            .repeatWhenEmpty(Integer.MAX_VALUE - 1, exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), timeout))
+            .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), timeout))
             .where(isRunning())
             .otherwiseIfEmpty(ExceptionUtils.illegalState("Application %s failed during start", application))
             .otherwise(ExceptionUtils.replace(DelayTimeoutException.class, () -> ExceptionUtils.illegalState("Application %s timed out during start", application)));
@@ -1256,7 +1256,7 @@ public final class DefaultApplications implements Applications {
         return requestGetApplication(cloudFoundryClient, applicationId)
             .map(response -> ResourceUtils.getEntity(response).getPackageState())
             .where(isStagingComplete())
-            .repeatWhenEmpty(Integer.MAX_VALUE - 1, exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), timeout))
+            .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), timeout))
             .where(isStaged())
             .otherwiseIfEmpty(ExceptionUtils.illegalState("Application %s failed during staging", application))
             .otherwise(ExceptionUtils.replace(DelayTimeoutException.class, () -> ExceptionUtils.illegalState("Application %s timed out during staging", application)));

@@ -1061,7 +1061,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     private static Mono<ApplicationInstanceInfo> waitForInstanceRestart(CloudFoundryClient cloudFoundryClient, String applicationId, String instanceName, Optional<Double> optionalSince) {
         return getInstanceInfo(cloudFoundryClient, applicationId, instanceName)
             .where(info -> !isIdentical(info.getSince(), optionalSince.orElse(null)))
-            .repeatWhenEmpty(Integer.MAX_VALUE - 1, exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
+            .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
     }
 
     private static Mono<String> waitForStaging(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -1072,7 +1072,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     private static Mono<AbstractApplicationResource> waitForStagingApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestGetApplication(cloudFoundryClient, applicationId)
             .where(response -> "STAGED".equals(response.getEntity().getPackageState()))
-            .repeatWhenEmpty(Integer.MAX_VALUE - 1, exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
+            .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
     }
 
     private static Mono<String> waitForStarting(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -1083,7 +1083,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .flatMap(response -> Flux.fromIterable(response.values()))
             .filter(applicationInstanceInfo -> "RUNNING".equals(applicationInstanceInfo.getState()))
             .next()
-            .repeatWhenEmpty(Integer.MAX_VALUE - 1, exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
+            .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
             .map(info -> applicationId);
     }
 

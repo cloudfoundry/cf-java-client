@@ -46,7 +46,7 @@ public final class JobUtils {
         return requestJob(cloudFoundryClient, jobId)
             .map(GetJobResponse::getEntity)
             .where(JobUtils::isComplete)
-            .repeatWhenEmpty(Integer.MAX_VALUE - 1, exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
+            .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
             .where(entity -> "failed".equals(entity.getStatus()))
             .flatMap(JobUtils::getError)
             .after();
