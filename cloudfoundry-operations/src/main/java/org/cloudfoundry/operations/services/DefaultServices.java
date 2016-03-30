@@ -416,7 +416,7 @@ public final class DefaultServices implements Services {
         return requestServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance))
             .map(DefaultServices::extractState)
             .where(DefaultServices::isNotInProgress)
-            .repeatWhenEmpty(Integer.MAX_VALUE - 1, DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
+            .repeatWhenEmpty(DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
             .after();
     }
 

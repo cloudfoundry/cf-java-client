@@ -22,7 +22,7 @@
     <orderEntry type="library" name="Maven: org.apache.tomcat.embed:tomcat-embed-core:8.0.32" level="project" />
     <orderEntry type="module" module-name="cloudfoundry-client" />
     <orderEntry type="library" name="Maven: com.google.protobuf:protobuf-java:2.6.1" level="project" />
-    <orderEntry type="library" name="Maven: io.projectreactor:reactor-core:2.5.0.M2" level="project" />
+    <orderEntry type="library" name="Maven: io.projectreactor:reactor-core:2.5.0.BUILD-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.reactivestreams:reactive-streams:1.0.0" level="project" />
     <orderEntry type="module" module-name="cloudfoundry-util" />
     <orderEntry type="library" name="Maven: org.atteo:evo-inflector:1.1" level="project" />
