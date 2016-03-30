@@ -38,15 +38,30 @@ public final class DelayUtils {
     }
 
     /**
-     * Implements an exponential backoff delay
+     * Implements an exponential backoff delay for use with {@link Mono#repeatWhenEmpty(Function)}
      *
      * @param minimum the minimum duration
      * @param maximum the maximum duration
+     * @param timeout the maximum amount of time to delay for
      * @return a delayed {@link Publisher}
      */
     public static Function<Flux<Long>, Publisher<?>> exponentialBackOff(Duration minimum, Duration maximum, Duration timeout) {
         Instant finish = Instant.now().plus(timeout);
         return iterations -> getDelay(minimum, maximum, finish, iterations);
+    }
+
+    /**
+     * Implements an exponential backoff delay for use with {@link Mono#retryWhen(Function)}
+     *
+     * @param minimum the minimum duration
+     * @param maximum the maximum duration
+     * @param timeout the maximum amount of time to delay for
+     * @return a delayed {@link Publisher}
+     */
+    public static Function<Flux<Throwable>, Publisher<?>> exponentialBackOffError(Duration minimum, Duration maximum, Duration timeout) {
+        Instant finish = Instant.now().plus(timeout);
+
+        return errors -> getDelay(minimum, maximum, finish, errors.zipWith(Flux.range(0, Integer.MAX_VALUE), (error, iteration) -> iteration.longValue()));
     }
 
     private static Duration calculateDuration(Duration minimum, Duration maximum, Long iteration) {
