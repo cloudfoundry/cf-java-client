@@ -48,7 +48,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .after(() -> this.cloudFoundryOperations.applications()
                 .delete(DeleteApplicationRequest.builder()
                     .name(applicationName)
-                    .deleteRoutes(false)
                     .build()))
             .subscribe(testSubscriber());
     }

@@ -162,7 +162,7 @@ public final class DefaultApplications implements Applications {
     public Mono<Void> delete(DeleteApplicationRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((request1, spaceId) -> getRoutesAndApplicationId(this.cloudFoundryClient, request1, spaceId)))
+            .then(function((request1, spaceId) -> getRoutesAndApplicationId(this.cloudFoundryClient, request1, spaceId, Optional.ofNullable(request.getDeleteRoutes()).orElse(false))))
             .then(function((routes, applicationId) -> deleteRoutes(this.cloudFoundryClient, routes)
                 .after(() -> Mono.just(applicationId))))
             .as(thenKeep((applicationId -> removeServiceBindings(this.cloudFoundryClient, applicationId))))
@@ -655,9 +655,9 @@ public final class DefaultApplications implements Applications {
             .map(SummaryApplicationResponse::getRoutes);
     }
 
-    private static Mono<Tuple2<Optional<List<Route>>, String>> getRoutesAndApplicationId(CloudFoundryClient cloudFoundryClient, DeleteApplicationRequest deleteApplicationRequest, String spaceId) {
+    private static Mono<Tuple2<Optional<List<Route>>, String>> getRoutesAndApplicationId(CloudFoundryClient cloudFoundryClient, DeleteApplicationRequest deleteApplicationRequest, String spaceId, boolean deleteRoutes) {
         return getApplicationId(cloudFoundryClient, deleteApplicationRequest.getName(), spaceId)
-            .then(applicationId -> getOptionalRoutes(cloudFoundryClient, deleteApplicationRequest.getDeleteRoutes(), applicationId)
+            .then(applicationId -> getOptionalRoutes(cloudFoundryClient, deleteRoutes, applicationId)
                 .and(Mono.just(applicationId)));
     }
 
