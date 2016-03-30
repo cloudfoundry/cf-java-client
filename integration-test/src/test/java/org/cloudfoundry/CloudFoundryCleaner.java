@@ -117,12 +117,12 @@ final class CloudFoundryCleaner {
                     .orElse(r -> true);
 
                 return Flux.empty()
+                    .after(() -> cleanRoutes(this.cloudFoundryClient, routePredicate))
                     .after(() -> cleanApplicationsV2(this.cloudFoundryClient, applicationV2Predicate))
                     .after(() -> cleanApplicationsV3(this.cloudFoundryClient, applicationsV3Predicate))
                     .after(() -> cleanPackages(this.cloudFoundryClient, packagePredicate))
                     .after(() -> cleanServiceInstances(this.cloudFoundryClient, serviceInstancePredicate))
                     .after(() -> cleanUserProvidedServiceInstances(this.cloudFoundryClient, userProvidedServiceInstancePredicate))
-                    .after(() -> cleanRoutes(this.cloudFoundryClient, routePredicate))
                     .after(() -> cleanDomains(this.cloudFoundryClient, domainPredicate))
                     .after(() -> cleanPrivateDomains(this.cloudFoundryClient, privateDomainPredicate))
                     .after(() -> cleanSpaces(this.cloudFoundryClient, spacePredicate))
@@ -132,7 +132,7 @@ final class CloudFoundryCleaner {
             .doOnError(Throwable::printStackTrace)
             .doOnComplete(() -> this.logger.debug("<< CLEANUP >>"))
             .after()
-            .get(Duration.ofMinutes(5));
+            .get(Duration.ofMinutes(10));
     }
 
     private static Flux<Void> cleanApplicationsV2(CloudFoundryClient cloudFoundryClient, Predicate<ApplicationResource> predicate) {
