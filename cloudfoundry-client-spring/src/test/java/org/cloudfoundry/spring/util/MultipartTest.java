@@ -22,9 +22,9 @@ import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.function.Function;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.cloudfoundry.logging.LoggregatorProtocolBuffers.LogMessage;
 
 public final class MultipartTest {
@@ -40,7 +40,7 @@ public final class MultipartTest {
             .subscribe(testSubscriber
                 .assertCount(14));
 
-        testSubscriber.verify(5, SECONDS);
+        testSubscriber.verify(Duration.ofSeconds(5));
     }
 
     private Function<byte[], LogMessage> toLogMessage() {

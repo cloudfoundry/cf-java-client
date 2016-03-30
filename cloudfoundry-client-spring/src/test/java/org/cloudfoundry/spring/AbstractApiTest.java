@@ -29,10 +29,10 @@ import reactor.core.util.Exceptions;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertArrayEquals;
 
 public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
@@ -45,7 +45,7 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
         this.testSubscriber.assertError(CloudFoundryException.class, "CF-UnprocessableEntity(10008): The request is semantically invalid: space_guid and name unique");
         invoke(getValidRequest()).subscribe(this.testSubscriber);
 
-        this.testSubscriber.verify(5, SECONDS);
+        this.testSubscriber.verify(Duration.ofSeconds(5));
         verify();
     }
 
@@ -59,7 +59,7 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
         this.testSubscriber.assertError(RequestValidationException.class, null); // ignore message
         invoke(request).subscribe(this.testSubscriber);
 
-        this.testSubscriber.verify(5, SECONDS);
+        this.testSubscriber.verify(Duration.ofSeconds(5));
         verify();
     }
 
@@ -71,7 +71,7 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
         mockRequest(getRequestContext());
         invoke(getValidRequest()).subscribe(this.testSubscriber);
 
-        this.testSubscriber.verify(5, SECONDS);
+        this.testSubscriber.verify(Duration.ofSeconds(5));
         verify();
     }
 

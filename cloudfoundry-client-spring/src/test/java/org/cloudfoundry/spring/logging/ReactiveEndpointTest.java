@@ -23,8 +23,8 @@ import org.junit.Test;
 import javax.websocket.CloseReason;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
+import java.time.Duration;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -54,7 +54,7 @@ public final class ReactiveEndpointTest {
 
         this.testSubscriber
             .assertError(LoggingException.class, "test-reason-phrase")
-            .verify(1, SECONDS);
+            .verify(Duration.ofSeconds(1));
     }
 
     @Test
@@ -63,7 +63,7 @@ public final class ReactiveEndpointTest {
 
         this.testSubscriber
             .assertError(LoggingException.class, "java.lang.RuntimeException")
-            .verify(5, SECONDS);
+            .verify(Duration.ofSeconds(5));
     }
 
     @Test
