@@ -26,7 +26,8 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import reactor.core.tuple.Tuple2;
 
-import static java.util.concurrent.TimeUnit.MINUTES;
+import java.time.Duration;
+
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -45,7 +46,7 @@ public abstract class AbstractIntegrationTest {
 
     @After
     public final void verify() throws InterruptedException {
-        this.testSubscriber.verify(5, MINUTES);
+        this.testSubscriber.verify(Duration.ofMinutes(5));
     }
 
     protected final <T> void assertTupleEquality(Tuple2<T, T> tuple) {

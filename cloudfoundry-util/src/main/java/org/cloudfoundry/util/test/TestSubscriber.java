@@ -28,15 +28,16 @@ import reactor.core.util.ReactiveStateUtils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.Duration;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.junit.Assert.fail;
 
@@ -167,8 +168,8 @@ public final class TestSubscriber<T> implements Subscriber<T> {
         });
     }
 
-    public void verify(long timeout, TimeUnit unit) throws InterruptedException {
-        if (!this.latch.await(timeout, unit)) {
+    public void verify(Duration duration) throws InterruptedException {
+        if (!this.latch.await(duration.toMillis(), MILLISECONDS)) {
             throw new IllegalStateException("Subscriber timed out");
         }
 

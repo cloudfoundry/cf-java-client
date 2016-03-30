@@ -22,9 +22,8 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 import org.reactivestreams.Publisher;
 
+import java.time.Duration;
 import java.util.function.Supplier;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 public abstract class AbstractOperationsApiTest<T> extends AbstractOperationsTest {
 
@@ -39,7 +38,7 @@ public abstract class AbstractOperationsApiTest<T> extends AbstractOperationsTes
         assertions(testSubscriber);
 
         invoke().subscribe(testSubscriber);
-        testSubscriber.verify(5, SECONDS);
+        testSubscriber.verify(Duration.ofSeconds(5));
     }
 
     protected abstract void assertions(TestSubscriber<T> testSubscriber);

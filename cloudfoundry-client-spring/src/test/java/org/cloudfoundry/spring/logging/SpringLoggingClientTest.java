@@ -26,10 +26,10 @@ import org.springframework.web.client.RestOperations;
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.WebSocketContainer;
 import java.net.URI;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -57,7 +57,7 @@ public final class SpringLoggingClientTest extends AbstractRestTest {
             .subscribe(testSubscriber
                 .assertCount(1));
 
-        testSubscriber.verify(5, SECONDS);
+        testSubscriber.verify(Duration.ofSeconds(5));
     }
 
 }

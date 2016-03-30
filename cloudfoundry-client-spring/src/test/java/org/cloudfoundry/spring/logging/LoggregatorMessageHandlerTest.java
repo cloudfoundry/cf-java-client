@@ -23,10 +23,10 @@ import org.cloudfoundry.logging.LoggregatorProtocolBuffers;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Test;
 
+import java.time.Duration;
 import java.util.Date;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.cloudfoundry.logging.LogMessage.MessageType.ERR;
 
 public final class LoggregatorMessageHandlerTest {
@@ -62,7 +62,7 @@ public final class LoggregatorMessageHandlerTest {
                 .sourceName("test-source-name")
                 .timestamp(timestamp)
                 .build())
-            .verify(5, SECONDS);
+            .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -71,7 +71,7 @@ public final class LoggregatorMessageHandlerTest {
 
         this.testSubscriber
             .assertError(InvalidProtocolBufferException.class, "Message missing required fields: message, message_type, timestamp, app_id")
-            .verify(5, SECONDS);
+            .verify(Duration.ofSeconds(5));
     }
 
 }
