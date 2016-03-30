@@ -22,6 +22,7 @@ import org.cloudfoundry.client.v2.serviceinstances.BindServiceInstanceToRouteRes
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
+import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstancePermissionsRequest;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstancePermissionsResponse;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
@@ -73,8 +74,8 @@ public final class SpringServiceInstances extends AbstractSpringOperations imple
     }
 
     @Override
-    public Mono<Void> delete(DeleteServiceInstanceRequest request) {
-        return delete(request, Void.class, builder -> {
+    public Mono<DeleteServiceInstanceResponse> delete(DeleteServiceInstanceRequest request) {
+        return delete(request, DeleteServiceInstanceResponse.class, builder -> {
             builder.pathSegment("v2", "service_instances", request.getServiceInstanceId());
             QueryBuilder.augment(builder, request);
         });
