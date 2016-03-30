@@ -177,8 +177,7 @@ public final class DefaultSpaces implements Spaces {
 
     private static Mono<Void> deleteSpace(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return requestDeleteSpace(cloudFoundryClient, spaceId)
-            .map(ResourceUtils::getId)
-            .then(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
+            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
     private static Mono<List<String>> getApplicationNames(CloudFoundryClient cloudFoundryClient, SpaceResource spaceResource) {

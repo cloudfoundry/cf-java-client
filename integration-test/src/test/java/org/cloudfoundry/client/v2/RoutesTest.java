@@ -118,8 +118,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .async(true)
                     .routeId(routeId)
                     .build()))
-            .map(ResourceUtils::getId)
-            .flatMap(jobId -> JobUtils.waitForCompletion(this.cloudFoundryClient, jobId))
+            .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))
             .subscribe(testSubscriber());
     }
 

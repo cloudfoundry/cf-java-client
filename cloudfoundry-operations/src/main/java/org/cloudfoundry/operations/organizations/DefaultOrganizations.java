@@ -127,8 +127,7 @@ public final class DefaultOrganizations implements Organizations {
 
     private static Mono<Void> deleteOrganization(CloudFoundryClient cloudFoundryClient, String organizationId) {
         return requestDeleteOrganization(cloudFoundryClient, organizationId)
-            .map(ResourceUtils::getId)
-            .then(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
+            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
     private static Mono<Tuple4<List<String>, OrganizationQuota, List<SpaceQuota>, List<String>>> getAuxiliaryContent(CloudFoundryClient cloudFoundryClient, OrganizationResource organizationResource) {

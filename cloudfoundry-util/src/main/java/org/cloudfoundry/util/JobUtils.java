@@ -18,6 +18,7 @@ package org.cloudfoundry.util;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.job.GetJobRequest;
 import org.cloudfoundry.client.v2.job.GetJobResponse;
 import org.cloudfoundry.client.v2.job.JobEntity;
@@ -39,14 +40,22 @@ public final class JobUtils {
      * Waits for a job to complete
      *
      * @param cloudFoundryClient the client to use to request job status
-     * @param jobId              the id of the job
+     * @param resource           the resource representing the job
      * @return {@code onComplete} once job has completed
      */
-    public static Mono<Void> waitForCompletion(CloudFoundryClient cloudFoundryClient, String jobId) {
-        return requestJob(cloudFoundryClient, jobId)
-            .map(GetJobResponse::getEntity)
-            .where(JobUtils::isComplete)
-            .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
+    public static Mono<Void> waitForCompletion(CloudFoundryClient cloudFoundryClient, Resource<JobEntity> resource) {
+        Mono<JobEntity> job;
+
+        if (JobUtils.isComplete(ResourceUtils.getEntity(resource))) {
+            job = Mono.just(ResourceUtils.getEntity(resource));
+        } else {
+            job = requestJob(cloudFoundryClient, ResourceUtils.getId(resource))
+                .map(GetJobResponse::getEntity)
+                .where(JobUtils::isComplete)
+                .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
+        }
+
+        return job
             .where(entity -> "failed".equals(entity.getStatus()))
             .flatMap(JobUtils::getError)
             .after();

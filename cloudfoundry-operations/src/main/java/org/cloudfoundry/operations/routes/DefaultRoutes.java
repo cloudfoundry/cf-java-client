@@ -162,8 +162,7 @@ public final class DefaultRoutes implements Routes {
 
     private static Mono<Void> deleteRoute(CloudFoundryClient cloudFoundryClient, String routeId) {
         return requestDeleteRoute(cloudFoundryClient, routeId)
-            .map(ResourceUtils::getId)
-            .then(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
+            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
     private static Mono<ApplicationResource> getApplication(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {

@@ -18,7 +18,6 @@ package org.cloudfoundry.client.v2;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
@@ -93,9 +92,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> createDomainId(this.cloudFoundryClient, domainName, organizationId))
-            .then(domainId -> requestDeleteDomain(cloudFoundryClient, domainId)
-                .map(ResourceUtils::getId)
-                .then(jobId -> JobUtils.waitForCompletion(this.cloudFoundryClient, jobId))
+            .then(domainId -> requestDeleteDomain(this.cloudFoundryClient, domainId)
+                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))
                 .after(() -> Mono.just(domainId)))
             .then(domainId -> requestGetDomain(this.cloudFoundryClient, domainId))
             .subscribe(testSubscriber()
@@ -114,7 +112,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 ))
             .then(function((organizationId, domainId) -> Mono
                 .when(
-                    getDomainEntity(cloudFoundryClient, domainId),
+                    getDomainEntity(this.cloudFoundryClient, domainId),
                     Mono.just(organizationId)
                 )))
             .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()

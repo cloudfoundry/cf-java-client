@@ -268,8 +268,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .spaceId(spaceId)
                     .async(true)
                     .build())
-                .map(ResourceUtils::getId)
-                .then(jobId -> JobUtils.waitForCompletion(this.cloudFoundryClient, jobId))
+                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))
                 .after(() -> Mono.just(spaceId)))
             .flatMap(spaceId -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.spaces()
