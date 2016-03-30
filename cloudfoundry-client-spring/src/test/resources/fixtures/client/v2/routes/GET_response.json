@@ -6,19 +6,23 @@
   "resources": [
     {
       "metadata": {
-        "guid": "13f2cca3-ea79-4b46-9ffd-99a490c84e2b",
-        "url": "/v2/routes/13f2cca3-ea79-4b46-9ffd-99a490c84e2b",
-        "created_at": "2015-07-27T22:43:11Z",
+        "guid": "8fd7433e-e9c7-4897-809f-9a9696f72986",
+        "url": "/v2/routes/8fd7433e-e9c7-4897-809f-9a9696f72986",
+        "created_at": "2016-03-17T21:41:19Z",
         "updated_at": null
       },
       "entity": {
-        "host": "host-6",
+        "host": "host-25",
         "path": "",
-        "domain_guid": "c3153192-e35d-4d1e-a518-ddaddf39241c",
-        "space_guid": "d56f6482-363c-4de9-9520-d16b3754c389",
-        "domain_url": "/v2/domains/c3153192-e35d-4d1e-a518-ddaddf39241c",
-        "space_url": "/v2/spaces/d56f6482-363c-4de9-9520-d16b3754c389",
-        "apps_url": "/v2/routes/13f2cca3-ea79-4b46-9ffd-99a490c84e2b/apps"
+        "domain_guid": "76d083f5-a5cc-4179-81b8-530a134cccf6",
+        "space_guid": "34453e18-fe59-4208-b29c-ae9f7b46985c",
+        "service_instance_guid": "8479be64-245d-4385-a553-593ffcc6b886",
+        "port": 0,
+        "domain_url": "/v2/domains/76d083f5-a5cc-4179-81b8-530a134cccf6",
+        "space_url": "/v2/spaces/34453e18-fe59-4208-b29c-ae9f7b46985c",
+        "service_instance_url": "/v2/service_instances/8479be64-245d-4385-a553-593ffcc6b886",
+        "apps_url": "/v2/routes/8fd7433e-e9c7-4897-809f-9a9696f72986/apps",
+        "route_mappings_url": "/v2/routes/8fd7433e-e9c7-4897-809f-9a9696f72986/route_mappings"
       }
     }
   ]
