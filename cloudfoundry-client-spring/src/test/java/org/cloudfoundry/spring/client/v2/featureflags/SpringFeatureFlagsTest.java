@@ -16,8 +16,11 @@
 
 package org.cloudfoundry.spring.client.v2.featureflags;
 
+import org.cloudfoundry.client.v2.featureflags.FeatureFlagEntity;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagRequest;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagResponse;
+import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsRequest;
+import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsResponse;
 import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
@@ -26,6 +29,47 @@ import static org.springframework.http.HttpStatus.OK;
 
 
 public final class SpringFeatureFlagsTest {
+
+    public static final class GetAppScaling extends AbstractApiTest<GetFeatureFlagRequest, GetFeatureFlagResponse> {
+
+        private final SpringFeatureFlags featureFlags = new SpringFeatureFlags(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected GetFeatureFlagRequest getInvalidRequest() {
+            return GetFeatureFlagRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("/v2/config/feature_flags/app_scaling")
+                .status(OK)
+                .responsePayload("fixtures/client/v2/feature_flags/GET_app_scaling_flag_response.json");
+        }
+
+        @Override
+        protected GetFeatureFlagResponse getResponse() {
+            return GetFeatureFlagResponse.builder()
+                .name("app_scaling")
+                .enabled(true)
+                .url("/v2/config/feature_flags/app_scaling")
+                .build();
+        }
+
+        @Override
+        protected GetFeatureFlagRequest getValidRequest() {
+            return GetFeatureFlagRequest.builder()
+                .name("app_scaling")
+                .build();
+        }
+
+        @Override
+        protected Mono<GetFeatureFlagResponse> invoke(GetFeatureFlagRequest request) {
+            return this.featureFlags.get(request);
+        }
+
+    }
 
     public static final class GetUserRoles extends AbstractApiTest<GetFeatureFlagRequest, GetFeatureFlagResponse> {
 
@@ -68,44 +112,110 @@ public final class SpringFeatureFlagsTest {
 
     }
 
-    public static final class GetAppScaling extends AbstractApiTest<GetFeatureFlagRequest, GetFeatureFlagResponse> {
+    public static final class List extends AbstractApiTest<ListFeatureFlagsRequest, ListFeatureFlagsResponse> {
 
-        private final SpringFeatureFlags featureFlags = new SpringFeatureFlags(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private SpringFeatureFlags featureFlags = new SpringFeatureFlags(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
-        protected GetFeatureFlagRequest getInvalidRequest() {
-            return GetFeatureFlagRequest.builder()
-                .build();
+        protected ListFeatureFlagsRequest getInvalidRequest() {
+            return null;
         }
 
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                .method(GET).path("/v2/config/feature_flags/app_scaling")
+                .method(GET).path("/v2/config/feature_flags")
                 .status(OK)
-                .responsePayload("fixtures/client/v2/feature_flags/GET_app_scaling_flag_response.json");
+                .responsePayload("fixtures/client/v2/feature_flags/GET_response.json");
         }
 
         @Override
-        protected GetFeatureFlagResponse getResponse() {
-            return GetFeatureFlagResponse.builder()
-                .name("app_scaling")
-                .enabled(true)
-                .url("/v2/config/feature_flags/app_scaling")
+        protected ListFeatureFlagsResponse getResponse() {
+            return ListFeatureFlagsResponse.builder()
+                .featureFlag(FeatureFlagEntity.builder()
+                    .name("user_org_creation")
+                    .enabled(false)
+                    .url("/v2/config/feature_flags/user_org_creation")
+                    .build()
+                )
+                .featureFlag(FeatureFlagEntity.builder()
+                    .name("private_domain_creation")
+                    .enabled(false)
+                    .errorMessage("foobar")
+                    .url("/v2/config/feature_flags/private_domain_creation")
+                    .build()
+                )
+                .featureFlag(FeatureFlagEntity.builder()
+                    .name("app_bits_upload")
+                    .enabled(true)
+                    .url("/v2/config/feature_flags/app_bits_upload")
+                    .build()
+                )
+                .featureFlag(FeatureFlagEntity.builder()
+                    .name("app_scaling")
+                    .enabled(true)
+                    .url("/v2/config/feature_flags/app_scaling")
+                    .build()
+                )
+                .featureFlag(FeatureFlagEntity.builder()
+                    .name("route_creation")
+                    .enabled(true)
+                    .url("/v2/config/feature_flags/route_creation")
+                    .build()
+                )
+                .featureFlag(FeatureFlagEntity.builder()
+                    .name("service_instance_creation")
+                    .enabled(true)
+                    .url("/v2/config/feature_flags/service_instance_creation")
+                    .build()
+                )
+                .featureFlag(FeatureFlagEntity.builder()
+                    .name("diego_docker")
+                    .enabled(false)
+                    .url("/v2/config/feature_flags/diego_docker")
+                    .build()
+                )
+                .featureFlag(FeatureFlagEntity.builder()
+                    .name("set_roles_by_username")
+                    .enabled(true)
+                    .url("/v2/config/feature_flags/set_roles_by_username")
+                    .build()
+                )
+                .featureFlag(FeatureFlagEntity.builder()
+                    .name("unset_roles_by_username")
+                    .enabled(true)
+                    .url("/v2/config/feature_flags/unset_roles_by_username")
+                    .build()
+                )
+                .featureFlag(FeatureFlagEntity.builder()
+                    .name("task_creation")
+                    .enabled(false)
+                    .url("/v2/config/feature_flags/task_creation")
+                    .build()
+                )
+                .featureFlag(FeatureFlagEntity.builder()
+                    .name("space_scoped_private_broker_creation")
+                    .enabled(true)
+                    .url("/v2/config/feature_flags/space_scoped_private_broker_creation")
+                    .build()
+                )
+                .featureFlag(FeatureFlagEntity.builder()
+                    .name("space_developer_env_var_visibility")
+                    .enabled(true)
+                    .url("/v2/config/feature_flags/space_developer_env_var_visibility")
+                    .build()
+                )
                 .build();
         }
 
         @Override
-        protected GetFeatureFlagRequest getValidRequest() {
-            return GetFeatureFlagRequest.builder()
-                .name("app_scaling")
-                .build();
+        protected ListFeatureFlagsRequest getValidRequest() throws Exception {
+            return ListFeatureFlagsRequest.builder().build();
         }
 
         @Override
-        protected Mono<GetFeatureFlagResponse> invoke(GetFeatureFlagRequest request) {
-            return this.featureFlags.get(request);
+        protected Mono<ListFeatureFlagsResponse> invoke(ListFeatureFlagsRequest request) {
+            return this.featureFlags.list(request);
         }
-
     }
 }
