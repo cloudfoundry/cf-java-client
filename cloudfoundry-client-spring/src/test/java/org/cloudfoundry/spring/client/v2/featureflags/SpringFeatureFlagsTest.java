@@ -217,5 +217,7 @@ public final class SpringFeatureFlagsTest {
         protected Mono<ListFeatureFlagsResponse> invoke(ListFeatureFlagsRequest request) {
             return this.featureFlags.list(request);
         }
+
     }
+
 }

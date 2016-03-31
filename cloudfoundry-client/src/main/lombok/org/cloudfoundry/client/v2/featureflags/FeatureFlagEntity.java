@@ -36,6 +36,7 @@ public final class FeatureFlagEntity extends AbstractFeatureFlag {
                       @JsonProperty("error_message") String errorMessage,
                       @JsonProperty("name") String name,
                       @JsonProperty("url") String url) {
+
         super(enabled, errorMessage, name, url);
     }
 

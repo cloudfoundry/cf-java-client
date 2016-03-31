@@ -55,5 +55,5 @@ public final class SpringFeatureFlags extends AbstractSpringOperations implement
     public Mono<ListFeatureFlagsResponse> list(ListFeatureFlagsRequest request) {
         return get(request, ListFeatureFlagsResponse.class, builder -> builder.pathSegment("v2", "config", "feature_flags"));
     }
-    
+
 }
