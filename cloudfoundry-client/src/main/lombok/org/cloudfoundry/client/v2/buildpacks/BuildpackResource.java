@@ -34,6 +34,7 @@ public final class BuildpackResource extends Resource<BuildpackEntity> {
     @Builder
     BuildpackResource(@JsonProperty("entity") BuildpackEntity entity,
                       @JsonProperty("metadata") Resource.Metadata metadata) {
+
         super(entity, metadata);
     }
 

@@ -49,6 +49,7 @@ public final class ListBuildpacksRequest extends PaginatedRequest implements Val
     @Builder
     ListBuildpacksRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                           @Singular List<String> names) {
+
         super(orderDirection, page, resultsPerPage);
         this.names = names;
     }

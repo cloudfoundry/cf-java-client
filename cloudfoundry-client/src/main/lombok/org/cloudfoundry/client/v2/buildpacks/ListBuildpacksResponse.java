@@ -40,6 +40,7 @@ public final class ListBuildpacksResponse extends PaginatedResponse<BuildpackRes
                            @JsonProperty("resources") @Singular List<BuildpackResource> resources,
                            @JsonProperty("total_pages") Integer totalPages,
                            @JsonProperty("total_results") Integer totalResults) {
+
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 

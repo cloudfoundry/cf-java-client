@@ -35,6 +35,8 @@ import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
 
+import java.net.URI;
+
 public final class SpringServicePlanVisibilities extends AbstractSpringOperations implements ServicePlanVisibilities {
 
     /**
@@ -44,7 +46,7 @@ public final class SpringServicePlanVisibilities extends AbstractSpringOperation
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param schedulerGroup The group to use when making requests
      */
-    public SpringServicePlanVisibilities(RestOperations restOperations, java.net.URI root, SchedulerGroup schedulerGroup) {
+    public SpringServicePlanVisibilities(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
         super(restOperations, root, schedulerGroup);
     }
 
