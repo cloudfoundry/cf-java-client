@@ -24,6 +24,7 @@ import lombok.ToString;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEvents;
+import org.cloudfoundry.client.v2.buildpacks.Buildpacks;
 import org.cloudfoundry.client.v2.domains.Domains;
 import org.cloudfoundry.client.v2.environmentvariablegroups.EnvironmentVariableGroups;
 import org.cloudfoundry.client.v2.events.Events;
@@ -56,6 +57,7 @@ import org.cloudfoundry.client.v3.processes.Processes;
 import org.cloudfoundry.client.v3.tasks.Tasks;
 import org.cloudfoundry.spring.client.v2.applications.SpringApplicationsV2;
 import org.cloudfoundry.spring.client.v2.applicationusageevents.SpringApplicationUsageEvents;
+import org.cloudfoundry.spring.client.v2.buildpacks.SpringBuildpacks;
 import org.cloudfoundry.spring.client.v2.domains.SpringDomains;
 import org.cloudfoundry.spring.client.v2.environmentvariablegroups.SpringEnvironmentVariableGroups;
 import org.cloudfoundry.spring.client.v2.events.SpringEvents;
@@ -118,6 +120,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     private final ApplicationsV2 applicationsV2;
 
     private final ApplicationsV3 applicationsV3;
+
+    private final Buildpacks buildpacks;
 
     private final ConnectionContext connectionContext;
 
@@ -199,6 +203,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.applicationUsageEvents = new SpringApplicationUsageEvents(restOperations, root, schedulerGroup);
         this.applicationsV2 = new SpringApplicationsV2(restOperations, root, schedulerGroup);
         this.applicationsV3 = new SpringApplicationsV3(restOperations, root, schedulerGroup);
+        this.buildpacks = new SpringBuildpacks(restOperations, root, schedulerGroup);
         this.domains = new SpringDomains(restOperations, root, schedulerGroup);
         this.droplets = new SpringDroplets(restOperations, root, schedulerGroup);
         this.environmentVariableGroups = new SpringEnvironmentVariableGroups(restOperations, root, schedulerGroup);
@@ -259,6 +264,11 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     @Override
     public ApplicationsV3 applicationsV3() {
         return this.applicationsV3;
+    }
+
+    @Override
+    public Buildpacks buildpacks() {
+        return this.buildpacks;
     }
 
     @Override

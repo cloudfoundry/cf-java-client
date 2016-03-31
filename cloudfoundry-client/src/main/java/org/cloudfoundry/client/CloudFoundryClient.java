@@ -18,6 +18,7 @@ package org.cloudfoundry.client;
 
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEvents;
+import org.cloudfoundry.client.v2.buildpacks.Buildpacks;
 import org.cloudfoundry.client.v2.domains.Domains;
 import org.cloudfoundry.client.v2.environmentvariablegroups.EnvironmentVariableGroups;
 import org.cloudfoundry.client.v2.events.Events;
@@ -80,6 +81,13 @@ public interface CloudFoundryClient {
      * @return the Cloud Foundry Application V3 Client API
      */
     ApplicationsV3 applicationsV3();
+
+    /**
+     * Main entry point to the Cloud Foundry Buildpacks V2 Client API
+     *
+     * @return the Cloud Foundry Buildpacks Client API
+     */
+    Buildpacks buildpacks();
 
     /**
      * Main entry point to the Cloud Foundry Domains Client API

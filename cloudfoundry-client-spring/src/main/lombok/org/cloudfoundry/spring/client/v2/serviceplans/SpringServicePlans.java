@@ -38,6 +38,8 @@ import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
 
+import java.net.URI;
+
 /**
  * The Spring-based implementation of {@link ServicePlans}
  */
@@ -51,7 +53,7 @@ public final class SpringServicePlans extends AbstractSpringOperations implement
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param schedulerGroup The group to use when making requests
      */
-    public SpringServicePlans(RestOperations restOperations, java.net.URI root, SchedulerGroup schedulerGroup) {
+    public SpringServicePlans(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
         super(restOperations, root, schedulerGroup);
     }
 
