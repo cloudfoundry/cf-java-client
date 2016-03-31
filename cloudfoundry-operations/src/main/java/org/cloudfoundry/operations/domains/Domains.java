@@ -31,4 +31,12 @@ public interface Domains {
      */
     Mono<Void> create(CreateDomainRequest request);
 
+    /**
+     * Create a new shared domain
+     *
+     * @param request the Create Shared Domain request
+     * @return a completion indicator
+     */
+    Mono<Void> createShared(CreateSharedDomainRequest request);
+
 }
