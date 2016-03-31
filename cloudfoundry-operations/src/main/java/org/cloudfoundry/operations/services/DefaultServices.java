@@ -152,12 +152,6 @@ public final class DefaultServices implements Services {
             .after();
     }
 
-    private static String convertInstanceType(String type) {
-        if ("managed_service_instance".equals(type)) return "managed";
-        if ("user_provided_service_instance".equals(type)) return "user-provided";
-        return "unknown";
-    }
-
     private static String convertLastOperation(LastOperation lastOperation) {
         return String.format("%s %s", lastOperation.getType(), lastOperation.getState());
     }
@@ -401,7 +395,6 @@ public final class DefaultServices implements Services {
             .lastOperation(Optional.ofNullable(entity.getLastOperation()).map(DefaultServices::convertLastOperation).orElse(null))
             .name(entity.getName())
             .plan(plan.orElse(null))
-            .type(convertInstanceType(entity.getType()))
             .service(service.orElse(null))
             .applications(applications)
             .build();

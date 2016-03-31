@@ -709,7 +709,6 @@ public final class DefaultServicesTest {
                     .name("test-service-instance-name")
                     .plan("test-service-plan")
                     .service("test-service")
-                    .type("managed")
                     .build());
         }
 
@@ -784,7 +783,6 @@ public final class DefaultServicesTest {
                 .assertEquals(ServiceInstance.builder()
                     .id("test-service-instance-id")
                     .name("test-service-instance-name")
-                    .type("user-provided")
                     .build());
         }
 
@@ -819,7 +817,6 @@ public final class DefaultServicesTest {
                 .assertEquals(ServiceInstance.builder()
                     .id("test-service-instance1-id")
                     .name("test-service-instance1")
-                    .type("user-provided")
                     .build())
                 .assertEquals(ServiceInstance.builder()
                     .application("test-application")
@@ -828,7 +825,6 @@ public final class DefaultServicesTest {
                     .name("test-service-instance2")
                     .plan("test-service-plan")
                     .service("test-service")
-                    .type("managed")
                     .build());
         }
 

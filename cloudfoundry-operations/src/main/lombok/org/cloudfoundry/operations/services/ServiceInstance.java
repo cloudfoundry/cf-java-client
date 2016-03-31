@@ -76,29 +76,19 @@ public final class ServiceInstance {
      */
     private final String service;
 
-    /**
-     * The type of service, "user-provided" or "managed"
-     *
-     * @param type the type of service
-     * @return the type of service
-     */
-    private final String type;
-
     @Builder
     ServiceInstance(@Singular List<String> applications,
                     String id,
                     String lastOperation,
                     String name,
                     String plan,
-                    String service,
-                    String type) {
+                    String service) {
         this.applications = applications;
         this.id = id;
         this.lastOperation = lastOperation;
         this.name = name;
         this.plan = plan;
         this.service = service;
-        this.type = type;
     }
 
 }
