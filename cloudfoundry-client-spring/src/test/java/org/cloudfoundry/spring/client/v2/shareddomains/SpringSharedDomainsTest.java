@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.spring.client.v2.shareddomains;
 
+import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest;
+import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainEntity;
@@ -25,9 +28,59 @@ import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringSharedDomainsTest {
+
+    public static final class Create extends AbstractApiTest<CreateSharedDomainRequest, CreateSharedDomainResponse> {
+
+        private final SpringSharedDomains sharedDomains = new SpringSharedDomains(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected CreateSharedDomainRequest getInvalidRequest() {
+            return CreateSharedDomainRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(POST).path("/v2/shared_domains")
+                .requestPayload("fixtures/client/v2/shared_domains/POST_request.json")
+                .status(OK)
+                .responsePayload("fixtures/client/v2/shared_domains/POST_response.json");
+        }
+
+        @Override
+        protected CreateSharedDomainResponse getResponse() {
+            return CreateSharedDomainResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .id("5e9d838e-6d4f-42cd-ba13-789bfae2277c")
+                    .url("/v2/shared_domains/5e9d838e-6d4f-42cd-ba13-789bfae2277c")
+                    .createdAt("2015-12-22T18:28:19Z")
+                    .build())
+                .entity(SharedDomainEntity.builder()
+                    .name("shared-domain.com")
+                    .routerGroupId("random-guid")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected CreateSharedDomainRequest getValidRequest() throws Exception {
+            return CreateSharedDomainRequest.builder()
+                .name("shared-domain.com")
+                .routerGroupId("random-guid")
+                .build();
+        }
+
+        @Override
+        protected Mono<CreateSharedDomainResponse> invoke(CreateSharedDomainRequest request) {
+            return this.sharedDomains.create(request);
+        }
+
+    }
 
     public static final class ListSharedDomains extends AbstractApiTest<ListSharedDomainsRequest, ListSharedDomainsResponse> {
 
