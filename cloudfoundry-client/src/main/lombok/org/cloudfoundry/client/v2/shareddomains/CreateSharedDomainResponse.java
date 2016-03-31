@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.cloudfoundry.client.v2.shareddomains;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -31,8 +32,10 @@ import org.cloudfoundry.client.v2.Resource;
 @ToString(callSuper = true)
 public final class CreateSharedDomainResponse extends Resource<SharedDomainEntity> {
 
-    @Builder CreateSharedDomainResponse(@JsonProperty("entity") SharedDomainEntity entity,
-            @JsonProperty("metadata") Metadata metadata) {
+    @Builder
+    CreateSharedDomainResponse(@JsonProperty("entity") SharedDomainEntity entity,
+                               @JsonProperty("metadata") Metadata metadata) {
+
         super(entity, metadata);
     }
 

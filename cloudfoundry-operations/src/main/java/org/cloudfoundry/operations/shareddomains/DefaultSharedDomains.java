@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.cloudfoundry.operations.shareddomains;
 
 import org.cloudfoundry.client.CloudFoundryClient;
@@ -20,8 +21,6 @@ import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest;
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
 import org.cloudfoundry.util.ValidationUtils;
 import reactor.core.publisher.Mono;
-
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public class DefaultSharedDomains implements SharedDomains {
 
@@ -34,17 +33,17 @@ public class DefaultSharedDomains implements SharedDomains {
     @Override
     public Mono<Void> create(CreateSharedDomainRequest request) {
         return ValidationUtils.validate(request)
-                .then(request1 -> requestCreateSharedDomain(this.cloudFoundryClient,
-                        request1.getName(), request1.getRouterGroupId()))
-                .after();
+            .then(request1 -> requestCreateSharedDomain(this.cloudFoundryClient, request1.getName(), request1.getRouterGroupId()))
+            .after();
     }
 
     private static Mono<CreateSharedDomainResponse> requestCreateSharedDomain(
-            CloudFoundryClient cloudFoundryClient, String sharedDomain, String routerGroupId) {
+        CloudFoundryClient cloudFoundryClient, String sharedDomain, String routerGroupId) {
         return cloudFoundryClient.sharedDomains()
-                .create(CreateSharedDomainRequest.builder()
-                        .name(sharedDomain)
-                        .routerGroupId(routerGroupId)
-                        .build());
+            .create(CreateSharedDomainRequest.builder()
+                .name(sharedDomain)
+                .routerGroupId(routerGroupId)
+                .build());
     }
+
 }

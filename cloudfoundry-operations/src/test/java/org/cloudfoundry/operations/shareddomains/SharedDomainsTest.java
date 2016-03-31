@@ -31,16 +31,14 @@ public final class SharedDomainsTest {
 
     private static void requestCreateSharedDomain(CloudFoundryClient cloudFoundryClient, String domain, String routerGroupId) {
         when(cloudFoundryClient.sharedDomains()
-                .create(CreateSharedDomainRequest.builder()
-                        .name(domain)
-                        .routerGroupId(routerGroupId)
-                        .build()))
-                .thenReturn(Mono
-                        .just(fill(CreateSharedDomainResponse.builder(), "shared-domain-")
-                                .build()));
+            .create(CreateSharedDomainRequest.builder()
+                .name(domain)
+                .routerGroupId(routerGroupId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(CreateSharedDomainResponse.builder(), "shared-domain-")
+                    .build()));
     }
-
-
 
     public static final class CreateSharedDomain extends AbstractOperationsApiTest<Void> {
 
@@ -52,17 +50,17 @@ public final class SharedDomainsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
         @Override
         protected Mono<Void> invoke() {
             return this.sharedDomains
-                    .create(CreateSharedDomainRequest.builder()
-                            .name("shared-domain")
-                            .routerGroupId("random-guid")
-                            .build());
+                .create(CreateSharedDomainRequest.builder()
+                    .name("shared-domain")
+                    .routerGroupId("random-guid")
+                    .build());
         }
 
     }

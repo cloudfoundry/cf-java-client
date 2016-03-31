@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.cloudfoundry.client.v2.shareddomains;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -46,7 +47,8 @@ public final class CreateSharedDomainRequest implements Validatable {
     @Getter(onMethod = @__(@JsonProperty("router_group_guid")))
     private final String routerGroupId;
 
-    @Builder CreateSharedDomainRequest(String name, String routerGroupId) {
+    @Builder
+    CreateSharedDomainRequest(String name, String routerGroupId) {
         this.name = name;
         this.routerGroupId = routerGroupId;
     }
@@ -56,7 +58,7 @@ public final class CreateSharedDomainRequest implements Validatable {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
         if (this.name == null) {
-            builder.message("shared domain name must be specified");
+            builder.message("name must be specified");
         }
 
         return builder.build();

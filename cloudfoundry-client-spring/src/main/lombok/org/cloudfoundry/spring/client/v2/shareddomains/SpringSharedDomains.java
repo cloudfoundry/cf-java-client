@@ -29,7 +29,6 @@ import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
 
-import java.lang.Override;
 import java.net.URI;
 
 /**
@@ -50,6 +49,11 @@ public final class SpringSharedDomains extends AbstractSpringOperations implemen
     }
 
     @Override
+    public Mono<CreateSharedDomainResponse> create(CreateSharedDomainRequest request) {
+        return post(request, CreateSharedDomainResponse.class, builder -> builder.pathSegment("v2", "shared_domains"));
+    }
+
+    @Override
     public Mono<ListSharedDomainsResponse> list(ListSharedDomainsRequest request) {
         return get(request, ListSharedDomainsResponse.class, builder -> {
             builder.pathSegment("v2", "shared_domains");
@@ -58,9 +62,4 @@ public final class SpringSharedDomains extends AbstractSpringOperations implemen
         });
     }
 
-    @Override
-    public Mono<CreateSharedDomainResponse> create(CreateSharedDomainRequest request) {
-        return post(request, CreateSharedDomainResponse.class, builder ->
-                builder.pathSegment("v2", "shared_domains"));
-    }
 }

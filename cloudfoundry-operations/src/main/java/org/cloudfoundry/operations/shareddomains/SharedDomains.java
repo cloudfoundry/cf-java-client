@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.cloudfoundry.operations.shareddomains;
 
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest;
-import org.cloudfoundry.operations.domains.CreateDomainRequest;
 import reactor.core.publisher.Mono;
 
 /**
@@ -31,4 +31,5 @@ public interface SharedDomains {
      * @return a completion indicator
      */
     Mono<Void> create(CreateSharedDomainRequest request);
+
 }
