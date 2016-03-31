@@ -21,6 +21,7 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
+import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
@@ -49,6 +50,14 @@ public final class DefaultDomains implements Domains {
             .after();
     }
 
+    @Override
+    public Mono<Void> createShared(CreateSharedDomainRequest request) {
+        return ValidationUtils
+            .validate(request)
+            .then(request1 -> requestCreateSharedDomain(this.cloudFoundryClient, request1.getDomain()))
+            .after();
+    }
+
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
         return requestOrganizations(cloudFoundryClient, organization)
             .single()
@@ -65,6 +74,13 @@ public final class DefaultDomains implements Domains {
             .create(CreatePrivateDomainRequest.builder()
                 .name(domain)
                 .owningOrganizationId(organizationId)
+                .build());
+    }
+
+    private static Mono<CreateSharedDomainResponse> requestCreateSharedDomain(CloudFoundryClient cloudFoundryClient, String domain) {
+        return cloudFoundryClient.sharedDomains()
+            .create(org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest.builder()
+                .name(domain)
                 .build());
     }
 

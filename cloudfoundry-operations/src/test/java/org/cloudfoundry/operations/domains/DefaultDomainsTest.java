@@ -22,7 +22,9 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
+import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
+import org.cloudfoundry.util.RequestValidationException;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import reactor.core.publisher.Mono;
@@ -41,6 +43,16 @@ public final class DefaultDomainsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(CreatePrivateDomainResponse.builder(), "private-domain-")
+                    .build()));
+    }
+
+    private static void requestCreateSharedDomain(CloudFoundryClient cloudFoundryClient, String domain) {
+        when(cloudFoundryClient.sharedDomains()
+            .create(org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest.builder()
+                .name(domain)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(CreateSharedDomainResponse.builder(), "shared-domain-")
                     .build()));
     }
 
@@ -113,6 +125,49 @@ public final class DefaultDomainsTest {
                 .create(CreateDomainRequest.builder()
                     .domain("test-domain")
                     .organization("test-organization")
+                    .build());
+        }
+
+    }
+
+    public static final class CreateSharedDomain extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultDomains domains = new DefaultDomains(this.cloudFoundryClient);
+
+        @Before
+        public void setUp() throws Exception {
+            requestCreateSharedDomain(this.cloudFoundryClient, "test-domain");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.domains
+                .createShared(CreateSharedDomainRequest.builder()
+                    .domain("test-domain")
+                    .build());
+        }
+
+    }
+
+    public static final class CreateSharedDomainInvalidRequest extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultDomains domains = new DefaultDomains(this.cloudFoundryClient);
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            testSubscriber
+                .assertError(RequestValidationException.class, "Request is invalid: domain must be specified");
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.domains
+                .createShared(CreateSharedDomainRequest.builder()
                     .build());
         }
 
