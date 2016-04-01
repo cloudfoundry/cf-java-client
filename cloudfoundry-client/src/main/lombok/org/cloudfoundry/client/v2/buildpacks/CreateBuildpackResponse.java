@@ -21,20 +21,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.cloudfoundry.client.v2.Resource;
 
 /**
- * The resource response payload for Buildpacks
+ * The response payload for the Create Buildpack operation
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class BuildpackResource extends AbstractBuildpackResource {
+public final class CreateBuildpackResponse extends AbstractBuildpackResource {
 
     @Builder
-    BuildpackResource(@JsonProperty("entity") BuildpackEntity entity,
-                      @JsonProperty("metadata") Resource.Metadata metadata) {
-
+    CreateBuildpackResponse(@JsonProperty("entity") BuildpackEntity entity,
+                            @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 

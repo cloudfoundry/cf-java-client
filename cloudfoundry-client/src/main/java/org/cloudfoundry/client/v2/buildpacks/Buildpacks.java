@@ -24,6 +24,14 @@ import reactor.core.publisher.Mono;
 public interface Buildpacks {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/buildpacks/creates_an_admin_buildpack.html">Create the Buildpack</a> request
+     *
+     * @param request the Create Buildpack request
+     * @return the response from the Create Buildpack request
+     */
+    Mono<CreateBuildpackResponse> create(CreateBuildpackRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/buildpacks/delete_a_particular_buildpack.html">Delete the Buildpack</a> request
      *
      * @param request the Delete Buildpack request
