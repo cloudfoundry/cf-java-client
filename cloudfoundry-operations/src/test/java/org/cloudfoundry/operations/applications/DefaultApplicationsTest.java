@@ -127,6 +127,27 @@ public final class DefaultApplicationsTest {
         when(randomWords.getNoun()).thenReturn("test-noun");
     }
 
+    private static void requestApplicationEmptyInstance(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .instances(ApplicationInstancesRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .just(ApplicationInstancesResponse.builder()
+                    .instance("instance-0", ApplicationInstanceInfo.builder().build())
+                    .build()));
+    }
+
+    private static void requestApplicationEmptyStats(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .statistics(ApplicationStatisticsRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .just(ApplicationStatisticsResponse.builder()
+                    .build()));
+    }
+
     private static void requestApplicationEnvironment(CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient.applicationsV2()
             .environment(ApplicationEnvironmentRequest.builder()
@@ -148,7 +169,7 @@ public final class DefaultApplicationsTest {
                 .applicationId(applicationId)
                 .build()))
             .thenReturn(Mono
-                .just(fill(ApplicationInstancesResponse.builder(), "application-instances-")
+                .just(ApplicationInstancesResponse.builder()
                     .instance("instance-0", fill(ApplicationInstanceInfo.builder(), "application-instance-info-")
                         .build())
                     .build()));
@@ -205,6 +226,43 @@ public final class DefaultApplicationsTest {
                 .just(fill(ApplicationInstancesResponse.builder(), "application-instances-")
                     .instance("instance-0", fill(ApplicationInstanceInfo.builder(), "application-instance-info-")
                         .state("STARTING")
+                        .build())
+                    .build()));
+    }
+
+    private static void requestApplicationNoInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .instances(ApplicationInstancesRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .just(ApplicationInstancesResponse.builder().build()));
+    }
+
+    private static void requestApplicationNullStats(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .statistics(ApplicationStatisticsRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .just(ApplicationStatisticsResponse.builder()
+                    .instance("instance-0", fill(ApplicationStatisticsResponse.InstanceStats.builder(), "instance-statistics-")
+                        .statistics(null)
+                        .build())
+                    .build()));
+    }
+
+    private static void requestApplicationNullUsage(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .statistics(ApplicationStatisticsRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .just(ApplicationStatisticsResponse.builder()
+                    .instance("instance-0", fill(ApplicationStatisticsResponse.InstanceStats.builder(), "instance-statistics-")
+                        .statistics(fill(ApplicationStatisticsResponse.InstanceStats.Statistics.builder(), "statistics-")
+                            .usage(null)
+                            .build())
                         .build())
                     .build()));
     }
@@ -1925,6 +1983,208 @@ public final class DefaultApplicationsTest {
                     .buildpack(null)
                     .id("test-application-summary-id")
                     .instanceDetail(fill(ApplicationDetail.InstanceDetail.builder())
+                        .since(new Date(1000))
+                        .state("test-application-instance-info-state")
+                        .build())
+                    .lastUploaded(new Date(0))
+                    .name("test-application-summary-name")
+                    .requestedState("test-application-summary-state")
+                    .stack("test-stack-entity-name")
+                    .url("test-route-host.test-domain-name")
+                    .build());
+        }
+
+        @Override
+        protected Mono<ApplicationDetail> invoke() {
+            return this.applications
+                .get(GetApplicationRequest.builder()
+                    .name("test-app")
+                    .build());
+        }
+
+    }
+
+    public static final class GetWithEmptyInstance extends AbstractOperationsApiTest<ApplicationDetail> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+            requestApplicationStats(this.cloudFoundryClient, "test-metadata-id");
+            requestStack(this.cloudFoundryClient, "test-application-stackId");
+            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+            requestApplicationEmptyInstance(this.cloudFoundryClient, "test-metadata-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationDetail> testSubscriber) {
+            testSubscriber
+                .assertEquals(fill(ApplicationDetail.builder())
+                    .buildpack("test-application-summary-buildpack")
+                    .id("test-application-summary-id")
+                    .instanceDetail(fill(ApplicationDetail.InstanceDetail.builder())
+                        .state(null)
+                        .build())
+                    .lastUploaded(new Date(0))
+                    .name("test-application-summary-name")
+                    .requestedState("test-application-summary-state")
+                    .stack("test-stack-entity-name")
+                    .url("test-route-host.test-domain-name")
+                    .build());
+        }
+
+        @Override
+        protected Mono<ApplicationDetail> invoke() {
+            return this.applications
+                .get(GetApplicationRequest.builder()
+                    .name("test-app")
+                    .build());
+        }
+
+    }
+
+    public static final class GetWithEmptyInstanceStats extends AbstractOperationsApiTest<ApplicationDetail> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+            requestApplicationEmptyStats(this.cloudFoundryClient, "test-metadata-id");
+            requestStack(this.cloudFoundryClient, "test-application-stackId");
+            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+            requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationDetail> testSubscriber) {
+            testSubscriber
+                .assertEquals(fill(ApplicationDetail.builder())
+                    .buildpack("test-application-summary-buildpack")
+                    .id("test-application-summary-id")
+                    .instanceDetail(ApplicationDetail.InstanceDetail.builder()
+                        .since(new Date(1000))
+                        .state("test-application-instance-info-state")
+                        .build())
+                    .lastUploaded(new Date(0))
+                    .name("test-application-summary-name")
+                    .requestedState("test-application-summary-state")
+                    .stack("test-stack-entity-name")
+                    .url("test-route-host.test-domain-name")
+                    .build());
+        }
+
+        @Override
+        protected Mono<ApplicationDetail> invoke() {
+            return this.applications
+                .get(GetApplicationRequest.builder()
+                    .name("test-app")
+                    .build());
+        }
+
+    }
+
+    public static final class GetWithNoInstances extends AbstractOperationsApiTest<ApplicationDetail> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+            requestApplicationStats(this.cloudFoundryClient, "test-metadata-id");
+            requestStack(this.cloudFoundryClient, "test-application-stackId");
+            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+            requestApplicationNoInstances(this.cloudFoundryClient, "test-metadata-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationDetail> testSubscriber) {
+            testSubscriber
+                .assertEquals(fill(ApplicationDetail.builder())
+                    .buildpack("test-application-summary-buildpack")
+                    .id("test-application-summary-id")
+                    .lastUploaded(new Date(0))
+                    .name("test-application-summary-name")
+                    .requestedState("test-application-summary-state")
+                    .stack("test-stack-entity-name")
+                    .url("test-route-host.test-domain-name")
+                    .build());
+        }
+
+        @Override
+        protected Mono<ApplicationDetail> invoke() {
+            return this.applications
+                .get(GetApplicationRequest.builder()
+                    .name("test-app")
+                    .build());
+        }
+
+    }
+
+    public static final class GetWithNullStats extends AbstractOperationsApiTest<ApplicationDetail> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+            requestApplicationNullStats(this.cloudFoundryClient, "test-metadata-id");
+            requestStack(this.cloudFoundryClient, "test-application-stackId");
+            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+            requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationDetail> testSubscriber) {
+            testSubscriber
+                .assertEquals(fill(ApplicationDetail.builder())
+                    .buildpack("test-application-summary-buildpack")
+                    .id("test-application-summary-id")
+                    .instanceDetail(ApplicationDetail.InstanceDetail.builder()
+                        .since(new Date(1000))
+                        .state("test-application-instance-info-state")
+                        .build())
+                    .lastUploaded(new Date(0))
+                    .name("test-application-summary-name")
+                    .requestedState("test-application-summary-state")
+                    .stack("test-stack-entity-name")
+                    .url("test-route-host.test-domain-name")
+                    .build());
+        }
+
+        @Override
+        protected Mono<ApplicationDetail> invoke() {
+            return this.applications
+                .get(GetApplicationRequest.builder()
+                    .name("test-app")
+                    .build());
+        }
+
+    }
+
+    public static final class GetWithNullUsage extends AbstractOperationsApiTest<ApplicationDetail> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+            requestApplicationNullUsage(this.cloudFoundryClient, "test-metadata-id");
+            requestStack(this.cloudFoundryClient, "test-application-stackId");
+            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+            requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationDetail> testSubscriber) {
+            testSubscriber
+                .assertEquals(fill(ApplicationDetail.builder())
+                    .buildpack("test-application-summary-buildpack")
+                    .id("test-application-summary-id")
+                    .instanceDetail(ApplicationDetail.InstanceDetail.builder()
+                        .diskQuota(1l)
+                        .memoryQuota(1l)
                         .since(new Date(1000))
                         .state("test-application-instance-info-state")
                         .build())

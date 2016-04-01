@@ -471,6 +471,23 @@ public final class DefaultApplications implements Applications {
         }
     }
 
+    private static ApplicationStatisticsResponse.InstanceStats.Statistics emptyApplicationStatistics() {
+        return ApplicationStatisticsResponse.InstanceStats.Statistics.builder()
+            .usage(emptyApplicationUsage())
+            .build();
+    }
+
+    private static ApplicationStatisticsResponse.InstanceStats.Statistics.Usage emptyApplicationUsage() {
+        return ApplicationStatisticsResponse.InstanceStats.Statistics.Usage.builder()
+            .build();
+    }
+
+    private static ApplicationStatisticsResponse.InstanceStats emptyInstanceStats() {
+        return ApplicationStatisticsResponse.InstanceStats.builder()
+            .statistics(emptyApplicationStatistics())
+            .build();
+    }
+
     private static String eventDescription(Map<String, Object> request, String... entryNames) {
         if (request == null) return "";
         boolean first = true;
@@ -1191,8 +1208,9 @@ public final class DefaultApplications implements Applications {
     }
 
     private static ApplicationDetail.InstanceDetail toInstanceDetail(Map.Entry<String, ApplicationInstanceInfo> entry, ApplicationStatisticsResponse statisticsResponse) {
-        ApplicationStatisticsResponse.InstanceStats.Statistics stats = statisticsResponse.get(entry.getKey()).getStatistics();
-        ApplicationStatisticsResponse.InstanceStats.Statistics.Usage usage = stats.getUsage();
+        ApplicationStatisticsResponse.InstanceStats instanceStats = Optional.ofNullable(statisticsResponse.get(entry.getKey())).orElse(emptyInstanceStats());
+        ApplicationStatisticsResponse.InstanceStats.Statistics stats = Optional.ofNullable(instanceStats.getStatistics()).orElse(emptyApplicationStatistics());
+        ApplicationStatisticsResponse.InstanceStats.Statistics.Usage usage = Optional.ofNullable(stats.getUsage()).orElse(emptyApplicationUsage());
 
         return ApplicationDetail.InstanceDetail.builder()
             .state(entry.getValue().getState())
