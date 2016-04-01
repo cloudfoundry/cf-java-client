@@ -22,6 +22,8 @@ import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagRequest;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagResponse;
 import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsRequest;
 import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsResponse;
+import org.cloudfoundry.client.v2.featureflags.SetFeatureFlagRequest;
+import org.cloudfoundry.client.v2.featureflags.SetFeatureFlagResponse;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
@@ -54,6 +56,11 @@ public final class SpringFeatureFlags extends AbstractSpringOperations implement
     @Override
     public Mono<ListFeatureFlagsResponse> list(ListFeatureFlagsRequest request) {
         return get(request, ListFeatureFlagsResponse.class, builder -> builder.pathSegment("v2", "config", "feature_flags"));
+    }
+
+    @Override
+    public Mono<SetFeatureFlagResponse> set(SetFeatureFlagRequest request) {
+        return put(request, SetFeatureFlagResponse.class, builder -> builder.pathSegment("v2", "config", "feature_flags", request.getName()));
     }
 
 }
