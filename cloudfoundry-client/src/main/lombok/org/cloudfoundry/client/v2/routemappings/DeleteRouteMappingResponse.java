@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v2.routemappings;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -31,8 +32,11 @@ import org.cloudfoundry.client.v2.job.JobEntity;
 @ToString(callSuper = true)
 public final class DeleteRouteMappingResponse extends Resource<JobEntity> {
 
+    @Builder
     DeleteRouteMappingResponse(@JsonProperty("entity") JobEntity entity,
                                @JsonProperty("metadata") Metadata metadata) {
+
         super(entity, metadata);
     }
+
 }

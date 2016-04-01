@@ -32,15 +32,6 @@ import org.cloudfoundry.ValidationResult;
 public final class DeleteRouteMappingRequest implements Validatable {
 
     /**
-     * The route mapping id
-     *
-     * @param routeMappingId the route mapping id
-     * @return the route mapping id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String routeMappingId;
-
-    /**
      * The async parameter
      *
      * @param async the async parameter
@@ -48,6 +39,15 @@ public final class DeleteRouteMappingRequest implements Validatable {
      */
     @Getter(onMethod = @__(@QueryParameter("async")))
     private final Boolean async;
+
+    /**
+     * The route mapping id
+     *
+     * @param routeMappingId the route mapping id
+     * @return the route mapping id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String routeMappingId;
 
     @Builder
     DeleteRouteMappingRequest(String routeMappingId, Boolean async) {
@@ -65,4 +65,5 @@ public final class DeleteRouteMappingRequest implements Validatable {
         }
         return builder.build();
     }
+
 }

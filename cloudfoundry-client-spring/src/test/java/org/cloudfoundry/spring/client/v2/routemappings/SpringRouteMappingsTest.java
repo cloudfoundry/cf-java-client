@@ -17,6 +17,7 @@
 package org.cloudfoundry.spring.client.v2.routemappings;
 
 import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.job.JobEntity;
 import org.cloudfoundry.client.v2.routemappings.CreateRouteMappingRequest;
 import org.cloudfoundry.client.v2.routemappings.CreateRouteMappingResponse;
 import org.cloudfoundry.client.v2.routemappings.DeleteRouteMappingRequest;
@@ -28,6 +29,7 @@ import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 
@@ -116,6 +118,54 @@ public final class SpringRouteMappingsTest {
         protected Publisher<DeleteRouteMappingResponse> invoke(DeleteRouteMappingRequest request) {
             return this.routeMappings.delete(request);
         }
+    }
+
+    public static final class DeleteAsync extends AbstractApiTest<DeleteRouteMappingRequest, DeleteRouteMappingResponse> {
+
+        private final SpringRouteMappings routeMappings = new SpringRouteMappings(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteRouteMappingRequest getInvalidRequest() {
+            return DeleteRouteMappingRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(DELETE).path("/v2/route_mappings/random-route-mapping-id?async=true")
+                .status(ACCEPTED)
+                .responsePayload("fixtures/client/v2/route_mappings/DELETE_{id}_async_response.json");
+        }
+
+        @Override
+        protected DeleteRouteMappingResponse getResponse() {
+            return DeleteRouteMappingResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .createdAt("2016-02-02T17:16:31Z")
+                    .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .build())
+                .entity(JobEntity.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .status("queued")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected DeleteRouteMappingRequest getValidRequest() throws Exception {
+            return DeleteRouteMappingRequest.builder()
+                .async(true)
+                .routeMappingId("random-route-mapping-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<DeleteRouteMappingResponse> invoke(DeleteRouteMappingRequest request) {
+            return this.routeMappings.delete(request);
+        }
+
     }
 
 }
