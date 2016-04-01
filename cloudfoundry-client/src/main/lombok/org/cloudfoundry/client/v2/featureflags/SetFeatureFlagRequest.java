@@ -61,6 +61,7 @@ public final class SetFeatureFlagRequest implements Validatable {
     SetFeatureFlagRequest(Boolean enabled,
                           String errorMessage,
                           String name) {
+
         this.enabled = enabled;
         this.errorMessage = errorMessage;
         this.name = name;
@@ -80,4 +81,5 @@ public final class SetFeatureFlagRequest implements Validatable {
 
         return builder.build();
     }
+
 }
