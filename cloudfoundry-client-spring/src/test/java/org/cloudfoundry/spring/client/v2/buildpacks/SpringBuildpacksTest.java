@@ -19,6 +19,8 @@ package org.cloudfoundry.spring.client.v2.buildpacks;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.buildpacks.BuildpackEntity;
 import org.cloudfoundry.client.v2.buildpacks.BuildpackResource;
+import org.cloudfoundry.client.v2.buildpacks.CreateBuildpackRequest;
+import org.cloudfoundry.client.v2.buildpacks.CreateBuildpackResponse;
 import org.cloudfoundry.client.v2.buildpacks.DeleteBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.DeleteBuildpackResponse;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
@@ -29,9 +31,61 @@ import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringBuildpacksTest {
+
+    public static final class Create extends AbstractApiTest<CreateBuildpackRequest, CreateBuildpackResponse> {
+
+        private SpringBuildpacks buildpacks = new SpringBuildpacks(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected CreateBuildpackRequest getInvalidRequest() {
+            return CreateBuildpackRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(POST).path("/v2/buildpacks")
+                .requestPayload("fixtures/client/v2/buildpacks/POST_request.json")
+                .status(CREATED)
+                .responsePayload("fixtures/client/v2/buildpacks/POST_response.json");
+        }
+
+        @Override
+        protected CreateBuildpackResponse getResponse() {
+            return CreateBuildpackResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .createdAt("2016-03-17T21:41:28Z")
+                    .id("9c38753c-960c-44aa-ac46-37ad61b87e35")
+                    .url("/v2/buildpacks/9c38753c-960c-44aa-ac46-37ad61b87e35")
+                    .build()
+                )
+                .entity(BuildpackEntity.builder()
+                    .enabled(true)
+                    .locked(false)
+                    .name("Golang_buildpack")
+                    .position(1)
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected CreateBuildpackRequest getValidRequest() throws Exception {
+            return CreateBuildpackRequest.builder()
+                .name("Golang_buildpack")
+                .build();
+        }
+
+        @Override
+        protected Mono<CreateBuildpackResponse> invoke(CreateBuildpackRequest request) {
+            return this.buildpacks.create(request);
+        }
+
+    }
 
     public static final class Delete extends AbstractApiTest<DeleteBuildpackRequest, DeleteBuildpackResponse> {
 

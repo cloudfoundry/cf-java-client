@@ -17,23 +17,21 @@
 package org.cloudfoundry.client.v2.buildpacks;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.cloudfoundry.client.v2.Resource;
 
 /**
- * The resource response payload for Buildpacks
+ * Buildpacks in responses
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class BuildpackResource extends AbstractBuildpackResource {
+public abstract class AbstractBuildpackResource extends Resource<BuildpackEntity> {
 
-    @Builder
-    BuildpackResource(@JsonProperty("entity") BuildpackEntity entity,
-                      @JsonProperty("metadata") Resource.Metadata metadata) {
+    AbstractBuildpackResource(@JsonProperty("entity") BuildpackEntity entity,
+                              @JsonProperty("metadata") Metadata metadata) {
 
         super(entity, metadata);
     }
