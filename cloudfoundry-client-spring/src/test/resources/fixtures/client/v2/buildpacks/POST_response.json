@@ -1,0 +1,15 @@
+{
+  "metadata": {
+    "guid": "9c38753c-960c-44aa-ac46-37ad61b87e35",
+    "url": "/v2/buildpacks/9c38753c-960c-44aa-ac46-37ad61b87e35",
+    "created_at": "2016-03-17T21:41:28Z",
+    "updated_at": null
+  },
+  "entity": {
+    "name": "Golang_buildpack",
+    "position": 1,
+    "enabled": true,
+    "locked": false,
+    "filename": null
+  }
+}
