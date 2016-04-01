@@ -21,10 +21,13 @@ import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagRequest;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagResponse;
 import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsRequest;
 import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsResponse;
+import org.cloudfoundry.client.v2.featureflags.SetFeatureFlagRequest;
+import org.cloudfoundry.client.v2.featureflags.SetFeatureFlagResponse;
 import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.OK;
 
 
@@ -216,6 +219,49 @@ public final class SpringFeatureFlagsTest {
         @Override
         protected Mono<ListFeatureFlagsResponse> invoke(ListFeatureFlagsRequest request) {
             return this.featureFlags.list(request);
+        }
+
+    }
+
+    public static final class Set extends AbstractApiTest<SetFeatureFlagRequest, SetFeatureFlagResponse> {
+
+        private final SpringFeatureFlags featureFlags = new SpringFeatureFlags(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected SetFeatureFlagRequest getInvalidRequest() {
+            return SetFeatureFlagRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(PUT).path("/v2/config/feature_flags/user_org_creation")
+                .requestPayload("fixtures/client/v2/feature_flags/PUT_user_org_creation_request.json")
+                .status(OK)
+                .responsePayload("fixtures/client/v2/feature_flags/PUT_user_org_creation_response.json");
+        }
+
+        @Override
+        protected SetFeatureFlagResponse getResponse() {
+            return SetFeatureFlagResponse.builder()
+                .name("user_org_creation")
+                .enabled(true)
+                .url("/v2/config/feature_flags/user_org_creation")
+                .build();
+        }
+
+        @Override
+        protected SetFeatureFlagRequest getValidRequest() {
+            return SetFeatureFlagRequest.builder()
+                .enabled(true)
+                .name("user_org_creation")
+                .build();
+        }
+
+        @Override
+        protected Mono<SetFeatureFlagResponse> invoke(SetFeatureFlagRequest request) {
+            return this.featureFlags.set(request);
         }
 
     }
