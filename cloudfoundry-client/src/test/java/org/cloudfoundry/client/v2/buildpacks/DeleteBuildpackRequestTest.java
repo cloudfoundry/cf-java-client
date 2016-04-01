@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.serviceinstances;
+package org.cloudfoundry.client.v2.buildpacks;
 
 import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
@@ -23,22 +23,22 @@ import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class DeleteServiceInstanceRequestTest {
+public class DeleteBuildpackRequestTest {
 
     @Test
     public void isNotValidNoId() {
-        ValidationResult result = DeleteServiceInstanceRequest.builder()
+        ValidationResult result = DeleteBuildpackRequest.builder()
             .build()
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("service instance id must be specified", result.getMessages().get(0));
+        assertEquals("buildpack id must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValid() {
-        ValidationResult result = DeleteServiceInstanceRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
+        ValidationResult result = DeleteBuildpackRequest.builder()
+            .buildpackId("test-buildpack-id")
             .build()
             .isValid();
 

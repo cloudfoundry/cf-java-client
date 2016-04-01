@@ -18,6 +18,8 @@ package org.cloudfoundry.spring.client.v2.buildpacks;
 
 import lombok.ToString;
 import org.cloudfoundry.client.v2.buildpacks.Buildpacks;
+import org.cloudfoundry.client.v2.buildpacks.DeleteBuildpackRequest;
+import org.cloudfoundry.client.v2.buildpacks.DeleteBuildpackResponse;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksResponse;
 import org.cloudfoundry.spring.client.v2.FilterBuilder;
@@ -44,6 +46,14 @@ public final class SpringBuildpacks extends AbstractSpringOperations implements 
      */
     public SpringBuildpacks(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
         super(restOperations, root, schedulerGroup);
+    }
+
+    @Override
+    public Mono<DeleteBuildpackResponse> delete(DeleteBuildpackRequest request) {
+        return delete(request, DeleteBuildpackResponse.class, builder -> {
+            builder.pathSegment("v2", "buildpacks", request.getBuildpackId());
+            QueryBuilder.augment(builder, request);
+        });
     }
 
     @Override
