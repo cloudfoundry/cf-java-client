@@ -32,7 +32,7 @@ public final class CreateBuildpackRequestTest {
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("buildpack name must be specified", result.getMessages().get(0));
+        assertEquals("name must be specified", result.getMessages().get(0));
     }
 
     @Test

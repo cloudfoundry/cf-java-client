@@ -93,7 +93,7 @@ public final class CreateBuildpackRequest implements Validatable {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
         if (this.name == null) {
-            builder.message("buildpack name must be specified");
+            builder.message("name must be specified");
         }
 
         return builder.build();
