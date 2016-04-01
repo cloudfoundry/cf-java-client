@@ -31,4 +31,12 @@ public interface RouteMappings {
      */
     Mono<CreateRouteMappingResponse> create(CreateRouteMappingRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/routes_mapping/delete_a_particular_route_mapping.html">Deleting a Route Mapping</a> request
+     *
+     * @param request the Delete a Route Mapping request
+     * @return the response from deleting a Route Mapping request
+     */
+    Mono<DeleteRouteMappingResponse> delete(DeleteRouteMappingRequest request);
+
 }
