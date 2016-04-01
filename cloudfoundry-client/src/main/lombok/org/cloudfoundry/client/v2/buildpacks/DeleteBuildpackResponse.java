@@ -35,6 +35,7 @@ public final class DeleteBuildpackResponse extends Resource<JobEntity> {
     @Builder
     DeleteBuildpackResponse(@JsonProperty("entity") JobEntity entity,
                             @JsonProperty("metadata") Metadata metadata) {
+
         super(entity, metadata);
     }
 
