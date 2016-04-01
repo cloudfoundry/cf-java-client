@@ -39,6 +39,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 
 public final class ApplicationsTest extends AbstractIntegrationTest {
 
@@ -236,26 +237,25 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void setAndUnsetEnvironment() throws IOException {
+    public void setEnvironmentVariable() throws IOException {
         String applicationName = getApplicationName();
+        String variableName1 = getVariableName();
+        String variableName2 = getVariableName();
+        String variableValue1 = getVariableValue();
+        String variableValue2 = getVariableValue();
 
         createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
             .then(this.cloudFoundryOperations.applications()
                 .setEnvironmentVariable(SetEnvironmentVariableApplicationRequest.builder()
                     .name(applicationName)
-                    .variableName("test-var-name")
-                    .variableValue("test-var-value")
+                    .variableName(variableName1)
+                    .variableValue(variableValue1)
                     .build()))
             .then(this.cloudFoundryOperations.applications()
                 .setEnvironmentVariable(SetEnvironmentVariableApplicationRequest.builder()
                     .name(applicationName)
-                    .variableName("test-var2-name")
-                    .variableValue("test-var2-value")
-                    .build()))
-            .then(this.cloudFoundryOperations.applications()
-                .unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest.builder()
-                    .name(applicationName)
-                    .variableName("test-var-name")
+                    .variableName(variableName2)
+                    .variableValue(variableValue2)
                     .build()))
             .then(this.cloudFoundryOperations.applications()
                 .getEnvironments(GetApplicationEnvironmentsRequest.builder()
@@ -264,7 +264,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .map(ApplicationEnvironments::getUserProvided)
             .subscribe(testSubscriber()
                 .assertEquals(StringMap.builder()
-                    .entry("test-var2-name", "test-var2-value")
+                    .entry(variableName1, variableValue1)
+                    .entry(variableName2, variableValue2)
                     .build()));
     }
 
@@ -290,6 +291,81 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .name(applicationName)
                     .build()))
             .subscribe(testSubscriber());
+    }
+
+    @Test
+    public void unsetEnvironmentVariableComplete() throws IOException {
+        String applicationName = getApplicationName();
+        String variableName1 = getVariableName();
+        String variableName2 = getVariableName();
+        String variableValue1 = getVariableValue();
+        String variableValue2 = getVariableValue();
+
+        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
+            .then(this.cloudFoundryOperations.applications()
+                .setEnvironmentVariable(SetEnvironmentVariableApplicationRequest.builder()
+                    .name(applicationName)
+                    .variableName(variableName1)
+                    .variableValue(variableValue1)
+                    .build()))
+            .then(this.cloudFoundryOperations.applications()
+                .setEnvironmentVariable(SetEnvironmentVariableApplicationRequest.builder()
+                    .name(applicationName)
+                    .variableName(variableName2)
+                    .variableValue(variableValue2)
+                    .build()))
+            .then(this.cloudFoundryOperations.applications()
+                .unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest.builder()
+                    .name(applicationName)
+                    .variableName(variableName1)
+                    .build()))
+            .then(this.cloudFoundryOperations.applications()
+                .unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest.builder()
+                    .name(applicationName)
+                    .variableName(variableName2)
+                    .build()))
+            .then(this.cloudFoundryOperations.applications()
+                .getEnvironments(GetApplicationEnvironmentsRequest.builder()
+                    .name(applicationName)
+                    .build()))
+            .map(ApplicationEnvironments::getUserProvided)
+            .subscribe(testSubscriber()
+                .assertEquals(Collections.emptyMap()));
+    }
+
+    @Test
+    public void unsetEnvironmentVariablePartial() throws IOException {
+        String applicationName = getApplicationName();
+        String variableName1 = getVariableName();
+        String variableName2 = getVariableName();
+        String variableValue1 = getVariableValue();
+        String variableValue2 = getVariableValue();
+
+        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
+            .after(() -> this.cloudFoundryOperations.applications()
+                .setEnvironmentVariable(SetEnvironmentVariableApplicationRequest.builder()
+                    .name(applicationName)
+                    .variableName(variableName1)
+                    .variableValue(variableValue1)
+                    .build()))
+            .after(() -> this.cloudFoundryOperations.applications()
+                .setEnvironmentVariable(SetEnvironmentVariableApplicationRequest.builder()
+                    .name(applicationName)
+                    .variableName(variableName2)
+                    .variableValue(variableValue2)
+                    .build()))
+            .after(() -> this.cloudFoundryOperations.applications()
+                .unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest.builder()
+                    .name(applicationName)
+                    .variableName(variableName1)
+                    .build()))
+            .after(() -> this.cloudFoundryOperations.applications()
+                .getEnvironments(GetApplicationEnvironmentsRequest.builder()
+                    .name(applicationName)
+                    .build()))
+            .map(ApplicationEnvironments::getUserProvided)
+            .subscribe(testSubscriber()
+                .assertEquals(Collections.singletonMap(variableName2, variableValue2)));
     }
 
     private static Mono<Void> bindServiceToApplication(CloudFoundryOperations cloudFoundryOperations, String applicationName, String serviceInstanceName) {
