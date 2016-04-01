@@ -355,8 +355,12 @@ public final class DefaultApplications implements Applications {
                     Mono.just(request1),
                     getApplication(this.cloudFoundryClient, request1.getName(), spaceId)
                 )))
-            .then(function((request1, resource) -> requestUpdateApplicationEnvironment(this.cloudFoundryClient, ResourceUtils.getId(resource),
-                addToEnvironment(getEnvironment(resource), request1.getVariableName(), request1.getVariableValue()))))
+            .then(function((request1, resource) ->
+                requestUpdateApplicationEnvironment(
+                    this.cloudFoundryClient,
+                    ResourceUtils.getId(resource),
+                    addToEnvironment(getEnvironment(resource), request1.getVariableName(), request1.getVariableValue())
+                )))
             .after();
     }
 
@@ -393,8 +397,12 @@ public final class DefaultApplications implements Applications {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
             .then(function((request1, spaceId) -> Mono.when(Mono.just(request1), getApplication(this.cloudFoundryClient, request1.getName(), spaceId))))
-            .then(function((request1, resource) -> requestUpdateApplicationEnvironment(this.cloudFoundryClient, ResourceUtils.getId(resource),
-                removeFromEnvironment(getEnvironment(resource), request1.getVariableName()))))
+            .then(function((request1, resource) ->
+                requestUpdateApplicationEnvironment(
+                    this.cloudFoundryClient,
+                    ResourceUtils.getId(resource),
+                    removeFromEnvironment(getEnvironment(resource), request1.getVariableName())
+                )))
             .after();
     }
 

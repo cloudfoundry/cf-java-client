@@ -369,6 +369,10 @@ public final class DefaultApplicationsTest {
     }
 
     private static void requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId, String applicationId) {
+        requestApplications(cloudFoundryClient, application, spaceId, applicationId, StringMap.builder().entry("test-var", "test-value").build());
+    }
+
+    private static void requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId, String applicationId, StringMap envResponse) {
         when(cloudFoundryClient.spaces()
             .listApplications(ListSpaceApplicationsRequest.builder()
                 .name(application)
@@ -382,7 +386,7 @@ public final class DefaultApplicationsTest {
                             .id(applicationId)
                             .build())
                         .entity(fill(ApplicationEntity.builder(), "application-")
-                            .environmentJson("test-var", "test-value")
+                            .environmentJsons(envResponse)
                             .build())
                         .build())
                     .totalPages(1)
@@ -1008,7 +1012,11 @@ public final class DefaultApplicationsTest {
                 .applicationId(applicationId)
                 .environmentJsons(environment)
                 .build()))
-            .thenReturn(Mono.just(fill(UpdateApplicationResponse.builder()).build()));
+            .thenReturn(Mono.just(fill(UpdateApplicationResponse.builder())
+                .entity(fill(ApplicationEntity.builder())
+                    .environmentJsons(environment)
+                    .build())
+                .build()));
     }
 
     private static void requestUpdateApplicationRename(CloudFoundryClient cloudFoundryClient, String applicationId, String name) {
@@ -3634,11 +3642,18 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestUpdateApplicationEnvironment(this.cloudFoundryClient, "test-metadata-id", StringMap.builder()
-                .entry("test-var", "test-value")
-                .entry("test-var-name", "test-var-value")
-                .build());
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id",
+                StringMap.builder()
+                    .entry("test-var", "test-value")
+                    .entry("test-var2", "test-value2")
+                    .build());
+            requestUpdateApplicationEnvironment(this.cloudFoundryClient, "test-metadata-id",
+                StringMap.builder()
+                    .entry("test-var", "test-value")
+                    .entry("test-var2", "test-value2")
+                    .entry("test-var-name", "test-var-value")
+                    .build()
+            );
         }
 
         @Override
@@ -3966,8 +3981,17 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestUpdateApplicationEnvironment(this.cloudFoundryClient, "test-metadata-id", StringMap.builder().build());
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id",
+                StringMap.builder()
+                    .entry("test-var", "test-value")
+                    .entry("test-var2", "test-value2")
+                    .entry("test-var-name", "test-var-value")
+                    .build());
+            requestUpdateApplicationEnvironment(this.cloudFoundryClient, "test-metadata-id",
+                StringMap.builder()
+                    .entry("test-var2", "test-value2")
+                    .entry("test-var-name", "test-var-value")
+                    .build());
         }
 
         @Override

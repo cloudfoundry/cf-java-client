@@ -17,11 +17,16 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.operations.applications.ApplicationEnvironments;
 import org.cloudfoundry.operations.applications.DeleteApplicationRequest;
+import org.cloudfoundry.operations.applications.GetApplicationEnvironmentsRequest;
 import org.cloudfoundry.operations.applications.PushApplicationRequest;
 import org.cloudfoundry.operations.applications.RestartApplicationRequest;
+import org.cloudfoundry.operations.applications.SetEnvironmentVariableApplicationRequest;
 import org.cloudfoundry.operations.applications.StartApplicationRequest;
+import org.cloudfoundry.operations.applications.UnsetEnvironmentVariableApplicationRequest;
 import org.cloudfoundry.operations.domains.CreateDomainRequest;
+import org.cloudfoundry.util.StringMap;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -174,6 +179,39 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .name(applicationName)
                     .build()))
             .subscribe(testSubscriber());
+    }
+
+    @Test
+    public void setAndUnsetEnvironment() throws IOException {
+        String applicationName = getApplicationName();
+
+        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
+            .after(() -> this.cloudFoundryOperations.applications()
+                .setEnvironmentVariable(SetEnvironmentVariableApplicationRequest.builder()
+                    .name(applicationName)
+                    .variableName("test-var-name")
+                    .variableValue("test-var-value")
+                    .build()))
+            .after(() -> this.cloudFoundryOperations.applications()
+                .setEnvironmentVariable(SetEnvironmentVariableApplicationRequest.builder()
+                    .name(applicationName)
+                    .variableName("test-var2-name")
+                    .variableValue("test-var2-value")
+                    .build()))
+            .after(() -> this.cloudFoundryOperations.applications()
+                .unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest.builder()
+                    .name(applicationName)
+                    .variableName("test-var-name")
+                    .build()))
+            .after(() -> this.cloudFoundryOperations.applications()
+                .getEnvironments(GetApplicationEnvironmentsRequest.builder()
+                    .name(applicationName)
+                    .build()))
+            .map(ApplicationEnvironments::getUserProvided)
+            .subscribe(testSubscriber()
+                .assertEquals(StringMap.builder()
+                    .entry("test-var2-name", "test-var2-value")
+                    .build()));
     }
 
     @Test
