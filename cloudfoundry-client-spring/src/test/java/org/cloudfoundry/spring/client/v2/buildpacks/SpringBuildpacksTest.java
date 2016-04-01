@@ -19,15 +19,66 @@ package org.cloudfoundry.spring.client.v2.buildpacks;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.buildpacks.BuildpackEntity;
 import org.cloudfoundry.client.v2.buildpacks.BuildpackResource;
+import org.cloudfoundry.client.v2.buildpacks.DeleteBuildpackRequest;
+import org.cloudfoundry.client.v2.buildpacks.DeleteBuildpackResponse;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksResponse;
+import org.cloudfoundry.client.v2.job.JobEntity;
 import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringBuildpacksTest {
+
+    public static final class Delete extends AbstractApiTest<DeleteBuildpackRequest, DeleteBuildpackResponse> {
+
+        private SpringBuildpacks buildpacks = new SpringBuildpacks(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteBuildpackRequest getInvalidRequest() {
+            return DeleteBuildpackRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(DELETE).path("/v2/buildpacks/test-buildpack-id?async=true")
+                .status(OK)
+                .responsePayload("fixtures/client/v2/buildpacks/DELETE_{id}_response.json");
+        }
+
+        @Override
+        protected DeleteBuildpackResponse getResponse() {
+            return DeleteBuildpackResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .createdAt("2015-07-27T22:43:34Z")
+                    .id("c900719e-c70a-4c75-9e6a-9535f118acc3")
+                    .url("/v2/jobs/c900719e-c70a-4c75-9e6a-9535f118acc3")
+                    .build())
+                .entity(JobEntity.builder()
+                    .id("c900719e-c70a-4c75-9e6a-9535f118acc3")
+                    .status("queued")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected DeleteBuildpackRequest getValidRequest() throws Exception {
+            return DeleteBuildpackRequest.builder()
+                .async(true)
+                .buildpackId("test-buildpack-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<DeleteBuildpackResponse> invoke(DeleteBuildpackRequest request) {
+            return this.buildpacks.delete(request);
+        }
+
+    }
 
     public static final class List extends AbstractApiTest<ListBuildpacksRequest, ListBuildpacksResponse> {
 
