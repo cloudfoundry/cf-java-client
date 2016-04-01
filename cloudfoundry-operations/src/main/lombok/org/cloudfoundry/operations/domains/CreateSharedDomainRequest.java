@@ -36,7 +36,7 @@ public final class CreateSharedDomainRequest implements Validatable {
     private final String domain;
 
     @Builder
-    CreateSharedDomainRequest(String domain, String organization) {
+    CreateSharedDomainRequest(String domain) {
         this.domain = domain;
     }
 

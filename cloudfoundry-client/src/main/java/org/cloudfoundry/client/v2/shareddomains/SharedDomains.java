@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface SharedDomains {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/private_domains/create_a_shared_domain.html">Create a Shared Domain</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/shared_domains/create_a_shared_domain.html">Create a Shared Domain</a> request
      *
      * @param request the Create a Shared Domain request
      * @return the response from the Create a Shared Domain request
