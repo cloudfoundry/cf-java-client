@@ -19,12 +19,17 @@ package org.cloudfoundry.spring.client.v2.routemappings;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.routemappings.CreateRouteMappingRequest;
 import org.cloudfoundry.client.v2.routemappings.CreateRouteMappingResponse;
+import org.cloudfoundry.client.v2.routemappings.DeleteRouteMappingRequest;
+import org.cloudfoundry.client.v2.routemappings.DeleteRouteMappingResponse;
 import org.cloudfoundry.client.v2.routemappings.RouteMappingEntity;
 import org.cloudfoundry.spring.AbstractApiTest;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 public final class SpringRouteMappingsTest {
 
@@ -76,6 +81,40 @@ public final class SpringRouteMappingsTest {
         @Override
         protected Mono<CreateRouteMappingResponse> invoke(CreateRouteMappingRequest request) {
             return this.routeMappings.create(request);
+        }
+    }
+
+    public static final class Delete extends AbstractApiTest<DeleteRouteMappingRequest, DeleteRouteMappingResponse> {
+
+        private final SpringRouteMappings routeMappings = new SpringRouteMappings(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteRouteMappingRequest getInvalidRequest() {
+            return DeleteRouteMappingRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(DELETE).path("/v2/route_mappings/random-route-mapping-id")
+                .status(NO_CONTENT);
+        }
+
+        @Override
+        protected DeleteRouteMappingResponse getResponse() {
+            return null;
+        }
+
+        @Override
+        protected DeleteRouteMappingRequest getValidRequest() throws Exception {
+            return DeleteRouteMappingRequest.builder()
+                .routeMappingId("random-route-mapping-id")
+                .build();
+        }
+
+        @Override
+        protected Publisher<DeleteRouteMappingResponse> invoke(DeleteRouteMappingRequest request) {
+            return this.routeMappings.delete(request);
         }
     }
 
