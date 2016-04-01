@@ -39,4 +39,12 @@ public interface FeatureFlags {
      */
     Mono<ListFeatureFlagsResponse> list(ListFeatureFlagsRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/feature_flags/set_a_feature_flag.html">Set Feature Flag</a> request
+     *
+     * @param request the set feature flag request
+     * @return the response from the set feature flag request
+     */
+    Mono<SetFeatureFlagResponse> set(SetFeatureFlagRequest request);
+
 }
