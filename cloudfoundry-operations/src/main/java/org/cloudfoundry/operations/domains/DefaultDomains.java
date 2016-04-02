@@ -17,6 +17,9 @@
 package org.cloudfoundry.operations.domains;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.domains.DomainEntity;
+import org.cloudfoundry.client.v2.domains.DomainResource;
+import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
@@ -58,6 +61,22 @@ public final class DefaultDomains implements Domains {
             .after();
     }
 
+    @Override
+    public Flux<Domain> list(ListDomainsRequest request) {
+        return ValidationUtils
+            .validate(request)
+            .flatMap(request1 -> getDomains(this.cloudFoundryClient, request1))
+            .map(resource -> toDomain(resource));
+    }
+
+    private static Flux<DomainResource> getDomains(CloudFoundryClient cloudFoundryClient, ListDomainsRequest request) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.domains()
+                .list(org.cloudfoundry.client.v2.domains.ListDomainsRequest.builder()
+                    .page(page)
+                    .build()));
+    }
+
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
         return requestOrganizations(cloudFoundryClient, organization)
             .single()
@@ -91,6 +110,16 @@ public final class DefaultDomains implements Domains {
                     .name(organization)
                     .page(page)
                     .build()));
+    }
+
+    private static Domain toDomain(DomainResource resource) {
+        DomainEntity entity = ResourceUtils.getEntity(resource);
+
+        return Domain.builder()
+            .domainId(ResourceUtils.getId(resource))
+            .domainName(entity.getName())
+            .owningOrganizationId(entity.getOwningOrganizationId())
+            .build();
     }
 
 }
