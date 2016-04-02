@@ -21,7 +21,13 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
+import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsRequest;
+import org.cloudfoundry.client.v2.privatedomains.PrivateDomainEntity;
+import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
+import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
+import org.cloudfoundry.client.v2.shareddomains.SharedDomainEntity;
+import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
@@ -34,6 +40,9 @@ import java.util.NoSuchElementException;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class DefaultDomains implements Domains {
+
+    private static final String SHARED_DOMAIN_STATUS = "shared";
+    private static final String PRIVATE_DOMAIN_STATUS = "owned";
 
     private final CloudFoundryClient cloudFoundryClient;
 
@@ -56,6 +65,15 @@ public final class DefaultDomains implements Domains {
             .validate(request)
             .then(request1 -> requestCreateSharedDomain(this.cloudFoundryClient, request1.getDomain()))
             .after();
+    }
+
+    @Override
+    public Flux<Domain> list() {
+        return requestListPrivateDomains(cloudFoundryClient)
+            .map(privateDomainResource -> toPrivateDomain(privateDomainResource))
+            .mergeWith(requestListSharedDomains(cloudFoundryClient)
+                .map(sharedDomainResource -> toSharedDomain(sharedDomainResource)));
+
     }
 
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
@@ -84,6 +102,22 @@ public final class DefaultDomains implements Domains {
                 .build());
     }
 
+    private static Flux<PrivateDomainResource> requestListPrivateDomains(CloudFoundryClient cloudFoundryClient) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.privateDomains()
+                .list(ListPrivateDomainsRequest.builder()
+                    .page(page)
+                    .build()));
+    }
+
+    private static Flux<SharedDomainResource> requestListSharedDomains(CloudFoundryClient cloudFoundryClient) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.sharedDomains()
+                .list(ListSharedDomainsRequest.builder()
+                    .page(page)
+                    .build()));
+    }
+
     private static Flux<OrganizationResource> requestOrganizations(CloudFoundryClient cloudFoundryClient, String organization) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.organizations().list(
@@ -91,6 +125,26 @@ public final class DefaultDomains implements Domains {
                     .name(organization)
                     .page(page)
                     .build()));
+    }
+
+    private static Domain toPrivateDomain(PrivateDomainResource resource) {
+        PrivateDomainEntity entity = ResourceUtils.getEntity(resource);
+
+        return Domain.builder()
+            .domainId(ResourceUtils.getId(resource))
+            .domainName(entity.getName())
+            .status(PRIVATE_DOMAIN_STATUS)
+            .build();
+    }
+
+    private static Domain toSharedDomain(SharedDomainResource resource) {
+        SharedDomainEntity entity = ResourceUtils.getEntity(resource);
+
+        return Domain.builder()
+            .domainId(ResourceUtils.getId(resource))
+            .domainName(entity.getName())
+            .status(SHARED_DOMAIN_STATUS)
+            .build();
     }
 
 }
