@@ -111,7 +111,7 @@ public final class DefaultServices implements Services {
     }
 
     @Override
-    public Mono<ServiceInstance> get(GetServiceInstanceRequest getRequest) {
+    public Mono<ServiceInstanceSummary> get(GetServiceInstanceRequest getRequest) {
         return Mono
             .when(ValidationUtils.validate(getRequest), this.spaceId)
             .then(function((request, spaceId) -> getServiceInstance(cloudFoundryClient, request.getName(), spaceId)))
@@ -125,7 +125,7 @@ public final class DefaultServices implements Services {
     }
 
     @Override
-    public Flux<ServiceInstance> listInstances() {
+    public Flux<ServiceInstanceSummary> listInstances() {
         return this.spaceId
             .flatMap(spaceId -> requestSpaceServiceInstances(this.cloudFoundryClient, spaceId))
             .flatMap(resource -> Mono
@@ -150,6 +150,12 @@ public final class DefaultServices implements Services {
             .then(function((serviceInstanceName, applicationId, serviceInstanceId) -> getServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId, serviceInstanceName)))
             .then(serviceBindingId -> deleteServiceBinding(this.cloudFoundryClient, serviceBindingId))
             .after();
+    }
+
+    private static ServiceInstanceType convertInstanceType(String type) {
+        if ("managed_service_instance".equals(type)) return ServiceInstanceType.MANAGED;
+        if ("user_provided_service_instance".equals(type)) return ServiceInstanceType.USER_PROVIDED;
+        return ServiceInstanceType.UNKNOWN;
     }
 
     private static String convertLastOperation(LastOperation lastOperation) {
@@ -385,17 +391,18 @@ public final class DefaultServices implements Services {
                     .build()));
     }
 
-    private static ServiceInstance toServiceInstance(ServiceInstanceResource resource, List<String> applications, Tuple2<Optional<String>, Optional<String>> serviceAndPlan) {
+    private static ServiceInstanceSummary toServiceInstance(ServiceInstanceResource resource, List<String> applications, Tuple2<Optional<String>, Optional<String>> serviceAndPlan) {
         ServiceInstanceEntity entity = resource.getEntity();
         Optional<String> service = serviceAndPlan.t1;
         Optional<String> plan = serviceAndPlan.t2;
 
-        return ServiceInstance.builder()
+        return ServiceInstanceSummary.builder()
             .id(ResourceUtils.getId(resource))
             .lastOperation(Optional.ofNullable(entity.getLastOperation()).map(DefaultServices::convertLastOperation).orElse(null))
             .name(entity.getName())
             .plan(plan.orElse(null))
             .service(service.orElse(null))
+            .type(convertInstanceType(entity.getType()))
             .applications(applications)
             .build();
     }

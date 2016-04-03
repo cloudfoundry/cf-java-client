@@ -23,10 +23,10 @@ import lombok.Singular;
 import java.util.List;
 
 /**
- * A service instance
+ * A service instance summary
  */
 @Data
-public final class ServiceInstance {
+public final class ServiceInstanceSummary {
 
     /**
      * The bound applications
@@ -76,19 +76,29 @@ public final class ServiceInstance {
      */
     private final String service;
 
+    /**
+     * The type of the service instance
+     *
+     * @param type the type of the service instance
+     * @return the type of the service instance
+     */
+    private final ServiceInstanceType type;
+
     @Builder
-    ServiceInstance(@Singular List<String> applications,
-                    String id,
-                    String lastOperation,
-                    String name,
-                    String plan,
-                    String service) {
+    ServiceInstanceSummary(@Singular List<String> applications,
+                           String id,
+                           String lastOperation,
+                           String name,
+                           String plan,
+                           String service,
+                           ServiceInstanceType type) {
         this.applications = applications;
         this.id = id;
         this.lastOperation = lastOperation;
         this.name = name;
         this.plan = plan;
         this.service = service;
+        this.type = type;
     }
 
 }
