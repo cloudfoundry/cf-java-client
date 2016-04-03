@@ -22,6 +22,8 @@ import org.cloudfoundry.client.v2.buildpacks.CreateBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.CreateBuildpackResponse;
 import org.cloudfoundry.client.v2.buildpacks.DeleteBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.DeleteBuildpackResponse;
+import org.cloudfoundry.client.v2.buildpacks.GetBuildpackRequest;
+import org.cloudfoundry.client.v2.buildpacks.GetBuildpackResponse;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksResponse;
 import org.cloudfoundry.spring.client.v2.FilterBuilder;
@@ -61,6 +63,11 @@ public final class SpringBuildpacks extends AbstractSpringOperations implements 
             builder.pathSegment("v2", "buildpacks", request.getBuildpackId());
             QueryBuilder.augment(builder, request);
         });
+    }
+
+    @Override
+    public Mono<GetBuildpackResponse> get(GetBuildpackRequest request) {
+        return get(request, GetBuildpackResponse.class, builder -> builder.pathSegment("v2", "buildpacks", request.getBuildpackId()));
     }
 
     @Override
