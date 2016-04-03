@@ -686,7 +686,7 @@ public final class DefaultServicesTest {
 
     }
 
-    public static final class GetServiceInstanceManaged extends AbstractOperationsApiTest<ServiceInstance> {
+    public static final class GetServiceInstanceManaged extends AbstractOperationsApiTest<ServiceInstanceSummary> {
 
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
 
@@ -700,20 +700,21 @@ public final class DefaultServicesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<ServiceInstance> testSubscriber) {
+        protected void assertions(TestSubscriber<ServiceInstanceSummary> testSubscriber) {
             testSubscriber
-                .assertEquals(ServiceInstance.builder()
+                .assertEquals(ServiceInstanceSummary.builder()
                     .application("test-application")
                     .id("test-service-instance-id")
                     .lastOperation("create successful")
                     .name("test-service-instance-name")
                     .plan("test-service-plan")
+                    .type(ServiceInstanceType.MANAGED)
                     .service("test-service")
                     .build());
         }
 
         @Override
-        protected Publisher<ServiceInstance> invoke() {
+        protected Publisher<ServiceInstanceSummary> invoke() {
             return this.services
                 .get(org.cloudfoundry.operations.services.GetServiceInstanceRequest.builder()
                     .name("test-service-instance-name")
@@ -722,7 +723,7 @@ public final class DefaultServicesTest {
 
     }
 
-    public static final class GetServiceInstanceNoInstances extends AbstractOperationsApiTest<ServiceInstance> {
+    public static final class GetServiceInstanceNoInstances extends AbstractOperationsApiTest<ServiceInstanceSummary> {
 
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
 
@@ -732,13 +733,13 @@ public final class DefaultServicesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<ServiceInstance> testSubscriber) {
+        protected void assertions(TestSubscriber<ServiceInstanceSummary> testSubscriber) {
             testSubscriber
                 .assertError(IllegalArgumentException.class, "Service test-invalid-name does not exist");
         }
 
         @Override
-        protected Publisher<ServiceInstance> invoke() {
+        protected Publisher<ServiceInstanceSummary> invoke() {
             return this.services
                 .get(org.cloudfoundry.operations.services.GetServiceInstanceRequest.builder()
                     .name("test-invalid-name")
@@ -747,18 +748,18 @@ public final class DefaultServicesTest {
 
     }
 
-    public static final class GetServiceInstanceNoSpace extends AbstractOperationsApiTest<ServiceInstance> {
+    public static final class GetServiceInstanceNoSpace extends AbstractOperationsApiTest<ServiceInstanceSummary> {
 
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, MISSING_SPACE_ID);
 
         @Override
-        protected void assertions(TestSubscriber<ServiceInstance> testSubscriber) {
+        protected void assertions(TestSubscriber<ServiceInstanceSummary> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "MISSING_SPACE_ID");
         }
 
         @Override
-        protected Publisher<ServiceInstance> invoke() {
+        protected Publisher<ServiceInstanceSummary> invoke() {
             return this.services
                 .get(org.cloudfoundry.operations.services.GetServiceInstanceRequest.builder()
                     .name("test-service-instance-name")
@@ -767,7 +768,7 @@ public final class DefaultServicesTest {
 
     }
 
-    public static final class GetServiceInstanceUserProvided extends AbstractOperationsApiTest<ServiceInstance> {
+    public static final class GetServiceInstanceUserProvided extends AbstractOperationsApiTest<ServiceInstanceSummary> {
 
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
 
@@ -778,16 +779,17 @@ public final class DefaultServicesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<ServiceInstance> testSubscriber) {
+        protected void assertions(TestSubscriber<ServiceInstanceSummary> testSubscriber) {
             testSubscriber
-                .assertEquals(ServiceInstance.builder()
+                .assertEquals(ServiceInstanceSummary.builder()
                     .id("test-service-instance-id")
                     .name("test-service-instance-name")
+                    .type(ServiceInstanceType.USER_PROVIDED)
                     .build());
         }
 
         @Override
-        protected Publisher<ServiceInstance> invoke() {
+        protected Publisher<ServiceInstanceSummary> invoke() {
             return this.services
                 .get(org.cloudfoundry.operations.services.GetServiceInstanceRequest.builder()
                     .name("test-service-instance-name")
@@ -796,7 +798,7 @@ public final class DefaultServicesTest {
 
     }
 
-    public static final class ListInstances extends AbstractOperationsApiTest<ServiceInstance> {
+    public static final class ListInstances extends AbstractOperationsApiTest<ServiceInstanceSummary> {
 
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
 
@@ -812,31 +814,33 @@ public final class DefaultServicesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<ServiceInstance> testSubscriber) {
+        protected void assertions(TestSubscriber<ServiceInstanceSummary> testSubscriber) {
             testSubscriber
-                .assertEquals(ServiceInstance.builder()
+                .assertEquals(ServiceInstanceSummary.builder()
                     .id("test-service-instance1-id")
                     .name("test-service-instance1")
+                    .type(ServiceInstanceType.USER_PROVIDED)
                     .build())
-                .assertEquals(ServiceInstance.builder()
+                .assertEquals(ServiceInstanceSummary.builder()
                     .application("test-application")
                     .id("test-service-instance2-id")
                     .lastOperation("create successful")
                     .name("test-service-instance2")
                     .plan("test-service-plan")
                     .service("test-service")
+                    .type(ServiceInstanceType.MANAGED)
                     .build());
         }
 
         @Override
-        protected Publisher<ServiceInstance> invoke() {
+        protected Publisher<ServiceInstanceSummary> invoke() {
             return this.services
                 .listInstances();
         }
 
     }
 
-    public static final class ListInstancesNoInstances extends AbstractOperationsApiTest<ServiceInstance> {
+    public static final class ListInstancesNoInstances extends AbstractOperationsApiTest<ServiceInstanceSummary> {
 
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
 
@@ -846,30 +850,30 @@ public final class DefaultServicesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<ServiceInstance> testSubscriber) {
+        protected void assertions(TestSubscriber<ServiceInstanceSummary> testSubscriber) {
             // Expects onComplete() with no onNext()
         }
 
         @Override
-        protected Publisher<ServiceInstance> invoke() {
+        protected Publisher<ServiceInstanceSummary> invoke() {
             return this.services
                 .listInstances();
         }
 
     }
 
-    public static final class ListInstancesNoSpace extends AbstractOperationsApiTest<ServiceInstance> {
+    public static final class ListInstancesNoSpace extends AbstractOperationsApiTest<ServiceInstanceSummary> {
 
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, MISSING_SPACE_ID);
 
         @Override
-        protected void assertions(TestSubscriber<ServiceInstance> testSubscriber) {
+        protected void assertions(TestSubscriber<ServiceInstanceSummary> testSubscriber) {
             testSubscriber
                 .assertError(IllegalStateException.class, "MISSING_SPACE_ID");
         }
 
         @Override
-        protected Publisher<ServiceInstance> invoke() {
+        protected Publisher<ServiceInstanceSummary> invoke() {
             return this.services
                 .listInstances();
         }

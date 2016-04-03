@@ -46,14 +46,14 @@ public interface Services {
      * @param request the get service instance request
      * @return the service instance
      */
-    Mono<ServiceInstance> get(GetServiceInstanceRequest request);
+    Mono<ServiceInstanceSummary> get(GetServiceInstanceRequest request);
 
     /**
      * List the service instances in the targeted space
      *
      * @return the service instances
      */
-    Flux<ServiceInstance> listInstances();
+    Flux<ServiceInstanceSummary> listInstances();
 
     /**
      * Unbind a service instance from an application
