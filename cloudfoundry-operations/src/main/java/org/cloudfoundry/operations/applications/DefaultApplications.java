@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.cloudfoundry.client.v2.applications.AbstractApplicationResource;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
@@ -110,6 +111,12 @@ import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
 
 public final class DefaultApplications implements Applications {
+
+    private static final int CF_APP_STOPPED_STATS_ERROR = 200003;
+
+    private static final int CF_INSTANCES_ERROR = 220001;
+
+    private static final int CF_STAGING_NOT_FINISHED = 170002;
 
     private static final int MAX_NUMBER_OF_RECENT_EVENTS = 50;
 
@@ -269,8 +276,8 @@ public final class DefaultApplications implements Applications {
             .as(thenKeep(function((applicationId, request1) -> uploadApplicationAndWait(this.cloudFoundryClient, applicationId, request1.getApplication()))))
             .as(thenKeep(function((applicationId, request1) -> stopApplication(this.cloudFoundryClient, applicationId))))
             .where(predicate((applicationId, request1) -> !Optional.ofNullable(request1.getNoStart()).orElse(false)))
-            .then(function((applicationId, request1) -> startApplicationAndWait(this.cloudFoundryClient, request1.getName(), applicationId, request1.getStagingTimeout(), request1.getStartupTimeout
-                ())))
+            .then(function((applicationId, request1) -> startApplicationAndWait(this.cloudFoundryClient, request1.getName(), applicationId, request1.getStagingTimeout(),
+                request1.getStartupTimeout())))
             .after();
     }
 
@@ -552,6 +559,29 @@ public final class DefaultApplications implements Applications {
             .map(ResourceUtils::getId);
     }
 
+    private static Mono<ApplicationInstancesResponse> getApplicationInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return requestApplicationInstances(cloudFoundryClient, applicationId)
+            .otherwise(throwable -> {
+                if (throwable instanceof CloudFoundryException &&
+                    (((CloudFoundryException) throwable).getCode() == CF_INSTANCES_ERROR || ((CloudFoundryException) throwable).getCode() == CF_STAGING_NOT_FINISHED)) {
+                    return Mono.just(ApplicationInstancesResponse.builder().build());
+                } else {
+                    return Mono.error(throwable);
+                }
+            });
+    }
+
+    private static Mono<ApplicationStatisticsResponse> getApplicationStats(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return requestApplicationStats(cloudFoundryClient, applicationId)
+            .otherwise(throwable -> {
+                if (throwable instanceof CloudFoundryException && ((CloudFoundryException) throwable).getCode() == CF_APP_STOPPED_STATS_ERROR) {
+                    return Mono.just(ApplicationStatisticsResponse.builder().build());
+                } else {
+                    return Mono.error(throwable);
+                }
+            });
+    }
+
     private static Mono<Tuple4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse>> getAuxiliaryContent(
         CloudFoundryClient cloudFoundryClient, AbstractApplicationResource applicationResource) {
 
@@ -560,10 +590,10 @@ public final class DefaultApplications implements Applications {
 
         return Mono
             .when(
-                requestApplicationStats(cloudFoundryClient, applicationId),
+                getApplicationStats(cloudFoundryClient, applicationId),
                 requestApplicationSummary(cloudFoundryClient, applicationId),
                 requestStack(cloudFoundryClient, stackId),
-                requestApplicationInstances(cloudFoundryClient, applicationId)
+                getApplicationInstances(cloudFoundryClient, applicationId)
             );
     }
 
