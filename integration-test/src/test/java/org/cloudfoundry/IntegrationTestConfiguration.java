@@ -57,9 +57,10 @@ public class IntegrationTestConfiguration {
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.test");
 
     @Bean(initMethod = "clean", destroyMethod = "clean")
-    CloudFoundryCleaner cloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Mono<Optional<String>> protectedDomainId, Mono<Optional<String>> protectedOrganizationId, Mono<List<String>>
-        protectedSpaceIds) {
-        return new CloudFoundryCleaner(cloudFoundryClient, protectedDomainId, protectedOrganizationId, protectedSpaceIds);
+    CloudFoundryCleaner cloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Mono<Optional<String>> protectedDomainId, Mono<List<String>> protectedFeatureFlags, Mono<Optional<String>>
+        protectedOrganizationId, Mono<List<String>>
+                                                protectedSpaceIds) {
+        return new CloudFoundryCleaner(cloudFoundryClient, protectedDomainId, protectedFeatureFlags, protectedOrganizationId, protectedSpaceIds);
     }
 
     @Bean
@@ -146,6 +147,10 @@ public class IntegrationTestConfiguration {
         return protectedDomainId;
     }
 
+    @Bean
+    Mono<List<String>> protectedFeatureFlags(@Value("${test.protected.featureflags}") List<String> protectedFlags) {
+        return Mono.just(protectedFlags);
+    }
 
     @Bean
     Mono<Optional<String>> protectedOrganizationId(CloudFoundryClient cloudFoundryClient, @Value("${test.protected.organization:}") String protectedOrganization) {
