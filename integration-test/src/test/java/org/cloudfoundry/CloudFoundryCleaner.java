@@ -74,16 +74,15 @@ final class CloudFoundryCleaner {
     private static final Map<String, Boolean> standardFeatureFlags = new HashMap<>();
 
     static {
-        standardFeatureFlags.put("route_creation", true);
-        standardFeatureFlags.put("user_org_creation", false);
-        standardFeatureFlags.put("unset_roles_by_username", true);
-        standardFeatureFlags.put("diego_docker", true);
-        standardFeatureFlags.put("service_instance_creation", true);
-        standardFeatureFlags.put("app_scaling", true);
         standardFeatureFlags.put("app_bits_upload", true);
-        standardFeatureFlags.put("set_roles_by_username", true);
-        standardFeatureFlags.put("task_creation", false);
+        standardFeatureFlags.put("app_scaling", true);
+        standardFeatureFlags.put("diego_docker", true);
         standardFeatureFlags.put("private_domain_creation", true);
+        standardFeatureFlags.put("route_creation", true);
+        standardFeatureFlags.put("service_instance_creation", true);
+        standardFeatureFlags.put("set_roles_by_username", true);
+        standardFeatureFlags.put("unset_roles_by_username", true);
+        standardFeatureFlags.put("user_org_creation", false);
     }
 
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.test");

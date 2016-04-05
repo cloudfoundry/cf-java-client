@@ -33,7 +33,6 @@ import reactor.core.tuple.Tuple2;
 import reactor.core.tuple.Tuple3;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -44,17 +43,16 @@ import static org.junit.Assert.assertTrue;
 
 public final class FeatureFlagsTest extends AbstractIntegrationTest {
 
-    private static final List<String> featureFlagNameList = Arrays.asList(
-        "route_creation",
-        "user_org_creation",
-        "unset_roles_by_username",
-        "diego_docker",
-        "service_instance_creation",
-        "app_scaling",
+    private static final List<String> coreFeatureFlagNameList = Arrays.asList(
         "app_bits_upload",
+        "app_scaling",
+        "diego_docker",
+        "private_domain_creation",
+        "route_creation",
+        "service_instance_creation",
         "set_roles_by_username",
-        "task_creation",
-        "private_domain_creation"
+        "unset_roles_by_username",
+        "user_org_creation"
     );
 
     @Autowired
@@ -63,7 +61,7 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
     @Test
     public void getEach() {
         Flux
-            .fromIterable(featureFlagNameList)
+            .fromIterable(coreFeatureFlagNameList)
             .flatMap(flagName -> this.cloudFoundryClient.featureFlags()
                 .get(GetFeatureFlagRequest.builder()
                     .name(flagName)
@@ -88,14 +86,18 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
             .list(ListFeatureFlagsRequest.builder()
                 .build())
             .subscribe(this.<ListFeatureFlagsResponse>testSubscriber()
-                .assertThat(response -> assertEquals("feature flag list incorrect", new HashSet<>(featureFlagNameList), flagNameSetFrom(response))));
+                .assertThat(response -> {
+                    Set<String> returnedFlagSet = flagNameSetFrom(response);
+
+                    assertTrue(String.format("feature flags listed (%s) does not include core set (%s)", returnedFlagSet, coreFeatureFlagNameList), returnedFlagSet.containsAll(coreFeatureFlagNameList));
+                }));
 
     }
 
     @Test
     public void setAndResetEach() {
         Flux
-            .fromIterable(featureFlagNameList)
+            .fromIterable(coreFeatureFlagNameList)
             .flatMap(flagName -> this.cloudFoundryClient.featureFlags()
                 .get(GetFeatureFlagRequest.builder()
                     .name(flagName)
