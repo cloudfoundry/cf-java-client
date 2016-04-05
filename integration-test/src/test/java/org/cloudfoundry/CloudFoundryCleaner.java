@@ -25,6 +25,9 @@ import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingRe
 import org.cloudfoundry.client.v2.domains.DeleteDomainRequest;
 import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
+import org.cloudfoundry.client.v2.featureflags.FeatureFlagEntity;
+import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsRequest;
+import org.cloudfoundry.client.v2.featureflags.SetFeatureFlagRequest;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
@@ -58,7 +61,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -66,27 +71,46 @@ import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 final class CloudFoundryCleaner {
 
+    private static final Map<String, Boolean> standardFeatureFlags = new HashMap<>();
+
+    static {
+        standardFeatureFlags.put("route_creation", true);
+        standardFeatureFlags.put("user_org_creation", false);
+        standardFeatureFlags.put("unset_roles_by_username", true);
+        standardFeatureFlags.put("diego_docker", true);
+        standardFeatureFlags.put("service_instance_creation", true);
+        standardFeatureFlags.put("app_scaling", true);
+        standardFeatureFlags.put("app_bits_upload", true);
+        standardFeatureFlags.put("set_roles_by_username", true);
+        standardFeatureFlags.put("task_creation", false);
+        standardFeatureFlags.put("private_domain_creation", true);
+    }
+
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.test");
 
     private final CloudFoundryClient cloudFoundryClient;
 
     private final Mono<Optional<String>> protectedDomainId;
 
+    private final Mono<List<String>> protectedFeatureFlags;
+
     private final Mono<Optional<String>> protectedOrganizationId;
 
     private final Mono<List<String>> protectedSpaceIds;
 
-    CloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Mono<Optional<String>> protectedDomainId, Mono<Optional<String>> protectedOrganizationId, Mono<List<String>> protectedSpaceIds) {
+    CloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Mono<Optional<String>> protectedDomainId, Mono<List<String>> protectedFeatureFlags, Mono<Optional<String>> protectedOrganizationId,
+                        Mono<List<String>> protectedSpaceIds) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.protectedDomainId = protectedDomainId;
+        this.protectedFeatureFlags = protectedFeatureFlags;
         this.protectedOrganizationId = protectedOrganizationId;
         this.protectedSpaceIds = protectedSpaceIds;
     }
 
     void clean() {
         Mono
-            .when(this.protectedDomainId, this.protectedOrganizationId, this.protectedSpaceIds)
-            .flatMap(function((protectedDomainId, protectedOrganizationId, protectedSpaceIds) -> {
+            .when(this.protectedDomainId, this.protectedOrganizationId, this.protectedSpaceIds, this.protectedFeatureFlags)
+            .flatMap(function((protectedDomainId, protectedOrganizationId, protectedSpaceIds, protectedFeatureFlags) -> {
 
                 Predicate<ApplicationResource> applicationV2Predicate = protectedOrganizationId
                     .map(id -> (Predicate<ApplicationResource>) r -> !protectedSpaceIds.contains(ResourceUtils.getEntity(r).getSpaceId()))
@@ -99,6 +123,8 @@ final class CloudFoundryCleaner {
                 Predicate<ServiceInstanceResource> serviceInstancePredicate = r -> !protectedSpaceIds.contains(ResourceUtils.getEntity(r).getSpaceId());
 
                 Predicate<UserProvidedServiceInstanceResource> userProvidedServiceInstancePredicate = r -> !protectedSpaceIds.contains(ResourceUtils.getEntity(r).getSpaceId());
+
+                Predicate<FeatureFlagEntity> featureFlagPredicate = f -> !protectedFeatureFlags.contains(f.getName());
 
                 Predicate<RouteResource> routePredicate = r -> true;
 
@@ -117,6 +143,7 @@ final class CloudFoundryCleaner {
                     .orElse(r -> true);
 
                 return Flux.empty()
+                    .after(() -> cleanFeatureFlags(this.cloudFoundryClient, featureFlagPredicate))
                     .after(() -> cleanRoutes(this.cloudFoundryClient, routePredicate))
                     .after(() -> cleanApplicationsV2(this.cloudFoundryClient, applicationV2Predicate))
                     .after(() -> cleanApplicationsV3(this.cloudFoundryClient, applicationsV3Predicate))
@@ -180,6 +207,26 @@ final class CloudFoundryCleaner {
                     .domainId(domainId)
                     .build()))
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+    }
+
+    private static Flux<Void> cleanFeatureFlags(CloudFoundryClient cloudFoundryClient, Predicate<FeatureFlagEntity> predicate) {
+        return cloudFoundryClient.featureFlags()
+            .list(ListFeatureFlagsRequest.builder()
+                .build())
+            .flatMap(Flux::fromIterable)
+            .filter(predicate)
+            .flatMap(flagEntity -> {
+                if (standardFeatureFlags.containsKey(flagEntity.getName())
+                    && !standardFeatureFlags.get(flagEntity.getName()).equals(flagEntity.getEnabled())) {
+                    return cloudFoundryClient.featureFlags()
+                        .set(SetFeatureFlagRequest.builder()
+                            .name(flagEntity.getName())
+                            .enabled(standardFeatureFlags.get(flagEntity.getName()))
+                            .build())
+                        .after();
+                }
+                return Mono.empty();
+            });
     }
 
     private static Flux<Void> cleanOrganizations(CloudFoundryClient cloudFoundryClient, Predicate<OrganizationResource> predicate) {

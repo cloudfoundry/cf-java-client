@@ -153,9 +153,9 @@ cloudFoundryOperations.organizations()
 
 To relate the example to the description above the following happens:
 
-1. `.list()` – Lists the Cloud Foundry organizations
-1. `.map(...)` – Maps an input type to an output type.  This example uses a method a reference and the equivalent lambda would look like `organization -> organization.getName()`.
-1. `consume...` – The terminal operation that consumes each item in the `Flux`.  Again, this example uses a method reference and the equivalent lambda would look like `name -> System.out.println(name)`.
+1. `.list()` – Lists the Cloud Foundry organizations as a `Flux` of elements of type `Organization`.
+1. `.map(...)` – Maps each organization to its name (type `String`).  This example uses a method reference; the equivalent lambda would look like `organization -> organization.getName()`.
+1. `consume...` – The terminal operation that consumes each name in the `Flux`.  Again, this example uses a method reference and the equivalent lambda would look like `name -> System.out.println(name)`.
 
 ### `CloudFoundryClient` APIs
 
@@ -175,9 +175,9 @@ cloudFoundryClient.organizations()
 
 The above example is more complicated:
 
-1. `.list(...)` – Retrieves a page of Cloud Foundry organizations
-1. `.flatMap(...)` – Substitutes the original `Mono` with a `Flux` of the `Resource`s returned by the requested page
-1. `.map(...)` – Maps the `Resource` to an `Organization` type
+1. `.list(...)` – Retrieves a page of Cloud Foundry organizations.
+1. `.flatMap(...)` – Substitutes the original `Mono` with a `Flux` of the `Resource`s returned by the requested page.
+1. `.map(...)` – Maps the `Resource` to an `Organization` type.
 
 ### Maven Plugin
 
@@ -204,7 +204,7 @@ $ ./mvnw clean install
 
 To run the integration tests, run the following:
 
-```shell
+```
 $ ./mvnw -Pintegration-test clean test
 ```
 
@@ -218,6 +218,7 @@ Name | Description
 `TEST_HOST` | The host of Cloud Foundry instance.  Typically something like `api.local.pcfdev.io`.
 `TEST_PASSWORD` | The test user's password
 `TEST_PROTECTED_DOMAIN` | A domain that will not be cleaned up
+`TEST_PROTECTED_FEATUREFLAGS` | A list of feature flags that will not be (re)set to standard values on cleanup
 `TEST_PROTECTED_ORGANIZATION` | An organization who's contents will not be cleaned up
 `TEST_SKIPSSLVALIDATION` | Whether to skip SSL validation when connecting to the Cloud Foundry instance.  Typically `true` when connecting to a PCF Dev instance.
 `TEST_USERNAME` | The test user's username
