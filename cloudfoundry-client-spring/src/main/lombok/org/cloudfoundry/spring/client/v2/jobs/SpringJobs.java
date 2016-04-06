@@ -17,9 +17,9 @@
 package org.cloudfoundry.spring.client.v2.jobs;
 
 import lombok.ToString;
-import org.cloudfoundry.client.v2.job.GetJobRequest;
-import org.cloudfoundry.client.v2.job.GetJobResponse;
-import org.cloudfoundry.client.v2.job.Jobs;
+import org.cloudfoundry.client.v2.jobs.GetJobRequest;
+import org.cloudfoundry.client.v2.jobs.GetJobResponse;
+import org.cloudfoundry.client.v2.jobs.Jobs;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;

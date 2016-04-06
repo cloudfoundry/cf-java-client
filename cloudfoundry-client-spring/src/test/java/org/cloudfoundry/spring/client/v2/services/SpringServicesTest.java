@@ -17,7 +17,7 @@
 package org.cloudfoundry.spring.client.v2.services;
 
 import org.cloudfoundry.client.v2.Resource;
-import org.cloudfoundry.client.v2.job.JobEntity;
+import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlanEntity;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlanResource;
 import org.cloudfoundry.client.v2.services.DeleteServiceRequest;

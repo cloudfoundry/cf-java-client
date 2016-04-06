@@ -27,7 +27,7 @@ import org.cloudfoundry.client.v2.buildpacks.GetBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.GetBuildpackResponse;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksResponse;
-import org.cloudfoundry.client.v2.job.JobEntity;
+import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 

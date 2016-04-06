@@ -18,7 +18,7 @@ package org.cloudfoundry.spring.client.v2.servicebindings;
 
 
 import org.cloudfoundry.client.v2.Resource;
-import org.cloudfoundry.client.v2.job.JobEntity;
+import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingRequest;

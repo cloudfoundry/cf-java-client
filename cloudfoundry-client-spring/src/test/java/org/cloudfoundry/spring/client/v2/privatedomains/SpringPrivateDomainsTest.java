@@ -17,7 +17,7 @@
 package org.cloudfoundry.spring.client.v2.privatedomains;
 
 import org.cloudfoundry.client.v2.Resource;
-import org.cloudfoundry.client.v2.job.JobEntity;
+import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
 import org.cloudfoundry.client.v2.privatedomains.DeletePrivateDomainRequest;
