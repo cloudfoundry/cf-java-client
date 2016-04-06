@@ -33,6 +33,7 @@ public final class GetBuildpackResponse extends AbstractBuildpackResource {
     @Builder
     GetBuildpackResponse(@JsonProperty("entity") BuildpackEntity entity,
                          @JsonProperty("metadata") Metadata metadata) {
+
         super(entity, metadata);
     }
 
