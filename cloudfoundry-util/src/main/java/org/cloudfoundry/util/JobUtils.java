@@ -19,9 +19,9 @@ package org.cloudfoundry.util;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.Resource;
-import org.cloudfoundry.client.v2.job.GetJobRequest;
-import org.cloudfoundry.client.v2.job.GetJobResponse;
-import org.cloudfoundry.client.v2.job.JobEntity;
+import org.cloudfoundry.client.v2.jobs.GetJobRequest;
+import org.cloudfoundry.client.v2.jobs.GetJobResponse;
+import org.cloudfoundry.client.v2.jobs.JobEntity;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;

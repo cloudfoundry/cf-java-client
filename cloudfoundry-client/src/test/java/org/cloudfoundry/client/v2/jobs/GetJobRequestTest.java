@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.job;
+package org.cloudfoundry.client.v2.jobs;
 
 import org.cloudfoundry.ValidationResult;
 import org.junit.Test;

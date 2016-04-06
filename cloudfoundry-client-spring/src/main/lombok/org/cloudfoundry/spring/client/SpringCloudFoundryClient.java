@@ -30,7 +30,7 @@ import org.cloudfoundry.client.v2.environmentvariablegroups.EnvironmentVariableG
 import org.cloudfoundry.client.v2.events.Events;
 import org.cloudfoundry.client.v2.featureflags.FeatureFlags;
 import org.cloudfoundry.client.v2.info.Info;
-import org.cloudfoundry.client.v2.job.Jobs;
+import org.cloudfoundry.client.v2.jobs.Jobs;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitions;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomains;
