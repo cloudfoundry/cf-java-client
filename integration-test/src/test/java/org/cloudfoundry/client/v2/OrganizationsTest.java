@@ -255,11 +255,12 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .then(organizationId -> this.cloudFoundryClient.organizations()
                 .delete(DeleteOrganizationRequest.builder()
                     .organizationId(organizationId)
+                    .async(true)
                     .build()))
             .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))
             .subscribe(this.testSubscriber());
     }
-
+    
     @Test
     public void get() {
         String organizationName = getOrganizationName();
