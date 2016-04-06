@@ -23,6 +23,8 @@ import org.cloudfoundry.client.v2.buildpacks.CreateBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.CreateBuildpackResponse;
 import org.cloudfoundry.client.v2.buildpacks.DeleteBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.DeleteBuildpackResponse;
+import org.cloudfoundry.client.v2.buildpacks.GetBuildpackRequest;
+import org.cloudfoundry.client.v2.buildpacks.GetBuildpackResponse;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksResponse;
 import org.cloudfoundry.client.v2.job.JobEntity;
@@ -132,6 +134,55 @@ public final class SpringBuildpacksTest {
             return this.buildpacks.delete(request);
         }
 
+    }
+
+    public static final class Get extends AbstractApiTest<GetBuildpackRequest, GetBuildpackResponse> {
+
+        private SpringBuildpacks buildpacks = new SpringBuildpacks(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected GetBuildpackRequest getInvalidRequest() {
+            return GetBuildpackRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("/v2/buildpacks/test-buildpack-id")
+                .status(OK)
+                .responsePayload("fixtures/client/v2/buildpacks/GET_{id}_response.json");
+        }
+
+        @Override
+        protected GetBuildpackResponse getResponse() {
+            return GetBuildpackResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .createdAt("2016-03-17T21:41:28Z")
+                    .id("35d3fa06-08db-4b9e-b2a7-58724a179687")
+                    .url("/v2/buildpacks/35d3fa06-08db-4b9e-b2a7-58724a179687")
+                    .build()
+                )
+                .entity(BuildpackEntity.builder()
+                    .enabled(true)
+                    .filename("name-2302")
+                    .locked(false)
+                    .name("name_1")
+                    .position(1)
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected GetBuildpackRequest getValidRequest() throws Exception {
+            return GetBuildpackRequest.builder()
+                .buildpackId("test-buildpack-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<GetBuildpackResponse> invoke(GetBuildpackRequest request) {
+            return this.buildpacks.get(request);
+        }
     }
 
     public static final class List extends AbstractApiTest<ListBuildpacksRequest, ListBuildpacksResponse> {
