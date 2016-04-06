@@ -61,6 +61,14 @@ public final class ServiceInstance {
     private final String documentationUrl;
 
     /**
+     * The last operation
+     *
+     * @param lastOperation the last operation
+     * @return the last operation
+     */
+    private final String lastOperation;
+
+    /**
      * The message
      *
      * @param message the message
@@ -137,6 +145,7 @@ public final class ServiceInstance {
                     String dashboardUrl,
                     String description,
                     String documentationUrl,
+                    String lastOperation,
                     String message,
                     String plan,
                     String service,
@@ -150,6 +159,7 @@ public final class ServiceInstance {
         this.dashboardUrl = dashboardUrl;
         this.description = description;
         this.documentationUrl = documentationUrl;
+        this.lastOperation = lastOperation;
         this.message = message;
         this.plan = plan;
         this.service = service;

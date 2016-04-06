@@ -431,6 +431,7 @@ public final class DefaultServices implements Services {
             .dashboardUrl(serviceInstanceEntity.getDashboardUrl())
             .description(serviceEntity.getDescription())
             .documentationUrl(documentationUrl.orElse(null))
+            .lastOperation(lastOperation.getType())
             .message(lastOperation.getDescription())
             .plan(plan.orElse(null))
             .service(serviceEntity.getLabel())

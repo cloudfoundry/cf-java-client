@@ -722,20 +722,14 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<ServiceInstance> testSubscriber) {
             testSubscriber
-                .assertEquals(ServiceInstance.builder()
+                .assertEquals(fill(ServiceInstance.builder())
                     .application("test-application")
-                    .dashboardUrl("test-dashboardUrl")
-                    .description("test-description")
                     .documentationUrl("test-documentation-url")
-                    .message("test-message")
+                    .lastOperation("test-type")
                     .plan("test-service-plan")
-                    .service("test-service")
                     .serviceInstance("test-service-instance-name")
-                    .startedAt("test-startedAt")
-                    .status("test-status")
                     .tag("test-tag")
                     .type(ServiceInstanceType.MANAGED)
-                    .updatedAt("test-updatedAt")
                     .build());
         }
 
@@ -847,20 +841,14 @@ public final class DefaultServicesTest {
                     .serviceInstance("test-service-instance1")
                     .type(ServiceInstanceType.USER_PROVIDED)
                     .build())
-                .assertEquals(ServiceInstance.builder()
+                .assertEquals(fill(ServiceInstance.builder())
                     .application("test-application")
-                    .dashboardUrl("test-dashboardUrl")
-                    .description("test-description")
                     .documentationUrl("test-documentation-url")
-                    .message("test-message")
+                    .lastOperation("test-type")
                     .plan("test-service-plan")
-                    .service("test-service")
                     .serviceInstance("test-service-instance2")
-                    .startedAt("test-startedAt")
-                    .status("test-status")
                     .tag("test-tag")
                     .type(ServiceInstanceType.MANAGED)
-                    .updatedAt("test-updatedAt")
                     .build());
         }
 
