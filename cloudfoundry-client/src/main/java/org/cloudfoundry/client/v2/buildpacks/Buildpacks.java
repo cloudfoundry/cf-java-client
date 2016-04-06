@@ -40,6 +40,14 @@ public interface Buildpacks {
     Mono<DeleteBuildpackResponse> delete(DeleteBuildpackRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/buildpacks/retrieve_a_particular_buildpack.html">Retrieve a particular Buildpack</a> request
+     *
+     * @param request the Get Buildpack request
+     * @return the response from the Get Buildpack request
+     */
+    Mono<GetBuildpackResponse> get(GetBuildpackRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/buildpacks/list_all_buildpacks.html">List all Buildpacks</a> request
      *
      * @param request the List all Buildpacks request
