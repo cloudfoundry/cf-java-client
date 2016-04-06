@@ -148,7 +148,7 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    Mono<List<String>> protectedFeatureFlags(@Value("${test.protected.featureflags}") List<String> protectedFlags) {
+    Mono<List<String>> protectedFeatureFlags(@Value("${test.protected.featureflags:}") List<String> protectedFlags) {
         return Mono.just(protectedFlags);
     }
 
