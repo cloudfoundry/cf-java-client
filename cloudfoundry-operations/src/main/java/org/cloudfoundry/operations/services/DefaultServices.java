@@ -55,7 +55,7 @@ import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.ValidationUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.tuple.Tuple2;
+import reactor.core.util.Exceptions;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -68,6 +68,8 @@ import java.util.function.Function;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class DefaultServices implements Services {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final CloudFoundryClient cloudFoundryClient;
 
@@ -167,16 +169,14 @@ public final class DefaultServices implements Services {
             .after();
     }
 
-    private static String convertLastOperation(LastOperation lastOperation) {
-        return String.format("%s %s", lastOperation.getType(), lastOperation.getState());
-    }
-
     private static ServiceInstanceType convertToInstanceType(String type) {
-        if ("user_provided_service_instance".equals(type)) return ServiceInstanceType.USER_PROVIDED;
-
-        if ("managed_service_instance".equals(type)) return ServiceInstanceType.MANAGED;
-
-        return ServiceInstanceType.UNKNOWN;
+        if ("user_provided_service_instance".equals(type)) {
+            return ServiceInstanceType.USER_PROVIDED;
+        } else if ("managed_service_instance".equals(type)) {
+            return ServiceInstanceType.MANAGED;
+        } else {
+            return ServiceInstanceType.UNKNOWN;
+        }
     }
 
     private static Mono<AbstractServiceInstanceResource> createServiceInstance(CloudFoundryClient cloudFoundryClient, String spaceId, String planId, CreateServiceInstanceRequest request) {
@@ -213,35 +213,17 @@ public final class DefaultServices implements Services {
             .toList();
     }
 
+    @SuppressWarnings("unchecked")
     private static String getExtraValue(String extra, String key) {
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        try {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> extraMap = (Map<String, Object>) objectMapper.readValue(extra, Map.class);
-
-            if (!extraMap.isEmpty()) {
-                return (String) extraMap.get(key);
-            }
-        } catch (IOException e) {
-            // Do nothing
+        if (extra == null || extra.isEmpty()) {
+            return null;
         }
 
-        return null;
-    }
-
-    private static Mono<Tuple2<Optional<String>, Optional<String>>> getServiceAndPlan(CloudFoundryClient cloudFoundryClient, String servicePlanId) {
-        return Optional.ofNullable(servicePlanId)
-            .map(servicePlanId1 -> requestServicePlan(cloudFoundryClient, servicePlanId1)
-                .map(ResourceUtils::getEntity)
-                .then(servicePlanEntity -> Mono
-                    .when(
-                        getServiceName(cloudFoundryClient, servicePlanEntity.getServiceId())
-                            .map(Optional::<String>of),
-                        Mono.just(Optional.of(servicePlanEntity.getName()))
-                    ))
-            )
-            .orElse(Mono.just(Tuple2.of(Optional.empty(), Optional.empty())));
+        try {
+            return (String) OBJECT_MAPPER.readValue(extra, Map.class).get(key);
+        } catch (IOException e) {
+            throw Exceptions.propagate(e);
+        }
     }
 
     private static Mono<String> getServiceBindingId(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId, String serviceInstanceName) {
@@ -259,15 +241,6 @@ public final class DefaultServices implements Services {
             .otherwiseIfEmpty(Mono.just(ServiceEntity.builder().build()));
     }
 
-    private static Mono<Tuple2<Optional<String>, Optional<String>>> getServiceIdAndPlan(CloudFoundryClient cloudFoundryClient, String servicePlanId) {
-        return Optional.ofNullable(servicePlanId)
-            .map(servicePlanId1 -> requestServicePlan(cloudFoundryClient, servicePlanId1)
-                .map(ResourceUtils::getEntity)
-                .then(servicePlanEntity -> Mono
-                    .just(Tuple2.of(Optional.of(servicePlanEntity.getServiceId()), Optional.of(servicePlanEntity.getName())))))
-            .orElse(Mono.just(Tuple2.of(Optional.empty(), Optional.empty())));
-    }
-
     private static Mono<String> getServiceIdByName(CloudFoundryClient cloudFoundryClient, String spaceId, String service) {
         return requestSpaceServices(cloudFoundryClient, spaceId, builder -> builder.label(service))
             .single()
@@ -279,12 +252,6 @@ public final class DefaultServices implements Services {
         return requestSpaceServiceInstancesByName(cloudFoundryClient, name, spaceId)
             .single()
             .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Service instance %s does not exist", name)));
-    }
-
-    private static Mono<String> getServiceName(CloudFoundryClient cloudFoundryClient, String serviceId) {
-        return requestService(cloudFoundryClient, serviceId)
-            .map(ResourceUtils::getEntity)
-            .map(ServiceEntity::getLabel);
     }
 
     private static Mono<ServicePlanEntity> getServicePlanEntity(CloudFoundryClient cloudFoundryClient, String servicePlanId) {
