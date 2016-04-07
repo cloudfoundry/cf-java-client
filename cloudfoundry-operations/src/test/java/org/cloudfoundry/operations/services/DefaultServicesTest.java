@@ -725,9 +725,10 @@ public final class DefaultServicesTest {
                 .assertEquals(fill(ServiceInstance.builder())
                     .application("test-application")
                     .documentationUrl("test-documentation-url")
+                    .id("test-service-instance-id")
                     .lastOperation("test-type")
                     .plan("test-service-plan")
-                    .serviceInstance("test-service-instance-name")
+                    .name("test-service-instance-name")
                     .tag("test-tag")
                     .type(ServiceInstanceType.MANAGED)
                     .build());
@@ -804,7 +805,8 @@ public final class DefaultServicesTest {
             testSubscriber
                 .assertEquals(ServiceInstance.builder()
                     .application("test-application")
-                    .serviceInstance("test-service-instance-name")
+                    .id("test-service-instance-id")
+                    .name("test-service-instance-name")
                     .type(ServiceInstanceType.USER_PROVIDED)
                     .build());
         }
@@ -838,15 +840,17 @@ public final class DefaultServicesTest {
         protected void assertions(TestSubscriber<ServiceInstance> testSubscriber) {
             testSubscriber
                 .assertEquals(ServiceInstance.builder()
-                    .serviceInstance("test-service-instance1")
+                    .name("test-service-instance1")
+                    .id("test-service-instance1-id")
                     .type(ServiceInstanceType.USER_PROVIDED)
                     .build())
                 .assertEquals(fill(ServiceInstance.builder())
                     .application("test-application")
                     .documentationUrl("test-documentation-url")
+                    .id("test-service-instance2-id")
                     .lastOperation("test-type")
                     .plan("test-service-plan")
-                    .serviceInstance("test-service-instance2")
+                    .name("test-service-instance2")
                     .tag("test-tag")
                     .type(ServiceInstanceType.MANAGED)
                     .build());

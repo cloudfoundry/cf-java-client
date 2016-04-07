@@ -61,6 +61,14 @@ public final class ServiceInstance {
     private final String documentationUrl;
 
     /**
+     * The service instance id
+     *
+     * @param id the service instance id
+     * @return the service instance id
+     */
+    private final String id;
+
+    /**
      * The last operation
      *
      * @param lastOperation the last operation
@@ -77,6 +85,14 @@ public final class ServiceInstance {
     private final String message;
 
     /**
+     * The service instance name
+     *
+     * @param name the service instance name
+     * @return the service instance name
+     */
+    private final String name;
+
+    /**
      * The managed service plan
      *
      * @param plan the managed service plan
@@ -91,14 +107,6 @@ public final class ServiceInstance {
      * @return the service
      */
     private final String service;
-
-    /**
-     * The service instance
-     *
-     * @param serviceInstance the service instance
-     * @return the service instance
-     */
-    private final String serviceInstance;
 
     /**
      * When the service was last started
@@ -145,11 +153,12 @@ public final class ServiceInstance {
                     String dashboardUrl,
                     String description,
                     String documentationUrl,
+                    String id,
                     String lastOperation,
                     String message,
+                    String name,
                     String plan,
                     String service,
-                    String serviceInstance,
                     String startedAt,
                     String status,
                     @Singular List<String> tags,
@@ -159,11 +168,12 @@ public final class ServiceInstance {
         this.dashboardUrl = dashboardUrl;
         this.description = description;
         this.documentationUrl = documentationUrl;
+        this.id = id;
         this.lastOperation = lastOperation;
         this.message = message;
+        this.name = name;
         this.plan = plan;
         this.service = service;
-        this.serviceInstance = serviceInstance;
         this.startedAt = startedAt;
         this.status = status;
         this.tags = tags;
