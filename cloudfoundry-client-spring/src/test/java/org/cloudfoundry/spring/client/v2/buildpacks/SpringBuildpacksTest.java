@@ -27,6 +27,8 @@ import org.cloudfoundry.client.v2.buildpacks.GetBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.GetBuildpackResponse;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksResponse;
+import org.cloudfoundry.client.v2.buildpacks.UpdateBuildpackRequest;
+import org.cloudfoundry.client.v2.buildpacks.UpdateBuildpackResponse;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
@@ -34,6 +36,7 @@ import reactor.core.publisher.Mono;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -265,6 +268,58 @@ public final class SpringBuildpacksTest {
             return this.buildpacks.list(request);
         }
 
+    }
+
+    public static final class Update extends AbstractApiTest<UpdateBuildpackRequest, UpdateBuildpackResponse> {
+
+        private SpringBuildpacks buildpacks = new SpringBuildpacks(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected UpdateBuildpackRequest getInvalidRequest() {
+            return UpdateBuildpackRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(PUT).path("/v2/buildpacks/test-buildpack-id")
+                .requestPayload("fixtures/client/v2/buildpacks/PUT_{id}_request.json")
+                .status(CREATED)
+                .responsePayload("fixtures/client/v2/buildpacks/PUT_{id}_response.json");
+        }
+
+        @Override
+        protected UpdateBuildpackResponse getResponse() {
+            return UpdateBuildpackResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .createdAt("2016-03-17T21:41:28Z")
+                    .id("edd64481-e13c-4193-b6cc-2a727a62e817")
+                    .updatedAt("2016-03-17T21:41:28Z")
+                    .url("/v2/buildpacks/edd64481-e13c-4193-b6cc-2a727a62e817")
+                    .build()
+                )
+                .entity(BuildpackEntity.builder()
+                    .enabled(false)
+                    .filename("name-2314")
+                    .locked(false)
+                    .name("name_1")
+                    .position(1)
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected UpdateBuildpackRequest getValidRequest() throws Exception {
+            return UpdateBuildpackRequest.builder()
+                .buildpackId("test-buildpack-id")
+                .enabled(false)
+                .build();
+        }
+
+        @Override
+        protected Mono<UpdateBuildpackResponse> invoke(UpdateBuildpackRequest request) {
+            return this.buildpacks.update(request);
+        }
     }
 
 }

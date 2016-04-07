@@ -55,4 +55,12 @@ public interface Buildpacks {
      */
     Mono<ListBuildpacksResponse> list(ListBuildpacksRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/buildpacks/enable_or_disable_a_buildpack.html">Update Buildpack</a> request
+     *
+     * @param request the Update Buildpack request
+     * @return the response from the Update Buildpack request
+     */
+    Mono<UpdateBuildpackResponse> update(UpdateBuildpackRequest request);
+
 }
