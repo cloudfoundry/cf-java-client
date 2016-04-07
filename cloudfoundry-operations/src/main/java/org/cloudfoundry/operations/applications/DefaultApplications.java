@@ -413,12 +413,12 @@ public final class DefaultApplications implements Applications {
             .after();
     }
 
-    private static boolean ApplicationInstancesUnavailable(Throwable throwable) {
+    private static boolean applicationInstancesUnavailable(Throwable throwable) {
         return throwable instanceof CloudFoundryException &&
             (((CloudFoundryException) throwable).getCode() == CF_INSTANCES_ERROR || ((CloudFoundryException) throwable).getCode() == CF_STAGING_NOT_FINISHED);
     }
 
-    private static boolean ApplicationStatisticsUnavailable(Throwable throwable) {
+    private static boolean applicationStatisticsUnavailable(Throwable throwable) {
         return throwable instanceof CloudFoundryException && ((CloudFoundryException) throwable).getCode() == CF_APP_STOPPED_STATS_ERROR;
     }
 
@@ -575,7 +575,7 @@ public final class DefaultApplications implements Applications {
     private static Mono<ApplicationInstancesResponse> getApplicationInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestApplicationInstances(cloudFoundryClient, applicationId)
             .otherwise(throwable -> {
-                if (ApplicationInstancesUnavailable(throwable)) {
+                if (applicationInstancesUnavailable(throwable)) {
                     return Mono.just(ApplicationInstancesResponse.builder().build());
                 } else {
                     return Mono.error(throwable);
@@ -586,7 +586,7 @@ public final class DefaultApplications implements Applications {
     private static Mono<ApplicationStatisticsResponse> getApplicationStatistics(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestApplicationStatistics(cloudFoundryClient, applicationId)
             .otherwise(throwable -> {
-                if (ApplicationStatisticsUnavailable(throwable)) {
+                if (applicationStatisticsUnavailable(throwable)) {
                     return Mono.just(ApplicationStatisticsResponse.builder().build());
                 } else {
                     return Mono.error(throwable);
