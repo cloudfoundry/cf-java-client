@@ -20,6 +20,7 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.operations.applications.ApplicationEnvironments;
 import org.cloudfoundry.operations.applications.DeleteApplicationRequest;
 import org.cloudfoundry.operations.applications.GetApplicationEnvironmentsRequest;
+import org.cloudfoundry.operations.applications.GetApplicationRequest;
 import org.cloudfoundry.operations.applications.PushApplicationRequest;
 import org.cloudfoundry.operations.applications.RestartApplicationRequest;
 import org.cloudfoundry.operations.applications.SetEnvironmentVariableApplicationRequest;
@@ -77,6 +78,34 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void get() {
+        String applicationName = getApplicationName();
+
+        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
+            .after(() -> this.cloudFoundryOperations.applications()
+                .get(GetApplicationRequest.builder()
+                    .name(applicationName)
+                    .build()))
+            .map(response -> response.getName())
+            .subscribe(testSubscriber()
+                .assertEquals(applicationName));
+    }
+
+    @Test
+    public void getStopped() {
+        String applicationName = getApplicationName();
+
+        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, true)
+            .after(() -> this.cloudFoundryOperations.applications()
+                .get(GetApplicationRequest.builder()
+                    .name(applicationName)
+                    .build()))
+            .map(response -> response.getName())
+            .subscribe(testSubscriber()
+                .assertEquals(applicationName));
+    }
+
+    @Test
     public void pushDomainNotFound() {
         String applicationName = getApplicationName();
         String domainName = getDomainName();
@@ -95,7 +124,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushExisting() throws IOException {
+    public void pushExisting() {
         String applicationName = getApplicationName();
 
         createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
@@ -111,7 +140,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushNew() throws IOException {
+    public void pushNew() {
         String applicationName = getApplicationName();
 
         createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
