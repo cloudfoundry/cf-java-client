@@ -1,0 +1,15 @@
+{
+  "metadata": {
+    "guid": "edd64481-e13c-4193-b6cc-2a727a62e817",
+    "url": "/v2/buildpacks/edd64481-e13c-4193-b6cc-2a727a62e817",
+    "created_at": "2016-03-17T21:41:28Z",
+    "updated_at": "2016-03-17T21:41:28Z"
+  },
+  "entity": {
+    "name": "name_1",
+    "position": 1,
+    "enabled": false,
+    "locked": false,
+    "filename": "name-2314"
+  }
+}
