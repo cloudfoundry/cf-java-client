@@ -66,7 +66,7 @@ import org.cloudfoundry.spring.client.v2.info.SpringInfo;
 import org.cloudfoundry.spring.client.v2.jobs.SpringJobs;
 import org.cloudfoundry.spring.client.v2.organizations.SpringOrganizations;
 import org.cloudfoundry.spring.client.v2.privatedomains.SpringPrivateDomains;
-import org.cloudfoundry.spring.client.v2.quotadefinitions.SpringOrganizationQuotaDefinitions;
+import org.cloudfoundry.spring.client.v2.organizationquotadefinitions.SpringOrganizationQuotaDefinitions;
 import org.cloudfoundry.spring.client.v2.routemappings.SpringRouteMappings;
 import org.cloudfoundry.spring.client.v2.routes.SpringRoutes;
 import org.cloudfoundry.spring.client.v2.servicebindings.SpringServiceBindings;
