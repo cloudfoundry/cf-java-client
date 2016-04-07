@@ -175,6 +175,15 @@ public final class DefaultApplicationsTest {
                     .build()));
     }
 
+    private static void requestApplicationInstancesError(CloudFoundryClient cloudFoundryClient, String applicationId, Integer code) {
+        when(cloudFoundryClient.applicationsV2()
+            .instances(ApplicationInstancesRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .error(new CloudFoundryException(code, "test-exception-description", "test-exception-errorCode")));
+    }
+
     private static void requestApplicationInstancesFailingPartial(CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient.applicationsV2()
             .instances(ApplicationInstancesRequest.builder()
@@ -293,7 +302,7 @@ public final class DefaultApplicationsTest {
             .thenReturn(Mono.empty());
     }
 
-    private static void requestApplicationStats(CloudFoundryClient cloudFoundryClient, String applicationId) {
+    private static void requestApplicationStatistics(CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient.applicationsV2()
             .statistics(ApplicationStatisticsRequest.builder()
                 .applicationId(applicationId)
@@ -307,6 +316,15 @@ public final class DefaultApplicationsTest {
                             .build())
                         .build())
                     .build()));
+    }
+
+    private static void requestApplicationStatisticsError(CloudFoundryClient cloudFoundryClient, String applicationId, Integer code) {
+        when(cloudFoundryClient.applicationsV2()
+            .statistics(ApplicationStatisticsRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .error(new CloudFoundryException(code, "test-exception-description", "test-exception-errorCode")));
     }
 
     private static void requestApplicationSummary(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -1544,7 +1562,7 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationStats(this.cloudFoundryClient, "test-metadata-id");
+            requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
             requestStack(this.cloudFoundryClient, "test-application-stackId");
             requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
             requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
@@ -1677,7 +1695,7 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationStats(this.cloudFoundryClient, "test-metadata-id");
+            requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
             requestStack(this.cloudFoundryClient, "test-application-stackId");
             requestApplicationSummaryDetectedBuildpack(this.cloudFoundryClient, "test-metadata-id");
             requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
@@ -1971,6 +1989,43 @@ public final class DefaultApplicationsTest {
 
     }
 
+    public static final class GetInstancesError extends AbstractOperationsApiTest<ApplicationDetail> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+            requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
+            requestStack(this.cloudFoundryClient, "test-application-stackId");
+            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+            requestApplicationInstancesError(this.cloudFoundryClient, "test-metadata-id", 220001);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationDetail> testSubscriber) {
+            testSubscriber
+                .assertEquals(fill(ApplicationDetail.builder())
+                    .buildpack("test-application-summary-buildpack")
+                    .id("test-application-summary-id")
+                    .lastUploaded(new Date(0))
+                    .name("test-application-summary-name")
+                    .requestedState("test-application-summary-state")
+                    .stack("test-stack-entity-name")
+                    .url("test-route-host.test-domain-name")
+                    .build());
+        }
+
+        @Override
+        protected Mono<ApplicationDetail> invoke() {
+            return this.applications
+                .get(GetApplicationRequest.builder()
+                    .name("test-app")
+                    .build());
+        }
+
+    }
+
     public static final class GetNoBuildpack extends AbstractOperationsApiTest<ApplicationDetail> {
 
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
@@ -1978,7 +2033,7 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationStats(this.cloudFoundryClient, "test-metadata-id");
+            requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
             requestStack(this.cloudFoundryClient, "test-application-stackId");
             requestApplicationSummaryNoBuildpack(this.cloudFoundryClient, "test-metadata-id");
             requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
@@ -2012,6 +2067,84 @@ public final class DefaultApplicationsTest {
 
     }
 
+    public static final class GetStagingError extends AbstractOperationsApiTest<ApplicationDetail> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+            requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
+            requestStack(this.cloudFoundryClient, "test-application-stackId");
+            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+            requestApplicationInstancesError(this.cloudFoundryClient, "test-metadata-id", 170002);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationDetail> testSubscriber) {
+            testSubscriber
+                .assertEquals(fill(ApplicationDetail.builder())
+                    .buildpack("test-application-summary-buildpack")
+                    .id("test-application-summary-id")
+                    .lastUploaded(new Date(0))
+                    .name("test-application-summary-name")
+                    .requestedState("test-application-summary-state")
+                    .stack("test-stack-entity-name")
+                    .url("test-route-host.test-domain-name")
+                    .build());
+        }
+
+        @Override
+        protected Mono<ApplicationDetail> invoke() {
+            return this.applications
+                .get(GetApplicationRequest.builder()
+                    .name("test-app")
+                    .build());
+        }
+
+    }
+
+    public static final class GetStoppedError extends AbstractOperationsApiTest<ApplicationDetail> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+            requestApplicationStatisticsError(this.cloudFoundryClient, "test-metadata-id", 200003);
+            requestStack(this.cloudFoundryClient, "test-application-stackId");
+            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+            requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationDetail> testSubscriber) {
+            testSubscriber
+                .assertEquals(fill(ApplicationDetail.builder())
+                    .buildpack("test-application-summary-buildpack")
+                    .id("test-application-summary-id")
+                    .instanceDetail(ApplicationDetail.InstanceDetail.builder()
+                        .since(new Date(1000))
+                        .state("test-application-instance-info-state")
+                        .build())
+                    .lastUploaded(new Date(0))
+                    .name("test-application-summary-name")
+                    .requestedState("test-application-summary-state")
+                    .stack("test-stack-entity-name")
+                    .url("test-route-host.test-domain-name")
+                    .build());
+        }
+
+        @Override
+        protected Mono<ApplicationDetail> invoke() {
+            return this.applications
+                .get(GetApplicationRequest.builder()
+                    .name("test-app")
+                    .build());
+        }
+
+    }
+
     public static final class GetWithEmptyInstance extends AbstractOperationsApiTest<ApplicationDetail> {
 
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
@@ -2019,7 +2152,7 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationStats(this.cloudFoundryClient, "test-metadata-id");
+            requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
             requestStack(this.cloudFoundryClient, "test-application-stackId");
             requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
             requestApplicationEmptyInstance(this.cloudFoundryClient, "test-metadata-id");
@@ -2100,7 +2233,7 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationStats(this.cloudFoundryClient, "test-metadata-id");
+            requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
             requestStack(this.cloudFoundryClient, "test-application-stackId");
             requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
             requestApplicationNoInstances(this.cloudFoundryClient, "test-metadata-id");
@@ -2191,8 +2324,8 @@ public final class DefaultApplicationsTest {
                     .buildpack("test-application-summary-buildpack")
                     .id("test-application-summary-id")
                     .instanceDetail(ApplicationDetail.InstanceDetail.builder()
-                        .diskQuota(1l)
-                        .memoryQuota(1l)
+                        .diskQuota(1L)
+                        .memoryQuota(1L)
                         .since(new Date(1000))
                         .state("test-application-instance-info-state")
                         .build())

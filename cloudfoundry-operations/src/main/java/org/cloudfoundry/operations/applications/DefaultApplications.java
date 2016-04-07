@@ -413,6 +413,15 @@ public final class DefaultApplications implements Applications {
             .after();
     }
 
+    private static boolean ApplicationInstancesUnavailable(Throwable throwable) {
+        return throwable instanceof CloudFoundryException &&
+            (((CloudFoundryException) throwable).getCode() == CF_INSTANCES_ERROR || ((CloudFoundryException) throwable).getCode() == CF_STAGING_NOT_FINISHED);
+    }
+
+    private static boolean ApplicationStatisticsUnavailable(Throwable throwable) {
+        return throwable instanceof CloudFoundryException && ((CloudFoundryException) throwable).getCode() == CF_APP_STOPPED_STATS_ERROR;
+    }
+
     private static Map<String, Object> addToEnvironment(Map<String, Object> environment, String variableName, Object variableValue) {
         return StringMap.builder()
             .entries(environment)
@@ -566,8 +575,7 @@ public final class DefaultApplications implements Applications {
     private static Mono<ApplicationInstancesResponse> getApplicationInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestApplicationInstances(cloudFoundryClient, applicationId)
             .otherwise(throwable -> {
-                if (throwable instanceof CloudFoundryException &&
-                    (((CloudFoundryException) throwable).getCode() == CF_INSTANCES_ERROR || ((CloudFoundryException) throwable).getCode() == CF_STAGING_NOT_FINISHED)) {
+                if (ApplicationInstancesUnavailable(throwable)) {
                     return Mono.just(ApplicationInstancesResponse.builder().build());
                 } else {
                     return Mono.error(throwable);
@@ -575,10 +583,10 @@ public final class DefaultApplications implements Applications {
             });
     }
 
-    private static Mono<ApplicationStatisticsResponse> getApplicationStats(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return requestApplicationStats(cloudFoundryClient, applicationId)
+    private static Mono<ApplicationStatisticsResponse> getApplicationStatistics(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return requestApplicationStatistics(cloudFoundryClient, applicationId)
             .otherwise(throwable -> {
-                if (throwable instanceof CloudFoundryException && ((CloudFoundryException) throwable).getCode() == CF_APP_STOPPED_STATS_ERROR) {
+                if (ApplicationStatisticsUnavailable(throwable)) {
                     return Mono.just(ApplicationStatisticsResponse.builder().build());
                 } else {
                     return Mono.error(throwable);
@@ -594,7 +602,7 @@ public final class DefaultApplications implements Applications {
 
         return Mono
             .when(
-                getApplicationStats(cloudFoundryClient, applicationId),
+                getApplicationStatistics(cloudFoundryClient, applicationId),
                 requestApplicationSummary(cloudFoundryClient, applicationId),
                 requestStack(cloudFoundryClient, stackId),
                 getApplicationInstances(cloudFoundryClient, applicationId)
@@ -817,7 +825,7 @@ public final class DefaultApplications implements Applications {
                 .build());
     }
 
-    private static Mono<ApplicationStatisticsResponse> requestApplicationStats(CloudFoundryClient cloudFoundryClient, String applicationId) {
+    private static Mono<ApplicationStatisticsResponse> requestApplicationStatistics(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return cloudFoundryClient.applicationsV2()
             .statistics(ApplicationStatisticsRequest.builder()
                 .applicationId(applicationId)
