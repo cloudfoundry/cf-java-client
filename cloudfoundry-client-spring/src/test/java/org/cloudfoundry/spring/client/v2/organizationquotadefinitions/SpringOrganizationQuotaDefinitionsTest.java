@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.quotadefinitions;
+package org.cloudfoundry.spring.client.v2.organizationquotadefinitions;
 
 import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionResponse;
@@ -30,7 +30,7 @@ import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringQuotaDefinitionsTest {
+public final class SpringOrganizationQuotaDefinitionsTest {
 
     public static final class GetQuotaDefinition extends AbstractApiTest<GetOrganizationQuotaDefinitionRequest, GetOrganizationQuotaDefinitionResponse> {
 
@@ -68,6 +68,8 @@ public final class SpringQuotaDefinitionsTest {
                     .trialDbAllowed(false)
                     .instanceMemoryLimit(-1)
                     .applicationInstanceLimit(-1)
+                    .appTaskLimit(-1)
+                    .totalServiceKeys(-1)
                     .build())
                 .build();
         }
@@ -124,6 +126,8 @@ public final class SpringQuotaDefinitionsTest {
                         .totalRoutes(1000)
                         .totalServices(100)
                         .trialDbAllowed(false)
+                        .appTaskLimit(-1)
+                        .totalServiceKeys(-1)
                         .build())
                     .build())
                 .build();

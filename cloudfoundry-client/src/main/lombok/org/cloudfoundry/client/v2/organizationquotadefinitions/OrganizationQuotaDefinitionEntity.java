@@ -27,6 +27,14 @@ import lombok.Data;
 public final class OrganizationQuotaDefinitionEntity {
 
     /**
+     * The application task limit
+     *
+     * @param appTaskLimit the application task limit
+     * @return then application task limit
+     */
+    private final Integer appTaskLimit;
+
+    /**
      * The application instance limit
      *
      * @param applicationInstanceLimit the application instance limit
@@ -83,6 +91,14 @@ public final class OrganizationQuotaDefinitionEntity {
     private final Integer totalRoutes;
 
     /**
+     * The total service keys
+     *
+     * @param totalServiceKeys the total service keys
+     * @return the total service keys
+     */
+    private final Integer totalServiceKeys;
+
+    /**
      * The total services
      *
      * @param totalServices the total services
@@ -99,24 +115,28 @@ public final class OrganizationQuotaDefinitionEntity {
     private final Boolean trialDbAllowed;
 
     @Builder
-    OrganizationQuotaDefinitionEntity(@JsonProperty("app_instance_limit") Integer applicationInstanceLimit,
+    OrganizationQuotaDefinitionEntity(@JsonProperty("app_task_limit") Integer appTaskLimit,
+                                      @JsonProperty("app_instance_limit") Integer applicationInstanceLimit,
                                       @JsonProperty("instance_memory_limit") Integer instanceMemoryLimit,
                                       @JsonProperty("memory_limit") Integer memoryLimit,
                                       @JsonProperty("name") String name,
                                       @JsonProperty("non_basic_services_allowed") Boolean nonBasicServicesAllowed,
                                       @JsonProperty("total_private_domains") Integer totalPrivateDomains,
-                                      @JsonProperty("trial_db_allowed") Boolean trialDbAllowed,
                                       @JsonProperty("total_routes") Integer totalRoutes,
-                                      @JsonProperty("total_services") Integer totalServices) {
+                                      @JsonProperty("total_service_keys") Integer totalServiceKeys,
+                                      @JsonProperty("total_services") Integer totalServices,
+                                      @JsonProperty("trial_db_allowed") Boolean trialDbAllowed) {
+        this.appTaskLimit = appTaskLimit;
         this.applicationInstanceLimit = applicationInstanceLimit;
         this.instanceMemoryLimit = instanceMemoryLimit;
         this.memoryLimit = memoryLimit;
         this.name = name;
         this.nonBasicServicesAllowed = nonBasicServicesAllowed;
         this.totalPrivateDomains = totalPrivateDomains;
-        this.trialDbAllowed = trialDbAllowed;
         this.totalRoutes = totalRoutes;
+        this.totalServiceKeys = totalServiceKeys;
         this.totalServices = totalServices;
+        this.trialDbAllowed = trialDbAllowed;
     }
 
 }

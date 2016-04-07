@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.quotadefinitions;
+package org.cloudfoundry.spring.client.v2.organizationquotadefinitions;
 
 import lombok.ToString;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionRequest;
