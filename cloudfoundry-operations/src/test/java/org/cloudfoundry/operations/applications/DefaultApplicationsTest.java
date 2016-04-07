@@ -1991,6 +1991,8 @@ public final class DefaultApplicationsTest {
 
     public static final class GetInstancesError extends AbstractOperationsApiTest<ApplicationDetail> {
 
+        private static final int CF_INSTANCES_ERROR = 220001;
+
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
 
         @Before
@@ -1999,7 +2001,7 @@ public final class DefaultApplicationsTest {
             requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
             requestStack(this.cloudFoundryClient, "test-application-stackId");
             requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-            requestApplicationInstancesError(this.cloudFoundryClient, "test-metadata-id", 220001);
+            requestApplicationInstancesError(this.cloudFoundryClient, "test-metadata-id", CF_INSTANCES_ERROR);
         }
 
         @Override
@@ -2069,6 +2071,8 @@ public final class DefaultApplicationsTest {
 
     public static final class GetStagingError extends AbstractOperationsApiTest<ApplicationDetail> {
 
+        private static final int CF_STAGING_NOT_FINISHED = 170002;
+
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
 
         @Before
@@ -2077,7 +2081,7 @@ public final class DefaultApplicationsTest {
             requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
             requestStack(this.cloudFoundryClient, "test-application-stackId");
             requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-            requestApplicationInstancesError(this.cloudFoundryClient, "test-metadata-id", 170002);
+            requestApplicationInstancesError(this.cloudFoundryClient, "test-metadata-id", CF_STAGING_NOT_FINISHED);
         }
 
         @Override
@@ -2106,12 +2110,14 @@ public final class DefaultApplicationsTest {
 
     public static final class GetStoppedError extends AbstractOperationsApiTest<ApplicationDetail> {
 
+        private static final int CF_APP_STOPPED_STATS_ERROR = 200003;
+
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationStatisticsError(this.cloudFoundryClient, "test-metadata-id", 200003);
+            requestApplicationStatisticsError(this.cloudFoundryClient, "test-metadata-id", CF_APP_STOPPED_STATS_ERROR);
             requestStack(this.cloudFoundryClient, "test-application-stackId");
             requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
             requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
