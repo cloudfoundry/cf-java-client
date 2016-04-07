@@ -20,13 +20,34 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
 import org.cloudfoundry.util.PaginationUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import static org.junit.Assert.fail;
 
 public final class OrganizationQuotaDefnitionsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
+
+    @Ignore("TODO: finish story https://www.pivotaltracker.com/projects/816799/stories/101527322")
+    @Test
+    public void create() {
+        fail("TODO: finish story https://www.pivotaltracker.com/projects/816799/stories/101527322");
+    }
+
+    @Ignore("TODO: finish story https://www.pivotaltracker.com/projects/816799/stories/101527324")
+    @Test
+    public void delete() {
+        fail("TODO: finish story https://www.pivotaltracker.com/projects/816799/stories/101527324");
+    }
+
+    @Ignore("TODO: finish story https://www.pivotaltracker.com/projects/816799/stories/101527322")
+    @Test
+    public void get() {
+        fail("TODO: finish story https://www.pivotaltracker.com/projects/816799/stories/101527322");
+    }
 
     @Test
     public void list() {
@@ -37,6 +58,12 @@ public final class OrganizationQuotaDefnitionsTest extends AbstractIntegrationTe
                 .build()))
             .after()
             .subscribe(this.testSubscriber());
+    }
+
+    @Ignore("TODO: finish story https://www.pivotaltracker.com/projects/816799/stories/101527330")
+    @Test
+    public void update() {
+        fail("TODO: finish story https://www.pivotaltracker.com/projects/816799/stories/101527330");
     }
 
 }
