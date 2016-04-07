@@ -260,7 +260,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))
             .subscribe(this.testSubscriber());
     }
-    
+
     @Test
     public void get() {
         String organizationName = getOrganizationName();

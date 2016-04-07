@@ -136,7 +136,7 @@ public final class DefaultApplications implements Applications {
         this(cloudFoundryClient, loggingClient, spaceId, new WordListRandomWords());
     }
 
-    public DefaultApplications(CloudFoundryClient cloudFoundryClient, Mono<LoggingClient> loggingClient, Mono<String> spaceId, RandomWords randomWords) {
+    DefaultApplications(CloudFoundryClient cloudFoundryClient, Mono<LoggingClient> loggingClient, Mono<String> spaceId, RandomWords randomWords) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.loggingClient = loggingClient;
         this.spaceId = spaceId;
@@ -504,12 +504,16 @@ public final class DefaultApplications implements Applications {
     }
 
     private static String eventDescription(Map<String, Object> request, String... entryNames) {
-        if (request == null) return "";
+        if (request == null) {
+            return "";
+        }
         boolean first = true;
         StringBuilder sb = new StringBuilder();
         for (String entryName : entryNames) {
             Object value = request.get(entryName);
-            if (value == null) continue;
+            if (value == null) {
+                continue;
+            }
             if (!first) {
                 sb.append(", ");
             }

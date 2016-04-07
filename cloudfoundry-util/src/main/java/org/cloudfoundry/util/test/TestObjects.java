@@ -148,29 +148,37 @@ public abstract class TestObjects {
     @SuppressWarnings("unchecked")
     private static <O> O buildTestValue(Method m, Class<O> clazz, String modifier, boolean isPaginated, boolean hasGetterOnBuiltType) {
 
-        if (clazz.getSimpleName().endsWith("Entity")) return buildFilled(clazz, modifier);
-        if (clazz.getSimpleName().endsWith("Metadata")) return buildFilled(clazz, modifier);
-
-        if (isPaginated) {
-            if (m.getName().equals("resultsPerPage")) return null;
-            if (m.getName().equals("orderDirection")) return null;
-        }
-
-        if (!hasGetterOnBuiltType) return null;
-
-        if (clazz == Boolean.class) return (O) Boolean.valueOf(true);
-        if (clazz == Integer.class) return (O) Integer.valueOf(1);
-        if (clazz == Long.class) return (O) Long.valueOf(1L);
-        if (clazz == Float.class) return (O) Float.valueOf(1.0f);
-        if (clazz == Double.class) return (O) Double.valueOf(1.0d);
-        if (clazz == String.class) return (O) String.valueOf("test-" + modifier + m.getName());
-        if (clazz == Map.class) return (O) Collections.emptyMap();
-        if (clazz == List.class) return (O) Collections.emptyList();
-        if (clazz == Collection.class) {
+        if (clazz.getSimpleName().endsWith("Entity")) {
+            return buildFilled(clazz, modifier);
+        } else if (clazz.getSimpleName().endsWith("Metadata")) {
+            return buildFilled(clazz, modifier);
+        } else if (isPaginated
+            && (m.getName().equals("resultsPerPage")
+            || m.getName().equals("orderDirection"))) {
+            return null;
+        } else if (!hasGetterOnBuiltType) {
+            return null;
+        } else if (clazz == Boolean.class) {
+            return (O) Boolean.valueOf(true);
+        } else if (clazz == Integer.class) {
+            return (O) Integer.valueOf(1);
+        } else if (clazz == Long.class) {
+            return (O) Long.valueOf(1L);
+        } else if (clazz == Float.class) {
+            return (O) Float.valueOf(1.0f);
+        } else if (clazz == Double.class) {
+            return (O) Double.valueOf(1.0d);
+        } else if (clazz == String.class) {
+            return (O) String.valueOf("test-" + modifier + m.getName());
+        } else if (clazz == Map.class) {
+            return (O) Collections.emptyMap();
+        } else if (clazz == List.class) {
+            return (O) Collections.emptyList();
+        } else if (clazz == Collection.class) {
+            return null;
+        } else {
             return null;
         }
-
-        return null;
     }
 
     private static <T> void callSetters(T builder, String modifier, Class<?> builderClass, Class<?> builtType, boolean isPaginated) {

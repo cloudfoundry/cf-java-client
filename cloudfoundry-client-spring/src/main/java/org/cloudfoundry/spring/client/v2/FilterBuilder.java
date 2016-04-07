@@ -16,8 +16,8 @@
 
 package org.cloudfoundry.spring.client.v2;
 
-import org.cloudfoundry.spring.util.MethodNameComparator;
 import org.cloudfoundry.client.v2.FilterParameter;
+import org.cloudfoundry.spring.util.MethodNameComparator;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;

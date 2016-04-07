@@ -20,6 +20,7 @@
           <option name="BLANK_LINES_AROUND_FIELD_IN_INTERFACE" value="1" />
           <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="1" />
           <option name="BLANK_LINES_AFTER_ANONYMOUS_CLASS_HEADER" value="1" />
+          <option name="IF_BRACE_FORCE" value="3" />
           <option name="WRAP_LONG_LINES" value="true" />
           <option name="PARENT_SETTINGS_INSTALLED" value="true" />
           <indentOptions>

@@ -142,7 +142,9 @@ public final class ScaleApplicationRequest implements Validatable {
     }
 
     private static Integer parseForMb(String limit) {
-        if (null == limit || limit.length() < 2) return null;
+        if (null == limit || limit.length() < 2) {
+            return null;
+        }
 
         int lastIndex = limit.length() - 1;
         String numberPart = limit.substring(0, lastIndex);

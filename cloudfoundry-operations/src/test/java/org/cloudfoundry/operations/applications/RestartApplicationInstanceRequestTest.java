@@ -37,17 +37,6 @@ public final class RestartApplicationInstanceRequestTest {
     }
 
     @Test
-    public void isValidNoName() {
-        ValidationResult result = RestartApplicationInstanceRequest.builder()
-            .instanceIndex(0)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
     public void isValidNoInstanceIndex() {
         ValidationResult result = RestartApplicationInstanceRequest.builder()
             .name("test-name")
@@ -56,6 +45,17 @@ public final class RestartApplicationInstanceRequestTest {
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("instance index must be specified", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isValidNoName() {
+        ValidationResult result = RestartApplicationInstanceRequest.builder()
+            .instanceIndex(0)
+            .build()
+            .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("name must be specified", result.getMessages().get(0));
     }
 
 }

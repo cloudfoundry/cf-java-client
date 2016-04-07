@@ -44,18 +44,18 @@ public final class UserOrganizationRoleEntity extends AbstractUserEntity {
 
     @Builder
     UserOrganizationRoleEntity(@JsonProperty("active") Boolean active,
-                                         @JsonProperty("admin") Boolean admin,
-                                         @JsonProperty("audited_organizations_url") String auditedOrganizationsUrl,
-                                         @JsonProperty("audited_spaces_url") String auditedSpacesUrl,
-                                         @JsonProperty("billing_managed_organizations_url") String billingManagedOrganizationsUrl,
-                                         @JsonProperty("default_space_guid") String defaultSpaceId,
-                                         @JsonProperty("default_space_url") String defaultSpaceUrl,
-                                         @JsonProperty("managed_organizations_url") String managedOrganizationsUrl,
-                                         @JsonProperty("managed_spaces_url") String managedSpacesUrl,
-                                         @JsonProperty("organizations_url") String organizationsUrl,
-                                         @JsonProperty("organization_roles") @Singular List<String> organizationRoles,
-                                         @JsonProperty("spaces_url") String spacesUrl,
-                                         @JsonProperty("username") String username) {
+                               @JsonProperty("admin") Boolean admin,
+                               @JsonProperty("audited_organizations_url") String auditedOrganizationsUrl,
+                               @JsonProperty("audited_spaces_url") String auditedSpacesUrl,
+                               @JsonProperty("billing_managed_organizations_url") String billingManagedOrganizationsUrl,
+                               @JsonProperty("default_space_guid") String defaultSpaceId,
+                               @JsonProperty("default_space_url") String defaultSpaceUrl,
+                               @JsonProperty("managed_organizations_url") String managedOrganizationsUrl,
+                               @JsonProperty("managed_spaces_url") String managedSpacesUrl,
+                               @JsonProperty("organizations_url") String organizationsUrl,
+                               @JsonProperty("organization_roles") @Singular List<String> organizationRoles,
+                               @JsonProperty("spaces_url") String spacesUrl,
+                               @JsonProperty("username") String username) {
         super(active, admin, auditedOrganizationsUrl, auditedSpacesUrl, billingManagedOrganizationsUrl, defaultSpaceId, defaultSpaceUrl, managedOrganizationsUrl, managedSpacesUrl, organizationsUrl,
             spacesUrl, username);
 

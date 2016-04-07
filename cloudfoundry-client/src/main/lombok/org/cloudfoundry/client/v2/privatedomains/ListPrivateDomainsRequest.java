@@ -46,7 +46,7 @@ public final class ListPrivateDomainsRequest extends PaginatedRequest implements
     @Getter(onMethod = @__(@InFilterParameter("name")))
     private final List<String> names;
 
-    
+
     @Builder
     ListPrivateDomainsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                               @Singular List<String> names) {

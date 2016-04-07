@@ -42,17 +42,6 @@ public final class PushApplicationRequestTest {
     }
 
     @Test
-    public void isValidNoName() {
-        ValidationResult result = PushApplicationRequest.builder()
-            .application(this.applicationBits)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
     public void isValidNoApplicationBits() {
         ValidationResult result = PushApplicationRequest.builder()
             .name("test-name")
@@ -61,6 +50,17 @@ public final class PushApplicationRequestTest {
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("application bits must be specified", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isValidNoName() {
+        ValidationResult result = PushApplicationRequest.builder()
+            .application(this.applicationBits)
+            .build()
+            .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("name must be specified", result.getMessages().get(0));
     }
 
 }

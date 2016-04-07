@@ -1191,6 +1191,67 @@ public final class SpringOrganizationsTest {
 
     }
 
+    public static final class ListDomains extends AbstractApiTest<ListOrganizationDomainsRequest, ListOrganizationDomainsResponse> {
+
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected ListOrganizationDomainsRequest getInvalidRequest() {
+            return ListOrganizationDomainsRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("/v2/organizations/test-organization-id/domains?page=-1")
+                .status(OK)
+                .responsePayload("fixtures/client/v2/organizations/GET_{id}_domains_response.json");
+        }
+
+        @Override
+        protected ListOrganizationDomainsResponse getResponse() {
+            return ListOrganizationDomainsResponse.builder()
+                .totalResults(2)
+                .totalPages(1)
+                .resource(DomainResource.builder()
+                    .metadata(Metadata.builder()
+                        .id("0010dd3b-aca0-4647-87d3-679059d67600")
+                        .url("/v2/domains/0010dd3b-aca0-4647-87d3-679059d67600")
+                        .createdAt("2016-01-26T22:20:04Z")
+                        .build())
+                    .entity(DomainEntity.builder()
+                        .name("customer-app-domain1.com")
+                        .build())
+                    .build())
+                .resource(DomainResource.builder()
+                    .metadata(Metadata.builder()
+                        .id("e366a4ce-73d2-4a5a-8194-04c8ff4adfe1")
+                        .url("/v2/domains/e366a4ce-73d2-4a5a-8194-04c8ff4adfe1")
+                        .createdAt("2016-01-26T22:20:04Z")
+                        .build())
+                    .entity(DomainEntity.builder()
+                        .name("customer-app-domain2.com")
+                        .build())
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListOrganizationDomainsRequest getValidRequest() throws Exception {
+            return ListOrganizationDomainsRequest.builder()
+                .organizationId("test-organization-id")
+                .page(-1)
+                .build();
+        }
+
+        @Override
+        protected Mono<ListOrganizationDomainsResponse> invoke(ListOrganizationDomainsRequest request) {
+            return this.organizations.listDomains(request);
+        }
+
+    }
+
     public static final class ListManagers extends AbstractApiTest<ListOrganizationManagersRequest, ListOrganizationManagersResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
@@ -1322,67 +1383,6 @@ public final class SpringOrganizationsTest {
         @Override
         protected Mono<ListOrganizationPrivateDomainsResponse> invoke(ListOrganizationPrivateDomainsRequest request) {
             return this.organizations.listPrivateDomains(request);
-        }
-
-    }
-
-    public static final class ListDomains extends AbstractApiTest<ListOrganizationDomainsRequest, ListOrganizationDomainsResponse> {
-
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
-
-        @Override
-        protected ListOrganizationDomainsRequest getInvalidRequest() {
-            return ListOrganizationDomainsRequest.builder()
-                .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/organizations/test-organization-id/domains?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/GET_{id}_domains_response.json");
-        }
-
-        @Override
-        protected ListOrganizationDomainsResponse getResponse() {
-            return ListOrganizationDomainsResponse.builder()
-                .totalResults(2)
-                .totalPages(1)
-                .resource(DomainResource.builder()
-                    .metadata(Metadata.builder()
-                        .id("0010dd3b-aca0-4647-87d3-679059d67600")
-                        .url("/v2/domains/0010dd3b-aca0-4647-87d3-679059d67600")
-                        .createdAt("2016-01-26T22:20:04Z")
-                        .build())
-                    .entity(DomainEntity.builder()
-                        .name("customer-app-domain1.com")
-                        .build())
-                    .build())
-                .resource(DomainResource.builder()
-                    .metadata(Metadata.builder()
-                        .id("e366a4ce-73d2-4a5a-8194-04c8ff4adfe1")
-                        .url("/v2/domains/e366a4ce-73d2-4a5a-8194-04c8ff4adfe1")
-                        .createdAt("2016-01-26T22:20:04Z")
-                        .build())
-                    .entity(DomainEntity.builder()
-                        .name("customer-app-domain2.com")
-                        .build())
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected ListOrganizationDomainsRequest getValidRequest() throws Exception {
-            return ListOrganizationDomainsRequest.builder()
-                .organizationId("test-organization-id")
-                .page(-1)
-                .build();
-        }
-
-        @Override
-        protected Mono<ListOrganizationDomainsResponse> invoke(ListOrganizationDomainsRequest request) {
-            return this.organizations.listDomains(request);
         }
 
     }

@@ -57,13 +57,17 @@ public final class CompareZips {
         byte[] buffer = new byte[BUFSIZE];
         int totalBytesRead = 0;
         int bytesRead = is.read(buffer, 0, BUFSIZE);
-        if (bytesRead <= 0) return null;
+        if (bytesRead <= 0) {
+            return null;
+        }
         totalBytesRead += bytesRead;
         while (bytesRead > 0 && totalBytesRead < BUFSIZE) {
             bytesRead = is.read(buffer, totalBytesRead, BUFSIZE - totalBytesRead);
             totalBytesRead += bytesRead;
         }
-        if (totalBytesRead == BUFSIZE) return buffer;
+        if (totalBytesRead == BUFSIZE) {
+            return buffer;
+        }
         byte[] result = new byte[totalBytesRead];
         System.arraycopy(buffer, 0, result, 0, totalBytesRead);
         return result;

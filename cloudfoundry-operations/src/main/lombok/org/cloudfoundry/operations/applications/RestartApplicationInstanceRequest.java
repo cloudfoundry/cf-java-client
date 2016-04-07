@@ -27,9 +27,9 @@ import org.cloudfoundry.ValidationResult;
 @Data
 public final class RestartApplicationInstanceRequest implements Validatable {
 
-    private final String name;
-
     private final Integer instanceIndex;
+
+    private final String name;
 
     @Builder
     RestartApplicationInstanceRequest(Integer instanceIndex, String name) {

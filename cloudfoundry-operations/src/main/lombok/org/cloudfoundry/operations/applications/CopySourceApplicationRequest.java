@@ -46,6 +46,14 @@ public final class CopySourceApplicationRequest implements Validatable {
     private final Boolean restart;
 
     /**
+     * How long to wait for staging
+     *
+     * @param stagingTimeout how long to wait for staging
+     * @return how long to wait for staging
+     */
+    private final Duration stagingTimeout;
+
+    /**
      * How long to wait for startup
      *
      * @param startupTimeout how long to wait for startup
@@ -68,14 +76,6 @@ public final class CopySourceApplicationRequest implements Validatable {
      * @return the organization of the target application
      */
     private final String targetOrganization;
-
-    /**
-     * How long to wait for staging
-     *
-     * @param stagingTimeout how long to wait for staging
-     * @return how long to wait for staging
-     */
-    private final Duration stagingTimeout;
 
     /**
      * The space of the target application

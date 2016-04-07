@@ -89,7 +89,8 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
                 .assertThat(response -> {
                     Set<String> returnedFlagSet = flagNameSetFrom(response);
 
-                    assertTrue(String.format("feature flags listed (%s) does not include core set (%s)", returnedFlagSet, coreFeatureFlagNameList), returnedFlagSet.containsAll(coreFeatureFlagNameList));
+                    assertTrue(String.format("feature flags listed (%s) does not include core set (%s)", returnedFlagSet, coreFeatureFlagNameList),
+                        returnedFlagSet.containsAll(coreFeatureFlagNameList));
                 }));
 
     }

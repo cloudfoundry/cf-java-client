@@ -31,7 +31,6 @@ import reactor.core.tuple.Tuple2;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public final class EventsTest extends AbstractIntegrationTest {
 
