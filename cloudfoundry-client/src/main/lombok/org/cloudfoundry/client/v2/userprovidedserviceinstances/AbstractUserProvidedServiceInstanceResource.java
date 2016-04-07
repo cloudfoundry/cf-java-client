@@ -16,24 +16,22 @@
 
 package org.cloudfoundry.client.v2.userprovidedserviceinstances;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.cloudfoundry.client.v2.Resource;
 
 /**
- * The resource response payload for the Update User Provided Service Instance Response
+ * The resource response payload for User Provided Service Instances
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class UpdateUserProvidedServiceInstanceResponse extends AbstractUserProvidedServiceInstanceResource {
+public abstract class AbstractUserProvidedServiceInstanceResource extends Resource<UserProvidedServiceInstanceEntity> {
 
-    @Builder
-    UpdateUserProvidedServiceInstanceResponse(@JsonProperty("entity") UserProvidedServiceInstanceEntity entity,
-                                              @JsonProperty("metadata") Metadata metadata) {
+    AbstractUserProvidedServiceInstanceResource(@JsonProperty("entity") UserProvidedServiceInstanceEntity entity,
+                                                @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 
