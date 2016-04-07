@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.operations.applications.Applications;
+import org.cloudfoundry.operations.buildpacks.Buildpacks;
 import org.cloudfoundry.operations.domains.Domains;
 import org.cloudfoundry.operations.organizations.Organizations;
 import org.cloudfoundry.operations.routes.Routes;
@@ -41,6 +42,13 @@ public interface CloudFoundryOperations {
      * @return the Cloud Foundry Applications Operations API
      */
     Applications applications();
+
+    /**
+     * Main entry point to the Cloud Foundry Buildpacks Operations API
+     *
+     * @return the Cloud Foundry Buildpacks Operations API
+     */
+    Buildpacks buildpacks();
 
     /**
      * Main entry point to the Cloud Foundry Domains Operations API

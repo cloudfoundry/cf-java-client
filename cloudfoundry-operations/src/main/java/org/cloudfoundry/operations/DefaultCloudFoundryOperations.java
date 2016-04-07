@@ -20,6 +20,8 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.logging.LoggingClient;
 import org.cloudfoundry.operations.applications.Applications;
 import org.cloudfoundry.operations.applications.DefaultApplications;
+import org.cloudfoundry.operations.buildpacks.Buildpacks;
+import org.cloudfoundry.operations.buildpacks.DefaultBuildpacks;
 import org.cloudfoundry.operations.domains.DefaultDomains;
 import org.cloudfoundry.operations.domains.Domains;
 import org.cloudfoundry.operations.organizations.DefaultOrganizations;
@@ -40,7 +42,9 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
 
     private final Applications applications;
 
-    private final DefaultDomains domains;
+    private final Buildpacks buildpacks;
+
+    private final Domains domains;
 
     private final Organizations organizations;
 
@@ -52,10 +56,11 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
 
     private final Spaces spaces;
 
-    private final DefaultStacks stacks;
+    private final Stacks stacks;
 
     DefaultCloudFoundryOperations(CloudFoundryClient cloudFoundryClient, Mono<LoggingClient> loggingClient, Mono<String> organizationId, Mono<String> spaceId, Mono<String> username) {
         this.applications = new DefaultApplications(cloudFoundryClient, loggingClient, spaceId);
+        this.buildpacks = new DefaultBuildpacks(cloudFoundryClient);
         this.domains = new DefaultDomains(cloudFoundryClient);
         this.organizations = new DefaultOrganizations(cloudFoundryClient, username);
         this.routes = new DefaultRoutes(cloudFoundryClient, organizationId, spaceId);
@@ -68,6 +73,11 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
     @Override
     public Applications applications() {
         return this.applications;
+    }
+
+    @Override
+    public Buildpacks buildpacks() {
+        return this.buildpacks;
     }
 
     @Override

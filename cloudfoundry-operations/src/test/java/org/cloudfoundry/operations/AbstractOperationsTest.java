@@ -18,6 +18,7 @@ package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
+import org.cloudfoundry.client.v2.buildpacks.Buildpacks;
 import org.cloudfoundry.client.v2.domains.Domains;
 import org.cloudfoundry.client.v2.events.Events;
 import org.cloudfoundry.client.v2.featureflags.FeatureFlags;
@@ -69,6 +70,8 @@ public abstract class AbstractOperationsTest {
 
     protected final ApplicationsV2 applications = mock(ApplicationsV2.class, RETURNS_SMART_NULLS);
 
+    protected final Buildpacks buildpacks = mock(Buildpacks.class, RETURNS_SMART_NULLS);
+
     protected final CloudFoundryClient cloudFoundryClient = mock(CloudFoundryClient.class, RETURNS_SMART_NULLS);
 
     protected final Domains domains = mock(Domains.class, RETURNS_SMART_NULLS);
@@ -112,6 +115,7 @@ public abstract class AbstractOperationsTest {
     @Before
     public final void mockClient() {
         when(this.cloudFoundryClient.applicationsV2()).thenReturn(this.applications);
+        when(this.cloudFoundryClient.buildpacks()).thenReturn(this.buildpacks);
         when(this.cloudFoundryClient.domains()).thenReturn(this.domains);
         when(this.cloudFoundryClient.events()).thenReturn(this.events);
         when(this.cloudFoundryClient.featureFlags()).thenReturn(this.featureFlags);
