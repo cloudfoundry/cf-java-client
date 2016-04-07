@@ -20,7 +20,9 @@
         "memory_limit": 10240,
         "trial_db_allowed": false,
         "instance_memory_limit": -1,
-        "app_instance_limit": -1
+        "app_instance_limit": -1,
+        "app_task_limit": -1,
+        "total_service_keys": -1
       }
     }
   ]

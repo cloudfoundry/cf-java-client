@@ -68,6 +68,8 @@ public final class SpringOrganizationQuotaDefinitionsTest {
                     .trialDbAllowed(false)
                     .instanceMemoryLimit(-1)
                     .applicationInstanceLimit(-1)
+                    .appTaskLimit(-1)
+                    .totalServiceKeys(-1)
                     .build())
                 .build();
         }
@@ -124,6 +126,8 @@ public final class SpringOrganizationQuotaDefinitionsTest {
                         .totalRoutes(1000)
                         .totalServices(100)
                         .trialDbAllowed(false)
+                        .appTaskLimit(-1)
+                        .totalServiceKeys(-1)
                         .build())
                     .build())
                 .build();
