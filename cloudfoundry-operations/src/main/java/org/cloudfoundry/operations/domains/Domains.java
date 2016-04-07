@@ -44,9 +44,8 @@ public interface Domains {
     /**
      * Lists the domains
      *
-     * @param request the List Routes request
-     * @return the routes and the applications bound to those routes
+     * @return the Domains
      */
-    Flux<Domain> list(ListDomainsRequest request);
+    Flux<Domain> list();
 
 }

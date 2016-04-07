@@ -17,16 +17,18 @@
 package org.cloudfoundry.operations.domains;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.domains.DomainEntity;
-import org.cloudfoundry.client.v2.domains.DomainResource;
-import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
-import org.cloudfoundry.client.v2.domains.ListDomainsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
+import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsRequest;
+import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsResponse;
+import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
+import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
+import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
+import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
 import org.cloudfoundry.util.RequestValidationException;
 import org.cloudfoundry.util.test.TestSubscriber;
@@ -36,7 +38,6 @@ import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.util.test.TestObjects.fill;
 import static org.cloudfoundry.util.test.TestObjects.fillPage;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 public final class DefaultDomainsTest {
@@ -62,6 +63,11 @@ public final class DefaultDomainsTest {
                     .build()));
     }
 
+    private static void requestDomains(CloudFoundryClient cloudFoundryClient) {
+        requestPrivateDomains(cloudFoundryClient);
+        requestSharedDomains(cloudFoundryClient);
+    }
+
     private static void requestOrganizations(CloudFoundryClient cloudFoundryClient, String organization) {
         when(cloudFoundryClient.organizations()
             .list(fillPage(ListOrganizationsRequest.builder())
@@ -84,35 +90,43 @@ public final class DefaultDomainsTest {
                     .build()));
     }
 
-    private static void requestDomains(CloudFoundryClient cloudFoundryClient, String name, String ownerId) {
-        when(cloudFoundryClient.domains()
-            .list(fillPage(org.cloudfoundry.client.v2.domains.ListDomainsRequest.builder())
-                .name(name)
-                .owningOrganizationId(ownerId)
-                .page(any(Integer.class))
+    private static void requestPrivateDomains(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient.privateDomains()
+            .list(fillPage(ListPrivateDomainsRequest.builder())
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListDomainsResponse.builder())
-                    .resource(fill(DomainResource.builder(), "domain-")
+                .just(fillPage(ListPrivateDomainsResponse.builder())
+                    .resource(fill(PrivateDomainResource.builder(), "private-domain-")
                         .build())
                     .build()));
     }
 
-    private static void requestDomainsWithNoOwningOrganization(CloudFoundryClient cloudFoundryClient, String name, String ownerId) {
-        when(cloudFoundryClient.domains()
-            .list(fillPage(org.cloudfoundry.client.v2.domains.ListDomainsRequest.builder())
-                .name(name)
-                .owningOrganizationId(ownerId)
-                .page(any(Integer.class))
+    private static void requestPrivateDomainsEmpty(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient.privateDomains()
+            .list(fillPage(ListPrivateDomainsRequest.builder())
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListDomainsResponse.builder())
-                    .resource(fill(DomainResource.builder(), "domain-")
-                        .entity(DomainEntity.builder()
-                            .name(name)
-                            .owningOrganizationId(null)
-                            .build())
+                .just(fillPage(ListPrivateDomainsResponse.builder())
+                    .build()));
+    }
+
+    private static void requestSharedDomains(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient.sharedDomains()
+            .list(fillPage(ListSharedDomainsRequest.builder())
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListSharedDomainsResponse.builder())
+                    .resource(fill(SharedDomainResource.builder(), "shared-domain-")
                         .build())
+                    .build()));
+    }
+
+    private static void requestSharedDomainsEmpty(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient.sharedDomains()
+            .list(fillPage(ListSharedDomainsRequest.builder())
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListSharedDomainsResponse.builder())
                     .build()));
     }
 
@@ -217,54 +231,85 @@ public final class DefaultDomainsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestDomains(this.cloudFoundryClient, "test-domain-name", "test-domain-owningOrganizationId");
+            requestDomains(this.cloudFoundryClient);
         }
 
         @Override
         protected void assertions(TestSubscriber<Domain> testSubscriber) {
             testSubscriber
                 .assertEquals(Domain.builder()
-                    .domainName("test-domain-name")
-                    .domainId("test-domain-id")
-                    .owningOrganizationId("test-domain-owningOrganizationId")
+                    .domainName("test-private-domain-name")
+                    .domainId("test-private-domain-id")
+                    .status("owned")
+                    .build());
+            testSubscriber
+                .assertEquals(Domain.builder()
+                    .domainName("test-shared-domain-name")
+                    .domainId("test-shared-domain-id")
+                    .status("shared")
                     .build());
         }
 
         @Override
         protected Publisher<Domain> invoke() {
             return this.domains
-                .list(ListDomainsRequest.builder()
-                    .name("test-domain-name")
-                    .owningOrganizationId("test-domain-owningOrganizationId")
-                    .build());
+                .list();
         }
 
     }
 
-    public static final class ListDomainsWithNoOwningOrganizationId extends AbstractOperationsApiTest<Domain> {
+    public static final class ListDomainsOnlyPrivate extends AbstractOperationsApiTest<Domain> {
 
         private final DefaultDomains domains = new DefaultDomains(this.cloudFoundryClient);
 
         @Before
         public void setUp() throws Exception {
-            requestDomainsWithNoOwningOrganization(this.cloudFoundryClient, "test-domain-name", null);
+            requestPrivateDomains(this.cloudFoundryClient);
+            requestSharedDomainsEmpty(this.cloudFoundryClient);
         }
 
         @Override
         protected void assertions(TestSubscriber<Domain> testSubscriber) {
             testSubscriber
                 .assertEquals(Domain.builder()
-                    .domainName("test-domain-name")
-                    .domainId("test-domain-id")
+                    .domainName("test-private-domain-name")
+                    .domainId("test-private-domain-id")
+                    .status("owned")
                     .build());
         }
 
         @Override
         protected Publisher<Domain> invoke() {
             return this.domains
-                .list(ListDomainsRequest.builder()
-                    .name("test-domain-name")
+                .list();
+        }
+
+    }
+
+    public static final class ListDomainsOnlyShared extends AbstractOperationsApiTest<Domain> {
+
+        private final DefaultDomains domains = new DefaultDomains(this.cloudFoundryClient);
+
+        @Before
+        public void setUp() throws Exception {
+            requestSharedDomains(this.cloudFoundryClient);
+            requestPrivateDomainsEmpty(this.cloudFoundryClient);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Domain> testSubscriber) {
+            testSubscriber
+                .assertEquals(Domain.builder()
+                    .domainName("test-shared-domain-name")
+                    .domainId("test-shared-domain-id")
+                    .status("shared")
                     .build());
+        }
+
+        @Override
+        protected Publisher<Domain> invoke() {
+            return this.domains
+                .list();
         }
 
     }

@@ -35,23 +35,23 @@ public final class Domain {
     /**
      * The name of the domain
      *
-     * @param name the name return the name of the domain
+     * @param name the name returns the name of the domain
      */
     private final String domainName;
 
     /**
-     * The GUID of the owner organization
+     * The status of the domain indicating shared or private domain
      *
-     * @param owningOrganizationId the GUID of the owner organization return the GUID of the owner organization
+     * @param status indicating the domain is shared or private
      */
-    private final String owningOrganizationId;
+    private final String status;
 
 
     @Builder
-    Domain(String domainId, String domainName, String owningOrganizationId) {
+    Domain(String domainId, String domainName, String status) {
         this.domainId = domainId;
         this.domainName = domainName;
-        this.owningOrganizationId = owningOrganizationId;
+        this.status = status;
     }
 
 }
