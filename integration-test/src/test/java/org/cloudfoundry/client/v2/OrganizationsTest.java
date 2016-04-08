@@ -20,23 +20,31 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationPrivateDomainRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationPrivateDomainResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserResponse;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationInstanceUsageRequest;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationInstanceUsageResponse;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationMemoryUsageRequest;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationMemoryUsageResponse;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.GetOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationUserRolesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationServicesRequest;
@@ -58,19 +66,26 @@ import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
+import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
+import org.cloudfoundry.client.v2.services.ListServicesRequest;
+import org.cloudfoundry.client.v2.services.ServiceResource;
+import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest;
+import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
+import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple2;
 
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
+import static reactor.core.publisher.Mono.when;
 
 public final class OrganizationsTest extends AbstractIntegrationTest {
 
@@ -87,15 +102,20 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void associateAuditor() {
         String organizationName = getOrganizationName();
 
-        createOrganizationId(this.cloudFoundryClient, organizationName)
-            .and(this.userId)
-            .then(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
-                .associateAuditor(AssociateOrganizationAuditorRequest.builder()
-                    .auditorId(userId)
-                    .organizationId(organizationId)
-                    .build())
-                .map(ResourceUtils::getId)
-                .and(Mono.just(organizationId))))
+        when(
+            createOrganizationId(this.cloudFoundryClient, organizationName),
+            this.userId
+        )
+            .then(function((organizationId, userId) ->
+                when(
+                    this.cloudFoundryClient.organizations()
+                        .associateAuditor(AssociateOrganizationAuditorRequest.builder()
+                            .auditorId(userId)
+                            .organizationId(organizationId)
+                            .build())
+                        .map(ResourceUtils::getId),
+                    Mono.just(organizationId)
+                )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -105,13 +125,16 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> this.cloudFoundryClient.organizations()
-                .associateAuditorByUsername(AssociateOrganizationAuditorByUsernameRequest.builder()
-                    .organizationId(organizationId)
-                    .username(this.userName)
-                    .build())
-                .map(ResourceUtils::getId)
-                .and(Mono.just(organizationId)))
+            .then(organizationId -> Mono
+                .when(
+                    Mono.just(organizationId),
+                    this.cloudFoundryClient.organizations()
+                        .associateAuditorByUsername(AssociateOrganizationAuditorByUsernameRequest.builder()
+                            .organizationId(organizationId)
+                            .username(this.userName)
+                            .build())
+                        .map(ResourceUtils::getId)
+                ))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -120,15 +143,21 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void associateBillingManager() {
         String organizationName = getOrganizationName();
 
-        createOrganizationId(this.cloudFoundryClient, organizationName)
-            .and(this.userId)
-            .then(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
-                .associateBillingManager(AssociateOrganizationBillingManagerRequest.builder()
-                    .billingManagerId(userId)
-                    .organizationId(organizationId)
-                    .build())
-                .map(ResourceUtils::getId)
-                .and(Mono.just(organizationId))))
+        Mono
+            .when(
+                createOrganizationId(this.cloudFoundryClient, organizationName),
+                this.userId
+            )
+            .then(function((organizationId, userId) -> Mono
+                .when(
+                    Mono.just(organizationId),
+                    this.cloudFoundryClient.organizations()
+                        .associateBillingManager(AssociateOrganizationBillingManagerRequest.builder()
+                            .billingManagerId(userId)
+                            .organizationId(organizationId)
+                            .build())
+                        .map(ResourceUtils::getId)
+                )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -138,13 +167,16 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> this.cloudFoundryClient.organizations()
-                .associateBillingManagerByUsername(AssociateOrganizationBillingManagerByUsernameRequest.builder()
-                    .organizationId(organizationId)
-                    .username(this.userName)
-                    .build())
-                .map(ResourceUtils::getId)
-                .and(Mono.just(organizationId)))
+            .then(organizationId -> Mono
+                .when(
+                    Mono.just(organizationId),
+                    this.cloudFoundryClient.organizations()
+                        .associateBillingManagerByUsername(AssociateOrganizationBillingManagerByUsernameRequest.builder()
+                            .organizationId(organizationId)
+                            .username(this.userName)
+                            .build())
+                        .map(ResourceUtils::getId)
+                ))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -153,15 +185,21 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void associateManager() {
         String organizationName = getOrganizationName();
 
-        createOrganizationId(this.cloudFoundryClient, organizationName)
-            .and(this.userId)
-            .then(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
-                .associateManager(AssociateOrganizationManagerRequest.builder()
-                    .managerId(userId)
-                    .organizationId(organizationId)
-                    .build())
-                .map(ResourceUtils::getId)
-                .and(Mono.just(organizationId))))
+        Mono
+            .when(
+                createOrganizationId(this.cloudFoundryClient, organizationName),
+                this.userId
+            )
+            .then(function((organizationId, userId) -> Mono
+                .when(
+                    Mono.just(organizationId),
+                    this.cloudFoundryClient.organizations()
+                        .associateManager(AssociateOrganizationManagerRequest.builder()
+                            .managerId(userId)
+                            .organizationId(organizationId)
+                            .build())
+                        .map(ResourceUtils::getId)
+                )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -171,13 +209,16 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> this.cloudFoundryClient.organizations()
-                .associateManagerByUsername(AssociateOrganizationManagerByUsernameRequest.builder()
-                    .organizationId(organizationId)
-                    .username(this.userName)
-                    .build())
-                .map(ResourceUtils::getId)
-                .and(Mono.just(organizationId)))
+            .then(organizationId -> Mono
+                .when(
+                    Mono.just(organizationId),
+                    this.cloudFoundryClient.organizations()
+                        .associateManagerByUsername(AssociateOrganizationManagerByUsernameRequest.builder()
+                            .organizationId(organizationId)
+                            .username(this.userName)
+                            .build())
+                        .map(ResourceUtils::getId)
+                ))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -188,15 +229,21 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> getPrivateDomainId(this.cloudFoundryClient, organizationId, domainName)
-                .and(Mono.just(organizationId)))
-            .then(function((privateDomainId, organizationId) -> this.cloudFoundryClient.organizations()
-                .associatePrivateDomain(AssociateOrganizationPrivateDomainRequest.builder()
-                    .organizationId(organizationId)
-                    .privateDomainId(privateDomainId)
-                    .build())
-                .map(ResourceUtils::getId)
-                .and(Mono.just(organizationId))))
+            .then(organizationId -> Mono
+                .when(
+                    getPrivateDomainId(this.cloudFoundryClient, organizationId, domainName),
+                    Mono.just(organizationId)
+                ))
+            .then(function((privateDomainId, organizationId) -> Mono
+                .when(
+                    Mono.just(organizationId),
+                    this.cloudFoundryClient.organizations()
+                        .associatePrivateDomain(AssociateOrganizationPrivateDomainRequest.builder()
+                            .organizationId(organizationId)
+                            .privateDomainId(privateDomainId)
+                            .build())
+                        .map(ResourceUtils::getId)
+                )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -205,15 +252,21 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void associateUser() {
         String organizationName = getOrganizationName();
 
-        createOrganizationId(this.cloudFoundryClient, organizationName)
-            .and(this.userId)
-            .then(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
-                .associateUser(AssociateOrganizationUserRequest.builder()
-                    .userId(userId)
-                    .organizationId(organizationId)
-                    .build())
-                .map(ResourceUtils::getId)
-                .and(Mono.just(organizationId))))
+        Mono
+            .when(
+                createOrganizationId(this.cloudFoundryClient, organizationName),
+                this.userId
+            )
+            .then(function((organizationId, userId) -> Mono
+                .when(
+                    Mono.just(organizationId),
+                    this.cloudFoundryClient.organizations()
+                        .associateUser(AssociateOrganizationUserRequest.builder()
+                            .userId(userId)
+                            .organizationId(organizationId)
+                            .build())
+                        .map(ResourceUtils::getId)
+                )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -223,13 +276,16 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> this.cloudFoundryClient.organizations()
-                .associateUserByUsername(AssociateOrganizationUserByUsernameRequest.builder()
-                    .organizationId(organizationId)
-                    .username(this.userName)
-                    .build())
-                .map(ResourceUtils::getId)
-                .and(Mono.just(organizationId)))
+            .then(organizationId -> Mono
+                .when(
+                    Mono.just(organizationId),
+                    this.cloudFoundryClient.organizations()
+                        .associateUserByUsername(AssociateOrganizationUserByUsernameRequest.builder()
+                            .organizationId(organizationId)
+                            .username(this.userName)
+                            .build())
+                        .map(ResourceUtils::getId)
+                ))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -252,13 +308,15 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> this.cloudFoundryClient.organizations()
+            .as(thenKeep(organizationId -> this.cloudFoundryClient.organizations()
                 .delete(DeleteOrganizationRequest.builder()
                     .organizationId(organizationId)
                     .async(true)
-                    .build()))
-            .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))
-            .subscribe(this.testSubscriber());
+                    .build())
+                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))))
+            .then(organizationId -> requestGetOrganization(this.cloudFoundryClient, organizationId))
+            .subscribe(testSubscriber()
+                .assertErrorMatch(CloudFoundryException.class, "CF-OrganizationNotFound\\([0-9]+\\): The organization could not be found: .*"));
     }
 
     @Test
@@ -266,12 +324,15 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> this.cloudFoundryClient.organizations()
-                .get(GetOrganizationRequest.builder()
-                    .organizationId(organizationId)
-                    .build())
-                .map(ResourceUtils::getId)
-                .and(Mono.just(organizationId)))
+            .then(organizationId -> Mono
+                .when(
+                    Mono.just(organizationId),
+                    this.cloudFoundryClient.organizations()
+                        .get(GetOrganizationRequest.builder()
+                            .organizationId(organizationId)
+                            .build())
+                        .map(ResourceUtils::getId)
+                ))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -339,18 +400,23 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void listAuditors() {
         String organizationName = getOrganizationName();
 
-        createOrganizationId(this.cloudFoundryClient, organizationName)
-            .and(this.userId)
+        Mono
+            .when(
+                createOrganizationId(this.cloudFoundryClient, organizationName),
+                this.userId
+            )
             .then(function((organizationId, userId) -> associateAuditor(this.cloudFoundryClient, organizationId, userId)))
-            .then(function((organizationId, userId) -> PaginationUtils
-                .requestResources(page -> this.cloudFoundryClient.organizations()
-                    .listAuditors(ListOrganizationAuditorsRequest.builder()
-                        .page(page)
-                        .organizationId(organizationId)
-                        .build()))
-                .single()
-                .map(ResourceUtils::getId)
-                .and(Mono.just(userId))))
+            .then(function((organizationId, userId) -> Mono
+                .when(
+                    Mono.just(userId),
+                    PaginationUtils.requestResources(page -> this.cloudFoundryClient.organizations()
+                        .listAuditors(ListOrganizationAuditorsRequest.builder()
+                            .page(page)
+                            .organizationId(organizationId)
+                            .build()))
+                        .single()
+                        .map(ResourceUtils::getId)
+                )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -359,38 +425,72 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void listBillingManagers() {
         String organizationName = getOrganizationName();
 
-        createOrganizationId(this.cloudFoundryClient, organizationName)
-            .and(this.userId)
+        Mono
+            .when(
+                createOrganizationId(this.cloudFoundryClient, organizationName),
+                this.userId
+            )
             .then(function((organizationId, userId) -> associateBillingManager(this.cloudFoundryClient, organizationId, userId)))
-            .then(function((organizationId, userId) -> PaginationUtils
-                .requestResources(page -> this.cloudFoundryClient.organizations()
-                    .listBillingManagers(ListOrganizationBillingManagersRequest.builder()
-                        .page(page)
-                        .organizationId(organizationId)
-                        .build()))
-                .single()
-                .map(ResourceUtils::getId)
-                .and(Mono.just(userId))))
+            .then(function((organizationId, userId) -> Mono
+                .when(
+                    Mono.just(userId),
+                    PaginationUtils.requestResources(page -> this.cloudFoundryClient.organizations()
+                        .listBillingManagers(ListOrganizationBillingManagersRequest.builder()
+                            .page(page)
+                            .organizationId(organizationId)
+                            .build()))
+                        .single()
+                        .map(ResourceUtils::getId)
+                )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
+    }
+
+    @Test
+    public void listDomains() {
+        String defaultOrganizationName = getOrganizationName();
+        String organizationName = getOrganizationName();
+        String privateDomainName = getDomainName();
+        String sharedDomainName = getDomainName();
+
+        requestCreateSharedDomainResponse(this.cloudFoundryClient, sharedDomainName)
+            .after(
+                when(
+                    createOrganizationId(this.cloudFoundryClient, defaultOrganizationName),
+                    createOrganizationId(this.cloudFoundryClient, organizationName)
+                ))
+            .then(function((defaultOrganizationId, organizationId) -> associatePrivateDomain(this.cloudFoundryClient, defaultOrganizationId, organizationId, privateDomainName)))
+            .flatMap(function((organizationId, privateDomainId) -> PaginationUtils
+                .requestResources(page -> this.cloudFoundryClient.organizations()
+                    .listDomains(ListOrganizationDomainsRequest.builder()
+                        .page(page)
+                        .organizationId(organizationId)
+                        .build()))))
+            .subscribe(this.testSubscriber()
+                .assertCount(2));
     }
 
     @Test
     public void listManagers() {
         String organizationName = getOrganizationName();
 
-        createOrganizationId(this.cloudFoundryClient, organizationName)
-            .and(this.userId)
+        Mono
+            .when(
+                createOrganizationId(this.cloudFoundryClient, organizationName),
+                this.userId
+            )
             .then(function((organizationId, userId) -> associateManager(this.cloudFoundryClient, organizationId, userId)))
-            .then(function((organizationId, userId) -> PaginationUtils
-                .requestResources(page -> this.cloudFoundryClient.organizations()
-                    .listManagers(ListOrganizationManagersRequest.builder()
-                        .page(page)
-                        .organizationId(organizationId)
-                        .build()))
-                .single()
-                .map(ResourceUtils::getId)
-                .and(Mono.just(userId))))
+            .then(function((organizationId, userId) -> Mono
+                .when(
+                    Mono.just(userId),
+                    PaginationUtils.requestResources(page -> this.cloudFoundryClient.organizations()
+                        .listManagers(ListOrganizationManagersRequest.builder()
+                            .page(page)
+                            .organizationId(organizationId)
+                            .build()))
+                        .single()
+                        .map(ResourceUtils::getId)
+                )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -401,36 +501,44 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String defaultOrganizationName = getOrganizationName();
         String organizationName = getOrganizationName();
 
-        createOrganizationId(this.cloudFoundryClient, defaultOrganizationName)
-            .and(createOrganizationId(this.cloudFoundryClient, organizationName))
+        Mono
+            .when(
+                createOrganizationId(this.cloudFoundryClient, defaultOrganizationName),
+                createOrganizationId(this.cloudFoundryClient, organizationName)
+            )
             .then(function((defaultOrganizationId, organizationId) -> associatePrivateDomain(this.cloudFoundryClient, defaultOrganizationId, organizationId, domainName)))
-            .then(function((organizationId, privateDomainId) -> PaginationUtils
-                .requestResources(page -> this.cloudFoundryClient.organizations()
-                    .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
-                        .page(page)
-                        .organizationId(organizationId)
-                        .build()))
-                .single()
-                .map(ResourceUtils::getId)
-                .and(Mono.just(privateDomainId))))
+            .then(function((organizationId, privateDomainId) -> Mono
+                .when(
+                    Mono.just(privateDomainId),
+                    PaginationUtils.requestResources(page -> this.cloudFoundryClient.organizations()
+                        .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
+                            .page(page)
+                            .organizationId(organizationId)
+                            .build()))
+                        .single()
+                        .map(ResourceUtils::getId)
+                )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
 
-    @Ignore("TODO: implement once create service plan visibility available https://www.pivotaltracker.com/story/show/101451560")
     @Test
     public void listServices() {
         String organizationName = getOrganizationName();
 
-        createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> PaginationUtils
-                .requestResources(page -> this.cloudFoundryClient.organizations()
-                    .listServices(ListOrganizationServicesRequest.builder()
-                        .organizationId(organizationId)
-                        .page(page)
-                        .build())))
-            .subscribe(this.testSubscriber()
-                .assertCount(0));
+        Mono
+            .when(
+                getServiceCount(this.cloudFoundryClient),
+                createOrganizationId(this.cloudFoundryClient, organizationName)
+                    .then(organizationId -> PaginationUtils
+                        .requestResources(page -> this.cloudFoundryClient.organizations()
+                            .listServices(ListOrganizationServicesRequest.builder()
+                                .organizationId(organizationId)
+                                .page(page)
+                                .build()))
+                        .count()))
+            .subscribe(this.<Tuple2<Long, Long>>testSubscriber()
+                .assertThat(this::assertTupleEquality));
     }
 
     @Test
@@ -454,11 +562,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String spaceName = getSpaceName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .as(thenKeep(organizationId -> this.cloudFoundryClient.spaces()
-                .create(CreateSpaceRequest.builder()
-                    .name(spaceName)
-                    .organizationId(organizationId)
-                    .build())))
+            .as(thenKeep(organizationId -> requestCreateSpace(cloudFoundryClient, organizationId, spaceName)))
             .flatMap(organizationId -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.organizations()
                     .listSpaces(ListOrganizationSpacesRequest.builder()
@@ -473,18 +577,23 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void listUsers() {
         String organizationName = getOrganizationName();
 
-        createOrganizationId(this.cloudFoundryClient, organizationName)
-            .and(this.userId)
+        Mono
+            .when(
+                createOrganizationId(this.cloudFoundryClient, organizationName),
+                this.userId
+            )
             .then(function((organizationId, userId) -> associateUser(this.cloudFoundryClient, organizationId, userId)))
-            .then(function((organizationId, userId) -> PaginationUtils
-                .requestResources(page -> this.cloudFoundryClient.organizations()
-                    .listUsers(ListOrganizationUsersRequest.builder()
-                        .page(page)
-                        .organizationId(organizationId)
-                        .build()))
-                .single()
-                .map(ResourceUtils::getId)
-                .and(Mono.just(userId))))
+            .then(function((organizationId, userId) -> Mono
+                .when(
+                    Mono.just(userId),
+                    PaginationUtils.requestResources(page -> this.cloudFoundryClient.organizations()
+                        .listUsers(ListOrganizationUsersRequest.builder()
+                            .page(page)
+                            .organizationId(organizationId)
+                            .build()))
+                        .single()
+                        .map(ResourceUtils::getId)
+                )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -493,8 +602,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void removeAuditor() {
         String organizationName = getOrganizationName();
 
-        createOrganizationId(this.cloudFoundryClient, organizationName)
-            .and(this.userId)
+        Mono
+            .when(
+                createOrganizationId(this.cloudFoundryClient, organizationName),
+                this.userId
+            )
             .then(function((organizationId, userId) -> associateAuditor(this.cloudFoundryClient, organizationId, userId)))
             .then(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
                 .removeAuditor(RemoveOrganizationAuditorRequest.builder()
@@ -508,8 +620,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void removeAuditorByUsername() {
         String organizationName = getOrganizationName();
 
-        createOrganizationId(this.cloudFoundryClient, organizationName)
-            .and(this.userId)
+        Mono
+            .when(
+                createOrganizationId(this.cloudFoundryClient, organizationName),
+                this.userId
+            )
             .then(function((organizationId, userId) -> associateAuditor(this.cloudFoundryClient, organizationId, userId)))
             .then(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
                 .removeAuditorByUsername(RemoveOrganizationAuditorByUsernameRequest.builder()
@@ -523,8 +638,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void removeBillingManager() {
         String organizationName = getOrganizationName();
 
-        createOrganizationId(this.cloudFoundryClient, organizationName)
-            .and(this.userId)
+        Mono
+            .when(
+                createOrganizationId(this.cloudFoundryClient, organizationName),
+                this.userId
+            )
             .then(function((organizationId, userId) -> associateBillingManager(this.cloudFoundryClient, organizationId, userId)))
             .then(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
                 .removeBillingManager(RemoveOrganizationBillingManagerRequest.builder()
@@ -538,8 +656,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void removeBillingManagerByUsername() {
         String organizationName = getOrganizationName();
 
-        createOrganizationId(this.cloudFoundryClient, organizationName)
-            .and(this.userId)
+        Mono
+            .when(
+                createOrganizationId(this.cloudFoundryClient, organizationName),
+                this.userId
+            )
             .then(function((organizationId, userId) -> associateBillingManager(this.cloudFoundryClient, organizationId, userId)))
             .then(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
                 .removeBillingManagerByUsername(RemoveOrganizationBillingManagerByUsernameRequest.builder()
@@ -553,8 +674,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void removeManager() {
         String organizationName = getOrganizationName();
 
-        createOrganizationId(this.cloudFoundryClient, organizationName)
-            .and(this.userId)
+        Mono
+            .when(
+                createOrganizationId(this.cloudFoundryClient, organizationName),
+                this.userId
+            )
             .then(function((organizationId, userId) -> associateManager(this.cloudFoundryClient, organizationId, userId)))
             .then(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
                 .removeManager(RemoveOrganizationManagerRequest.builder()
@@ -568,8 +692,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void removeManagerByUsername() {
         String organizationName = getOrganizationName();
 
-        createOrganizationId(this.cloudFoundryClient, organizationName)
-            .and(this.userId)
+        Mono
+            .when(
+                createOrganizationId(this.cloudFoundryClient, organizationName),
+                this.userId
+            )
             .then(function((organizationId, userId) -> associateManager(this.cloudFoundryClient, organizationId, userId)))
             .then(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
                 .removeManagerByUsername(RemoveOrganizationManagerByUsernameRequest.builder()
@@ -585,8 +712,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String defaultOrganizationName = getOrganizationName();
         String organizationName = getOrganizationName();
 
-        createOrganizationId(this.cloudFoundryClient, defaultOrganizationName)
-            .and(createOrganizationId(this.cloudFoundryClient, organizationName))
+        Mono
+            .when(
+                createOrganizationId(this.cloudFoundryClient, defaultOrganizationName),
+                createOrganizationId(this.cloudFoundryClient, organizationName)
+            )
             .then(function((defaultOrganizationId, organizationId) -> associatePrivateDomain(this.cloudFoundryClient, defaultOrganizationId, organizationId, domainName)))
             .then(function((organizationId, privateDomainId) -> this.cloudFoundryClient.organizations()
                 .removePrivateDomain(RemoveOrganizationPrivateDomainRequest.builder()
@@ -600,8 +730,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void removeUser() {
         String organizationName = getOrganizationName();
 
-        createOrganizationId(this.cloudFoundryClient, organizationName)
-            .and(this.userId)
+        Mono
+            .when(
+                createOrganizationId(this.cloudFoundryClient, organizationName),
+                this.userId
+            )
             .then(function((organizationId, userId) -> associateUser(this.cloudFoundryClient, organizationId, userId)))
             .then(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
                 .removeUser(RemoveOrganizationUserRequest.builder()
@@ -615,8 +748,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void removeUserByUsername() {
         String organizationName = getOrganizationName();
 
-        createOrganizationId(this.cloudFoundryClient, organizationName)
-            .and(this.userId)
+        Mono
+            .when(
+                createOrganizationId(this.cloudFoundryClient, organizationName),
+                this.userId
+            )
             .then(function((organizationId, userId) -> associateUser(this.cloudFoundryClient, organizationId, userId)))
             .then(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
                 .removeUserByUsername(RemoveOrganizationUserByUsernameRequest.builder()
@@ -658,66 +794,128 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     }
 
     private static Mono<Tuple2<String, String>> associateAuditor(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
-        return cloudFoundryClient.organizations()
-            .associateAuditor(AssociateOrganizationAuditorRequest.builder()
-                .auditorId(userId)
-                .organizationId(organizationId)
-                .build())
+        return requestAssociateAuditor(cloudFoundryClient, organizationId, userId)
             .map(ignore -> Tuple2.of(organizationId, userId));
     }
 
     private static Mono<Tuple2<String, String>> associateBillingManager(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
-        return cloudFoundryClient.organizations()
-            .associateBillingManager(AssociateOrganizationBillingManagerRequest.builder()
-                .billingManagerId(userId)
-                .organizationId(organizationId)
-                .build())
+        return requestAssociateBillingManager(cloudFoundryClient, organizationId, userId)
             .map(ignore -> Tuple2.of(organizationId, userId));
     }
 
     private static Mono<Tuple2<String, String>> associateManager(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
-        return cloudFoundryClient.organizations()
-            .associateManager(AssociateOrganizationManagerRequest.builder()
-                .managerId(userId)
-                .organizationId(organizationId)
-                .build())
+        return requestAssociateManager(cloudFoundryClient, organizationId, userId)
             .map(ignore -> Tuple2.of(organizationId, userId));
     }
 
     private static Mono<Tuple2<String, String>> associatePrivateDomain(CloudFoundryClient cloudFoundryClient, String defaultOrganizationId, String organizationId, String domainName) {
         return getPrivateDomainId(cloudFoundryClient, defaultOrganizationId, domainName)
-            .then(privateDomainId -> cloudFoundryClient.organizations()
-                .associatePrivateDomain(AssociateOrganizationPrivateDomainRequest.builder()
-                    .organizationId(organizationId)
-                    .privateDomainId(privateDomainId)
-                    .build())
+            .then(privateDomainId -> requestAssociatePrivateDomain(cloudFoundryClient, organizationId, privateDomainId)
                 .map(response -> Tuple2.of(organizationId, privateDomainId)));
     }
 
     private static Mono<Tuple2<String, String>> associateUser(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
-        return cloudFoundryClient.organizations()
-            .associateUser(AssociateOrganizationUserRequest.builder()
-                .userId(userId)
-                .organizationId(organizationId)
-                .build())
+        return requestAssociateUser(cloudFoundryClient, organizationId, userId)
             .map(ignore -> Tuple2.of(organizationId, userId));
     }
 
     private static Mono<String> createOrganizationId(CloudFoundryClient cloudFoundryClient, String organizationName) {
-        return cloudFoundryClient.organizations()
-            .create(CreateOrganizationRequest.builder()
-                .name(organizationName)
-                .build())
+        return requestCreateOrganization(cloudFoundryClient, organizationName)
             .map(ResourceUtils::getId);
     }
 
     private static Mono<String> getPrivateDomainId(CloudFoundryClient cloudFoundryClient, String organizationId, String domainName) {
+        return requestCreatePrivateDomain(cloudFoundryClient, domainName, organizationId)
+            .map(ResourceUtils::getId);
+    }
+
+    private static Mono<Long> getServiceCount(CloudFoundryClient cloudFoundryClient) {
+        return requestListAllServices(cloudFoundryClient)
+            .count();
+    }
+
+    private static Mono<AssociateOrganizationAuditorResponse> requestAssociateAuditor(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return cloudFoundryClient.organizations()
+            .associateAuditor(AssociateOrganizationAuditorRequest.builder()
+                .auditorId(userId)
+                .organizationId(organizationId)
+                .build());
+    }
+
+    private static Mono<AssociateOrganizationBillingManagerResponse> requestAssociateBillingManager(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return cloudFoundryClient.organizations()
+            .associateBillingManager(AssociateOrganizationBillingManagerRequest.builder()
+                .billingManagerId(userId)
+                .organizationId(organizationId)
+                .build());
+    }
+
+    private static Mono<AssociateOrganizationManagerResponse> requestAssociateManager(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return cloudFoundryClient.organizations()
+            .associateManager(AssociateOrganizationManagerRequest.builder()
+                .managerId(userId)
+                .organizationId(organizationId)
+                .build());
+    }
+
+    private static Mono<AssociateOrganizationPrivateDomainResponse> requestAssociatePrivateDomain(CloudFoundryClient cloudFoundryClient, String organizationId, String privateDomainId) {
+        return cloudFoundryClient.organizations()
+            .associatePrivateDomain(AssociateOrganizationPrivateDomainRequest.builder()
+                .organizationId(organizationId)
+                .privateDomainId(privateDomainId)
+                .build());
+    }
+
+    private static Mono<AssociateOrganizationUserResponse> requestAssociateUser(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return cloudFoundryClient.organizations()
+            .associateUser(AssociateOrganizationUserRequest.builder()
+                .userId(userId)
+                .organizationId(organizationId)
+                .build());
+    }
+
+    private static Mono<CreateOrganizationResponse> requestCreateOrganization(CloudFoundryClient cloudFoundryClient, String organizationName) {
+        return cloudFoundryClient.organizations()
+            .create(CreateOrganizationRequest.builder()
+                .name(organizationName)
+                .build());
+    }
+
+    private static Mono<CreatePrivateDomainResponse> requestCreatePrivateDomain(CloudFoundryClient cloudFoundryClient, String domainName, String organizationId) {
         return cloudFoundryClient.privateDomains()
             .create(CreatePrivateDomainRequest.builder()
                 .name(domainName)
                 .owningOrganizationId(organizationId)
-                .build())
-            .map(ResourceUtils::getId);
+                .build());
+    }
+
+    private static Mono<CreateSharedDomainResponse> requestCreateSharedDomainResponse(CloudFoundryClient cloudFoundryClient, String sharedDomainName) {
+        return cloudFoundryClient.sharedDomains()
+            .create(CreateSharedDomainRequest.builder()
+                .name(sharedDomainName)
+                .build());
+    }
+
+    private static Mono<CreateSpaceResponse> requestCreateSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
+        return cloudFoundryClient.spaces()
+            .create(CreateSpaceRequest.builder()
+                .name(spaceName)
+                .organizationId(organizationId)
+                .build());
+    }
+
+    private static Mono<GetOrganizationResponse> requestGetOrganization(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return cloudFoundryClient.organizations()
+            .get(GetOrganizationRequest.builder()
+                .organizationId(organizationId)
+                .build());
+    }
+
+    private static Flux<ServiceResource> requestListAllServices(CloudFoundryClient cloudFoundryClient) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.services()
+                .list(ListServicesRequest.builder()
+                    .build()));
     }
 
 }
