@@ -153,7 +153,7 @@ final class CloudFoundryCleaner {
                     .after(() -> cleanUserProvidedServiceInstances(this.cloudFoundryClient, userProvidedServiceInstancePredicate))
                     .after(() -> cleanDomains(this.cloudFoundryClient, domainPredicate))
                     .after(() -> cleanPrivateDomains(this.cloudFoundryClient, privateDomainPredicate))
-                    .after(() -> cleanSpaces(this.cloudFoundryClient, spacePredicate))
+                    .after(() -> cleanSpaces(this.cloudFoundryClient, spacePredicate, this.logger))
                     .after(() -> cleanOrganizations(this.cloudFoundryClient, organizationPredicate));
             }))
             .doOnSubscribe(s -> this.logger.debug(">> CLEANUP <<"))
