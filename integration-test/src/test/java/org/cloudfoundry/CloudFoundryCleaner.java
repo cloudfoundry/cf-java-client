@@ -41,7 +41,7 @@ import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
-import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
+import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
@@ -54,7 +54,6 @@ import org.cloudfoundry.client.v3.packages.ListPackagesRequest;
 import org.cloudfoundry.client.v3.packages.ListPackagesResponse;
 import org.cloudfoundry.client.v3.packages.Package;
 import org.cloudfoundry.util.JobUtils;
-import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -323,16 +322,13 @@ final class CloudFoundryCleaner {
                         .spaceId(spaceId)
                         .build())
                     .doOnError(t -> { // TODO: Remove once the application deletion problem has been identified
-                        PaginationUtils
-                            .requestResources(page -> cloudFoundryClient.spaces()
-                                .listApplications(ListSpaceApplicationsRequest.builder()
-                                    .spaceId(spaceId)
-                                    .build()))
-                            .map(ResourceUtils::getId)
-                            .doOnSubscribe(s -> logger.error("Unable to delete space: {}", spaceId))
-                            .consume(applicationId -> logger.error("Application still associated: {}", applicationId));
-
-                        t.printStackTrace();
+                        cloudFoundryClient.spaces()
+                            .getSummary(GetSpaceSummaryRequest.builder()
+                                .spaceId(spaceId)
+                                .build())
+                            .doOnSubscribe(s -> logger.error("Unable to delete space with id: {}", spaceId))
+                            .doOnSuccess(summary -> logger.error("Space summary: {}", summary))
+                            .get();
                     })
                 )
                 .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
