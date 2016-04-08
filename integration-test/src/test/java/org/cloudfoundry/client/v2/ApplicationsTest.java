@@ -908,7 +908,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                                 return result;
                             }
                         } catch (Exception e) {
-                            throw Exceptions.fail(e);
+                            throw Exceptions.propagate(e);
                         }
                     }
 
