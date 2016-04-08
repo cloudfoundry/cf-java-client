@@ -41,6 +41,14 @@ public interface PrivateDomains {
     Mono<DeletePrivateDomainResponse> delete(DeletePrivateDomainRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/private_domains/retrieve_a_particular_private_domain.html">Retrieve a Particular Private Domain</a> request
+     *
+     * @param request the Get Private Domain request
+     * @return the response from the Get Private Domain request
+     */
+    Mono<GetPrivateDomainResponse> get(GetPrivateDomainRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/private_domains/filtering_private_domains_by_name.html">List Private Domains</a> request
      *
      * @param request the List Private Domains request

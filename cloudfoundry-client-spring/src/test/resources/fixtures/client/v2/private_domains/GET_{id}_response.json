@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "guid": "3de9db5f-8e3b-4d10-a8c9-8137caafe43d",
+    "url": "/v2/private_domains/3de9db5f-8e3b-4d10-a8c9-8137caafe43d",
+    "created_at": "2016-02-19T02:04:00Z",
+    "updated_at": null
+  },
+  "entity": {
+    "name": "my-domain.com",
+    "owning_organization_guid": "2f70efed-abb2-4b7a-9f31-d4fe4d849932",
+    "owning_organization_url": "/v2/organizations/2f70efed-abb2-4b7a-9f31-d4fe4d849932",
+    "shared_organizations_url": "/v2/private_domains/3de9db5f-8e3b-4d10-a8c9-8137caafe43d/shared_organizations"
+  }
+}
