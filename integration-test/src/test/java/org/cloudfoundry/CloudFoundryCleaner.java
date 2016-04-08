@@ -331,7 +331,7 @@ final class CloudFoundryCleaner {
                                     .build()))
                             .map(ResourceUtils::getId)
                             .doOnSubscribe(s -> logger.error("Unable to delete space with id: {}", spaceId))
-                            .doOnNext(applicationId -> logger.error("Space associated with application: {}", applicationId))
+                            .doOnNext(applicationId -> logger.error("Space {} associated with application: {}", spaceId, applicationId))
                             .after()
                             .get();
                     })

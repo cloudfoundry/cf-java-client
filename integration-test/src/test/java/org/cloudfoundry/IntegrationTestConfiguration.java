@@ -58,8 +58,7 @@ public class IntegrationTestConfiguration {
 
     @Bean(initMethod = "clean", destroyMethod = "clean")
     CloudFoundryCleaner cloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Mono<Optional<String>> protectedDomainId, Mono<List<String>> protectedFeatureFlags, Mono<Optional<String>>
-        protectedOrganizationId, Mono<List<String>>
-                                                protectedSpaceIds) {
+        protectedOrganizationId, Mono<List<String>> protectedSpaceIds) {
         return new CloudFoundryCleaner(cloudFoundryClient, protectedDomainId, protectedFeatureFlags, protectedOrganizationId, protectedSpaceIds);
     }
 
@@ -184,6 +183,7 @@ public class IntegrationTestConfiguration {
                     .requestResources(page -> cloudFoundryClient.spaces()
                         .list(ListSpacesRequest.builder()
                             .organizationId(id)
+                            .page(page)
                             .build()))
                     .map(ResourceUtils::getId)
                     .toList())
