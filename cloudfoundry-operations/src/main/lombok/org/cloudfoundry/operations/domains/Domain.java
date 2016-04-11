@@ -26,32 +26,56 @@ import lombok.Data;
 public final class Domain {
 
     /**
-     * The GUID of the domain
+     * The id of the domain
      *
-     * @param domainId the GUID of the domain return the GUID of the domain
+     * @param id the id of the domain
+     * @return the id of the domain
      */
-    private final String domainId;
+    private final String id;
 
     /**
      * The name of the domain
      *
-     * @param name the name returns the name of the domain
+     * @param name the name
+     * @return the name of the domain
      */
-    private final String domainName;
+    private final String name;
 
     /**
      * The status of the domain indicating shared or private domain
      *
      * @param status indicating the domain is shared or private
+     * @return the status of the domain
      */
-    private final String status;
-
+    private final Status status;
 
     @Builder
-    Domain(String domainId, String domainName, String status) {
-        this.domainId = domainId;
-        this.domainName = domainName;
+    Domain(String id, String name, Status status) {
+        this.id = id;
+        this.name = name;
         this.status = status;
+    }
+
+    /**
+     * The statuses of domains
+     */
+    public enum Status {
+
+        /**
+         * Domain is privately owned
+         */
+        OWNED,
+
+        /**
+         * Domain is shared
+         */
+        SHARED;
+
+        @Override
+        public String toString() {
+            return name().toLowerCase();
+        }
+
     }
 
 }

@@ -30,6 +30,7 @@ import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
+import org.cloudfoundry.operations.domains.Domain.Status;
 import org.cloudfoundry.util.RequestValidationException;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
@@ -61,11 +62,6 @@ public final class DefaultDomainsTest {
             .thenReturn(Mono
                 .just(fill(CreateSharedDomainResponse.builder(), "shared-domain-")
                     .build()));
-    }
-
-    private static void requestDomains(CloudFoundryClient cloudFoundryClient) {
-        requestPrivateDomains(cloudFoundryClient);
-        requestSharedDomains(cloudFoundryClient);
     }
 
     private static void requestOrganizations(CloudFoundryClient cloudFoundryClient, String organization) {
@@ -231,22 +227,23 @@ public final class DefaultDomainsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestDomains(this.cloudFoundryClient);
+            requestPrivateDomains(this.cloudFoundryClient);
+            requestSharedDomains(this.cloudFoundryClient);
         }
 
         @Override
         protected void assertions(TestSubscriber<Domain> testSubscriber) {
             testSubscriber
                 .assertEquals(Domain.builder()
-                    .domainName("test-private-domain-name")
-                    .domainId("test-private-domain-id")
-                    .status("owned")
+                    .id("test-private-domain-id")
+                    .name("test-private-domain-name")
+                    .status(Status.OWNED)
                     .build());
             testSubscriber
                 .assertEquals(Domain.builder()
-                    .domainName("test-shared-domain-name")
-                    .domainId("test-shared-domain-id")
-                    .status("shared")
+                    .id("test-shared-domain-id")
+                    .name("test-shared-domain-name")
+                    .status(Status.SHARED)
                     .build());
         }
 
@@ -272,9 +269,9 @@ public final class DefaultDomainsTest {
         protected void assertions(TestSubscriber<Domain> testSubscriber) {
             testSubscriber
                 .assertEquals(Domain.builder()
-                    .domainName("test-private-domain-name")
-                    .domainId("test-private-domain-id")
-                    .status("owned")
+                    .id("test-private-domain-id")
+                    .name("test-private-domain-name")
+                    .status(Status.OWNED)
                     .build());
         }
 
@@ -300,9 +297,9 @@ public final class DefaultDomainsTest {
         protected void assertions(TestSubscriber<Domain> testSubscriber) {
             testSubscriber
                 .assertEquals(Domain.builder()
-                    .domainName("test-shared-domain-name")
-                    .domainId("test-shared-domain-id")
-                    .status("shared")
+                    .id("test-shared-domain-id")
+                    .name("test-shared-domain-name")
+                    .status(Status.SHARED)
                     .build());
         }
 
