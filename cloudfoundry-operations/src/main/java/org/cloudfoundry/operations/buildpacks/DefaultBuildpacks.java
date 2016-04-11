@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations.buildpacks;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.buildpacks.BuildpackEntity;
 import org.cloudfoundry.client.v2.buildpacks.BuildpackResource;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
 import org.cloudfoundry.util.PaginationUtils;
@@ -32,7 +33,7 @@ public final class DefaultBuildpacks implements Buildpacks {
     }
 
     @Override
-    public Flux<BuildpackSummary> list() {
+    public Flux<Buildpack> list() {
         return requestBuildpacks(this.cloudFoundryClient)
             .map(DefaultBuildpacks::toBuildpackResource);
     }
@@ -45,14 +46,16 @@ public final class DefaultBuildpacks implements Buildpacks {
                     .build()));
     }
 
-    private static BuildpackSummary toBuildpackResource(BuildpackResource resource) {
-        return BuildpackSummary.builder()
-            .enabled(ResourceUtils.getEntity(resource).getEnabled())
-            .filename(ResourceUtils.getEntity(resource).getFilename())
+    private static Buildpack toBuildpackResource(BuildpackResource resource) {
+        BuildpackEntity entity = ResourceUtils.getEntity(resource);
+
+        return Buildpack.builder()
+            .enabled(entity.getEnabled())
+            .filename(entity.getFilename())
             .id(ResourceUtils.getId(resource))
-            .locked(ResourceUtils.getEntity(resource).getLocked())
-            .name(ResourceUtils.getEntity(resource).getName())
-            .position(ResourceUtils.getEntity(resource).getPosition())
+            .locked(entity.getLocked())
+            .name(entity.getName())
+            .position(entity.getPosition())
             .build();
     }
 

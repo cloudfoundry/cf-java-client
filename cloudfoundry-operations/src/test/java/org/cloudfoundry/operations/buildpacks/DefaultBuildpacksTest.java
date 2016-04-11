@@ -43,7 +43,7 @@ public final class DefaultBuildpacksTest {
                     .build()));
     }
 
-    public static final class List extends AbstractOperationsApiTest<BuildpackSummary> {
+    public static final class List extends AbstractOperationsApiTest<Buildpack> {
 
         private final DefaultBuildpacks buildpacks = new DefaultBuildpacks(this.cloudFoundryClient);
 
@@ -53,14 +53,20 @@ public final class DefaultBuildpacksTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<BuildpackSummary> testSubscriber) {
+        protected void assertions(TestSubscriber<Buildpack> testSubscriber) {
             testSubscriber
-                .assertEquals(fill(BuildpackSummary.builder(), "buildpack-")
+                .assertEquals(Buildpack.builder()
+                    .enabled(true)
+                    .filename("test-buildpack-filename")
+                    .id("test-buildpack-id")
+                    .locked(true)
+                    .name("test-buildpack-name")
+                    .position(1)
                     .build());
         }
 
         @Override
-        protected Publisher<BuildpackSummary> invoke() {
+        protected Publisher<Buildpack> invoke() {
             return this.buildpacks.list();
         }
     }

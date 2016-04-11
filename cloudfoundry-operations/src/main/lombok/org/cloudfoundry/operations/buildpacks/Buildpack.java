@@ -23,7 +23,7 @@ import lombok.Data;
  * A Cloud Foundry Buildpack Summary
  */
 @Data
-public final class BuildpackSummary {
+public final class Buildpack {
 
     /**
      * The enabled flag
@@ -75,12 +75,12 @@ public final class BuildpackSummary {
 
 
     @Builder
-    BuildpackSummary(Boolean enabled,
-                     String filename,
-                     String id,
-                     Boolean locked,
-                     String name,
-                     Integer position) {
+    Buildpack(Boolean enabled,
+              String filename,
+              String id,
+              Boolean locked,
+              String name,
+              Integer position) {
         this.enabled = enabled;
         this.filename = filename;
         this.id = id;

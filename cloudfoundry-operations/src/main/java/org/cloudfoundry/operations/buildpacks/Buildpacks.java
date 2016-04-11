@@ -18,6 +18,9 @@ package org.cloudfoundry.operations.buildpacks;
 
 import reactor.core.publisher.Flux;
 
+/**
+ * Main entry point to the Cloud Foundry Buildpacks Operations API
+ */
 public interface Buildpacks {
 
     /**
@@ -25,6 +28,6 @@ public interface Buildpacks {
      *
      * @return the buildpacks
      */
-    Flux<BuildpackSummary> list();
+    Flux<Buildpack> list();
 
 }
