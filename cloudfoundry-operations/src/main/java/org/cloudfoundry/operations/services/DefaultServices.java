@@ -47,7 +47,6 @@ import org.cloudfoundry.client.v2.services.ServiceResource;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServicesRequest;
-import org.cloudfoundry.client.v2.userprovidedserviceinstances.AbstractUserProvidedServiceInstanceResource;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.util.DelayUtils;
 import org.cloudfoundry.util.ExceptionUtils;
@@ -120,8 +119,9 @@ public final class DefaultServices implements Services {
     @Override
     public Mono<Void> createUserProvidedInstance(CreateUserProvidedServiceInstanceRequest createRequest) {
         return Mono
-            .when(ValidationUtils.validate(createRequest), spaceId)
-            .then(function((request, spaceId) -> createUserProvidedServiceInstance(this.cloudFoundryClient, spaceId, request)))
+            .when(ValidationUtils.validate(createRequest), this.spaceId)
+            .then(function((request, spaceId) -> requestCreateUserProvidedServiceInstance(this.cloudFoundryClient, spaceId, request.getName(), request.getCredentials(), request.getRouteServiceUrl(),
+                request.getSyslogDrainUrl())))
             .after();
     }
 
@@ -192,12 +192,6 @@ public final class DefaultServices implements Services {
     private static Mono<AbstractServiceInstanceResource> createServiceInstance(CloudFoundryClient cloudFoundryClient, String spaceId, String planId, CreateServiceInstanceRequest request) {
         return requestCreateServiceInstance(cloudFoundryClient, spaceId, planId, request.getServiceInstanceName(), request.getParameters(), request.getTags())
             .cast(AbstractServiceInstanceResource.class);
-    }
-
-    private static Mono<AbstractUserProvidedServiceInstanceResource> createUserProvidedServiceInstance(CloudFoundryClient cloudFoundryClient, String spaceId,
-                                                                                                       CreateUserProvidedServiceInstanceRequest request) {
-        return requestCreateUserProvidedServiceInstance(cloudFoundryClient, spaceId, request.getName(), request.getCredentials(), request.getRouteServiceUrl(), request.getSyslogDrainUrl())
-            .cast(AbstractUserProvidedServiceInstanceResource.class);
     }
 
     private static Mono<Void> deleteServiceBinding(CloudFoundryClient cloudFoundryClient, String serviceBindingId) {
