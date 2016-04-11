@@ -1989,6 +1989,53 @@ public final class DefaultApplicationsTest {
 
     }
 
+    public static final class GetHealthCheck extends AbstractOperationsApiTest<ApplicationHealthCheck> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationHealthCheck> testSubscriber) {
+            testSubscriber
+                .assertEquals(ApplicationHealthCheck.builder()
+                    .type("test-application-healthCheckType")
+                    .build());
+        }
+
+        @Override
+        protected Publisher<ApplicationHealthCheck> invoke() {
+            return this.applications
+                .getHealthCheck(GetApplicationHealthCheckRequest.builder()
+                    .name("test-application-name")
+                    .build());
+        }
+
+    }
+
+    public static final class GetHealthCheckInvalidRequest extends AbstractOperationsApiTest<ApplicationHealthCheck> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationHealthCheck> testSubscriber) {
+            testSubscriber.
+                assertError(RequestValidationException.class, "Request is invalid: name must be specified");
+        }
+
+        @Override
+        protected Mono<ApplicationHealthCheck> invoke() {
+            return this.applications
+                .getHealthCheck(GetApplicationHealthCheckRequest.builder()
+                    .build());
+        }
+
+    }
+
     public static final class GetInstancesError extends AbstractOperationsApiTest<ApplicationDetail> {
 
         private static final int CF_INSTANCES_ERROR = 220001;

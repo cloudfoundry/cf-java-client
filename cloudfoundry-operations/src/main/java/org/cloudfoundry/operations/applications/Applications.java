@@ -92,6 +92,15 @@ public interface Applications {
     Flux<ApplicationEvent> getEvents(GetApplicationEventsRequest request);
 
     /**
+     * Retrieve the Health Check Type of an application
+     *
+     * @param request the get health check request
+     * @return a completion indicator
+     */
+    Mono<ApplicationHealthCheck> getHealthCheck(GetApplicationHealthCheckRequest request);
+
+
+    /**
      * Lists the applications
      *
      * @return the applications

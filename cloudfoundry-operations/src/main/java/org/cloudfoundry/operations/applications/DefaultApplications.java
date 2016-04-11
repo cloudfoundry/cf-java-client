@@ -239,6 +239,14 @@ public final class DefaultApplications implements Applications {
     }
 
     @Override
+    public Mono<ApplicationHealthCheck> getHealthCheck(GetApplicationHealthCheckRequest getApplicationHealthCheckRequest) {
+        return Mono
+            .when(ValidationUtils.validate(getApplicationHealthCheckRequest), this.spaceId)
+            .then(function((request, spaceId) -> getApplication(this.cloudFoundryClient, request.getName(), spaceId)))
+            .map(DefaultApplications::toHealthCheck);
+    }
+
+    @Override
     public Flux<ApplicationSummary> list() {
         return this.spaceId
             .then(spaceId -> requestSpaceSummary(this.cloudFoundryClient, spaceId))
@@ -413,6 +421,13 @@ public final class DefaultApplications implements Applications {
             .after();
     }
 
+    private static Map<String, Object> addToEnvironment(Map<String, Object> environment, String variableName, Object variableValue) {
+        return StringMap.builder()
+            .entries(environment)
+            .entry(variableName, variableValue)
+            .build();
+    }
+
     private static boolean applicationInstancesUnavailable(Throwable throwable) {
         return throwable instanceof CloudFoundryException &&
             (((CloudFoundryException) throwable).getCode() == CF_INSTANCES_ERROR || ((CloudFoundryException) throwable).getCode() == CF_STAGING_NOT_FINISHED);
@@ -420,13 +435,6 @@ public final class DefaultApplications implements Applications {
 
     private static boolean applicationStatisticsUnavailable(Throwable throwable) {
         return throwable instanceof CloudFoundryException && ((CloudFoundryException) throwable).getCode() == CF_APP_STOPPED_STATS_ERROR;
-    }
-
-    private static Map<String, Object> addToEnvironment(Map<String, Object> environment, String variableName, Object variableValue) {
-        return StringMap.builder()
-            .entries(environment)
-            .entry(variableName, variableValue)
-            .build();
     }
 
     private static boolean areModifiersPresent(ScaleApplicationRequest request) {
@@ -1255,6 +1263,12 @@ public final class DefaultApplications implements Applications {
 
     private static Date toDate(Double date) {
         return date == null ? null : DateUtils.parseSecondsFromEpoch(date);
+    }
+
+    private static ApplicationHealthCheck toHealthCheck(AbstractApplicationResource resource) {
+        return ApplicationHealthCheck.builder()
+            .type(resource.getEntity().getHealthCheckType())
+            .build();
     }
 
     private static ApplicationDetail.InstanceDetail toInstanceDetail(Map.Entry<String, ApplicationInstanceInfo> entry, ApplicationStatisticsResponse statisticsResponse) {

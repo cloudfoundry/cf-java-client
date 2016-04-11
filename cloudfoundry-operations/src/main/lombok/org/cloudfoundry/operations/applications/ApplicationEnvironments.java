@@ -22,7 +22,7 @@ import lombok.Data;
 import java.util.Map;
 
 /**
- * An event of an application
+ * An environment of an application
  */
 @Data
 public final class ApplicationEnvironments {
