@@ -29,6 +29,7 @@ public final class UpdateServiceBrokerResponse extends Resource<ServiceBrokerEnt
     @Builder
     UpdateServiceBrokerResponse(@JsonProperty("entity") ServiceBrokerEntity entity,
                                 @JsonProperty("metadata") Metadata metadata) {
+
         super(entity, metadata);
     }
 

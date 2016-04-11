@@ -28,6 +28,7 @@ public final class UpdateBuildpackResponse extends AbstractBuildpackResource {
     @Builder
     UpdateBuildpackResponse(@JsonProperty("entity") BuildpackEntity entity,
                             @JsonProperty("metadata") Metadata metadata) {
+
         super(entity, metadata);
     }
 

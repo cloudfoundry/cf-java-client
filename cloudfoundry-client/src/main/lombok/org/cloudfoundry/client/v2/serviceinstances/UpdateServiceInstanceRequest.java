@@ -98,6 +98,7 @@ public final class UpdateServiceInstanceRequest implements Validatable {
                                  String serviceInstanceId,
                                  String servicePlanId,
                                  @Singular List<String> tags) {
+
         this.acceptsIncomplete = acceptsIncomplete;
         this.name = name;
         this.parameters = parameters;

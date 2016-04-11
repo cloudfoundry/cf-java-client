@@ -82,6 +82,7 @@ public final class UpdateBuildpackRequest implements Validatable {
                            Boolean locked,
                            String name,
                            Integer position) {
+
         this.buildpackId = buildpackId;
         this.enabled = enabled;
         this.locked = locked;
