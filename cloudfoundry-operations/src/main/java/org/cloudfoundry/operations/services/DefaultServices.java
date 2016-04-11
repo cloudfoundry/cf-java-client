@@ -47,6 +47,7 @@ import org.cloudfoundry.client.v2.services.ServiceResource;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServicesRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.util.DelayUtils;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.JobUtils;
@@ -112,6 +113,15 @@ public final class DefaultServices implements Services {
                 )))
             .then(function((request, spaceId, planId) -> createServiceInstance(this.cloudFoundryClient, spaceId, planId, request)))
             .then(serviceInstance -> waitForCreateInstance(this.cloudFoundryClient, serviceInstance))
+            .after();
+    }
+
+    @Override
+    public Mono<Void> createUserProvidedInstance(CreateUserProvidedServiceInstanceRequest createRequest) {
+        return Mono
+            .when(ValidationUtils.validate(createRequest), this.spaceId)
+            .then(function((request, spaceId) -> requestCreateUserProvidedServiceInstance(this.cloudFoundryClient, spaceId, request.getName(), request.getCredentials(), request.getRouteServiceUrl(),
+                request.getSyslogDrainUrl())))
             .after();
     }
 
@@ -316,6 +326,22 @@ public final class DefaultServices implements Services {
                 .spaceId(spaceId)
                 .parameters(parameters)
                 .tags(tags)
+                .build());
+    }
+
+    private static Mono<CreateUserProvidedServiceInstanceResponse> requestCreateUserProvidedServiceInstance(CloudFoundryClient cloudFoundryClient,
+                                                                                                            String spaceId,
+                                                                                                            String name,
+                                                                                                            Map<String, Object> credentials,
+                                                                                                            String routeServiceUrl,
+                                                                                                            String syslogDrainUrl) {
+        return cloudFoundryClient.userProvidedServiceInstances()
+            .create(org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest.builder()
+                .name(name)
+                .credentials(credentials)
+                .routeServiceUrl(routeServiceUrl)
+                .spaceId(spaceId)
+                .syslogDrainUrl(syslogDrainUrl)
                 .build());
     }
 

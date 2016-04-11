@@ -14,44 +14,36 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.userprovidedserviceinstances;
+package org.cloudfoundry.operations.services;
 
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.Singular;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
 import java.util.Map;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
-
 /**
- * The request payload for the Create User Provided Service Instance
+ * The request options for the create user provided service operation
  */
 @Data
 public final class CreateUserProvidedServiceInstanceRequest implements Validatable {
 
-
     /**
-     * Key/value pairs that can be stored to store credentials
+     * The credentials of the user provided service instance
      *
+     * @param credentials the credentials
      * @return the credentials
      */
-    @Getter(onMethod = @__({@JsonProperty("credentials"), @JsonInclude(NON_EMPTY)}))
     private final Map<String, Object> credentials;
 
     /**
-     * The name
+     * The name of the user provided service instance to create
      *
-     * @param name the name
-     * @return the name
+     * @param name the name of the user provided service instance
+     * @return the name of the user provided service instance
      */
-    @Getter(onMethod = @__(@JsonProperty("name")))
     private final String name;
 
     /**
@@ -60,37 +52,24 @@ public final class CreateUserProvidedServiceInstanceRequest implements Validatab
      * @param routeServiceUrl the route service url
      * @return the route service url
      */
-    @Getter(onMethod = @__(@JsonProperty("route_service_url")))
     private final String routeServiceUrl;
 
     /**
-     * The space id
+     * The url for the Syslog Drain Url
      *
-     * @param spaceId the space id
-     * @return the space id
+     * @param syslogDrainUrl the Syslog Drain Url
+     * @return the Syslog Drain Url
      */
-    @Getter(onMethod = @__(@JsonProperty("space_guid")))
-    private final String spaceId;
-
-    /**
-     * The url for the syslog_drain to direct to
-     *
-     * @param syslogDrainUrl the syslog drain url
-     * @return the syslog drain url
-     */
-    @Getter(onMethod = @__(@JsonProperty("syslog_drain_url")))
     private final String syslogDrainUrl;
 
     @Builder
     CreateUserProvidedServiceInstanceRequest(@Singular Map<String, Object> credentials,
                                              String name,
                                              String routeServiceUrl,
-                                             String spaceId,
                                              String syslogDrainUrl) {
         this.credentials = credentials;
         this.name = name;
         this.routeServiceUrl = routeServiceUrl;
-        this.spaceId = spaceId;
         this.syslogDrainUrl = syslogDrainUrl;
     }
 
@@ -100,10 +79,6 @@ public final class CreateUserProvidedServiceInstanceRequest implements Validatab
 
         if (this.name == null) {
             builder.message("name must be specified");
-        }
-
-        if (this.spaceId == null) {
-            builder.message("space id must be specified");
         }
 
         return builder.build();

@@ -41,6 +41,14 @@ public interface Services {
     Mono<Void> createInstance(CreateServiceInstanceRequest request);
 
     /**
+     * Create a user provided service instance
+     *
+     * @param request the user provided create service instance request
+     * @return a completion indicator
+     */
+    Mono<Void> createUserProvidedInstance(CreateUserProvidedServiceInstanceRequest request);
+
+    /**
      * Get a service instance
      *
      * @param request the get service instance request

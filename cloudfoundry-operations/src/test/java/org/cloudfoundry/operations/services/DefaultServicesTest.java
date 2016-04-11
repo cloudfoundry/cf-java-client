@@ -58,6 +58,8 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServicesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServicesResponse;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceEntity;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
 import org.cloudfoundry.util.RequestValidationException;
 import org.cloudfoundry.util.test.TestSubscriber;
@@ -512,6 +514,31 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
+    private static void requestUserProvidedCreateServiceInstance(CloudFoundryClient cloudFoundryClient,
+                                                                 String spaceId,
+                                                                 String name,
+                                                                 Map<String, Object> credentials,
+                                                                 String routeServiceUrl,
+                                                                 String syslogDrainUrl,
+                                                                 String userProvidedServiceInstanceId) {
+        when(cloudFoundryClient.userProvidedServiceInstances()
+            .create(org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest.builder()
+                .name(name)
+                .credentials(credentials)
+                .routeServiceUrl(routeServiceUrl)
+                .spaceId(spaceId)
+                .syslogDrainUrl(syslogDrainUrl)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(CreateUserProvidedServiceInstanceResponse.builder())
+                    .metadata(Resource.Metadata.builder()
+                        .id(userProvidedServiceInstanceId)
+                        .build())
+                    .entity(fill(UserProvidedServiceInstanceEntity.builder())
+                        .build())
+                    .build()));
+    }
+
     public static final class BindServiceInstance extends AbstractOperationsApiTest<Void> {
 
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
@@ -701,6 +728,40 @@ public final class DefaultServicesTest {
                     .planName("test-plan")
                     .parameter("test-parameter-key", "test-parameter-value")
                     .tag("test-tag")
+                    .build());
+        }
+
+    }
+
+    public static final class CreateUserProvidedServiceInstance extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestUserProvidedCreateServiceInstance(this.cloudFoundryClient,
+                TEST_SPACE_ID,
+                "test-user-provided-service-instance",
+                Collections.singletonMap("test-credential-key", "test-credential-value"),
+                "test-route-url",
+                "test-syslog-url",
+                "test-user-provided-service-instance-id");
+        }
+
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.services
+                .createUserProvidedInstance(CreateUserProvidedServiceInstanceRequest.builder()
+                    .name("test-user-provided-service-instance")
+                    .credential("test-credential-key", "test-credential-value")
+                    .routeServiceUrl("test-route-url")
+                    .syslogDrainUrl("test-syslog-url")
                     .build());
         }
 
