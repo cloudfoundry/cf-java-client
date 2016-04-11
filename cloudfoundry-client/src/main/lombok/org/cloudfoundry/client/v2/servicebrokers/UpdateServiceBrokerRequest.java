@@ -20,10 +20,15 @@ package org.cloudfoundry.client.v2.servicebrokers;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
+/**
+ * The request payload to Update a Service Broker
+ */
+@Data
 public final class UpdateServiceBrokerRequest implements Validatable {
 
     /**
