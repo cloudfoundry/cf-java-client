@@ -19,9 +19,7 @@ package org.cloudfoundry.operations.routes;
 import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
 
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.cloudfoundry.operations.routes.ListRoutesRequest.Level.ORGANIZATION;
 import static org.junit.Assert.assertEquals;
 
 public final class ListRoutesRequestTest {
@@ -29,21 +27,10 @@ public final class ListRoutesRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ListRoutesRequest.builder()
-            .level(ORGANIZATION)
             .build()
             .isValid();
 
         assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidNoLevel() {
-        ValidationResult result = ListRoutesRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("level must be specified", result.getMessages().get(0));
     }
 
 }
