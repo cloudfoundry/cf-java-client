@@ -18,8 +18,10 @@ package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.operations.applications.ApplicationEnvironments;
+import org.cloudfoundry.operations.applications.ApplicationHealthCheck;
 import org.cloudfoundry.operations.applications.DeleteApplicationRequest;
 import org.cloudfoundry.operations.applications.GetApplicationEnvironmentsRequest;
+import org.cloudfoundry.operations.applications.GetApplicationHealthCheckRequest;
 import org.cloudfoundry.operations.applications.GetApplicationRequest;
 import org.cloudfoundry.operations.applications.PushApplicationRequest;
 import org.cloudfoundry.operations.applications.RestartApplicationRequest;
@@ -89,6 +91,20 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .map(response -> response.getName())
             .subscribe(testSubscriber()
                 .assertEquals(applicationName));
+    }
+
+    @Test
+    public void getHealthCheck() throws IOException {
+        String applicationName = getApplicationName();
+
+        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, true)
+            .after(() -> this.cloudFoundryOperations.applications()
+                .getHealthCheck(GetApplicationHealthCheckRequest.builder()
+                    .name(applicationName)
+                    .build()))
+            .map(ApplicationHealthCheck::getType)
+            .subscribe(testSubscriber()
+                .assertEquals("port"));
     }
 
     @Test
@@ -179,6 +195,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .application(getApplicationBits())
                 .buildpack("staticfile_buildpack")
                 .diskQuota(512)
+                .healthCheckType("port")
                 .host(host)
                 .memory(64)
                 .name(applicationName)
