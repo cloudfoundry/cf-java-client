@@ -50,6 +50,15 @@ public final class UpdateBuildpackRequest implements Validatable {
     private final Boolean enabled;
 
     /**
+     * The filename
+     *
+     * @param filename the name of the uploaded buildpack file
+     * @return the filename
+     */
+    @Getter(onMethod = @__(@JsonProperty("filename")))
+    private final String filename;
+
+    /**
      * The locked flag
      *
      * @param locked whether or not the buildpack is locked to prevent updates
@@ -79,12 +88,14 @@ public final class UpdateBuildpackRequest implements Validatable {
     @Builder
     UpdateBuildpackRequest(String buildpackId,
                            Boolean enabled,
+                           String filename,
                            Boolean locked,
                            String name,
                            Integer position) {
 
         this.buildpackId = buildpackId;
         this.enabled = enabled;
+        this.filename = filename;
         this.locked = locked;
         this.name = name;
         this.position = position;

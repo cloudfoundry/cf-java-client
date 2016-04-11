@@ -1050,7 +1050,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .applicationId(applicationId)
                     .build())
                 .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job))
-                .after(() -> Mono.just(applicationId));
+                .after(Mono.just(applicationId));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

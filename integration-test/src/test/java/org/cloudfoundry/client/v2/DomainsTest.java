@@ -94,7 +94,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
             .then(organizationId -> createDomainId(this.cloudFoundryClient, domainName, organizationId))
             .then(domainId -> requestDeleteDomain(this.cloudFoundryClient, domainId)
                 .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))
-                .after(() -> Mono.just(domainId)))
+                .after(Mono.just(domainId)))
             .then(domainId -> requestGetDomain(this.cloudFoundryClient, domainId))
             .subscribe(testSubscriber()
                 .assertErrorMatch(CloudFoundryException.class, "CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"));

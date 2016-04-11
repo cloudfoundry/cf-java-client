@@ -53,6 +53,7 @@ import org.cloudfoundry.client.v3.packages.ListPackagesRequest;
 import org.cloudfoundry.client.v3.packages.ListPackagesResponse;
 import org.cloudfoundry.client.v3.packages.Package;
 import org.cloudfoundry.util.JobUtils;
+import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +67,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static org.cloudfoundry.util.PaginationUtils.requestResources;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 final class CloudFoundryCleaner {
@@ -163,10 +163,11 @@ final class CloudFoundryCleaner {
     }
 
     private static Flux<Void> cleanApplicationsV2(CloudFoundryClient cloudFoundryClient, Predicate<ApplicationResource> predicate) {
-        return requestResources(page -> cloudFoundryClient.applicationsV2()
-            .list(ListApplicationsRequest.builder()
-                .page(page)
-                .build()))
+        return PaginationUtils.
+            requestResources(page -> cloudFoundryClient.applicationsV2()
+                .list(ListApplicationsRequest.builder()
+                    .page(page)
+                    .build()))
             .filter(predicate)
             .map(ResourceUtils::getId)
             .flatMap(applicationId -> removeServiceBindings(cloudFoundryClient, applicationId)
@@ -193,10 +194,11 @@ final class CloudFoundryCleaner {
     }
 
     private static Flux<Void> cleanDomains(CloudFoundryClient cloudFoundryClient, Predicate<DomainResource> predicate) {
-        return requestResources(page -> cloudFoundryClient.domains()
-            .list(ListDomainsRequest.builder()
-                .page(page)
-                .build()))
+        return PaginationUtils.
+            requestResources(page -> cloudFoundryClient.domains()
+                .list(ListDomainsRequest.builder()
+                    .page(page)
+                    .build()))
             .filter(predicate)
             .map(ResourceUtils::getId)
             .flatMap(domainId -> cloudFoundryClient.domains()
@@ -228,10 +230,11 @@ final class CloudFoundryCleaner {
     }
 
     private static Flux<Void> cleanOrganizations(CloudFoundryClient cloudFoundryClient, Predicate<OrganizationResource> predicate) {
-        return requestResources(page -> cloudFoundryClient.organizations()
-            .list(ListOrganizationsRequest.builder()
-                .page(page)
-                .build()))
+        return PaginationUtils.
+            requestResources(page -> cloudFoundryClient.organizations()
+                .list(ListOrganizationsRequest.builder()
+                    .page(page)
+                    .build()))
             .filter(predicate)
             .map(ResourceUtils::getId)
             .flatMap(organizationId -> cloudFoundryClient.organizations()
@@ -258,10 +261,11 @@ final class CloudFoundryCleaner {
     }
 
     private static Flux<Void> cleanPrivateDomains(CloudFoundryClient cloudFoundryClient, Predicate<PrivateDomainResource> predicate) {
-        return requestResources(page -> cloudFoundryClient.privateDomains()
-            .list(ListPrivateDomainsRequest.builder()
-                .page(page)
-                .build()))
+        return PaginationUtils.
+            requestResources(page -> cloudFoundryClient.privateDomains()
+                .list(ListPrivateDomainsRequest.builder()
+                    .page(page)
+                    .build()))
             .filter(predicate)
             .map(ResourceUtils::getId)
             .flatMap(privateDomainId -> cloudFoundryClient.privateDomains()
@@ -273,10 +277,11 @@ final class CloudFoundryCleaner {
     }
 
     private static Flux<Void> cleanRoutes(CloudFoundryClient cloudFoundryClient, Predicate<RouteResource> predicate) {
-        return requestResources(page -> cloudFoundryClient.routes()
-            .list(ListRoutesRequest.builder()
-                .page(page)
-                .build()))
+        return PaginationUtils.
+            requestResources(page -> cloudFoundryClient.routes()
+                .list(ListRoutesRequest.builder()
+                    .page(page)
+                    .build()))
             .filter(predicate)
             .map(ResourceUtils::getId)
             .flatMap(routeId -> cloudFoundryClient.routes()
@@ -288,10 +293,11 @@ final class CloudFoundryCleaner {
     }
 
     private static Flux<Void> cleanServiceInstances(CloudFoundryClient cloudFoundryClient, Predicate<ServiceInstanceResource> predicate) {
-        return requestResources(page -> cloudFoundryClient.serviceInstances()
-            .list(ListServiceInstancesRequest.builder()
-                .page(page)
-                .build()))
+        return PaginationUtils.
+            requestResources(page -> cloudFoundryClient.serviceInstances()
+                .list(ListServiceInstancesRequest.builder()
+                    .page(page)
+                    .build()))
             .filter(predicate)
             .map(ResourceUtils::getId)
             .flatMap(serviceInstanceId -> cloudFoundryClient.serviceInstances()
@@ -303,10 +309,11 @@ final class CloudFoundryCleaner {
     }
 
     private static Flux<Void> cleanSpaces(CloudFoundryClient cloudFoundryClient, Predicate<SpaceResource> predicate, Logger logger) {
-        return requestResources(page -> cloudFoundryClient.spaces()
-            .list(ListSpacesRequest.builder()
-                .page(page)
-                .build()))
+        return PaginationUtils.
+            requestResources(page -> cloudFoundryClient.spaces()
+                .list(ListSpacesRequest.builder()
+                    .page(page)
+                    .build()))
             .filter(predicate)
             .map(ResourceUtils::getId)
             .flatMap(spaceId -> cloudFoundryClient.spaces()
@@ -318,10 +325,11 @@ final class CloudFoundryCleaner {
     }
 
     private static Flux<Void> cleanUserProvidedServiceInstances(CloudFoundryClient cloudFoundryClient, Predicate<UserProvidedServiceInstanceResource> predicate) {
-        return requestResources(page -> cloudFoundryClient.userProvidedServiceInstances()
-            .list(ListUserProvidedServiceInstancesRequest.builder()
-                .page(page)
-                .build()))
+        return PaginationUtils.
+            requestResources(page -> cloudFoundryClient.userProvidedServiceInstances()
+                .list(ListUserProvidedServiceInstancesRequest.builder()
+                    .page(page)
+                    .build()))
             .filter(predicate)
             .map(ResourceUtils::getId)
             .flatMap(userProvidedServiceInstanceId -> cloudFoundryClient.userProvidedServiceInstances()
@@ -331,11 +339,12 @@ final class CloudFoundryCleaner {
     }
 
     private static Flux<Void> removeServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return requestResources(page -> cloudFoundryClient.applicationsV2()
-            .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
-                .page(page)
-                .applicationId(applicationId)
-                .build()))
+        return PaginationUtils.
+            requestResources(page -> cloudFoundryClient.applicationsV2()
+                .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
+                    .page(page)
+                    .applicationId(applicationId)
+                    .build()))
             .map(ResourceUtils::getId)
             .flatMap(serviceBindingId -> cloudFoundryClient.applicationsV2()
                 .removeServiceBinding(RemoveApplicationServiceBindingRequest.builder()

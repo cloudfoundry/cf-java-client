@@ -157,7 +157,7 @@ public final class DefaultApplications implements Applications {
                 .when(
                     Mono.just(request1),
                     copyBits(this.cloudFoundryClient, sourceApplicationId, targetApplicationId)
-                        .after(() -> Mono.just(targetApplicationId))
+                        .after(Mono.just(targetApplicationId))
                 )))
             .where(predicate((request1, targetApplicationId) -> Optional.ofNullable(request1.getRestart()).orElse(false)))
             .then(function((request1, targetApplicationId) ->
@@ -171,7 +171,7 @@ public final class DefaultApplications implements Applications {
             .when(ValidationUtils.validate(request), this.spaceId)
             .then(function((request1, spaceId) -> getRoutesAndApplicationId(this.cloudFoundryClient, request1, spaceId, Optional.ofNullable(request.getDeleteRoutes()).orElse(false))))
             .then(function((routes, applicationId) -> deleteRoutes(this.cloudFoundryClient, routes)
-                .after(() -> Mono.just(applicationId))))
+                .after(Mono.just(applicationId))))
             .as(thenKeep((applicationId -> removeServiceBindings(this.cloudFoundryClient, applicationId))))
             .then(applicationId -> requestDeleteApplication(this.cloudFoundryClient, applicationId));
     }
