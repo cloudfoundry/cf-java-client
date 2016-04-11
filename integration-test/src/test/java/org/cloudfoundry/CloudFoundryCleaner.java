@@ -169,6 +169,8 @@ final class CloudFoundryCleaner {
             .list(ListApplicationsRequest.builder()
                 .page(page)
                 .build()))
+            .toList()
+            .flatMap(Flux::fromIterable)
             .filter(predicate)
             .map(ResourceUtils::getId)
             .flatMap(applicationId -> removeServiceBindings(cloudFoundryClient, applicationId)

@@ -108,9 +108,9 @@ public class IntegrationTestConfiguration {
                 .name(organizationName)
                 .build())
             .map(ResourceUtils::getId)
-            .doOnSubscribe(s -> this.logger.debug(">> ORGANIZATION <<"))
+            .doOnSubscribe(s -> this.logger.debug(">> ORGANIZATION name({}) <<", organizationName))
             .doOnError(Throwable::printStackTrace)
-            .doOnSuccess(id -> this.logger.debug("<< ORGANIZATION >>"))
+            .doOnSuccess(id -> this.logger.debug("<< ORGANIZATION id({}) >>", id))
             .cache();
 
         organizationId.get();
@@ -211,9 +211,9 @@ public class IntegrationTestConfiguration {
                     .organizationId(orgId)
                     .build()))
             .map(ResourceUtils::getId)
-            .doOnSubscribe(s -> this.logger.debug(">> SPACE <<"))
+            .doOnSubscribe(s -> this.logger.debug(">> SPACE name({}) <<", spaceName))
             .doOnError(Throwable::printStackTrace)
-            .doOnSuccess(id -> this.logger.debug("<< SPACE >>"))
+            .doOnSuccess(id -> this.logger.debug("<< SPACE id({}) >>", id))
             .cache();
 
         spaceId.get();
@@ -266,7 +266,7 @@ public class IntegrationTestConfiguration {
             .filter(resource -> userName.equals(ResourceUtils.getEntity(resource).getUsername()))
             .map(ResourceUtils::getId)
             .single()
-            .doOnSubscribe(s -> this.logger.debug(">> USER <<"))
+            .doOnSubscribe(s -> this.logger.debug(">> USER name({}) <<", userName))
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(id -> this.logger.debug("<< USER >>"))
             .cache();
