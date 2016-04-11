@@ -33,6 +33,9 @@ import java.util.Map;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 
+/**
+ * The request payload to Update a Service Instance
+ */
 @Data
 public final class UpdateServiceInstanceRequest implements Validatable {
 
@@ -95,6 +98,7 @@ public final class UpdateServiceInstanceRequest implements Validatable {
                                  String serviceInstanceId,
                                  String servicePlanId,
                                  @Singular List<String> tags) {
+
         this.acceptsIncomplete = acceptsIncomplete;
         this.name = name;
         this.parameters = parameters;

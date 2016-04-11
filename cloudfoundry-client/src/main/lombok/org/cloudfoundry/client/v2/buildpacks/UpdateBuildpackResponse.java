@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.servicebrokers;
+package org.cloudfoundry.client.v2.buildpacks;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
-import org.cloudfoundry.client.v2.Resource;
 
 /**
- * The response payload for the the Update Service Broker request.
+ * The response payload for the the Update Buildpack request.
  */
-public final class UpdateServiceBrokerResponse extends Resource<ServiceBrokerEntity> {
+public final class UpdateBuildpackResponse extends AbstractBuildpackResource {
 
     @Builder
-    UpdateServiceBrokerResponse(@JsonProperty("entity") ServiceBrokerEntity entity,
-                                @JsonProperty("metadata") Metadata metadata) {
+    UpdateBuildpackResponse(@JsonProperty("entity") BuildpackEntity entity,
+                            @JsonProperty("metadata") Metadata metadata) {
 
         super(entity, metadata);
     }

@@ -20,6 +20,9 @@ package org.cloudfoundry.client.v2.serviceinstances;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 
+/**
+ * The response payload for the the Update Service Instance request.
+ */
 public final class UpdateServiceInstanceResponse extends AbstractServiceInstanceResource {
 
     @Builder
