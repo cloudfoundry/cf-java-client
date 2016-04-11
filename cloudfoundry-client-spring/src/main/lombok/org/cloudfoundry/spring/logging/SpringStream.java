@@ -87,7 +87,7 @@ final class SpringStream {
                     exchange.accept(subscriber);
                 })
             )
-            .publishOn(this.schedulerGroup)
+            .subscribeOn(this.schedulerGroup)
             .onBackpressureBuffer();
     }
 

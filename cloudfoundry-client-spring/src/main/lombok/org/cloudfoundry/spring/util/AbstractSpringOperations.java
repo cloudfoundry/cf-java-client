@@ -89,7 +89,7 @@ public abstract class AbstractSpringOperations {
                         signalEmitter.onError(t);
                     }
                 }))
-            .publishOn(this.schedulerGroup)
+            .subscribeOn(this.schedulerGroup)
             .onBackpressureBuffer();
     }
 
