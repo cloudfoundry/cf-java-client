@@ -21,7 +21,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.cloudfoundry.client.v2.Resource;
 
 /**
  * The resource response payload for User Provided Service Instances
@@ -29,7 +28,7 @@ import org.cloudfoundry.client.v2.Resource;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class UserProvidedServiceInstanceResource extends Resource<UserProvidedServiceInstanceEntity> {
+public final class UserProvidedServiceInstanceResource extends AbstractUserProvidedServiceInstanceResource {
 
     @Builder
     UserProvidedServiceInstanceResource(@JsonProperty("entity") UserProvidedServiceInstanceEntity entity,

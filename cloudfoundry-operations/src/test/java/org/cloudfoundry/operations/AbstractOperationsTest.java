@@ -35,6 +35,7 @@ import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.cloudfoundry.client.v2.stacks.Stacks;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstances;
 import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.logging.LoggingClient;
 import org.cloudfoundry.uaa.UaaClient;
@@ -110,6 +111,8 @@ public abstract class AbstractOperationsTest {
 
     protected final UaaClient uaaClient = mock(UaaClient.class, RETURNS_SMART_NULLS);
 
+    protected final UserProvidedServiceInstances userProvidedServiceInstances = mock(UserProvidedServiceInstances.class, RETURNS_SMART_NULLS);
+
     protected final Users users = mock(Users.class, RETURNS_SMART_NULLS);
 
     @Before
@@ -132,6 +135,7 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.spaceQuotaDefinitions()).thenReturn(this.spaceQuotaDefinitions);
         when(this.cloudFoundryClient.spaces()).thenReturn(this.spaces);
         when(this.cloudFoundryClient.stacks()).thenReturn(this.stacks);
+        when(this.cloudFoundryClient.userProvidedServiceInstances()).thenReturn(this.userProvidedServiceInstances);
         when(this.cloudFoundryClient.users()).thenReturn(this.users);
 
         when(this.uaaClient.accessTokenAdministration()).thenReturn(this.accessTokenAdministration);
