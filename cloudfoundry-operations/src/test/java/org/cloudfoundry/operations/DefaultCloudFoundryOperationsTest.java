@@ -32,6 +32,11 @@ public final class DefaultCloudFoundryOperationsTest extends AbstractOperationsT
     }
 
     @Test
+    public void buildpacks() {
+        assertNotNull(this.operations.buildpacks());
+    }
+
+    @Test
     public void domains() {
         assertNotNull(this.operations.domains());
     }
