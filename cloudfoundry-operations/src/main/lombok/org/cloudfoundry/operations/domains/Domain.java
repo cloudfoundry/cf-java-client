@@ -16,36 +16,42 @@
 
 package org.cloudfoundry.operations.domains;
 
-import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import lombok.Builder;
+import lombok.Data;
 
 /**
- * Main entry point to the Cloud Foundry Domains Operations API
+ * Domain object representation
  */
-public interface Domains {
+@Data
+public final class Domain {
 
     /**
-     * Create a new domain
+     * The GUID of the domain
      *
-     * @param request The Create Domain request
-     * @return a completion indicator
+     * @param domainId the GUID of the domain return the GUID of the domain
      */
-    Mono<Void> create(CreateDomainRequest request);
+    private final String domainId;
 
     /**
-     * Create a new shared domain
+     * The name of the domain
      *
-     * @param request the Create Shared Domain request
-     * @return a completion indicator
+     * @param name the name returns the name of the domain
      */
-    Mono<Void> createShared(CreateSharedDomainRequest request);
+    private final String domainName;
 
     /**
-     * Lists the domains
+     * The status of the domain indicating shared or private domain
      *
-     * @return the Domains
+     * @param status indicating the domain is shared or private
      */
-    Flux<Domain> list();
+    private final String status;
+
+
+    @Builder
+    Domain(String domainId, String domainName, String status) {
+        this.domainId = domainId;
+        this.domainName = domainName;
+        this.status = status;
+    }
 
 }
