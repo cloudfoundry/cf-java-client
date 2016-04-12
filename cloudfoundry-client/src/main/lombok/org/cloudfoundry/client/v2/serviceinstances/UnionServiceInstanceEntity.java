@@ -29,12 +29,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The entity response payload for Service Instances
+ * The entity response payload for any type of Service Instances
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ServiceInstanceEntity extends BaseServiceInstanceEntity {
+public final class UnionServiceInstanceEntity extends BaseServiceInstanceEntity {
 
     /**
      * The dashboard url
@@ -62,6 +62,14 @@ public final class ServiceInstanceEntity extends BaseServiceInstanceEntity {
     private final LastOperation lastOperation;
 
     /**
+     * URL to which requests for bound routes will be forwarded
+     *
+     * @param routeServiceUrl the route service url
+     * @return the route service url
+     */
+    private final String routeServiceUrl;
+
+    /**
      * The service keys url
      *
      * @param serviceKeysUrl the service keys url
@@ -86,6 +94,14 @@ public final class ServiceInstanceEntity extends BaseServiceInstanceEntity {
     private final String servicePlanUrl;
 
     /**
+     * The url for the syslog_drain to direct to
+     *
+     * @param syslogDrainUrl the syslog drain url
+     * @return the syslog drain url
+     */
+    private final String syslogDrainUrl;
+
+    /**
      * The tags
      *
      * @param tags the tags
@@ -94,29 +110,33 @@ public final class ServiceInstanceEntity extends BaseServiceInstanceEntity {
     private final List<String> tags;
 
     @Builder
-    ServiceInstanceEntity(@JsonProperty("credentials") @Singular Map<String, Object> credentials,
-                          @JsonProperty("dashboard_url") String dashboardUrl,
-                          @JsonProperty("gateway_data") @Deprecated String gatewayData,
-                          @JsonProperty("last_operation") LastOperation lastOperation,
-                          @JsonProperty("name") String name,
-                          @JsonProperty("routes_url") String routesUrl,
-                          @JsonProperty("service_bindings_url") String serviceBindingsUrl,
-                          @JsonProperty("service_keys_url") String serviceKeysUrl,
-                          @JsonProperty("service_plan_guid") String servicePlanId,
-                          @JsonProperty("service_plan_url") String servicePlanUrl,
-                          @JsonProperty("space_guid") String spaceId,
-                          @JsonProperty("space_url") String spaceUrl,
-                          @JsonProperty("tags") @Singular List<String> tags,
-                          @JsonProperty("type") String type) {
+    UnionServiceInstanceEntity(@JsonProperty("credentials") @Singular Map<String, Object> credentials,
+                               @JsonProperty("dashboard_url") String dashboardUrl,
+                               @JsonProperty("gateway_data") @Deprecated String gatewayData,
+                               @JsonProperty("last_operation") LastOperation lastOperation,
+                               @JsonProperty("name") String name,
+                               @JsonProperty("route_service_url") String routeServiceUrl,
+                               @JsonProperty("routes_url") String routesUrl,
+                               @JsonProperty("service_bindings_url") String serviceBindingsUrl,
+                               @JsonProperty("service_keys_url") String serviceKeysUrl,
+                               @JsonProperty("service_plan_guid") String servicePlanId,
+                               @JsonProperty("service_plan_url") String servicePlanUrl,
+                               @JsonProperty("space_guid") String spaceId,
+                               @JsonProperty("space_url") String spaceUrl,
+                               @JsonProperty("syslog_drain_url") String syslogDrainUrl,
+                               @JsonProperty("tags") @Singular List<String> tags,
+                               @JsonProperty("type") String type) {
 
         super(credentials, name, routesUrl, serviceBindingsUrl, spaceId, spaceUrl, type);
 
         this.dashboardUrl = dashboardUrl;
         this.gatewayData = gatewayData;
         this.lastOperation = lastOperation;
+        this.routeServiceUrl = routeServiceUrl;
         this.serviceKeysUrl = serviceKeysUrl;
         this.servicePlanId = servicePlanId;
         this.servicePlanUrl = servicePlanUrl;
+        this.syslogDrainUrl = syslogDrainUrl;
         this.tags = tags;
     }
 

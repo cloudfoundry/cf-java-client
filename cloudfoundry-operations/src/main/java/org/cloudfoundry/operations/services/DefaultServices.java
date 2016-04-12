@@ -33,8 +33,8 @@ import org.cloudfoundry.client.v2.serviceinstances.AbstractServiceInstanceResour
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
-import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
-import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
+import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceEntity;
+import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceResource;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanRequest;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanResponse;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
@@ -129,7 +129,7 @@ public final class DefaultServices implements Services {
     public Mono<ServiceInstance> getInstance(GetServiceInstanceRequest getRequest) {
         return Mono
             .when(ValidationUtils.validate(getRequest), this.spaceId)
-            .then(function((request, spaceId) -> getServiceInstance(cloudFoundryClient, request.getName(), spaceId)))
+            .then(function((request, spaceId) -> getSpaceServiceInstance(cloudFoundryClient, request.getName(), spaceId)))
             .then(resource -> Mono
                 .when(
                     Mono.just(resource),
@@ -258,12 +258,6 @@ public final class DefaultServices implements Services {
             .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Service %s does not exist", service)));
     }
 
-    private static Mono<ServiceInstanceResource> getServiceInstance(CloudFoundryClient cloudFoundryClient, String name, String spaceId) {
-        return requestSpaceServiceInstancesByName(cloudFoundryClient, name, spaceId)
-            .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Service instance %s does not exist", name)));
-    }
-
     private static Mono<ServicePlanEntity> getServicePlanEntity(CloudFoundryClient cloudFoundryClient, String servicePlanId) {
         return Mono
             .justOrEmpty(servicePlanId)
@@ -280,7 +274,7 @@ public final class DefaultServices implements Services {
             .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Service plan %s does not exist", plan)));
     }
 
-    private static Mono<ServiceInstanceResource> getSpaceServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
+    private static Mono<UnionServiceInstanceResource> getSpaceServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
         return requestSpaceServiceInstancesByName(cloudFoundryClient, serviceInstanceName, spaceId)
             .single()
             .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Service instance %s does not exist", serviceInstanceName)));
@@ -411,7 +405,7 @@ public final class DefaultServices implements Services {
                     .build()));
     }
 
-    private static Flux<ServiceInstanceResource> requestSpaceServiceInstances(CloudFoundryClient cloudFoundryClient, String spaceId) {
+    private static Flux<UnionServiceInstanceResource> requestSpaceServiceInstances(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
@@ -421,7 +415,7 @@ public final class DefaultServices implements Services {
                     .build()));
     }
 
-    private static Flux<ServiceInstanceResource> requestSpaceServiceInstancesByName(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
+    private static Flux<UnionServiceInstanceResource> requestSpaceServiceInstancesByName(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
@@ -443,10 +437,10 @@ public final class DefaultServices implements Services {
                     .build()));
     }
 
-    private static ServiceInstance toServiceInstance(ServiceInstanceResource resource, Optional<String> plan, List<String> applications, ServiceEntity serviceEntity) {
+    private static ServiceInstance toServiceInstance(UnionServiceInstanceResource resource, Optional<String> plan, List<String> applications, ServiceEntity serviceEntity) {
         String extra = Optional.ofNullable(serviceEntity.getExtra()).orElse("");
         Optional<String> documentationUrl = Optional.ofNullable(getExtraValue(extra, "documentationUrl"));
-        ServiceInstanceEntity serviceInstanceEntity = resource.getEntity();
+        UnionServiceInstanceEntity serviceInstanceEntity = resource.getEntity();
         LastOperation lastOperation = Optional
             .ofNullable(serviceInstanceEntity.getLastOperation())
             .orElse(LastOperation.builder()

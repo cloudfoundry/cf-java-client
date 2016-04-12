@@ -41,6 +41,7 @@ public final class JobUtils {
      *
      * @param cloudFoundryClient the client to use to request job status
      * @param resource           the resource representing the job
+     * @param <R>                the Job resource type
      * @return {@code onComplete} once job has completed
      */
     public static <R extends Resource<JobEntity>> Mono<Void> waitForCompletion(CloudFoundryClient cloudFoundryClient, R resource) {

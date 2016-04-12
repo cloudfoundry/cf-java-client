@@ -41,7 +41,8 @@ import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
-import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
+import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceEntity;
+import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceResource;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanRequest;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanResponse;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
@@ -382,7 +383,7 @@ public final class DefaultServicesTest {
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListSpaceServiceInstancesResponse.builder())
-                    .resource(fill(ServiceInstanceResource.builder(), "service-instance-")
+                    .resource(fill(UnionServiceInstanceResource.builder(), "service-instance-")
                         .build())
                     .build()));
     }
@@ -410,9 +411,9 @@ public final class DefaultServicesTest {
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListSpaceServiceInstancesResponse.builder())
-                    .resource(ServiceInstanceResource.builder()
+                    .resource(UnionServiceInstanceResource.builder()
                         .metadata(Resource.Metadata.builder().id("test-service-instance-id").build())
-                        .entity(fill(ServiceInstanceEntity.builder())
+                        .entity(fill(UnionServiceInstanceEntity.builder())
                             .name(serviceName)
                             .servicePlanId("test-service-plan-id")
                             .tags(Collections.singletonList("test-tag"))
@@ -439,11 +440,11 @@ public final class DefaultServicesTest {
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListSpaceServiceInstancesResponse.builder())
-                    .resource(ServiceInstanceResource.builder()
+                    .resource(UnionServiceInstanceResource.builder()
                         .metadata(Resource.Metadata.builder()
                             .id("test-service-instance-id")
                             .build())
-                        .entity(ServiceInstanceEntity.builder()
+                        .entity(UnionServiceInstanceEntity.builder()
                             .type("user_provided_service_instance")
                             .name(serviceName)
                             .build())
@@ -485,9 +486,9 @@ public final class DefaultServicesTest {
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListSpaceServiceInstancesResponse.builder())
-                    .resource(ServiceInstanceResource.builder()
+                    .resource(UnionServiceInstanceResource.builder()
                         .metadata(Resource.Metadata.builder().id(instanceName1 + "-id").build())
-                        .entity(fill(ServiceInstanceEntity.builder())
+                        .entity(fill(UnionServiceInstanceEntity.builder())
                             .type("user_provided_service_instance")
                             .dashboardUrl(null)
                             .name(instanceName1)
@@ -495,9 +496,9 @@ public final class DefaultServicesTest {
                             .lastOperation(null)
                             .build())
                         .build())
-                    .resource(ServiceInstanceResource.builder()
+                    .resource(UnionServiceInstanceResource.builder()
                         .metadata(Resource.Metadata.builder().id(instanceName2 + "-id").build())
-                        .entity(fill(ServiceInstanceEntity.builder())
+                        .entity(fill(UnionServiceInstanceEntity.builder())
                             .type("managed_service_instance")
                             .name(instanceName2)
                             .tag("test-tag")
