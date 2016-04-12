@@ -1,0 +1,23 @@
+{
+  "total_results": 1,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "50dedf28-08db-4cdd-9903-0d74f3b8708d",
+        "url": "/v2/route_mappings/50dedf28-08db-4cdd-9903-0d74f3b8708d",
+        "created_at": "2016-04-06T00:17:40Z",
+        "updated_at": null
+      },
+      "entity": {
+        "app_port": 8888,
+        "app_guid": "fbfe5df8-5391-4e75-966b-69fe34b7ee5d",
+        "route_guid": "b683ae9e-0a54-4445-a2ea-5d78d9f89266",
+        "app_url": "/v2/apps/fbfe5df8-5391-4e75-966b-69fe34b7ee5d",
+        "route_url": "/v2/routes/b683ae9e-0a54-4445-a2ea-5d78d9f89266"
+      }
+    }
+  ]
+}

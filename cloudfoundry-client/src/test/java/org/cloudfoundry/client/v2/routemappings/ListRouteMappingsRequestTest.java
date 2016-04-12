@@ -16,24 +16,17 @@
 
 package org.cloudfoundry.client.v2.routemappings;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import org.cloudfoundry.ValidationResult;
+import org.junit.Test;
 
-/**
- * The response payload for the Creating a Route Mapping operation
- */
-@Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public final class CreateRouteMappingResponse extends AbstractRouteMappingResource {
+import static org.junit.Assert.assertEquals;
 
-    @Builder
-    CreateRouteMappingResponse(@JsonProperty("entity") RouteMappingEntity entity,
-                               @JsonProperty("metadata") Metadata metadata) {
-        super(entity, metadata);
+public final class ListRouteMappingsRequestTest {
+
+    @Test
+    public void isValid() {
+        assertEquals(ValidationResult.Status.VALID,
+            ListRouteMappingsRequest.builder().build().isValid().getStatus());
     }
 
 }
