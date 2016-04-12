@@ -1037,6 +1037,19 @@ public final class DefaultApplicationsTest {
                 .build()));
     }
 
+    private static void requestUpdateApplicationHealthCheck(CloudFoundryClient cloudFoundryClient, String applicationId, String type) {
+        when(cloudFoundryClient.applicationsV2()
+            .update(UpdateApplicationRequest.builder()
+                .applicationId(applicationId)
+                .healthCheckType(type)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(UpdateApplicationResponse.builder())
+                    .entity(fill(ApplicationEntity.builder(), "application-entity-")
+                        .build())
+                    .build()));
+    }
+
     private static void requestUpdateApplicationRename(CloudFoundryClient cloudFoundryClient, String applicationId, String name) {
         when(cloudFoundryClient.applicationsV2()
             .update(UpdateApplicationRequest.builder()
@@ -1995,7 +2008,6 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-
             requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
         }
 
@@ -3881,6 +3893,52 @@ public final class DefaultApplicationsTest {
                     .name("test-app")
                     .variableName("test-var-name")
                     .variableValue("test-var-value")
+                    .build());
+        }
+
+    }
+
+    public static final class SetHealthCheck extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-application-id");
+            requestUpdateApplicationHealthCheck(this.cloudFoundryClient, "test-application-id", "test-type");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .setHealthCheck(SetApplicationHealthCheckRequest.builder()
+                    .name("test-application-name")
+                    .type("test-type")
+                    .build());
+        }
+
+    }
+
+    public static final class SetHealthCheckInvalidRequest extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.loggingClient), Mono.just(TEST_SPACE_ID));
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            testSubscriber.
+                assertError(RequestValidationException.class, "Request is invalid: type must be specified");
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .setHealthCheck(SetApplicationHealthCheckRequest.builder()
+                    .name("test-application-name")
                     .build());
         }
 

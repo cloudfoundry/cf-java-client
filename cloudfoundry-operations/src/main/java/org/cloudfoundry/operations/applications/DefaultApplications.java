@@ -380,6 +380,19 @@ public final class DefaultApplications implements Applications {
     }
 
     @Override
+    public Mono<Void> setHealthCheck(SetApplicationHealthCheckRequest setApplicationHealthCheckRequest) {
+        return Mono
+            .when(ValidationUtils.validate(setApplicationHealthCheckRequest), this.spaceId)
+            .then(function((request, spaceId) -> Mono
+                .when(
+                    getApplicationId(this.cloudFoundryClient, request.getName(), spaceId),
+                    Mono.just(request.getType())
+                )))
+            .then(function((applicationId, type) -> updateHealthCheck(this.cloudFoundryClient, applicationId, type)))
+            .after();
+    }
+
+    @Override
     public Mono<Boolean> sshEnabled(ApplicationSshEnabledRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
@@ -1308,6 +1321,14 @@ public final class DefaultApplications implements Applications {
             .map(DefaultApplications::toUrl)
             .toList()
             .get();
+    }
+
+    private static Mono<UpdateApplicationResponse> updateHealthCheck(CloudFoundryClient cloudFoundryClient, String applicationId, String type) {
+        return cloudFoundryClient.applicationsV2()
+            .update(UpdateApplicationRequest.builder()
+                .applicationId(applicationId)
+                .healthCheckType(type)
+                .build());
     }
 
     private static Mono<Void> uploadApplicationAndWait(CloudFoundryClient cloudFoundryClient, String applicationId, InputStream application) {
