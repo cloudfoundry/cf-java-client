@@ -19,6 +19,7 @@ package org.cloudfoundry.spring.util.network;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
@@ -98,7 +99,7 @@ public final class ConnectionContextFactory {
     }
 
     private static RestOperations getRestOperations(HostnameVerifier hostnameVerifier, SSLContext sslContext) {
-        return new RestTemplate(new CustomSslSimpleClientHttpRequestFactory(hostnameVerifier, sslContext));
+        return new RestTemplate(new HttpComponentsClientHttpRequestFactory(HttpClientFactory.getHttpClient(hostnameVerifier, sslContext)));
     }
 
     private static SSLContext getSslContext(TrustManager trustManager) {
