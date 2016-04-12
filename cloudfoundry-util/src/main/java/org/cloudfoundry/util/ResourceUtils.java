@@ -30,9 +30,10 @@ public final class ResourceUtils {
      *
      * @param resource the resource
      * @param <T>      the type of the resource's entity
+     * @param <R>      the resource type
      * @return the resource's entity
      */
-    public static <T> T getEntity(Resource<T> resource) {
+    public static <T, R extends Resource<T>> T getEntity(R resource) {
         return resource.getEntity();
     }
 
