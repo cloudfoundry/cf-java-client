@@ -23,16 +23,16 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * The response payload for the Creating a Route Mapping operation
+ * The resource response payload for Route Mappings
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class CreateRouteMappingResponse extends AbstractRouteMappingResource {
+public final class RouteMappingResource extends AbstractRouteMappingResource {
 
     @Builder
-    CreateRouteMappingResponse(@JsonProperty("entity") RouteMappingEntity entity,
-                               @JsonProperty("metadata") Metadata metadata) {
+    RouteMappingResource(@JsonProperty("entity") RouteMappingEntity entity,
+                         @JsonProperty("metadata") Metadata metadata) {
 
         super(entity, metadata);
     }
