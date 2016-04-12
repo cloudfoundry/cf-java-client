@@ -17,22 +17,21 @@
 package org.cloudfoundry.client.v2.privatedomains;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.cloudfoundry.client.v2.Resource;
 
 /**
- * The resource response payload for Service Instances
+ * The response payload for the deprecated Create a Private Domain operation
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class PrivateDomainResource extends AbstractPrivateDomainResource {
+public abstract class AbstractPrivateDomainResource extends Resource<PrivateDomainEntity> {
 
-    @Builder
-    PrivateDomainResource(@JsonProperty("entity") PrivateDomainEntity entity,
-                          @JsonProperty("metadata") Metadata metadata) {
+    AbstractPrivateDomainResource(@JsonProperty("entity") PrivateDomainEntity entity,
+                                  @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 

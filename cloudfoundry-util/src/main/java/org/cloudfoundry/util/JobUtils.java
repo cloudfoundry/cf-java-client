@@ -43,7 +43,7 @@ public final class JobUtils {
      * @param resource           the resource representing the job
      * @return {@code onComplete} once job has completed
      */
-    public static Mono<Void> waitForCompletion(CloudFoundryClient cloudFoundryClient, Resource<JobEntity> resource) {
+    public static <R extends Resource<JobEntity>> Mono<Void> waitForCompletion(CloudFoundryClient cloudFoundryClient, R resource) {
         Mono<JobEntity> job;
 
         if (JobUtils.isComplete(ResourceUtils.getEntity(resource))) {
@@ -57,7 +57,7 @@ public final class JobUtils {
 
         return job
             .where(entity -> "failed".equals(entity.getStatus()))
-            .flatMap(JobUtils::getError)
+            .then(JobUtils::getError)
             .after();
     }
 
