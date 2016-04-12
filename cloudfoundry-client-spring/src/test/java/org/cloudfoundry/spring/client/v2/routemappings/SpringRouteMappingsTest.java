@@ -22,16 +22,21 @@ import org.cloudfoundry.client.v2.routemappings.CreateRouteMappingRequest;
 import org.cloudfoundry.client.v2.routemappings.CreateRouteMappingResponse;
 import org.cloudfoundry.client.v2.routemappings.DeleteRouteMappingRequest;
 import org.cloudfoundry.client.v2.routemappings.DeleteRouteMappingResponse;
+import org.cloudfoundry.client.v2.routemappings.ListRouteMappingsRequest;
+import org.cloudfoundry.client.v2.routemappings.ListRouteMappingsResponse;
 import org.cloudfoundry.client.v2.routemappings.RouteMappingEntity;
+import org.cloudfoundry.client.v2.routemappings.RouteMappingResource;
 import org.cloudfoundry.spring.AbstractApiTest;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringRouteMappingsTest {
 
@@ -164,6 +169,59 @@ public final class SpringRouteMappingsTest {
         @Override
         protected Mono<DeleteRouteMappingResponse> invoke(DeleteRouteMappingRequest request) {
             return this.routeMappings.delete(request);
+        }
+
+    }
+
+    public static final class List extends AbstractApiTest<ListRouteMappingsRequest, ListRouteMappingsResponse> {
+
+        private final SpringRouteMappings routeMappings = new SpringRouteMappings(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected ListRouteMappingsRequest getInvalidRequest() {
+            return null;
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("/v2/route_mappings?page=-1")
+                .status(OK)
+                .responsePayload("fixtures/client/v2/route_mappings/GET_response.json");
+        }
+
+        @Override
+        protected ListRouteMappingsResponse getResponse() {
+            return ListRouteMappingsResponse.builder()
+                .totalPages(1)
+                .totalResults(1)
+                .resource(RouteMappingResource.builder()
+                    .metadata(Resource.Metadata.builder()
+                        .createdAt("2016-04-06T00:17:40Z")
+                        .id("50dedf28-08db-4cdd-9903-0d74f3b8708d")
+                        .url("/v2/route_mappings/50dedf28-08db-4cdd-9903-0d74f3b8708d")
+                        .build())
+                    .entity(RouteMappingEntity.builder()
+                        .applicationId("fbfe5df8-5391-4e75-966b-69fe34b7ee5d")
+                        .applicationPort(8888)
+                        .routeId("b683ae9e-0a54-4445-a2ea-5d78d9f89266")
+                        .applicationUrl("/v2/apps/fbfe5df8-5391-4e75-966b-69fe34b7ee5d")
+                        .routeUrl("/v2/routes/b683ae9e-0a54-4445-a2ea-5d78d9f89266")
+                        .build())
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListRouteMappingsRequest getValidRequest() throws Exception {
+            return ListRouteMappingsRequest.builder()
+                .page(-1)
+                .build();
+        }
+
+        @Override
+        protected Mono<ListRouteMappingsResponse> invoke(ListRouteMappingsRequest request) {
+            return this.routeMappings.list(request);
         }
 
     }

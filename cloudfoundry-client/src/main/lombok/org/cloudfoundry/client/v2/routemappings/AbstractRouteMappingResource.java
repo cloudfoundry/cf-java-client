@@ -17,22 +17,21 @@
 package org.cloudfoundry.client.v2.routemappings;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.cloudfoundry.client.v2.Resource;
 
 /**
- * The response payload for the Creating a Route Mapping operation
+ * The resource response payload for Route Mapping
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class CreateRouteMappingResponse extends AbstractRouteMappingResource {
+public abstract class AbstractRouteMappingResource extends Resource<RouteMappingEntity> {
 
-    @Builder
-    CreateRouteMappingResponse(@JsonProperty("entity") RouteMappingEntity entity,
-                               @JsonProperty("metadata") Metadata metadata) {
+    AbstractRouteMappingResource(@JsonProperty("entity") RouteMappingEntity entity,
+                                 @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 

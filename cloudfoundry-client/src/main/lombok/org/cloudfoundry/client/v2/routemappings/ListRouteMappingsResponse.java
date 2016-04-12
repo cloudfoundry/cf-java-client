@@ -18,22 +18,20 @@ package org.cloudfoundry.client.v2.routemappings;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Singular;
+import org.cloudfoundry.client.v2.PaginatedResponse;
 
-/**
- * The response payload for the Creating a Route Mapping operation
- */
-@Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public final class CreateRouteMappingResponse extends AbstractRouteMappingResource {
+import java.util.List;
+
+public class ListRouteMappingsResponse extends PaginatedResponse<RouteMappingResource> {
 
     @Builder
-    CreateRouteMappingResponse(@JsonProperty("entity") RouteMappingEntity entity,
-                               @JsonProperty("metadata") Metadata metadata) {
-        super(entity, metadata);
+    ListRouteMappingsResponse(@JsonProperty("next_url") String nextUrl,
+                              @JsonProperty("prev_url") String previousUrl,
+                              @JsonProperty("resources") @Singular List<RouteMappingResource> resources,
+                              @JsonProperty("total_pages") Integer totalPages,
+                              @JsonProperty("total_results") Integer totalResults) {
+        super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 
 }
