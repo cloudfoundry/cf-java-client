@@ -17,13 +17,13 @@
 package org.cloudfoundry.client.v2.spaces;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Singular;
 import lombok.ToString;
+import org.cloudfoundry.QueryParameter;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 import org.cloudfoundry.client.v2.InFilterParameter;
@@ -72,7 +72,7 @@ public final class ListSpaceServiceInstancesRequest extends PaginatedRequest imp
      * @param returnUserProvidedServiceInstances the return user provided service instances
      * @return the return user provided service instances
      */
-    @Getter(onMethod = @__(@JsonProperty("return_user_provided_service_instances")))
+    @Getter(onMethod = @__(@QueryParameter("return_user_provided_service_instances")))
     private final Boolean returnUserProvidedServiceInstances;
 
     /**

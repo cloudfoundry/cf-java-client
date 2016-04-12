@@ -1410,7 +1410,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                .method(GET).path("/v2/spaces/test-space-id/service_instances?page=-1")
+                .method(GET).path("/v2/spaces/test-space-id/service_instances?page=-1&return_user_provided_service_instances=true")
                 .status(OK)
                 .responsePayload("fixtures/client/v2/spaces/GET_{id}_service_instances_response.json");
         }
