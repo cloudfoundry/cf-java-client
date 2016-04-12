@@ -31,7 +31,7 @@ import org.cloudfoundry.client.v2.PaginatedRequest;
 import java.util.List;
 
 /**
- * The request payload for the List all Spaces for the Organization operation
+ * The request payload for the List all Services for the Organization operation
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

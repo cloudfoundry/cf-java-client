@@ -95,10 +95,9 @@ public interface Applications {
      * Retrieve the Health Check Type of an application
      *
      * @param request the get health check request
-     * @return a completion indicator
+     * @return the health check
      */
     Mono<ApplicationHealthCheck> getHealthCheck(GetApplicationHealthCheckRequest request);
-
 
     /**
      * Lists the applications
@@ -122,7 +121,6 @@ public interface Applications {
      * @return a completion indicator
      */
     Mono<Void> push(PushApplicationRequest request);
-
 
     /**
      * Rename a specific application
@@ -171,6 +169,14 @@ public interface Applications {
      * @return a completion indicator
      */
     Mono<Void> setEnvironmentVariable(SetEnvironmentVariableApplicationRequest request);
+
+    /**
+     * Set the Health Check Type of an application
+     *
+     * @param request the set health check request
+     * @return a completion indicator
+     */
+    Mono<Void> setHealthCheck(SetApplicationHealthCheckRequest request);
 
     /**
      * Check if SSH is enabled for a specific application
