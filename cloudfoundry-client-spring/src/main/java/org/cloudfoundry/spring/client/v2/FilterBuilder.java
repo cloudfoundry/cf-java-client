@@ -27,6 +27,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * A builder for Cloud Foundry V2 filters
@@ -75,7 +78,9 @@ public final class FilterBuilder {
             return value;
         }
 
-        Collection<?> collection = (Collection) value;
+        List<?> collection = (List<?>) ((Collection) value).stream()
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
 
         if (collection.isEmpty()) {
             return null;

@@ -26,6 +26,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public final class FilterBuilder {
 
@@ -56,6 +59,7 @@ public final class FilterBuilder {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static String getValue(Method method, Object instance) {
         ReflectionUtils.makeAccessible(method);
         Object value = ReflectionUtils.invokeMethod(method, instance);
@@ -63,7 +67,11 @@ public final class FilterBuilder {
         if (value == null) {
             return "";
         } else if (value instanceof Collection) {
-            return StringUtils.collectionToCommaDelimitedString((Collection) value);
+            List<?> collection = (List<?>) ((Collection) value).stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+            return StringUtils.collectionToCommaDelimitedString(collection);
         } else {
             return value.toString();
         }
