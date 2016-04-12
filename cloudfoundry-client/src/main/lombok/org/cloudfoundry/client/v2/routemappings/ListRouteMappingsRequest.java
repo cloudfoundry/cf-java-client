@@ -59,6 +59,7 @@ public class ListRouteMappingsRequest extends PaginatedRequest implements Valida
     ListRouteMappingsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                              @Singular List<String> applicationIds,
                              @Singular List<String> routeIds) {
+
         super(orderDirection, page, resultsPerPage);
         this.applicationIds = applicationIds;
         this.routeIds = routeIds;

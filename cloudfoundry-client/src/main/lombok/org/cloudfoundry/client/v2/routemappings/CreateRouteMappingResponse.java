@@ -33,6 +33,7 @@ public final class CreateRouteMappingResponse extends AbstractRouteMappingResour
     @Builder
     CreateRouteMappingResponse(@JsonProperty("entity") RouteMappingEntity entity,
                                @JsonProperty("metadata") Metadata metadata) {
+
         super(entity, metadata);
     }
 

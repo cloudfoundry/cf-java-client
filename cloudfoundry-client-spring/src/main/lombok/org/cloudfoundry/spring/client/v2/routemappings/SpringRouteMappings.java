@@ -71,5 +71,5 @@ public final class SpringRouteMappings extends AbstractSpringOperations implemen
             QueryBuilder.augment(builder, request);
         });
     }
-    
+
 }

@@ -31,6 +31,7 @@ public class ListRouteMappingsResponse extends PaginatedResponse<RouteMappingRes
                               @JsonProperty("resources") @Singular List<RouteMappingResource> resources,
                               @JsonProperty("total_pages") Integer totalPages,
                               @JsonProperty("total_results") Integer totalResults) {
+
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 
