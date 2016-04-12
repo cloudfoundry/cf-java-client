@@ -20,7 +20,7 @@ import lombok.Builder;
 import lombok.Data;
 
 /**
- * A Cloud Foundry Buildpack Summary
+ * A Cloud Foundry Buildpack
  */
 @Data
 public final class Buildpack {

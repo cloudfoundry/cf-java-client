@@ -17,24 +17,23 @@
 package org.cloudfoundry.client.v2.organizationquotadefinitions;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.cloudfoundry.client.v2.Resource;
 
 /**
- * Base class for resources that contain Quota Definitions
+ * Organization Quota in responses
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class OrganizationQuotaDefinitionResource extends AbstractOrganizationQuotaDefinition {
+public abstract class AbstractOrganizationQuotaDefinition extends Resource<OrganizationQuotaDefinitionEntity> {
 
-    @Builder
-    OrganizationQuotaDefinitionResource(@JsonProperty("entity") OrganizationQuotaDefinitionEntity entity,
+    AbstractOrganizationQuotaDefinition(@JsonProperty("entity") OrganizationQuotaDefinitionEntity entity,
                                         @JsonProperty("metadata") Metadata metadata) {
+
         super(entity, metadata);
     }
 
 }
-
