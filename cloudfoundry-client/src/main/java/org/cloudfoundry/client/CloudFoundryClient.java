@@ -30,6 +30,7 @@ import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomains;
 import org.cloudfoundry.client.v2.routemappings.RouteMappings;
 import org.cloudfoundry.client.v2.routes.Routes;
+import org.cloudfoundry.client.v2.runningsecuritygroups.RunningSecurityGroups;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindings;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokers;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
@@ -193,6 +194,13 @@ public interface CloudFoundryClient {
      * @return the Cloud Foundry Routes Client API
      */
     Routes routes();
+
+    /**
+     * Main entry point to the Cloud Foundry Running Security Groups Client API
+     *
+     * @return the Cloud Foundry Running Security Groups Client API
+     */
+    RunningSecurityGroups runningSecurityGroups();
 
     /**
      * Main entry point to the Cloud Foundry Service Bindings Client API
