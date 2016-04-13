@@ -22,6 +22,8 @@ import org.cloudfoundry.client.v2.routemappings.CreateRouteMappingRequest;
 import org.cloudfoundry.client.v2.routemappings.CreateRouteMappingResponse;
 import org.cloudfoundry.client.v2.routemappings.DeleteRouteMappingRequest;
 import org.cloudfoundry.client.v2.routemappings.DeleteRouteMappingResponse;
+import org.cloudfoundry.client.v2.routemappings.GetRouteMappingRequest;
+import org.cloudfoundry.client.v2.routemappings.GetRouteMappingResponse;
 import org.cloudfoundry.client.v2.routemappings.ListRouteMappingsRequest;
 import org.cloudfoundry.client.v2.routemappings.ListRouteMappingsResponse;
 import org.cloudfoundry.client.v2.routemappings.RouteMappingEntity;
@@ -171,6 +173,54 @@ public final class SpringRouteMappingsTest {
             return this.routeMappings.delete(request);
         }
 
+    }
+
+    public static final class Get extends AbstractApiTest<GetRouteMappingRequest, GetRouteMappingResponse> {
+
+        private final SpringRouteMappings routeMappings = new SpringRouteMappings(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected GetRouteMappingRequest getInvalidRequest() {
+            return GetRouteMappingRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("/v2/route_mappings/route-mapping-id")
+                .status(OK)
+                .responsePayload("fixtures/client/v2/route_mappings/GET_{id}_response.json");
+        }
+
+        @Override
+        protected GetRouteMappingResponse getResponse() {
+            return GetRouteMappingResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .id("304bead7-ad5a-4f6e-a093-f2a85d30c54a")
+                    .createdAt("2016-04-06T00:17:40Z")
+                    .url("/v2/route_mappings/304bead7-ad5a-4f6e-a093-f2a85d30c54a")
+                    .build())
+                .entity(RouteMappingEntity.builder()
+                    .applicationId("65489f49-f437-431a-8f58-c118ce08d83a")
+                    .applicationPort(8888)
+                    .applicationUrl("/v2/apps/65489f49-f437-431a-8f58-c118ce08d83a")
+                    .routeId("c7ce0cac-f1d6-405c-83fd-c2d75513eb23")
+                    .routeUrl("/v2/routes/c7ce0cac-f1d6-405c-83fd-c2d75513eb23")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected GetRouteMappingRequest getValidRequest() throws Exception {
+            return GetRouteMappingRequest.builder()
+                .routeMappingId("route-mapping-id")
+                .build();
+        }
+
+        @Override
+        protected Publisher<GetRouteMappingResponse> invoke(GetRouteMappingRequest request) {
+            return this.routeMappings.get(request);
+        }
     }
 
     public static final class List extends AbstractApiTest<ListRouteMappingsRequest, ListRouteMappingsResponse> {
