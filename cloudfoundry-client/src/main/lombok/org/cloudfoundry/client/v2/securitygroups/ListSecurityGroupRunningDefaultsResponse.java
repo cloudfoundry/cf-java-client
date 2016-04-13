@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.runningsecuritygroups;
+package org.cloudfoundry.client.v2.securitygroups;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -23,7 +23,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.v2.PaginatedResponse;
-import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
 
 import java.util.List;
 
@@ -33,14 +32,15 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ListRunningSecurityGroupResponse extends PaginatedResponse<SecurityGroupResource> {
+public final class ListSecurityGroupRunningDefaultsResponse extends PaginatedResponse<SecurityGroupResource> {
 
     @Builder
-    ListRunningSecurityGroupResponse(@JsonProperty("next_url") String nextUrl,
-                                     @JsonProperty("prev_url") String previousUrl,
-                                     @JsonProperty("resources") @Singular List<SecurityGroupResource> resources,
-                                     @JsonProperty("total_pages") Integer totalPages,
-                                     @JsonProperty("total_results") Integer totalResults) {
+    ListSecurityGroupRunningDefaultsResponse(@JsonProperty("next_url") String nextUrl,
+                                             @JsonProperty("prev_url") String previousUrl,
+                                             @JsonProperty("resources") @Singular List<SecurityGroupResource> resources,
+                                             @JsonProperty("total_pages") Integer totalPages,
+                                             @JsonProperty("total_results") Integer totalResults) {
+
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 

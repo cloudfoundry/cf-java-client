@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.runningsecuritygroups;
+package org.cloudfoundry.spring.client.v2.securitygroups;
 
 import lombok.ToString;
-import org.cloudfoundry.client.v2.runningsecuritygroups.ListRunningSecurityGroupResponse;
-import org.cloudfoundry.client.v2.runningsecuritygroups.ListRunningSecurityGroupsRequest;
-import org.cloudfoundry.client.v2.runningsecuritygroups.RunningSecurityGroups;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsRequest;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsResponse;
+import org.cloudfoundry.client.v2.securitygroups.SecurityGroups;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
@@ -28,10 +28,10 @@ import reactor.core.publisher.SchedulerGroup;
 import java.net.URI;
 
 /**
- * The Spring-based implementation of {@link RunningSecurityGroups}
+ * The Spring-based implementation of {@link SecurityGroups}
  */
 @ToString(callSuper = true)
-public class SpringRunningSecurityGroups extends AbstractSpringOperations implements RunningSecurityGroups {
+public class SpringSecurityGroups extends AbstractSpringOperations implements SecurityGroups {
 
     /**
      * Creates an instance
@@ -40,13 +40,13 @@ public class SpringRunningSecurityGroups extends AbstractSpringOperations implem
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param schedulerGroup The group to use when making requests
      */
-    public SpringRunningSecurityGroups(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
+    public SpringSecurityGroups(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
         super(restOperations, root, schedulerGroup);
     }
 
     @Override
-    public Mono<ListRunningSecurityGroupResponse> list(ListRunningSecurityGroupsRequest request) {
-        return get(request, ListRunningSecurityGroupResponse.class, builder -> builder.pathSegment("v2", "config", "running_security_groups"));
+    public Mono<ListSecurityGroupRunningDefaultsResponse> listRunningDefaults(ListSecurityGroupRunningDefaultsRequest request) {
+        return get(request, ListSecurityGroupRunningDefaultsResponse.class, builder -> builder.pathSegment("v2", "config", "running_security_groups"));
     }
 
 }

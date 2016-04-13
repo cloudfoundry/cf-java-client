@@ -36,7 +36,7 @@ import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomains;
 import org.cloudfoundry.client.v2.routemappings.RouteMappings;
 import org.cloudfoundry.client.v2.routes.Routes;
-import org.cloudfoundry.client.v2.runningsecuritygroups.RunningSecurityGroups;
+import org.cloudfoundry.client.v2.securitygroups.SecurityGroups;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindings;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokers;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
@@ -70,7 +70,7 @@ import org.cloudfoundry.spring.client.v2.organizations.SpringOrganizations;
 import org.cloudfoundry.spring.client.v2.privatedomains.SpringPrivateDomains;
 import org.cloudfoundry.spring.client.v2.routemappings.SpringRouteMappings;
 import org.cloudfoundry.spring.client.v2.routes.SpringRoutes;
-import org.cloudfoundry.spring.client.v2.runningsecuritygroups.SpringRunningSecurityGroups;
+import org.cloudfoundry.spring.client.v2.securitygroups.SpringSecurityGroups;
 import org.cloudfoundry.spring.client.v2.servicebindings.SpringServiceBindings;
 import org.cloudfoundry.spring.client.v2.servicebrokers.SpringServiceBrokers;
 import org.cloudfoundry.spring.client.v2.serviceinstances.SpringServiceInstances;
@@ -155,7 +155,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private final Routes routes;
 
-    private final RunningSecurityGroups runningSecurityGroups;
+    private final SecurityGroups securityGroups;
 
     private final ServiceBindings serviceBindings;
 
@@ -222,7 +222,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.processes = new SpringProcesses(restOperations, root, schedulerGroup);
         this.routeMappings = new SpringRouteMappings(restOperations, root, schedulerGroup);
         this.routes = new SpringRoutes(restOperations, root, schedulerGroup);
-        this.runningSecurityGroups = new SpringRunningSecurityGroups(restOperations, root, schedulerGroup);
+        this.securityGroups = new SpringSecurityGroups(restOperations, root, schedulerGroup);
         this.sharedDomains = new SpringSharedDomains(restOperations, root, schedulerGroup);
         this.serviceBindings = new SpringServiceBindings(restOperations, root, schedulerGroup);
         this.serviceBrokers = new SpringServiceBrokers(restOperations, root, schedulerGroup);
@@ -361,8 +361,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     }
 
     @Override
-    public RunningSecurityGroups runningSecurityGroups() {
-        return this.runningSecurityGroups;
+    public SecurityGroups securityGroups() {
+        return this.securityGroups;
     }
 
     @Override

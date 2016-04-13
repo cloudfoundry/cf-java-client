@@ -14,19 +14,26 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.runningsecuritygroups;
+package org.cloudfoundry.client.v2.securitygroups;
 
+import lombok.Builder;
+import lombok.Data;
+import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+/**
+ * The request payload for the List Running Security Groups operation
+ */
+@Data
+public final class ListSecurityGroupRunningDefaultsRequest implements Validatable {
 
-public final class ListRunningSecurityGroupsRequestTest {
+    @Builder
+    ListSecurityGroupRunningDefaultsRequest() {
+    }
 
-    @Test
-    public void isValid() {
-        assertEquals(ValidationResult.Status.VALID,
-            ListRunningSecurityGroupsRequest.builder().build().isValid().getStatus());
+    @Override
+    public ValidationResult isValid() {
+        return ValidationResult.builder().build();
     }
 
 }

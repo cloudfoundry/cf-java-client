@@ -33,6 +33,7 @@ public final class SecurityGroupResource extends AbstractSecurityGroupResource {
     @Builder
     SecurityGroupResource(@JsonProperty("entity") SecurityGroupEntity entity,
                           @JsonProperty("metadata") Metadata metadata) {
+
         super(entity, metadata);
     }
 

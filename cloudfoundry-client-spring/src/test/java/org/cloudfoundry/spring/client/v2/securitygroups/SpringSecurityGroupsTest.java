@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.runningsecuritygroups;
+package org.cloudfoundry.spring.client.v2.securitygroups;
 
 import org.cloudfoundry.client.v2.Resource;
-import org.cloudfoundry.client.v2.runningsecuritygroups.ListRunningSecurityGroupResponse;
-import org.cloudfoundry.client.v2.runningsecuritygroups.ListRunningSecurityGroupsRequest;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsRequest;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsResponse;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
 import org.cloudfoundry.spring.AbstractApiTest;
@@ -27,14 +27,14 @@ import reactor.core.publisher.Mono;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringRunningSecurityGroupsTest {
+public final class SpringSecurityGroupsTest {
 
-    public static final class List extends AbstractApiTest<ListRunningSecurityGroupsRequest, ListRunningSecurityGroupResponse> {
+    public static final class List extends AbstractApiTest<ListSecurityGroupRunningDefaultsRequest, ListSecurityGroupRunningDefaultsResponse> {
 
-        private final SpringRunningSecurityGroups runningSecurityGroups = new SpringRunningSecurityGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final SpringSecurityGroups securityGroups = new SpringSecurityGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
-        protected ListRunningSecurityGroupsRequest getInvalidRequest() {
+        protected ListSecurityGroupRunningDefaultsRequest getInvalidRequest() {
             return null;
         }
 
@@ -43,12 +43,12 @@ public final class SpringRunningSecurityGroupsTest {
             return new RequestContext()
                 .method(GET).path("/v2/config/running_security_groups")
                 .status(OK)
-                .responsePayload("fixtures/client/v2/running_security_groups/GET_response.json");
+                .responsePayload("fixtures/client/v2/config/GET_running_security_groups_response.json");
         }
 
         @Override
-        protected ListRunningSecurityGroupResponse getResponse() {
-            return ListRunningSecurityGroupResponse.builder()
+        protected ListSecurityGroupRunningDefaultsResponse getResponse() {
+            return ListSecurityGroupRunningDefaultsResponse.builder()
                 .totalPages(1)
                 .totalResults(1)
                 .resource(SecurityGroupResource.builder()
@@ -72,13 +72,13 @@ public final class SpringRunningSecurityGroupsTest {
         }
 
         @Override
-        protected ListRunningSecurityGroupsRequest getValidRequest() throws Exception {
-            return ListRunningSecurityGroupsRequest.builder().build();
+        protected ListSecurityGroupRunningDefaultsRequest getValidRequest() throws Exception {
+            return ListSecurityGroupRunningDefaultsRequest.builder().build();
         }
 
         @Override
-        protected Mono<ListRunningSecurityGroupResponse> invoke(ListRunningSecurityGroupsRequest request) {
-            return this.runningSecurityGroups.list(request);
+        protected Mono<ListSecurityGroupRunningDefaultsResponse> invoke(ListSecurityGroupRunningDefaultsRequest request) {
+            return this.securityGroups.listRunningDefaults(request);
         }
 
     }

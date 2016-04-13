@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.runningsecuritygroups;
+package org.cloudfoundry.client.v2.securitygroups;
 
 import reactor.core.publisher.Mono;
 
-public interface RunningSecurityGroups {
+public interface SecurityGroups {
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_group_running_defaults/return_the_security_groups_used_for_running_apps.html">List Running Security Groups</a>
@@ -27,6 +27,6 @@ public interface RunningSecurityGroups {
      * @param request the list running security groups request
      * @return the response from the list running security groups request
      */
-    Mono<ListRunningSecurityGroupResponse> list(ListRunningSecurityGroupsRequest request);
+    Mono<ListSecurityGroupRunningDefaultsResponse> listRunningDefaults(ListSecurityGroupRunningDefaultsRequest request);
 
 }
