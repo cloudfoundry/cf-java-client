@@ -19,6 +19,7 @@ package org.cloudfoundry.spring.client.v3;
 import org.cloudfoundry.client.v3.FilterParameter;
 import org.cloudfoundry.spring.util.MethodNameComparator;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -27,7 +28,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public final class FilterBuilder {
@@ -68,7 +68,7 @@ public final class FilterBuilder {
             return "";
         } else if (value instanceof Collection) {
             List<?> collection = (List<?>) ((Collection) value).stream()
-                .filter(Objects::nonNull)
+                .filter(o -> !ObjectUtils.isEmpty(o))
                 .collect(Collectors.toList());
 
             return StringUtils.collectionToCommaDelimitedString(collection);

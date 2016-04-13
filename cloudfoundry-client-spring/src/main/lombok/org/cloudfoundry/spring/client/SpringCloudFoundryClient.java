@@ -114,7 +114,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 /**
  * The Spring-based implementation of {@link CloudFoundryClient}
  */
-@ToString
 public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private final ApplicationUsageEvents applicationUsageEvents;
