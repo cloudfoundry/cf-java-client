@@ -111,9 +111,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .getHealthCheck(GetApplicationHealthCheckRequest.builder()
                     .name(applicationName)
                     .build()))
-            .map(ApplicationHealthCheck::getType)
             .subscribe(testSubscriber()
-                .assertEquals("port"));
+                .assertEquals(ApplicationHealthCheck.PORT));
     }
 
     @Test
@@ -204,7 +203,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .application(getApplicationBits())
                 .buildpack("staticfile_buildpack")
                 .diskQuota(512)
-                .healthCheckType("port")
+                .healthCheckType(ApplicationHealthCheck.PORT)
                 .host(host)
                 .memory(64)
                 .name(applicationName)
@@ -309,6 +308,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         return cloudFoundryOperations.applications()
             .push(PushApplicationRequest.builder()
                 .application(applicationBits)
+                .healthCheckType(ApplicationHealthCheck.PORT)
                 .buildpack("staticfile_buildpack")
                 .diskQuota(512)
                 .memory(64)

@@ -111,6 +111,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.function.Supplier;
 
@@ -405,6 +406,7 @@ public final class DefaultApplicationsTest {
                             .build())
                         .entity(fill(ApplicationEntity.builder(), "application-")
                             .environmentJsons(envResponse)
+                            .healthCheckType(ApplicationHealthCheck.PORT.getText())
                             .build())
                         .build())
                     .totalPages(1)
@@ -491,7 +493,7 @@ public final class DefaultApplicationsTest {
                 .diskQuota(request.getDiskQuota())
                 .dockerImage(request.getDockerImage())
                 .healthCheckTimeout(request.getTimeout())
-                .healthCheckType(request.getHealthCheckType())
+                .healthCheckType(Optional.ofNullable(request.getHealthCheckType()).map(ApplicationHealthCheck::getText).orElse(null))
                 .instances(request.getInstances())
                 .memory(request.getMemory())
                 .name(request.getName())
@@ -1010,7 +1012,7 @@ public final class DefaultApplicationsTest {
                 .diskQuota(request.getDiskQuota())
                 .dockerImage(request.getDockerImage())
                 .healthCheckTimeout(request.getTimeout())
-                .healthCheckType(request.getHealthCheckType())
+                .healthCheckType(Optional.ofNullable(request.getHealthCheckType()).map(ApplicationHealthCheck::getText).orElse(null))
                 .instances(request.getInstances())
                 .memory(request.getMemory())
                 .name(request.getName())
@@ -1037,11 +1039,11 @@ public final class DefaultApplicationsTest {
                 .build()));
     }
 
-    private static void requestUpdateApplicationHealthCheck(CloudFoundryClient cloudFoundryClient, String applicationId, String type) {
+    private static void requestUpdateApplicationHealthCheck(CloudFoundryClient cloudFoundryClient, String applicationId, ApplicationHealthCheck type) {
         when(cloudFoundryClient.applicationsV2()
             .update(UpdateApplicationRequest.builder()
                 .applicationId(applicationId)
-                .healthCheckType(type)
+                .healthCheckType(type.getText())
                 .build()))
             .thenReturn(Mono
                 .just(fill(UpdateApplicationResponse.builder())
@@ -2014,9 +2016,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<ApplicationHealthCheck> testSubscriber) {
             testSubscriber
-                .assertEquals(ApplicationHealthCheck.builder()
-                    .type("test-application-healthCheckType")
-                    .build());
+                .assertEquals(ApplicationHealthCheck.PORT);
         }
 
         @Override
@@ -3905,7 +3905,7 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-application-id");
-            requestUpdateApplicationHealthCheck(this.cloudFoundryClient, "test-application-id", "test-type");
+            requestUpdateApplicationHealthCheck(this.cloudFoundryClient, "test-application-id", ApplicationHealthCheck.PORT);
         }
 
         @Override
@@ -3918,7 +3918,7 @@ public final class DefaultApplicationsTest {
             return this.applications
                 .setHealthCheck(SetApplicationHealthCheckRequest.builder()
                     .name("test-application-name")
-                    .type("test-type")
+                    .type(ApplicationHealthCheck.PORT)
                     .build());
         }
 

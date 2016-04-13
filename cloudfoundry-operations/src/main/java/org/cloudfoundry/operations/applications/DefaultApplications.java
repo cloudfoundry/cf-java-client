@@ -895,7 +895,7 @@ public final class DefaultApplications implements Applications {
                 .diskQuota(request.getDiskQuota())
                 .dockerImage(request.getDockerImage())
                 .healthCheckTimeout(request.getTimeout())
-                .healthCheckType(request.getHealthCheckType())
+                .healthCheckType(Optional.ofNullable(request.getHealthCheckType()).map(ApplicationHealthCheck::getText).orElse(null))
                 .instances(request.getInstances())
                 .memory(request.getMemory())
                 .name(request.getName())
@@ -1111,7 +1111,7 @@ public final class DefaultApplications implements Applications {
                 .diskQuota(request.getDiskQuota())
                 .dockerImage(request.getDockerImage())
                 .healthCheckTimeout(request.getTimeout())
-                .healthCheckType(request.getHealthCheckType())
+                .healthCheckType(Optional.ofNullable(request.getHealthCheckType()).map(ApplicationHealthCheck::getText).orElse(null))
                 .instances(request.getInstances())
                 .memory(request.getMemory())
                 .name(request.getName())
@@ -1279,9 +1279,15 @@ public final class DefaultApplications implements Applications {
     }
 
     private static ApplicationHealthCheck toHealthCheck(AbstractApplicationResource resource) {
-        return ApplicationHealthCheck.builder()
-            .type(resource.getEntity().getHealthCheckType())
-            .build();
+        String type = resource.getEntity().getHealthCheckType();
+
+        if (ApplicationHealthCheck.NONE.getText().equals(type)) {
+            return ApplicationHealthCheck.NONE;
+        } else if (ApplicationHealthCheck.PORT.getText().equals(type)) {
+            return ApplicationHealthCheck.PORT;
+        } else {
+            return null;
+        }
     }
 
     private static ApplicationDetail.InstanceDetail toInstanceDetail(Map.Entry<String, ApplicationInstanceInfo> entry, ApplicationStatisticsResponse statisticsResponse) {
@@ -1323,11 +1329,11 @@ public final class DefaultApplications implements Applications {
             .get();
     }
 
-    private static Mono<UpdateApplicationResponse> updateHealthCheck(CloudFoundryClient cloudFoundryClient, String applicationId, String type) {
+    private static Mono<UpdateApplicationResponse> updateHealthCheck(CloudFoundryClient cloudFoundryClient, String applicationId, ApplicationHealthCheck type) {
         return cloudFoundryClient.applicationsV2()
             .update(UpdateApplicationRequest.builder()
                 .applicationId(applicationId)
-                .healthCheckType(type)
+                .healthCheckType(type.getText())
                 .build());
     }
 
