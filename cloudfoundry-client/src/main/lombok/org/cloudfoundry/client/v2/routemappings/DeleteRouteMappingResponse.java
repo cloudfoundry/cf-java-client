@@ -25,7 +25,7 @@ import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
 
 /**
- * Response object for the delete route mapping
+ * The response payload for the Delete a Route Mapping operation
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

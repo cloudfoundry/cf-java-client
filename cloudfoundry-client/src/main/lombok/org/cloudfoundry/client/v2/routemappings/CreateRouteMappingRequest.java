@@ -24,7 +24,7 @@ import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
 /**
- * The request payload for the Creating a Route Mapping operation
+ * The request payload for the Create a Route Mapping operation
  */
 @Data
 public final class CreateRouteMappingRequest implements Validatable {

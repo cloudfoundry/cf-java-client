@@ -23,7 +23,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * The response payload for the Creating a Route Mapping operation
+ * The response payload for the Create a Route Mapping operation
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

@@ -26,7 +26,7 @@ import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
 /**
- * Request payload object for deleting the route mapping
+ * The request payload object for the Delete a Route Mapping operation
  */
 @Data
 public final class DeleteRouteMappingRequest implements Validatable {

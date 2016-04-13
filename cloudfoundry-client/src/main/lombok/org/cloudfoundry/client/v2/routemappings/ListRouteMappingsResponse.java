@@ -18,11 +18,20 @@ package org.cloudfoundry.client.v2.routemappings;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Singular;
+import lombok.ToString;
 import org.cloudfoundry.client.v2.PaginatedResponse;
 
 import java.util.List;
 
+/**
+ * The response payload for the List Route Mappings operation
+ */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class ListRouteMappingsResponse extends PaginatedResponse<RouteMappingResource> {
 
     @Builder
