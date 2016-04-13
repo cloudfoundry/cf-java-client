@@ -21,17 +21,19 @@ package org.cloudfoundry.operations.applications;
  */
 
 public enum ApplicationHealthCheck {
-    NONE("none"),
-    PORT("port");
 
-    private String text;
+    /**
+     * No health check
+     */
+    NONE,
 
-    ApplicationHealthCheck(String text) {
-        this.text = text;
-    }
+    /**
+     * Port health check
+     */
+    PORT;
 
     public String getText() {
-        return this.text;
+        return name().toLowerCase();
     }
 
 }
