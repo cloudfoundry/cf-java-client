@@ -14,26 +14,23 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.services;
+package org.cloudfoundry.operations.services;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import org.cloudfoundry.ValidationResult;
+import org.junit.Test;
 
-/**
- * The resource response payload for Services
- */
-@Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public final class ServiceResource extends AbstractServiceResource {
+import static org.cloudfoundry.ValidationResult.Status.VALID;
+import static org.junit.Assert.assertEquals;
 
-    @Builder
-    ServiceResource(@JsonProperty("entity") ServiceEntity entity,
-                    @JsonProperty("metadata") Metadata metadata) {
-        super(entity, metadata);
+public final class GetMarketplaceRequestTest {
+
+    @Test
+    public void isValidAll() {
+        ValidationResult result = GetMarketplaceRequest.builder()
+            .build()
+            .isValid();
+
+        assertEquals(VALID, result.getStatus());
     }
 
 }
