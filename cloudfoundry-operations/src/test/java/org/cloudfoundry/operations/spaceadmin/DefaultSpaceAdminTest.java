@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations.spacequotas;
+package org.cloudfoundry.operations.spaceadmin;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
@@ -30,7 +30,7 @@ import static org.cloudfoundry.util.test.TestObjects.fill;
 import static org.cloudfoundry.util.test.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
-public final class DefaultSpaceQuotasTest {
+public final class DefaultSpaceAdminTest {
 
     private static void requestSpaceQuotaDefinitions(CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient.organizations()
@@ -56,7 +56,7 @@ public final class DefaultSpaceQuotasTest {
 
     public static final class Get extends AbstractOperationsApiTest<SpaceQuota> {
 
-        private final DefaultSpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+        private final DefaultSpaceAdmin spaceAdmin = new DefaultSpaceAdmin(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -72,7 +72,7 @@ public final class DefaultSpaceQuotasTest {
 
         @Override
         protected Mono<SpaceQuota> invoke() {
-            return this.spaceQuotas
+            return this.spaceAdmin
                 .get(GetSpaceQuotaRequest.builder()
                     .name("test-space-quota-definition-name")
                     .build());
@@ -82,7 +82,7 @@ public final class DefaultSpaceQuotasTest {
 
     public static final class GetNoOrganization extends AbstractOperationsApiTest<SpaceQuota> {
 
-        private final DefaultSpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, MISSING_ORGANIZATION_ID);
+        private final DefaultSpaceAdmin spaceAdmin = new DefaultSpaceAdmin(this.cloudFoundryClient, MISSING_ORGANIZATION_ID);
 
         @Override
         protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) {
@@ -92,7 +92,7 @@ public final class DefaultSpaceQuotasTest {
 
         @Override
         protected Mono<SpaceQuota> invoke() {
-            return this.spaceQuotas
+            return this.spaceAdmin
                 .get(GetSpaceQuotaRequest.builder()
                     .name("test-space-quota-definition-name")
                     .build());
@@ -102,7 +102,7 @@ public final class DefaultSpaceQuotasTest {
 
     public static final class GetNotFound extends AbstractOperationsApiTest<SpaceQuota> {
 
-        private final DefaultSpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+        private final DefaultSpaceAdmin spaceAdmin = new DefaultSpaceAdmin(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -117,7 +117,7 @@ public final class DefaultSpaceQuotasTest {
 
         @Override
         protected Mono<SpaceQuota> invoke() {
-            return this.spaceQuotas
+            return this.spaceAdmin
                 .get(GetSpaceQuotaRequest.builder()
                     .name("test-space-quota-definition-name")
                     .build());
@@ -127,7 +127,7 @@ public final class DefaultSpaceQuotasTest {
 
     public static final class List extends AbstractOperationsApiTest<SpaceQuota> {
 
-        private final DefaultSpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+        private final DefaultSpaceAdmin spaceAdmin = new DefaultSpaceAdmin(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -143,15 +143,15 @@ public final class DefaultSpaceQuotasTest {
 
         @Override
         protected Publisher<SpaceQuota> invoke() {
-            return this.spaceQuotas
-                .list();
+            return this.spaceAdmin
+                .listQuotas();
         }
 
     }
 
     public static final class ListNoOrganization extends AbstractOperationsApiTest<SpaceQuota> {
 
-        private final DefaultSpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, MISSING_ORGANIZATION_ID);
+        private final DefaultSpaceAdmin spaceAdmin = new DefaultSpaceAdmin(this.cloudFoundryClient, MISSING_ORGANIZATION_ID);
 
         @Override
         protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) {
@@ -161,8 +161,8 @@ public final class DefaultSpaceQuotasTest {
 
         @Override
         protected Publisher<SpaceQuota> invoke() {
-            return this.spaceQuotas
-                .list();
+            return this.spaceAdmin
+                .listQuotas();
         }
 
     }

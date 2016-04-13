@@ -24,21 +24,21 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 
-public final class DefaultQuotas implements Quotas {
+public final class DefaultOrganizationAdmin implements OrganizationAdmin {
 
     private final CloudFoundryClient cloudFoundryClient;
 
-    public DefaultQuotas(CloudFoundryClient cloudFoundryClient) {
+    public DefaultOrganizationAdmin(CloudFoundryClient cloudFoundryClient) {
         this.cloudFoundryClient = cloudFoundryClient;
     }
 
     @Override
-    public Flux<Quota> list() {
-        return requestQuotas(this.cloudFoundryClient)
-            .map(DefaultQuotas::toQuotaResource);
+    public Flux<OrganizationQuota> listQuotas() {
+        return requestListOrganizationQuotas(this.cloudFoundryClient)
+            .map(DefaultOrganizationAdmin::toOrganizationQuota);
     }
 
-    private static Flux<OrganizationQuotaDefinitionResource> requestQuotas(CloudFoundryClient cloudFoundryClient) {
+    private static Flux<OrganizationQuotaDefinitionResource> requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.organizationQuotaDefinitions()
                 .list(ListOrganizationQuotaDefinitionsRequest.builder()
@@ -46,12 +46,13 @@ public final class DefaultQuotas implements Quotas {
                     .build()));
     }
 
-    private static Quota toQuotaResource(OrganizationQuotaDefinitionResource resource) {
+    private static OrganizationQuota toOrganizationQuota(OrganizationQuotaDefinitionResource resource) {
         OrganizationQuotaDefinitionEntity entity = ResourceUtils.getEntity(resource);
 
-        return Quota.builder()
+        return OrganizationQuota.builder()
             .allowPaidServicePlans(entity.getNonBasicServicesAllowed())
             .applicationInstanceLimit(entity.getApplicationInstanceLimit())
+            .id(ResourceUtils.getId(resource))
             .instanceMemoryLimit(entity.getInstanceMemoryLimit())
             .memoryLimit(entity.getMemoryLimit())
             .name(entity.getName())

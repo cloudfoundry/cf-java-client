@@ -32,7 +32,6 @@ public abstract class AbstractOrganizationQuotaDefinition extends Resource<Organ
 
     AbstractOrganizationQuotaDefinition(@JsonProperty("entity") OrganizationQuotaDefinitionEntity entity,
                                         @JsonProperty("metadata") Metadata metadata) {
-
         super(entity, metadata);
     }
 

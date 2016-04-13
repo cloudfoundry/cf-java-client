@@ -19,15 +19,15 @@ package org.cloudfoundry.operations.quotas;
 import reactor.core.publisher.Flux;
 
 /**
- * Main entry point to the Cloud Foundry Quotas Operations API
+ * Main entry point to the Cloud Foundry Organization Admin Operations API
  */
-public interface Quotas {
+public interface OrganizationAdmin {
 
     /**
-     * Lists the buildpacks
+     * Lists the organization quotas
      *
-     * @return the buildpacks
+     * @return the organization quotas
      */
-    Flux<Quota> list();
+    Flux<OrganizationQuota> listQuotas();
 
 }

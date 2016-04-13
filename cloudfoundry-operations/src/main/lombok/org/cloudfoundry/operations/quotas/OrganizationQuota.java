@@ -23,7 +23,7 @@ import lombok.Data;
  * A Cloud Foundry Quota
  */
 @Data
-public final class Quota {
+public final class OrganizationQuota {
 
     /**
      * The allow paid service plans flag
@@ -40,6 +40,14 @@ public final class Quota {
      * @return applicationInstanceLimit
      */
     private final Integer applicationInstanceLimit;
+
+    /**
+     * The id
+     *
+     * @param id the id
+     * @return the id
+     */
+    private final String id;
 
     /**
      * The instance memory limit
@@ -82,14 +90,16 @@ public final class Quota {
     private final Integer totalServices;
 
     @Builder
-    Quota(Boolean allowPaidServicePlans,
-          Integer applicationInstanceLimit,
-          Integer instanceMemoryLimit,
-          Integer memoryLimit,
-          String name,
-          Integer totalRoutes,
-          Integer totalServices) {
+    OrganizationQuota(Boolean allowPaidServicePlans,
+                      Integer applicationInstanceLimit,
+                      String id,
+                      Integer instanceMemoryLimit,
+                      Integer memoryLimit,
+                      String name,
+                      Integer totalRoutes,
+                      Integer totalServices) {
         this.applicationInstanceLimit = applicationInstanceLimit;
+        this.id = id;
         this.instanceMemoryLimit = instanceMemoryLimit;
         this.memoryLimit = memoryLimit;
         this.name = name;

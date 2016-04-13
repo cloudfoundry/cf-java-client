@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations.spacequotas;
+package org.cloudfoundry.operations.spaceadmin;
 
 import org.cloudfoundry.ValidationResult;
 import org.junit.Test;

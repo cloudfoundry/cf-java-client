@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations.spacequotas;
+package org.cloudfoundry.operations.spaceadmin;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
@@ -31,13 +31,13 @@ import java.util.NoSuchElementException;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
-public final class DefaultSpaceQuotas implements SpaceQuotas {
+public final class DefaultSpaceAdmin implements SpaceAdmin {
 
     private final CloudFoundryClient cloudFoundryClient;
 
     private final Mono<String> organizationId;
 
-    public DefaultSpaceQuotas(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId) {
+    public DefaultSpaceAdmin(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.organizationId = organizationId;
     }
@@ -48,14 +48,14 @@ public final class DefaultSpaceQuotas implements SpaceQuotas {
             .validate(request)
             .and(this.organizationId)
             .then(function((request1, organizationId) -> getSpaceQuotaDefinition(this.cloudFoundryClient, organizationId, request1.getName())))
-            .map(DefaultSpaceQuotas::toSpaceQuota);
+            .map(DefaultSpaceAdmin::toSpaceQuota);
     }
 
     @Override
-    public Flux<SpaceQuota> list() {
+    public Flux<SpaceQuota> listQuotas() {
         return this.organizationId
             .flatMap(organizationId1 -> requestSpaceQuotaDefinitions(this.cloudFoundryClient, organizationId1))
-            .map(DefaultSpaceQuotas::toSpaceQuota);
+            .map(DefaultSpaceAdmin::toSpaceQuota);
     }
 
     private static Mono<SpaceQuotaDefinitionResource> getSpaceQuotaDefinition(CloudFoundryClient cloudFoundryClient, String organizationId, String name) {

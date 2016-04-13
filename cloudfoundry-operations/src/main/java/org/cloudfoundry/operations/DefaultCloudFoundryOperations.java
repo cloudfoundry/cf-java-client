@@ -26,14 +26,14 @@ import org.cloudfoundry.operations.domains.DefaultDomains;
 import org.cloudfoundry.operations.domains.Domains;
 import org.cloudfoundry.operations.organizations.DefaultOrganizations;
 import org.cloudfoundry.operations.organizations.Organizations;
-import org.cloudfoundry.operations.quotas.DefaultQuotas;
-import org.cloudfoundry.operations.quotas.Quotas;
+import org.cloudfoundry.operations.quotas.DefaultOrganizationAdmin;
+import org.cloudfoundry.operations.quotas.OrganizationAdmin;
 import org.cloudfoundry.operations.routes.DefaultRoutes;
 import org.cloudfoundry.operations.routes.Routes;
 import org.cloudfoundry.operations.services.DefaultServices;
 import org.cloudfoundry.operations.services.Services;
-import org.cloudfoundry.operations.spacequotas.DefaultSpaceQuotas;
-import org.cloudfoundry.operations.spacequotas.SpaceQuotas;
+import org.cloudfoundry.operations.spaceadmin.DefaultSpaceAdmin;
+import org.cloudfoundry.operations.spaceadmin.SpaceAdmin;
 import org.cloudfoundry.operations.spaces.DefaultSpaces;
 import org.cloudfoundry.operations.spaces.Spaces;
 import org.cloudfoundry.operations.stacks.DefaultStacks;
@@ -48,15 +48,15 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
 
     private final Domains domains;
 
-    private final Organizations organizations;
+    private final OrganizationAdmin organizationAdmin;
 
-    private final Quotas quotas;
+    private final Organizations organizations;
 
     private final Routes routes;
 
     private final Services services;
 
-    private final SpaceQuotas spaceQuotas;
+    private final SpaceAdmin spaceAdmin;
 
     private final Spaces spaces;
 
@@ -66,11 +66,11 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
         this.applications = new DefaultApplications(cloudFoundryClient, loggingClient, spaceId);
         this.buildpacks = new DefaultBuildpacks(cloudFoundryClient);
         this.domains = new DefaultDomains(cloudFoundryClient);
+        this.organizationAdmin = new DefaultOrganizationAdmin(cloudFoundryClient);
         this.organizations = new DefaultOrganizations(cloudFoundryClient, username);
-        this.quotas = new DefaultQuotas(cloudFoundryClient);
         this.routes = new DefaultRoutes(cloudFoundryClient, organizationId, spaceId);
         this.services = new DefaultServices(cloudFoundryClient, spaceId);
-        this.spaceQuotas = new DefaultSpaceQuotas(cloudFoundryClient, organizationId);
+        this.spaceAdmin = new DefaultSpaceAdmin(cloudFoundryClient, organizationId);
         this.spaces = new DefaultSpaces(cloudFoundryClient, organizationId, username);
         this.stacks = new DefaultStacks(cloudFoundryClient);
     }
@@ -91,13 +91,13 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
     }
 
     @Override
-    public Organizations organizations() {
-        return this.organizations;
+    public OrganizationAdmin organizationAdmin() {
+        return this.organizationAdmin;
     }
 
     @Override
-    public Quotas quotas() {
-        return this.quotas;
+    public Organizations organizations() {
+        return this.organizations;
     }
 
     @Override
@@ -111,8 +111,8 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
     }
 
     @Override
-    public SpaceQuotas spaceQuotas() {
-        return this.spaceQuotas;
+    public SpaceAdmin spaceAdmin() {
+        return this.spaceAdmin;
     }
 
     @Override

@@ -30,45 +30,46 @@ import static org.cloudfoundry.util.test.TestObjects.fill;
 import static org.cloudfoundry.util.test.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
-public final class DefaultQuotasTest {
+public final class DefaultOrganizationAdminTest {
 
-    private static void requestQuotas(CloudFoundryClient cloudFoundryClient) {
+    private static void requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.organizationQuotaDefinitions()
             .list(fillPage(ListOrganizationQuotaDefinitionsRequest.builder())
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListOrganizationQuotaDefinitionsResponse.builder())
-                    .resource(fill(OrganizationQuotaDefinitionResource.builder(), "quotas-")
+                    .resource(fill(OrganizationQuotaDefinitionResource.builder(), "quota-")
                         .build())
                     .build()));
     }
 
-    public static final class List extends AbstractOperationsApiTest<Quota> {
+    public static final class List extends AbstractOperationsApiTest<OrganizationQuota> {
 
-        private final DefaultQuotas quotas = new DefaultQuotas(this.cloudFoundryClient);
+        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(this.cloudFoundryClient);
 
         @Before
         public void setUp() throws Exception {
-            requestQuotas(this.cloudFoundryClient);
+            requestListOrganizationQuotas(this.cloudFoundryClient);
         }
 
         @Override
-        protected void assertions(TestSubscriber<Quota> testSubscriber) {
+        protected void assertions(TestSubscriber<OrganizationQuota> testSubscriber) {
             testSubscriber
-                .assertEquals(Quota.builder()
+                .assertEquals(OrganizationQuota.builder()
                     .allowPaidServicePlans(true)
                     .applicationInstanceLimit(1)
+                    .id("test-quota-id")
                     .instanceMemoryLimit(1)
                     .memoryLimit(1)
-                    .name("test-quotas-name")
+                    .name("test-quota-name")
                     .totalRoutes(1)
                     .totalServices(1)
                     .build());
         }
 
         @Override
-        protected Publisher<Quota> invoke() {
-            return this.quotas.list();
+        protected Publisher<OrganizationQuota> invoke() {
+            return this.organizationAdmin.listQuotas();
         }
     }
 
