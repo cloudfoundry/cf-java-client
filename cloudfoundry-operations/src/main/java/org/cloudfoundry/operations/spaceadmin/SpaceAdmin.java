@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations.spacequotas;
+package org.cloudfoundry.operations.spaceadmin;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * Main entry point to the Cloud Foundry Spaces Operations API
+ * Main entry point to the Cloud Foundry Space Admin API
  */
-public interface SpaceQuotas {
+public interface SpaceAdmin {
 
     /**
      * Gets a space quota
@@ -37,6 +37,6 @@ public interface SpaceQuotas {
      *
      * @return the space quotas
      */
-    Flux<SpaceQuota> list();
+    Flux<SpaceQuota> listQuotas();
 
 }

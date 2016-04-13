@@ -63,7 +63,7 @@ import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceResponse;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.cloudfoundry.operations.spacequotas.SpaceQuota;
+import org.cloudfoundry.operations.spaceadmin.SpaceQuota;
 import org.cloudfoundry.util.RequestValidationException;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;

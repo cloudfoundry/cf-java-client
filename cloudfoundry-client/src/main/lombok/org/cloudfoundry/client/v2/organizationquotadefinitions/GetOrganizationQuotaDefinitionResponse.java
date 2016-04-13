@@ -21,7 +21,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.cloudfoundry.client.v2.Resource;
 
 /**
  * The response payload for the Retrieve a Particular Organization Quota Definition operation
@@ -29,7 +28,7 @@ import org.cloudfoundry.client.v2.Resource;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class GetOrganizationQuotaDefinitionResponse extends Resource<OrganizationQuotaDefinitionEntity> {
+public final class GetOrganizationQuotaDefinitionResponse extends AbstractOrganizationQuotaDefinition {
 
     @Builder
     GetOrganizationQuotaDefinitionResponse(@JsonProperty("entity") OrganizationQuotaDefinitionEntity entity,

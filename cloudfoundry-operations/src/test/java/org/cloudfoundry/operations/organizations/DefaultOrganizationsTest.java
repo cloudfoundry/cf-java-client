@@ -51,7 +51,7 @@ import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.cloudfoundry.operations.spacequotas.SpaceQuota;
+import org.cloudfoundry.operations.spaceadmin.SpaceQuota;
 import org.cloudfoundry.util.RequestValidationException;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;

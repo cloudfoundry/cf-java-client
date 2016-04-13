@@ -39,7 +39,7 @@ import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
-import org.cloudfoundry.operations.spacequotas.SpaceQuota;
+import org.cloudfoundry.operations.spaceadmin.SpaceQuota;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;

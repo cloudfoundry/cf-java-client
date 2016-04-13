@@ -19,7 +19,7 @@ package org.cloudfoundry.operations.organizations;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
-import org.cloudfoundry.operations.spacequotas.SpaceQuota;
+import org.cloudfoundry.operations.spaceadmin.SpaceQuota;
 
 import java.util.List;
 

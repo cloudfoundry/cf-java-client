@@ -20,9 +20,10 @@ import org.cloudfoundry.operations.applications.Applications;
 import org.cloudfoundry.operations.buildpacks.Buildpacks;
 import org.cloudfoundry.operations.domains.Domains;
 import org.cloudfoundry.operations.organizations.Organizations;
+import org.cloudfoundry.operations.quotas.OrganizationAdmin;
 import org.cloudfoundry.operations.routes.Routes;
 import org.cloudfoundry.operations.services.Services;
-import org.cloudfoundry.operations.spacequotas.SpaceQuotas;
+import org.cloudfoundry.operations.spaceadmin.SpaceAdmin;
 import org.cloudfoundry.operations.spaces.Spaces;
 import org.cloudfoundry.operations.stacks.Stacks;
 
@@ -58,6 +59,13 @@ public interface CloudFoundryOperations {
     Domains domains();
 
     /**
+     * Main entry point to the Cloud Foundry Organization Admin Operations API
+     *
+     * @return the Cloud Foundry Organization Admin Operations API
+     */
+    OrganizationAdmin organizationAdmin();
+
+    /**
      * Main entry point to the Cloud Foundry Organizations Operations API
      *
      * @return the Cloud Foundry Organizations Operations API
@@ -79,11 +87,11 @@ public interface CloudFoundryOperations {
     Services services();
 
     /**
-     * Main entry point to the Cloud Foundry Space Quotas Operations API
+     * Main entry point to the Cloud Foundry Space Admin Operations API
      *
-     * @return the Cloud Foundry Space Quotas Operations API
+     * @return the Cloud Foundry Space Admin Operations API
      */
-    SpaceQuotas spaceQuotas();
+    SpaceAdmin spaceAdmin();
 
     /**
      * Main entry point to the Cloud Foundry Spaces Operations API

@@ -42,6 +42,11 @@ public final class DefaultCloudFoundryOperationsTest extends AbstractOperationsT
     }
 
     @Test
+    public void organizationAdmin() {
+        assertNotNull(this.operations.organizationAdmin());
+    }
+
+    @Test
     public void organizations() {
         assertNotNull(this.operations.organizations());
     }
@@ -57,8 +62,8 @@ public final class DefaultCloudFoundryOperationsTest extends AbstractOperationsT
     }
 
     @Test
-    public void spaceQuotas() {
-        assertNotNull(this.operations.spaceQuotas());
+    public void spaceAdmin() {
+        assertNotNull(this.operations.spaceAdmin());
     }
 
     @Test

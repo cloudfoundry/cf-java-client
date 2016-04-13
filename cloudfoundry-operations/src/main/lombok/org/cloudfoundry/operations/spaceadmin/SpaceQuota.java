@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations.spacequotas;
+package org.cloudfoundry.operations.spaceadmin;
 
 import lombok.Builder;
 import lombok.Data;
