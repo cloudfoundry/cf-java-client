@@ -17,10 +17,10 @@
 package org.cloudfoundry.client.v2.securitygroups;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.cloudfoundry.client.v2.Resource;
 
 /**
  * Route Resource in responses
@@ -28,12 +28,10 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class SecurityGroupResource extends AbstractSecurityGroupResource {
+public abstract class AbstractSecurityGroupResource extends Resource<SecurityGroupEntity> {
 
-    @Builder
-    SecurityGroupResource(@JsonProperty("entity") SecurityGroupEntity entity,
-                          @JsonProperty("metadata") Metadata metadata) {
-
+    AbstractSecurityGroupResource(@JsonProperty("entity") SecurityGroupEntity entity,
+                                  @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 

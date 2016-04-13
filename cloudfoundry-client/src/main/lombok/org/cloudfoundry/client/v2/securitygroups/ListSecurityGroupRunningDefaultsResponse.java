@@ -20,21 +20,28 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Singular;
 import lombok.ToString;
+import org.cloudfoundry.client.v2.PaginatedResponse;
+
+import java.util.List;
 
 /**
- * Route Resource in responses
+ * The response payload for the List Running Security Groups operation
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class SecurityGroupResource extends AbstractSecurityGroupResource {
+public final class ListSecurityGroupRunningDefaultsResponse extends PaginatedResponse<SecurityGroupResource> {
 
     @Builder
-    SecurityGroupResource(@JsonProperty("entity") SecurityGroupEntity entity,
-                          @JsonProperty("metadata") Metadata metadata) {
+    ListSecurityGroupRunningDefaultsResponse(@JsonProperty("next_url") String nextUrl,
+                                             @JsonProperty("prev_url") String previousUrl,
+                                             @JsonProperty("resources") @Singular List<SecurityGroupResource> resources,
+                                             @JsonProperty("total_pages") Integer totalPages,
+                                             @JsonProperty("total_results") Integer totalResults) {
 
-        super(entity, metadata);
+        super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 
 }

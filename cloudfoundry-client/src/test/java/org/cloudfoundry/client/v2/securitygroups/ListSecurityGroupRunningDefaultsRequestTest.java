@@ -16,25 +16,16 @@
 
 package org.cloudfoundry.client.v2.securitygroups;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import org.cloudfoundry.ValidationResult;
+import org.junit.Assert;
+import org.junit.Test;
 
-/**
- * Route Resource in responses
- */
-@Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public final class SecurityGroupResource extends AbstractSecurityGroupResource {
+public final class ListSecurityGroupRunningDefaultsRequestTest {
 
-    @Builder
-    SecurityGroupResource(@JsonProperty("entity") SecurityGroupEntity entity,
-                          @JsonProperty("metadata") Metadata metadata) {
-
-        super(entity, metadata);
+    @Test
+    public void isValid() {
+        Assert.assertEquals(ValidationResult.Status.VALID,
+            ListSecurityGroupRunningDefaultsRequest.builder().build().isValid().getStatus());
     }
 
 }
