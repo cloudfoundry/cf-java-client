@@ -165,6 +165,28 @@ public final class DefaultServices implements Services {
     }
 
     @Override
+    public Flux<ServiceOffering> listOfferings(GetMarketplaceRequest marketplaceRequest) {
+        return Mono
+            .when(ValidationUtils.validate(marketplaceRequest), this.spaceId)
+            .flatMap(function(
+                (request, spaceId) ->
+                    requestSpaceServices(
+                        this.cloudFoundryClient,
+                        spaceId,
+                        builder -> {
+                            if (marketplaceRequest.getServiceName() != null) {
+                                builder.label(marketplaceRequest.getServiceName());
+                            }
+                            return builder;
+                        })))
+            .flatMap(resource -> Mono
+                .when(
+                    Mono.just(resource),
+                    getServicePlanNames(this.cloudFoundryClient, ResourceUtils.getId(resource))))
+            .map(function(DefaultServices::toServiceOffering));
+    }
+
+    @Override
     public Mono<Void> unbind(UnbindServiceInstanceRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
@@ -272,6 +294,13 @@ public final class DefaultServices implements Services {
             .single()
             .map(ResourceUtils::getId)
             .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Service plan %s does not exist", plan)));
+    }
+
+    private static Mono<List<String>> getServicePlanNames(CloudFoundryClient cloudFoundryClient, String serviceId) {
+        return requestServicePlans(cloudFoundryClient, builder -> builder.serviceId(serviceId))
+            .map(ResourceUtils::getEntity)
+            .map(ServicePlanEntity::getName)
+            .toList();
     }
 
     private static Mono<UnionServiceInstanceResource> getSpaceServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
@@ -462,6 +491,16 @@ public final class DefaultServices implements Services {
             .tags(serviceInstanceEntity.getTags())
             .type(convertToInstanceType(serviceInstanceEntity.getType()))
             .updatedAt(lastOperation.getUpdatedAt())
+            .build();
+    }
+
+    private static ServiceOffering toServiceOffering(ServiceResource resource, List<String> servicePlanNames) {
+        ServiceEntity entity = resource.getEntity();
+        return ServiceOffering.builder()
+            .description(entity.getDescription())
+            .id(ResourceUtils.getId(resource))
+            .label(entity.getLabel())
+            .planNames(servicePlanNames)
             .build();
     }
 
