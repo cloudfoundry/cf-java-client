@@ -180,12 +180,12 @@ public final class DefaultServices implements Services {
     }
 
     private static ServiceInstanceType convertToInstanceType(String type) {
-        if ("user_provided_service_instance".equals(type)) {
+        if (ServiceInstanceType.USER_PROVIDED.getText().equals(type)) {
             return ServiceInstanceType.USER_PROVIDED;
-        } else if ("managed_service_instance".equals(type)) {
+        } else if (ServiceInstanceType.MANAGED.getText().equals(type)) {
             return ServiceInstanceType.MANAGED;
         } else {
-            return ServiceInstanceType.UNKNOWN;
+            return null;
         }
     }
 
