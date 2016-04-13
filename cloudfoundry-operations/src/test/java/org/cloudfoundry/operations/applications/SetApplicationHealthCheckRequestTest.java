@@ -29,7 +29,7 @@ public final class SetApplicationHealthCheckRequestTest {
     public void isValid() {
         ValidationResult result = SetApplicationHealthCheckRequest.builder()
             .name("test-name")
-            .type("test-type")
+            .type(ApplicationHealthCheck.NONE)
             .build()
             .isValid();
 
@@ -39,7 +39,7 @@ public final class SetApplicationHealthCheckRequestTest {
     @Test
     public void isValidNoName() {
         ValidationResult result = SetApplicationHealthCheckRequest.builder()
-            .type("test-type")
+            .type(ApplicationHealthCheck.NONE)
             .build()
             .isValid();
 

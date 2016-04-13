@@ -41,10 +41,10 @@ public final class SetApplicationHealthCheckRequest implements Validatable {
      * @param type the type of the health check
      * @return the type of the health check
      */
-    private final String type;
+    private final ApplicationHealthCheck type;
 
     @Builder
-    SetApplicationHealthCheckRequest(String name, String type) {
+    SetApplicationHealthCheckRequest(String name, ApplicationHealthCheck type) {
         this.name = name;
         this.type = type;
     }

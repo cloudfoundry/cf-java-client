@@ -16,26 +16,22 @@
 
 package org.cloudfoundry.operations.applications;
 
-import lombok.Builder;
-import lombok.Data;
-
 /**
- * A health check of an application
+ * The health check type of an application
  */
-@Data
-public final class ApplicationHealthCheck {
 
-    /**
-     * The health check type
-     *
-     * @param type the type
-     * @return the type
-     */
-    private final String type;
+public enum ApplicationHealthCheck {
+    NONE("none"),
+    PORT("port");
 
-    @Builder
-    ApplicationHealthCheck(String type) {
-        this.type = type;
+    private String text;
+
+    ApplicationHealthCheck(String text) {
+        this.text = text;
+    }
+
+    public String getText() {
+        return this.text;
     }
 
 }

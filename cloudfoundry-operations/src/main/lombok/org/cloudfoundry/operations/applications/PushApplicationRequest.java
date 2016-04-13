@@ -84,7 +84,7 @@ public final class PushApplicationRequest implements Validatable {
      * @param healthCheckType the health check type for the application
      * @return the health check type for the application
      */
-    private final String healthCheckType;
+    private final ApplicationHealthCheck healthCheckType;
 
     /**
      * The host for the application
@@ -205,7 +205,7 @@ public final class PushApplicationRequest implements Validatable {
                            Integer diskQuota,
                            String dockerImage,
                            String domain,
-                           String healthCheckType,
+                           ApplicationHealthCheck healthCheckType,
                            String host,
                            Integer instances,
                            Integer memory,
