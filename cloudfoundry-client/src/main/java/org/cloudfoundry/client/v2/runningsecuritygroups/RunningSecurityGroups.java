@@ -14,26 +14,19 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.securitygroups;
+package org.cloudfoundry.client.v2.runningsecuritygroups;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import reactor.core.publisher.Mono;
 
-/**
- * Route Resource in responses
- */
-@Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public final class SecurityGroupResource extends AbstractSecurityGroupResource {
+public interface RunningSecurityGroups {
 
-    @Builder
-    SecurityGroupResource(@JsonProperty("entity") SecurityGroupEntity entity,
-                          @JsonProperty("metadata") Metadata metadata) {
-        super(entity, metadata);
-    }
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_group_running_defaults/return_the_security_groups_used_for_running_apps.html">List Running Security Groups</a>
+     * request.
+     *
+     * @param request the list running security groups request
+     * @return the response from the list running security groups request
+     */
+    Mono<ListRunningSecurityGroupResponse> list(ListRunningSecurityGroupsRequest request);
 
 }

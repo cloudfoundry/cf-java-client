@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.securitygroups;
+package org.cloudfoundry.client.v2.runningsecuritygroups;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import org.cloudfoundry.Validatable;
+import org.cloudfoundry.ValidationResult;
 
 /**
- * Route Resource in responses
+ * The request payload for the List Running Security Groups operation
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public final class SecurityGroupResource extends AbstractSecurityGroupResource {
+public final class ListRunningSecurityGroupsRequest implements Validatable {
 
     @Builder
-    SecurityGroupResource(@JsonProperty("entity") SecurityGroupEntity entity,
-                          @JsonProperty("metadata") Metadata metadata) {
-        super(entity, metadata);
+    ListRunningSecurityGroupsRequest() {
+    }
+
+    @Override
+    public ValidationResult isValid() {
+        return ValidationResult.builder().build();
     }
 
 }
