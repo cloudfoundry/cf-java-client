@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.privatedomains;
+package org.cloudfoundry.client.v2.routemappings;
 
 import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
@@ -23,22 +23,22 @@ import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class GetPrivateDomainRequestTest {
+public final class GetRouteMappingRequestTest {
 
     @Test
     public void isNotValidNoId() {
-        ValidationResult result = GetPrivateDomainRequest.builder()
+        ValidationResult result = GetRouteMappingRequest.builder()
             .build()
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("private domain id must be specified", result.getMessages().get(0));
+        assertEquals("route mapping id must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValid() {
-        ValidationResult result = GetPrivateDomainRequest.builder()
-            .privateDomainId("test-private-domain-id")
+        ValidationResult result = GetRouteMappingRequest.builder()
+            .routeMappingId("test-route-mapping-id")
             .build()
             .isValid();
 
