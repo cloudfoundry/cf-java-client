@@ -21,6 +21,8 @@ import org.cloudfoundry.client.v2.routemappings.CreateRouteMappingRequest;
 import org.cloudfoundry.client.v2.routemappings.CreateRouteMappingResponse;
 import org.cloudfoundry.client.v2.routemappings.DeleteRouteMappingRequest;
 import org.cloudfoundry.client.v2.routemappings.DeleteRouteMappingResponse;
+import org.cloudfoundry.client.v2.routemappings.GetRouteMappingRequest;
+import org.cloudfoundry.client.v2.routemappings.GetRouteMappingResponse;
 import org.cloudfoundry.client.v2.routemappings.ListRouteMappingsRequest;
 import org.cloudfoundry.client.v2.routemappings.ListRouteMappingsResponse;
 import org.cloudfoundry.client.v2.routemappings.RouteMappings;
@@ -61,6 +63,11 @@ public final class SpringRouteMappings extends AbstractSpringOperations implemen
             builder.pathSegment("v2", "route_mappings", request.getRouteMappingId());
             QueryBuilder.augment(builder, request);
         });
+    }
+
+    @Override
+    public Mono<GetRouteMappingResponse> get(GetRouteMappingRequest request) {
+        return get(request, GetRouteMappingResponse.class, builder -> builder.pathSegment("v2", "route_mappings", request.getRouteMappingId()));
     }
 
     @Override
