@@ -61,6 +61,10 @@ public final class CreatePrivateDomainRequest implements Validatable {
             builder.message("name must be specified");
         }
 
+        if (this.owningOrganizationId == null) {
+            builder.message("owning organization id must be specified");
+        }
+
         return builder.build();
     }
 
