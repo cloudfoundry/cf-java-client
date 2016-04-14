@@ -17,6 +17,7 @@
 package org.cloudfoundry.spring.client.v2.securitygroups;
 
 import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRunningDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsResponse;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
@@ -24,10 +25,47 @@ import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
 import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringSecurityGroupsTest {
+
+    public static final class Delete extends AbstractApiTest<DeleteSecurityGroupRunningDefaultRequest, Void> {
+
+        private final SpringSecurityGroups securityGroups = new SpringSecurityGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteSecurityGroupRunningDefaultRequest getInvalidRequest() {
+            return DeleteSecurityGroupRunningDefaultRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(DELETE).path("/v2/config/running_security_groups/test-id")
+                .status(NO_CONTENT);
+        }
+
+        @Override
+        protected Void getResponse() {
+            return null;
+        }
+
+        @Override
+        protected DeleteSecurityGroupRunningDefaultRequest getValidRequest() throws Exception {
+            return DeleteSecurityGroupRunningDefaultRequest.builder()
+                .securityGroupRunningDefaultId("test-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<Void> invoke(DeleteSecurityGroupRunningDefaultRequest request) {
+            return this.securityGroups.deleteRunningDefault(request);
+        }
+
+    }
 
     public static final class List extends AbstractApiTest<ListSecurityGroupRunningDefaultsRequest, ListSecurityGroupRunningDefaultsResponse> {
 

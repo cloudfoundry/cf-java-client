@@ -21,6 +21,15 @@ import reactor.core.publisher.Mono;
 public interface SecurityGroups {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_group_running_defaults/return_the_security_groups_used_for_running_apps.html">Delete Running Security Group</a>
+     * request.
+     *
+     * @param request the delete running security group request
+     * @return the response from the delete running security group request
+     */
+    Mono<Void> deleteRunningDefault(DeleteSecurityGroupRunningDefaultRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_group_running_defaults/return_the_security_groups_used_for_running_apps.html">List Running Security Groups</a>
      * request.
      *
