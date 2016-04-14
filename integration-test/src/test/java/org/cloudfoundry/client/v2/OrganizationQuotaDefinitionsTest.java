@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.fail;
 
-public final class OrganizationQuotaDefnitionsTest extends AbstractIntegrationTest {
+public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
