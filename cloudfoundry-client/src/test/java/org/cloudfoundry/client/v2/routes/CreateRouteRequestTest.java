@@ -26,22 +26,7 @@ import static org.junit.Assert.assertEquals;
 public final class CreateRouteRequestTest {
 
     @Test
-    public void isValid() {
-        ValidationResult result = CreateRouteRequest.builder()
-            .domainId("test-domain-id")
-            .generatePort("test-generate-port")
-            .host("test-host")
-            .path("test-path")
-            .port(10000)
-            .spaceId("test-space-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidNoDomainId() {
+    public void isNotValidNoDomainId() {
         ValidationResult result = CreateRouteRequest.builder()
             .generatePort("test-generate-port")
             .host("test-host")
@@ -56,7 +41,7 @@ public final class CreateRouteRequestTest {
     }
 
     @Test
-    public void isValidNoSpaceId() {
+    public void isNotValidNoSpaceId() {
         ValidationResult result = CreateRouteRequest.builder()
             .domainId("test-domain-id")
             .generatePort("test-generate-port")
@@ -68,6 +53,21 @@ public final class CreateRouteRequestTest {
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("space id must be specified", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isValid() {
+        ValidationResult result = CreateRouteRequest.builder()
+            .domainId("test-domain-id")
+            .generatePort("test-generate-port")
+            .host("test-host")
+            .path("test-path")
+            .port(10000)
+            .spaceId("test-space-id")
+            .build()
+            .isValid();
+
+        assertEquals(VALID, result.getStatus());
     }
 
 }
