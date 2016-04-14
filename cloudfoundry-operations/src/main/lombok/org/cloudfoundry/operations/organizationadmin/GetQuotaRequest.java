@@ -16,26 +16,33 @@
 
 package org.cloudfoundry.operations.organizationadmin;
 
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import lombok.Builder;
+import lombok.Data;
+import org.cloudfoundry.Validatable;
+import org.cloudfoundry.ValidationResult;
 
 /**
- * Main entry point to the Cloud Foundry Organization Admin Operations API
+ * The request options for the get quota operation
  */
-public interface OrganizationAdmin {
+@Data
+public final class GetQuotaRequest implements Validatable {
 
-    /**
-     * Get the organization quota
-     *
-     * @return the organization quota
-     */
-    Mono<OrganizationQuota> getQuota(GetQuotaRequest request);
+    private final String name;
 
-    /**
-     * Lists the organization quotas
-     *
-     * @return the organization quotas
-     */
-    Flux<OrganizationQuota> listQuotas();
+    @Builder
+    GetQuotaRequest(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public ValidationResult isValid() {
+        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
+
+        if (this.name == null) {
+            builder.message("name must be specified");
+        }
+
+        return builder.build();
+    }
 
 }
