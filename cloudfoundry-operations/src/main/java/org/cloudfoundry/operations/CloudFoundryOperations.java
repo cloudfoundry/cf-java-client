@@ -20,7 +20,7 @@ import org.cloudfoundry.operations.applications.Applications;
 import org.cloudfoundry.operations.buildpacks.Buildpacks;
 import org.cloudfoundry.operations.domains.Domains;
 import org.cloudfoundry.operations.organizations.Organizations;
-import org.cloudfoundry.operations.quotas.OrganizationAdmin;
+import org.cloudfoundry.operations.organizationadmin.OrganizationAdmin;
 import org.cloudfoundry.operations.routes.Routes;
 import org.cloudfoundry.operations.services.Services;
 import org.cloudfoundry.operations.spaceadmin.SpaceAdmin;
