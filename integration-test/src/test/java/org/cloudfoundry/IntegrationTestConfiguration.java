@@ -235,7 +235,7 @@ public class IntegrationTestConfiguration {
                     .build()))
             .single()
             .map(ResourceUtils::getId)
-            .doOnSubscribe(s -> this.logger.debug(">> STACK <<"))
+            .doOnSubscribe(s -> this.logger.debug(">> STACK name({}) <<", stackName))
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(id -> this.logger.debug("<< STACK >>"))
             .cache();
