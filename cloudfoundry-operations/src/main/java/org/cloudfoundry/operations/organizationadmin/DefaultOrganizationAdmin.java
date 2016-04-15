@@ -28,7 +28,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.NoSuchElementException;
-import java.util.function.Function;
 
 public final class DefaultOrganizationAdmin implements OrganizationAdmin {
 
@@ -47,22 +46,29 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
 
     @Override
     public Flux<OrganizationQuota> listQuotas() {
-        return requestListOrganizationQuotas(this.cloudFoundryClient, Function.identity())
+        return requestListOrganizationQuotas(this.cloudFoundryClient)
             .map(DefaultOrganizationAdmin::toOrganizationQuota);
     }
 
     private static Mono<OrganizationQuotaDefinitionResource> getOrganizationQuota(CloudFoundryClient cloudFoundryClient, String name) {
-        return requestListOrganizationQuotas(cloudFoundryClient, builder -> builder.name(name))
+        return requestListOrganizationQuotas(cloudFoundryClient, name)
             .single()
             .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Quota %s does not exist", name)));
     }
 
-    private static Flux<OrganizationQuotaDefinitionResource> requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient,
-                                                                                           Function<ListOrganizationQuotaDefinitionsRequest.ListOrganizationQuotaDefinitionsRequestBuilder,
-                                                                                               ListOrganizationQuotaDefinitionsRequest.ListOrganizationQuotaDefinitionsRequestBuilder> filter) {
+    private static Flux<OrganizationQuotaDefinitionResource> requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.organizationQuotaDefinitions()
-                .list(filter.apply(ListOrganizationQuotaDefinitionsRequest.builder())
+                .list(ListOrganizationQuotaDefinitionsRequest.builder()
+                    .page(page)
+                    .build()));
+    }
+
+    private static Flux<OrganizationQuotaDefinitionResource> requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient, String name) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.organizationQuotaDefinitions()
+                .list(ListOrganizationQuotaDefinitionsRequest.builder()
+                    .name(name)
                     .page(page)
                     .build()));
     }
@@ -81,4 +87,5 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
             .totalServices(entity.getTotalServices())
             .build();
     }
+
 }

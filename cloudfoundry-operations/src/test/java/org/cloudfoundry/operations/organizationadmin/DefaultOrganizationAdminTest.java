@@ -43,7 +43,7 @@ public final class DefaultOrganizationAdminTest {
                     .build()));
     }
 
-    private static void requestListOrganizationQuotasByName(CloudFoundryClient cloudFoundryClient, String name) {
+    private static void requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient, String name) {
         when(cloudFoundryClient.organizationQuotaDefinitions()
             .list(fillPage(ListOrganizationQuotaDefinitionsRequest.builder().name(name))
                 .build()))
@@ -54,7 +54,7 @@ public final class DefaultOrganizationAdminTest {
                     .build()));
     }
 
-    private static void requestListOrganizationQuotasByNameEmpty(CloudFoundryClient cloudFoundryClient, String name) {
+    private static void requestListOrganizationQuotasEmpty(CloudFoundryClient cloudFoundryClient, String name) {
         when(cloudFoundryClient.organizationQuotaDefinitions()
             .list(fillPage(ListOrganizationQuotaDefinitionsRequest.builder().name(name))
                 .build()))
@@ -69,7 +69,7 @@ public final class DefaultOrganizationAdminTest {
 
         @Before
         public void setUp() throws Exception {
-            requestListOrganizationQuotasByName(this.cloudFoundryClient, "test-quota");
+            requestListOrganizationQuotas(this.cloudFoundryClient, "test-quota");
         }
 
         @Override
@@ -101,7 +101,7 @@ public final class DefaultOrganizationAdminTest {
 
         @Before
         public void setUp() throws Exception {
-            requestListOrganizationQuotasByNameEmpty(this.cloudFoundryClient, "test-quota-not-found");
+            requestListOrganizationQuotasEmpty(this.cloudFoundryClient, "test-quota-not-found");
         }
 
         @Override
