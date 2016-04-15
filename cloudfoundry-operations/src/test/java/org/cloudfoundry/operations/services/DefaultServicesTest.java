@@ -373,6 +373,25 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
+    private static void requestSpaceServiceByName(CloudFoundryClient cloudFoundryClient, String spaceId, String serviceLabel) {
+        when(cloudFoundryClient.spaces()
+            .listServices(ListSpaceServicesRequest.builder()
+                .page(1)
+                .label(serviceLabel)
+                .spaceId(spaceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListSpaceServicesResponse.builder())
+                    .resource(ServiceResource.builder()
+                        .metadata(Resource.Metadata.builder().id(serviceLabel + "-id").build())
+                        .entity(fill(ServiceEntity.builder())
+                            .description(serviceLabel + "-description")
+                            .label(serviceLabel)
+                            .build())
+                        .build())
+                    .build()));
+    }
+
     private static void requestSpaceServiceInstanceByName(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
         when(cloudFoundryClient.spaces()
             .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
@@ -510,6 +529,31 @@ public final class DefaultServicesTest {
                                 .type("test-type")
                                 .updatedAt("test-updatedAt")
                                 .build())
+                            .build())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestSpaceServicesTwo(CloudFoundryClient cloudFoundryClient, String spaceId, String serviceLabel1, String serviceLabel2) {
+        when(cloudFoundryClient.spaces()
+            .listServices(ListSpaceServicesRequest.builder()
+                .page(1)
+                .spaceId(spaceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListSpaceServicesResponse.builder())
+                    .resource(ServiceResource.builder()
+                        .metadata(Resource.Metadata.builder().id(serviceLabel1 + "-id").build())
+                        .entity(fill(ServiceEntity.builder())
+                            .description(serviceLabel1 + "-description")
+                            .label(serviceLabel1)
+                            .build())
+                        .build())
+                    .resource(ServiceResource.builder()
+                        .metadata(Resource.Metadata.builder().id(serviceLabel2 + "-id").build())
+                        .entity(fill(ServiceEntity.builder())
+                            .description(serviceLabel2 + "-description")
+                            .label(serviceLabel2)
                             .build())
                         .build())
                     .build()));
@@ -962,6 +1006,73 @@ public final class DefaultServicesTest {
         protected Publisher<ServiceInstance> invoke() {
             return this.services
                 .listInstances();
+        }
+
+    }
+
+    public static final class ListOffering extends AbstractOperationsApiTest<ServiceOffering> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestSpaceServicesTwo(this.cloudFoundryClient, TEST_SPACE_ID, "test-service1", "test-service2");
+            requestListServicePlans(this.cloudFoundryClient, "test-service1-id", "test-service1-plan", "test-service1-plan-id");
+            requestListServicePlans(this.cloudFoundryClient, "test-service2-id", "test-service2-plan", "test-service2-plan-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ServiceOffering> testSubscriber) {
+            testSubscriber
+                .assertEquals(ServiceOffering.builder()
+                    .description("test-service1-description")
+                    .id("test-service1-id")
+                    .label("test-service1")
+                    .planName("test-service1-plan")
+                    .build())
+                .assertEquals(ServiceOffering.builder()
+                    .description("test-service2-description")
+                    .id("test-service2-id")
+                    .label("test-service2")
+                    .planName("test-service2-plan")
+                    .build());
+        }
+
+        @Override
+        protected Publisher<ServiceOffering> invoke() {
+            return this.services
+                .listOfferings(GetMarketplaceRequest.builder().build());
+        }
+
+    }
+
+    public static final class ListOfferingByService extends AbstractOperationsApiTest<ServiceOffering> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestSpaceServiceByName(this.cloudFoundryClient, TEST_SPACE_ID, "test-service");
+            requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-service-plan", "test-service-plan-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ServiceOffering> testSubscriber) {
+            testSubscriber
+                .assertEquals(ServiceOffering.builder()
+                    .description("test-service-description")
+                    .id("test-service-id")
+                    .label("test-service")
+                    .planName("test-service-plan")
+                    .build());
+        }
+
+        @Override
+        protected Publisher<ServiceOffering> invoke() {
+            return this.services
+                .listOfferings(GetMarketplaceRequest.builder()
+                    .serviceName("test-service")
+                    .build());
         }
 
     }
