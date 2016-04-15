@@ -38,9 +38,10 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     }
 
     @Override
-    public Mono<OrganizationQuota> getQuota(GetQuotaRequest getQuotaRequest) {
-        return ValidationUtils.validate(getQuotaRequest)
-            .then(request -> getOrganizationQuota(this.cloudFoundryClient, request.getName()))
+    public Mono<OrganizationQuota> getQuota(GetQuotaRequest request) {
+        return ValidationUtils
+            .validate(request)
+            .then(request1 -> getOrganizationQuota(this.cloudFoundryClient, request1.getName()))
             .map(DefaultOrganizationAdmin::toOrganizationQuota);
     }
 
