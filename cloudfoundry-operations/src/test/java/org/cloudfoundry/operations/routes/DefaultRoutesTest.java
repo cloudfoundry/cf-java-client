@@ -587,6 +587,7 @@ public final class DefaultRoutesTest {
         @Before
         public void setUp() throws Exception {
             requestSpacesEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME);
+            requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         }
 
         @Override
@@ -1356,6 +1357,7 @@ public final class DefaultRoutesTest {
         @Before
         public void setUp() throws Exception {
             requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         }
 
         @Override
