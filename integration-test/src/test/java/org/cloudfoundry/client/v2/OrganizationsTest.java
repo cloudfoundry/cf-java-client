@@ -447,36 +447,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listDomainsPrivate() {
-        String defaultOrganizationName = getOrganizationName();
-        String organizationName = getOrganizationName();
-        String privateDomainName = getDomainName();
-
-        Mono
-            .when(
-                createOrganizationId(this.cloudFoundryClient, defaultOrganizationName),
-                createOrganizationId(this.cloudFoundryClient, organizationName)
-            )
-            .then(function((defaultOrganizationId, organizationId) -> associatePrivateDomain(this.cloudFoundryClient, defaultOrganizationId, organizationId, privateDomainName)))
-            .flatMap(function((organizationId, privateDomainId) -> Mono
-                .when(
-                    Mono.just(privateDomainId),
-                    PaginationUtils
-                        .requestResources(page -> this.cloudFoundryClient.organizations()
-                            .listDomains(ListOrganizationDomainsRequest.builder()
-                                .page(page)
-                                .organizationId(organizationId)
-                                .build()))
-                        .filter(response -> privateDomainName.equals(response.getEntity().getName()))
-                        .single()
-                        .map(ResourceUtils::getId)))
-            )
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
-    }
-
-    @Test
-    public void listDomainsShared() {
+    public void listDomains() {
         String organizationName = getOrganizationName();
         String sharedDomainName = getDomainName();
 
@@ -485,9 +456,9 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 createOrganizationId(this.cloudFoundryClient, organizationName),
                 requestCreateSharedDomainResponse(this.cloudFoundryClient, sharedDomainName)
             )
-            .flatMap(function((organizationId, sharedDomainId) -> Mono
+            .flatMap(function((organizationId, sharedDomainResponse) -> Mono
                 .when(
-                    Mono.just(sharedDomainName),
+                    Mono.just(ResourceUtils.getId(sharedDomainResponse)),
                     PaginationUtils
                         .requestResources(page -> this.cloudFoundryClient.organizations()
                             .listDomains(ListOrganizationDomainsRequest.builder()
@@ -528,7 +499,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listPrivateDomain() {
+    public void listPrivateDomains() {
         String domainName = getDomainName();
         String defaultOrganizationName = getOrganizationName();
         String organizationName = getOrganizationName();
