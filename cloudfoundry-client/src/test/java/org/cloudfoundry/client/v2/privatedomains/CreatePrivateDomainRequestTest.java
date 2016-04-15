@@ -47,4 +47,15 @@ public final class CreatePrivateDomainRequestTest {
         assertEquals("name must be specified", result.getMessages().get(0));
     }
 
+    @Test
+    public void isValidNoOrganization() {
+        ValidationResult result = CreatePrivateDomainRequest.builder()
+            .name("test-name")
+            .build()
+            .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("owning organization id must be specified", result.getMessages().get(0));
+    }
+
 }
