@@ -82,20 +82,6 @@ import static org.mockito.Mockito.when;
 
 public final class DefaultServicesTest {
 
-    private static void requestApplication(CloudFoundryClient cloudFoundryClient, String applicationId, String application) {
-        when(cloudFoundryClient.applicationsV2().get(GetApplicationRequest.builder()
-            .applicationId(applicationId)
-            .build()))
-            .thenReturn(Mono
-                .just(fill(GetApplicationResponse.builder())
-                    .metadata(Resource.Metadata.builder().id(applicationId).build())
-                    .entity(ApplicationEntity.builder()
-                        .name(application)
-                        .build())
-                    .build())
-            );
-    }
-
     private static void requestApplications(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
         when(cloudFoundryClient.spaces()
             .listApplications(fillPage(ListSpaceApplicationsRequest.builder())
@@ -122,7 +108,24 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
-    private static void requestBindService(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId, Map<String, Object> parameters) {
+    private static void requestApplicationsListServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId) {
+        when(cloudFoundryClient.applicationsV2()
+            .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
+                .page(1)
+                .applicationId(applicationId)
+                .serviceInstanceId(serviceInstanceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListApplicationServiceBindingsResponse.builder())
+                    .resource(fill(ServiceBindingResource.builder(), "service-binding-")
+                        .entity(ServiceBindingEntity.builder()
+                            .applicationId(applicationId)
+                            .build())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestCreateServiceBinding(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId, Map<String, Object> parameters) {
         when(cloudFoundryClient.serviceBindings()
             .create(CreateServiceBindingRequest.builder()
                 .applicationId(applicationId)
@@ -159,6 +162,26 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
+    private static void requestCreateUserProvidedServiceInstance(CloudFoundryClient cloudFoundryClient, String spaceId, String name, Map<String, Object> credentials, String routeServiceUrl,
+                                                                 String syslogDrainUrl, String userProvidedServiceInstanceId) {
+        when(cloudFoundryClient.userProvidedServiceInstances()
+            .create(org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest.builder()
+                .name(name)
+                .credentials(credentials)
+                .routeServiceUrl(routeServiceUrl)
+                .spaceId(spaceId)
+                .syslogDrainUrl(syslogDrainUrl)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(CreateUserProvidedServiceInstanceResponse.builder())
+                    .metadata(Resource.Metadata.builder()
+                        .id(userProvidedServiceInstanceId)
+                        .build())
+                    .entity(fill(UserProvidedServiceInstanceEntity.builder())
+                        .build())
+                    .build()));
+    }
+
     private static void requestDeleteServiceBinding(CloudFoundryClient cloudFoundryClient, String serviceBindingId) {
         when(cloudFoundryClient.serviceBindings()
             .delete(DeleteServiceBindingRequest.builder()
@@ -168,6 +191,34 @@ public final class DefaultServicesTest {
             .thenReturn(Mono
                 .just(fill(DeleteServiceBindingResponse.builder())
                     .entity(fill(JobEntity.builder(), "job-entity-")
+                        .build())
+                    .build()));
+    }
+
+    private static void requestGetApplication(CloudFoundryClient cloudFoundryClient, String applicationId, String application) {
+        when(cloudFoundryClient.applicationsV2().get(GetApplicationRequest.builder()
+            .applicationId(applicationId)
+            .build()))
+            .thenReturn(Mono
+                .just(fill(GetApplicationResponse.builder())
+                    .metadata(Resource.Metadata.builder().id(applicationId).build())
+                    .entity(ApplicationEntity.builder()
+                        .name(application)
+                        .build())
+                    .build())
+            );
+    }
+
+    private static void requestGetService(CloudFoundryClient cloudFoundryClient, String serviceId, String service) {
+        when(cloudFoundryClient.services()
+            .get(GetServiceRequest.builder()
+                .serviceId(serviceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(GetServiceResponse.builder())
+                    .entity(fill(ServiceEntity.builder())
+                        .extra("{\"displayName\":\"test-value\",\"longDescription\":\"test-value\",\"documentationUrl\":\"test-documentation-url\",\"supportUrl\":\"test-value\"}")
+                        .label(service)
                         .build())
                     .build()));
     }
@@ -187,6 +238,20 @@ public final class DefaultServicesTest {
                             .type("create")
                             .state(state)
                             .build())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestGetServicePlan(CloudFoundryClient cloudFoundryClient, String servicePlanId, String servicePlan, String service) {
+        when(cloudFoundryClient.servicePlans()
+            .get(GetServicePlanRequest.builder()
+                .servicePlanId(servicePlanId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(GetServicePlanResponse.builder())
+                    .entity(ServicePlanEntity.builder()
+                        .name(servicePlan)
+                        .serviceId(service + "-id")
                         .build())
                     .build()));
     }
@@ -251,17 +316,6 @@ public final class DefaultServicesTest {
                 }));
     }
 
-    private static void requestListServiceBindings(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
-        when(cloudFoundryClient.serviceBindings()
-            .list(ListServiceBindingsRequest.builder()
-                .page(1)
-                .serviceInstanceId(serviceInstanceId)
-                .build()))
-            .thenReturn(Mono
-                .just(fillPage(ListServiceBindingsResponse.builder())
-                    .build()));
-    }
-
     private static void requestListServiceBindings(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String applicationId) {
         when(cloudFoundryClient.serviceBindings()
             .list(ListServiceBindingsRequest.builder()
@@ -270,7 +324,7 @@ public final class DefaultServicesTest {
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListServiceBindingsResponse.builder())
-                    .resource(fill(ServiceBindingResource.builder())
+                    .resource(fill(ServiceBindingResource.builder(), "service-binding")
                         .entity(ServiceBindingEntity.builder()
                             .applicationId(applicationId)
                             .build())
@@ -278,121 +332,18 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
-    private static void requestListServicePlans(CloudFoundryClient cloudFoundryClient, String serviceId, String plan, String planId) {
-        when(cloudFoundryClient.servicePlans()
-            .list(ListServicePlansRequest.builder()
-                .serviceId(serviceId)
+    private static void requestListServiceBindingsEmpty(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
+        when(cloudFoundryClient.serviceBindings()
+            .list(ListServiceBindingsRequest.builder()
                 .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fillPage(ListServicePlansResponse.builder())
-                    .resource(ServicePlanResource.builder()
-                        .metadata(Resource.Metadata.builder()
-                            .id(planId)
-                            .build())
-                        .entity(fill(ServicePlanEntity.builder())
-                            .name(plan)
-                            .build())
-                        .build())
-                    .build())
-
-            );
-    }
-
-    private static void requestListSpaceServices(CloudFoundryClient cloudFoundryClient, String spaceId, String service, String serviceId) {
-        when(cloudFoundryClient.spaces()
-            .listServices(ListSpaceServicesRequest.builder()
-                .page(1)
-                .spaceId(spaceId)
-                .label(service)
-                .build()))
-            .thenReturn(Mono
-                .just(fillPage(ListSpaceServicesResponse.builder())
-                    .resource(ServiceResource.builder()
-                        .metadata(Resource.Metadata.builder()
-                            .id(serviceId)
-                            .build())
-                        .entity(fill(ServiceEntity.builder())
-                            .build())
-                        .build())
-                    .build()));
-    }
-
-    private static void requestService(CloudFoundryClient cloudFoundryClient, String serviceId, String service) {
-        when(cloudFoundryClient.services()
-            .get(GetServiceRequest.builder()
-                .serviceId(serviceId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(GetServiceResponse.builder())
-                    .entity(fill(ServiceEntity.builder())
-                        .extra("{\"displayName\":\"test-value\",\"longDescription\":\"test-value\",\"documentationUrl\":\"test-documentation-url\",\"supportUrl\":\"test-value\"}")
-                        .label(service)
-                        .build())
-                    .build()));
-    }
-
-    private static void requestServiceBinding(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId) {
-        when(cloudFoundryClient.applicationsV2()
-            .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
-                .page(1)
-                .applicationId(applicationId)
                 .serviceInstanceId(serviceInstanceId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListApplicationServiceBindingsResponse.builder())
-                    .resource(fill(ServiceBindingResource.builder(), "service-binding-")
-                        .build())
+                .just(fillPage(ListServiceBindingsResponse.builder())
                     .build()));
     }
 
-    private static void requestServiceEmpty(CloudFoundryClient cloudFoundryClient, String serviceId, String service) {
-        when(cloudFoundryClient.services()
-            .get(GetServiceRequest.builder()
-                .serviceId(serviceId)
-                .build()))
-            .thenReturn(Mono
-                .just(GetServiceResponse.builder()
-                    .entity(ServiceEntity.builder()
-                        .label(service)
-                        .build())
-                    .build()));
-    }
-
-    private static void requestServicePlan(CloudFoundryClient cloudFoundryClient, String servicePlanId, String servicePlan, String service) {
-        when(cloudFoundryClient.servicePlans()
-            .get(GetServicePlanRequest.builder()
-                .servicePlanId(servicePlanId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(GetServicePlanResponse.builder())
-                    .entity(ServicePlanEntity.builder()
-                        .name(servicePlan)
-                        .serviceId(service + "-id")
-                        .build())
-                    .build()));
-    }
-
-    private static void requestSpaceServiceByName(CloudFoundryClient cloudFoundryClient, String spaceId, String serviceLabel) {
-        when(cloudFoundryClient.spaces()
-            .listServices(ListSpaceServicesRequest.builder()
-                .page(1)
-                .label(serviceLabel)
-                .spaceId(spaceId)
-                .build()))
-            .thenReturn(Mono
-                .just(fillPage(ListSpaceServicesResponse.builder())
-                    .resource(ServiceResource.builder()
-                        .metadata(Resource.Metadata.builder().id(serviceLabel + "-id").build())
-                        .entity(fill(ServiceEntity.builder())
-                            .description(serviceLabel + "-description")
-                            .label(serviceLabel)
-                            .build())
-                        .build())
-                    .build()));
-    }
-
-    private static void requestSpaceServiceInstanceByName(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
+    private static void requestListServiceInstances(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
         when(cloudFoundryClient.spaces()
             .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
                 .page(1)
@@ -407,12 +358,24 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
-    private static void requestSpaceServiceInstanceByNameEmpty(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
+    private static void requestListServiceInstancesEmpty(CloudFoundryClient cloudFoundryClient, String spaceId) {
         when(cloudFoundryClient.spaces()
             .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
                 .page(1)
                 .spaceId(spaceId)
                 .returnUserProvidedServiceInstances(true)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListSpaceServiceInstancesResponse.builder())
+                    .build()));
+    }
+
+    private static void requestListServiceInstancesEmpty(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
+        when(cloudFoundryClient.spaces()
+            .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
+                .page(1)
+                .returnUserProvidedServiceInstances(true)
+                .spaceId(spaceId)
                 .name(serviceName)
                 .build()))
             .thenReturn(Mono
@@ -420,7 +383,7 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
-    private static void requestSpaceServiceInstanceByNameManaged(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
+    private static void requestListServiceInstancesManaged(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
         when(cloudFoundryClient.spaces()
             .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
                 .page(1)
@@ -449,54 +412,7 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
-    private static void requestSpaceServiceInstanceByNameUserProvided(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
-        when(cloudFoundryClient.spaces()
-            .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
-                .page(1)
-                .spaceId(spaceId)
-                .returnUserProvidedServiceInstances(true)
-                .name(serviceName)
-                .build()))
-            .thenReturn(Mono
-                .just(fillPage(ListSpaceServiceInstancesResponse.builder())
-                    .resource(UnionServiceInstanceResource.builder()
-                        .metadata(Resource.Metadata.builder()
-                            .id("test-service-instance-id")
-                            .build())
-                        .entity(UnionServiceInstanceEntity.builder()
-                            .type("user_provided_service_instance")
-                            .name(serviceName)
-                            .build())
-                        .build())
-                    .build()));
-    }
-
-    private static void requestSpaceServiceInstancesEmpty(CloudFoundryClient cloudFoundryClient, String spaceId) {
-        when(cloudFoundryClient.spaces()
-            .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
-                .page(1)
-                .spaceId(spaceId)
-                .returnUserProvidedServiceInstances(true)
-                .build()))
-            .thenReturn(Mono
-                .just(fillPage(ListSpaceServiceInstancesResponse.builder())
-                    .build()));
-    }
-
-    private static void requestSpaceServiceInstancesEmpty(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
-        when(cloudFoundryClient.spaces()
-            .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
-                .page(1)
-                .returnUserProvidedServiceInstances(true)
-                .spaceId(spaceId)
-                .name(serviceName)
-                .build()))
-            .thenReturn(Mono
-                .just(fillPage(ListSpaceServiceInstancesResponse.builder())
-                    .build()));
-    }
-
-    private static void requestSpaceServiceInstancesTwo(CloudFoundryClient cloudFoundryClient, String spaceId, String instanceName1, String instanceName2) {
+    private static void requestListServiceInstancesTwo(CloudFoundryClient cloudFoundryClient, String spaceId, String instanceName1, String instanceName2) {
         when(cloudFoundryClient.spaces()
             .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
                 .page(1)
@@ -534,7 +450,69 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
-    private static void requestSpaceServicesTwo(CloudFoundryClient cloudFoundryClient, String spaceId, String serviceLabel1, String serviceLabel2) {
+    private static void requestListServiceInstancesUserProvided(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
+        when(cloudFoundryClient.spaces()
+            .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
+                .page(1)
+                .spaceId(spaceId)
+                .returnUserProvidedServiceInstances(true)
+                .name(serviceName)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListSpaceServiceInstancesResponse.builder())
+                    .resource(UnionServiceInstanceResource.builder()
+                        .metadata(Resource.Metadata.builder()
+                            .id("test-service-instance-id")
+                            .build())
+                        .entity(UnionServiceInstanceEntity.builder()
+                            .type("user_provided_service_instance")
+                            .name(serviceName)
+                            .build())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestListServicePlans(CloudFoundryClient cloudFoundryClient, String serviceId, String plan, String planId) {
+        when(cloudFoundryClient.servicePlans()
+            .list(ListServicePlansRequest.builder()
+                .serviceId(serviceId)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListServicePlansResponse.builder())
+                    .resource(ServicePlanResource.builder()
+                        .metadata(Resource.Metadata.builder()
+                            .id(planId)
+                            .build())
+                        .entity(fill(ServicePlanEntity.builder())
+                            .name(plan)
+                            .build())
+                        .build())
+                    .build())
+
+            );
+    }
+
+    private static void requestListServices(CloudFoundryClient cloudFoundryClient, String spaceId, String serviceLabel) {
+        when(cloudFoundryClient.spaces()
+            .listServices(ListSpaceServicesRequest.builder()
+                .page(1)
+                .label(serviceLabel)
+                .spaceId(spaceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListSpaceServicesResponse.builder())
+                    .resource(ServiceResource.builder()
+                        .metadata(Resource.Metadata.builder().id(serviceLabel + "-id").build())
+                        .entity(fill(ServiceEntity.builder())
+                            .description(serviceLabel + "-description")
+                            .label(serviceLabel)
+                            .build())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestListServicesTwo(CloudFoundryClient cloudFoundryClient, String spaceId, String serviceLabel1, String serviceLabel2) {
         when(cloudFoundryClient.spaces()
             .listServices(ListSpaceServicesRequest.builder()
                 .page(1)
@@ -559,27 +537,21 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
-    private static void requestUserProvidedCreateServiceInstance(CloudFoundryClient cloudFoundryClient,
-                                                                 String spaceId,
-                                                                 String name,
-                                                                 Map<String, Object> credentials,
-                                                                 String routeServiceUrl,
-                                                                 String syslogDrainUrl,
-                                                                 String userProvidedServiceInstanceId) {
-        when(cloudFoundryClient.userProvidedServiceInstances()
-            .create(org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest.builder()
-                .name(name)
-                .credentials(credentials)
-                .routeServiceUrl(routeServiceUrl)
+    private static void requestListSpaceServices(CloudFoundryClient cloudFoundryClient, String spaceId, String service, String serviceId) {
+        when(cloudFoundryClient.spaces()
+            .listServices(ListSpaceServicesRequest.builder()
+                .page(1)
                 .spaceId(spaceId)
-                .syslogDrainUrl(syslogDrainUrl)
+                .label(service)
                 .build()))
             .thenReturn(Mono
-                .just(fill(CreateUserProvidedServiceInstanceResponse.builder())
-                    .metadata(Resource.Metadata.builder()
-                        .id(userProvidedServiceInstanceId)
-                        .build())
-                    .entity(fill(UserProvidedServiceInstanceEntity.builder())
+                .just(fillPage(ListSpaceServicesResponse.builder())
+                    .resource(ServiceResource.builder()
+                        .metadata(Resource.Metadata.builder()
+                            .id(serviceId)
+                            .build())
+                        .entity(fill(ServiceEntity.builder())
+                            .build())
                         .build())
                     .build()));
     }
@@ -591,8 +563,8 @@ public final class DefaultServicesTest {
         @Before
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
-            requestSpaceServiceInstanceByName(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-            requestBindService(this.cloudFoundryClient, "test-application-id", "test-service-instance-id", Collections.singletonMap("test-parameter-key", "test-parameter-value"));
+            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+            requestCreateServiceBinding(this.cloudFoundryClient, "test-application-id", "test-service-instance-id", Collections.singletonMap("test-parameter-key", "test-parameter-value"));
         }
 
         @Override
@@ -619,7 +591,7 @@ public final class DefaultServicesTest {
         @Before
         public void setUp() throws Exception {
             requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
-            requestSpaceServiceInstanceByName(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         }
 
         @Override
@@ -647,7 +619,7 @@ public final class DefaultServicesTest {
         @Before
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
-            requestSpaceServiceInstancesEmpty(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+            requestListServiceInstancesEmpty(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         }
 
         @Override
@@ -784,7 +756,7 @@ public final class DefaultServicesTest {
 
         @Before
         public void setUp() throws Exception {
-            requestUserProvidedCreateServiceInstance(this.cloudFoundryClient,
+            requestCreateUserProvidedServiceInstance(this.cloudFoundryClient,
                 TEST_SPACE_ID,
                 "test-user-provided-service-instance",
                 Collections.singletonMap("test-credential-key", "test-credential-value"),
@@ -818,11 +790,11 @@ public final class DefaultServicesTest {
 
         @Before
         public void setUp() throws Exception {
-            requestSpaceServiceInstanceByNameManaged(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-            requestServicePlan(this.cloudFoundryClient, "test-service-plan-id", "test-service-plan", "test-service");
+            requestListServiceInstancesManaged(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+            requestGetServicePlan(this.cloudFoundryClient, "test-service-plan-id", "test-service-plan", "test-service");
             requestListServiceBindings(this.cloudFoundryClient, "test-service-instance-id", "test-application-id");
-            requestService(this.cloudFoundryClient, "test-service-id", "test-service");
-            requestApplication(this.cloudFoundryClient, "test-application-id", "test-application");
+            requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
+            requestGetApplication(this.cloudFoundryClient, "test-application-id", "test-application");
         }
 
         @Override
@@ -856,7 +828,7 @@ public final class DefaultServicesTest {
 
         @Before
         public void setUp() throws Exception {
-            requestSpaceServiceInstanceByNameEmpty(this.cloudFoundryClient, "test-invalid-name", TEST_SPACE_ID);
+            requestListServiceInstancesEmpty(this.cloudFoundryClient, "test-invalid-name", TEST_SPACE_ID);
         }
 
         @Override
@@ -901,9 +873,9 @@ public final class DefaultServicesTest {
 
         @Before
         public void setUp() throws Exception {
-            requestSpaceServiceInstanceByNameUserProvided(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+            requestListServiceInstancesUserProvided(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
             requestListServiceBindings(this.cloudFoundryClient, "test-service-instance-id", "test-application-id");
-            requestApplication(this.cloudFoundryClient, "test-application-id", "test-application");
+            requestGetApplication(this.cloudFoundryClient, "test-application-id", "test-application");
         }
 
         @Override
@@ -933,13 +905,13 @@ public final class DefaultServicesTest {
 
         @Before
         public void setUp() throws Exception {
-            requestSpaceServiceInstancesTwo(this.cloudFoundryClient, TEST_SPACE_ID, "test-service-instance1", "test-service-instance2");
-            requestListServiceBindings(this.cloudFoundryClient, "test-service-instance1-id");
+            requestListServiceInstancesTwo(this.cloudFoundryClient, TEST_SPACE_ID, "test-service-instance1", "test-service-instance2");
+            requestListServiceBindingsEmpty(this.cloudFoundryClient, "test-service-instance1-id");
             requestListServiceBindings(this.cloudFoundryClient, "test-service-instance2-id", "test-application-id");
-            requestServicePlan(this.cloudFoundryClient, "test-service-instance1-plan-id", "test-service-plan", "test-service");
-            requestServicePlan(this.cloudFoundryClient, "test-service-instance2-plan-id", "test-service-plan", "test-service");
-            requestService(this.cloudFoundryClient, "test-service-id", "test-service");
-            requestApplication(this.cloudFoundryClient, "test-application-id", "test-application");
+            requestGetServicePlan(this.cloudFoundryClient, "test-service-instance1-plan-id", "test-service-plan", "test-service");
+            requestGetServicePlan(this.cloudFoundryClient, "test-service-instance2-plan-id", "test-service-plan", "test-service");
+            requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
+            requestGetApplication(this.cloudFoundryClient, "test-application-id", "test-application");
         }
 
         @Override
@@ -976,7 +948,7 @@ public final class DefaultServicesTest {
 
         @Before
         public void setUp() throws Exception {
-            requestSpaceServiceInstancesEmpty(this.cloudFoundryClient, TEST_SPACE_ID);
+            requestListServiceInstancesEmpty(this.cloudFoundryClient, TEST_SPACE_ID);
         }
 
         @Override
@@ -1010,13 +982,13 @@ public final class DefaultServicesTest {
 
     }
 
-    public static final class ListOffering extends AbstractOperationsApiTest<ServiceOffering> {
+    public static final class ListServiceOfferings extends AbstractOperationsApiTest<ServiceOffering> {
 
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
-            requestSpaceServicesTwo(this.cloudFoundryClient, TEST_SPACE_ID, "test-service1", "test-service2");
+            requestListServicesTwo(this.cloudFoundryClient, TEST_SPACE_ID, "test-service1", "test-service2");
             requestListServicePlans(this.cloudFoundryClient, "test-service1-id", "test-service1-plan", "test-service1-plan-id");
             requestListServicePlans(this.cloudFoundryClient, "test-service2-id", "test-service2-plan", "test-service2-plan-id");
         }
@@ -1028,31 +1000,41 @@ public final class DefaultServicesTest {
                     .description("test-service1-description")
                     .id("test-service1-id")
                     .label("test-service1")
-                    .planName("test-service1-plan")
+                    .servicePlan(ServicePlan.builder()
+                        .description("test-description")
+                        .free(true)
+                        .id("test-service1-plan-id")
+                        .name("test-service1-plan")
+                        .build())
                     .build())
                 .assertEquals(ServiceOffering.builder()
                     .description("test-service2-description")
                     .id("test-service2-id")
                     .label("test-service2")
-                    .planName("test-service2-plan")
+                    .servicePlan(ServicePlan.builder()
+                        .description("test-description")
+                        .free(true)
+                        .id("test-service2-plan-id")
+                        .name("test-service2-plan")
+                        .build())
                     .build());
         }
 
         @Override
         protected Publisher<ServiceOffering> invoke() {
             return this.services
-                .listOfferings(GetMarketplaceRequest.builder().build());
+                .listServiceOfferings(ListServiceOfferingsRequest.builder().build());
         }
 
     }
 
-    public static final class ListOfferingByService extends AbstractOperationsApiTest<ServiceOffering> {
+    public static final class ListServiceOfferingsSingle extends AbstractOperationsApiTest<ServiceOffering> {
 
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
-            requestSpaceServiceByName(this.cloudFoundryClient, TEST_SPACE_ID, "test-service");
+            requestListServices(this.cloudFoundryClient, TEST_SPACE_ID, "test-service");
             requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-service-plan", "test-service-plan-id");
         }
 
@@ -1063,14 +1045,19 @@ public final class DefaultServicesTest {
                     .description("test-service-description")
                     .id("test-service-id")
                     .label("test-service")
-                    .planName("test-service-plan")
+                    .servicePlan(ServicePlan.builder()
+                        .description("test-description")
+                        .free(true)
+                        .id("test-service-plan-id")
+                        .name("test-service-plan")
+                        .build())
                     .build());
         }
 
         @Override
         protected Publisher<ServiceOffering> invoke() {
             return this.services
-                .listOfferings(GetMarketplaceRequest.builder()
+                .listServiceOfferings(ListServiceOfferingsRequest.builder()
                     .serviceName("test-service")
                     .build());
         }
@@ -1084,8 +1071,8 @@ public final class DefaultServicesTest {
         @Before
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
-            requestSpaceServiceInstanceByName(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-            requestServiceBinding(this.cloudFoundryClient, "test-application-id", "test-service-instance-id");
+            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+            requestApplicationsListServiceBindings(this.cloudFoundryClient, "test-application-id", "test-service-instance-id");
             requestDeleteServiceBinding(this.cloudFoundryClient, "test-service-binding-id");
             requestJobSuccess(this.cloudFoundryClient, "test-id");
         }
@@ -1113,8 +1100,8 @@ public final class DefaultServicesTest {
         @Before
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
-            requestSpaceServiceInstanceByName(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-            requestServiceBinding(this.cloudFoundryClient, "test-application-id", "test-service-instance-id");
+            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+            requestApplicationsListServiceBindings(this.cloudFoundryClient, "test-application-id", "test-service-instance-id");
             requestDeleteServiceBinding(this.cloudFoundryClient, "test-service-binding-id");
             requestJobFailure(this.cloudFoundryClient, "test-id");
         }

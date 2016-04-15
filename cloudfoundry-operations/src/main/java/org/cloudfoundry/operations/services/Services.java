@@ -64,11 +64,11 @@ public interface Services {
     Flux<ServiceInstance> listInstances();
 
     /**
-     * LList available offerings in the marketplace
+     * LList available services offerings in the marketplace
      *
-     * @return the service instances
+     * @return the service offerings
      */
-    Flux<ServiceOffering> listOfferings(GetMarketplaceRequest request);
+    Flux<ServiceOffering> listServiceOfferings(ListServiceOfferingsRequest request);
 
     /**
      * Unbind a service instance from an application

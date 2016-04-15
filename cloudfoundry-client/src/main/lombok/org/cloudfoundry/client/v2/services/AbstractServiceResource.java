@@ -32,6 +32,7 @@ public abstract class AbstractServiceResource extends Resource<ServiceEntity> {
 
     AbstractServiceResource(@JsonProperty("entity") ServiceEntity entity,
                             @JsonProperty("metadata") Metadata metadata) {
+
         super(entity, metadata);
     }
 

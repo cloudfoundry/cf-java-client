@@ -25,7 +25,7 @@ import org.cloudfoundry.ValidationResult;
  * The request options for the marketplace operation
  */
 @Data
-public final class GetMarketplaceRequest implements Validatable {
+public final class ListServiceOfferingsRequest implements Validatable {
 
     /**
      * The name of the service
@@ -36,7 +36,7 @@ public final class GetMarketplaceRequest implements Validatable {
     private final String serviceName;
 
     @Builder
-    GetMarketplaceRequest(String serviceName) {
+    ListServiceOfferingsRequest(String serviceName) {
         this.serviceName = serviceName;
     }
 

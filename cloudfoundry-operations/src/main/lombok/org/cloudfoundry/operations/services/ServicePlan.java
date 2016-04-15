@@ -18,15 +18,12 @@ package org.cloudfoundry.operations.services;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.Singular;
-
-import java.util.List;
 
 /**
- * A Cloud Foundry Service Offering
+ * A Cloud Foundry Service Plan
  */
 @Data
-public final class ServiceOffering {
+public final class ServicePlan {
 
     /**
      * The description
@@ -37,6 +34,14 @@ public final class ServiceOffering {
     private final String description;
 
     /**
+     * Whether the plan is free
+     *
+     * @param paid whether the plan is free
+     * @return whether the plan is free
+     */
+    private final Boolean free;
+
+    /**
      * The id
      *
      * @param id the id
@@ -45,31 +50,19 @@ public final class ServiceOffering {
     private final String id;
 
     /**
-     * The label
+     * The name
      *
-     * @param name the label
-     * @return the label
+     * @param name the name
+     * @return the name
      */
-    private final String label;
-
-    /**
-     * The service plans
-     *
-     * @param servicePlans the service plans
-     * @return the service plans
-     */
-    private final List<ServicePlan> servicePlans;
+    private final String name;
 
     @Builder
-    ServiceOffering(String description,
-                    String id,
-                    String label,
-                    @Singular List<ServicePlan> servicePlans) {
-
+    ServicePlan(String description, Boolean free, String id, String name) {
         this.description = description;
+        this.free = free;
         this.id = id;
-        this.label = label;
-        this.servicePlans = servicePlans;
+        this.name = name;
     }
 
 }

@@ -22,11 +22,11 @@ import org.junit.Test;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class GetMarketplaceRequestTest {
+public final class ListServiceOfferingsRequestTest {
 
     @Test
     public void isValidAll() {
-        ValidationResult result = GetMarketplaceRequest.builder()
+        ValidationResult result = ListServiceOfferingsRequest.builder()
             .build()
             .isValid();
 
