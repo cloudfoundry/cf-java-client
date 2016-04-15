@@ -40,7 +40,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
@@ -78,7 +77,6 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    @DependsOn({"organizationId", "spaceId"})
     CloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient, LoggingClient loggingClient, UaaClient uaaClient, String organizationName, String spaceName) {
         return new CloudFoundryOperationsBuilder()
             .cloudFoundryClient(cloudFoundryClient)
@@ -101,9 +99,8 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    @DependsOn("cloudFoundryCleaner")
     Mono<String> organizationId(CloudFoundryClient cloudFoundryClient, String organizationName) throws InterruptedException {
-        Mono<String> organizationId = cloudFoundryClient.organizations()
+        return cloudFoundryClient.organizations()
             .create(CreateOrganizationRequest.builder()
                 .name(organizationName)
                 .build())
@@ -112,9 +109,6 @@ public class IntegrationTestConfiguration {
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(id -> this.logger.debug("<< ORGANIZATION id({}) >>", id))
             .cache();
-
-        organizationId.get();
-        return organizationId;
     }
 
     @Bean
@@ -124,7 +118,7 @@ public class IntegrationTestConfiguration {
 
     @Bean
     Mono<Optional<String>> protectedDomainId(CloudFoundryClient cloudFoundryClient, @Value("${test.protected.domain:}") String protectedDomain) {
-        Mono<Optional<String>> protectedDomainId = Mono
+        return Mono
             .just(protectedDomain)
             .where(StringUtils::hasText)
             .flatMap(protectedDomain1 -> PaginationUtils
@@ -141,9 +135,6 @@ public class IntegrationTestConfiguration {
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(id -> this.logger.debug("<< PROTECTED DOMAIN >>"))
             .cache();
-
-        protectedDomainId.get();
-        return protectedDomainId;
     }
 
     @Bean
@@ -153,7 +144,7 @@ public class IntegrationTestConfiguration {
 
     @Bean
     Mono<Optional<String>> protectedOrganizationId(CloudFoundryClient cloudFoundryClient, @Value("${test.protected.organization:}") String protectedOrganization) {
-        Mono<Optional<String>> protectedOrganizationId = Mono
+        return Mono
             .just(protectedOrganization)
             .where(StringUtils::hasText)
             .flatMap(protectedOrganization1 -> PaginationUtils
@@ -170,14 +161,11 @@ public class IntegrationTestConfiguration {
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(id -> this.logger.debug("<< PROTECTED ORGANIZATION >>"))
             .cache();
-
-        protectedOrganizationId.get();
-        return protectedOrganizationId;
     }
 
     @Bean
     Mono<List<String>> protectedSpaceIds(CloudFoundryClient cloudFoundryClient, Mono<Optional<String>> protectedOrganizationId) {
-        Mono<List<String>> protectedSpaceIds = protectedOrganizationId
+        return protectedOrganizationId
             .then(protectedOrganizationId1 -> protectedOrganizationId1
                 .map(id -> PaginationUtils
                     .requestResources(page -> cloudFoundryClient.spaces()
@@ -192,9 +180,6 @@ public class IntegrationTestConfiguration {
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(id -> this.logger.debug("<< PROTECTED SPACES >>"))
             .cache();
-
-        protectedSpaceIds.get();
-        return protectedSpaceIds;
     }
 
     @Bean
@@ -204,7 +189,7 @@ public class IntegrationTestConfiguration {
 
     @Bean
     Mono<String> spaceId(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, String spaceName) throws InterruptedException {
-        Mono<String> spaceId = organizationId
+        return organizationId
             .then(orgId -> cloudFoundryClient.spaces()
                 .create(CreateSpaceRequest.builder()
                     .name(spaceName)
@@ -215,9 +200,6 @@ public class IntegrationTestConfiguration {
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(id -> this.logger.debug("<< SPACE id({}) >>", id))
             .cache();
-
-        spaceId.get();
-        return spaceId;
     }
 
     @Bean
@@ -227,7 +209,7 @@ public class IntegrationTestConfiguration {
 
     @Bean
     Mono<String> stackId(CloudFoundryClient cloudFoundryClient, String stackName) throws InterruptedException {
-        Mono<String> stackId = PaginationUtils
+        return PaginationUtils
             .requestResources(page -> cloudFoundryClient.stacks()
                 .list(ListStacksRequest.builder()
                     .name(stackName)
@@ -239,9 +221,6 @@ public class IntegrationTestConfiguration {
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(id -> this.logger.debug("<< STACK >>"))
             .cache();
-
-        stackId.get();
-        return stackId;
     }
 
     @Bean
@@ -258,7 +237,7 @@ public class IntegrationTestConfiguration {
 
     @Bean
     Mono<String> userId(CloudFoundryClient cloudFoundryClient, String userName) {  // TODO: Create new user when APIs available
-        Mono<String> userId = PaginationUtils
+        return PaginationUtils
             .requestResources(page -> cloudFoundryClient.users()
                 .list(ListUsersRequest.builder()
                     .page(page)
@@ -270,9 +249,6 @@ public class IntegrationTestConfiguration {
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(id -> this.logger.debug("<< USER >>"))
             .cache();
-
-        userId.get();
-        return userId;
     }
 
     @Bean

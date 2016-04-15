@@ -140,12 +140,9 @@ public final class CloudFoundryOperationsBuilder {
             return Mono.error(new IllegalStateException("No organization targeted"));
         }
 
-        Mono<String> organizationId = getOrganization(cloudFoundryClient, organization)
+        return getOrganization(cloudFoundryClient, organization)
             .map(ResourceUtils::getId)
             .cache();
-
-        organizationId.get();
-        return organizationId;
     }
 
     private static Mono<SpaceResource> getSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
@@ -159,13 +156,10 @@ public final class CloudFoundryOperationsBuilder {
             return Mono.error(new IllegalStateException("No space targeted"));
         }
 
-        Mono<String> spaceId = organizationId
+        return organizationId
             .then(organizationId1 -> getSpace(cloudFoundryClient, organizationId1, space))
             .map(ResourceUtils::getId)
             .cache();
-
-        spaceId.get();
-        return spaceId;
     }
 
     private static Mono<String> getUsername(CloudFoundryClient cloudFoundryClient, UaaClient uaaClient) {

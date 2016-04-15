@@ -91,7 +91,7 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple2;
-import reactor.core.tuple.Tuple4;
+import reactor.core.tuple.Tuple6;
 
 import java.io.InputStream;
 import java.time.Duration;
@@ -615,8 +615,8 @@ public final class DefaultApplications implements Applications {
             });
     }
 
-    private static Mono<Tuple4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse>> getAuxiliaryContent(
-        CloudFoundryClient cloudFoundryClient, AbstractApplicationResource applicationResource) {
+    private static Mono<Tuple6<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse, List<ApplicationDetail.InstanceDetail>, List<String>>>
+    getAuxiliaryContent(CloudFoundryClient cloudFoundryClient, AbstractApplicationResource applicationResource) {
 
         String applicationId = ResourceUtils.getId(applicationResource);
         String stackId = ResourceUtils.getEntity(applicationResource).getStackId();
@@ -625,9 +625,17 @@ public final class DefaultApplications implements Applications {
             .when(
                 getApplicationStatistics(cloudFoundryClient, applicationId),
                 requestApplicationSummary(cloudFoundryClient, applicationId),
-                requestStack(cloudFoundryClient, stackId),
                 getApplicationInstances(cloudFoundryClient, applicationId)
-            );
+            )
+            .then(function((applicationStatisticsResponse, summaryApplicationResponse, applicationInstancesResponse) -> Mono
+                .when(
+                    Mono.just(applicationStatisticsResponse),
+                    Mono.just(summaryApplicationResponse),
+                    requestStack(cloudFoundryClient, stackId),
+                    Mono.just(applicationInstancesResponse),
+                    toInstanceDetailList(applicationInstancesResponse, applicationStatisticsResponse),
+                    toUrls(summaryApplicationResponse.getRoutes())
+                )));
     }
 
     private static String getBuildpack(SummaryApplicationResponse response) {
@@ -1203,12 +1211,13 @@ public final class DefaultApplications implements Applications {
     }
 
     private static ApplicationDetail toApplicationDetail(ApplicationStatisticsResponse applicationStatisticsResponse, SummaryApplicationResponse summaryApplicationResponse,
-                                                         GetStackResponse getStackResponse, ApplicationInstancesResponse applicationInstancesResponse) {
+                                                         GetStackResponse getStackResponse, ApplicationInstancesResponse applicationInstancesResponse,
+                                                         List<ApplicationDetail.InstanceDetail> instanceDetails, List<String> urls) {
         return ApplicationDetail.builder()
             .buildpack(getBuildpack(summaryApplicationResponse))
             .diskQuota(summaryApplicationResponse.getDiskQuota())
             .id(summaryApplicationResponse.getId())
-            .instanceDetails(toInstanceDetailList(applicationInstancesResponse, applicationStatisticsResponse))
+            .instanceDetails(instanceDetails)
             .instances(summaryApplicationResponse.getInstances())
             .lastUploaded(toDate(summaryApplicationResponse.getPackageUpdatedAt()))
             .memoryLimit(summaryApplicationResponse.getMemory())
@@ -1216,7 +1225,7 @@ public final class DefaultApplications implements Applications {
             .requestedState(summaryApplicationResponse.getState())
             .runningInstances(summaryApplicationResponse.getRunningInstances())
             .stack(getStackResponse.getEntity().getName())
-            .urls(toUrls(summaryApplicationResponse.getRoutes()))
+            .urls(urls)
             .build();
     }
 
@@ -1306,12 +1315,11 @@ public final class DefaultApplications implements Applications {
             .build();
     }
 
-    private static List<ApplicationDetail.InstanceDetail> toInstanceDetailList(ApplicationInstancesResponse instancesResponse, ApplicationStatisticsResponse statisticsResponse) {
+    private static Mono<List<ApplicationDetail.InstanceDetail>> toInstanceDetailList(ApplicationInstancesResponse instancesResponse, ApplicationStatisticsResponse statisticsResponse) {
         return Flux
             .fromIterable(instancesResponse.entrySet())
             .map(entry -> toInstanceDetail(entry, statisticsResponse))
-            .toList()
-            .get();
+            .toList();
     }
 
     private static String toUrl(Route route) {
@@ -1321,12 +1329,11 @@ public final class DefaultApplications implements Applications {
         return hostName.isEmpty() ? domainName : String.format("%s.%s", hostName, domainName);
     }
 
-    private static List<String> toUrls(List<Route> routes) {
+    private static Mono<List<String>> toUrls(List<Route> routes) {
         return Flux
             .fromIterable(routes)
             .map(DefaultApplications::toUrl)
-            .toList()
-            .get();
+            .toList();
     }
 
     private static Mono<UpdateApplicationResponse> updateHealthCheck(CloudFoundryClient cloudFoundryClient, String applicationId, ApplicationHealthCheck type) {
