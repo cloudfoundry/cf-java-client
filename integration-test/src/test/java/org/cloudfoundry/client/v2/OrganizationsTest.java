@@ -85,7 +85,6 @@ import reactor.core.tuple.Tuple2;
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
-import static reactor.core.publisher.Mono.when;
 
 public final class OrganizationsTest extends AbstractIntegrationTest {
 
@@ -102,12 +101,13 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void associateAuditor() {
         String organizationName = getOrganizationName();
 
-        when(
-            createOrganizationId(this.cloudFoundryClient, organizationName),
-            this.userId
-        )
-            .then(function((organizationId, userId) ->
-                when(
+        Mono
+            .when(
+                createOrganizationId(this.cloudFoundryClient, organizationName),
+                this.userId
+            )
+            .then(function((organizationId, userId) -> Mono
+                .when(
                     this.cloudFoundryClient.organizations()
                         .associateAuditor(AssociateOrganizationAuditorRequest.builder()
                             .auditorId(userId)
@@ -454,8 +454,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String sharedDomainName = getDomainName();
 
         requestCreateSharedDomainResponse(this.cloudFoundryClient, sharedDomainName)
-            .after(
-                when(
+            .after(Mono
+                .when(
                     createOrganizationId(this.cloudFoundryClient, defaultOrganizationName),
                     createOrganizationId(this.cloudFoundryClient, organizationName)
                 ))
