@@ -64,6 +64,13 @@ public interface Services {
     Flux<ServiceInstance> listInstances();
 
     /**
+     * LList available services offerings in the marketplace
+     *
+     * @return the service offerings
+     */
+    Flux<ServiceOffering> listServiceOfferings(ListServiceOfferingsRequest request);
+
+    /**
      * Unbind a service instance from an application
      *
      * @param request the unbind service instance request
