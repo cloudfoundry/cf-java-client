@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
@@ -99,6 +100,7 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean(initMethod = "get")
+    @DependsOn("cloudFoundryCleaner")
     Mono<String> organizationId(CloudFoundryClient cloudFoundryClient, String organizationName) throws InterruptedException {
         return cloudFoundryClient.organizations()
             .create(CreateOrganizationRequest.builder()
@@ -188,6 +190,7 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean(initMethod = "get")
+    @DependsOn("cloudFoundryCleaner")
     Mono<String> spaceId(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, String spaceName) throws InterruptedException {
         return organizationId
             .then(orgId -> cloudFoundryClient.spaces()
@@ -208,6 +211,7 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean(initMethod = "get")
+    @DependsOn("cloudFoundryCleaner")
     Mono<String> stackId(CloudFoundryClient cloudFoundryClient, String stackName) throws InterruptedException {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.stacks()
@@ -236,6 +240,7 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean(initMethod = "get")
+    @DependsOn("cloudFoundryCleaner")
     Mono<String> userId(CloudFoundryClient cloudFoundryClient, String userName) {  // TODO: Create new user when APIs available
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.users()
