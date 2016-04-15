@@ -448,26 +448,29 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listDomains() {
-        String defaultOrganizationName = getOrganizationName();
         String organizationName = getOrganizationName();
-        String privateDomainName = getDomainName();
         String sharedDomainName = getDomainName();
 
-        requestCreateSharedDomainResponse(this.cloudFoundryClient, sharedDomainName)
-            .after(Mono
+        Mono
+            .when(
+                createOrganizationId(this.cloudFoundryClient, organizationName),
+                requestCreateSharedDomainResponse(this.cloudFoundryClient, sharedDomainName)
+            )
+            .flatMap(function((organizationId, sharedDomainResponse) -> Mono
                 .when(
-                    createOrganizationId(this.cloudFoundryClient, defaultOrganizationName),
-                    createOrganizationId(this.cloudFoundryClient, organizationName)
-                ))
-            .then(function((defaultOrganizationId, organizationId) -> associatePrivateDomain(this.cloudFoundryClient, defaultOrganizationId, organizationId, privateDomainName)))
-            .flatMap(function((organizationId, privateDomainId) -> PaginationUtils
-                .requestResources(page -> this.cloudFoundryClient.organizations()
-                    .listDomains(ListOrganizationDomainsRequest.builder()
-                        .page(page)
-                        .organizationId(organizationId)
-                        .build()))))
-            .subscribe(this.testSubscriber()
-                .assertCount(2));
+                    Mono.just(ResourceUtils.getId(sharedDomainResponse)),
+                    PaginationUtils
+                        .requestResources(page -> this.cloudFoundryClient.organizations()
+                            .listDomains(ListOrganizationDomainsRequest.builder()
+                                .page(page)
+                                .organizationId(organizationId)
+                                .build()))
+                        .filter(response -> sharedDomainName.equals(response.getEntity().getName()))
+                        .single()
+                        .map(ResourceUtils::getId)))
+            )
+            .subscribe(this.<Tuple2<String, String>>testSubscriber()
+                .assertThat(this::assertTupleEquality));
     }
 
     @Test
@@ -496,7 +499,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listPrivateDomain() {
+    public void listPrivateDomains() {
         String domainName = getDomainName();
         String defaultOrganizationName = getOrganizationName();
         String organizationName = getOrganizationName();
