@@ -1,0 +1,16 @@
+{
+  "allowedproviders": [
+    "uaa"
+  ],
+  "authorities": [
+    "uaa.resource"
+  ],
+  "authorized_grant_types": [
+    "authorization_code"
+  ],
+  "client_id": "limited-client",
+  "client_secret": "limited-client-secret",
+  "scope": [
+    "openid"
+  ]
+}

@@ -17,7 +17,7 @@
 package org.cloudfoundry.uaa;
 
 import org.cloudfoundry.uaa.accesstokenadministration.AccessTokenAdministration;
-import org.cloudfoundry.uaa.identityzonemanagement.IdentityZoneManagement;
+import org.cloudfoundry.uaa.identityzones.IdentityZones;
 
 /**
  * Main entry point to the UAA Client API
@@ -32,10 +32,10 @@ public interface UaaClient {
     AccessTokenAdministration accessTokenAdministration();
 
     /**
-     * Main entry point to the UAA Identity Zone Management Client API
+     * Main entry point to the UAA Identity Zones Client API
      *
-     * @return the UAA Identity Zone Management Client API
+     * @return the UAA Identity Zones Client API
      */
-    IdentityZoneManagement identityZoneManagement();
+    IdentityZones identityZones();
 
 }

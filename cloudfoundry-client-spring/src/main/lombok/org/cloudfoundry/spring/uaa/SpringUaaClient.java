@@ -24,7 +24,7 @@ import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
 import org.cloudfoundry.spring.uaa.accesstokenadministration.SpringAccessTokenAdministration;
-import org.cloudfoundry.spring.uaa.identityzonemanagement.SpringIdentityZoneManagement;
+import org.cloudfoundry.spring.uaa.identityzones.SpringIdentityZones;
 import org.cloudfoundry.spring.util.SchedulerGroupBuilder;
 import org.cloudfoundry.spring.util.network.ConnectionContext;
 import org.cloudfoundry.spring.util.network.FallbackHttpMessageConverter;
@@ -32,7 +32,7 @@ import org.cloudfoundry.spring.util.network.OAuth2RestTemplateBuilder;
 import org.cloudfoundry.spring.util.network.SslCertificateTruster;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.accesstokenadministration.AccessTokenAdministration;
-import org.cloudfoundry.uaa.identityzonemanagement.IdentityZoneManagement;
+import org.cloudfoundry.uaa.identityzones.IdentityZones;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
@@ -51,11 +51,11 @@ public final class SpringUaaClient implements UaaClient {
 
     private final SpringAccessTokenAdministration accessTokenAdministration;
 
-    private final SpringIdentityZoneManagement identityZoneManagement;
+    private final SpringIdentityZones identityZones;
 
     SpringUaaClient(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
         this.accessTokenAdministration = new SpringAccessTokenAdministration(restOperations, root, schedulerGroup);
-        this.identityZoneManagement = new SpringIdentityZoneManagement(restOperations, root, schedulerGroup);
+        this.identityZones = new SpringIdentityZones(restOperations, root, schedulerGroup);
     }
 
     @Builder
@@ -71,8 +71,8 @@ public final class SpringUaaClient implements UaaClient {
     }
 
     @Override
-    public IdentityZoneManagement identityZoneManagement() {
-        return this.identityZoneManagement;
+    public IdentityZones identityZones() {
+        return this.identityZones;
     }
 
     private static OAuth2RestOperations getRestOperations(ConnectionContext connectionContext) {
