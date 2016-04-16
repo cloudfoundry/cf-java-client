@@ -19,10 +19,8 @@ package org.cloudfoundry.operations.buildpacks;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.buildpacks.BuildpackEntity;
 import org.cloudfoundry.client.v2.buildpacks.BuildpackResource;
-import org.cloudfoundry.client.v2.buildpacks.CreateBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.CreateBuildpackResponse;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
-import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.ValidationUtils;
@@ -41,9 +39,7 @@ public final class DefaultBuildpacks implements Buildpacks {
     public Mono<Void> create(CreateBuildpackRequest request) {
         return ValidationUtils
             .validate(request)
-            .then(request1 -> validateAdditionalArguments(request1.getFilename(), request1.getPosition()))
-            .then(message -> ExceptionUtils.illegalArgument(message))
-            .otherwiseIfEmpty(requestCreateBuildpack(this.cloudFoundryClient, request))
+            .then(request1 -> requestCreateBuildpack(this.cloudFoundryClient, request1.getBuildpack(), request1.getPath(), request1.getPosition(), request1.getEnable()))
             .after();
     }
 
@@ -53,9 +49,15 @@ public final class DefaultBuildpacks implements Buildpacks {
             .map(DefaultBuildpacks::toBuildpackResource);
     }
 
-    private static Mono<CreateBuildpackResponse> requestCreateBuildpack(CloudFoundryClient cloudFoundryClient, CreateBuildpackRequest request){
+    private static Mono<CreateBuildpackResponse> requestCreateBuildpack(CloudFoundryClient cloudFoundryClient, String buildpack, String path, Integer position, Boolean enable) {
         return cloudFoundryClient.buildpacks()
-            .create(request);
+            .create(org.cloudfoundry.client.v2.buildpacks.CreateBuildpackRequest
+                .builder()
+                .name(buildpack)
+                .filename(path)
+                .position(position)
+                .enabled(enable)
+                .build());
     }
 
     private static Flux<BuildpackResource> requestBuildpacks(CloudFoundryClient cloudFoundryClient) {
@@ -77,16 +79,6 @@ public final class DefaultBuildpacks implements Buildpacks {
             .name(entity.getName())
             .position(entity.getPosition())
             .build();
-    }
-
-    private static Mono<String> validateAdditionalArguments(String filename, Integer position){
-        return filename == null ?
-            (position == null ?
-                Mono.just("Filename must be specified and position must be specified") :
-                Mono.just("Filename must be specified"))
-            : (position == null ?
-                Mono.just("Position must be specified") :
-                Mono.empty());
     }
 
 }

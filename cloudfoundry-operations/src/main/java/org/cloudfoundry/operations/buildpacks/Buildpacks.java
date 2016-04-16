@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.operations.buildpacks;
 
-import org.cloudfoundry.client.v2.buildpacks.CreateBuildpackRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
