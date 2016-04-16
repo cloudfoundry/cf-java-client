@@ -17,19 +17,23 @@
 package org.cloudfoundry.operations.buildpacks;
 
 import org.cloudfoundry.ValidationResult;
-import org.cloudfoundry.client.v2.buildpacks.CreateBuildpackRequest;
 import org.junit.Test;
 
 import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class CreateBuildpackRequestTest {
 
     @Test
     public void isValid() {
+
         ValidationResult result = CreateBuildpackRequest.builder()
-            .name("test-go-buildpack")
+            .buildpack("test-go-buildpack")
+            .path("https://github.com/cloudfoundry/go-buildpack")
+            .position(1)
+            .enable(true)
             .build()
             .isValid();
 
@@ -37,13 +41,85 @@ public class CreateBuildpackRequestTest {
     }
 
     @Test
-    public void isValidNoName() {
+    public void isValidDefaultEnable() {
+
+        CreateBuildpackRequest buildpackRequest = CreateBuildpackRequest.builder()
+            .buildpack("test-go-buildpack")
+            .path("https://github.com/cloudfoundry/go-buildpack")
+            .position(1)
+            .build();
+        ValidationResult result = buildpackRequest.isValid();
+
+        assertTrue(buildpackRequest.getEnable() == true);
+        assertEquals(VALID, result.getStatus());
+    }
+
+    @Test
+    public void isValidDisabledBuildpack() {
+
+        CreateBuildpackRequest buildpackRequest = CreateBuildpackRequest.builder()
+            .buildpack("test-go-buildpack")
+            .path("https://github.com/cloudfoundry/go-buildpack")
+            .position(1)
+            .enable(false)
+            .build();
+        ValidationResult result = buildpackRequest.isValid();
+
+        assertTrue(buildpackRequest.getEnable() == false);
+        assertEquals(VALID, result.getStatus());
+    }
+
+    @Test
+    public void isInValid() {
         ValidationResult result = CreateBuildpackRequest.builder()
             .build()
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+        assertTrue(result.getMessages().size() == 3);
+        assertEquals("buildpack must be specified", result.getMessages().get(0));
+        assertEquals("path must be specified", result.getMessages().get(1));
+        assertEquals("position must be specified", result.getMessages().get(2));
     }
+
+    @Test
+    public void isInValidNoBuildpack() {
+        ValidationResult result = CreateBuildpackRequest.builder()
+            .path("https://github.com/cloudfoundry/go-buildpack")
+            .position(1)
+            .build()
+            .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertTrue(result.getMessages().size() == 1);
+        assertEquals("buildpack must be specified", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isInValidNoPath() {
+        ValidationResult result = CreateBuildpackRequest.builder()
+            .buildpack("test-go-buildpack")
+            .position(1)
+            .build()
+            .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertTrue(result.getMessages().size() == 1);
+        assertEquals("path must be specified", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isInValidNoPosition() {
+        ValidationResult result = CreateBuildpackRequest.builder()
+            .buildpack("test-go-buildpack")
+            .path("https://github.com/cloudfoundry/go-buildpack")
+            .build()
+            .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertTrue(result.getMessages().size() == 1);
+        assertEquals("position must be specified", result.getMessages().get(0));
+    }
+
 
 }
