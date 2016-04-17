@@ -21,7 +21,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.cloudfoundry.client.v2.Resource;
 
 /**
  * Base class for resources that contain auditors
@@ -29,7 +28,7 @@ import org.cloudfoundry.client.v2.Resource;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class OrganizationResource extends Resource<OrganizationEntity> {
+public final class OrganizationResource extends AbstractOrganizationResource {
 
     @Builder
     OrganizationResource(@JsonProperty("entity") OrganizationEntity entity,
