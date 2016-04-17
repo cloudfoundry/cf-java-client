@@ -20,6 +20,11 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionResource;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
+import org.cloudfoundry.client.v2.organizations.OrganizationResource;
+import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.UpdateOrganizationResponse;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
@@ -32,9 +37,18 @@ import static org.mockito.Mockito.when;
 
 public final class DefaultOrganizationAdminTest {
 
-    private static void requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient) {
+    private static void requestListOrganizationEmpty(CloudFoundryClient cloudFoundryClient, String name) {
+        when(cloudFoundryClient.organizations()
+            .list(fillPage(ListOrganizationsRequest.builder().name(name))
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListOrganizationsResponse.builder())
+                    .build()));
+    }
+
+    private static void requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient, String name) {
         when(cloudFoundryClient.organizationQuotaDefinitions()
-            .list(fillPage(ListOrganizationQuotaDefinitionsRequest.builder())
+            .list(fillPage(ListOrganizationQuotaDefinitionsRequest.builder().name(name))
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListOrganizationQuotaDefinitionsResponse.builder())
@@ -43,9 +57,9 @@ public final class DefaultOrganizationAdminTest {
                     .build()));
     }
 
-    private static void requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient, String name) {
+    private static void requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.organizationQuotaDefinitions()
-            .list(fillPage(ListOrganizationQuotaDefinitionsRequest.builder().name(name))
+            .list(fillPage(ListOrganizationQuotaDefinitionsRequest.builder())
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListOrganizationQuotaDefinitionsResponse.builder())
@@ -61,6 +75,27 @@ public final class DefaultOrganizationAdminTest {
             .thenReturn(Mono
                 .just(fillPage(ListOrganizationQuotaDefinitionsResponse.builder())
                     .build()));
+    }
+
+    private static void requestListOrganizations(CloudFoundryClient cloudFoundryClient, String name) {
+        when(cloudFoundryClient.organizations()
+            .list(fillPage(ListOrganizationsRequest.builder().name(name))
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListOrganizationsResponse.builder())
+                    .resource(fill(OrganizationResource.builder(), "organization-")
+                        .build())
+                    .build()));
+    }
+
+    private static void requestUpdateOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String quotaId) {
+        when(cloudFoundryClient.organizations()
+            .update(UpdateOrganizationRequest.builder()
+                .organizationId(organizationId)
+                .quotaDefinitionId(quotaId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(UpdateOrganizationResponse.builder(), "organization-").build()));
     }
 
     public static final class GetQuota extends AbstractOperationsApiTest<OrganizationQuota> {
@@ -146,6 +181,82 @@ public final class DefaultOrganizationAdminTest {
         @Override
         protected Publisher<OrganizationQuota> invoke() {
             return this.organizationAdmin.listQuotas();
+        }
+    }
+
+    public static final class SetQuota extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(this.cloudFoundryClient);
+
+        @Before
+        public void setUp() throws Exception {
+            requestListOrganizationQuotas(this.cloudFoundryClient, "test-quota");
+            requestListOrganizations(this.cloudFoundryClient, "test-organization");
+            requestUpdateOrganization(this.cloudFoundryClient, "test-organization-id", "test-quota-id");
+
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            return this.organizationAdmin.setQuota(SetQuotaRequest.builder()
+                .organizationName("test-organization")
+                .quotaName("test-quota")
+                .build());
+        }
+    }
+
+    public static final class SetQuotaOrganizationNotFound extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(this.cloudFoundryClient);
+
+        @Before
+        public void setUp() throws Exception {
+            requestListOrganizationQuotas(this.cloudFoundryClient, "test-quota");
+            requestListOrganizationEmpty(this.cloudFoundryClient, "test-organization-not-found");
+
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            testSubscriber
+                .assertError(IllegalArgumentException.class, "Organization test-organization-not-found does not exist");
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            return this.organizationAdmin.setQuota(SetQuotaRequest.builder()
+                .organizationName("test-organization-not-found")
+                .quotaName("test-quota")
+                .build());
+        }
+    }
+
+    public static final class SetQuotaQuotaNotFound extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(this.cloudFoundryClient);
+
+        @Before
+        public void setUp() throws Exception {
+            requestListOrganizationQuotasEmpty(this.cloudFoundryClient, "test-quota-not-found");
+            requestListOrganizations(this.cloudFoundryClient, "test-organization");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            testSubscriber
+                .assertError(IllegalArgumentException.class, "Quota test-quota-not-found does not exist");
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            return this.organizationAdmin.setQuota(SetQuotaRequest.builder()
+                .organizationName("test-organization")
+                .quotaName("test-quota-not-found")
+                .build());
         }
     }
 
