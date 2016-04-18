@@ -20,13 +20,11 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionResource;
-import org.cloudfoundry.client.v2.organizations.AbstractOrganizationResource;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationResponse;
 import org.cloudfoundry.util.ExceptionUtils;
-import org.cloudfoundry.util.OperationUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.ValidationUtils;
@@ -46,10 +44,10 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     }
 
     @Override
-    public Mono<OrganizationQuota> getQuota(GetQuotaRequest getQuotaRequest) {
+    public Mono<OrganizationQuota> getQuota(GetQuotaRequest request) {
         return ValidationUtils
-            .validate(getQuotaRequest)
-            .then(request -> getOrganizationQuota(this.cloudFoundryClient, request.getName()))
+            .validate(request)
+            .then(request1 -> getOrganizationQuota(this.cloudFoundryClient, request1.getName()))
             .map(DefaultOrganizationAdmin::toOrganizationQuota);
     }
 
@@ -60,13 +58,13 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     }
 
     @Override
-    public Mono<Void> setQuota(SetQuotaRequest setQuotaRequest) {
-        return ValidationUtils.validate(setQuotaRequest)
-            .then(request -> Mono.when(
-                getOrganizationId(this.cloudFoundryClient, request.getOrganizationName()),
-                getOrganizationQuotaId(this.cloudFoundryClient, request.getQuotaName())
+    public Mono<Void> setQuota(SetQuotaRequest request) {
+        return ValidationUtils.validate(request)
+            .then(request1 -> Mono.when(
+                getOrganizationId(this.cloudFoundryClient, request1.getOrganizationName()),
+                getOrganizationQuotaId(this.cloudFoundryClient, request1.getQuotaName())
             ))
-            .then(function(((organizationId, quotaDefinitionId) -> requestSetOrganizationQuota(this.cloudFoundryClient, organizationId, quotaDefinitionId))))
+            .then(function(((organizationId, quotaDefinitionId) -> requesUpdateOrganization(this.cloudFoundryClient, organizationId, quotaDefinitionId))))
             .after();
     }
 
@@ -84,18 +82,16 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     }
 
     private static Mono<String> getOrganizationQuotaId(CloudFoundryClient cloudFoundryClient, String name) {
-        return requestListOrganizationQuotas(cloudFoundryClient, name)
-            .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Quota %s does not exist", name)))
+        return getOrganizationQuota(cloudFoundryClient, name)
             .map(ResourceUtils::getId);
     }
 
-    private static Flux<OrganizationQuotaDefinitionResource> requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient) {
-        return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizationQuotaDefinitions()
-                .list(ListOrganizationQuotaDefinitionsRequest.builder()
-                    .page(page)
-                    .build()));
+    private static Mono<UpdateOrganizationResponse> requesUpdateOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String quotaDefinitionId) {
+        return cloudFoundryClient.organizations()
+            .update(UpdateOrganizationRequest.builder()
+                .organizationId(organizationId)
+                .quotaDefinitionId(quotaDefinitionId)
+                .build());
     }
 
     private static Flux<OrganizationQuotaDefinitionResource> requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient, String name) {
@@ -107,6 +103,14 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
                     .build()));
     }
 
+    private static Flux<OrganizationQuotaDefinitionResource> requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.organizationQuotaDefinitions()
+                .list(ListOrganizationQuotaDefinitionsRequest.builder()
+                    .page(page)
+                    .build()));
+    }
+
     private static Flux<OrganizationResource> requestListOrganizations(CloudFoundryClient cloudFoundryClient, String name) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.organizations()
@@ -114,14 +118,6 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
                     .name(name)
                     .page(page)
                     .build()));
-    }
-
-    private static Mono<AbstractOrganizationResource> requestSetOrganizationQuota(CloudFoundryClient cloudFoundryClient, String organizationId, String quotaDefinitionId) {
-        return cloudFoundryClient.organizations().update(UpdateOrganizationRequest.builder()
-            .organizationId(organizationId)
-            .quotaDefinitionId(quotaDefinitionId)
-            .build())
-            .map(OperationUtils.<UpdateOrganizationResponse, AbstractOrganizationResource>cast());
     }
 
     private static OrganizationQuota toOrganizationQuota(OrganizationQuotaDefinitionResource resource) {
