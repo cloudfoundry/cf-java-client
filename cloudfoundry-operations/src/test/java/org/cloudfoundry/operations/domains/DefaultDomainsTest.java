@@ -17,9 +17,11 @@
 package org.cloudfoundry.operations.domains;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationPrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
 import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsRequest;
@@ -43,7 +45,7 @@ import static org.mockito.Mockito.when;
 
 public final class DefaultDomainsTest {
 
-    private static void requestCreateDomain(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
+    private static void requestCreatePrivateDomain(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
         when(cloudFoundryClient.privateDomains()
             .create(CreatePrivateDomainRequest.builder()
                 .name(domain)
@@ -61,6 +63,34 @@ public final class DefaultDomainsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(CreateSharedDomainResponse.builder(), "shared-domain-")
+                    .build()));
+    }
+
+    private static void requestListPrivateDomains(CloudFoundryClient cloudFoundryClient, String domain, String domainId) {
+        when(cloudFoundryClient.privateDomains()
+            .list(ListPrivateDomainsRequest.builder()
+                .name(domain)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListPrivateDomainsResponse.builder())
+                    .resource(PrivateDomainResource.builder()
+                        .metadata(fill(Resource.Metadata.builder(), "private-domain-")
+                            .id(domainId)
+                            .build())
+                        .build())
+                    .totalPages(1)
+                    .build()));
+    }
+
+    private static void requestListPrivateDomainsEmpty(CloudFoundryClient cloudFoundryClient, String domain) {
+        when(cloudFoundryClient.privateDomains()
+            .list(ListPrivateDomainsRequest.builder()
+                .name(domain)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListPrivateDomainsResponse.builder())
                     .build()));
     }
 
@@ -106,6 +136,15 @@ public final class DefaultDomainsTest {
                     .build()));
     }
 
+    private static void requestRemoveOrganizationPrivateDomain(CloudFoundryClient cloudFoundryClient, String domainId, String organizationId) {
+        when(cloudFoundryClient.organizations()
+            .removePrivateDomain(RemoveOrganizationPrivateDomainRequest.builder()
+                .privateDomainId(domainId)
+                .organizationId(organizationId)
+                .build()))
+            .thenReturn(Mono.empty());
+    }
+
     private static void requestSharedDomains(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.sharedDomains()
             .list(fillPage(ListSharedDomainsRequest.builder())
@@ -133,7 +172,7 @@ public final class DefaultDomainsTest {
         @Before
         public void setUp() throws Exception {
             requestOrganizations(this.cloudFoundryClient, "test-organization");
-            requestCreateDomain(this.cloudFoundryClient, "test-domain", "test-organization-id");
+            requestCreatePrivateDomain(this.cloudFoundryClient, "test-domain", "test-organization-id");
         }
 
         @Override
@@ -307,6 +346,84 @@ public final class DefaultDomainsTest {
         protected Publisher<Domain> invoke() {
             return this.domains
                 .list();
+        }
+
+    }
+
+    public static final class ShareDomain extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultDomains domains = new DefaultDomains(this.cloudFoundryClient);
+
+        @Before
+        public void setUp() throws Exception {
+            requestListPrivateDomains(this.cloudFoundryClient, "test-domain", "test-domain-id");
+            requestOrganizations(this.cloudFoundryClient, "test-organization");
+            requestRemoveOrganizationPrivateDomain(this.cloudFoundryClient, "test-domain-id", "test-organization-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.domains
+                .share(ShareDomainRequest.builder()
+                    .domain("test-domain")
+                    .organization("test-organization")
+                    .build());
+        }
+
+    }
+
+    public static final class ShareDomainInvalidRequest extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultDomains domains = new DefaultDomains(this.cloudFoundryClient);
+
+        @Before
+        public void setUp() throws Exception {
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            testSubscriber
+                .assertError(RequestValidationException.class, "Request is invalid: organization must be specified");
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.domains
+                .share(ShareDomainRequest.builder()
+                    .domain("test-domain")
+                    .build());
+        }
+
+    }
+
+    public static final class ShareDomainSharedDomain extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultDomains domains = new DefaultDomains(this.cloudFoundryClient);
+
+        @Before
+        public void setUp() throws Exception {
+            requestListPrivateDomainsEmpty(this.cloudFoundryClient, "test-domain");
+            requestOrganizations(this.cloudFoundryClient, "test-organization");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            testSubscriber
+                .assertError(IllegalArgumentException.class, "Private domain test-domain does not exist");
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.domains
+                .share(ShareDomainRequest.builder()
+                    .domain("test-domain")
+                    .organization("test-organization")
+                    .build());
         }
 
     }

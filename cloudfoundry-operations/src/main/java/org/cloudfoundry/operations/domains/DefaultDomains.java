@@ -19,6 +19,7 @@ package org.cloudfoundry.operations.domains;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationPrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
 import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsRequest;
@@ -74,6 +75,19 @@ public final class DefaultDomains implements Domains {
 
     }
 
+    @Override
+    public Mono<Void> share(ShareDomainRequest request) {
+        return ValidationUtils
+            .validate(request)
+            .then(request1 -> Mono
+                .when(
+                    getPrivateDomainId(this.cloudFoundryClient, request.getDomain()),
+                    getOrganizationId(this.cloudFoundryClient, request.getOrganization())
+                ))
+            .then(function((domainId, organizationId) -> requestRemoveOrganizationPrivateDomainRequest(this.cloudFoundryClient, domainId, organizationId)))
+            .after();
+    }
+
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
         return requestOrganizations(cloudFoundryClient, organization)
             .single()
@@ -82,6 +96,17 @@ public final class DefaultDomains implements Domains {
 
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
         return getOrganization(cloudFoundryClient, organization)
+            .map(ResourceUtils::getId);
+    }
+
+    private static Mono<PrivateDomainResource> getPrivateDomain(CloudFoundryClient cloudFoundryClient, String domain) {
+        return requestListPrivateDomains(cloudFoundryClient, domain)
+            .single()
+            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Private domain %s does not exist", domain)));
+    }
+
+    private static Mono<String> getPrivateDomainId(CloudFoundryClient cloudFoundryClient, String domain) {
+        return getPrivateDomain(cloudFoundryClient, domain)
             .map(ResourceUtils::getId);
     }
 
@@ -98,6 +123,15 @@ public final class DefaultDomains implements Domains {
             .create(org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest.builder()
                 .name(domain)
                 .build());
+    }
+
+    private static Flux<PrivateDomainResource> requestListPrivateDomains(CloudFoundryClient cloudFoundryClient, String domain) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.privateDomains()
+                .list(ListPrivateDomainsRequest.builder()
+                    .name(domain)
+                    .page(page)
+                    .build()));
     }
 
     private static Flux<PrivateDomainResource> requestListPrivateDomains(CloudFoundryClient cloudFoundryClient) {
@@ -123,6 +157,14 @@ public final class DefaultDomains implements Domains {
                     .name(organization)
                     .page(page)
                     .build()));
+    }
+
+    private static Mono<Void> requestRemoveOrganizationPrivateDomainRequest(CloudFoundryClient cloudFoundryClient, String domainId, String organizationId) {
+        return cloudFoundryClient.organizations()
+            .removePrivateDomain(RemoveOrganizationPrivateDomainRequest.builder()
+                .organizationId(organizationId)
+                .privateDomainId(domainId)
+                .build());
     }
 
     private static Domain toDomain(PrivateDomainResource resource) {
