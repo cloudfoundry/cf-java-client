@@ -21,24 +21,37 @@ import org.junit.Test;
 
 import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.cloudfoundry.util.test.TestObjects.fill;
 import static org.junit.Assert.assertEquals;
 
-public final class GetQuotaRequestTest {
+public final class SetQuotaRequestTest {
 
     @Test
-    public void isNotValidNoName() {
-        ValidationResult result = GetQuotaRequest.builder()
+    public void isNotValidNoOrganizationName() {
+        ValidationResult result = SetQuotaRequest.builder()
+            .quotaName("test-quota")
             .build()
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+        assertEquals("organization name must be specified", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isNotValidNoQuotaName() {
+        ValidationResult result = SetQuotaRequest.builder()
+            .organizationName("test-organization")
+            .build()
+            .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("quota name must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValid() {
-        ValidationResult result = fill(GetQuotaRequest.builder())
+        ValidationResult result = SetQuotaRequest.builder()
+            .organizationName("test-organization")
+            .quotaName("test-quota")
             .build()
             .isValid();
 

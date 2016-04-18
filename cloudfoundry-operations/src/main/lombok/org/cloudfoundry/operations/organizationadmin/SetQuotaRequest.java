@@ -22,30 +22,44 @@ import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
 /**
- * The request options for the get quota operation
+ * The request options for the set quota operation
  */
 @Data
-public final class GetQuotaRequest implements Validatable {
+public final class SetQuotaRequest implements Validatable {
 
     /**
-     * The name of the quota
+     * The name of the organization on which the quota must be set
      *
-     * @param name the name of the quota
+     * @param organizationName the name of the organization
+     * @return the name of the organization
+     */
+    private final String organizationName;
+
+    /**
+     * The name of the quota that will be set
+     *
+     * @param quotaName the name of the quota
      * @return the name of the quota
      */
-    private final String name;
+    private final String quotaName;
 
     @Builder
-    GetQuotaRequest(String name) {
-        this.name = name;
+    SetQuotaRequest(String organizationName,
+                    String quotaName) {
+        this.organizationName = organizationName;
+        this.quotaName = quotaName;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.name == null) {
-            builder.message("name must be specified");
+        if (this.organizationName == null) {
+            builder.message("organization name must be specified");
+        }
+
+        if (this.quotaName == null) {
+            builder.message("quota name must be specified");
         }
 
         return builder.build();
