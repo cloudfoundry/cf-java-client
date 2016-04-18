@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.operations.domains;
 
-import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -47,5 +46,13 @@ public interface Domains {
      * @return the Domains
      */
     Flux<Domain> list();
+
+    /**
+     * Share a private domain
+     *
+     * @param request The Share Domain request
+     * @return a completion indicator
+     */
+    Mono<Void> share(ShareDomainRequest request);
 
 }
