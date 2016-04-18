@@ -38,4 +38,11 @@ public interface OrganizationAdmin {
      */
     Flux<OrganizationQuota> listQuotas();
 
+    /**
+     * Set the organization quota
+     *
+     * @return a completion indicator
+     */
+    Mono<Void> setQuota(SetQuotaRequest request);
+
 }

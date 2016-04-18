@@ -17,22 +17,21 @@
 package org.cloudfoundry.client.v2.organizations;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.cloudfoundry.client.v2.Resource;
 
 /**
- * The response payload for the Update an Organization operation
+ * The core resource in organization responses
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class UpdateOrganizationResponse extends AbstractOrganizationResource {
+public abstract class AbstractOrganizationResource extends Resource<OrganizationEntity> {
 
-    @Builder
-    UpdateOrganizationResponse(@JsonProperty("entity") OrganizationEntity entity,
-                               @JsonProperty("metadata") Metadata metadata) {
+    AbstractOrganizationResource(@JsonProperty("entity") OrganizationEntity entity,
+                                 @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 
