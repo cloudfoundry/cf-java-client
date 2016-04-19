@@ -17,6 +17,8 @@
 package org.cloudfoundry.operations.domains;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationPrivateDomainRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationPrivateDomainResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationPrivateDomainRequest;
@@ -81,8 +83,21 @@ public final class DefaultDomains implements Domains {
             .validate(request)
             .then(request1 -> Mono
                 .when(
-                    getPrivateDomainId(this.cloudFoundryClient, request.getDomain()),
-                    getOrganizationId(this.cloudFoundryClient, request.getOrganization())
+                    getPrivateDomainId(this.cloudFoundryClient, request1.getDomain()),
+                    getOrganizationId(this.cloudFoundryClient, request1.getOrganization())
+                ))
+            .then(function((domainId, organizationId) -> requestAssociateOrganizationPrivateDomainRequest(this.cloudFoundryClient, domainId, organizationId)))
+            .after();
+    }
+
+    @Override
+    public Mono<Void> unshare(UnshareDomainRequest request) {
+        return ValidationUtils
+            .validate(request)
+            .then(request1 -> Mono
+                .when(
+                    getPrivateDomainId(this.cloudFoundryClient, request1.getDomain()),
+                    getOrganizationId(this.cloudFoundryClient, request1.getOrganization())
                 ))
             .then(function((domainId, organizationId) -> requestRemoveOrganizationPrivateDomainRequest(this.cloudFoundryClient, domainId, organizationId)))
             .after();
@@ -108,6 +123,14 @@ public final class DefaultDomains implements Domains {
     private static Mono<String> getPrivateDomainId(CloudFoundryClient cloudFoundryClient, String domain) {
         return getPrivateDomain(cloudFoundryClient, domain)
             .map(ResourceUtils::getId);
+    }
+
+    private static Mono<AssociateOrganizationPrivateDomainResponse> requestAssociateOrganizationPrivateDomainRequest(CloudFoundryClient cloudFoundryClient, String domainId, String organizationId) {
+        return cloudFoundryClient.organizations()
+            .associatePrivateDomain(AssociateOrganizationPrivateDomainRequest.builder()
+                .organizationId(organizationId)
+                .privateDomainId(domainId)
+                .build());
     }
 
     private static Mono<CreatePrivateDomainResponse> requestCreateDomain(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
