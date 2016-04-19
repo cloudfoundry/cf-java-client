@@ -20,14 +20,24 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
+import org.cloudfoundry.QueryParameter;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
 /**
- * The request payload for the Retrieve a Particular Organization Quota Definition operation
+ * The request payload for the Delete an Organization Quota Definition operation
  */
 @Data
-public final class GetOrganizationQuotaDefinitionRequest implements Validatable {
+public final class DeleteOrganizationQuotaDefinitionRequest implements Validatable {
+
+    /**
+     * The async flag
+     *
+     * @param async Will run the delete request in a background job. Recommended: 'true'.
+     * @return the async flag
+     */
+    @Getter(onMethod = @__(@QueryParameter("async")))
+    private final Boolean async;
 
     /**
      * The quota definition id
@@ -39,7 +49,9 @@ public final class GetOrganizationQuotaDefinitionRequest implements Validatable 
     private final String organizationQuotaDefinitionId;
 
     @Builder
-    GetOrganizationQuotaDefinitionRequest(String organizationQuotaDefinitionId) {
+    DeleteOrganizationQuotaDefinitionRequest(Boolean async,
+                                             String organizationQuotaDefinitionId) {
+        this.async = async;
         this.organizationQuotaDefinitionId = organizationQuotaDefinitionId;
     }
 

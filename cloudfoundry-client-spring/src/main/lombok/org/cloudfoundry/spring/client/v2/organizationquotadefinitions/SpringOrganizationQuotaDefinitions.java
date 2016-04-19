@@ -19,6 +19,8 @@ package org.cloudfoundry.spring.client.v2.organizationquotadefinitions;
 import lombok.ToString;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionResponse;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.DeleteOrganizationQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.DeleteOrganizationQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
@@ -53,6 +55,14 @@ public final class SpringOrganizationQuotaDefinitions extends AbstractSpringOper
     @Override
     public Mono<CreateOrganizationQuotaDefinitionResponse> create(CreateOrganizationQuotaDefinitionRequest request) {
         return post(request, CreateOrganizationQuotaDefinitionResponse.class, builder -> builder.pathSegment("v2", "quota_definitions"));
+    }
+
+    @Override
+    public Mono<DeleteOrganizationQuotaDefinitionResponse> delete(DeleteOrganizationQuotaDefinitionRequest request) {
+        return delete(request, DeleteOrganizationQuotaDefinitionResponse.class, builder -> {
+            builder.pathSegment("v2", "quota_definitions", request.getOrganizationQuotaDefinitionId());
+            QueryBuilder.augment(builder, request);
+        });
     }
 
     @Override

@@ -33,6 +33,15 @@ public interface OrganizationQuotaDefinitions {
     Mono<CreateOrganizationQuotaDefinitionResponse> create(CreateOrganizationQuotaDefinitionRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/organization_quota_definitions/delete_a_particular_organization_quota_definition.html">Delete an Organization Quota
+     * Definition</a> request
+     *
+     * @param request the Delete an Organization Quota Definition request
+     * @return the response from the Delete an Organization Quota Definition request
+     */
+    Mono<DeleteOrganizationQuotaDefinitionResponse> delete(DeleteOrganizationQuotaDefinitionRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/organization_quota_definitions/retrieve_a_particular_organization_quota_definition.html">Retrieve a Particular Organization
      * Quota Definition</a> request
      *
