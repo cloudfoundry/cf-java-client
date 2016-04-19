@@ -25,8 +25,10 @@ import lombok.Getter;
 import lombok.Singular;
 import lombok.ToString;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * The entity response payload for any type of Service Instances
@@ -137,7 +139,7 @@ public final class UnionServiceInstanceEntity extends BaseServiceInstanceEntity 
         this.servicePlanId = servicePlanId;
         this.servicePlanUrl = servicePlanUrl;
         this.syslogDrainUrl = syslogDrainUrl;
-        this.tags = tags;
+        this.tags = Optional.ofNullable(tags).orElse(Collections.emptyList());
     }
 
 }

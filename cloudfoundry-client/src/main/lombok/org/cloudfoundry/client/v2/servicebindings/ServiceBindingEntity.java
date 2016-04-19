@@ -21,7 +21,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * The entity response payload for the Service Binding resource
@@ -60,8 +62,8 @@ public final class ServiceBindingEntity {
 
         this.applicationId = applicationId;
         this.applicationUrl = applicationUrl;
-        this.bindingOptions = bindingOptions;
-        this.credentials = credentials;
+        this.bindingOptions = Optional.ofNullable(bindingOptions).orElse(Collections.emptyMap());
+        this.credentials = Optional.ofNullable(credentials).orElse(Collections.emptyMap());
         this.gatewayData = gatewayData;
         this.gatewayName = gatewayName;
         this.serviceInstanceId = serviceInstanceId;

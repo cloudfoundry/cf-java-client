@@ -22,7 +22,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * The entity response payload for the Event resource
@@ -136,7 +138,7 @@ public final class EventEntity {
         this.actor = actor;
         this.actorName = actorName;
         this.actorType = actorType;
-        this.metadatas = metadatas;
+        this.metadatas = Optional.ofNullable(metadatas).orElse(Collections.emptyMap());
         this.organizationId = organizationId;
         this.spaceId = spaceId;
         this.timestamp = timestamp;

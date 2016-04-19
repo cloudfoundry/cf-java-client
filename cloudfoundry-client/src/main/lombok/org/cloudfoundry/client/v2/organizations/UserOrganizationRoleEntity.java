@@ -24,7 +24,9 @@ import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.v2.users.AbstractUserEntity;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The entity response payload for the Route resource
@@ -59,7 +61,7 @@ public final class UserOrganizationRoleEntity extends AbstractUserEntity {
         super(active, admin, auditedOrganizationsUrl, auditedSpacesUrl, billingManagedOrganizationsUrl, defaultSpaceId, defaultSpaceUrl, managedOrganizationsUrl, managedSpacesUrl, organizationsUrl,
             spacesUrl, username);
 
-        this.organizationRoles = organizationRoles;
+        this.organizationRoles = Optional.ofNullable(organizationRoles).orElse(Collections.emptyList());
     }
 
 }

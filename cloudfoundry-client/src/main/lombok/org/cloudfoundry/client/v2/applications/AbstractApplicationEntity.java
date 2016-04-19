@@ -21,7 +21,9 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Singular;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * The core entity response payload for Application resources
@@ -228,9 +230,9 @@ public abstract class AbstractApplicationEntity {
         this.detectedStartCommand = detectedStartCommand;
         this.diego = diego;
         this.diskQuota = diskQuota;
-        this.dockerCredentialsJsons = dockerCredentialsJsons;
+        this.dockerCredentialsJsons = Optional.ofNullable(dockerCredentialsJsons).orElse(Collections.emptyMap());
         this.dockerImage = dockerImage;
-        this.environmentJsons = environmentJsons;
+        this.environmentJsons = Optional.ofNullable(environmentJsons).orElse(Collections.emptyMap());
         this.healthCheckTimeout = healthCheckTimeout;
         this.healthCheckType = healthCheckType;
         this.instances = instances;

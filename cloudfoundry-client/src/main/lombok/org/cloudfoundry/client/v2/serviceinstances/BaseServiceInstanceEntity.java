@@ -21,7 +21,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.Singular;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * The entity response payload for both types of Service Instances
@@ -92,7 +94,7 @@ public abstract class BaseServiceInstanceEntity {
                                      @JsonProperty("space_guid") String spaceId,
                                      @JsonProperty("space_url") String spaceUrl,
                                      @JsonProperty("type") String type) {
-        this.credentials = credentials;
+        this.credentials = Optional.ofNullable(credentials).orElse(Collections.emptyMap());
         this.name = name;
         this.routesUrl = routesUrl;
         this.serviceBindingsUrl = serviceBindingsUrl;

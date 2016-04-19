@@ -22,7 +22,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * The entity response payload for Service Keys
@@ -67,7 +69,7 @@ public final class ServiceKeyEntity {
                      @JsonProperty("name") String name,
                      @JsonProperty("service_instance_guid") String serviceInstanceId,
                      @JsonProperty("service_instance_url") String serviceInstanceUrl) {
-        this.credentials = credentials;
+        this.credentials = Optional.ofNullable(credentials).orElse(Collections.emptyMap());
         this.name = name;
         this.serviceInstanceId = serviceInstanceId;
         this.serviceInstanceUrl = serviceInstanceUrl;
