@@ -21,6 +21,8 @@ import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRunningDefau
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsResponse;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroups;
+import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultRequest;
+import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultResponse;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
@@ -53,6 +55,11 @@ public class SpringSecurityGroups extends AbstractSpringOperations implements Se
     @Override
     public Mono<ListSecurityGroupRunningDefaultsResponse> listRunningDefaults(ListSecurityGroupRunningDefaultsRequest request) {
         return get(request, ListSecurityGroupRunningDefaultsResponse.class, builder -> builder.pathSegment("v2", "config", "running_security_groups"));
+    }
+
+    @Override
+    public Mono<SetSecurityGroupRunningDefaultResponse> setRunningDefault(SetSecurityGroupRunningDefaultRequest request) {
+        return put(request, SetSecurityGroupRunningDefaultResponse.class, builder -> builder.pathSegment("v2", "config", "running_security_groups", request.getSecurityGroupRunningDefaultId()));
     }
 
 }
