@@ -1,0 +1,10 @@
+{
+  "name": "gold_quota",
+  "non_basic_services_allowed": true,
+  "total_services": -1,
+  "total_routes": -1,
+  "memory_limit": 5120,
+  "instance_memory_limit": 10240,
+  "app_instance_limit": 10,
+  "app_task_limit": 5
+}
