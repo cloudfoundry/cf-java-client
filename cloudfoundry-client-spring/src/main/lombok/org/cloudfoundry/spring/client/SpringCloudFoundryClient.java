@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Singular;
-import lombok.ToString;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEvents;
@@ -103,7 +102,7 @@ import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.SchedulerGroup;
+import reactor.core.scheduler.Scheduler;
 
 import java.net.URI;
 import java.util.List;
@@ -202,7 +201,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         new CloudFoundryClientCompatibilityChecker(this.info).check();
     }
 
-    SpringCloudFoundryClient(ConnectionContext connectionContext, RestOperations restOperations, URI root, SchedulerGroup schedulerGroup, OAuth2TokenProvider tokenProvider) {
+    SpringCloudFoundryClient(ConnectionContext connectionContext, RestOperations restOperations, URI root, Scheduler schedulerGroup, OAuth2TokenProvider tokenProvider) {
         this.applicationUsageEvents = new SpringApplicationUsageEvents(restOperations, root, schedulerGroup);
         this.applicationsV2 = new SpringApplicationsV2(restOperations, root, schedulerGroup);
         this.applicationsV3 = new SpringApplicationsV3(restOperations, root, schedulerGroup);
@@ -246,12 +245,12 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     }
 
     // Let's take a moment to reflect on the fact that this bridge constructor is needed to counter a useless compiler constraint
-    private SpringCloudFoundryClient(ConnectionContext connectionContext, String host, Integer port, SchedulerGroup schedulerGroup, List<DeserializationProblemHandler> problemHandlers) {
+    private SpringCloudFoundryClient(ConnectionContext connectionContext, String host, Integer port, Scheduler schedulerGroup, List<DeserializationProblemHandler> problemHandlers) {
         this(connectionContext, getRestOperations(connectionContext, problemHandlers), getRoot(host, port, connectionContext.getSslCertificateTruster()), schedulerGroup);
     }
 
     // Let's take a moment to reflect on the fact that this bridge constructor is needed to counter a useless compiler constraint
-    private SpringCloudFoundryClient(ConnectionContext connectionContext, OAuth2RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
+    private SpringCloudFoundryClient(ConnectionContext connectionContext, OAuth2RestOperations restOperations, URI root, Scheduler schedulerGroup) {
         this(connectionContext, restOperations, root, schedulerGroup, new OAuth2RestOperationsOAuth2TokenProvider(restOperations));
     }
 
@@ -471,7 +470,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         return uri;
     }
 
-    private static SchedulerGroup getSchedulerGroup() {
+    private static Scheduler getSchedulerGroup() {
         return new SchedulerGroupBuilder()
             .name("cloud-foundry")
             .autoShutdown(false)

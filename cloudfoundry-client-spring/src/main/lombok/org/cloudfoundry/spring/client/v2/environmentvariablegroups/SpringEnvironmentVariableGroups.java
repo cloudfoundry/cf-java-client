@@ -29,7 +29,7 @@ import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateStagingEnviron
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.SchedulerGroup;
+import reactor.core.scheduler.Scheduler;
 
 import java.net.URI;
 
@@ -46,7 +46,7 @@ public final class SpringEnvironmentVariableGroups extends AbstractSpringOperati
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param schedulerGroup The group to use when making requests
      */
-    public SpringEnvironmentVariableGroups(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
+    public SpringEnvironmentVariableGroups(RestOperations restOperations, URI root, Scheduler schedulerGroup) {
         super(restOperations, root, schedulerGroup);
     }
 

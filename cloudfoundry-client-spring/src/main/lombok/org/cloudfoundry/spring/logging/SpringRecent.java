@@ -22,7 +22,7 @@ import org.cloudfoundry.logging.RecentLogsRequest;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.SchedulerGroup;
+import reactor.core.scheduler.Scheduler;
 
 import java.net.URI;
 import java.util.List;
@@ -40,7 +40,7 @@ final class SpringRecent extends AbstractSpringOperations {
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param schedulerGroup The group to use when making requests
      */
-    SpringRecent(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
+    SpringRecent(RestOperations restOperations, URI root, Scheduler schedulerGroup) {
         super(restOperations, root, schedulerGroup);
     }
 

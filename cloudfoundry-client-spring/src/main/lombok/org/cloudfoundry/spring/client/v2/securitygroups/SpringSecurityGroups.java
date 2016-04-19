@@ -24,7 +24,7 @@ import org.cloudfoundry.client.v2.securitygroups.SecurityGroups;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.SchedulerGroup;
+import reactor.core.scheduler.Scheduler;
 
 import java.net.URI;
 
@@ -41,7 +41,7 @@ public class SpringSecurityGroups extends AbstractSpringOperations implements Se
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param schedulerGroup The group to use when making requests
      */
-    public SpringSecurityGroups(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
+    public SpringSecurityGroups(RestOperations restOperations, URI root, Scheduler schedulerGroup) {
         super(restOperations, root, schedulerGroup);
     }
 

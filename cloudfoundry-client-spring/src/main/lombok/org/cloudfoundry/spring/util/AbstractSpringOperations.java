@@ -27,7 +27,7 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.SchedulerGroup;
+import reactor.core.scheduler.Scheduler;
 import reactor.core.subscriber.SignalEmitter;
 import reactor.core.util.Exceptions;
 
@@ -51,9 +51,9 @@ public abstract class AbstractSpringOperations {
 
     private final URI root;
 
-    private final SchedulerGroup schedulerGroup;
+    private final Scheduler schedulerGroup;
 
-    protected AbstractSpringOperations(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
+    protected AbstractSpringOperations(RestOperations restOperations, URI root, Scheduler schedulerGroup) {
         this.restOperations = restOperations;
         this.root = root;
         this.schedulerGroup = schedulerGroup;

@@ -39,7 +39,7 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.SchedulerGroup;
+import reactor.core.scheduler.Scheduler;
 
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.ContainerProvider;
@@ -65,19 +65,19 @@ public final class SpringLoggingClient implements LoggingClient {
     }
 
     SpringLoggingClient(RestOperations restOperations, URI recentRoot, URI streamRoot, WebSocketContainer webSocketContainer, ClientEndpointConfig clientEndpointConfig,
-                        SchedulerGroup schedulerGroup) {
+                        Scheduler schedulerGroup) {
 
         this.recent = new SpringRecent(restOperations, recentRoot, schedulerGroup);
         this.stream = new SpringStream(webSocketContainer, clientEndpointConfig, streamRoot, schedulerGroup);
     }
 
     // Let's take a moment to reflect on the fact that this bridge constructor is needed to counter a useless compiler constraint
-    private SpringLoggingClient(ConnectionContext connectionContext, OAuth2RestOperations restOperations, WebSocketContainer webSocketContainer, SchedulerGroup schedulerGroup) {
+    private SpringLoggingClient(ConnectionContext connectionContext, OAuth2RestOperations restOperations, WebSocketContainer webSocketContainer, Scheduler schedulerGroup) {
         this(connectionContext, restOperations, getLoggingEndpoint(connectionContext.getCloudFoundryClient()), webSocketContainer, schedulerGroup);
     }
 
     // Let's take a moment to reflect on the fact that this bridge constructor is needed to counter a useless compiler constraint
-    private SpringLoggingClient(ConnectionContext connectionContext, OAuth2RestOperations restOperations, URI loggingEndpoint, WebSocketContainer webSocketContainer, SchedulerGroup schedulerGroup) {
+    private SpringLoggingClient(ConnectionContext connectionContext, OAuth2RestOperations restOperations, URI loggingEndpoint, WebSocketContainer webSocketContainer, Scheduler schedulerGroup) {
         this(restOperations, getRecentRoot(loggingEndpoint, connectionContext.getSslCertificateTruster()),
             getStreamRoot(loggingEndpoint, connectionContext.getSslCertificateTruster()), webSocketContainer, getClientEndpointConfig(restOperations), schedulerGroup);
     }
@@ -126,7 +126,7 @@ public final class SpringLoggingClient implements LoggingClient {
             .build();
     }
 
-    private static SchedulerGroup getSchedulerGroup() {
+    private static Scheduler getSchedulerGroup() {
         return new SchedulerGroupBuilder()
             .name("logging")
             .autoShutdown(false)

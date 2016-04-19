@@ -65,7 +65,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.SchedulerGroup;
+import reactor.core.scheduler.Scheduler;
 
 import java.net.URI;
 import java.util.List;
@@ -83,7 +83,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param schedulerGroup The group to use when making requests
      */
-    public SpringApplicationsV2(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
+    public SpringApplicationsV2(RestOperations restOperations, URI root, Scheduler schedulerGroup) {
         super(restOperations, root, schedulerGroup);
     }
 

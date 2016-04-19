@@ -43,7 +43,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.SchedulerGroup;
+import reactor.core.scheduler.Scheduler;
 
 import java.net.URI;
 
@@ -60,7 +60,7 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param schedulerGroup The group to use when making requests
      */
-    public SpringPackages(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
+    public SpringPackages(RestOperations restOperations, URI root, Scheduler schedulerGroup) {
         super(restOperations, root, schedulerGroup);
     }
 

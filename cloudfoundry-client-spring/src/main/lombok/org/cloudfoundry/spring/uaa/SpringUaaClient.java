@@ -36,7 +36,7 @@ import org.cloudfoundry.uaa.identityzonemanagement.IdentityZoneManagement;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.SchedulerGroup;
+import reactor.core.scheduler.Scheduler;
 
 import java.net.URI;
 import java.time.Duration;
@@ -53,7 +53,7 @@ public final class SpringUaaClient implements UaaClient {
 
     private final SpringIdentityZoneManagement identityZoneManagement;
 
-    SpringUaaClient(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
+    SpringUaaClient(RestOperations restOperations, URI root, Scheduler schedulerGroup) {
         this.accessTokenAdministration = new SpringAccessTokenAdministration(restOperations, root, schedulerGroup);
         this.identityZoneManagement = new SpringIdentityZoneManagement(restOperations, root, schedulerGroup);
     }
@@ -95,7 +95,7 @@ public final class SpringUaaClient implements UaaClient {
         return uri;
     }
 
-    private static SchedulerGroup getSchedulerGroup() {
+    private static Scheduler getSchedulerGroup() {
         return new SchedulerGroupBuilder()
             .name("uaa")
             .autoShutdown(false)

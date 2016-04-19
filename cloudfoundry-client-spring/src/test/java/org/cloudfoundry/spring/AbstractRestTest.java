@@ -39,7 +39,7 @@ import org.springframework.test.web.client.ResponseActions;
 import org.springframework.test.web.client.ResponseCreator;
 import org.springframework.util.Assert;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.publisher.SchedulerGroup;
+import reactor.core.scheduler.Scheduler;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -54,7 +54,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 public abstract class AbstractRestTest {
 
-    protected static final SchedulerGroup PROCESSOR_GROUP = new SchedulerGroupBuilder()
+    protected static final Scheduler PROCESSOR_GROUP = new SchedulerGroupBuilder()
         .name("test")
         .autoShutdown(false)
         .build();

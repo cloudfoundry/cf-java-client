@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.SchedulerGroup;
+import reactor.core.scheduler.Scheduler;
 import reactor.core.subscriber.SubscriberWithContext;
 
 import javax.websocket.ClientEndpointConfig;
@@ -49,11 +49,11 @@ final class SpringStream {
 
     private final URI root;
 
-    private final SchedulerGroup schedulerGroup;
+    private final Scheduler schedulerGroup;
 
     private final WebSocketContainer webSocketContainer;
 
-    SpringStream(WebSocketContainer webSocketContainer, ClientEndpointConfig clientEndpointConfig, URI root, SchedulerGroup schedulerGroup) {
+    SpringStream(WebSocketContainer webSocketContainer, ClientEndpointConfig clientEndpointConfig, URI root, Scheduler schedulerGroup) {
         this.clientEndpointConfig = clientEndpointConfig;
         this.root = root;
         this.schedulerGroup = schedulerGroup;

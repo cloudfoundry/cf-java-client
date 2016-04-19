@@ -19,7 +19,8 @@ package org.cloudfoundry.spring.util;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import reactor.core.publisher.SchedulerGroup;
+import reactor.core.publisher.Computations;
+import reactor.core.scheduler.Scheduler;
 import reactor.core.util.PlatformDependent;
 
 import java.util.Optional;
@@ -37,11 +38,11 @@ public final class SchedulerGroupBuilder {
 
     private String name;
 
-    public SchedulerGroup build() {
-        return SchedulerGroup
-            .io(this.name,
+    public Scheduler build() {
+        return Computations
+            .concurrent(this.name,
                 Optional.ofNullable(this.bufferSize).orElse(PlatformDependent.MEDIUM_BUFFER_SIZE),
-                Optional.ofNullable(this.concurrency).orElse(SchedulerGroup.DEFAULT_POOL_SIZE),
+                Optional.ofNullable(this.concurrency).orElse(Computations.DEFAULT_POOL_SIZE),
                 Optional.ofNullable(this.autoShutdown).orElse(true));
     }
 

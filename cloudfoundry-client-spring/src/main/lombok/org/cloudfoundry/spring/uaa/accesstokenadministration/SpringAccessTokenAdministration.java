@@ -23,7 +23,7 @@ import org.cloudfoundry.uaa.accesstokenadministration.GetTokenKeyRequest;
 import org.cloudfoundry.uaa.accesstokenadministration.GetTokenKeyResponse;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.SchedulerGroup;
+import reactor.core.scheduler.Scheduler;
 
 import java.net.URI;
 
@@ -37,7 +37,7 @@ public final class SpringAccessTokenAdministration extends AbstractSpringOperati
      * @param root           the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
      * @param schedulerGroup The group to use when making requests
      */
-    public SpringAccessTokenAdministration(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
+    public SpringAccessTokenAdministration(RestOperations restOperations, URI root, Scheduler schedulerGroup) {
         super(restOperations, root, schedulerGroup);
     }
 
