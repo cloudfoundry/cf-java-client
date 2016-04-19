@@ -24,6 +24,15 @@ import reactor.core.publisher.Mono;
 public interface OrganizationQuotaDefinitions {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/organization_quota_definitions/creating_a_organization_quota_definition.html">Creating a Organization Quota Definition</a>
+     * request
+     *
+     * @param request the Create an Organization Quota Definition request
+     * @return the response from the Create an Organization Quota Definition request
+     */
+    Mono<CreateOrganizationQuotaDefinitionResponse> create(CreateOrganizationQuotaDefinitionRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/organization_quota_definitions/retrieve_a_particular_organization_quota_definition.html">Retrieve a Particular Organization
      * Quota Definition</a> request
      *

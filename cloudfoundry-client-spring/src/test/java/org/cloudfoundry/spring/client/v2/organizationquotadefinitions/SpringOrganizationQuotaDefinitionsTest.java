@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.spring.client.v2.organizationquotadefinitions;
 
+import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
@@ -28,9 +30,75 @@ import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringOrganizationQuotaDefinitionsTest {
+
+    public static final class CreateQuotaDefinition extends AbstractApiTest<CreateOrganizationQuotaDefinitionRequest, CreateOrganizationQuotaDefinitionResponse> {
+
+        private final SpringOrganizationQuotaDefinitions quotaDefinitions = new SpringOrganizationQuotaDefinitions(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected CreateOrganizationQuotaDefinitionRequest getInvalidRequest() {
+            return CreateOrganizationQuotaDefinitionRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(POST).path("/v2/quota_definitions")
+                .requestPayload("fixtures/client/v2/quota_definitions/POST_request.json")
+                .status(CREATED)
+                .responsePayload("fixtures/client/v2/quota_definitions/POST_response.json");
+        }
+
+        @Override
+        protected CreateOrganizationQuotaDefinitionResponse getResponse() {
+            return CreateOrganizationQuotaDefinitionResponse.builder()
+                .metadata(Metadata.builder()
+                    .id("27a0466e-53c0-439a-ab9f-3e56854302f9")
+                    .url("/v2/quota_definitions/27a0466e-53c0-439a-ab9f-3e56854302f9")
+                    .createdAt("2016-04-06T00:17:26Z")
+                    .build())
+                .entity(OrganizationQuotaDefinitionEntity.builder()
+                    .name("gold_quota")
+                    .nonBasicServicesAllowed(true)
+                    .totalServices(-1)
+                    .totalRoutes(-1)
+                    .totalPrivateDomains(-1)
+                    .memoryLimit(5120)
+                    .trialDbAllowed(false)
+                    .instanceMemoryLimit(10240)
+                    .applicationInstanceLimit(10)
+                    .applicationTaskLimit(5)
+                    .totalServiceKeys(-1)
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected CreateOrganizationQuotaDefinitionRequest getValidRequest() throws Exception {
+            return CreateOrganizationQuotaDefinitionRequest.builder()
+                .name("gold_quota")
+                .nonBasicServicesAllowed(true)
+                .totalServices(-1)
+                .totalRoutes(-1)
+                .memoryLimit(5120)
+                .instanceMemoryLimit(10240)
+                .applicationInstanceLimit(10)
+                .applicationTaskLimit(5)
+                .build();
+        }
+
+        @Override
+        protected Mono<CreateOrganizationQuotaDefinitionResponse> invoke(CreateOrganizationQuotaDefinitionRequest request) {
+            return this.quotaDefinitions.create(request);
+        }
+
+    }
 
     public static final class GetQuotaDefinition extends AbstractApiTest<GetOrganizationQuotaDefinitionRequest, GetOrganizationQuotaDefinitionResponse> {
 
@@ -68,7 +136,7 @@ public final class SpringOrganizationQuotaDefinitionsTest {
                     .trialDbAllowed(false)
                     .instanceMemoryLimit(-1)
                     .applicationInstanceLimit(-1)
-                    .appTaskLimit(-1)
+                    .applicationTaskLimit(-1)
                     .totalServiceKeys(-1)
                     .build())
                 .build();
@@ -126,7 +194,7 @@ public final class SpringOrganizationQuotaDefinitionsTest {
                         .totalRoutes(1000)
                         .totalServices(100)
                         .trialDbAllowed(false)
-                        .appTaskLimit(-1)
+                        .applicationTaskLimit(-1)
                         .totalServiceKeys(-1)
                         .build())
                     .build())
