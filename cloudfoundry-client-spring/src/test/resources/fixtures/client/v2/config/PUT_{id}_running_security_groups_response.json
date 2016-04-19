@@ -1,0 +1,20 @@
+{
+  "metadata": {
+    "guid": "9aa7ab9c-997f-4f87-be50-87105521881a",
+    "url": "/v2/config/running_security_groups/9aa7ab9c-997f-4f87-be50-87105521881a",
+    "created_at": "2016-04-06T00:17:17Z",
+    "updated_at": "2016-04-06T00:17:17Z"
+  },
+  "entity": {
+    "name": "name-109",
+    "rules": [
+      {
+        "protocol": "udp",
+        "ports": "8080",
+        "destination": "198.41.191.47/1"
+      }
+    ],
+    "running_default": true,
+    "staging_default": false
+  }
+}
