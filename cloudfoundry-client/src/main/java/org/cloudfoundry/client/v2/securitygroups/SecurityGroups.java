@@ -39,12 +39,12 @@ public interface SecurityGroups {
     Mono<ListSecurityGroupRunningDefaultsResponse> listRunningDefaults(ListSecurityGroupRunningDefaultsRequest request);
 
     /**
-        * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_group_running_defaults/set_a_security_group_as_a_default_for_running_apps.html">Set a Security Group as a default for running Apps</a>
-        * request.
-    *
-        * @param request the list running security groups request
-    * @return the response from the list running security groups request
-    */
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_group_running_defaults/set_a_security_group_as_a_default_for_running_apps.html">Set a Security Group as a default for
+     * running Apps</a> request.
+     *
+     * @param request the list running security groups request
+     * @return the response from the list running security groups request
+     */
     Mono<SetSecurityGroupRunningDefaultResponse> setRunningDefault(SetSecurityGroupRunningDefaultRequest request);
 
 }
