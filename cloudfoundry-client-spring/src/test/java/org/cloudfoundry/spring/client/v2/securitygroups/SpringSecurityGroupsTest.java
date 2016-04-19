@@ -22,11 +22,14 @@ import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefault
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsResponse;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
+import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultRequest;
+import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultResponse;
 import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -117,6 +120,59 @@ public final class SpringSecurityGroupsTest {
         @Override
         protected Mono<ListSecurityGroupRunningDefaultsResponse> invoke(ListSecurityGroupRunningDefaultsRequest request) {
             return this.securityGroups.listRunningDefaults(request);
+        }
+
+    }
+
+    public static final class Set extends AbstractApiTest<SetSecurityGroupRunningDefaultRequest, SetSecurityGroupRunningDefaultResponse> {
+
+        private final SpringSecurityGroups securityGroups = new SpringSecurityGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected SetSecurityGroupRunningDefaultRequest getInvalidRequest() {
+            return SetSecurityGroupRunningDefaultRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(PUT).path("/v2/config/running_security_groups/test-security-group-default-id")
+                .status(OK)
+                .responsePayload("fixtures/client/v2/config/PUT_{id}_running_security_groups_response.json");
+        }
+
+        @Override
+        protected SetSecurityGroupRunningDefaultResponse getResponse() {
+            return SetSecurityGroupRunningDefaultResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .createdAt("2016-04-06T00:17:17Z")
+                    .id("9aa7ab9c-997f-4f87-be50-87105521881a")
+                    .url("/v2/config/running_security_groups/9aa7ab9c-997f-4f87-be50-87105521881a")
+                    .updatedAt("2016-04-06T00:17:17Z")
+                    .build())
+                .entity(SecurityGroupEntity.builder()
+                    .name("name-109")
+                    .rule(SecurityGroupEntity.RuleEntity.builder()
+                        .destination("198.41.191.47/1")
+                        .ports("8080")
+                        .protocol("udp")
+                        .build())
+                    .runningDefault(true)
+                    .stagingDefault(false)
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected SetSecurityGroupRunningDefaultRequest getValidRequest() throws Exception {
+            return SetSecurityGroupRunningDefaultRequest.builder()
+                .securityGroupRunningDefaultId("test-security-group-default-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<SetSecurityGroupRunningDefaultResponse> invoke(SetSecurityGroupRunningDefaultRequest request) {
+            return this.securityGroups.setRunningDefault(request);
         }
 
     }
