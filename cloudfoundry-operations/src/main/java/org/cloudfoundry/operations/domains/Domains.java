@@ -55,4 +55,12 @@ public interface Domains {
      */
     Mono<Void> share(ShareDomainRequest request);
 
+    /**
+     * Unshare a private domain
+     *
+     * @param request The Unshare Domain request
+     * @return a completion indicator
+     */
+    Mono<Void> unshare(UnshareDomainRequest request);
+
 }
