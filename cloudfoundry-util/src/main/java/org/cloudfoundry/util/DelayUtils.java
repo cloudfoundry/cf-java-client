@@ -60,18 +60,26 @@ public final class DelayUtils {
      */
     public static Function<Flux<Throwable>, Publisher<?>> exponentialBackOffError(Duration minimum, Duration maximum, Duration timeout) {
         Instant finish = Instant.now().plus(timeout);
-
         return errors -> getDelay(minimum, maximum, finish, errors.zipWith(Flux.range(0, Integer.MAX_VALUE), (error, iteration) -> iteration.longValue()));
     }
 
     /**
-     * Implements an exponential backoff delay for use with {@link Mono#repeatWhenEmpty(Function)}
+     * Implements an fixed delay for use with {@link Mono#repeatWhenEmpty(Function)}
      *
      * @param duration the duration of the delay
      * @return a delayed {@link Publisher}
      */
     public static Function<Flux<Long>, Publisher<?>> fixed(Duration duration) {
         return iterations -> Mono.delay(duration);
+    }
+
+    /**
+     * Implements an instant or no delay for use with {@link Mono#repeatWhenEmpty(Function)}
+     *
+     * @return a non-delayed {@link Publisher}
+     */
+    public static Function<Flux<Long>, Publisher<?>> instant() {
+        return iterations -> Mono.empty();
     }
 
     private static Duration calculateDuration(Duration minimum, Duration maximum, Long iteration) {

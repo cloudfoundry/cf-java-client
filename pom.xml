@@ -52,7 +52,7 @@
         <lombok.version>1.16.8</lombok.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <protobuf.version>2.6.1</protobuf.version>
-        <reactor.version>2.5.0.BUILD-SNAPSHOT</reactor.version>
+        <reactor.version>2.5.0.M3</reactor.version>
     </properties>
 
     <dependencyManagement>

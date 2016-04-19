@@ -28,8 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple2;
 
-import java.time.Duration;
-
 import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
 
 public final class JobsTest extends AbstractIntegrationTest {
@@ -59,7 +57,7 @@ public final class JobsTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getId)
                 .and(Mono.just(jobId)))
             .where(predicate(String::equals))
-            .repeatWhenEmpty(5, DelayUtils.fixed(Duration.ofMillis(0)))
+            .repeatWhenEmpty(5, DelayUtils.instant())
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }

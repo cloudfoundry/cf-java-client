@@ -23,7 +23,7 @@ Most projects will need two dependencies; the Operations API and an implementati
     <dependency>
         <groupId>io.projectreactor</groupId>
         <artifactId>reactor-core</artifactId>
-        <version>2.5.0.M2</version>
+        <version>2.5.0.M3</version>
     </dependency>
     ...
 </dependencies>
