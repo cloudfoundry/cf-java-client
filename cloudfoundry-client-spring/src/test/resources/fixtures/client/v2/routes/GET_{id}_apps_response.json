@@ -18,7 +18,7 @@
         "stack_guid": "0ef84d2a-4fdd-43ba-afbc-074a5e19ea66",
         "buildpack": null,
         "detected_buildpack": null,
-        "environment_json": {},
+        "environment_json": null,
         "memory": 1024,
         "instances": 1,
         "disk_quota": 1024,
@@ -41,7 +41,6 @@
         "docker_credentials_json": {
           "redacted_message": "[PRIVATE DATA HIDDEN]"
         },
-        "ports": [],
         "space_url": "/v2/spaces/55f1c5ea-12a5-4128-8f20-606af2a3bce1",
         "stack_url": "/v2/stacks/0ef84d2a-4fdd-43ba-afbc-074a5e19ea66",
         "events_url": "/v2/apps/f1243da8-e613-490a-8a0e-21ef1bcce952/events",

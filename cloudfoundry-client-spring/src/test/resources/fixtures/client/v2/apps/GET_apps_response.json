@@ -18,7 +18,7 @@
         "stack_guid": "d3476df6-534d-4140-b85b-401fa4923234",
         "buildpack": null,
         "detected_buildpack": null,
-        "environment_json": {},
+        "environment_json": null,
         "memory": 1024,
         "instances": 1,
         "disk_quota": 1024,
@@ -47,7 +47,7 @@
         "service_bindings_url": "/v2/apps/3d294ed0-105c-4ccd-8f79-5605d6b7198c/service_bindings",
         "routes_url": "/v2/apps/3d294ed0-105c-4ccd-8f79-5605d6b7198c/routes",
         "route_mappings_url": "/v2/apps/3d294ed0-105c-4ccd-8f79-5605d6b7198c/route_mappings",
-        "ports": []
+        "ports": null
       }
     },
     {
@@ -64,7 +64,7 @@
         "stack_guid": "14b4a0b7-7c7b-4cf2-99f0-cc3ed1473f09",
         "buildpack": null,
         "detected_buildpack": null,
-        "environment_json": {},
+        "environment_json": null,
         "memory": 1024,
         "instances": 1,
         "disk_quota": 1024,
@@ -93,7 +93,7 @@
         "service_bindings_url": "/v2/apps/522c5382-29e9-48aa-9db0-9f6cfa643ec1/service_bindings",
         "routes_url": "/v2/apps/522c5382-29e9-48aa-9db0-9f6cfa643ec1/routes",
         "route_mappings_url": "/v2/apps/522c5382-29e9-48aa-9db0-9f6cfa643ec1/route_mappings",
-        "ports": []
+        "ports": null
       }
     },
     {
@@ -110,7 +110,7 @@
         "stack_guid": "8d42ba27-60df-420e-9208-535e753b706a",
         "buildpack": null,
         "detected_buildpack": null,
-        "environment_json": {},
+        "environment_json": null,
         "memory": 1024,
         "instances": 1,
         "disk_quota": 1024,
@@ -138,8 +138,7 @@
         "events_url": "/v2/apps/ec31bfbd-ab5c-490d-8e83-3c1ea5d1bedf/events",
         "service_bindings_url": "/v2/apps/ec31bfbd-ab5c-490d-8e83-3c1ea5d1bedf/service_bindings",
         "routes_url": "/v2/apps/ec31bfbd-ab5c-490d-8e83-3c1ea5d1bedf/routes",
-        "route_mappings_url": "/v2/apps/ec31bfbd-ab5c-490d-8e83-3c1ea5d1bedf/route_mappings",
-        "ports": []
+        "route_mappings_url": "/v2/apps/ec31bfbd-ab5c-490d-8e83-3c1ea5d1bedf/route_mappings"
       }
     }
   ]

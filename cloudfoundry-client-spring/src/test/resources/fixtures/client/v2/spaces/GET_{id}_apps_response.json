@@ -18,7 +18,7 @@
         "stack_guid": "e458a99f-53a4-4da4-b78a-5f2eb212cc47",
         "buildpack": null,
         "detected_buildpack": null,
-        "environment_json": {},
+        "environment_json": null,
         "memory": 1024,
         "instances": 1,
         "disk_quota": 1024,
@@ -46,8 +46,7 @@
         "events_url": "/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/events",
         "service_bindings_url": "/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/service_bindings",
         "routes_url": "/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/routes",
-        "route_mappings_url": "/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/route_mappings",
-        "ports": []
+        "route_mappings_url": "/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/route_mappings"
       }
     }
   ]

@@ -12,7 +12,7 @@
     "stack_guid": "160fb300-c60e-4682-8527-8500e0318839",
     "buildpack": null,
     "detected_buildpack": null,
-    "environment_json": {},
+    "environment_json": null,
     "memory": 1024,
     "instances": 1,
     "disk_quota": 1024,
@@ -39,8 +39,7 @@
     "stack_url": "/v2/stacks/160fb300-c60e-4682-8527-8500e0318839",
     "events_url": "/v2/apps/03f286bb-f17c-42b4-8dcd-b818b0b798af/events",
     "service_bindings_url": "/v2/apps/03f286bb-f17c-42b4-8dcd-b818b0b798af/service_bindings",
-    "routes_url": "/v2/apps/03f286bb-f17c-42b4-8dcd-b818b0b798af/routes",
     "route_mappings_url": "/v2/apps/03f286bb-f17c-42b4-8dcd-b818b0b798af/route_mappings",
-    "ports": []
+    "routes_url": "/v2/apps/03f286bb-f17c-42b4-8dcd-b818b0b798af/routes"
   }
 }
