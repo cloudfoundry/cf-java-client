@@ -23,8 +23,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * The response entity payload for the Restage an Application operation
@@ -83,7 +85,7 @@ public final class RestageApplicationEntity extends AbstractApplicationEntity {
         this.enableSsh = enableSsh;
         this.packageState = packageState;
         this.packageUpdatedAt = packageUpdatedAt;
-        this.ports = ports;
+        this.ports = Optional.ofNullable(ports).orElse(Collections.emptyList());
         this.stagingTaskId = stagingTaskId;
         this.version = version;
     }

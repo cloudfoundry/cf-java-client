@@ -21,7 +21,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The entity response payload for the Route resource
@@ -77,7 +79,7 @@ public final class SecurityGroupEntity {
                         @JsonProperty("staging_default") Boolean stagingDefault) {
 
         this.name = name;
-        this.rules = rules;
+        this.rules = Optional.ofNullable(rules).orElse(Collections.emptyList());
         this.runningDefault = runningDefault;
         this.spacesUrl = spacesUrl;
         this.stagingDefault = stagingDefault;

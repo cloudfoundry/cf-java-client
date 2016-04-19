@@ -23,8 +23,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * The entity response payload for the Application resource
@@ -185,7 +187,7 @@ public final class ApplicationEntity extends AbstractApplicationEntity {
         this.serviceBindingsUrl = serviceBindingsUrl;
         this.spaceUrl = spaceUrl;
         this.stackUrl = stackUrl;
-        this.ports = ports;
+        this.ports = Optional.ofNullable(ports).orElse(Collections.emptyList());
         this.stagingTaskId = stagingTaskId;
         this.version = version;
     }

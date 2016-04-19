@@ -17,12 +17,7 @@
     "bindable": true,
     "unique_id": "8fbdd3bc-3eee-4b03-97a3-57929484649b",
     "extra": null,
-    "tags": [
-
-    ],
-    "requires": [
-
-    ],
+    "tags": null,
     "documentation_url": null,
     "service_broker_guid": "fe6e3f23-7b92-4855-aaa7-56f515d678c5",
     "plan_updateable": false,

@@ -23,7 +23,9 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Singular;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The entity response payload for Services
@@ -201,10 +203,10 @@ public final class ServiceEntity {
         this.longDescription = longDescription;
         this.planUpdateable = planUpdateable;
         this.provider = provider;
-        this.requires = requires;
+        this.requires = Optional.ofNullable(requires).orElse(Collections.emptyList());
         this.serviceBrokerId = serviceBrokerId;
         this.servicePlansUrl = servicePlansUrl;
-        this.tags = tags;
+        this.tags = Optional.ofNullable(tags).orElse(Collections.emptyList());
         this.uniqueId = uniqueId;
         this.url = url;
         this.version = version;
