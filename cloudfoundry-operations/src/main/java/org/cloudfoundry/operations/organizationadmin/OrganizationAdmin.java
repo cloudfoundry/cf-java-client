@@ -27,6 +27,7 @@ public interface OrganizationAdmin {
     /**
      * Get the organization quota
      *
+     * @param request The Get Quota request
      * @return the organization quota
      */
     Mono<OrganizationQuota> getQuota(GetQuotaRequest request);
@@ -41,6 +42,7 @@ public interface OrganizationAdmin {
     /**
      * Set the organization quota
      *
+     * @param request The Set Quota request
      * @return a completion indicator
      */
     Mono<Void> setQuota(SetQuotaRequest request);

@@ -43,7 +43,7 @@ public interface Services {
     /**
      * Create a user provided service instance
      *
-     * @param request the user provided create service instance request
+     * @param request the create user provided service instance request
      * @return a completion indicator
      */
     Mono<Void> createUserProvidedInstance(CreateUserProvidedServiceInstanceRequest request);
@@ -64,8 +64,9 @@ public interface Services {
     Flux<ServiceInstance> listInstances();
 
     /**
-     * LList available services offerings in the marketplace
+     * List available services offerings in the marketplace
      *
+     * @param request The list service offerings request
      * @return the service offerings
      */
     Flux<ServiceOffering> listServiceOfferings(ListServiceOfferingsRequest request);
