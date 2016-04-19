@@ -23,11 +23,11 @@ import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class GetOrganizationQuotaDefinitionRequestTest {
+public class DeleteOrganizationQuotaDefinitionRequestTest {
 
     @Test
     public void isNotValidNoId() {
-        ValidationResult result = GetOrganizationQuotaDefinitionRequest.builder()
+        ValidationResult result = DeleteOrganizationQuotaDefinitionRequest.builder()
             .build()
             .isValid();
 
@@ -37,7 +37,7 @@ public final class GetOrganizationQuotaDefinitionRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = GetOrganizationQuotaDefinitionRequest.builder()
+        ValidationResult result = DeleteOrganizationQuotaDefinitionRequest.builder()
             .organizationQuotaDefinitionId("test-organization-quota-definition-id")
             .build()
             .isValid();

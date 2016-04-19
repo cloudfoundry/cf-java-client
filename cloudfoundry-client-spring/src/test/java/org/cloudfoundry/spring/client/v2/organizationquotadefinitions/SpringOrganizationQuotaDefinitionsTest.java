@@ -18,6 +18,8 @@ package org.cloudfoundry.spring.client.v2.organizationquotadefinitions;
 
 import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionResponse;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.DeleteOrganizationQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.DeleteOrganizationQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
@@ -31,10 +33,12 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringOrganizationQuotaDefinitionsTest {
@@ -99,6 +103,41 @@ public final class SpringOrganizationQuotaDefinitionsTest {
         @Override
         protected Mono<CreateOrganizationQuotaDefinitionResponse> invoke(CreateOrganizationQuotaDefinitionRequest request) {
             return this.quotaDefinitions.create(request);
+        }
+
+    }
+
+    public static final class DeleteQuotaDefinition extends AbstractApiTest<DeleteOrganizationQuotaDefinitionRequest, DeleteOrganizationQuotaDefinitionResponse> {
+
+        private final SpringOrganizationQuotaDefinitions quotaDefinitions = new SpringOrganizationQuotaDefinitions(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteOrganizationQuotaDefinitionRequest getInvalidRequest() {
+            return DeleteOrganizationQuotaDefinitionRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(DELETE).path("/v2/quota_definitions/test-quota-definition-id")
+                .status(NO_CONTENT);
+        }
+
+        @Override
+        protected DeleteOrganizationQuotaDefinitionResponse getResponse() {
+            return null;
+        }
+
+        @Override
+        protected DeleteOrganizationQuotaDefinitionRequest getValidRequest() throws Exception {
+            return DeleteOrganizationQuotaDefinitionRequest.builder()
+                .organizationQuotaDefinitionId("test-quota-definition-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<DeleteOrganizationQuotaDefinitionResponse> invoke(DeleteOrganizationQuotaDefinitionRequest request) {
+            return this.quotaDefinitions.delete(request);
         }
 
     }
