@@ -77,6 +77,17 @@ public final class DelayUtils {
             .doOnSubscribe(logDelay(duration));
     }
 
+    /**
+     * Implements an instant (no delay) for use with {@link Mono#repeatWhenEmpty(Function)}
+     *
+     \* @return an instant (no delay) {@link Publisher}
+     */
+    public static Function<Flux<Long>, Publisher<?>> instant() {
+        return iterations -> Mono
+            .just(0L)
+            .doOnSubscribe(logDelay(Duration.ZERO));
+    }
+
     private static Duration calculateDuration(Duration minimum, Duration maximum, Long iteration) {
         Duration candidate = minimum.multipliedBy((long) Math.pow(2, iteration));
         return min(candidate, maximum);
