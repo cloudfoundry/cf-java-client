@@ -24,6 +24,8 @@ import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQ
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionResource;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.UpdateOrganizationQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.UpdateOrganizationQuotaDefinitionResponse;
 import org.cloudfoundry.spring.AbstractApiTest;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
@@ -31,6 +33,7 @@ import reactor.core.publisher.Mono;
 import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -214,5 +217,64 @@ public final class SpringOrganizationQuotaDefinitionsTest {
         }
 
     }
+
+    public static final class UpdateQuotaDefinition extends AbstractApiTest<UpdateOrganizationQuotaDefinitionRequest, UpdateOrganizationQuotaDefinitionResponse> {
+
+        private final SpringOrganizationQuotaDefinitions quotaDefinitions = new SpringOrganizationQuotaDefinitions(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected UpdateOrganizationQuotaDefinitionRequest getInvalidRequest() {
+            return UpdateOrganizationQuotaDefinitionRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(PUT).path("/v2/quota_definitions/test-quota-definition-id")
+                .requestPayload("fixtures/client/v2/quota_definitions/PUT_{id}_request.json")
+                .status(CREATED)
+                .responsePayload("fixtures/client/v2/quota_definitions/PUT_{id}_response.json");
+        }
+
+        @Override
+        protected UpdateOrganizationQuotaDefinitionResponse getResponse() {
+            return UpdateOrganizationQuotaDefinitionResponse.builder()
+                .metadata(Metadata.builder()
+                    .id("cd10a1dd-f372-4b19-8ff6-60214b265f6f")
+                    .url("/v2/quota_definitions/cd10a1dd-f372-4b19-8ff6-60214b265f6f")
+                    .createdAt("2016-04-06T00:17:26Z")
+                    .updatedAt("2016-04-06T00:17:26Z")
+                    .build())
+                .entity(OrganizationQuotaDefinitionEntity.builder()
+                    .name("name-601")
+                    .nonBasicServicesAllowed(true)
+                    .totalServices(60)
+                    .totalRoutes(1000)
+                    .totalPrivateDomains(-1)
+                    .memoryLimit(20480)
+                    .trialDbAllowed(false)
+                    .instanceMemoryLimit(-1)
+                    .applicationInstanceLimit(-1)
+                    .applicationTaskLimit(-1)
+                    .totalServiceKeys(-1)
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected UpdateOrganizationQuotaDefinitionRequest getValidRequest() throws Exception {
+            return UpdateOrganizationQuotaDefinitionRequest.builder()
+                .organizationQuotaDefinitionId("test-quota-definition-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<UpdateOrganizationQuotaDefinitionResponse> invoke(UpdateOrganizationQuotaDefinitionRequest request) {
+            return this.quotaDefinitions.update(request);
+        }
+
+    }
+
 
 }

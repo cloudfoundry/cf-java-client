@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface OrganizationQuotaDefinitions {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/organization_quota_definitions/creating_a_organization_quota_definition.html">Creating a Organization Quota Definition</a>
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/organization_quota_definitions/creating_a_organization_quota_definition.html">Creating an Organization Quota Definition</a>
      * request
      *
      * @param request the Create an Organization Quota Definition request
@@ -49,5 +49,14 @@ public interface OrganizationQuotaDefinitions {
      * @return the response from the List all Organization Quota Definitions request
      */
     Mono<ListOrganizationQuotaDefinitionsResponse> list(ListOrganizationQuotaDefinitionsRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/organization_quota_definitions/updating_a_organization_quota_definition.html">Update an Organization Quota Definition</a>
+     * request
+     *
+     * @param request the Update an Organization Quota Definition request
+     * @return the response from the Update an Organization Quota Definition request
+     */
+    Mono<UpdateOrganizationQuotaDefinitionResponse> update(UpdateOrganizationQuotaDefinitionRequest request);
 
 }
