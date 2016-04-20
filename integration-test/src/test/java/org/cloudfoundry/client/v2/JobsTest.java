@@ -59,7 +59,7 @@ public final class JobsTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getId)
                 .and(Mono.just(jobId)))
             .where(predicate(String::equals))
-            .repeatWhenEmpty(5, DelayUtils.fixed(Duration.ofMillis(100)))
+            .repeatWhenEmpty(5, DelayUtils.fixed(Duration.ofMillis(250)))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
