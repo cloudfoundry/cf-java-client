@@ -40,7 +40,7 @@ public final class CreateOrganizationQuotaDefinitionRequestTest {
             .totalRoutes(-1)
             .totalServiceKeys(-1)
             .totalServices(-1)
-            .trialDbAllowed(false)
+            .trialDatabaseAllowed(false)
             .build()
             .isValid();
 
@@ -74,7 +74,7 @@ public final class CreateOrganizationQuotaDefinitionRequestTest {
             .totalRoutes(-1)
             .totalServiceKeys(-1)
             .totalServices(-1)
-            .trialDbAllowed(false)
+            .trialDatabaseAllowed(false)
             .build()
             .isValid();
 
@@ -94,7 +94,7 @@ public final class CreateOrganizationQuotaDefinitionRequestTest {
             .totalRoutes(-1)
             .totalServiceKeys(-1)
             .totalServices(-1)
-            .trialDbAllowed(false)
+            .trialDatabaseAllowed(false)
             .build()
             .isValid();
 
@@ -114,7 +114,7 @@ public final class CreateOrganizationQuotaDefinitionRequestTest {
             .totalRoutes(-1)
             .totalServiceKeys(-1)
             .totalServices(-1)
-            .trialDbAllowed(false)
+            .trialDatabaseAllowed(false)
             .build()
             .isValid();
 
@@ -134,7 +134,7 @@ public final class CreateOrganizationQuotaDefinitionRequestTest {
             .totalRoutes(-1)
             .totalServiceKeys(-1)
             .totalServices(-1)
-            .trialDbAllowed(false)
+            .trialDatabaseAllowed(false)
             .build()
             .isValid();
 
@@ -154,7 +154,7 @@ public final class CreateOrganizationQuotaDefinitionRequestTest {
             .totalPrivateDomains(-1)
             .totalServiceKeys(-1)
             .totalServices(-1)
-            .trialDbAllowed(false)
+            .trialDatabaseAllowed(false)
             .build()
             .isValid();
 
@@ -174,7 +174,7 @@ public final class CreateOrganizationQuotaDefinitionRequestTest {
             .totalPrivateDomains(-1)
             .totalRoutes(-1)
             .totalServiceKeys(-1)
-            .trialDbAllowed(false)
+            .trialDatabaseAllowed(false)
             .build()
             .isValid();
 

@@ -122,11 +122,11 @@ public final class CreateOrganizationQuotaDefinitionRequest implements Validatab
     /**
      * The trial db allowed
      *
-     * @param trialDbAllowed the trial db allowed
+     * @param trialDatabaseAllowed the trial db allowed
      * @return the trial db allowed
      */
-    @Getter(onMethod = @__(@JsonProperty("trial_db_allowed")))
-    private final Boolean trialDbAllowed;
+    @Getter(onMethod = @__({@JsonProperty("trial_db_allowed"), @Deprecated}))
+    private final Boolean trialDatabaseAllowed;
 
     @Builder
     CreateOrganizationQuotaDefinitionRequest(Integer applicationInstanceLimit,
@@ -139,7 +139,7 @@ public final class CreateOrganizationQuotaDefinitionRequest implements Validatab
                                              Integer totalRoutes,
                                              Integer totalServiceKeys,
                                              Integer totalServices,
-                                             Boolean trialDbAllowed) {
+                                             Boolean trialDatabaseAllowed) {
 
         this.applicationInstanceLimit = applicationInstanceLimit;
         this.applicationTaskLimit = applicationTaskLimit;
@@ -151,7 +151,7 @@ public final class CreateOrganizationQuotaDefinitionRequest implements Validatab
         this.totalRoutes = totalRoutes;
         this.totalServiceKeys = totalServiceKeys;
         this.totalServices = totalServices;
-        this.trialDbAllowed = trialDbAllowed;
+        this.trialDatabaseAllowed = trialDatabaseAllowed;
     }
 
     @Override
