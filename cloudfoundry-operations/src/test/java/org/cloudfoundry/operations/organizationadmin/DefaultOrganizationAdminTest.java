@@ -17,8 +17,13 @@
 package org.cloudfoundry.operations.organizationadmin;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsResponse;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionResource;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
@@ -37,6 +42,50 @@ import static org.mockito.Mockito.when;
 
 public final class DefaultOrganizationAdminTest {
 
+    private static void requestCreateOrganizationQuotaError(CloudFoundryClient cloudFoundryClient, String name) {
+        when(cloudFoundryClient.organizationQuotaDefinitions()
+            .create(CreateOrganizationQuotaDefinitionRequest.builder()
+                .instanceMemoryLimit(-1)
+                .memoryLimit(0)
+                .nonBasicServicesAllowed(false)
+                .totalRoutes(0)
+                .totalServices(0)
+                .name(name)
+                .build()))
+            .thenReturn(Mono
+                .error(new CloudFoundryException(999, "test-exception-description", "test-exception-errorCode")));
+    }
+    
+    private static void requestCreateOrganizationQuota(CloudFoundryClient cloudFoundryClient, Integer instanceMemoryLimit, Integer memoryLimit, String name,
+                                                       Boolean nonBasicServicesAllowed, Integer totalRoutes, Integer totalServices, String quotaDefinitionId) {
+        when(cloudFoundryClient.organizationQuotaDefinitions()
+            .create(CreateOrganizationQuotaDefinitionRequest.builder()
+                .instanceMemoryLimit(instanceMemoryLimit)
+                .memoryLimit(memoryLimit)
+                .nonBasicServicesAllowed(nonBasicServicesAllowed)
+                .totalRoutes(totalRoutes)
+                .totalServices(totalServices)
+                .name(name)
+                .build()))
+            .thenReturn(Mono
+                .just(CreateOrganizationQuotaDefinitionResponse.builder()
+                    .metadata(Resource.Metadata.builder()
+                        .id(quotaDefinitionId)
+                        .build())
+                    .entity(OrganizationQuotaDefinitionEntity.builder()
+                        .totalServices(totalServices)
+                        .memoryLimit(memoryLimit)
+                        .instanceMemoryLimit(instanceMemoryLimit)
+                        .applicationInstanceLimit(-1)
+                        .applicationTaskLimit(-1)
+                        .name("test-quota")
+                        .nonBasicServicesAllowed(nonBasicServicesAllowed)
+                        .totalPrivateDomains(-1)
+                        .totalRoutes(totalRoutes)
+                        .build())
+                    .build()));
+    }
+
     private static void requestListOrganizationEmpty(CloudFoundryClient cloudFoundryClient, String name) {
         when(cloudFoundryClient.organizations()
             .list(fillPage(ListOrganizationsRequest.builder().name(name))
@@ -46,9 +95,9 @@ public final class DefaultOrganizationAdminTest {
                     .build()));
     }
 
-    private static void requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient, String name) {
+    private static void requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.organizationQuotaDefinitions()
-            .list(fillPage(ListOrganizationQuotaDefinitionsRequest.builder().name(name))
+            .list(fillPage(ListOrganizationQuotaDefinitionsRequest.builder())
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListOrganizationQuotaDefinitionsResponse.builder())
@@ -57,9 +106,9 @@ public final class DefaultOrganizationAdminTest {
                     .build()));
     }
 
-    private static void requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient) {
+    private static void requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient, String name) {
         when(cloudFoundryClient.organizationQuotaDefinitions()
-            .list(fillPage(ListOrganizationQuotaDefinitionsRequest.builder())
+            .list(fillPage(ListOrganizationQuotaDefinitionsRequest.builder().name(name))
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListOrganizationQuotaDefinitionsResponse.builder())
@@ -96,6 +145,66 @@ public final class DefaultOrganizationAdminTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(UpdateOrganizationResponse.builder(), "organization-").build()));
+    }
+
+    public static final class CreateQuota extends AbstractOperationsApiTest<OrganizationQuota> {
+
+        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(this.cloudFoundryClient);
+
+        @Before
+        public void setUp() throws Exception {
+            requestCreateOrganizationQuota(this.cloudFoundryClient, 3, 4, "test-quota", true, 1, 2, "test-quota-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<OrganizationQuota> testSubscriber) {
+            testSubscriber
+                .assertEquals(OrganizationQuota.builder()
+                    .allowPaidServicePlans(true)
+                    .applicationInstanceLimit(-1)
+                    .id("test-quota-id")
+                    .instanceMemoryLimit(3)
+                    .memoryLimit(4)
+                    .name("test-quota")
+                    .totalRoutes(1)
+                    .totalServices(2)
+                    .build());
+        }
+
+        @Override
+        protected Publisher<OrganizationQuota> invoke() {
+            return this.organizationAdmin.createQuota(CreateQuotaRequest.builder()
+                .name("test-quota")
+                .allowPaidServicePlans(true)
+                .totalRoutes(1)
+                .totalServices(2)
+                .instanceMemoryLimit(3)
+                .memoryLimit(4)
+                .build());
+        }
+    }
+    
+    public static final class CreateQuotaError extends AbstractOperationsApiTest<OrganizationQuota> {
+
+        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(this.cloudFoundryClient);
+
+        @Before
+        public void setUp() throws Exception {
+            requestCreateOrganizationQuotaError(this.cloudFoundryClient, "test-quota-error");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<OrganizationQuota> testSubscriber) {
+            testSubscriber
+                .assertError(CloudFoundryException.class, "test-exception-errorCode(999): test-exception-description");
+        }
+
+        @Override
+        protected Publisher<OrganizationQuota> invoke() {
+            return this.organizationAdmin.createQuota(CreateQuotaRequest.builder()
+                .name("test-quota-error")
+                .build());
+        }
     }
 
     public static final class GetQuota extends AbstractOperationsApiTest<OrganizationQuota> {

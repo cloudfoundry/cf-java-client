@@ -17,6 +17,9 @@
 package org.cloudfoundry.operations.organizationadmin;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.AbstractOrganizationQuotaDefinition;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionResource;
@@ -32,6 +35,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -41,6 +45,15 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
 
     public DefaultOrganizationAdmin(CloudFoundryClient cloudFoundryClient) {
         this.cloudFoundryClient = cloudFoundryClient;
+    }
+
+    @Override
+    public Mono<OrganizationQuota> createQuota(CreateQuotaRequest request) {
+        return ValidationUtils
+            .validate(request)
+            .then(validRequest -> requestCreateOrganizationQuota(this.cloudFoundryClient, validRequest.getInstanceMemoryLimit(), validRequest.getMemoryLimit(), validRequest.getName(),
+                validRequest.getAllowPaidServicePlans(), validRequest.getTotalRoutes(), validRequest.getTotalServices()))
+            .map(DefaultOrganizationAdmin::toOrganizationQuota);
     }
 
     @Override
@@ -64,7 +77,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
                 getOrganizationId(this.cloudFoundryClient, request1.getOrganizationName()),
                 getOrganizationQuotaId(this.cloudFoundryClient, request1.getQuotaName())
             ))
-            .then(function(((organizationId, quotaDefinitionId) -> requesUpdateOrganization(this.cloudFoundryClient, organizationId, quotaDefinitionId))))
+            .then(function(((organizationId, quotaDefinitionId) -> requestUpdateOrganization(this.cloudFoundryClient, organizationId, quotaDefinitionId))))
             .after();
     }
 
@@ -86,12 +99,25 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
             .map(ResourceUtils::getId);
     }
 
-    private static Mono<UpdateOrganizationResponse> requesUpdateOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String quotaDefinitionId) {
-        return cloudFoundryClient.organizations()
-            .update(UpdateOrganizationRequest.builder()
-                .organizationId(organizationId)
-                .quotaDefinitionId(quotaDefinitionId)
+    private static Mono<CreateOrganizationQuotaDefinitionResponse> requestCreateOrganizationQuota(CloudFoundryClient cloudFoundryClient, Integer instanceMemoryLimit, Integer memoryLimit, String name,
+                                                                                                  Boolean nonBasicServicesAllowed, Integer totalRoutes, Integer totalServices) {
+        return cloudFoundryClient.organizationQuotaDefinitions()
+            .create(CreateOrganizationQuotaDefinitionRequest.builder()
+                .instanceMemoryLimit(Optional.ofNullable(instanceMemoryLimit).orElse(-1))
+                .memoryLimit(Optional.ofNullable(memoryLimit).orElse(0))
+                .name(name)
+                .nonBasicServicesAllowed(Optional.ofNullable(nonBasicServicesAllowed).orElse(false))
+                .totalRoutes(Optional.ofNullable(totalRoutes).orElse(0))
+                .totalServices(Optional.ofNullable(totalServices).orElse(0))
                 .build());
+    }
+
+    private static Flux<OrganizationQuotaDefinitionResource> requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.organizationQuotaDefinitions()
+                .list(ListOrganizationQuotaDefinitionsRequest.builder()
+                    .page(page)
+                    .build()));
     }
 
     private static Flux<OrganizationQuotaDefinitionResource> requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient, String name) {
@@ -99,14 +125,6 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
             .requestResources(page -> cloudFoundryClient.organizationQuotaDefinitions()
                 .list(ListOrganizationQuotaDefinitionsRequest.builder()
                     .name(name)
-                    .page(page)
-                    .build()));
-    }
-
-    private static Flux<OrganizationQuotaDefinitionResource> requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient) {
-        return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizationQuotaDefinitions()
-                .list(ListOrganizationQuotaDefinitionsRequest.builder()
                     .page(page)
                     .build()));
     }
@@ -120,7 +138,15 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
                     .build()));
     }
 
-    private static OrganizationQuota toOrganizationQuota(OrganizationQuotaDefinitionResource resource) {
+    private static Mono<UpdateOrganizationResponse> requestUpdateOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String quotaDefinitionId) {
+        return cloudFoundryClient.organizations()
+            .update(UpdateOrganizationRequest.builder()
+                .organizationId(organizationId)
+                .quotaDefinitionId(quotaDefinitionId)
+                .build());
+    }
+
+    private static OrganizationQuota toOrganizationQuota(AbstractOrganizationQuotaDefinition resource) {
         OrganizationQuotaDefinitionEntity entity = ResourceUtils.getEntity(resource);
 
         return OrganizationQuota.builder()
