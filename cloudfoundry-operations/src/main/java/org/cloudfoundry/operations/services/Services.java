@@ -72,6 +72,14 @@ public interface Services {
     Flux<ServiceOffering> listServiceOfferings(ListServiceOfferingsRequest request);
 
     /**
+     * Rename a service instance
+     *
+     * @param request the rename service instance request
+     * @return a completion indicator
+     */
+    Mono<Void> renameInstance(RenameServiceInstanceRequest request);
+
+    /**
      * Unbind a service instance from an application
      *
      * @param request the unbind service instance request
