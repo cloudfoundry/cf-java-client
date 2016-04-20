@@ -1,0 +1,15 @@
+{
+  "metadata": {
+    "guid": "353360ea-59bb-414b-a90e-100c37317a02",
+    "url": "/v2/buildpacks/353360ea-59bb-414b-a90e-100c37317a02",
+    "created_at": "2016-04-21T08:51:39Z",
+    "updated_at": "2016-04-21T09:38:16Z"
+  },
+  "entity": {
+    "name": "binary_buildpack",
+    "position": 8,
+    "enabled": true,
+    "locked": false,
+    "filename": "binary_buildpack-cached-v1.0.1.zip"
+  }
+}

@@ -28,9 +28,18 @@ import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksResponse;
 import org.cloudfoundry.client.v2.buildpacks.UpdateBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.UpdateBuildpackResponse;
+import org.cloudfoundry.client.v2.buildpacks.UploadBuildpackRequest;
+import org.cloudfoundry.client.v2.buildpacks.UploadBuildpackResponse;
 import org.cloudfoundry.spring.client.v2.FilterBuilder;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.spring.util.QueryBuilder;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
@@ -84,6 +93,25 @@ public final class SpringBuildpacks extends AbstractSpringOperations implements 
     @Override
     public Mono<UpdateBuildpackResponse> update(UpdateBuildpackRequest request) {
         return put(request, UpdateBuildpackResponse.class, builder -> builder.pathSegment("v2", "buildpacks", request.getBuildpackId()));
+    }
+
+    @Override
+    public Mono<UploadBuildpackResponse> upload(UploadBuildpackRequest request) {
+        return putWithBody(request, () -> {
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("buildpack", getBuildpackPart(request));
+            return body;
+        }, UploadBuildpackResponse.class, builder -> builder.pathSegment("v2", "buildpacks", request.getBuildpackId(), "bits"));
+    }
+
+    private static HttpEntity<Resource> getBuildpackPart(UploadBuildpackRequest request) {
+        Resource body = new InputStreamResource(request.getBuildpack());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDispositionFormData("buildpack", request.getFilename());
+        headers.setContentType(MediaType.parseMediaType("application/zip"));
+
+        return new HttpEntity<>(body, headers);
     }
 
 }
