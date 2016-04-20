@@ -107,12 +107,12 @@ public final class OrganizationQuotaDefinitionEntity {
     private final Integer totalServices;
 
     /**
-     * The trial db allowed
+     * The trial database allowed
      *
-     * @param trialDbAllowed the trial db allowed
-     * @return the trial db allowed
+     * @param trialDatabaseAllowed the trial database allowed
+     * @return the trial database allowed
      */
-    private final Boolean trialDbAllowed;
+    private final Boolean trialDatabaseAllowed;
 
     @Builder
     OrganizationQuotaDefinitionEntity(@JsonProperty("app_instance_limit") Integer applicationInstanceLimit,
@@ -125,7 +125,7 @@ public final class OrganizationQuotaDefinitionEntity {
                                       @JsonProperty("total_routes") Integer totalRoutes,
                                       @JsonProperty("total_service_keys") Integer totalServiceKeys,
                                       @JsonProperty("total_services") Integer totalServices,
-                                      @JsonProperty("trial_db_allowed") Boolean trialDbAllowed) {
+                                      @JsonProperty("trial_db_allowed") @Deprecated Boolean trialDatabaseAllowed) {
         this.applicationInstanceLimit = applicationInstanceLimit;
         this.applicationTaskLimit = applicationTaskLimit;
         this.instanceMemoryLimit = instanceMemoryLimit;
@@ -136,7 +136,7 @@ public final class OrganizationQuotaDefinitionEntity {
         this.totalRoutes = totalRoutes;
         this.totalServiceKeys = totalServiceKeys;
         this.totalServices = totalServices;
-        this.trialDbAllowed = trialDbAllowed;
+        this.trialDatabaseAllowed = trialDatabaseAllowed;
     }
 
 }
