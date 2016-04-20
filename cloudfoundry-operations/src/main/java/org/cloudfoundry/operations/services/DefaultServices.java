@@ -30,11 +30,14 @@ import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.ListServiceBindingsRequest;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.serviceinstances.AbstractServiceInstanceResource;
+import org.cloudfoundry.client.v2.serviceinstances.BaseServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceResource;
+import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest;
+import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanRequest;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanResponse;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
@@ -48,6 +51,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServicesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.util.DelayUtils;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.JobUtils;
@@ -178,6 +182,20 @@ public final class DefaultServices implements Services {
                     getServicePlans(this.cloudFoundryClient, ResourceUtils.getId(resource))
                 ))
             .map(function(DefaultServices::toServiceOffering));
+    }
+
+    @Override
+    public Mono<Void> renameInstance(RenameServiceInstanceRequest request) {
+        return Mono
+            .when(ValidationUtils.validate(request), this.spaceId)
+            .then(function((validRequest, spaceId) -> Mono.when(
+                Mono.just(validRequest),
+                getSpaceServiceInstance(cloudFoundryClient, validRequest.getName(), spaceId)
+            )))
+            .then(function((validRequest, serviceInstance) ->
+                requestRenameServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance), ResourceUtils.getEntity(serviceInstance).getServicePlanId() == null, validRequest.getNewName())
+            ))
+            .after();
     }
 
     @Override
@@ -456,6 +474,24 @@ public final class DefaultServices implements Services {
                     .page(page)
                     .spaceId(spaceId)
                     .build()));
+    }
+
+    private static Mono<BaseServiceInstanceEntity> requestRenameServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, boolean userProvided, String newName) {
+        if(userProvided) {
+            return cloudFoundryClient.userProvidedServiceInstances()
+                .update(UpdateUserProvidedServiceInstanceRequest.builder()
+                    .name(newName)
+                    .userProvidedServiceInstanceId(serviceInstanceId)
+                    .build())
+                .cast(BaseServiceInstanceEntity.class);
+        } else {
+            return cloudFoundryClient.serviceInstances()
+                .update(UpdateServiceInstanceRequest.builder()
+                    .name(newName)
+                    .serviceInstanceId(serviceInstanceId)
+                    .build())
+                .cast(BaseServiceInstanceEntity.class);
+        }
     }
 
     private static ServiceInstance toServiceInstance(UnionServiceInstanceResource resource, Optional<String> plan, List<String> applications, ServiceEntity serviceEntity) {

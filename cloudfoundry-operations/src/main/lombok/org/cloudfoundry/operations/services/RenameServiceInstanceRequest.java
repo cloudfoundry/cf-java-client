@@ -22,10 +22,10 @@ import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
 /**
- * The request options for the get service instance operation
+ * The request options for the rename service instance operation
  */
 @Data
-public final class GetServiceInstanceRequest implements Validatable {
+public final class RenameServiceInstanceRequest implements Validatable {
 
     /**
      * The name of the service instance
@@ -35,9 +35,19 @@ public final class GetServiceInstanceRequest implements Validatable {
      */
     private final String name;
 
+    /**
+     * The new name of the service instance
+     *
+     * @param newName the new name of the service instance
+     * @return the new name of the service instance
+     */
+    private final String newName;
+
     @Builder
-    GetServiceInstanceRequest(String name) {
+    RenameServiceInstanceRequest(String name,
+                                 String newName) {
         this.name = name;
+        this.newName = newName;
     }
 
     @Override
@@ -45,8 +55,13 @@ public final class GetServiceInstanceRequest implements Validatable {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
         if (this.name == null) {
-            builder.message("service instance name must be specified");
+            builder.message("name must be specified");
         }
+
+        if (this.newName == null) {
+            builder.message("new name must be specified");
+        }
+
 
         return builder.build();
     }

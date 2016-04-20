@@ -43,6 +43,8 @@ import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceResource;
+import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest;
+import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanRequest;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanResponse;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
@@ -556,6 +558,17 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
+    private static void requestRenameServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String newName) {
+        when(cloudFoundryClient.serviceInstances()
+            .update(UpdateServiceInstanceRequest.builder()
+                .name(newName)
+                .serviceInstanceId(serviceInstanceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(UpdateServiceInstanceResponse.builder())
+                    .build()));
+    }
+
     public static final class BindServiceInstance extends AbstractOperationsApiTest<Void> {
 
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
@@ -1059,6 +1072,31 @@ public final class DefaultServicesTest {
             return this.services
                 .listServiceOfferings(ListServiceOfferingsRequest.builder()
                     .serviceName("test-service")
+                    .build());
+        }
+
+    }
+
+    public static final class RenameServiceInstance extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+            requestRenameServiceInstance(this.cloudFoundryClient, "test-service-instance-id", "test-service-instance-new-name");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.services
+                .renameInstance(RenameServiceInstanceRequest.builder()
+                    .name("test-service-instance-name")
+                    .newName("test-service-instance-new-name")
                     .build());
         }
 
