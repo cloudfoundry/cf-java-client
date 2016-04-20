@@ -80,7 +80,7 @@ public final class DelayUtils {
     /**
      * Implements an instant (no delay) for use with {@link Mono#repeatWhenEmpty(Function)}
      *
-     \* @return an instant (no delay) {@link Publisher}
+     * @return an instant (no delay) {@link Publisher}
      */
     public static Function<Flux<Long>, Publisher<?>> instant() {
         return iterations -> Mono
