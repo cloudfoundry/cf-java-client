@@ -18,6 +18,7 @@ package org.cloudfoundry.util;
 
 import org.atteo.evo.inflector.English;
 import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
@@ -25,6 +26,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -70,16 +72,9 @@ public final class DelayUtils {
      * @return a delayed {@link Publisher}
      */
     public static Function<Flux<Long>, Publisher<?>> fixed(Duration duration) {
-        return iterations -> Mono.delay(duration);
-    }
-
-    /**
-     * Implements an instant or no delay for use with {@link Mono#repeatWhenEmpty(Function)}
-     *
-     * @return a non-delayed {@link Publisher}
-     */
-    public static Function<Flux<Long>, Publisher<?>> instant() {
-        return iterations -> Mono.empty();
+        return iterations -> Mono
+            .delay(duration)
+            .doOnSubscribe(logDelay(duration));
     }
 
     private static Duration calculateDuration(Duration minimum, Duration maximum, Long iteration) {
@@ -97,11 +92,21 @@ public final class DelayUtils {
 
                 return Mono
                     .delay(delay)
-                    .doOnSubscribe(subscription -> {
-                        int seconds = (int) delay.getSeconds();
-                        LOGGER.debug("Delaying {} {}", seconds, English.plural("second", seconds));
-                    });
+                    .doOnSubscribe(logDelay(delay));
             });
+    }
+
+    private static Consumer<Subscription> logDelay(Duration delay) {
+        return subscription -> {
+            int seconds = (int) delay.getSeconds();
+            if (seconds > 0) {
+                LOGGER.debug("Delaying {} {}", seconds, English.plural("second", seconds));
+                return;
+            }
+
+            int milliseconds = (int) delay.toMillis();
+            LOGGER.debug("Delaying {} {}", milliseconds, English.plural("millisecond", milliseconds));
+        };
     }
 
     private static Duration min(Duration a, Duration b) {
