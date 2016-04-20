@@ -21,11 +21,14 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.jobs.GetJobRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
+import org.cloudfoundry.util.DelayUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple2;
+
+import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
 
 public final class JobsTest extends AbstractIntegrationTest {
 
@@ -53,6 +56,8 @@ public final class JobsTest extends AbstractIntegrationTest {
                     .build())
                 .map(ResourceUtils::getId)
                 .and(Mono.just(jobId)))
+            .where(predicate(String::equals))
+            .repeatWhenEmpty(5, DelayUtils.instant())
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
