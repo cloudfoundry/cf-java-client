@@ -33,6 +33,14 @@ public interface OrganizationAdmin {
     Mono<OrganizationQuota> getQuota(GetQuotaRequest request);
 
     /**
+     * Create an organization quota
+     *
+     * @param request The Create Quota request
+     * @return the organization quota
+     */
+    Mono<OrganizationQuota> createQuota(CreateQuotaRequest request);
+
+    /**
      * Lists the organization quotas
      *
      * @return the organization quotas
