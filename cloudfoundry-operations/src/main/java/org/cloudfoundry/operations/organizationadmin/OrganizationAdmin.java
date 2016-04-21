@@ -33,6 +33,14 @@ public interface OrganizationAdmin {
     Mono<OrganizationQuota> createQuota(CreateQuotaRequest request);
 
     /**
+     * Delete an organization quota
+     *
+     * @param request The Delete Quota request
+     * @return a completion indicator
+     */
+    Mono<Void> deleteQuota(DeleteQuotaRequest request);
+
+    /**
      * Get the organization quota
      *
      * @param request The Get Quota request

@@ -20,6 +20,8 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.AbstractOrganizationQuotaDefinition;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionResponse;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.DeleteOrganizationQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.DeleteOrganizationQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionResource;
@@ -28,6 +30,7 @@ import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationResponse;
 import org.cloudfoundry.util.ExceptionUtils;
+import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.ValidationUtils;
@@ -57,6 +60,15 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     }
 
     @Override
+    public Mono<Void> deleteQuota(DeleteQuotaRequest request) {
+        return ValidationUtils
+            .validate(request)
+            .then(request1 -> getOrganizationQuota(this.cloudFoundryClient, request1.getName()))
+            .map(ResourceUtils::getId)
+            .then(quotaId -> deleteOrganizationQuota(this.cloudFoundryClient, quotaId));
+    }
+
+    @Override
     public Mono<OrganizationQuota> getQuota(GetQuotaRequest request) {
         return ValidationUtils
             .validate(request)
@@ -79,6 +91,11 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
             ))
             .then(function(((organizationId, quotaDefinitionId) -> requestUpdateOrganization(this.cloudFoundryClient, organizationId, quotaDefinitionId))))
             .after();
+    }
+
+    private static Mono<Void> deleteOrganizationQuota(CloudFoundryClient cloudFoundryClient, String quotaId) {
+        return requestDeleteOrganizationQuota(cloudFoundryClient, quotaId)
+            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String name) {
@@ -109,6 +126,14 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
                 .nonBasicServicesAllowed(Optional.ofNullable(nonBasicServicesAllowed).orElse(false))
                 .totalRoutes(Optional.ofNullable(totalRoutes).orElse(0))
                 .totalServices(Optional.ofNullable(totalServices).orElse(0))
+                .build());
+    }
+
+    private static Mono<DeleteOrganizationQuotaDefinitionResponse> requestDeleteOrganizationQuota(CloudFoundryClient cloudFoundryClient, String quotaId) {
+        return cloudFoundryClient.organizationQuotaDefinitions()
+            .delete(DeleteOrganizationQuotaDefinitionRequest.builder()
+                .organizationQuotaDefinitionId(quotaId)
+                .async(true)
                 .build());
     }
 
