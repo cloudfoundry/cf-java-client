@@ -23,11 +23,11 @@ import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class GetQuotaRequestTest {
+public final class DeleteQuotaRequestTest {
 
     @Test
     public void isNotValidNoName() {
-        ValidationResult result = GetQuotaRequest.builder()
+        ValidationResult result = DeleteQuotaRequest.builder()
             .build()
             .isValid();
 
@@ -37,8 +37,8 @@ public final class GetQuotaRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = GetQuotaRequest.builder()
-            .name("test-name")
+        ValidationResult result = DeleteQuotaRequest.builder()
+            .name("test-quota")
             .build()
             .isValid();
 
