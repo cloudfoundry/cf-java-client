@@ -63,4 +63,12 @@ public interface OrganizationAdmin {
      */
     Mono<Void> setQuota(SetQuotaRequest request);
 
+    /**
+     * Update an organization quota
+     *
+     * @param request The Update Quota request
+     * @return the organization quota
+     */
+    Mono<OrganizationQuota> updateQuota(UpdateQuotaRequest request);
+
 }
