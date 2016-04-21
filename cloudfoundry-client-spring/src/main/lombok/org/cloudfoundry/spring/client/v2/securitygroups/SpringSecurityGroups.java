@@ -20,6 +20,8 @@ import lombok.ToString;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRunningDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsResponse;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsRequest;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsResponse;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroups;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultResponse;
@@ -57,6 +59,14 @@ public class SpringSecurityGroups extends AbstractSpringOperations implements Se
     public Mono<ListSecurityGroupRunningDefaultsResponse> listRunningDefaults(ListSecurityGroupRunningDefaultsRequest request) {
         return get(request, ListSecurityGroupRunningDefaultsResponse.class, builder -> {
             builder.pathSegment("v2", "config", "running_security_groups");
+            QueryBuilder.augment(builder, request);
+        });
+    }
+
+    @Override
+    public Mono<ListSecurityGroupStagingDefaultsResponse> listStagingDefaults(ListSecurityGroupStagingDefaultsRequest request) {
+        return get(request, ListSecurityGroupStagingDefaultsResponse.class, builder -> {
+            builder.pathSegment("v2", "config", "staging_security_groups");
             QueryBuilder.augment(builder, request);
         });
     }
