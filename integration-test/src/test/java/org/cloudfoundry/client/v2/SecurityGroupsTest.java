@@ -65,10 +65,10 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         fail("TODO: finish story https://www.pivotaltracker.com/story/show/101522660");
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656 et al as well as https://github.com/cloudfoundry/cloud_controller_ng/issues/578")
+    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656 et al")
     @Test
     public void listRunningDefaults() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/101522656 and check issue https://github.com/cloudfoundry/cloud_controller_ng/issues/578");
+        fail("TODO: finish story https://www.pivotaltracker.com/story/show/101522656 et al");
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522662 et al")
@@ -77,10 +77,10 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         fail("TODO: finish story https://www.pivotaltracker.com/story/show/101522662");
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656 et al as well as https://github.com/cloudfoundry/cloud_controller_ng/issues/578")
+    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656 et al")
     @Test
     public void listStagingDefaults() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/101522650 and check issue https://github.com/cloudfoundry/cloud_controller_ng/issues/578");
+        fail("TODO: finish story https://www.pivotaltracker.com/story/show/101522650 et al");
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522652")

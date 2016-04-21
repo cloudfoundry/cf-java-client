@@ -24,6 +24,7 @@ import org.cloudfoundry.client.v2.securitygroups.SecurityGroups;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultResponse;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
@@ -54,7 +55,10 @@ public class SpringSecurityGroups extends AbstractSpringOperations implements Se
 
     @Override
     public Mono<ListSecurityGroupRunningDefaultsResponse> listRunningDefaults(ListSecurityGroupRunningDefaultsRequest request) {
-        return get(request, ListSecurityGroupRunningDefaultsResponse.class, builder -> builder.pathSegment("v2", "config", "running_security_groups"));
+        return get(request, ListSecurityGroupRunningDefaultsResponse.class, builder -> {
+            builder.pathSegment("v2", "config", "running_security_groups");
+            QueryBuilder.augment(builder, request);
+        });
     }
 
     @Override

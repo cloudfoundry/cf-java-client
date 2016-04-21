@@ -18,17 +18,23 @@ package org.cloudfoundry.client.v2.securitygroups;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
+import org.cloudfoundry.client.v2.PaginatedRequest;
 
 /**
  * The request payload for the List Running Security Groups operation
  */
 @Data
-public final class ListSecurityGroupRunningDefaultsRequest implements Validatable {
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public final class ListSecurityGroupRunningDefaultsRequest extends PaginatedRequest implements Validatable {
 
     @Builder
-    ListSecurityGroupRunningDefaultsRequest() {
+    ListSecurityGroupRunningDefaultsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage) {
+        super(orderDirection, page, resultsPerPage);
     }
 
     @Override
