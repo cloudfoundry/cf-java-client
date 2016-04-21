@@ -63,8 +63,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     public Mono<Void> deleteQuota(DeleteQuotaRequest request) {
         return ValidationUtils
             .validate(request)
-            .then(request1 -> getOrganizationQuota(this.cloudFoundryClient, request1.getName()))
-            .map(ResourceUtils::getId)
+            .then(request1 -> getOrganizationQuotaId(this.cloudFoundryClient, request1.getName()))
             .then(quotaId -> deleteOrganizationQuota(this.cloudFoundryClient, quotaId));
     }
 
