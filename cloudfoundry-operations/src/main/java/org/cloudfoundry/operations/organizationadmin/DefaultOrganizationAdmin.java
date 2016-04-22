@@ -56,8 +56,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     public Mono<OrganizationQuota> createQuota(CreateQuotaRequest request) {
         return ValidationUtils
             .validate(request)
-            .then(validRequest -> requestCreateOrganizationQuota(this.cloudFoundryClient, validRequest.getInstanceMemoryLimit(), validRequest.getMemoryLimit(), validRequest.getName(),
-                validRequest.getAllowPaidServicePlans(), validRequest.getTotalRoutes(), validRequest.getTotalServices()))
+            .then(validatedRequest -> createOrganizationQuota(this.cloudFoundryClient, validatedRequest))
             .map(DefaultOrganizationAdmin::toOrganizationQuota);
     }
 
@@ -96,15 +95,27 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
 
     @Override
     public Mono<OrganizationQuota> updateQuota(UpdateQuotaRequest request) {
-        return ValidationUtils.validate(request)
-            .then(validRequest -> Mono.when(
-                Mono.just(validRequest),
-                getOrganizationQuota(this.cloudFoundryClient, validRequest.getName())
-            ))
-            .then(function((validRequest, quotaDefinition) -> requestUpdateOrganizationQuota(this.cloudFoundryClient, quotaDefinition, validRequest.getInstanceMemoryLimit(),
-                validRequest.getMemoryLimit(), validRequest.getNewName(), validRequest.getAllowPaidServicePlans(), validRequest.getTotalRoutes(), validRequest.getTotalServices())))
+        return ValidationUtils
+            .validate(request)
+            .then(validatedRequest -> Mono
+                .when(
+                    Mono.just(validatedRequest),
+                    getOrganizationQuota(this.cloudFoundryClient, validatedRequest.getName())
+                ))
+            .then(function((validatedRequest, exitingQuotaDefinition) -> updateOrganizationQuota(this.cloudFoundryClient, validatedRequest, exitingQuotaDefinition)))
             .map(DefaultOrganizationAdmin::toOrganizationQuota);
 
+    }
+
+    private static Mono<CreateOrganizationQuotaDefinitionResponse> createOrganizationQuota(CloudFoundryClient cloudFoundryClient, CreateQuotaRequest request) {
+        return requestCreateOrganizationQuota(
+            cloudFoundryClient,
+            Optional.ofNullable(request.getInstanceMemoryLimit()).orElse(-1),
+            Optional.ofNullable(request.getMemoryLimit()).orElse(0),
+            request.getName(),
+            Optional.ofNullable(request.getAllowPaidServicePlans()).orElse(false),
+            Optional.ofNullable(request.getTotalRoutes()).orElse(0),
+            Optional.ofNullable(request.getTotalServices()).orElse(0));
     }
 
     private static Mono<Void> deleteOrganizationQuota(CloudFoundryClient cloudFoundryClient, String quotaId) {
@@ -134,12 +145,12 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
                                                                                                   Boolean nonBasicServicesAllowed, Integer totalRoutes, Integer totalServices) {
         return cloudFoundryClient.organizationQuotaDefinitions()
             .create(CreateOrganizationQuotaDefinitionRequest.builder()
-                .instanceMemoryLimit(Optional.ofNullable(instanceMemoryLimit).orElse(-1))
-                .memoryLimit(Optional.ofNullable(memoryLimit).orElse(0))
+                .instanceMemoryLimit(instanceMemoryLimit)
+                .memoryLimit(memoryLimit)
                 .name(name)
-                .nonBasicServicesAllowed(Optional.ofNullable(nonBasicServicesAllowed).orElse(false))
-                .totalRoutes(Optional.ofNullable(totalRoutes).orElse(0))
-                .totalServices(Optional.ofNullable(totalServices).orElse(0))
+                .nonBasicServicesAllowed(nonBasicServicesAllowed)
+                .totalRoutes(totalRoutes)
+                .totalServices(totalServices)
                 .build());
     }
 
@@ -185,19 +196,18 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
                 .build());
     }
 
-    private static Mono<UpdateOrganizationQuotaDefinitionResponse> requestUpdateOrganizationQuota(CloudFoundryClient cloudFoundryClient, OrganizationQuotaDefinitionResource quotaDefinition,
-                                                                                                  Integer instanceMemoryLimit, Integer memoryLimit, String newName, Boolean nonBasicServicesAllowed,
+    private static Mono<UpdateOrganizationQuotaDefinitionResponse> requestUpdateOrganizationQuota(CloudFoundryClient cloudFoundryClient, String organizationQuotaDefinitionId,
+                                                                                                  Integer instanceMemoryLimit, Integer memoryLimit, String name, Boolean nonBasicServicesAllowed,
                                                                                                   Integer totalRoutes, Integer totalServices) {
-        OrganizationQuotaDefinitionEntity entity = ResourceUtils.getEntity(quotaDefinition);
         return cloudFoundryClient.organizationQuotaDefinitions()
             .update(UpdateOrganizationQuotaDefinitionRequest.builder()
-                .instanceMemoryLimit(Optional.ofNullable(instanceMemoryLimit).orElse(entity.getInstanceMemoryLimit()))
-                .memoryLimit(Optional.ofNullable(memoryLimit).orElse(entity.getMemoryLimit()))
-                .name(Optional.ofNullable(newName).orElse(entity.getName()))
-                .organizationQuotaDefinitionId(ResourceUtils.getId(quotaDefinition))
-                .nonBasicServicesAllowed(Optional.ofNullable(nonBasicServicesAllowed).orElse(entity.getNonBasicServicesAllowed()))
-                .totalRoutes(Optional.ofNullable(totalRoutes).orElse(entity.getTotalRoutes()))
-                .totalServices(Optional.ofNullable(totalServices).orElse(entity.getTotalServices()))
+                .instanceMemoryLimit(instanceMemoryLimit)
+                .memoryLimit(memoryLimit)
+                .name(name)
+                .organizationQuotaDefinitionId(organizationQuotaDefinitionId)
+                .nonBasicServicesAllowed(nonBasicServicesAllowed)
+                .totalRoutes(totalRoutes)
+                .totalServices(totalServices)
                 .build());
     }
 
@@ -214,6 +224,21 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
             .totalRoutes(entity.getTotalRoutes())
             .totalServices(entity.getTotalServices())
             .build();
+    }
+
+    private static Mono<UpdateOrganizationQuotaDefinitionResponse> updateOrganizationQuota(CloudFoundryClient cloudFoundryClient, UpdateQuotaRequest request,
+                                                                                           OrganizationQuotaDefinitionResource resource) {
+        OrganizationQuotaDefinitionEntity existing = ResourceUtils.getEntity(resource);
+
+        return requestUpdateOrganizationQuota(
+            cloudFoundryClient,
+            ResourceUtils.getId(resource),
+            Optional.ofNullable(request.getInstanceMemoryLimit()).orElse(existing.getInstanceMemoryLimit()),
+            Optional.ofNullable(request.getMemoryLimit()).orElse(existing.getMemoryLimit()),
+            Optional.ofNullable(request.getNewName()).orElse(existing.getName()),
+            Optional.ofNullable(request.getAllowPaidServicePlans()).orElse(existing.getNonBasicServicesAllowed()),
+            Optional.ofNullable(request.getTotalRoutes()).orElse(existing.getTotalRoutes()),
+            Optional.ofNullable(request.getTotalServices()).orElse(existing.getTotalServices()));
     }
 
 }

@@ -44,8 +44,8 @@ import static org.mockito.Mockito.when;
 
 public final class DefaultOrganizationAdminTest {
 
-    private static void requestCreateOrganizationQuota(CloudFoundryClient cloudFoundryClient, Integer instanceMemoryLimit, Integer memoryLimit, String name,
-                                                       Boolean nonBasicServicesAllowed, Integer totalRoutes, Integer totalServices, String quotaDefinitionId) {
+    private static void requestCreateOrganizationQuota(CloudFoundryClient cloudFoundryClient, Integer instanceMemoryLimit, Integer memoryLimit, String name, Boolean nonBasicServicesAllowed,
+                                                       Integer totalRoutes, Integer totalServices, String quotaDefinitionId) {
         when(cloudFoundryClient.organizationQuotaDefinitions()
             .create(CreateOrganizationQuotaDefinitionRequest.builder()
                 .instanceMemoryLimit(instanceMemoryLimit)
@@ -149,31 +149,31 @@ public final class DefaultOrganizationAdminTest {
                 .just(fill(UpdateOrganizationResponse.builder(), "organization-").build()));
     }
 
-    private static void requestUpdateOrganizationQuota(CloudFoundryClient cloudFoundryClient, String organizationQuotaDefinitionId, Integer instanceMemoryLimit, Integer memoryLimit, String newName,
+    private static void requestUpdateOrganizationQuota(CloudFoundryClient cloudFoundryClient, String organizationQuotaDefinitionId, Integer instanceMemoryLimit, Integer memoryLimit, String name,
                                                        Boolean nonBasicServicesAllowed, Integer totalRoutes, Integer totalServices) {
         when(cloudFoundryClient.organizationQuotaDefinitions()
             .update(UpdateOrganizationQuotaDefinitionRequest.builder()
                 .instanceMemoryLimit(instanceMemoryLimit)
                 .memoryLimit(memoryLimit)
+                .name(name)
                 .nonBasicServicesAllowed(nonBasicServicesAllowed)
                 .organizationQuotaDefinitionId(organizationQuotaDefinitionId)
                 .totalRoutes(totalRoutes)
                 .totalServices(totalServices)
-                .name(newName)
                 .build()))
             .thenReturn(Mono
                 .just(UpdateOrganizationQuotaDefinitionResponse.builder()
                     .metadata(fill(Resource.Metadata.builder()).id(organizationQuotaDefinitionId).build())
                     .entity(OrganizationQuotaDefinitionEntity.builder()
-                        .totalServices(totalServices)
-                        .memoryLimit(memoryLimit)
-                        .instanceMemoryLimit(instanceMemoryLimit)
                         .applicationInstanceLimit(-1)
                         .applicationTaskLimit(-1)
-                        .name(newName)
+                        .instanceMemoryLimit(instanceMemoryLimit)
+                        .memoryLimit(memoryLimit)
+                        .name(name)
                         .nonBasicServicesAllowed(nonBasicServicesAllowed)
                         .totalPrivateDomains(-1)
                         .totalRoutes(totalRoutes)
+                        .totalServices(totalServices)
                         .build())
                     .build()));
     }
