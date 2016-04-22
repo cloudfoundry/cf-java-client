@@ -17,7 +17,6 @@
 package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.cloudfoundry.client.v2.applications.AbstractApplicationResource;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
@@ -441,15 +440,6 @@ public final class DefaultApplications implements Applications {
             .build();
     }
 
-    private static boolean applicationInstancesUnavailable(Throwable throwable) {
-        return throwable instanceof CloudFoundryException &&
-            (((CloudFoundryException) throwable).getCode() == CF_INSTANCES_ERROR || ((CloudFoundryException) throwable).getCode() == CF_STAGING_NOT_FINISHED);
-    }
-
-    private static boolean applicationStatisticsUnavailable(Throwable throwable) {
-        return throwable instanceof CloudFoundryException && ((CloudFoundryException) throwable).getCode() == CF_APP_STOPPED_STATS_ERROR;
-    }
-
     private static boolean areModifiersPresent(ScaleApplicationRequest request) {
         return request.getMemoryLimit() != null || request.getDiskLimit() != null || request.getInstances() != null;
     }
@@ -595,24 +585,13 @@ public final class DefaultApplications implements Applications {
 
     private static Mono<ApplicationInstancesResponse> getApplicationInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestApplicationInstances(cloudFoundryClient, applicationId)
-            .otherwise(throwable -> {
-                if (applicationInstancesUnavailable(throwable)) {
-                    return Mono.just(ApplicationInstancesResponse.builder().build());
-                } else {
-                    return Mono.error(throwable);
-                }
-            });
+            .otherwise(ExceptionUtils.replace(CF_INSTANCES_ERROR, () -> Mono.just(ApplicationInstancesResponse.builder().build())))
+            .otherwise(ExceptionUtils.replace(CF_STAGING_NOT_FINISHED, () -> Mono.just(ApplicationInstancesResponse.builder().build())));
     }
 
     private static Mono<ApplicationStatisticsResponse> getApplicationStatistics(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestApplicationStatistics(cloudFoundryClient, applicationId)
-            .otherwise(throwable -> {
-                if (applicationStatisticsUnavailable(throwable)) {
-                    return Mono.just(ApplicationStatisticsResponse.builder().build());
-                } else {
-                    return Mono.error(throwable);
-                }
-            });
+            .otherwise(ExceptionUtils.replace(CF_APP_STOPPED_STATS_ERROR, () -> Mono.just(ApplicationStatisticsResponse.builder().build())));
     }
 
     private static Mono<Tuple6<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse, List<ApplicationDetail.InstanceDetail>, List<String>>>

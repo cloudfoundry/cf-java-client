@@ -16,9 +16,9 @@
 
 package org.cloudfoundry.util;
 
+import org.cloudfoundry.client.v2.CloudFoundryException;
 import reactor.core.publisher.Mono;
 
-import java.util.NoSuchElementException;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -61,18 +61,34 @@ public final class ExceptionUtils {
     }
 
     /**
-     * Converts {@link Throwable}s to more descriptive exception types, attaching the original {@link Throwable} as the new cause.
-     *
-     * <ul> <li>{@link NoSuchElementException} to {@link IllegalArgumentException}</li> </ul>
+     * Replaces {@link Throwable}s of a given type with an alternate value
      *
      * @param exceptionType       the type of exception to convert
-     * @param replacementSupplier a supplier of a replacement exception
+     * @param replacementSupplier a supplier of a replacement
      * @param <T>                 the type of the {@link Mono} being converted
      * @return a function that converts errors
      */
     public static <T> Function<Throwable, Mono<T>> replace(Class<? extends Exception> exceptionType, Supplier<Mono<T>> replacementSupplier) {
         return throwable -> {
             if (exceptionType.isAssignableFrom(throwable.getClass())) {
+                return replacementSupplier.get();
+            } else {
+                return Mono.error(throwable);
+            }
+        };
+    }
+
+    /**
+     * Replaces {@link CloudFoundryException}s with a given code with an alternate value
+     *
+     * @param code                the {@link CloudFoundryException} code
+     * @param replacementSupplier a supplier of a replacement
+     * @param <T>                 the type of the {@link Mono} being converted
+     * @return a function that converts errors
+     */
+    public static <T> Function<Throwable, Mono<T>> replace(int code, Supplier<Mono<T>> replacementSupplier) {
+        return throwable -> {
+            if (CloudFoundryException.class.isAssignableFrom(throwable.getClass()) && ((CloudFoundryException) throwable).getCode() == code) {
                 return replacementSupplier.get();
             } else {
                 return Mono.error(throwable);

@@ -17,7 +17,6 @@
 package org.cloudfoundry.spring.client.v2.routes;
 
 import lombok.ToString;
-import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationResponse;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
@@ -38,6 +37,7 @@ import org.cloudfoundry.client.v2.routes.UpdateRouteResponse;
 import org.cloudfoundry.spring.client.v2.FilterBuilder;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.spring.util.QueryBuilder;
+import org.cloudfoundry.util.ExceptionUtils;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
@@ -91,13 +91,7 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
             QueryBuilder.augment(builder, request);
         })
             .defaultIfEmpty(true)
-            .otherwise(throwable -> {
-                if (throwable instanceof CloudFoundryException && ((CloudFoundryException) throwable).getCode() == CF_NOT_FOUND) {
-                    return Mono.just(false);
-                } else {
-                    return Mono.error(throwable);
-                }
-            });
+            .otherwise(ExceptionUtils.replace(CF_NOT_FOUND, () -> Mono.just(false)));
     }
 
     @Override
