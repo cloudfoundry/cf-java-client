@@ -1066,6 +1066,23 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return apps;
 	}
 
+    @Override
+    public List<CloudApplication> getApplicationsByRoute(CloudRoute cloudRoute) {
+        Map<String, Object> urlVars = new HashMap<String, Object>();
+        String urlPath = "/v2";
+        if (sessionSpace != null) {
+            urlVars.put("guid", cloudRoute.getMeta().getGuid());
+            urlPath = urlPath + "/routes/{guid}/apps?inline-relations-depth=1";
+        }
+        List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
+        List<CloudApplication> apps = new ArrayList<CloudApplication>();
+        for (Map<String, Object> resource : resourceList) {
+            processApplicationResource(resource, false);
+            apps.add(mapCloudApplication(resource));
+        }
+        return apps;
+    }
+
 	@Override
 	public CloudApplication getApplication(String appName) {
 		Map<String, Object> resource = findApplicationResource(appName, true);
@@ -1962,7 +1979,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	public void deleteDomain(String domainName) {
 		assertSpaceProvided("delete domain");
 		UUID domainGuid = getDomainGuid(domainName, true);
-		List<CloudRoute> routes = getRoutes(domainName);
+		List<CloudRoute> routes = getRoutes(domainName, null);
 		if (routes.size() > 0) {
 			throw new IllegalStateException("Unable to remove domain that is in use --" +
 					" it has " + routes.size() + " routes.");
@@ -1976,10 +1993,10 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	@Override
-	public List<CloudRoute> getRoutes(String domainName) {
+	public List<CloudRoute> getRoutes(String domainName, String hostName) {
 		assertSpaceProvided("get routes for domain");
 		UUID domainGuid = getDomainGuid(domainName, true);
-		return doGetRoutes(domainGuid);
+		return doGetRoutes(domainGuid, hostName);
 	}
 
 	@Override
@@ -2042,7 +2059,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	private List<CloudRoute> fetchOrphanRoutes(String domainName) {
 		List<CloudRoute> orphanRoutes = new ArrayList<>();
-		for (CloudRoute cloudRoute : getRoutes(domainName)) {
+		for (CloudRoute cloudRoute : getRoutes(domainName, null)) {
 			if (isOrphanRoute(cloudRoute)) {
 				orphanRoutes.add(cloudRoute);
 			}
@@ -2097,7 +2114,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		getRestTemplate().delete(getUrl(urlPath), urlVars);
 	}
 
-	private List<CloudRoute> doGetRoutes(UUID domainGuid) {
+	private List<CloudRoute> doGetRoutes(UUID domainGuid, String hostName) {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		String urlPath = "/v2";
 //		TODO: NOT implemented ATM:
@@ -2105,7 +2122,12 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 //			urlVars.put("space", sessionSpace.getMeta().getGuid());
 //			urlPath = urlPath + "/spaces/{space}";
 //		}
-		urlPath = urlPath + "/routes?inline-relations-depth=1";
+		if (hostName != null) {
+			urlPath = urlPath + "/routes?inline-relations-depth=1&q=host:" + hostName;
+		} else {
+			urlPath = urlPath + "/routes?inline-relations-depth=1";
+		}
+
 		List<Map<String, Object>> allRoutes = getAllResources(urlPath, urlVars);
 		List<CloudRoute> routes = new ArrayList<CloudRoute>();
 		for (Map<String, Object> route : allRoutes) {
