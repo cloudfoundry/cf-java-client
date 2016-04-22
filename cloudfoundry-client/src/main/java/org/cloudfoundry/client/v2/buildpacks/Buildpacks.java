@@ -63,4 +63,12 @@ public interface Buildpacks {
      */
     Mono<UpdateBuildpackResponse> update(UpdateBuildpackRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/buildpacks/upload_the_bits_for_an_admin_buildpack.html">Upload Buildpack</a> request
+     *
+     * @param request the Upload Buildpack request
+     * @return the response from the Upload Buildpack request
+     */
+    Mono<UploadBuildpackResponse> upload(UploadBuildpackRequest request);
+
 }

@@ -29,16 +29,22 @@ import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksResponse;
 import org.cloudfoundry.client.v2.buildpacks.UpdateBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.UpdateBuildpackResponse;
+import org.cloudfoundry.client.v2.buildpacks.UploadBuildpackRequest;
+import org.cloudfoundry.client.v2.buildpacks.UploadBuildpackResponse;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.spring.AbstractApiTest;
+import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Mono;
 
+import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 
 public final class SpringBuildpacksTest {
 
@@ -319,6 +325,60 @@ public final class SpringBuildpacksTest {
         @Override
         protected Mono<UpdateBuildpackResponse> invoke(UpdateBuildpackRequest request) {
             return this.buildpacks.update(request);
+        }
+    }
+
+    public static final class Upload extends AbstractApiTest<UploadBuildpackRequest, UploadBuildpackResponse> {
+
+        private SpringBuildpacks buildpacks = new SpringBuildpacks(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected UploadBuildpackRequest getInvalidRequest() {
+            return UploadBuildpackRequest.builder().build();
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(PUT).path("/v2/buildpacks/test-buildpack-id/bits")
+                .requestMatcher(header("Content-Type", startsWith(MULTIPART_FORM_DATA_VALUE)))
+                .anyRequestPayload()
+                .status(CREATED)
+                .responsePayload("fixtures/client/v2/buildpacks/PUT_{id}_bits_response.json");
+        }
+
+        @Override
+        protected UploadBuildpackResponse getResponse() {
+            return UploadBuildpackResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .createdAt("2016-04-21T08:51:39Z")
+                    .id("353360ea-59bb-414b-a90e-100c37317a02")
+                    .updatedAt("2016-04-21T09:38:16Z")
+                    .url("/v2/buildpacks/353360ea-59bb-414b-a90e-100c37317a02")
+                    .build())
+                .entity(BuildpackEntity.builder()
+                    .enabled(true)
+                    .filename("binary_buildpack-cached-v1.0.1.zip")
+                    .locked(false)
+                    .name("binary_buildpack")
+                    .position(8)
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected UploadBuildpackRequest getValidRequest() throws Exception {
+            return UploadBuildpackRequest.builder()
+                .buildpack(new ClassPathResource("fixtures/client/v2/buildpacks/test_buildpack.zip").getInputStream())
+                .buildpackId("test-buildpack-id")
+                .filename("test-filename")
+                .build();
+        }
+
+        @Override
+        protected Mono<UploadBuildpackResponse> invoke(UploadBuildpackRequest request) {
+            return this.buildpacks.upload(request);
         }
     }
 
