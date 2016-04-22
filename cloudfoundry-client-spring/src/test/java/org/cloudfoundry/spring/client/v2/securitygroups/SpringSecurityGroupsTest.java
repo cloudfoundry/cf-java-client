@@ -20,6 +20,8 @@ import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRunningDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsResponse;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsRequest;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsResponse;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultRequest;
@@ -35,7 +37,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringSecurityGroupsTest {
 
-    public static final class Delete extends AbstractApiTest<DeleteSecurityGroupRunningDefaultRequest, Void> {
+    public static final class DeleteRunning extends AbstractApiTest<DeleteSecurityGroupRunningDefaultRequest, Void> {
 
         private final SpringSecurityGroups securityGroups = new SpringSecurityGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
 
@@ -70,7 +72,7 @@ public final class SpringSecurityGroupsTest {
 
     }
 
-    public static final class List extends AbstractApiTest<ListSecurityGroupRunningDefaultsRequest, ListSecurityGroupRunningDefaultsResponse> {
+    public static final class ListRunning extends AbstractApiTest<ListSecurityGroupRunningDefaultsRequest, ListSecurityGroupRunningDefaultsResponse> {
 
         private final SpringSecurityGroups securityGroups = new SpringSecurityGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
 
@@ -124,7 +126,61 @@ public final class SpringSecurityGroupsTest {
 
     }
 
-    public static final class Set extends AbstractApiTest<SetSecurityGroupRunningDefaultRequest, SetSecurityGroupRunningDefaultResponse> {
+    public static final class ListStaging extends AbstractApiTest<ListSecurityGroupStagingDefaultsRequest, ListSecurityGroupStagingDefaultsResponse> {
+
+        private final SpringSecurityGroups securityGroups = new SpringSecurityGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected ListSecurityGroupStagingDefaultsRequest getInvalidRequest() {
+            return null;
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("/v2/config/staging_security_groups")
+                .status(OK)
+                .responsePayload("fixtures/client/v2/config/GET_staging_security_groups_response.json");
+        }
+
+        @Override
+        protected ListSecurityGroupStagingDefaultsResponse getResponse() {
+            return ListSecurityGroupStagingDefaultsResponse.builder()
+                .totalPages(1)
+                .totalResults(1)
+                .resource(SecurityGroupResource.builder()
+                    .metadata(Resource.Metadata.builder()
+                        .createdAt("2016-04-16T01:23:52Z")
+                        .id("c0bb3afb-ae01-4af0-96cf-a5b0d2dca894")
+                        .url("/v2/config/staging_security_groups/c0bb3afb-ae01-4af0-96cf-a5b0d2dca894")
+                        .build())
+                    .entity(SecurityGroupEntity.builder()
+                        .name("name-570")
+                        .rule(SecurityGroupEntity.RuleEntity.builder()
+                            .destination("198.41.191.47/1")
+                            .ports("8080")
+                            .protocol("udp")
+                            .build())
+                        .runningDefault(false)
+                        .stagingDefault(true)
+                        .build())
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListSecurityGroupStagingDefaultsRequest getValidRequest() throws Exception {
+            return ListSecurityGroupStagingDefaultsRequest.builder().build();
+        }
+
+        @Override
+        protected Mono<ListSecurityGroupStagingDefaultsResponse> invoke(ListSecurityGroupStagingDefaultsRequest request) {
+            return this.securityGroups.listStagingDefaults(request);
+        }
+
+    }
+
+    public static final class SetRunning extends AbstractApiTest<SetSecurityGroupRunningDefaultRequest, SetSecurityGroupRunningDefaultResponse> {
 
         private final SpringSecurityGroups securityGroups = new SpringSecurityGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
 
