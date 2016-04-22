@@ -22,10 +22,10 @@ import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
 /**
- * The request options for the create quota operation
+ * The request options for the update quota operation
  */
 @Data
-public final class CreateQuotaRequest implements Validatable {
+public final class UpdateQuotaRequest implements Validatable {
 
     /**
      * The allow paid service plans flag
@@ -60,6 +60,14 @@ public final class CreateQuotaRequest implements Validatable {
     private final String name;
 
     /**
+     * The new name
+     *
+     * @param newName the new name
+     * @return new name
+     */
+    private final String newName;
+
+    /**
      * The total routes
      *
      * @param totalRoutes the total routes
@@ -76,16 +84,18 @@ public final class CreateQuotaRequest implements Validatable {
     private final Integer totalServices;
 
     @Builder
-    CreateQuotaRequest(Boolean allowPaidServicePlans,
+    UpdateQuotaRequest(Boolean allowPaidServicePlans,
                        Integer instanceMemoryLimit,
                        Integer memoryLimit,
                        String name,
+                       String newName,
                        Integer totalRoutes,
                        Integer totalServices) {
         this.allowPaidServicePlans = allowPaidServicePlans;
         this.instanceMemoryLimit = instanceMemoryLimit;
         this.memoryLimit = memoryLimit;
         this.name = name;
+        this.newName = newName;
         this.totalRoutes = totalRoutes;
         this.totalServices = totalServices;
     }
