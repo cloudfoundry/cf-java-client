@@ -281,6 +281,27 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void deleteAsyncFalse() {
+        String spaceName = getSpaceName();
+
+        this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .as(thenKeep(spaceId -> this.cloudFoundryClient.spaces()
+                .delete(DeleteSpaceRequest.builder()
+                    .spaceId(spaceId)
+                    .async(false)
+                    .build())))
+            .flatMap(spaceId -> PaginationUtils
+                .requestResources(page -> this.cloudFoundryClient.spaces()
+                    .list(ListSpacesRequest.builder()
+                        .page(page)
+                        .build()))
+                .map(ResourceUtils::getId)
+                .filter(spaceId::equals))
+            .subscribe(testSubscriber());
+    }
+
+    @Test
     public void get() {
         String spaceName = getSpaceName();
 
