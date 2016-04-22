@@ -86,4 +86,12 @@ public interface Services {
      * @return a completion indicator
      */
     Mono<Void> unbind(UnbindServiceInstanceRequest request);
+
+    /**
+     * List the service keys for a service instance
+     *
+     * @param request the list service keys request
+     * @return the service keys
+     */
+    Flux<ServiceKey> listServiceKeys(ListServiceKeysRequest request);
 }
