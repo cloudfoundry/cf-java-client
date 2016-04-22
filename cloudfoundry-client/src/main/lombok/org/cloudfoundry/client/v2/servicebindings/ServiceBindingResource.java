@@ -21,7 +21,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.cloudfoundry.client.v2.Resource;
 
 /**
  * Service Binding in responses
@@ -29,7 +28,7 @@ import org.cloudfoundry.client.v2.Resource;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ServiceBindingResource extends Resource<ServiceBindingEntity> {
+public final class ServiceBindingResource extends AbstractServiceBindingResource {
 
     @Builder
     ServiceBindingResource(@JsonProperty("entity") ServiceBindingEntity entity,
