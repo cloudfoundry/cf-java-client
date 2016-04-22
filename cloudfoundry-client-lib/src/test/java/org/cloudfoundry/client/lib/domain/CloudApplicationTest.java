@@ -19,6 +19,7 @@ public class CloudApplicationTest {
 		attributes.put("name", "Test1");
 		attributes.put("state", CloudApplication.AppState.STOPPED.name());
 		attributes.put("package_state", CloudApplication.PackageState.STAGED.name());
+		attributes.put("package_updated_at", "2016-02-12T18:32:44Z");
 
 		CloudApplication cloudApplication = new CloudApplication(attributes);
 
@@ -42,6 +43,7 @@ public class CloudApplicationTest {
 		attributes.put("name", "Test1");
 		attributes.put("state", CloudApplication.AppState.STOPPED.name());
 		attributes.put("package_state", CloudApplication.PackageState.STAGED.name());
+		attributes.put("package_updated_at", "2016-02-12T18:32:44Z");
 
 		CloudApplication cloudApplication = new CloudApplication(attributes);
 
