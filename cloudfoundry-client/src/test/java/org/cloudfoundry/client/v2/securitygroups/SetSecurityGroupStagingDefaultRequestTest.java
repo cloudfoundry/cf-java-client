@@ -23,22 +23,22 @@ import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class SetSecurityGroupRunningDefaultRequestTest {
+public final class SetSecurityGroupStagingDefaultRequestTest {
 
     @Test
     public void isNotValidNoId() {
-        ValidationResult result = SetSecurityGroupRunningDefaultRequest.builder()
+        ValidationResult result = SetSecurityGroupStagingDefaultRequest.builder()
             .build()
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("security group running default id must be specified", result.getMessages().get(0));
+        assertEquals("security group staging default id must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValid() {
-        ValidationResult result = SetSecurityGroupRunningDefaultRequest.builder()
-            .securityGroupRunningDefaultId("test-security-group-default-id")
+        ValidationResult result = SetSecurityGroupStagingDefaultRequest.builder()
+            .securityGroupStagingDefaultId("test-security-group-default-id")
             .build()
             .isValid();
 

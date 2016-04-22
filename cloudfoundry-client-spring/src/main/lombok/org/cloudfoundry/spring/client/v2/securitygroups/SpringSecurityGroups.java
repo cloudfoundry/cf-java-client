@@ -25,6 +25,8 @@ import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefault
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroups;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultResponse;
+import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupStagingDefaultRequest;
+import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupStagingDefaultResponse;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
@@ -76,4 +78,9 @@ public class SpringSecurityGroups extends AbstractSpringOperations implements Se
         return put(request, SetSecurityGroupRunningDefaultResponse.class, builder -> builder.pathSegment("v2", "config", "running_security_groups", request.getSecurityGroupRunningDefaultId()));
     }
 
+    @Override
+    public Mono<SetSecurityGroupStagingDefaultResponse> setStagingDefault(SetSecurityGroupStagingDefaultRequest request) {
+        return put(request, SetSecurityGroupStagingDefaultResponse.class, builder -> builder.pathSegment("v2", "config", "staging_security_groups", request.getSecurityGroupStagingDefaultId()));
+    }
+    
 }

@@ -26,6 +26,8 @@ import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultResponse;
+import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupStagingDefaultRequest;
+import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupStagingDefaultResponse;
 import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
@@ -229,6 +231,59 @@ public final class SpringSecurityGroupsTest {
         @Override
         protected Mono<SetSecurityGroupRunningDefaultResponse> invoke(SetSecurityGroupRunningDefaultRequest request) {
             return this.securityGroups.setRunningDefault(request);
+        }
+
+    }
+
+    public static final class SetStaging extends AbstractApiTest<SetSecurityGroupStagingDefaultRequest, SetSecurityGroupStagingDefaultResponse> {
+
+        private final SpringSecurityGroups securityGroups = new SpringSecurityGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected SetSecurityGroupStagingDefaultRequest getInvalidRequest() {
+            return SetSecurityGroupStagingDefaultRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(PUT).path("/v2/config/staging_security_groups/test-security-group-default-id")
+                .status(OK)
+                .responsePayload("fixtures/client/v2/config/PUT_{id}_staging_security_groups_response.json");
+        }
+
+        @Override
+        protected SetSecurityGroupStagingDefaultResponse getResponse() {
+            return SetSecurityGroupStagingDefaultResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .createdAt("2016-04-16T01:23:52Z")
+                    .id("50165fce-6c41-4c35-a4d8-3858ee217d36")
+                    .url("/v2/config/staging_security_groups/50165fce-6c41-4c35-a4d8-3858ee217d36")
+                    .updatedAt("2016-04-16T01:23:52Z")
+                    .build())
+                .entity(SecurityGroupEntity.builder()
+                    .name("name-567")
+                    .rule(SecurityGroupEntity.RuleEntity.builder()
+                        .destination("198.41.191.47/1")
+                        .ports("8080")
+                        .protocol("udp")
+                        .build())
+                    .runningDefault(false)
+                    .stagingDefault(true)
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected SetSecurityGroupStagingDefaultRequest getValidRequest() throws Exception {
+            return SetSecurityGroupStagingDefaultRequest.builder()
+                .securityGroupStagingDefaultId("test-security-group-default-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<SetSecurityGroupStagingDefaultResponse> invoke(SetSecurityGroupStagingDefaultRequest request) {
+            return this.securityGroups.setStagingDefault(request);
         }
 
     }
