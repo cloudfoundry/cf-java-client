@@ -25,7 +25,7 @@ import org.cloudfoundry.ValidationResult;
 public class ListServiceKeysRequest implements Validatable {
 
     /**
-     * The name of the service instance for which the keys will be listed
+     * The name of the service instance for which the keys will be listed 
      *
      * @param serviceInstanceName the service instance name for which the keys will be listed
      * @return service instance
