@@ -18,6 +18,7 @@ package org.cloudfoundry.operations.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
@@ -77,6 +78,8 @@ public final class DefaultServices implements Services {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
+    private static final int CF_SERVICE_ALREADY_BOUND = 90003;
+
     private final CloudFoundryClient cloudFoundryClient;
 
     private final Mono<String> spaceId;
@@ -96,7 +99,7 @@ public final class DefaultServices implements Services {
                     getSpaceServiceInstanceId(this.cloudFoundryClient, request1.getServiceInstanceName(), spaceId),
                     Mono.just(request1)
                 )))
-            .then(function((applicationId, serviceInstanceId, request1) -> requestCreateServiceBinding(this.cloudFoundryClient, applicationId, serviceInstanceId, request1.getParameters())))
+            .then(function((applicationId, serviceInstanceId, request1) -> createServiceBinding(this.cloudFoundryClient, applicationId, serviceInstanceId, request1.getParameters())))
             .after();
     }
 
@@ -340,6 +343,18 @@ public final class DefaultServices implements Services {
             return requestServiceInstanceUpdate(cloudFoundryClient, ResourceUtils.getId(serviceInstance), newName)
                 .cast(BaseServiceInstanceEntity.class);
         }
+    }
+
+    private static Mono<CreateServiceBindingResponse> createServiceBinding(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId,
+                                                                           Map<String, Object> parameters) {
+        return requestCreateServiceBinding(cloudFoundryClient, applicationId, serviceInstanceId, parameters)
+            .otherwise(throwable -> {
+                if (((CloudFoundryException) throwable).getCode() == CF_SERVICE_ALREADY_BOUND) {
+                    return Mono.empty();
+                } else {
+                    return Mono.error(throwable);
+                }
+            });
     }
 
     private static Mono<CreateServiceBindingResponse> requestCreateServiceBinding(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId,

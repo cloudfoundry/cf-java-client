@@ -139,6 +139,17 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
+    private static void requestCreateServiceBindingError(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId, Map<String, Object> parameters, int code) {
+        when(cloudFoundryClient.serviceBindings()
+            .create(CreateServiceBindingRequest.builder()
+                .applicationId(applicationId)
+                .parameters(parameters)
+                .serviceInstanceId(serviceInstanceId)
+                .build()))
+            .thenReturn(Mono
+                .error(new CloudFoundryException(code, "test-exception-description", "test-exception-errorCode")));
+    }
+
     private static void requestCreateServiceInstance(CloudFoundryClient cloudFoundryClient, String spaceId, String planId, String serviceInstance, Map<String, Object> parameters, List<String> tags,
                                                      String serviceInstanceId, String state) {
         when(cloudFoundryClient.serviceInstances()
@@ -578,6 +589,37 @@ public final class DefaultServicesTest {
             requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
             requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
             requestCreateServiceBinding(this.cloudFoundryClient, "test-application-id", "test-service-instance-id", Collections.singletonMap("test-parameter-key", "test-parameter-value"));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.services
+                .bind(BindServiceInstanceRequest.builder()
+                    .applicationName("test-application-name")
+                    .serviceInstanceName("test-service-instance-name")
+                    .parameter("test-parameter-key", "test-parameter-value")
+                    .build());
+        }
+
+    }
+
+    public static final class BindServiceInstanceAlreadyBound extends AbstractOperationsApiTest<Void> {
+
+        private static final int CF_SERVICE_ALREADY_BOUND = 90003;
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+            requestCreateServiceBindingError(this.cloudFoundryClient, "test-application-id", "test-service-instance-id", Collections.singletonMap("test-parameter-key", "test-parameter-value"),
+                CF_SERVICE_ALREADY_BOUND);
         }
 
         @Override
