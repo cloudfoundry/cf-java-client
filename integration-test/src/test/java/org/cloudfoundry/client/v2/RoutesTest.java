@@ -27,6 +27,7 @@ import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.GetRouteRequest;
+import org.cloudfoundry.client.v2.routes.GetRouteResponse;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v2.routes.RemoveRouteApplicationRequest;
@@ -124,13 +125,36 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 this.spaceId
             )
             .then(function((domainId, spaceId) -> createRouteId(this.cloudFoundryClient, domainId, spaceId)))
-            .then(routeId -> this.cloudFoundryClient.routes()
+            .as(thenKeep(routeId -> this.cloudFoundryClient.routes()
                 .delete(DeleteRouteRequest.builder()
                     .async(true)
                     .routeId(routeId)
-                    .build()))
-            .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))
-            .subscribe(testSubscriber());
+                    .build())
+                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))))
+            .then(routeId -> requestGetRoute(this.cloudFoundryClient, routeId))
+            .subscribe(testSubscriber()
+                .assertErrorMatch(CloudFoundryException.class, "CF-RouteNotFound\\([0-9]+\\): The route could not be found: .*"));
+    }
+
+    @Test
+    public void deleteAsyncFalse() {
+        String domainName = getDomainName();
+
+        Mono
+            .when(
+                this.organizationId
+                    .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId, domainName)),
+                this.spaceId
+            )
+            .then(function((domainId, spaceId) -> createRouteId(this.cloudFoundryClient, domainId, spaceId)))
+            .as(thenKeep(routeId -> this.cloudFoundryClient.routes()
+                .delete(DeleteRouteRequest.builder()
+                    .async(false)
+                    .routeId(routeId)
+                    .build())))
+            .then(routeId -> requestGetRoute(this.cloudFoundryClient, routeId))
+            .subscribe(testSubscriber()
+                .assertErrorMatch(CloudFoundryException.class, "CF-RouteNotFound\\([0-9]+\\): The route could not be found: .*"));
     }
 
     @Test
@@ -588,6 +612,13 @@ public final class RoutesTest extends AbstractIntegrationTest {
             .create(CreateRouteRequest.builder()
                 .domainId(domainId)
                 .spaceId(spaceId)
+                .build());
+    }
+
+    private static Mono<GetRouteResponse> requestGetRoute(CloudFoundryClient cloudFoundryClient, String routeId) {
+        return cloudFoundryClient.routes()
+            .get(GetRouteRequest.builder()
+                .routeId(routeId)
                 .build());
     }
 

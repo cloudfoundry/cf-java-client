@@ -320,6 +320,21 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void deleteAsyncFalse() {
+        String organizationName = getOrganizationName();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .as(thenKeep(organizationId -> this.cloudFoundryClient.organizations()
+                .delete(DeleteOrganizationRequest.builder()
+                    .organizationId(organizationId)
+                    .async(false)
+                    .build())))
+            .then(organizationId -> requestGetOrganization(this.cloudFoundryClient, organizationId))
+            .subscribe(testSubscriber()
+                .assertErrorMatch(CloudFoundryException.class, "CF-OrganizationNotFound\\([0-9]+\\): The organization could not be found: .*"));
+    }
+
+    @Test
     public void get() {
         String organizationName = getOrganizationName();
 

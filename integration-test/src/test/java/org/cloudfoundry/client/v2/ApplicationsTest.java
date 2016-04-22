@@ -46,7 +46,9 @@ import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
+import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
+import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
 import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
@@ -195,7 +197,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .then(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId))
+            .as(thenKeep(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId)))
             .flatMap(applicationId -> this.cloudFoundryClient.applicationsV2()
                 .downloadDroplet(DownloadApplicationDropletRequest.builder()
                     .applicationId(applicationId)
@@ -688,12 +690,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .then(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId))
-            .then(applicationId -> this.cloudFoundryClient.applicationsV2()
+            .as(thenKeep(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId)))
+            .as(thenKeep(applicationId -> this.cloudFoundryClient.applicationsV2()
                 .restage(RestageApplicationRequest.builder()
                     .applicationId(applicationId)
-                    .build())
-                .map(ResourceUtils::getId))
+                    .build())))
             .then(applicationId -> waitForStagingApplication(this.cloudFoundryClient, applicationId))
             .subscribe(this.<AbstractApplicationResource>testSubscriber()
                 .assertThat(resource -> assertEquals(applicationName, ResourceUtils.getEntity(resource).getName())));
@@ -705,7 +706,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .then(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId))
+            .as(thenKeep(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId)))
             .then(applicationId -> this.cloudFoundryClient.applicationsV2()
                 .statistics(ApplicationStatisticsRequest.builder()
                     .applicationId(applicationId)
@@ -737,7 +738,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .then(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId))
+            .as(thenKeep(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId)))
             .then(applicationId -> Mono
                 .when(
                     Mono.just(applicationId),
@@ -783,7 +784,26 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .then(applicationId -> uploadApplication(this.cloudFoundryClient, applicationId))
+            .as(thenKeep(applicationId -> uploadApplication(this.cloudFoundryClient, applicationId)))
+            .then(applicationId -> Mono
+                .when(
+                    downloadApplication(cloudFoundryClient, applicationId),
+                    getByteArrayFrom(testApplicationName, testApplication)
+                ))
+            .subscribe(this.<Tuple2<byte[], byte[]>>testSubscriber()
+                .assertThat(consumer((bytes1, bytes2) -> zipAssertEquivalent(new ByteArrayInputStream(bytes1), new ByteArrayInputStream(bytes2)))));
+    }
+
+    @Test
+    public void uploadAndDownloadAsyncFalse() {
+        String applicationName = getApplicationName();
+
+        String testApplicationName = "test-application.zip";
+        Resource testApplication = new ClassPathResource(testApplicationName);
+
+        this.spaceId
+            .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
+            .as(thenKeep(applicationId -> uploadApplicationAsyncFalse(this.cloudFoundryClient, applicationId)))
             .then(applicationId -> Mono
                 .when(
                     downloadApplication(cloudFoundryClient, applicationId),
@@ -1025,23 +1045,26 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build()));
     }
 
-    private static Mono<String> startApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
+    private static Mono<UpdateApplicationResponse> requestUpdateApplicationState(CloudFoundryClient cloudFoundryClient, String applicationId, String state) {
         return cloudFoundryClient.applicationsV2()
             .update(UpdateApplicationRequest.builder()
                 .applicationId(applicationId)
-                .state("STARTED")
-                .build())
-            .map(ResourceUtils::getId)
-            .then(id -> waitForStaging(cloudFoundryClient, id))
-            .then(id -> waitForStarting(cloudFoundryClient, id));
+                .state(state)
+                .build());
     }
 
-    private static Mono<String> uploadAndStartApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
+    private static Mono<ApplicationInstanceInfo> startApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return requestUpdateApplicationState(cloudFoundryClient, applicationId, "STARTED")
+            .after(waitForStagingApplication(cloudFoundryClient, applicationId))
+            .after(waitForStartingInstanceInfo(cloudFoundryClient, applicationId));
+    }
+
+    private static Mono<ApplicationInstanceInfo> uploadAndStartApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return uploadApplication(cloudFoundryClient, applicationId)
-            .then(id -> startApplication(cloudFoundryClient, id));
+            .after(startApplication(cloudFoundryClient, applicationId));
     }
 
-    private static Mono<String> uploadApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
+    private static Mono<Void> uploadApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
         try {
             return cloudFoundryClient.applicationsV2()
                 .upload(UploadApplicationRequest.builder()
@@ -1049,8 +1072,21 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .async(true)
                     .applicationId(applicationId)
                     .build())
-                .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job))
-                .after(Mono.just(applicationId));
+                .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static Mono<UploadApplicationResponse> uploadApplicationAsyncFalse(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        try {
+            final InputStream inputStream = new ClassPathResource("test-application.zip").getInputStream();
+            return cloudFoundryClient.applicationsV2()
+                .upload(UploadApplicationRequest.builder()
+                    .application(inputStream)
+                    .async(false)
+                    .applicationId(applicationId)
+                    .build());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -1062,18 +1098,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
     }
 
-    private static Mono<String> waitForStaging(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return waitForStagingApplication(cloudFoundryClient, applicationId)
-            .map(ResourceUtils::getId);
-    }
-
     private static Mono<AbstractApplicationResource> waitForStagingApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestGetApplication(cloudFoundryClient, applicationId)
             .where(response -> "STAGED".equals(response.getEntity().getPackageState()))
             .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
     }
 
-    private static Mono<String> waitForStarting(CloudFoundryClient cloudFoundryClient, String applicationId) {
+    private static Mono<ApplicationInstanceInfo> waitForStartingInstanceInfo(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return cloudFoundryClient.applicationsV2()
             .instances(ApplicationInstancesRequest.builder()
                 .applicationId(applicationId)
@@ -1081,8 +1112,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .flatMap(response -> Flux.fromIterable(response.values()))
             .filter(applicationInstanceInfo -> "RUNNING".equals(applicationInstanceInfo.getState()))
             .next()
-            .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
-            .map(info -> applicationId);
+            .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
     }
 
 }

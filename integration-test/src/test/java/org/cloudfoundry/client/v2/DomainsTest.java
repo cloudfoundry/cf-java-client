@@ -92,9 +92,20 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> createDomainId(this.cloudFoundryClient, domainName, organizationId))
-            .then(domainId -> requestDeleteDomain(this.cloudFoundryClient, domainId)
-                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))
-                .after(Mono.just(domainId)))
+            .as(thenKeep(domainId -> requestDeleteDomain(this.cloudFoundryClient, domainId)
+                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))))
+            .then(domainId -> requestGetDomain(this.cloudFoundryClient, domainId))
+            .subscribe(testSubscriber()
+                .assertErrorMatch(CloudFoundryException.class, "CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"));
+    }
+
+    @Test
+    public void deleteNotAsync() {
+        String domainName = getDomainName();
+
+        this.organizationId
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, domainName, organizationId))
+            .as(thenKeep(domainId -> requestDeleteDomainAsyncFalse(this.cloudFoundryClient, domainId)))
             .then(domainId -> requestGetDomain(this.cloudFoundryClient, domainId))
             .subscribe(testSubscriber()
                 .assertErrorMatch(CloudFoundryException.class, "CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"));
@@ -400,6 +411,14 @@ public final class DomainsTest extends AbstractIntegrationTest {
         return cloudFoundryClient.domains()
             .delete(DeleteDomainRequest.builder()
                 .async(true)
+                .domainId(domainId)
+                .build());
+    }
+
+    private static Mono<DeleteDomainResponse> requestDeleteDomainAsyncFalse(CloudFoundryClient cloudFoundryClient, String domainId) {
+        return cloudFoundryClient.domains()
+            .delete(DeleteDomainRequest.builder()
+                .async(false)
                 .domainId(domainId)
                 .build());
     }
