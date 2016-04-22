@@ -222,6 +222,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		return cc.getApplications();
 	}
 
+    public List<CloudApplication> getApplicationsByRoute(CloudRoute cloudRoute) {
+        return cc.getApplicationsByRoute(cloudRoute);
+    }
+
 	public CloudApplication getApplication(String appName) {
 		return cc.getApplication(appName);
 	}
@@ -531,8 +535,8 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.removeDomain(domainName);
 	}
 
-	public List<CloudRoute> getRoutes(String domainName) {
-		return cc.getRoutes(domainName);
+	public List<CloudRoute> getRoutes(String domainName, String hostName) {
+		return cc.getRoutes(domainName, hostName);
 	}
 
 	public void addRoute(String host, String domainName) {

@@ -297,6 +297,14 @@ public interface CloudFoundryOperations {
 	List<CloudApplication> getApplications();
 
 	/**
+	 * Get all cloud applications by a route.
+	 *
+	 * @param cloudRoute a cloud app route
+	 * @return list of cloud applications by a route.
+	 */
+	List<CloudApplication> getApplicationsByRoute(CloudRoute cloudRoute);
+
+	/**
 	 * Get cloud application with the specified name.
 	 *
 	 * @param appName name of the app
@@ -917,9 +925,10 @@ public interface CloudFoundryOperations {
 	 * Get the info for all routes for a domain.
 	 *
 	 * @param domainName the domain the routes belong to
+	 * @param hostName the hostname part of the uri
 	 * @return list of routes
 	 */
-	List<CloudRoute> getRoutes(String domainName);
+	List<CloudRoute> getRoutes(String domainName, String hostName);
 
 	/**
 	 * Register a new route to the a domain.

@@ -122,6 +122,8 @@ public interface CloudControllerClient {
 
 	List<CloudApplication> getApplications();
 
+    List<CloudApplication> getApplicationsByRoute(CloudRoute cloudRoute);
+
 	CloudApplication getApplication(String appName);
 
 	CloudApplication getApplication(UUID appGuid);
@@ -233,7 +235,7 @@ public interface CloudControllerClient {
 
 	void removeDomain(String domainName);
 
-	List<CloudRoute> getRoutes(String domainName);
+	List<CloudRoute> getRoutes(String domainName, String hostName);
 
 	void addRoute(String host, String domainName);
 
