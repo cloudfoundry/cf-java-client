@@ -44,6 +44,7 @@ import reactor.core.scheduler.Scheduler;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -162,6 +163,17 @@ public abstract class AbstractRestTest {
 
         public RequestContext path(String path) {
             this.path = path;
+            return this;
+        }
+
+        public RequestContext requestHeader(String name, String value) {
+            if (name != null) {
+                this.requestMatchers.add(request -> {
+                    Assert.isTrue(request.getHeaders().containsKey(name));
+                    Assert.isTrue(request.getHeaders().get(name).size() == 1);
+                    Assert.isTrue(Objects.equals(request.getHeaders().getFirst(name), value));
+                });
+            }
             return this;
         }
 

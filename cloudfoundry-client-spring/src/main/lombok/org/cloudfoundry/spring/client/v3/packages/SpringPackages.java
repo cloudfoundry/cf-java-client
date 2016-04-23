@@ -106,7 +106,7 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
     @Override
     public Mono<UploadPackageResponse> upload(UploadPackageRequest request) {
         return postWithBody(request, () -> CollectionUtils.singletonMultiValueMap("bits", getApplicationPart(request)), UploadPackageResponse.class,
-            builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "upload"));
+            builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "upload"), null);
     }
 
     private static HttpEntity<Resource> getApplicationPart(UploadPackageRequest request) {
