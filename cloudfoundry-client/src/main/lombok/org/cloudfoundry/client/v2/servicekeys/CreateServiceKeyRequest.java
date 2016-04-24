@@ -20,6 +20,7 @@ package org.cloudfoundry.client.v2.servicekeys;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Singular;
 import org.cloudfoundry.Validatable;
@@ -32,6 +33,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 /**
  * The request payload for the Create Service Key
  */
+@Data
 public final class CreateServiceKeyRequest implements Validatable {
 
     /**
