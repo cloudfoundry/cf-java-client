@@ -18,6 +18,7 @@ package org.cloudfoundry.spring.client.v2.securitygroups;
 
 import lombok.ToString;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRunningDefaultRequest;
+import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupStagingDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsResponse;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsRequest;
@@ -55,6 +56,11 @@ public class SpringSecurityGroups extends AbstractSpringOperations implements Se
     @Override
     public Mono<Void> deleteRunningDefault(DeleteSecurityGroupRunningDefaultRequest request) {
         return delete(request, Void.class, builder -> builder.pathSegment("v2", "config", "running_security_groups", request.getSecurityGroupRunningDefaultId()));
+    }
+
+    @Override
+    public Mono<Void> deleteStagingDefault(DeleteSecurityGroupStagingDefaultRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "config", "staging_security_groups", request.getSecurityGroupStagingDefaultId()));
     }
 
     @Override

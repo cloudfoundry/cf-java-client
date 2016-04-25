@@ -18,6 +18,7 @@ package org.cloudfoundry.spring.client.v2.securitygroups;
 
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRunningDefaultRequest;
+import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupStagingDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsResponse;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsRequest;
@@ -70,6 +71,41 @@ public final class SpringSecurityGroupsTest {
         @Override
         protected Mono<Void> invoke(DeleteSecurityGroupRunningDefaultRequest request) {
             return this.securityGroups.deleteRunningDefault(request);
+        }
+
+    }
+
+    public static final class DeleteStaging extends AbstractApiTest<DeleteSecurityGroupStagingDefaultRequest, Void> {
+
+        private final SpringSecurityGroups securityGroups = new SpringSecurityGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteSecurityGroupStagingDefaultRequest getInvalidRequest() {
+            return DeleteSecurityGroupStagingDefaultRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(DELETE).path("/v2/config/staging_security_groups/test-id")
+                .status(NO_CONTENT);
+        }
+
+        @Override
+        protected Void getResponse() {
+            return null;
+        }
+
+        @Override
+        protected DeleteSecurityGroupStagingDefaultRequest getValidRequest() throws Exception {
+            return DeleteSecurityGroupStagingDefaultRequest.builder()
+                .securityGroupStagingDefaultId("test-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<Void> invoke(DeleteSecurityGroupStagingDefaultRequest request) {
+            return this.securityGroups.deleteStagingDefault(request);
         }
 
     }
