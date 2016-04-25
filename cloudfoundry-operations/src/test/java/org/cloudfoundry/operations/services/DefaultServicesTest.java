@@ -45,6 +45,10 @@ import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceResource;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse;
+import org.cloudfoundry.client.v2.servicekeys.ListServiceKeysRequest;
+import org.cloudfoundry.client.v2.servicekeys.ListServiceKeysResponse;
+import org.cloudfoundry.client.v2.servicekeys.ServiceKeyEntity;
+import org.cloudfoundry.client.v2.servicekeys.ServiceKeyResource;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanRequest;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanResponse;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
@@ -482,6 +486,36 @@ public final class DefaultServicesTest {
                             .name(serviceName)
                             .build())
                         .build())
+                    .build()));
+    }
+
+    private static void requestListServiceKeys(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
+        when(cloudFoundryClient.serviceKeys()
+            .list(ListServiceKeysRequest.builder()
+                .serviceInstanceId(serviceInstanceId)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListServiceKeysResponse.builder())
+                    .resource(ServiceKeyResource.builder()
+                        .metadata(Resource.Metadata.builder()
+                            .id("id")
+                            .build())
+                        .entity(fill(ServiceKeyEntity.builder())
+                            .name("test-service-key")
+                            .build())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestListServiceKeysEmpty(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
+        when(cloudFoundryClient.serviceKeys()
+            .list(ListServiceKeysRequest.builder()
+                .serviceInstanceId(serviceInstanceId)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListServiceKeysResponse.builder())
                     .build()));
     }
 
@@ -1033,6 +1067,95 @@ public final class DefaultServicesTest {
         protected Publisher<ServiceInstance> invoke() {
             return this.services
                 .listInstances();
+        }
+
+    }
+
+    public static final class ListServiceKeys extends AbstractOperationsApiTest<ServiceKey> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        private static final String SERVICE_INSTANCE = "service-instance";
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstances(this.cloudFoundryClient, SERVICE_INSTANCE, TEST_SPACE_ID);
+            requestListServiceKeys(this.cloudFoundryClient, "test-service-instance-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ServiceKey> testSubscriber) {
+            testSubscriber
+                .assertEquals(ServiceKey.builder()
+                    .name("test-service-key")
+                    .build());
+        }
+
+        @Override
+        protected Publisher<ServiceKey> invoke() {
+            return this.services
+                .listServiceKeys(org.cloudfoundry.operations.services.ListServiceKeysRequest
+                    .builder()
+                    .serviceInstanceName(SERVICE_INSTANCE)
+                    .build());
+        }
+
+    }
+
+    public static final class ListServiceKeysEmpty extends AbstractOperationsApiTest<ServiceKey> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        private static final String SERVICE_INSTANCE = "service-instance";
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstances(this.cloudFoundryClient, SERVICE_INSTANCE, TEST_SPACE_ID);
+            requestListServiceKeysEmpty(this.cloudFoundryClient, "test-service-instance-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ServiceKey> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Publisher<ServiceKey> invoke() {
+            return this.services
+                .listServiceKeys(org.cloudfoundry.operations.services.ListServiceKeysRequest
+                    .builder()
+                    .serviceInstanceName(SERVICE_INSTANCE)
+                    .build());
+        }
+
+    }
+
+    public static final class ListServiceKeysNoServiceInstance extends AbstractOperationsApiTest<ServiceKey> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        private static final String NOT_EXIST_SERVICE_INSTANCE = "not-exist-service-instance";
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstancesEmpty(this.cloudFoundryClient, NOT_EXIST_SERVICE_INSTANCE, TEST_SPACE_ID);
+            requestListServiceKeysEmpty(this.cloudFoundryClient, "test-service-instance-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ServiceKey> testSubscriber) {
+            testSubscriber
+                .assertError(IllegalArgumentException.class,
+                    String.format("Service instance %s does not exist", NOT_EXIST_SERVICE_INSTANCE));
+        }
+
+        @Override
+        protected Publisher<ServiceKey> invoke() {
+            return this.services
+                .listServiceKeys(org.cloudfoundry.operations.services.ListServiceKeysRequest
+                    .builder()
+                    .serviceInstanceName(NOT_EXIST_SERVICE_INSTANCE)
+                    .build());
         }
 
     }
