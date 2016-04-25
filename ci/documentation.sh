@@ -37,5 +37,8 @@ pushd updated-cf-java-client-documentation
   git config --local user.name "Spring Buildmaster"
   git config --local user.email "buildmaster@springframework.org"
   git add .
-  git commit --message "$VERSION Documentation Update"
+
+  if ! git diff-index --cached --quiet HEAD --ignore-submodules --; then
+    git commit --message "$VERSION Documentation Update"
+  fi
 popd
