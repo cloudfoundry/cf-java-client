@@ -143,17 +143,17 @@ final class CloudFoundryCleaner {
                     .orElse(r -> true);
 
                 return Flux.empty()
-                    .after(() -> cleanFeatureFlags(this.cloudFoundryClient, featureFlagPredicate))
-                    .after(() -> cleanRoutes(this.cloudFoundryClient, routePredicate))
-                    .after(() -> cleanApplicationsV2(this.cloudFoundryClient, applicationV2Predicate))
-                    .after(() -> cleanApplicationsV3(this.cloudFoundryClient, applicationsV3Predicate))
-                    .after(() -> cleanPackages(this.cloudFoundryClient, packagePredicate))
-                    .after(() -> cleanServiceInstances(this.cloudFoundryClient, serviceInstancePredicate))
-                    .after(() -> cleanUserProvidedServiceInstances(this.cloudFoundryClient, userProvidedServiceInstancePredicate))
-                    .after(() -> cleanDomains(this.cloudFoundryClient, domainPredicate))
-                    .after(() -> cleanPrivateDomains(this.cloudFoundryClient, privateDomainPredicate))
-                    .after(() -> cleanSpaces(this.cloudFoundryClient, spacePredicate, this.logger))
-                    .after(() -> cleanOrganizations(this.cloudFoundryClient, organizationPredicate));
+                    .after(cleanFeatureFlags(this.cloudFoundryClient, featureFlagPredicate))
+                    .after(cleanRoutes(this.cloudFoundryClient, routePredicate))
+                    .after(cleanApplicationsV2(this.cloudFoundryClient, applicationV2Predicate))
+                    .after(cleanApplicationsV3(this.cloudFoundryClient, applicationsV3Predicate))
+                    .after(cleanPackages(this.cloudFoundryClient, packagePredicate))
+                    .after(cleanServiceInstances(this.cloudFoundryClient, serviceInstancePredicate))
+                    .after(cleanUserProvidedServiceInstances(this.cloudFoundryClient, userProvidedServiceInstancePredicate))
+                    .after(cleanDomains(this.cloudFoundryClient, domainPredicate))
+                    .after(cleanPrivateDomains(this.cloudFoundryClient, privateDomainPredicate))
+                    .after(cleanSpaces(this.cloudFoundryClient, spacePredicate, this.logger))
+                    .after(cleanOrganizations(this.cloudFoundryClient, organizationPredicate));
             }))
             .doOnSubscribe(s -> this.logger.debug(">> CLEANUP <<"))
             .doOnError(Throwable::printStackTrace)
