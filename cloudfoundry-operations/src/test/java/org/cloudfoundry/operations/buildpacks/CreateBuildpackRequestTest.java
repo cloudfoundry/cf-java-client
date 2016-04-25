@@ -19,6 +19,8 @@ package org.cloudfoundry.operations.buildpacks;
 import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
+
 import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
@@ -30,8 +32,9 @@ public class CreateBuildpackRequestTest {
     public void isValid() {
 
         ValidationResult result = CreateBuildpackRequest.builder()
-            .buildpack("test-go-buildpack")
-            .path("https://github.com/cloudfoundry/go-buildpack")
+            .name("go-buildpack")
+            .fileName("buildpack.zip")
+            .buildpack(new ByteArrayInputStream(new byte[0]))
             .position(1)
             .enable(true)
             .build()
@@ -44,8 +47,9 @@ public class CreateBuildpackRequestTest {
     public void isValidDefaultEnable() {
 
         CreateBuildpackRequest buildpackRequest = CreateBuildpackRequest.builder()
-            .buildpack("test-go-buildpack")
-            .path("https://github.com/cloudfoundry/go-buildpack")
+            .name("go-buildpack")
+            .fileName("buildpack.zip")
+            .buildpack(new ByteArrayInputStream(new byte[0]))
             .position(1)
             .build();
         ValidationResult result = buildpackRequest.isValid();
@@ -58,8 +62,9 @@ public class CreateBuildpackRequestTest {
     public void isValidDisabledBuildpack() {
 
         CreateBuildpackRequest buildpackRequest = CreateBuildpackRequest.builder()
-            .buildpack("test-go-buildpack")
-            .path("https://github.com/cloudfoundry/go-buildpack")
+            .name("go-buildpack")
+            .fileName("buildpack.zip")
+            .buildpack(new ByteArrayInputStream(new byte[0]))
             .position(1)
             .enable(false)
             .build();
@@ -76,16 +81,18 @@ public class CreateBuildpackRequestTest {
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertTrue(result.getMessages().size() == 3);
-        assertEquals("buildpack must be specified", result.getMessages().get(0));
-        assertEquals("path must be specified", result.getMessages().get(1));
-        assertEquals("position must be specified", result.getMessages().get(2));
+        assertTrue(result.getMessages().size() == 4);
+        assertEquals("name must be specified", result.getMessages().get(0));
+        assertEquals("file name must be specified", result.getMessages().get(1));
+        assertEquals("buildpack must be specified", result.getMessages().get(2));
+        assertEquals("position must be specified", result.getMessages().get(3));
     }
 
     @Test
     public void isInValidNoBuildpack() {
         ValidationResult result = CreateBuildpackRequest.builder()
-            .path("https://github.com/cloudfoundry/go-buildpack")
+            .name("go-buildpack")
+            .fileName("buildpack.zip")
             .position(1)
             .build()
             .isValid();
@@ -96,23 +103,25 @@ public class CreateBuildpackRequestTest {
     }
 
     @Test
-    public void isInValidNoPath() {
+    public void isInValidNoFileName() {
         ValidationResult result = CreateBuildpackRequest.builder()
-            .buildpack("test-go-buildpack")
+            .name("go-buildpack")
+            .buildpack(new ByteArrayInputStream(new byte[0]))
             .position(1)
             .build()
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertTrue(result.getMessages().size() == 1);
-        assertEquals("path must be specified", result.getMessages().get(0));
+        assertEquals("file name must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isInValidNoPosition() {
         ValidationResult result = CreateBuildpackRequest.builder()
-            .buildpack("test-go-buildpack")
-            .path("https://github.com/cloudfoundry/go-buildpack")
+            .name("go-buildpack")
+            .fileName("buildpack.zip")
+            .buildpack(new ByteArrayInputStream(new byte[0]))
             .build()
             .isValid();
 

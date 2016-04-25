@@ -21,27 +21,37 @@ import lombok.Data;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
+import java.io.InputStream;
+
 /**
  * The request options for the create buildpack operation
  */
 @Data
-public class CreateBuildpackRequest implements Validatable {
+public final class CreateBuildpackRequest implements Validatable {
 
     /**
      * The buildpack name
      *
-     * @param buildpack the buildpack name
+     * @param name the buildpack name
      * @return the buildpack name
      */
-    private final String buildpack;
+    private final String name;
 
     /**
-     * The buildpack path
+     * The buildpack file name
      *
-     * @param path the buildpack path
-     * @return the buildpack path
+     * @param fileName the buildpack file name
+     * @return the buildpack file name
      */
-    private final String path;
+    private final String fileName;
+
+    /**
+     * The buildpack file stream
+     *
+     * @param buildpack the buildpack file stream
+     * @return the buildpack file stream
+     */
+    private final InputStream buildpack;
 
     /**
      * The buildpack position
@@ -52,8 +62,7 @@ public class CreateBuildpackRequest implements Validatable {
     private final Integer position;
 
     /**
-     * Enables the buildpack to be used for staging
-     * Default value is true
+     * Enables the buildpack to be used for staging Default value is true
      *
      * @param enable the enable option indicating whether the buildpack is used for staging
      * @return the enable option
@@ -62,9 +71,10 @@ public class CreateBuildpackRequest implements Validatable {
 
 
     @Builder
-    CreateBuildpackRequest(String buildpack, String path, Integer position, Boolean enable) {
+    CreateBuildpackRequest(String name, String fileName, InputStream buildpack, Integer position, Boolean enable) {
+        this.name = name;
+        this.fileName = fileName;
         this.buildpack = buildpack;
-        this.path = path;
         this.position = position;
         this.enable = (enable != null ? enable : true);
     }
@@ -73,12 +83,16 @@ public class CreateBuildpackRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.buildpack == null) {
-            builder.message("buildpack must be specified");
+        if (this.name == null) {
+            builder.message("name must be specified");
         }
 
-        if (this.path == null) {
-            builder.message("path must be specified");
+        if (this.fileName == null) {
+            builder.message("file name must be specified");
+        }
+
+        if (this.buildpack == null) {
+            builder.message("buildpack must be specified");
         }
 
         if (this.position == null) {
