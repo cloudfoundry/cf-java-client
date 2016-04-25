@@ -190,8 +190,8 @@ public final class DefaultServices implements Services {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
             .flatMap(function((request1, spaceId) -> Optional.ofNullable(request1.getServiceName())
-                    .map(serviceName -> getSpaceService(this.cloudFoundryClient, spaceId, serviceName).flux())
-                    .orElse(requestListServices(this.cloudFoundryClient, spaceId))
+                .map(serviceName -> getSpaceService(this.cloudFoundryClient, spaceId, serviceName).flux())
+                .orElse(requestListServices(this.cloudFoundryClient, spaceId))
             ))
             .flatMap(resource -> Mono
                 .when(
@@ -387,8 +387,7 @@ public final class DefaultServices implements Services {
                 .build());
     }
 
-    private static Mono<CreateServiceKeyResponse> requestCreateServiceKey(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKey,
-                                                                          Map<String, Object> parameters) {
+    private static Mono<CreateServiceKeyResponse> requestCreateServiceKey(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKey, Map<String, Object> parameters) {
         return cloudFoundryClient.serviceKeys()
             .create(org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyRequest.builder()
                 .serviceInstanceId(serviceInstanceId)

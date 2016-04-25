@@ -23,7 +23,29 @@ import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public class CreateServiceKeyRequestTest {
+public final class CreateServiceKeyRequestTest {
+
+    @Test
+    public void isInValidNoServiceInstance() {
+        ValidationResult result = CreateServiceKeyRequest.builder()
+            .serviceKeyName("test-service-key-name")
+            .build()
+            .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("service instance name must be specified", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isInValidNoServiceKey() {
+        ValidationResult result = CreateServiceKeyRequest.builder()
+            .serviceInstanceName("test-service-instance-name")
+            .build()
+            .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("service key must be specified", result.getMessages().get(0));
+    }
 
     @Test
     public void isValid() {
@@ -46,28 +68,6 @@ public class CreateServiceKeyRequestTest {
             .isValid();
 
         assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isInValidNoServiceInstance() {
-        ValidationResult result = CreateServiceKeyRequest.builder()
-            .serviceKeyName("test-service-key-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service instance name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isInValidNoServiceKey() {
-        ValidationResult result = CreateServiceKeyRequest.builder()
-            .serviceInstanceName("test-service-instance-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service key must be specified", result.getMessages().get(0));
     }
 
 }

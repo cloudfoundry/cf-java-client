@@ -25,7 +25,15 @@ import org.cloudfoundry.ValidationResult;
 import java.util.Map;
 
 @Data
-public class CreateServiceKeyRequest implements Validatable {
+public final class CreateServiceKeyRequest implements Validatable {
+
+    /**
+     * The parameters of the service key
+     *
+     * @param parameters the parameters
+     * @return the parameters
+     */
+    private final Map<String, Object> parameters;
 
     /**
      * The name of the service instance
@@ -43,19 +51,11 @@ public class CreateServiceKeyRequest implements Validatable {
      */
     private final String serviceKeyName;
 
-    /**
-     * The parameters of the service key
-     *
-     * @param parameters the parameters
-     * @return the parameters
-     */
-    private final Map<String, Object> parameters;
-
     @Builder
-    CreateServiceKeyRequest(String serviceInstanceName, String serviceKeyName, @Singular Map<String, Object> parameters) {
+    CreateServiceKeyRequest(@Singular Map<String, Object> parameters, String serviceInstanceName, String serviceKeyName) {
+        this.parameters = parameters;
         this.serviceInstanceName = serviceInstanceName;
         this.serviceKeyName = serviceKeyName;
-        this.parameters = parameters;
     }
 
     @Override

@@ -176,7 +176,7 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
-    private static void requestCreateServiceKey(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKey,  Map<String, Object> parameters) {
+    private static void requestCreateServiceKey(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKey, Map<String, Object> parameters) {
         when(cloudFoundryClient.serviceKeys()
             .create(org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyRequest.builder()
                 .serviceInstanceId(serviceInstanceId)
@@ -818,6 +818,67 @@ public final class DefaultServicesTest {
 
     }
 
+    public static final class CreateServiceKey extends AbstractOperationsApiTest<Void> {
+
+        private static final String SERVICE_INSTANCE = "test-service-instance";
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstances(this.cloudFoundryClient, SERVICE_INSTANCE, TEST_SPACE_ID);
+            requestCreateServiceKey(this.cloudFoundryClient, "test-service-instance-id", "test-service-key",
+                Collections.singletonMap("test-parameter-key", "test-parameter-value"));
+        }
+
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.services
+                .createServiceKey(CreateServiceKeyRequest.builder()
+                    .serviceInstanceName(SERVICE_INSTANCE)
+                    .serviceKeyName("test-service-key")
+                    .parameter("test-parameter-key", "test-parameter-value")
+                    .build());
+        }
+
+    }
+
+    public static final class CreateServiceKeyNoServiceInstance extends AbstractOperationsApiTest<Void> {
+
+        private static final String NOT_EXIST_SERVICE_INSTANCE = "test-service-instance";
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstancesEmpty(this.cloudFoundryClient, NOT_EXIST_SERVICE_INSTANCE, TEST_SPACE_ID);
+        }
+
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            testSubscriber.assertError(IllegalArgumentException.class,
+                String.format("Service instance %s does not exist", NOT_EXIST_SERVICE_INSTANCE));
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.services
+                .createServiceKey(CreateServiceKeyRequest.builder()
+                    .serviceInstanceName(NOT_EXIST_SERVICE_INSTANCE)
+                    .serviceKeyName("test-service-key")
+                    .parameter("test-parameter-key", "test-parameter-value")
+                    .build());
+        }
+
+    }
+
     public static final class CreateUserProvidedServiceInstance extends AbstractOperationsApiTest<Void> {
 
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
@@ -847,69 +908,6 @@ public final class DefaultServicesTest {
                     .credential("test-credential-key", "test-credential-value")
                     .routeServiceUrl("test-route-url")
                     .syslogDrainUrl("test-syslog-url")
-                    .build());
-        }
-
-    }
-
-    public static final class CreateServiceKey extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
-
-        private static final String SERVICE_INSTANCE = "test-service-instance";
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, SERVICE_INSTANCE, TEST_SPACE_ID);
-            requestCreateServiceKey(this.cloudFoundryClient, "test-service-instance-id", "test-service-key",
-                Collections.singletonMap("test-parameter-key", "test-parameter-value"));
-        }
-
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .createServiceKey(CreateServiceKeyRequest.builder()
-                    .serviceInstanceName(SERVICE_INSTANCE)
-                    .serviceKeyName("test-service-key")
-                    .parameter("test-parameter-key", "test-parameter-value")
-                    .build());
-        }
-
-    }
-
-    public static final class CreateServiceKeyNoServiceInstance extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
-
-        private static final String NOT_EXIST_SERVICE_INSTANCE = "test-service-instance";
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstancesEmpty(this.cloudFoundryClient, NOT_EXIST_SERVICE_INSTANCE, TEST_SPACE_ID);
-            requestCreateServiceKey(this.cloudFoundryClient, "test-service-instance-id", "test-service-key",
-                Collections.singletonMap("test-parameter-key", "test-parameter-value"));
-        }
-
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber.assertError(IllegalArgumentException.class,
-                String.format("Service instance %s does not exist", NOT_EXIST_SERVICE_INSTANCE));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .createServiceKey(CreateServiceKeyRequest.builder()
-                    .serviceInstanceName(NOT_EXIST_SERVICE_INSTANCE)
-                    .serviceKeyName("test-service-key")
-                    .parameter("test-parameter-key", "test-parameter-value")
                     .build());
         }
 
