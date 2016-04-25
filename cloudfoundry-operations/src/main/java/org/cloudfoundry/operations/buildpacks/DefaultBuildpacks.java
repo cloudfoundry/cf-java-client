@@ -19,10 +19,13 @@ package org.cloudfoundry.operations.buildpacks;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.buildpacks.BuildpackEntity;
 import org.cloudfoundry.client.v2.buildpacks.BuildpackResource;
+import org.cloudfoundry.client.v2.buildpacks.CreateBuildpackResponse;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
+import org.cloudfoundry.util.ValidationUtils;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public final class DefaultBuildpacks implements Buildpacks {
 
@@ -33,9 +36,28 @@ public final class DefaultBuildpacks implements Buildpacks {
     }
 
     @Override
+    public Mono<Void> create(CreateBuildpackRequest request) {
+        return ValidationUtils
+            .validate(request)
+            .then(request1 -> requestCreateBuildpack(this.cloudFoundryClient, request1.getBuildpack(), request1.getPath(), request1.getPosition(), request1.getEnable()))
+            .after();
+    }
+
+    @Override
     public Flux<Buildpack> list() {
         return requestBuildpacks(this.cloudFoundryClient)
             .map(DefaultBuildpacks::toBuildpackResource);
+    }
+
+    private static Mono<CreateBuildpackResponse> requestCreateBuildpack(CloudFoundryClient cloudFoundryClient, String buildpack, String path, Integer position, Boolean enable) {
+        return cloudFoundryClient.buildpacks()
+            .create(org.cloudfoundry.client.v2.buildpacks.CreateBuildpackRequest
+                .builder()
+                .name(buildpack)
+                .filename(path)
+                .position(position)
+                .enabled(enable)
+                .build());
     }
 
     private static Flux<BuildpackResource> requestBuildpacks(CloudFoundryClient cloudFoundryClient) {

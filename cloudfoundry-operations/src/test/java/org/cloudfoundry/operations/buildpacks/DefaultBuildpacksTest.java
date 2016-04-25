@@ -18,9 +18,11 @@ package org.cloudfoundry.operations.buildpacks;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.buildpacks.BuildpackResource;
+import org.cloudfoundry.client.v2.buildpacks.CreateBuildpackResponse;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksResponse;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
+import org.cloudfoundry.util.RequestValidationException;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
@@ -41,6 +43,73 @@ public final class DefaultBuildpacksTest {
                     .resource(fill(BuildpackResource.builder(), "buildpack-")
                         .build())
                     .build()));
+    }
+
+    private static void requestCreateBuildpack(CloudFoundryClient cloudFoundryClient, String name, String filename, Integer position, Boolean enable) {
+        when(cloudFoundryClient.buildpacks()
+            .create(org.cloudfoundry.client.v2.buildpacks.CreateBuildpackRequest.builder()
+                .name(name)
+                .filename(filename)
+                .position(position)
+                .enabled(enable)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(CreateBuildpackResponse.builder())
+                    .build()));
+    }
+
+    public static final class Create extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultBuildpacks buildpacks = new DefaultBuildpacks(this.cloudFoundryClient);
+
+        private static final String BUILDPACK_NAME = "go-buildpack";
+
+        private static final String BUILDPACK_FILE_NAME = "gobuildpack.zip";
+
+        private static final Integer POSITION = 1;
+
+        private static final Boolean ENABLE = true;
+
+        @Before
+        public void setUp() throws Exception {
+            requestCreateBuildpack(this.cloudFoundryClient, BUILDPACK_NAME, BUILDPACK_FILE_NAME, POSITION, ENABLE);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            return this.buildpacks
+                .create(CreateBuildpackRequest.builder()
+                    .buildpack(BUILDPACK_NAME)
+                    .path(BUILDPACK_FILE_NAME)
+                    .position(POSITION)
+                    .enable(ENABLE)
+                    .build());
+        }
+
+    }
+
+    public static final class CreateInvalid extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultBuildpacks buildpacks = new DefaultBuildpacks(this.cloudFoundryClient);
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            testSubscriber
+                .assertError(RequestValidationException.class, "Request is invalid: buildpack must be specified, path must be specified, position must be specified");
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            return this.buildpacks
+                .create(CreateBuildpackRequest.builder()
+                    .build());
+        }
+
     }
 
     public static final class List extends AbstractOperationsApiTest<Buildpack> {
