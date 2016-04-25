@@ -38,6 +38,7 @@ import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceResource;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse;
+import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyResponse;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanRequest;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanResponse;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
@@ -120,6 +121,19 @@ public final class DefaultServices implements Services {
                 )))
             .then(function((request, spaceId, planId) -> createServiceInstance(this.cloudFoundryClient, spaceId, planId, request)))
             .then(serviceInstance -> waitForCreateInstance(this.cloudFoundryClient, serviceInstance))
+            .after();
+    }
+
+    @Override
+    public Mono<Void> createServiceKey(CreateServiceKeyRequest createServiceKeyRequest) {
+        return Mono
+            .when(ValidationUtils.validate(createServiceKeyRequest), this.spaceId)
+            .then(function((request, spaceId) -> Mono
+                .when(
+                    Mono.just(request),
+                    getSpaceServiceInstanceId(this.cloudFoundryClient, request.getServiceInstanceName(), spaceId)
+                )))
+            .then(function((request, serviceInstanceId) -> requestCreateServiceKey(this.cloudFoundryClient, serviceInstanceId, request.getServiceKeyName(), request.getParameters())))
             .after();
     }
 
@@ -370,6 +384,15 @@ public final class DefaultServices implements Services {
                 .spaceId(spaceId)
                 .parameters(parameters)
                 .tags(tags)
+                .build());
+    }
+
+    private static Mono<CreateServiceKeyResponse> requestCreateServiceKey(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKey, Map<String, Object> parameters) {
+        return cloudFoundryClient.serviceKeys()
+            .create(org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyRequest.builder()
+                .serviceInstanceId(serviceInstanceId)
+                .name(serviceKey)
+                .parameters(parameters)
                 .build());
     }
 
