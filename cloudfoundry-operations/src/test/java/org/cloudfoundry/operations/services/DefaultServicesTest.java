@@ -46,6 +46,9 @@ import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceResource;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyResponse;
+import org.cloudfoundry.client.v2.servicekeys.ListServiceKeysRequest;
+import org.cloudfoundry.client.v2.servicekeys.ListServiceKeysResponse;
+import org.cloudfoundry.client.v2.servicekeys.ServiceKeyResource;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanRequest;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanResponse;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
@@ -219,6 +222,14 @@ public final class DefaultServicesTest {
                     .entity(fill(JobEntity.builder(), "job-entity-")
                         .build())
                     .build()));
+    }
+
+    private static void requestDeleteServiceKey(CloudFoundryClient cloudFoundryClient, String serviceKeyId) {
+        when(cloudFoundryClient.serviceKeys()
+            .delete(org.cloudfoundry.client.v2.servicekeys.DeleteServiceKeyRequest.builder()
+                .serviceKeyId(serviceKeyId)
+                .build()))
+            .thenReturn(Mono.empty());
     }
 
     private static void requestGetApplication(CloudFoundryClient cloudFoundryClient, String applicationId, String application) {
@@ -495,6 +506,32 @@ public final class DefaultServicesTest {
                             .name(serviceName)
                             .build())
                         .build())
+                    .build()));
+    }
+
+    private static void requestListServiceKeys(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKey) {
+        when(cloudFoundryClient.serviceKeys()
+            .list(ListServiceKeysRequest.builder()
+                .page(1)
+                .serviceInstanceId(serviceInstanceId)
+                .name(serviceKey)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListServiceKeysResponse.builder())
+                    .resource(fill(ServiceKeyResource.builder(), "service-key-")
+                        .build())
+                    .build()));
+    }
+
+    private static void requestListServiceKeysEmpty(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKey) {
+        when(cloudFoundryClient.serviceKeys()
+            .list(ListServiceKeysRequest.builder()
+                .page(1)
+                .serviceInstanceId(serviceInstanceId)
+                .name(serviceKey)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListServiceKeysResponse.builder())
                     .build()));
     }
 
@@ -908,6 +945,91 @@ public final class DefaultServicesTest {
                     .credential("test-credential-key", "test-credential-value")
                     .routeServiceUrl("test-route-url")
                     .syslogDrainUrl("test-syslog-url")
+                    .build());
+        }
+
+    }
+
+    public static final class DeleteServiceKey extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance", TEST_SPACE_ID);
+            requestListServiceKeys(this.cloudFoundryClient, "test-service-instance-id", "test-service-key");
+            requestDeleteServiceKey(this.cloudFoundryClient, "test-service-key-id");
+        }
+
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.services
+                .deleteServiceKey(DeleteServiceKeyRequest.builder()
+                    .serviceInstanceName("test-service-instance")
+                    .serviceKeyName("test-service-key")
+                    .build());
+        }
+
+    }
+
+    public static final class DeleteServiceKeyNoServiceInstance extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstancesEmpty(this.cloudFoundryClient, "test-service-instance", TEST_SPACE_ID);
+            requestListServiceKeys(this.cloudFoundryClient, "test-service-instance-id", "test-service-key");
+        }
+
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            testSubscriber.assertError(IllegalArgumentException.class,
+                String.format("Service instance %s does not exist", "test-service-instance"));
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.services
+                .deleteServiceKey(DeleteServiceKeyRequest.builder()
+                    .serviceInstanceName("test-service-instance")
+                    .serviceKeyName("test-service-key")
+                    .build());
+        }
+
+    }
+
+    public static final class DeleteServiceKeyNoServiceKey extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance", TEST_SPACE_ID);
+            requestListServiceKeysEmpty(this.cloudFoundryClient, "test-service-instance-id", "test-service-key");
+            requestDeleteServiceKey(this.cloudFoundryClient, "test-service-key-id");
+        }
+
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            testSubscriber.assertError(IllegalArgumentException.class,
+                String.format("Service key %s does not exist", "test-service-key"));
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.services
+                .deleteServiceKey(DeleteServiceKeyRequest.builder()
+                    .serviceInstanceName("test-service-instance")
+                    .serviceKeyName("test-service-key")
                     .build());
         }
 
