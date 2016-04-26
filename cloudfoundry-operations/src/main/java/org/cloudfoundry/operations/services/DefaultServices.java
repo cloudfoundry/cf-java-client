@@ -157,7 +157,7 @@ public final class DefaultServices implements Services {
     public Mono<Void> deleteInstance(DeleteServiceInstanceRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((validateRequest, spaceId) -> getSpaceServiceInstance(cloudFoundryClient, validateRequest.getName(), spaceId)))
+            .then(function((validRequest, spaceId) -> getSpaceServiceInstance(this.cloudFoundryClient, validRequest.getName(), spaceId)))
             .then(serviceInstance -> deleteServiceInstance(this.cloudFoundryClient, serviceInstance))
             .after();
     }
@@ -259,7 +259,7 @@ public final class DefaultServices implements Services {
     private static Mono<CreateServiceBindingResponse> createServiceBinding(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId,
                                                                            Map<String, Object> parameters) {
         return requestCreateServiceBinding(cloudFoundryClient, applicationId, serviceInstanceId, parameters)
-            .otherwise(ExceptionUtils.replace(CF_SERVICE_ALREADY_BOUND, () -> Mono.empty()));
+            .otherwise(ExceptionUtils.replace(CF_SERVICE_ALREADY_BOUND, Mono::empty));
     }
 
     private static Mono<AbstractServiceInstanceResource> createServiceInstance(CloudFoundryClient cloudFoundryClient, String spaceId, String planId, CreateServiceInstanceRequest request) {
