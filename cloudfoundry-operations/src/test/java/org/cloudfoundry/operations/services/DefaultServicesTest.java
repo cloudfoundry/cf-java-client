@@ -820,13 +820,11 @@ public final class DefaultServicesTest {
 
     public static final class CreateServiceKey extends AbstractOperationsApiTest<Void> {
 
-        private static final String SERVICE_INSTANCE = "test-service-instance";
-
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, SERVICE_INSTANCE, TEST_SPACE_ID);
+            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance", TEST_SPACE_ID);
             requestCreateServiceKey(this.cloudFoundryClient, "test-service-instance-id", "test-service-key",
                 Collections.singletonMap("test-parameter-key", "test-parameter-value"));
         }
@@ -841,7 +839,7 @@ public final class DefaultServicesTest {
         protected Mono<Void> invoke() {
             return this.services
                 .createServiceKey(CreateServiceKeyRequest.builder()
-                    .serviceInstanceName(SERVICE_INSTANCE)
+                    .serviceInstanceName("test-service-instance")
                     .serviceKeyName("test-service-key")
                     .parameter("test-parameter-key", "test-parameter-value")
                     .build());
@@ -851,27 +849,25 @@ public final class DefaultServicesTest {
 
     public static final class CreateServiceKeyNoServiceInstance extends AbstractOperationsApiTest<Void> {
 
-        private static final String NOT_EXIST_SERVICE_INSTANCE = "test-service-instance";
-
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
-            requestListServiceInstancesEmpty(this.cloudFoundryClient, NOT_EXIST_SERVICE_INSTANCE, TEST_SPACE_ID);
+            requestListServiceInstancesEmpty(this.cloudFoundryClient, "test-service-instance-does-not-exist", TEST_SPACE_ID);
         }
 
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber.assertError(IllegalArgumentException.class,
-                String.format("Service instance %s does not exist", NOT_EXIST_SERVICE_INSTANCE));
+                String.format("Service instance %s does not exist", "test-service-instance-does-not-exist"));
         }
 
         @Override
         protected Mono<Void> invoke() {
             return this.services
                 .createServiceKey(CreateServiceKeyRequest.builder()
-                    .serviceInstanceName(NOT_EXIST_SERVICE_INSTANCE)
+                    .serviceInstanceName("test-service-instance-does-not-exist")
                     .serviceKeyName("test-service-key")
                     .parameter("test-parameter-key", "test-parameter-value")
                     .build());
