@@ -224,11 +224,11 @@ public final class DefaultServices implements Services {
     public Mono<Void> unbind(UnbindServiceInstanceRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((request1, spaceId) -> Mono
+            .then(function((validRequest, spaceId) -> Mono
                 .when(
-                    Mono.just(request1.getServiceInstanceName()),
-                    getApplicationId(this.cloudFoundryClient, request1.getApplicationName(), spaceId),
-                    getSpaceServiceInstanceId(this.cloudFoundryClient, request1.getServiceInstanceName(), spaceId)
+                    Mono.just(validRequest.getServiceInstanceName()),
+                    getApplicationId(this.cloudFoundryClient, validRequest.getApplicationName(), spaceId),
+                    getSpaceServiceInstanceId(this.cloudFoundryClient, validRequest.getServiceInstanceName(), spaceId)
                 )))
             .then(function((serviceInstanceName, applicationId, serviceInstanceId) -> getServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId, serviceInstanceName)))
             .then(serviceBindingId -> deleteServiceBinding(this.cloudFoundryClient, serviceBindingId))

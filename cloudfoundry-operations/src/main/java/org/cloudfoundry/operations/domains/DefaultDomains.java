@@ -54,9 +54,9 @@ public final class DefaultDomains implements Domains {
     public Mono<Void> create(CreateDomainRequest request) {
         return ValidationUtils
             .validate(request)
-            .then(request1 -> getOrganizationId(this.cloudFoundryClient, request1.getOrganization())
-                .and(Mono.just(request1)))
-            .then(function((domainId, request1) -> requestCreateDomain(this.cloudFoundryClient, request1.getDomain(), domainId)))
+            .then(validRequest -> getOrganizationId(this.cloudFoundryClient, validRequest.getOrganization())
+                .and(Mono.just(validRequest)))
+            .then(function((domainId, validRequest) -> requestCreateDomain(this.cloudFoundryClient, validRequest.getDomain(), domainId)))
             .after();
     }
 
@@ -64,7 +64,7 @@ public final class DefaultDomains implements Domains {
     public Mono<Void> createShared(CreateSharedDomainRequest request) {
         return ValidationUtils
             .validate(request)
-            .then(request1 -> requestCreateSharedDomain(this.cloudFoundryClient, request1.getDomain()))
+            .then(validRequest -> requestCreateSharedDomain(this.cloudFoundryClient, validRequest.getDomain()))
             .after();
     }
 
@@ -81,10 +81,10 @@ public final class DefaultDomains implements Domains {
     public Mono<Void> share(ShareDomainRequest request) {
         return ValidationUtils
             .validate(request)
-            .then(request1 -> Mono
+            .then(validRequest -> Mono
                 .when(
-                    getPrivateDomainId(this.cloudFoundryClient, request1.getDomain()),
-                    getOrganizationId(this.cloudFoundryClient, request1.getOrganization())
+                    getPrivateDomainId(this.cloudFoundryClient, validRequest.getDomain()),
+                    getOrganizationId(this.cloudFoundryClient, validRequest.getOrganization())
                 ))
             .then(function((domainId, organizationId) -> requestAssociateOrganizationPrivateDomainRequest(this.cloudFoundryClient, domainId, organizationId)))
             .after();
@@ -94,10 +94,10 @@ public final class DefaultDomains implements Domains {
     public Mono<Void> unshare(UnshareDomainRequest request) {
         return ValidationUtils
             .validate(request)
-            .then(request1 -> Mono
+            .then(validRequest -> Mono
                 .when(
-                    getPrivateDomainId(this.cloudFoundryClient, request1.getDomain()),
-                    getOrganizationId(this.cloudFoundryClient, request1.getOrganization())
+                    getPrivateDomainId(this.cloudFoundryClient, validRequest.getDomain()),
+                    getOrganizationId(this.cloudFoundryClient, validRequest.getOrganization())
                 ))
             .then(function((domainId, organizationId) -> requestRemoveOrganizationPrivateDomainRequest(this.cloudFoundryClient, domainId, organizationId)))
             .after();

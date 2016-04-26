@@ -78,7 +78,7 @@ final class SpringStream {
     private <T, V extends Validatable> Flux<T> exchange(V request, Consumer<Subscriber<T>> exchange) {
         return ValidationUtils
             .validate(request)
-            .flatMap(request1 -> Flux
+            .flatMap(validRequest -> Flux
                 .generate((Long n, SubscriberWithContext<T, Void> subscriber) -> {
                     if (n != Long.MAX_VALUE) {
                         subscriber.onError(new IllegalArgumentException("Publisher doesn't support back pressure"));

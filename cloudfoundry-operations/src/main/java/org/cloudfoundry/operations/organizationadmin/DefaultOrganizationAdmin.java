@@ -64,7 +64,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     public Mono<Void> deleteQuota(DeleteQuotaRequest request) {
         return ValidationUtils
             .validate(request)
-            .then(request1 -> getOrganizationQuotaId(this.cloudFoundryClient, request1.getName()))
+            .then(validRequest -> getOrganizationQuotaId(this.cloudFoundryClient, validRequest.getName()))
             .then(quotaId -> deleteOrganizationQuota(this.cloudFoundryClient, quotaId));
     }
 
@@ -72,7 +72,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     public Mono<OrganizationQuota> getQuota(GetQuotaRequest request) {
         return ValidationUtils
             .validate(request)
-            .then(request1 -> getOrganizationQuota(this.cloudFoundryClient, request1.getName()))
+            .then(validRequest -> getOrganizationQuota(this.cloudFoundryClient, validRequest.getName()))
             .map(DefaultOrganizationAdmin::toOrganizationQuota);
     }
 
@@ -85,9 +85,9 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     @Override
     public Mono<Void> setQuota(SetQuotaRequest request) {
         return ValidationUtils.validate(request)
-            .then(request1 -> Mono.when(
-                getOrganizationId(this.cloudFoundryClient, request1.getOrganizationName()),
-                getOrganizationQuotaId(this.cloudFoundryClient, request1.getQuotaName())
+            .then(validRequest -> Mono.when(
+                getOrganizationId(this.cloudFoundryClient, validRequest.getOrganizationName()),
+                getOrganizationQuotaId(this.cloudFoundryClient, validRequest.getQuotaName())
             ))
             .then(function(((organizationId, quotaDefinitionId) -> requestUpdateOrganization(this.cloudFoundryClient, organizationId, quotaDefinitionId))))
             .after();

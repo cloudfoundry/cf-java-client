@@ -85,7 +85,7 @@ public final class DefaultSpaces implements Spaces {
     public Mono<Void> allowSsh(AllowSpaceSshRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.organizationId)
-            .then(function((request1, organizationId) -> getOrganizationSpaceIdWhere(this.cloudFoundryClient, organizationId, request1.getName(), sshEnabled(false))))
+            .then(function((validRequest, organizationId) -> getOrganizationSpaceIdWhere(this.cloudFoundryClient, organizationId, validRequest.getName(), sshEnabled(false))))
             .then(spaceId -> requestUpdateSpaceSsh(this.cloudFoundryClient, spaceId, true))
             .after();
     }
@@ -93,21 +93,21 @@ public final class DefaultSpaces implements Spaces {
     @Override
     public Mono<Void> create(CreateSpaceRequest request) {
         return ValidationUtils.validate(request)
-            .then(request1 -> Mono
+            .then(validRequest -> Mono
                 .when(
-                    Mono.just(request1),
-                    getOrganizationOrDefault(this.cloudFoundryClient, request1, this.organizationId)
+                    Mono.just(validRequest),
+                    getOrganizationOrDefault(this.cloudFoundryClient, validRequest, this.organizationId)
                 ))
-            .then(function((request1, organizationId) -> Mono
+            .then(function((validRequest, organizationId) -> Mono
                 .when(
                     Mono.just(request),
                     Mono.just(organizationId),
-                    getOptionalSpaceQuotaId(this.cloudFoundryClient, organizationId, request1.getSpaceQuota())
+                    getOptionalSpaceQuotaId(this.cloudFoundryClient, organizationId, validRequest.getSpaceQuota())
                 )))
-            .then(function((request1, organizationId, spaceQuotaId) -> Mono
+            .then(function((validRequest, organizationId, spaceQuotaId) -> Mono
                 .when(
                     Mono.just(organizationId),
-                    requestCreateSpace(this.cloudFoundryClient, organizationId, request1.getName(), spaceQuotaId.orElse(null))
+                    requestCreateSpace(this.cloudFoundryClient, organizationId, validRequest.getName(), spaceQuotaId.orElse(null))
                         .map(ResourceUtils::getId),
                     this.username
                 )))
@@ -125,7 +125,7 @@ public final class DefaultSpaces implements Spaces {
     public Mono<Void> delete(DeleteSpaceRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.organizationId)
-            .then(function((request1, organizationId) -> getOrganizationSpaceId(this.cloudFoundryClient, organizationId, request1.getName())))
+            .then(function((validRequest, organizationId) -> getOrganizationSpaceId(this.cloudFoundryClient, organizationId, validRequest.getName())))
             .then(spaceId -> deleteSpace(this.cloudFoundryClient, spaceId));
     }
 
@@ -133,7 +133,7 @@ public final class DefaultSpaces implements Spaces {
     public Mono<Void> disallowSsh(DisallowSpaceSshRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.organizationId)
-            .then(function((request1, organizationId) -> getOrganizationSpaceIdWhere(this.cloudFoundryClient, organizationId, request1.getName(), sshEnabled(true))))
+            .then(function((validRequest, organizationId) -> getOrganizationSpaceIdWhere(this.cloudFoundryClient, organizationId, validRequest.getName(), sshEnabled(true))))
             .then(spaceId -> requestUpdateSpaceSsh(this.cloudFoundryClient, spaceId, false))
             .after();
     }
@@ -143,10 +143,10 @@ public final class DefaultSpaces implements Spaces {
         return ValidationUtils
             .validate(request)
             .and(this.organizationId)
-            .then(function((request1, organizationId1) -> Mono
-                .just(request1)
-                .and(getOrganizationSpace(this.cloudFoundryClient, organizationId1, request1.getName()))))
-            .then(function((request1, resource) -> getSpaceDetail(this.cloudFoundryClient, resource, request1)));
+            .then(function((validRequest, organizationId1) -> Mono
+                .just(validRequest)
+                .and(getOrganizationSpace(this.cloudFoundryClient, organizationId1, validRequest.getName()))))
+            .then(function((validRequest, resource) -> getSpaceDetail(this.cloudFoundryClient, resource, validRequest)));
     }
 
     @Override
@@ -160,9 +160,9 @@ public final class DefaultSpaces implements Spaces {
     public Mono<Void> rename(RenameSpaceRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.organizationId)
-            .then(function((request1, organizationId1) -> getOrganizationSpaceId(this.cloudFoundryClient, organizationId1, request.getName())
-                .and(Mono.just(request1))))
-            .then(function((spaceId, request1) -> requestUpdateSpace(this.cloudFoundryClient, spaceId, request1.getNewName())))
+            .then(function((validRequest, organizationId1) -> getOrganizationSpaceId(this.cloudFoundryClient, organizationId1, request.getName())
+                .and(Mono.just(validRequest))))
+            .then(function((spaceId, validRequest) -> requestUpdateSpace(this.cloudFoundryClient, spaceId, validRequest.getNewName())))
             .after();
 
     }
@@ -171,7 +171,7 @@ public final class DefaultSpaces implements Spaces {
     public Mono<Boolean> sshAllowed(SpaceSshAllowedRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.organizationId)
-            .then(function((request1, organizationId1) -> getOrganizationSpace(this.cloudFoundryClient, organizationId1, request1.getName())))
+            .then(function((validRequest, organizationId1) -> getOrganizationSpace(this.cloudFoundryClient, organizationId1, validRequest.getName())))
             .map(resource -> ResourceUtils.getEntity(resource).getAllowSsh());
     }
 

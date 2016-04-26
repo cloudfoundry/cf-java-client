@@ -72,9 +72,9 @@ public final class DefaultOrganizations implements Organizations {
     public Mono<Void> create(CreateOrganizationRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.username)
-            .then(function((request1, username) -> Mono
+            .then(function((validRequest, username) -> Mono
                 .when(
-                    createOrganization(this.cloudFoundryClient, request1),
+                    createOrganization(this.cloudFoundryClient, validRequest),
                     getFeatureFlagEnabled(this.cloudFoundryClient, SET_ROLES_BY_USERNAME_FEATURE_FLAG),
                     Mono.just(username)
                 )))
@@ -86,7 +86,7 @@ public final class DefaultOrganizations implements Organizations {
     public Mono<Void> delete(DeleteOrganizationRequest request) {
         return ValidationUtils
             .validate(request)
-            .then(request1 -> getOrganizationId(this.cloudFoundryClient, request1.getName()))
+            .then(validRequest -> getOrganizationId(this.cloudFoundryClient, validRequest.getName()))
             .then(organizationId -> deleteOrganization(this.cloudFoundryClient, organizationId));
     }
 
@@ -94,8 +94,8 @@ public final class DefaultOrganizations implements Organizations {
     public Mono<OrganizationDetail> get(OrganizationInfoRequest request) {
         return ValidationUtils
             .validate(request)
-            .then(request1 -> getOrganization(this.cloudFoundryClient, request1.getName())
-                .and(Mono.just(request1)))
+            .then(validRequest -> getOrganization(this.cloudFoundryClient, validRequest.getName())
+                .and(Mono.just(validRequest)))
             .then(function((organizationResource, organizationInfoRequest) -> getAuxiliaryContent(this.cloudFoundryClient, organizationResource)
                 .map(function((domains, organizationQuota, spacesQuotas, spaces) -> toOrganizationDetail(domains, organizationQuota, spacesQuotas, spaces, organizationResource,
                     organizationInfoRequest)))));
@@ -111,9 +111,9 @@ public final class DefaultOrganizations implements Organizations {
     public Mono<Void> rename(RenameOrganizationRequest request) {
         return ValidationUtils
             .validate(request)
-            .then(request1 -> getOrganizationId(this.cloudFoundryClient, request1.getName())
-                .and(Mono.just(request1)))
-            .then(function((organizationId, request1) -> requestUpdateOrganization(this.cloudFoundryClient, organizationId, request1.getNewName())))
+            .then(validRequest -> getOrganizationId(this.cloudFoundryClient, validRequest.getName())
+                .and(Mono.just(validRequest)))
+            .then(function((organizationId, validRequest) -> requestUpdateOrganization(this.cloudFoundryClient, organizationId, validRequest.getNewName())))
             .after();
     }
 

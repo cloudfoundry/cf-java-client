@@ -146,21 +146,21 @@ public final class DefaultApplications implements Applications {
     public Mono<Void> copySource(CopySourceApplicationRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((request1, spaceId) -> Mono
+            .then(function((validRequest, spaceId) -> Mono
                 .when(
-                    Mono.just(request1),
-                    getApplicationId(this.cloudFoundryClient, request1.getName(), spaceId),
-                    getApplicationIdFromOrgSpace(this.cloudFoundryClient, request1.getTargetName(), spaceId, request1.getTargetOrganization(), request1.getTargetSpace())
+                    Mono.just(validRequest),
+                    getApplicationId(this.cloudFoundryClient, validRequest.getName(), spaceId),
+                    getApplicationIdFromOrgSpace(this.cloudFoundryClient, validRequest.getTargetName(), spaceId, validRequest.getTargetOrganization(), validRequest.getTargetSpace())
                 )))
-            .then(function((request1, sourceApplicationId, targetApplicationId) -> Mono
+            .then(function((validRequest, sourceApplicationId, targetApplicationId) -> Mono
                 .when(
-                    Mono.just(request1),
+                    Mono.just(validRequest),
                     copyBits(this.cloudFoundryClient, sourceApplicationId, targetApplicationId)
                         .after(Mono.just(targetApplicationId))
                 )))
-            .where(predicate((request1, targetApplicationId) -> Optional.ofNullable(request1.getRestart()).orElse(false)))
-            .then(function((request1, targetApplicationId) ->
-                restartApplication(this.cloudFoundryClient, request1.getTargetName(), targetApplicationId, request1.getStagingTimeout(), request1.getStartupTimeout())))
+            .where(predicate((validRequest, targetApplicationId) -> Optional.ofNullable(validRequest.getRestart()).orElse(false)))
+            .then(function((validRequest, targetApplicationId) ->
+                restartApplication(this.cloudFoundryClient, validRequest.getTargetName(), targetApplicationId, validRequest.getStagingTimeout(), validRequest.getStartupTimeout())))
             .after();
     }
 
@@ -168,7 +168,7 @@ public final class DefaultApplications implements Applications {
     public Mono<Void> delete(DeleteApplicationRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((request1, spaceId) -> getRoutesAndApplicationId(this.cloudFoundryClient, request1, spaceId, Optional.ofNullable(request.getDeleteRoutes()).orElse(false))))
+            .then(function((validRequest, spaceId) -> getRoutesAndApplicationId(this.cloudFoundryClient, validRequest, spaceId, Optional.ofNullable(request.getDeleteRoutes()).orElse(false))))
             .then(function((routes, applicationId) -> deleteRoutes(this.cloudFoundryClient, routes)
                 .after(Mono.just(applicationId))))
             .as(thenKeep(applicationId -> removeServiceBindings(this.cloudFoundryClient, applicationId)))
@@ -179,7 +179,7 @@ public final class DefaultApplications implements Applications {
     public Mono<Void> disableSsh(DisableApplicationSshRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((request1, spaceId) -> getApplicationIdWhere(this.cloudFoundryClient, request1.getName(), spaceId, sshEnabled(true))))
+            .then(function((validRequest, spaceId) -> getApplicationIdWhere(this.cloudFoundryClient, validRequest.getName(), spaceId, sshEnabled(true))))
             .then(applicationId -> requestUpdateApplicationSsh(this.cloudFoundryClient, applicationId, false))
             .after();
     }
@@ -188,7 +188,7 @@ public final class DefaultApplications implements Applications {
     public Mono<Void> enableSsh(EnableApplicationSshRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((request1, spaceId) -> getApplicationIdWhere(this.cloudFoundryClient, request1.getName(), spaceId, sshEnabled(false))))
+            .then(function((validRequest, spaceId) -> getApplicationIdWhere(this.cloudFoundryClient, validRequest.getName(), spaceId, sshEnabled(false))))
             .then(applicationId -> requestUpdateApplicationSsh(this.cloudFoundryClient, applicationId, true))
             .after();
     }
@@ -197,7 +197,7 @@ public final class DefaultApplications implements Applications {
     public Mono<ApplicationDetail> get(GetApplicationRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((request1, spaceId) -> getApplication(this.cloudFoundryClient, request1.getName(), spaceId)))
+            .then(function((validRequest, spaceId) -> getApplication(this.cloudFoundryClient, validRequest.getName(), spaceId)))
             .then(applicationResource -> getAuxiliaryContent(this.cloudFoundryClient, applicationResource))
             .map(function(DefaultApplications::toApplicationDetail));
     }
@@ -206,7 +206,7 @@ public final class DefaultApplications implements Applications {
     public Mono<ApplicationManifest> getApplicationManifest(GetApplicationManifestRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((request1, spaceId) -> getApplicationId(this.cloudFoundryClient, request1.getName(), spaceId)))
+            .then(function((validRequest, spaceId) -> getApplicationId(this.cloudFoundryClient, validRequest.getName(), spaceId)))
             .then(applicationId -> requestApplicationSummary(this.cloudFoundryClient, applicationId))
             .then(response -> Mono
                 .just(response)
@@ -218,7 +218,7 @@ public final class DefaultApplications implements Applications {
     public Mono<ApplicationEnvironments> getEnvironments(GetApplicationEnvironmentsRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((request1, spaceId) -> getApplicationId(this.cloudFoundryClient, request1.getName(), spaceId)))
+            .then(function((validRequest, spaceId) -> getApplicationId(this.cloudFoundryClient, validRequest.getName(), spaceId)))
             .then(applicationId -> requestApplicationEnvironment(this.cloudFoundryClient, applicationId))
             .map(DefaultApplications::toApplicationEnvironments);
     }
@@ -227,13 +227,13 @@ public final class DefaultApplications implements Applications {
     public Flux<ApplicationEvent> getEvents(GetApplicationEventsRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((request1, spaceId) -> Mono
+            .then(function((validRequest, spaceId) -> Mono
                 .when(
-                    Mono.just(request1),
-                    getApplicationId(this.cloudFoundryClient, request1.getName(), spaceId)
+                    Mono.just(validRequest),
+                    getApplicationId(this.cloudFoundryClient, validRequest.getName(), spaceId)
                 )))
-            .flatMap(function((request1, applicationId) -> requestEvents(applicationId, this.cloudFoundryClient)
-                .take(Optional.ofNullable(request1.getMaxNumberOfEvents()).orElse(MAX_NUMBER_OF_RECENT_EVENTS))))
+            .flatMap(function((validRequest, applicationId) -> requestEvents(applicationId, this.cloudFoundryClient)
+                .take(Optional.ofNullable(validRequest.getMaxNumberOfEvents()).orElse(MAX_NUMBER_OF_RECENT_EVENTS))))
             .map(DefaultApplications::convertToApplicationEvent);
     }
 
@@ -257,8 +257,8 @@ public final class DefaultApplications implements Applications {
     public Flux<LogMessage> logs(LogsRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((request1, spaceId) -> getApplicationId(this.cloudFoundryClient, request1.getName(), spaceId)
-                .and(Mono.just(request1))))
+            .then(function((validRequest, spaceId) -> getApplicationId(this.cloudFoundryClient, validRequest.getName(), spaceId)
+                .and(Mono.just(validRequest))))
             .flatMap(function((applicationId, logsRequest) -> getLogs(this.loggingClient, applicationId, logsRequest.getRecent())));
     }
 
@@ -266,25 +266,25 @@ public final class DefaultApplications implements Applications {
     public Mono<Void> push(PushApplicationRequest request) {
         return ValidationUtils
             .validate(request)
-            .then(request1 -> Mono
+            .then(validRequest -> Mono
                 .when(
-                    Mono.just(request1),
+                    Mono.just(validRequest),
                     DefaultApplications.this.spaceId,
-                    getOptionalStackId(this.cloudFoundryClient, request1.getStack())
+                    getOptionalStackId(this.cloudFoundryClient, validRequest.getStack())
                 ))
-            .then(function((request1, spaceId, stackId) -> Mono
+            .then(function((validRequest, spaceId, stackId) -> Mono
                 .when(
-                    getApplicationId(this.cloudFoundryClient, request1, spaceId, stackId.orElse(null)),
-                    Mono.just(request1),
+                    getApplicationId(this.cloudFoundryClient, validRequest, spaceId, stackId.orElse(null)),
+                    Mono.just(validRequest),
                     Mono.just(spaceId)
                 )))
-            .as(thenKeep(function((applicationId, request1, spaceId) -> prepareDomainsAndRoutes(this.cloudFoundryClient, request1, applicationId, spaceId, this.randomWords))))
-            .map(function((applicationId, request1, spaceId) -> Tuple2.of(applicationId, request1)))
-            .as(thenKeep(function((applicationId, request1) -> uploadApplicationAndWait(this.cloudFoundryClient, applicationId, request1.getApplication()))))
-            .as(thenKeep(function((applicationId, request1) -> stopApplication(this.cloudFoundryClient, applicationId))))
-            .where(predicate((applicationId, request1) -> !Optional.ofNullable(request1.getNoStart()).orElse(false)))
-            .then(function((applicationId, request1) -> startApplicationAndWait(this.cloudFoundryClient, request1.getName(), applicationId, request1.getStagingTimeout(),
-                request1.getStartupTimeout())))
+            .as(thenKeep(function((applicationId, validRequest, spaceId) -> prepareDomainsAndRoutes(this.cloudFoundryClient, validRequest, applicationId, spaceId, this.randomWords))))
+            .map(function((applicationId, validRequest, spaceId) -> Tuple2.of(applicationId, validRequest)))
+            .as(thenKeep(function((applicationId, validRequest) -> uploadApplicationAndWait(this.cloudFoundryClient, applicationId, validRequest.getApplication()))))
+            .as(thenKeep(function((applicationId, validRequest) -> stopApplication(this.cloudFoundryClient, applicationId))))
+            .where(predicate((applicationId, validRequest) -> !Optional.ofNullable(validRequest.getNoStart()).orElse(false)))
+            .then(function((applicationId, validRequest) -> startApplicationAndWait(this.cloudFoundryClient, validRequest.getName(), applicationId, validRequest.getStagingTimeout(),
+                validRequest.getStartupTimeout())))
             .after();
     }
 
@@ -292,10 +292,10 @@ public final class DefaultApplications implements Applications {
     public Mono<Void> rename(RenameApplicationRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((request1, spaceId) -> Mono
+            .then(function((validRequest, spaceId) -> Mono
                 .when(
-                    getApplicationId(this.cloudFoundryClient, request1.getName(), spaceId),
-                    Mono.just(request1.getNewName())
+                    getApplicationId(this.cloudFoundryClient, validRequest.getName(), spaceId),
+                    Mono.just(validRequest.getNewName())
                 )))
             .then(function((applicationId, newName) -> requestUpdateApplicationRename(this.cloudFoundryClient, applicationId, newName)))
             .after();
@@ -305,10 +305,11 @@ public final class DefaultApplications implements Applications {
     public Mono<Void> restage(RestageApplicationRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((request1, spaceId) -> Mono
-                .just(request1)
-                .and(getApplicationId(this.cloudFoundryClient, request1.getName(), spaceId))))
-            .then(function((request1, applicationId) -> restageApplication(this.cloudFoundryClient, request1.getName(), applicationId, request1.getStagingTimeout(), request1.getStartupTimeout())))
+            .then(function((validRequest, spaceId) -> Mono
+                .just(validRequest)
+                .and(getApplicationId(this.cloudFoundryClient, validRequest.getName(), spaceId))))
+            .then(function((validRequest, applicationId) -> restageApplication(this.cloudFoundryClient, validRequest.getName(), applicationId, validRequest.getStagingTimeout(), 
+                validRequest.getStartupTimeout())))
             .after();
     }
 
@@ -316,10 +317,11 @@ public final class DefaultApplications implements Applications {
     public Mono<Void> restart(RestartApplicationRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((request1, spaceId) -> getApplication(this.cloudFoundryClient, request1.getName(), spaceId)
-                .and(Mono.just(request1))))
-            .then(function((resource, request1) -> stopApplicationIfNotStopped(cloudFoundryClient, resource)
-                .then(resource1 -> startApplicationAndWait(this.cloudFoundryClient, request1.getName(), ResourceUtils.getId(resource1), request1.getStagingTimeout(), request1.getStartupTimeout()))))
+            .then(function((validRequest, spaceId) -> getApplication(this.cloudFoundryClient, validRequest.getName(), spaceId)
+                .and(Mono.just(validRequest))))
+            .then(function((resource, validRequest) -> stopApplicationIfNotStopped(cloudFoundryClient, resource)
+                .then(resource1 -> startApplicationAndWait(this.cloudFoundryClient, validRequest.getName(), ResourceUtils.getId(resource1), validRequest.getStagingTimeout(), 
+                    validRequest.getStartupTimeout()))))
             .after();
     }
 
@@ -327,10 +329,10 @@ public final class DefaultApplications implements Applications {
     public Mono<Void> restartInstance(RestartApplicationInstanceRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((request1, spaceId) -> Mono
+            .then(function((validRequest, spaceId) -> Mono
                 .when(
-                    getApplicationId(this.cloudFoundryClient, request1.getName(), spaceId),
-                    Mono.just(String.valueOf(request1.getInstanceIndex()))
+                    getApplicationId(this.cloudFoundryClient, validRequest.getName(), spaceId),
+                    Mono.just(String.valueOf(validRequest.getInstanceIndex()))
                 )))
             .then(function((applicationId, instanceIndex) -> requestTerminateApplicationInstance(this.cloudFoundryClient, applicationId, instanceIndex)));
     }
@@ -344,19 +346,19 @@ public final class DefaultApplications implements Applications {
                     .where(DefaultApplications::areModifiersPresent),
                 this.spaceId
             )
-            .then(function((request1, spaceId) -> Mono
+            .then(function((validRequest, spaceId) -> Mono
                 .when(
-                    Mono.just(request1),
-                    getApplicationId(this.cloudFoundryClient, request1.getName(), spaceId)
+                    Mono.just(validRequest),
+                    getApplicationId(this.cloudFoundryClient, validRequest.getName(), spaceId)
                 )))
-            .then(function((request1, applicationId) -> Mono
+            .then(function((validRequest, applicationId) -> Mono
                 .when(
-                    Mono.just(request1),
-                    requestUpdateApplicationScale(this.cloudFoundryClient, applicationId, request1.getDiskLimit(), request1.getInstances(), request1.getMemoryLimit())
+                    Mono.just(validRequest),
+                    requestUpdateApplicationScale(this.cloudFoundryClient, applicationId, validRequest.getDiskLimit(), validRequest.getInstances(), validRequest.getMemoryLimit())
                 )))
             .where(predicate(DefaultApplications::isRestartRequired))
-            .then(function((request1, resource) ->
-                restartApplication(this.cloudFoundryClient, request1.getName(), ResourceUtils.getId(resource), request1.getStagingTimeout(), request1.getStartupTimeout())))
+            .then(function((validRequest, resource) ->
+                restartApplication(this.cloudFoundryClient, validRequest.getName(), ResourceUtils.getId(resource), validRequest.getStagingTimeout(), validRequest.getStartupTimeout())))
             .after();
     }
 
@@ -364,16 +366,16 @@ public final class DefaultApplications implements Applications {
     public Mono<Void> setEnvironmentVariable(SetEnvironmentVariableApplicationRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((request1, spaceId) -> Mono
+            .then(function((validRequest, spaceId) -> Mono
                 .when(
-                    Mono.just(request1),
-                    getApplication(this.cloudFoundryClient, request1.getName(), spaceId)
+                    Mono.just(validRequest),
+                    getApplication(this.cloudFoundryClient, validRequest.getName(), spaceId)
                 )))
-            .then(function((request1, resource) ->
+            .then(function((validRequest, resource) ->
                 requestUpdateApplicationEnvironment(
                     this.cloudFoundryClient,
                     ResourceUtils.getId(resource),
-                    addToEnvironment(getEnvironment(resource), request1.getVariableName(), request1.getVariableValue())
+                    addToEnvironment(getEnvironment(resource), validRequest.getVariableName(), validRequest.getVariableValue())
                 )))
             .after();
     }
@@ -395,7 +397,7 @@ public final class DefaultApplications implements Applications {
     public Mono<Boolean> sshEnabled(ApplicationSshEnabledRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((request1, spaceId) -> getApplication(this.cloudFoundryClient, request1.getName(), spaceId)))
+            .then(function((validRequest, spaceId) -> getApplication(this.cloudFoundryClient, validRequest.getName(), spaceId)))
             .map(applicationResource -> ResourceUtils.getEntity(applicationResource).getEnableSsh());
     }
 
@@ -403,10 +405,10 @@ public final class DefaultApplications implements Applications {
     public Mono<Void> start(StartApplicationRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((request1, spaceId) -> getApplicationIdWhere(this.cloudFoundryClient, request1.getName(), spaceId, isNotIn(STARTED_STATE))
-                .and(Mono.just(request1))))
-            .then(function((applicationId, request1) ->
-                startApplicationAndWait(this.cloudFoundryClient, request1.getName(), applicationId, request1.getStagingTimeout(), request1.getStartupTimeout())))
+            .then(function((validRequest, spaceId) -> getApplicationIdWhere(this.cloudFoundryClient, validRequest.getName(), spaceId, isNotIn(STARTED_STATE))
+                .and(Mono.just(validRequest))))
+            .then(function((applicationId, validRequest) ->
+                startApplicationAndWait(this.cloudFoundryClient, validRequest.getName(), applicationId, validRequest.getStagingTimeout(), validRequest.getStartupTimeout())))
             .after();
     }
 
@@ -414,7 +416,7 @@ public final class DefaultApplications implements Applications {
     public Mono<Void> stop(StopApplicationRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((request1, spaceId) -> getApplicationIdWhere(this.cloudFoundryClient, request1.getName(), spaceId, isNotIn(STOPPED_STATE))))
+            .then(function((validRequest, spaceId) -> getApplicationIdWhere(this.cloudFoundryClient, validRequest.getName(), spaceId, isNotIn(STOPPED_STATE))))
             .then(applicationId -> stopApplication(this.cloudFoundryClient, applicationId))
             .after();
     }
@@ -423,12 +425,12 @@ public final class DefaultApplications implements Applications {
     public Mono<Void> unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((request1, spaceId) -> Mono.when(Mono.just(request1), getApplication(this.cloudFoundryClient, request1.getName(), spaceId))))
-            .then(function((request1, resource) ->
+            .then(function((validRequest, spaceId) -> Mono.when(Mono.just(validRequest), getApplication(this.cloudFoundryClient, validRequest.getName(), spaceId))))
+            .then(function((validRequest, resource) ->
                 requestUpdateApplicationEnvironment(
                     this.cloudFoundryClient,
                     ResourceUtils.getId(resource),
-                    removeFromEnvironment(getEnvironment(resource), request1.getVariableName())
+                    removeFromEnvironment(getEnvironment(resource), validRequest.getVariableName())
                 )))
             .after();
     }
@@ -794,14 +796,14 @@ public final class DefaultApplications implements Applications {
         return state -> "STAGED".equals(state) || "FAILED".equals(state);
     }
 
-    private static Mono<Void> prepareDomainsAndRoutes(CloudFoundryClient cloudFoundryClient, PushApplicationRequest request1, String applicationId, String spaceId, RandomWords randomWords) {
-        if (Optional.ofNullable(request1.getNoRoute()).orElse(false)) {
+    private static Mono<Void> prepareDomainsAndRoutes(CloudFoundryClient cloudFoundryClient, PushApplicationRequest validRequest, String applicationId, String spaceId, RandomWords randomWords) {
+        if (Optional.ofNullable(validRequest.getNoRoute()).orElse(false)) {
             return Mono.empty();
         }
 
         return getSpaceOrganizationId(cloudFoundryClient, spaceId)
-            .then(organizationId -> getDomainId(cloudFoundryClient, request1.getDomain(), organizationId))
-            .then(domainId -> getPushRouteId(cloudFoundryClient, domainId, request1, spaceId, randomWords))
+            .then(organizationId -> getDomainId(cloudFoundryClient, validRequest.getDomain(), organizationId))
+            .then(domainId -> getPushRouteId(cloudFoundryClient, domainId, validRequest, spaceId, randomWords))
             .then(routeId -> requestAssociateRoute(cloudFoundryClient, applicationId, routeId))
             .after();
     }

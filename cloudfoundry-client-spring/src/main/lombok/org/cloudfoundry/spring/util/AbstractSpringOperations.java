@@ -73,7 +73,7 @@ public abstract class AbstractSpringOperations {
     protected final <T, V extends Validatable> Flux<T> exchange(V request, Function<SignalEmitter<T>, T> exchange) {
         return ValidationUtils
             .validate(request)
-            .flatMap(request1 -> Flux
+            .flatMap(validRequest -> Flux
                 .yield((Consumer<SignalEmitter<T>>) signalEmitter -> {
                     try {
                         T result = exchange.apply(signalEmitter);

@@ -47,7 +47,7 @@ public final class DefaultSpaceAdmin implements SpaceAdmin {
         return ValidationUtils
             .validate(request)
             .and(this.organizationId)
-            .then(function((request1, organizationId) -> getSpaceQuotaDefinition(this.cloudFoundryClient, organizationId, request1.getName())))
+            .then(function((validRequest, organizationId) -> getSpaceQuotaDefinition(this.cloudFoundryClient, organizationId, validRequest.getName())))
             .map(DefaultSpaceAdmin::toSpaceQuota);
     }
 
