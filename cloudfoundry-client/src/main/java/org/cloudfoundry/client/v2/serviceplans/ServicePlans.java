@@ -55,15 +55,6 @@ public interface ServicePlans {
     Mono<ListServicePlanServiceInstancesResponse> listServiceInstances(ListServicePlanServiceInstancesRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/service_instances/migrate_service_instances_from_one_service_plan_to_another_service_plan_%28experimental%29.html">Migrate
-     * Service Instances from one Service Plan to the other</a> request
-     *
-     * @param request the Migrate Service Instance request
-     * @return the response from the Migrate Service Instance request
-     */
-    Mono<MigrateServiceInstancesResponse> migrateServiceInstances(MigrateServiceInstancesRequest request);
-
-    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/service_plans/updating_a_service_plan.html">Updating a Service Plan</a> request
      *
      * @param request the Update Service Plan request
