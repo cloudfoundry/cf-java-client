@@ -37,6 +37,7 @@ import org.cloudfoundry.client.v2.servicebindings.ListServiceBindingsResponse;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse;
+import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
@@ -63,6 +64,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServicesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServicesResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceEntity;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
 import org.cloudfoundry.util.RequestValidationException;
@@ -219,6 +221,27 @@ public final class DefaultServicesTest {
                     .entity(fill(JobEntity.builder(), "job-entity-")
                         .build())
                     .build()));
+    }
+
+    private static void requestDeleteServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
+        when(cloudFoundryClient.serviceInstances()
+            .delete(org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest.builder()
+                .serviceInstanceId(serviceInstanceId)
+                .async(true)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(DeleteServiceInstanceResponse.builder())
+                    .entity(fill(JobEntity.builder(), "job-entity-")
+                        .build())
+                    .build()));
+    }
+
+    private static void requestDeleteUserProvidedServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
+        when(cloudFoundryClient.userProvidedServiceInstances()
+            .delete(DeleteUserProvidedServiceInstanceRequest.builder()
+                .userProvidedServiceInstanceId(serviceInstanceId)
+                .build()))
+            .thenReturn(Mono.empty());
     }
 
     private static void requestGetApplication(CloudFoundryClient cloudFoundryClient, String applicationId, String application) {
@@ -911,6 +934,77 @@ public final class DefaultServicesTest {
                     .build());
         }
 
+    }
+
+    public static final class DeleteServiceInstance extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+            requestDeleteUserProvidedServiceInstance(this.cloudFoundryClient, "test-service-instance-id");
+            requestJobSuccess(this.cloudFoundryClient, "test-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.services
+                .deleteInstance(DeleteServiceInstanceRequest.builder()
+                    .name("test-service-instance-name")
+                    .build());
+        }
+
+    }
+
+    public static final class DeleteServiceInstanceNoSpace extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, MISSING_SPACE_ID);
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            testSubscriber
+                .assertError(IllegalStateException.class, "MISSING_SPACE_ID");
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.services
+                .deleteInstance(DeleteServiceInstanceRequest.builder()
+                    .name("test-invalid-name")
+                    .build());
+        }
+
+    }
+
+    public static final class DeleteServiceInstanceNotFound extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstancesEmpty(this.cloudFoundryClient, "test-invalid-name", TEST_SPACE_ID);
+
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            testSubscriber
+                .assertError(IllegalArgumentException.class, "Service instance test-invalid-name does not exist");
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.services
+                .deleteInstance(DeleteServiceInstanceRequest.builder()
+                    .name("test-invalid-name")
+                    .build());
+        }
     }
 
     public static final class GetServiceInstanceManaged extends AbstractOperationsApiTest<ServiceInstance> {

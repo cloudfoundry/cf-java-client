@@ -32,6 +32,7 @@ import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.serviceinstances.AbstractServiceInstanceResource;
 import org.cloudfoundry.client.v2.serviceinstances.BaseServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse;
+import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceEntity;
@@ -52,6 +53,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServicesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.util.DelayUtils;
@@ -143,6 +145,15 @@ public final class DefaultServices implements Services {
             .when(ValidationUtils.validate(createRequest), this.spaceId)
             .then(function((request, spaceId) -> requestCreateUserProvidedServiceInstance(this.cloudFoundryClient, spaceId, request.getName(), request.getCredentials(), request.getRouteServiceUrl(),
                 request.getSyslogDrainUrl())))
+            .after();
+    }
+
+    @Override
+    public Mono<Void> deleteInstance(DeleteServiceInstanceRequest request) {
+        return Mono
+            .when(ValidationUtils.validate(request), this.spaceId)
+            .then(function((validateRequest, spaceId) -> getSpaceServiceInstance(cloudFoundryClient, validateRequest.getName(), spaceId)))
+            .then(serviceInstance -> deleteServiceInstance(this.cloudFoundryClient, serviceInstance))
             .after();
     }
 
@@ -254,6 +265,15 @@ public final class DefaultServices implements Services {
     private static Mono<Void> deleteServiceBinding(CloudFoundryClient cloudFoundryClient, String serviceBindingId) {
         return requestDeleteServiceBinding(cloudFoundryClient, serviceBindingId)
             .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+    }
+
+    private static Mono<Void> deleteServiceInstance(CloudFoundryClient cloudFoundryClient, UnionServiceInstanceResource serviceInstance) {
+        if (isUserProvidedService(serviceInstance)) {
+            return requestDeleteServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance))
+                .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+        } else {
+            return requestDeleteUserProvidedServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance));
+        }
     }
 
     private static String extractState(AbstractServiceInstanceResource serviceInstance) {
@@ -413,6 +433,21 @@ public final class DefaultServices implements Services {
             .delete(DeleteServiceBindingRequest.builder()
                 .serviceBindingId(serviceBindingId)
                 .async(true)
+                .build());
+    }
+
+    private static Mono<DeleteServiceInstanceResponse> requestDeleteServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
+        return cloudFoundryClient.serviceInstances()
+            .delete(org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest.builder()
+                .serviceInstanceId(serviceInstanceId)
+                .async(true)
+                .build());
+    }
+
+    private static Mono<Void> requestDeleteUserProvidedServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
+        return cloudFoundryClient.userProvidedServiceInstances()
+            .delete(DeleteUserProvidedServiceInstanceRequest.builder()
+                .userProvidedServiceInstanceId(serviceInstanceId)
                 .build());
     }
 
