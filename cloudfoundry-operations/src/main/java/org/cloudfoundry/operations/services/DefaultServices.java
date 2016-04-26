@@ -39,6 +39,8 @@ import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceResource;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyResponse;
+import org.cloudfoundry.client.v2.servicekeys.ListServiceKeysRequest;
+import org.cloudfoundry.client.v2.servicekeys.ServiceKeyResource;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanRequest;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanResponse;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
@@ -147,6 +149,19 @@ public final class DefaultServices implements Services {
     }
 
     @Override
+    public Mono<Void> deleteServiceKey(DeleteServiceKeyRequest deleteServiceKeyRequest) {
+        return Mono
+            .when(ValidationUtils.validate(deleteServiceKeyRequest), this.spaceId)
+            .then(function((request, spaceId) -> Mono
+                .when(
+                    Mono.just(request),
+                    getSpaceServiceInstanceId(this.cloudFoundryClient, request.getServiceInstanceName(), spaceId)
+                )))
+            .then(function((request, serviceInstanceId) -> getServiceKeyIdByName(this.cloudFoundryClient, serviceInstanceId, request.getServiceKeyName())))
+            .then(serviceKeyId -> deleteServiceKey(this.cloudFoundryClient, serviceKeyId));
+    }
+
+    @Override
     public Mono<ServiceInstance> getInstance(GetServiceInstanceRequest getRequest) {
         return Mono
             .when(ValidationUtils.validate(getRequest), this.spaceId)
@@ -190,8 +205,8 @@ public final class DefaultServices implements Services {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
             .flatMap(function((request1, spaceId) -> Optional.ofNullable(request1.getServiceName())
-                .map(serviceName -> getSpaceService(this.cloudFoundryClient, spaceId, serviceName).flux())
-                .orElse(requestListServices(this.cloudFoundryClient, spaceId))
+                    .map(serviceName -> getSpaceService(this.cloudFoundryClient, spaceId, serviceName).flux())
+                    .orElse(requestListServices(this.cloudFoundryClient, spaceId))
             ))
             .flatMap(resource -> Mono
                 .when(
@@ -210,7 +225,7 @@ public final class DefaultServices implements Services {
                 getSpaceServiceInstance(this.cloudFoundryClient, validRequest.getName(), spaceId)
             )))
             .then(function((validRequest, serviceInstance) ->
-                renameServiceInstance(this.cloudFoundryClient, serviceInstance, validRequest.getNewName())
+                    renameServiceInstance(this.cloudFoundryClient, serviceInstance, validRequest.getNewName())
             ))
             .after();
     }
@@ -254,6 +269,10 @@ public final class DefaultServices implements Services {
     private static Mono<Void> deleteServiceBinding(CloudFoundryClient cloudFoundryClient, String serviceBindingId) {
         return requestDeleteServiceBinding(cloudFoundryClient, serviceBindingId)
             .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+    }
+
+    private static Mono<Void> deleteServiceKey(CloudFoundryClient cloudFoundryClient, String serviceKeyId) {
+        return requestDeleteServiceKey(cloudFoundryClient, serviceKeyId);
     }
 
     private static String extractState(AbstractServiceInstanceResource serviceInstance) {
@@ -310,6 +329,17 @@ public final class DefaultServices implements Services {
 
     private static Mono<String> getServiceIdByName(CloudFoundryClient cloudFoundryClient, String spaceId, String service) {
         return getSpaceService(cloudFoundryClient, spaceId, service)
+            .map(ResourceUtils::getId);
+    }
+
+    private static Mono<ServiceKeyResource> getServiceKey(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKeyName) {
+        return requestListServiceKeys(cloudFoundryClient, serviceInstanceId, serviceKeyName)
+            .single()
+            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Service key %s does not exist", serviceKeyName)));
+    }
+
+    private static Mono<String> getServiceKeyIdByName(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKeyName) {
+        return getServiceKey(cloudFoundryClient, serviceInstanceId, serviceKeyName)
             .map(ResourceUtils::getId);
     }
 
@@ -416,6 +446,13 @@ public final class DefaultServices implements Services {
                 .build());
     }
 
+    private static Mono<Void> requestDeleteServiceKey(CloudFoundryClient cloudFoundryClient, String serviceKeyId) {
+        return cloudFoundryClient.serviceKeys()
+            .delete(org.cloudfoundry.client.v2.servicekeys.DeleteServiceKeyRequest.builder()
+                .serviceKeyId(serviceKeyId)
+                .build());
+    }
+
     private static Mono<GetApplicationResponse> requestGetApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return cloudFoundryClient.applicationsV2()
             .get(GetApplicationRequest.builder()
@@ -491,6 +528,16 @@ public final class DefaultServices implements Services {
                     .returnUserProvidedServiceInstances(true)
                     .name(serviceInstanceName)
                     .spaceId(spaceId)
+                    .build()));
+    }
+
+    private static Flux<ServiceKeyResource> requestListServiceKeys(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKeyName) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.serviceKeys()
+                .list(ListServiceKeysRequest.builder()
+                    .page(page)
+                    .serviceInstanceId(serviceInstanceId)
+                    .name(serviceKeyName)
                     .build()));
     }
 
