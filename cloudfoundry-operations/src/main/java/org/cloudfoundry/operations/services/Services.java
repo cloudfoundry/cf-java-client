@@ -57,6 +57,14 @@ public interface Services {
     Mono<Void> createUserProvidedInstance(CreateUserProvidedServiceInstanceRequest request);
 
     /**
+     * Delete a service instance
+     *
+     * @param request the delete service instance request
+     * @return a completion indicator
+     */
+    Mono<Void> deleteInstance(DeleteServiceInstanceRequest request);
+
+    /**
      * Get a service instance
      *
      * @param request the get service instance request
