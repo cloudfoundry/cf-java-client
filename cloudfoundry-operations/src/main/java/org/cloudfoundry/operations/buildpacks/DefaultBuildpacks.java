@@ -30,6 +30,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.InputStream;
+import java.util.Optional;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -45,12 +46,12 @@ public final class DefaultBuildpacks implements Buildpacks {
     public Mono<Void> create(CreateBuildpackRequest request) {
         return ValidationUtils
             .validate(request)
-            .then(request1 ->
+            .then(validRequest ->
                 Mono.when(
-                    Mono.just(request1),
-                    requestCreateBuildpack(this.cloudFoundryClient, request1.getName(), request1.getPosition(), request1.getEnable())
+                    Mono.just(validRequest),
+                    requestCreateBuildpack(this.cloudFoundryClient, validRequest.getName(), validRequest.getPosition(), validRequest.getEnable())
                 ))
-            .then(function((request2, response) -> requestUploadBuildpackBits(this.cloudFoundryClient, ResourceUtils.getId(response), request2.getFileName(), request2.getBuildpack())))
+            .then(function((validRequest, response) -> requestUploadBuildpackBits(this.cloudFoundryClient, ResourceUtils.getId(response), validRequest.getFileName(), validRequest.getBuildpack())))
             .after();
     }
 
@@ -58,16 +59,6 @@ public final class DefaultBuildpacks implements Buildpacks {
     public Flux<Buildpack> list() {
         return requestBuildpacks(this.cloudFoundryClient)
             .map(DefaultBuildpacks::toBuildpackResource);
-    }
-
-    private static Mono<CreateBuildpackResponse> requestCreateBuildpack(CloudFoundryClient cloudFoundryClient, String buildpackName, Integer position, Boolean enable) {
-        return cloudFoundryClient.buildpacks()
-            .create(org.cloudfoundry.client.v2.buildpacks.CreateBuildpackRequest
-                .builder()
-                .name(buildpackName)
-                .position(position)
-                .enabled(enable)
-                .build());
     }
 
     private static Flux<BuildpackResource> requestBuildpacks(CloudFoundryClient cloudFoundryClient) {
@@ -78,7 +69,17 @@ public final class DefaultBuildpacks implements Buildpacks {
                     .build()));
     }
 
-    private static Mono<UploadBuildpackResponse> requestUploadBuildpackBits(CloudFoundryClient cloudFoundryClient, String buildpackId,  String filename, InputStream buildpack) {
+    private static Mono<CreateBuildpackResponse> requestCreateBuildpack(CloudFoundryClient cloudFoundryClient, String buildpackName, Integer position, Boolean enable) {
+        return cloudFoundryClient.buildpacks()
+            .create(org.cloudfoundry.client.v2.buildpacks.CreateBuildpackRequest
+                .builder()
+                .name(buildpackName)
+                .position(position)
+                .enabled(Optional.ofNullable(enable).orElse(true))
+                .build());
+    }
+
+    private static Mono<UploadBuildpackResponse> requestUploadBuildpackBits(CloudFoundryClient cloudFoundryClient, String buildpackId, String filename, InputStream buildpack) {
         return cloudFoundryClient.buildpacks()
             .upload(UploadBuildpackRequest.builder()
                 .buildpackId(buildpackId)

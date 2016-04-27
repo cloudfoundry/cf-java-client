@@ -30,12 +30,20 @@ import java.io.InputStream;
 public final class CreateBuildpackRequest implements Validatable {
 
     /**
-     * The buildpack name
+     * The buildpack file stream
      *
-     * @param name the buildpack name
-     * @return the buildpack name
+     * @param buildpack the buildpack file stream
+     * @return the buildpack file stream
      */
-    private final String name;
+    private final InputStream buildpack;
+
+    /**
+     * Enables the buildpack to be used for staging
+     *
+     * @param enable the enable option indicating whether the buildpack is used for staging
+     * @return the enable option
+     */
+    private final Boolean enable;
 
     /**
      * The buildpack file name
@@ -46,12 +54,12 @@ public final class CreateBuildpackRequest implements Validatable {
     private final String fileName;
 
     /**
-     * The buildpack file stream
+     * The buildpack name
      *
-     * @param buildpack the buildpack file stream
-     * @return the buildpack file stream
+     * @param name the buildpack name
+     * @return the buildpack name
      */
-    private final InputStream buildpack;
+    private final String name;
 
     /**
      * The buildpack position
@@ -61,38 +69,29 @@ public final class CreateBuildpackRequest implements Validatable {
      */
     private final Integer position;
 
-    /**
-     * Enables the buildpack to be used for staging Default value is true
-     *
-     * @param enable the enable option indicating whether the buildpack is used for staging
-     * @return the enable option
-     */
-    private Boolean enable;
-
-
     @Builder
-    CreateBuildpackRequest(String name, String fileName, InputStream buildpack, Integer position, Boolean enable) {
-        this.name = name;
-        this.fileName = fileName;
+    CreateBuildpackRequest(InputStream buildpack, Boolean enable, String fileName, String name, Integer position) {
         this.buildpack = buildpack;
+        this.enable = enable;
+        this.fileName = fileName;
+        this.name = name;
         this.position = position;
-        this.enable = (enable != null ? enable : true);
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.name == null) {
-            builder.message("name must be specified");
+        if (this.buildpack == null) {
+            builder.message("buildpack must be specified");
         }
 
         if (this.fileName == null) {
             builder.message("file name must be specified");
         }
 
-        if (this.buildpack == null) {
-            builder.message("buildpack must be specified");
+        if (this.name == null) {
+            builder.message("name must be specified");
         }
 
         if (this.position == null) {
@@ -101,4 +100,5 @@ public final class CreateBuildpackRequest implements Validatable {
 
         return builder.build();
     }
+
 }
