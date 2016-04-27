@@ -182,13 +182,13 @@ public final class DefaultSpaces implements Spaces {
 
     private static Mono<List<String>> getApplicationNames(CloudFoundryClient cloudFoundryClient, SpaceResource spaceResource) {
         return requestSpaceApplications(cloudFoundryClient, ResourceUtils.getId(spaceResource))
-            .map(resource -> ResourceUtils.getEntity(resource).getName())
+            .map(applicationResource -> ResourceUtils.getEntity(applicationResource).getName())
             .toList();
     }
 
-    private static Mono<List<String>> getDomainNames(CloudFoundryClient cloudFoundryClient, SpaceResource resource) {
-        return requestSpaceDomains(cloudFoundryClient, ResourceUtils.getId(resource))
-            .map(resource1 -> ResourceUtils.getEntity(resource1).getName())
+    private static Mono<List<String>> getDomainNames(CloudFoundryClient cloudFoundryClient, SpaceResource spaceResource) {
+        return requestSpaceDomains(cloudFoundryClient, ResourceUtils.getId(spaceResource))
+            .map(domainResource -> ResourceUtils.getEntity(domainResource).getName())
             .toList();
     }
 
@@ -255,28 +255,26 @@ public final class DefaultSpaces implements Spaces {
             .map(ResourceUtils::getId);
     }
 
-    private static Mono<List<SecurityGroupEntity>> getSecurityGroups(CloudFoundryClient cloudFoundryClient, SpaceResource resource, boolean withRules) {
-        return requestSpaceSecurityGroups(cloudFoundryClient, ResourceUtils.getId(resource))
-            .map(resource1 -> {
-                    SecurityGroupEntity entity = ResourceUtils.getEntity(resource1);
-                    if (!withRules) {
-                        entity = SecurityGroupEntity.builder()
-                            .name(entity.getName())
-                            .runningDefault(entity.getRunningDefault())
-                            .spacesUrl(entity.getSpacesUrl())
-                            .stagingDefault(entity.getStagingDefault())
-                            .build();
-                    }
-                    return entity;
+    private static Mono<List<SecurityGroupEntity>> getSecurityGroups(CloudFoundryClient cloudFoundryClient, SpaceResource spaceResource, boolean withRules) {
+        return requestSpaceSecurityGroups(cloudFoundryClient, ResourceUtils.getId(spaceResource))
+            .map(securityGroupResource -> {
+                SecurityGroupEntity entity = ResourceUtils.getEntity(securityGroupResource);
+                if (!withRules) {
+                    entity = SecurityGroupEntity.builder()
+                        .name(entity.getName())
+                        .runningDefault(entity.getRunningDefault())
+                        .spacesUrl(entity.getSpacesUrl())
+                        .stagingDefault(entity.getStagingDefault())
+                        .build();
                 }
-
-            )
+                return entity;
+            })
             .toList();
     }
 
-    private static Mono<List<String>> getServiceNames(CloudFoundryClient cloudFoundryClient, SpaceResource resource) {
-        return requestSpaceServices(cloudFoundryClient, ResourceUtils.getId(resource))
-            .map(resource1 -> ResourceUtils.getEntity(resource1).getLabel())
+    private static Mono<List<String>> getServiceNames(CloudFoundryClient cloudFoundryClient, SpaceResource spaceResource) {
+        return requestSpaceServices(cloudFoundryClient, ResourceUtils.getId(spaceResource))
+            .map(serviceResource -> ResourceUtils.getEntity(serviceResource).getLabel())
             .toList();
     }
 

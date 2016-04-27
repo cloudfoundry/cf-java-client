@@ -308,7 +308,7 @@ public final class DefaultApplications implements Applications {
             .then(function((validRequest, spaceId) -> Mono
                 .just(validRequest)
                 .and(getApplicationId(this.cloudFoundryClient, validRequest.getName(), spaceId))))
-            .then(function((validRequest, applicationId) -> restageApplication(this.cloudFoundryClient, validRequest.getName(), applicationId, validRequest.getStagingTimeout(), 
+            .then(function((validRequest, applicationId) -> restageApplication(this.cloudFoundryClient, validRequest.getName(), applicationId, validRequest.getStagingTimeout(),
                 validRequest.getStartupTimeout())))
             .after();
     }
@@ -320,7 +320,7 @@ public final class DefaultApplications implements Applications {
             .then(function((validRequest, spaceId) -> getApplication(this.cloudFoundryClient, validRequest.getName(), spaceId)
                 .and(Mono.just(validRequest))))
             .then(function((resource, validRequest) -> stopApplicationIfNotStopped(cloudFoundryClient, resource)
-                .then(resource1 -> startApplicationAndWait(this.cloudFoundryClient, validRequest.getName(), ResourceUtils.getId(resource1), validRequest.getStagingTimeout(), 
+                .then(stoppedApplication -> startApplicationAndWait(this.cloudFoundryClient, validRequest.getName(), ResourceUtils.getId(stoppedApplication), validRequest.getStagingTimeout(),
                     validRequest.getStartupTimeout()))))
             .after();
     }
