@@ -238,7 +238,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656")
     @Test
     public void associateSecurityGroup() {
-        fail();
+        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656");
     }
 
     @Test
@@ -698,7 +698,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522686 really create a new user")
     @Test
     public void listFilterByDeveloperId() {
-        fail();
+        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/101522686 really create a new user");
     }
 
     @Test
@@ -1035,84 +1035,85 @@ public final class SpacesTest extends AbstractIntegrationTest {
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656")
     @Test
     public void listSecurityGroups() {
-
+        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656");
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656")
     @Test
     public void listSecurityGroupsFilterByName() {
-
+        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656");
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039")
     @Test
     public void listServiceInstances() {
+        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039");
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039")
     @Test
     public void listServiceInstancesFilterByGatewayName() {
-
+        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039");
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039")
     @Test
     public void listServiceInstancesFilterByName() {
-
+        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039");
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039")
     @Test
     public void listServiceInstancesFilterByOrganizationId() {
-
+        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039");
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039")
     @Test
     public void listServiceInstancesFilterByServiceBindingId() {
-
+        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039");
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039")
     @Test
     public void listServiceInstancesFilterByServiceKeyId() {
-
+        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039");
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039")
     @Test
     public void listServiceInstancesFilterByServicePlanId() {
-
+        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039");
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039")
     @Test
     public void listServices() {
-
+        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039");
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039")
     @Test
     public void listServicesFilterByActive() {
-
+        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039");
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039")
     @Test
     public void listServicesFilterByLabel() {
-
+        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039");
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039")
     @Test
     public void listServicesFilterByProvider() {
-
+        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039");
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039")
     @Test
     public void listServicesFilterByServiceBrokerId() {
-
+        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/112665039");
     }
 
     @Test
@@ -1292,7 +1293,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522658")
     @Test
     public void removeSecurityGroup() {
-
+        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/101522658");
     }
 
     @Test
