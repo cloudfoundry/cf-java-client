@@ -39,13 +39,13 @@ import java.util.List;
 public final class ListOrganizationServicesRequest extends PaginatedRequest implements Validatable {
 
     /**
-     * The actives
+     * The active flag
      *
-     * @param actives the actives
-     * @return the actives
+     * @param active the active flag
+     * @return the active flag
      */
     @Getter(onMethod = @__(@InFilterParameter("active")))
-    private final List<Boolean> actives;
+    private final Boolean active;
 
     /**
      * The labels
@@ -85,13 +85,13 @@ public final class ListOrganizationServicesRequest extends PaginatedRequest impl
 
     @Builder
     ListOrganizationServicesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
-                                    @Singular List<Boolean> actives,
+                                    Boolean active,
                                     @Singular List<String> labels,
                                     String organizationId,
                                     @Singular List<String> providers,
                                     @Singular List<String> serviceBrokerIds) {
         super(orderDirection, page, resultsPerPage);
-        this.actives = actives;
+        this.active = active;
         this.labels = labels;
         this.organizationId = organizationId;
         this.providers = providers;

@@ -53,7 +53,7 @@ public final class DeleteServiceRequest implements Validatable {
      * The service id
      *
      * @param serviceId the service id
-     * @return the binding id
+     * @return the service id
      */
     @Getter(onMethod = @__(@JsonIgnore))
     private final String serviceId;
