@@ -22,6 +22,9 @@ import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingRequest;
+import org.cloudfoundry.client.v2.buildpacks.BuildpackResource;
+import org.cloudfoundry.client.v2.buildpacks.DeleteBuildpackRequest;
+import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
 import org.cloudfoundry.client.v2.domains.DeleteDomainRequest;
 import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
@@ -89,6 +92,8 @@ final class CloudFoundryCleaner {
 
     private final CloudFoundryClient cloudFoundryClient;
 
+    private final Mono<List<String>> protectedBuildpackIds;
+
     private final Mono<Optional<String>> protectedDomainId;
 
     private final Mono<List<String>> protectedFeatureFlags;
@@ -97,10 +102,11 @@ final class CloudFoundryCleaner {
 
     private final Mono<List<String>> protectedSpaceIds;
 
-    CloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Mono<Optional<String>> protectedDomainId, Mono<List<String>> protectedFeatureFlags, Mono<Optional<String>> protectedOrganizationId,
-                        Mono<List<String>> protectedSpaceIds) {
+    CloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Mono<List<String>> protectedBuildpackIds, Mono<Optional<String>> protectedDomainId, Mono<List<String>> protectedFeatureFlags,
+                        Mono<Optional<String>> protectedOrganizationId, Mono<List<String>> protectedSpaceIds) {
 
         this.cloudFoundryClient = cloudFoundryClient;
+        this.protectedBuildpackIds = protectedBuildpackIds;
         this.protectedDomainId = protectedDomainId;
         this.protectedFeatureFlags = protectedFeatureFlags;
         this.protectedOrganizationId = protectedOrganizationId;
@@ -109,14 +115,16 @@ final class CloudFoundryCleaner {
 
     void clean() {
         Mono
-            .when(this.protectedDomainId, this.protectedOrganizationId, this.protectedSpaceIds, this.protectedFeatureFlags)
-            .flatMap(function((protectedDomainId, protectedOrganizationId, protectedSpaceIds, protectedFeatureFlags) -> {
+            .when(this.protectedBuildpackIds, this.protectedDomainId, this.protectedOrganizationId, this.protectedSpaceIds, this.protectedFeatureFlags)
+            .flatMap(function((protectedBuildpackIds, protectedDomainId, protectedOrganizationId, protectedSpaceIds, protectedFeatureFlags) -> {
 
                 Predicate<ApplicationResource> applicationV2Predicate = protectedOrganizationId
                     .map(id -> (Predicate<ApplicationResource>) r -> !protectedSpaceIds.contains(ResourceUtils.getEntity(r).getSpaceId()))
                     .orElse(r -> true);
 
                 Predicate<ListApplicationsResponse.Resource> applicationsV3Predicate = r -> true;  // TODO: Filter out interesting organizations
+
+                Predicate<BuildpackResource> buildpackPredicate = r -> !protectedBuildpackIds.contains(ResourceUtils.getId(r));
 
                 Predicate<ListPackagesResponse.Resource> packagePredicate = r -> true;  // TODO: Filter out interesting organizations
 
@@ -143,6 +151,7 @@ final class CloudFoundryCleaner {
                     .orElse(r -> true);
 
                 return Flux.empty()
+                    .after(cleanBuildpacks(this.cloudFoundryClient, buildpackPredicate))
                     .after(cleanFeatureFlags(this.cloudFoundryClient, featureFlagPredicate))
                     .after(cleanRoutes(this.cloudFoundryClient, routePredicate))
                     .after(cleanApplicationsV2(this.cloudFoundryClient, applicationV2Predicate))
@@ -152,7 +161,7 @@ final class CloudFoundryCleaner {
                     .after(cleanUserProvidedServiceInstances(this.cloudFoundryClient, userProvidedServiceInstancePredicate))
                     .after(cleanDomains(this.cloudFoundryClient, domainPredicate))
                     .after(cleanPrivateDomains(this.cloudFoundryClient, privateDomainPredicate))
-                    .after(cleanSpaces(this.cloudFoundryClient, spacePredicate, this.logger))
+                    .after(cleanSpaces(this.cloudFoundryClient, spacePredicate))
                     .after(cleanOrganizations(this.cloudFoundryClient, organizationPredicate));
             }))
             .doOnSubscribe(s -> this.logger.debug(">> CLEANUP <<"))
@@ -191,6 +200,22 @@ final class CloudFoundryCleaner {
                 .delete(org.cloudfoundry.client.v3.applications.DeleteApplicationRequest.builder()
                     .applicationId(applicationId)
                     .build()));
+    }
+
+    private static Flux<Void> cleanBuildpacks(CloudFoundryClient cloudFoundryClient, Predicate<BuildpackResource> predicate) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.buildpacks()
+                .list(ListBuildpacksRequest.builder()
+                    .page(page)
+                    .build()))
+            .filter(predicate)
+            .map(ResourceUtils::getId)
+            .flatMap(buildpackId -> cloudFoundryClient.buildpacks()
+                .delete(DeleteBuildpackRequest.builder()
+                    .async(true)
+                    .buildpackId(buildpackId)
+                    .build()))
+            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
     private static Flux<Void> cleanDomains(CloudFoundryClient cloudFoundryClient, Predicate<DomainResource> predicate) {
@@ -308,7 +333,7 @@ final class CloudFoundryCleaner {
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
-    private static Flux<Void> cleanSpaces(CloudFoundryClient cloudFoundryClient, Predicate<SpaceResource> predicate, Logger logger) {
+    private static Flux<Void> cleanSpaces(CloudFoundryClient cloudFoundryClient, Predicate<SpaceResource> predicate) {
         return PaginationUtils.
             requestResources(page -> cloudFoundryClient.spaces()
                 .list(ListSpacesRequest.builder()

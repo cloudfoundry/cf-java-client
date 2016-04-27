@@ -17,11 +17,20 @@
 package org.cloudfoundry.operations.buildpacks;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Buildpacks Operations API
  */
 public interface Buildpacks {
+
+    /**
+     * Create a new Buildpack
+     *
+     * @param request The Create Buildpack request
+     * @return a completion indicator
+     */
+    Mono<Void> create(CreateBuildpackRequest request);
 
     /**
      * Lists the buildpacks

@@ -60,6 +60,10 @@ public abstract class AbstractIntegrationTest {
         return this.nameFactory.getName("test-application-");
     }
 
+    protected final String getBuildpackName() {
+        return this.nameFactory.getName("test-buildpack-");
+    }
+
     protected final String getDomainName() {
         return this.nameFactory.getName("test.domain.");
     }

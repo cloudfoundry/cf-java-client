@@ -17,6 +17,7 @@
 package org.cloudfoundry;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
 import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
@@ -57,9 +58,10 @@ public class IntegrationTestConfiguration {
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.test");
 
     @Bean(initMethod = "clean", destroyMethod = "clean")
-    CloudFoundryCleaner cloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Mono<Optional<String>> protectedDomainId, Mono<List<String>> protectedFeatureFlags, Mono<Optional<String>>
-        protectedOrganizationId, Mono<List<String>> protectedSpaceIds) {
-        return new CloudFoundryCleaner(cloudFoundryClient, protectedDomainId, protectedFeatureFlags, protectedOrganizationId, protectedSpaceIds);
+    CloudFoundryCleaner cloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Mono<List<String>> protectedBuildpackIds, Mono<Optional<String>> protectedDomainId, Mono<List<String>>
+        protectedFeatureFlags, Mono<Optional<String>>
+                                                protectedOrganizationId, Mono<List<String>> protectedSpaceIds) {
+        return new CloudFoundryCleaner(cloudFoundryClient, protectedBuildpackIds, protectedDomainId, protectedFeatureFlags, protectedOrganizationId, protectedSpaceIds);
     }
 
     @Bean
@@ -116,6 +118,21 @@ public class IntegrationTestConfiguration {
     @Bean
     String organizationName(NameFactory nameFactory) {
         return nameFactory.getName("test-organization-");
+    }
+
+    @Bean
+    Mono<List<String>> protectedBuildpackIds(CloudFoundryClient cloudFoundryClient) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.buildpacks()
+                .list(ListBuildpacksRequest.builder()
+                    .page(page)
+                    .build()))
+            .map(ResourceUtils::getId)
+            .toList()
+            .doOnSubscribe(s -> this.logger.debug(">> PROTECTED BUILDPACKS <<"))
+            .doOnError(Throwable::printStackTrace)
+            .doOnSuccess(id -> this.logger.debug("<< PROTECTED BUILDPACKS >>"))
+            .cache();
     }
 
     @Bean(initMethod = "get")
