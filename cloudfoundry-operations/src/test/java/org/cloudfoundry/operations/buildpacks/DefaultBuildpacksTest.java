@@ -75,19 +75,19 @@ public final class DefaultBuildpacksTest {
 
     public static final class Create extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultBuildpacks buildpacks = new DefaultBuildpacks(this.cloudFoundryClient);
-
         private static final String BUILDPACK_ID = "test-buildpack-id";
 
         private static final String BUILDPACK_NAME = "go-buildpack";
+
+        private static final ByteArrayInputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[0]);
+
+        private static final Boolean ENABLE = true;
 
         private static final String FILE_NAME = "gobuildpack.zip";
 
         private static final Integer POSITION = 1;
 
-        private static final Boolean ENABLE = true;
-
-        private static final ByteArrayInputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[0]);
+        private final DefaultBuildpacks buildpacks = new DefaultBuildpacks(this.cloudFoundryClient);
 
         @Before
         public void setUp() throws Exception {
@@ -121,14 +121,16 @@ public final class DefaultBuildpacksTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(RequestValidationException.class, "Request is invalid: name must be specified, file name must be specified, " +
-                    "buildpack must be specified, position must be specified");
+                .assertError(RequestValidationException.class, "Request is invalid: buildpack must be specified");
         }
 
         @Override
         protected Publisher<Void> invoke() {
             return this.buildpacks
                 .create(CreateBuildpackRequest.builder()
+                    .fileName("test-file-name")
+                    .name("test-name")
+                    .position(0)
                     .build());
         }
 

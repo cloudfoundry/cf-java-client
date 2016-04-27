@@ -24,111 +24,72 @@ import java.io.ByteArrayInputStream;
 import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class CreateBuildpackRequestTest {
 
     @Test
-    public void isValid() {
-
+    public void isNotValidNoBuildpack() {
         ValidationResult result = CreateBuildpackRequest.builder()
-            .name("go-buildpack")
-            .fileName("buildpack.zip")
-            .buildpack(new ByteArrayInputStream(new byte[0]))
-            .position(1)
-            .enable(true)
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidDefaultEnable() {
-
-        CreateBuildpackRequest buildpackRequest = CreateBuildpackRequest.builder()
-            .name("go-buildpack")
-            .fileName("buildpack.zip")
-            .buildpack(new ByteArrayInputStream(new byte[0]))
-            .position(1)
-            .build();
-        ValidationResult result = buildpackRequest.isValid();
-
-        assertTrue(buildpackRequest.getEnable() == true);
-        assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidDisabledBuildpack() {
-
-        CreateBuildpackRequest buildpackRequest = CreateBuildpackRequest.builder()
-            .name("go-buildpack")
-            .fileName("buildpack.zip")
-            .buildpack(new ByteArrayInputStream(new byte[0]))
-            .position(1)
-            .enable(false)
-            .build();
-        ValidationResult result = buildpackRequest.isValid();
-
-        assertTrue(buildpackRequest.getEnable() == false);
-        assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isInValid() {
-        ValidationResult result = CreateBuildpackRequest.builder()
+            .fileName("test-file-name")
+            .name("test-name")
+            .position(0)
             .build()
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertTrue(result.getMessages().size() == 4);
-        assertEquals("name must be specified", result.getMessages().get(0));
-        assertEquals("file name must be specified", result.getMessages().get(1));
-        assertEquals("buildpack must be specified", result.getMessages().get(2));
-        assertEquals("position must be specified", result.getMessages().get(3));
-    }
-
-    @Test
-    public void isInValidNoBuildpack() {
-        ValidationResult result = CreateBuildpackRequest.builder()
-            .name("go-buildpack")
-            .fileName("buildpack.zip")
-            .position(1)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertTrue(result.getMessages().size() == 1);
         assertEquals("buildpack must be specified", result.getMessages().get(0));
     }
 
     @Test
-    public void isInValidNoFileName() {
+    public void isNotValidNoFilename() {
         ValidationResult result = CreateBuildpackRequest.builder()
-            .name("go-buildpack")
             .buildpack(new ByteArrayInputStream(new byte[0]))
-            .position(1)
+            .name("test-name")
+            .position(0)
             .build()
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertTrue(result.getMessages().size() == 1);
         assertEquals("file name must be specified", result.getMessages().get(0));
     }
 
     @Test
-    public void isInValidNoPosition() {
+    public void isNotValidNoName() {
         ValidationResult result = CreateBuildpackRequest.builder()
-            .name("go-buildpack")
-            .fileName("buildpack.zip")
             .buildpack(new ByteArrayInputStream(new byte[0]))
+            .fileName("test-file-name")
+            .position(0)
             .build()
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertTrue(result.getMessages().size() == 1);
+        assertEquals("name must be specified", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isNotValidNoPosition() {
+        ValidationResult result = CreateBuildpackRequest.builder()
+            .buildpack(new ByteArrayInputStream(new byte[0]))
+            .fileName("test-file-name")
+            .name("test-name")
+            .build()
+            .isValid();
+
+        assertEquals(INVALID, result.getStatus());
         assertEquals("position must be specified", result.getMessages().get(0));
     }
 
+    @Test
+    public void isValid() {
+        ValidationResult result = CreateBuildpackRequest.builder()
+            .buildpack(new ByteArrayInputStream(new byte[0]))
+            .fileName("test-file-name")
+            .name("test-name")
+            .position(0)
+            .build()
+            .isValid();
+
+        assertEquals(VALID, result.getStatus());
+    }
 
 }
