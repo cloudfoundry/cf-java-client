@@ -37,14 +37,12 @@ import org.cloudfoundry.client.v2.servicebindings.ListServiceBindingsResponse;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse;
-import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceResource;
-import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyResponse;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanRequest;
@@ -53,6 +51,10 @@ import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansResponse;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlanEntity;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlanResource;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.ListServicePlanVisibilitiesRequest;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.ListServicePlanVisibilitiesResponse;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilityEntity;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilityResource;
 import org.cloudfoundry.client.v2.services.GetServiceRequest;
 import org.cloudfoundry.client.v2.services.GetServiceResponse;
 import org.cloudfoundry.client.v2.services.ServiceEntity;
@@ -223,19 +225,6 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
-    private static void requestDeleteServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
-        when(cloudFoundryClient.serviceInstances()
-            .delete(org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest.builder()
-                .serviceInstanceId(serviceInstanceId)
-                .async(true)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(DeleteServiceInstanceResponse.builder())
-                    .entity(fill(JobEntity.builder(), "job-entity-")
-                        .build())
-                    .build()));
-    }
-
     private static void requestDeleteUserProvidedServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
         when(cloudFoundryClient.userProvidedServiceInstances()
             .delete(DeleteUserProvidedServiceInstanceRequest.builder()
@@ -245,9 +234,10 @@ public final class DefaultServicesTest {
     }
 
     private static void requestGetApplication(CloudFoundryClient cloudFoundryClient, String applicationId, String application) {
-        when(cloudFoundryClient.applicationsV2().get(GetApplicationRequest.builder()
-            .applicationId(applicationId)
-            .build()))
+        when(cloudFoundryClient.applicationsV2()
+            .get(GetApplicationRequest.builder()
+                .applicationId(applicationId)
+                .build()))
             .thenReturn(Mono
                 .just(fill(GetApplicationResponse.builder())
                     .metadata(Resource.Metadata.builder().id(applicationId).build())
@@ -265,6 +255,9 @@ public final class DefaultServicesTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(GetServiceResponse.builder())
+                    .metadata(Resource.Metadata.builder()
+                        .id(serviceId)
+                        .build())
                     .entity(fill(ServiceEntity.builder())
                         .extra("{\"displayName\":\"test-value\",\"longDescription\":\"test-value\",\"documentationUrl\":\"test-documentation-url\",\"supportUrl\":\"test-value\"}")
                         .label(service)
@@ -302,6 +295,16 @@ public final class DefaultServicesTest {
                         .name(servicePlan)
                         .serviceId(service + "-id")
                         .build())
+                    .build()));
+    }
+
+    private static void requestGetServicePlanEmpty(CloudFoundryClient cloudFoundryClient, String servicePlanId) {
+        when(cloudFoundryClient.servicePlans()
+            .get(GetServicePlanRequest.builder()
+                .servicePlanId(servicePlanId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(GetServicePlanResponse.builder())
                     .build()));
     }
 
@@ -403,6 +406,24 @@ public final class DefaultServicesTest {
             .thenReturn(Mono
                 .just(fillPage(ListSpaceServiceInstancesResponse.builder())
                     .resource(fill(UnionServiceInstanceResource.builder(), "service-instance-")
+                        .build())
+                    .build()));
+    }
+
+    private static void requestListServiceInstances(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId, String servicePlanId) {
+        when(cloudFoundryClient.spaces()
+            .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
+                .page(1)
+                .spaceId(spaceId)
+                .returnUserProvidedServiceInstances(true)
+                .name(serviceName)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListSpaceServiceInstancesResponse.builder())
+                    .resource(fill(UnionServiceInstanceResource.builder(), "service-instance-")
+                        .entity(fill(UnionServiceInstanceEntity.builder())
+                            .servicePlanId(servicePlanId)
+                            .build())
                         .build())
                     .build()));
     }
@@ -521,6 +542,36 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
+    private static void requestListServicePlanVisibilities(CloudFoundryClient cloudFoundryClient, String organizationId, String servicePlanId) {
+        when(cloudFoundryClient.servicePlanVisibilities()
+            .list(ListServicePlanVisibilitiesRequest.builder()
+                .organizationId(organizationId)
+                .page(1)
+                .servicePlanId(servicePlanId)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListServicePlanVisibilitiesResponse.builder())
+                    .resource(ServicePlanVisibilityResource.builder()
+                        .entity(ServicePlanVisibilityEntity.builder()
+                            .organizationId(organizationId)
+                            .servicePlanId(servicePlanId)
+                            .build())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestListServicePlanVisibilitiesEmpty(CloudFoundryClient cloudFoundryClient, String organizationId, String servicePlanId) {
+        when(cloudFoundryClient.servicePlanVisibilities()
+            .list(ListServicePlanVisibilitiesRequest.builder()
+                .organizationId(organizationId)
+                .page(1)
+                .servicePlanId(servicePlanId)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListServicePlanVisibilitiesResponse.builder())
+                    .build()));
+    }
+
     private static void requestListServicePlans(CloudFoundryClient cloudFoundryClient, String serviceId, String plan, String planId) {
         when(cloudFoundryClient.servicePlans()
             .list(ListServicePlansRequest.builder()
@@ -542,6 +593,28 @@ public final class DefaultServicesTest {
             );
     }
 
+    private static void requestListServicePlansNotPublic(CloudFoundryClient cloudFoundryClient, String serviceId, String plan, String planId) {
+        when(cloudFoundryClient.servicePlans()
+            .list(ListServicePlansRequest.builder()
+                .serviceId(serviceId)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListServicePlansResponse.builder())
+                    .resource(ServicePlanResource.builder()
+                        .metadata(Resource.Metadata.builder()
+                            .id(planId)
+                            .build())
+                        .entity(fill(ServicePlanEntity.builder())
+                            .name(plan)
+                            .publiclyVisible(false)
+                            .build())
+                        .build())
+                    .build())
+
+            );
+    }
+
     private static void requestListServices(CloudFoundryClient cloudFoundryClient, String spaceId, String serviceLabel) {
         when(cloudFoundryClient.spaces()
             .listServices(ListSpaceServicesRequest.builder()
@@ -552,7 +625,9 @@ public final class DefaultServicesTest {
             .thenReturn(Mono
                 .just(fillPage(ListSpaceServicesResponse.builder())
                     .resource(ServiceResource.builder()
-                        .metadata(Resource.Metadata.builder().id(serviceLabel + "-id").build())
+                        .metadata(Resource.Metadata.builder()
+                            .id(serviceLabel + "-id")
+                            .build())
                         .entity(fill(ServiceEntity.builder())
                             .description(serviceLabel + "-description")
                             .label(serviceLabel)
@@ -586,28 +661,9 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
-    private static void requestListSpaceServices(CloudFoundryClient cloudFoundryClient, String spaceId, String service, String serviceId) {
-        when(cloudFoundryClient.spaces()
-            .listServices(ListSpaceServicesRequest.builder()
-                .page(1)
-                .spaceId(spaceId)
-                .label(service)
-                .build()))
-            .thenReturn(Mono
-                .just(fillPage(ListSpaceServicesResponse.builder())
-                    .resource(ServiceResource.builder()
-                        .metadata(Resource.Metadata.builder()
-                            .id(serviceId)
-                            .build())
-                        .entity(fill(ServiceEntity.builder())
-                            .build())
-                        .build())
-                    .build()));
-    }
-
     private static void requestRenameServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String newName) {
         when(cloudFoundryClient.serviceInstances()
-            .update(UpdateServiceInstanceRequest.builder()
+            .update(org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest.builder()
                 .name(newName)
                 .serviceInstanceId(serviceInstanceId)
                 .build()))
@@ -616,9 +672,23 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
+    private static void requestUpdateServiceInstance(CloudFoundryClient cloudFoundryClient, Map<String, Object> parameter, String serviceInstanceId, String servicePlanId, List<String> tags) {
+        when(cloudFoundryClient.serviceInstances()
+            .update(org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest.builder()
+                .acceptsIncomplete(true)
+                .parameters(parameter)
+                .servicePlanId(servicePlanId)
+                .serviceInstanceId(serviceInstanceId)
+                .tags(tags)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(UpdateServiceInstanceResponse.builder())
+                    .build()));
+    }
+
     public static final class BindServiceInstance extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -648,7 +718,7 @@ public final class DefaultServicesTest {
 
         private static final int CF_SERVICE_ALREADY_BOUND = 90003;
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -677,7 +747,7 @@ public final class DefaultServicesTest {
 
     public static final class BindServiceInstanceNoApplication extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -705,7 +775,7 @@ public final class DefaultServicesTest {
 
     public static final class BindServiceInstanceNoServiceInstance extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -733,11 +803,11 @@ public final class DefaultServicesTest {
 
     public static final class CreateServiceInstanceDelay extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
-            requestListSpaceServices(this.cloudFoundryClient, TEST_SPACE_ID, "test-service", "test-service-id");
+            requestListServices(this.cloudFoundryClient, TEST_SPACE_ID, "test-service");
             requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
             requestCreateServiceInstance(this.cloudFoundryClient, TEST_SPACE_ID, "test-plan-id", "test-service-instance", Collections.emptyMap(), Collections.emptyList(),
                 "test-service-instance-id", "in progress");
@@ -764,11 +834,11 @@ public final class DefaultServicesTest {
 
     public static final class CreateServiceInstanceInstant extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
-            requestListSpaceServices(this.cloudFoundryClient, TEST_SPACE_ID, "test-service", "test-service-id");
+            requestListServices(this.cloudFoundryClient, TEST_SPACE_ID, "test-service");
             requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
             requestCreateServiceInstance(this.cloudFoundryClient, TEST_SPACE_ID, "test-plan-id", "test-service-instance", Collections.singletonMap("test-parameter-key", "test-parameter-value"),
                 Collections.singletonList("test-tag"), "test-service-instance-id", "successful");
@@ -796,7 +866,7 @@ public final class DefaultServicesTest {
 
     public static final class CreateServiceInstanceNoService extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, MISSING_SPACE_ID);
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, MISSING_SPACE_ID, Mono.just(TEST_ORGANIZATION_ID));
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
@@ -819,7 +889,7 @@ public final class DefaultServicesTest {
 
     public static final class CreateServiceInstanceNoSpace extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, MISSING_SPACE_ID);
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, MISSING_SPACE_ID, Mono.just(TEST_ORGANIZATION_ID));
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
@@ -843,7 +913,7 @@ public final class DefaultServicesTest {
 
     public static final class CreateServiceKey extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -872,7 +942,7 @@ public final class DefaultServicesTest {
 
     public static final class CreateServiceKeyNoServiceInstance extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -900,7 +970,7 @@ public final class DefaultServicesTest {
 
     public static final class CreateUserProvidedServiceInstance extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -934,7 +1004,7 @@ public final class DefaultServicesTest {
 
     public static final class DeleteServiceInstance extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -960,7 +1030,7 @@ public final class DefaultServicesTest {
 
     public static final class DeleteServiceInstanceNoSpace extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, MISSING_SPACE_ID);
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, MISSING_SPACE_ID, Mono.just(TEST_ORGANIZATION_ID));
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
@@ -980,7 +1050,7 @@ public final class DefaultServicesTest {
 
     public static final class DeleteServiceInstanceNotFound extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1005,7 +1075,7 @@ public final class DefaultServicesTest {
 
     public static final class GetServiceInstanceManaged extends AbstractOperationsApiTest<ServiceInstance> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1043,7 +1113,7 @@ public final class DefaultServicesTest {
 
     public static final class GetServiceInstanceNoInstances extends AbstractOperationsApiTest<ServiceInstance> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1068,7 +1138,7 @@ public final class DefaultServicesTest {
 
     public static final class GetServiceInstanceNoSpace extends AbstractOperationsApiTest<ServiceInstance> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, MISSING_SPACE_ID);
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, MISSING_SPACE_ID, Mono.just(TEST_ORGANIZATION_ID));
 
         @Override
         protected void assertions(TestSubscriber<ServiceInstance> testSubscriber) {
@@ -1088,7 +1158,7 @@ public final class DefaultServicesTest {
 
     public static final class GetServiceInstanceUserProvided extends AbstractOperationsApiTest<ServiceInstance> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1120,7 +1190,7 @@ public final class DefaultServicesTest {
 
     public static final class ListInstances extends AbstractOperationsApiTest<ServiceInstance> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1163,7 +1233,7 @@ public final class DefaultServicesTest {
 
     public static final class ListInstancesNoInstances extends AbstractOperationsApiTest<ServiceInstance> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1185,7 +1255,7 @@ public final class DefaultServicesTest {
 
     public static final class ListInstancesNoSpace extends AbstractOperationsApiTest<ServiceInstance> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, MISSING_SPACE_ID);
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, MISSING_SPACE_ID, Mono.just(TEST_ORGANIZATION_ID));
 
         @Override
         protected void assertions(TestSubscriber<ServiceInstance> testSubscriber) {
@@ -1203,7 +1273,7 @@ public final class DefaultServicesTest {
 
     public static final class ListServiceOfferings extends AbstractOperationsApiTest<ServiceOffering> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1249,7 +1319,7 @@ public final class DefaultServicesTest {
 
     public static final class ListServiceOfferingsSingle extends AbstractOperationsApiTest<ServiceOffering> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1285,7 +1355,7 @@ public final class DefaultServicesTest {
 
     public static final class RenameServiceInstance extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1310,7 +1380,7 @@ public final class DefaultServicesTest {
 
     public static final class UnbindServiceInstance extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1339,7 +1409,7 @@ public final class DefaultServicesTest {
 
     public static final class UnbindServiceInstanceFailure extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1369,7 +1439,7 @@ public final class DefaultServicesTest {
 
     public static final class UnbindServiceInstanceInvalidRequest extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, MISSING_SPACE_ID);
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
@@ -1389,7 +1459,7 @@ public final class DefaultServicesTest {
 
     public static final class UnbindServiceNoSpace extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, MISSING_SPACE_ID);
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, MISSING_SPACE_ID, Mono.just(TEST_ORGANIZATION_ID));
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
@@ -1403,6 +1473,246 @@ public final class DefaultServicesTest {
                 .unbind(UnbindServiceInstanceRequest.builder()
                     .applicationName("test-application-name")
                     .serviceInstanceName("test-service-instance-name")
+                    .build());
+        }
+
+    }
+
+    public static final class updateService extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-service-plan-id");
+            requestGetServicePlan(this.cloudFoundryClient, "test-service-plan-id", "test-service-plan", "test-service");
+            requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
+            requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
+            requestUpdateServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-parameter-key", "test-parameter-value"), "test-service-instance-id", "test-plan-id",
+                Collections.singletonList("test-tag"));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.services
+                .update(UpdateServiceInstanceRequest.builder()
+                    .planName("test-plan")
+                    .parameter("test-parameter-key", "test-parameter-value")
+                    .serviceInstanceName("test-service")
+                    .tag("test-tag")
+                    .build());
+        }
+
+    }
+
+    public static final class updateServiceNoParameters extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-service-plan-id");
+            requestGetServicePlan(this.cloudFoundryClient, "test-service-plan-id", "test-service-plan", "test-service");
+            requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
+            requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-service-plan-id");
+            requestUpdateServiceInstance(this.cloudFoundryClient, Collections.emptyMap(), "test-service-instance-id", "test-service-plan-id", Collections.singletonList("test-tag"));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.services
+                .update(UpdateServiceInstanceRequest.builder()
+                    .planName("test-plan")
+                    .serviceInstanceName("test-service")
+                    .tag("test-tag")
+                    .build());
+        }
+
+    }
+
+    public static final class updateServiceNoPlan extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.services
+                .update(UpdateServiceInstanceRequest.builder()
+                    .parameter("test-parameter-key", "test-parameter-value")
+                    .serviceInstanceName("test-service")
+                    .tag("test-tag")
+                    .build());
+        }
+
+    }
+
+    public static final class updateServiceNoTags extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-service-plan-id");
+            requestGetServicePlan(this.cloudFoundryClient, "test-service-plan-id", "test-service-plan", "test-service");
+            requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
+            requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
+            requestUpdateServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-parameter-key", "test-parameter-value"), "test-service-instance-id", "test-plan-id",
+                Collections.emptyList());
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.services
+                .update(UpdateServiceInstanceRequest.builder()
+                    .planName("test-plan")
+                    .parameter("test-parameter-key", "test-parameter-value")
+                    .serviceInstanceName("test-service")
+                    .build());
+        }
+
+    }
+
+    public static final class updateServiceNotPublic extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-plan-id");
+            requestGetServicePlan(this.cloudFoundryClient, "test-plan-id", "test-service-plan", "test-service");
+            requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
+            requestListServicePlansNotPublic(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
+            requestListServicePlanVisibilities(this.cloudFoundryClient, "test-organization-id", "test-plan-id");
+            requestUpdateServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-parameter-key", "test-parameter-value"), "test-service-instance-id", "test-plan-id",
+                Collections.singletonList("test-tag"));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.services
+                .update(UpdateServiceInstanceRequest.builder()
+                    .planName("test-plan")
+                    .parameter("test-parameter-key", "test-parameter-value")
+                    .serviceInstanceName("test-service")
+                    .tag("test-tag")
+                    .build());
+        }
+
+    }
+
+    public static final class updateServiceNotVisible extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-plan-id");
+            requestGetServicePlan(this.cloudFoundryClient, "test-plan-id", "test-service-plan", "test-service");
+            requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
+            requestListServicePlansNotPublic(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
+            requestListServicePlanVisibilitiesEmpty(this.cloudFoundryClient, "test-organization-id", "test-plan-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            testSubscriber
+                .assertError(IllegalArgumentException.class, "Service Plan test-plan is not visible to your organization");
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.services
+                .update(UpdateServiceInstanceRequest.builder()
+                    .planName("test-plan")
+                    .parameter("test-parameter-key", "test-parameter-value")
+                    .serviceInstanceName("test-service")
+                    .tag("test-tag")
+                    .build());
+        }
+
+    }
+
+    public static final class updateServiceUserProvided extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "");
+            requestGetServicePlanEmpty(this.cloudFoundryClient, "test-service-plan-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            testSubscriber
+                .assertError(IllegalArgumentException.class, "Plan does not exist for the test-name service");
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.services
+                .update(UpdateServiceInstanceRequest.builder()
+                    .planName("test-plan")
+                    .parameter("test-parameter-key", "test-parameter-value")
+                    .serviceInstanceName("test-service")
+                    .tag("test-tag")
+                    .build());
+        }
+
+    }
+
+    public static final class updateServiceUserProvidedNoPlan extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.services
+                .update(UpdateServiceInstanceRequest.builder()
+                    .parameter("test-parameter-key", "test-parameter-value")
+                    .serviceInstanceName("test-service")
+                    .tag("test-tag")
                     .build());
         }
 

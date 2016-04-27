@@ -102,4 +102,14 @@ public interface Services {
      * @return a completion indicator
      */
     Mono<Void> unbind(UnbindServiceInstanceRequest request);
+
+    /**
+     * Update a service instance
+     *
+     * @param request the update service instance request
+     * @return a completion indicator
+     */
+    Mono<Void> update(UpdateServiceInstanceRequest request);
+
+
 }

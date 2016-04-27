@@ -69,7 +69,7 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
         this.organizationAdmin = new DefaultOrganizationAdmin(cloudFoundryClient);
         this.organizations = new DefaultOrganizations(cloudFoundryClient, username);
         this.routes = new DefaultRoutes(cloudFoundryClient, organizationId, spaceId);
-        this.services = new DefaultServices(cloudFoundryClient, spaceId);
+        this.services = new DefaultServices(cloudFoundryClient, spaceId, organizationId);
         this.spaceAdmin = new DefaultSpaceAdmin(cloudFoundryClient, organizationId);
         this.spaces = new DefaultSpaces(cloudFoundryClient, organizationId, username);
         this.stacks = new DefaultStacks(cloudFoundryClient);

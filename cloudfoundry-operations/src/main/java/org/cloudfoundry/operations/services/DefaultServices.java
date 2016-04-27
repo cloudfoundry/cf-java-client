@@ -37,7 +37,6 @@ import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceResource;
-import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyResponse;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanRequest;
@@ -45,6 +44,8 @@ import org.cloudfoundry.client.v2.serviceplans.GetServicePlanResponse;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlanEntity;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlanResource;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.ListServicePlanVisibilitiesRequest;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilityResource;
 import org.cloudfoundry.client.v2.services.GetServiceRequest;
 import org.cloudfoundry.client.v2.services.GetServiceResponse;
 import org.cloudfoundry.client.v2.services.ServiceEntity;
@@ -83,11 +84,14 @@ public final class DefaultServices implements Services {
 
     private final CloudFoundryClient cloudFoundryClient;
 
+    private final Mono<String> organizationId;
+
     private final Mono<String> spaceId;
 
-    public DefaultServices(CloudFoundryClient cloudFoundryClient, Mono<String> spaceId) {
+    public DefaultServices(CloudFoundryClient cloudFoundryClient, Mono<String> spaceId, Mono<String> organizationId) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.spaceId = spaceId;
+        this.organizationId = organizationId;
     }
 
     @Override
@@ -245,6 +249,39 @@ public final class DefaultServices implements Services {
             .then();
     }
 
+    @Override
+    public Mono<Void> update(UpdateServiceInstanceRequest request) {
+        return Mono
+            .when(ValidationUtils.validate(request), this.organizationId, this.spaceId)
+            .then(function((validRequest, organizationId, spaceId) -> Mono
+                .when(
+                    Mono.just(validRequest),
+                    Mono.just(organizationId),
+                    getSpaceServiceInstance(this.cloudFoundryClient, validRequest.getServiceInstanceName(), spaceId)
+                )))
+            .then(function((validRequest, organizationId, serviceInstance) -> Mono
+                .when(
+                    Mono.just(validRequest),
+                    Mono.just(serviceInstance.getMetadata().getId()),
+                    getValidatedServicePlanId(this.cloudFoundryClient, validRequest.getPlanName(), serviceInstance, organizationId)
+                )))
+            .then(function((validRequest, serviceInstanceId, servicePlanId) -> updateServiceInstance(this.cloudFoundryClient, validRequest, serviceInstanceId, servicePlanId)))
+            .then();
+    }
+
+    private static Mono<String> checkVisibility(CloudFoundryClient cloudFoundryClient, String organizationId, ServicePlanResource resource) {
+        String servicePlanId = resource.getMetadata().getId();
+
+        if (resource.getEntity().getPubliclyVisible()) {
+            return Mono.just(servicePlanId);
+        }
+
+        return requestListServicePlanVisibilities(cloudFoundryClient, organizationId, servicePlanId)
+            .next()
+            .otherwiseIfEmpty(ExceptionUtils.illegalArgument("Service Plan %s is not visible to your organization", resource.getEntity().getName()))
+            .then(Mono.just(servicePlanId));
+    }
+
     private static ServiceInstanceType convertToInstanceType(String type) {
         if (ServiceInstanceType.USER_PROVIDED.getText().equals(type)) {
             return ServiceInstanceType.USER_PROVIDED;
@@ -332,6 +369,11 @@ public final class DefaultServices implements Services {
             .otherwiseIfEmpty(Mono.just(ServiceEntity.builder().build()));
     }
 
+    private static Mono<String> getServiceId(CloudFoundryClient cloudFoundryClient, String servicePlanId) {
+        return requestGetServicePlan(cloudFoundryClient, servicePlanId)
+            .map(response -> response.getEntity().getServiceId());
+    }
+
     private static Mono<String> getServiceIdByName(CloudFoundryClient cloudFoundryClient, String spaceId, String service) {
         return getSpaceService(cloudFoundryClient, spaceId, service)
             .map(ResourceUtils::getId);
@@ -370,8 +412,35 @@ public final class DefaultServices implements Services {
             .map(ResourceUtils::getId);
     }
 
+    private static Mono<String> getValidatedServicePlanId(CloudFoundryClient cloudFoundryClient, String planName, UnionServiceInstanceResource serviceInstance, String organizationId) {
+        if (planName == null || planName.isEmpty()) {
+            return Mono.empty();
+        }
+
+        String servicePlanId = serviceInstance.getEntity().getServicePlanId();
+
+        if (servicePlanId == null || servicePlanId.isEmpty()) {
+            return ExceptionUtils.illegalArgument("Plan does not exist for the %s service", serviceInstance.getEntity().getName());
+        }
+
+        return getServiceId(cloudFoundryClient, serviceInstance.getEntity().getServicePlanId())
+            .then(serviceId -> requestGetService(cloudFoundryClient, serviceId))
+            .where(DefaultServices::isUpdateable)
+            .otherwiseIfEmpty(ExceptionUtils.illegalArgument("Plan does not exist for the %s service", serviceInstance.getEntity().getName()))
+            .flatMap(response -> requestListServicePlans(cloudFoundryClient, response.getMetadata().getId()))
+            .filter(resource -> planName.equals(resource.getEntity().getName()))
+            .singleOrEmpty()
+            .otherwiseIfEmpty(ExceptionUtils.illegalArgument("New service plan %s not found", planName))
+            .then(resource -> checkVisibility(cloudFoundryClient, organizationId, resource));
+    }
+
     private static boolean isNotInProgress(String state) {
         return !state.equals("in progress");
+    }
+
+    private static boolean isUpdateable(GetServiceResponse response) {
+        return response.getEntity().getPlanUpdateable();
+
     }
 
     private static boolean isUserProvidedService(UnionServiceInstanceResource serviceInstance) {
@@ -521,6 +590,16 @@ public final class DefaultServices implements Services {
                     .build()));
     }
 
+    private static Flux<ServicePlanVisibilityResource> requestListServicePlanVisibilities(CloudFoundryClient cloudFoundryClient, String organizationId, String servicePlanId) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.servicePlanVisibilities()
+                .list(ListServicePlanVisibilitiesRequest.builder()
+                    .organizationId(organizationId)
+                    .page(page)
+                    .servicePlanId(servicePlanId)
+                    .build()));
+    }
+
     private static Flux<ServicePlanResource> requestListServicePlans(CloudFoundryClient cloudFoundryClient, String serviceId) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.servicePlans()
@@ -551,7 +630,7 @@ public final class DefaultServices implements Services {
 
     private static Mono<UpdateServiceInstanceResponse> requestServiceInstanceUpdate(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String newName) {
         return cloudFoundryClient.serviceInstances()
-            .update(UpdateServiceInstanceRequest.builder()
+            .update(org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest.builder()
                 .name(newName)
                 .serviceInstanceId(serviceInstanceId)
                 .build());
@@ -619,6 +698,30 @@ public final class DefaultServices implements Services {
         return servicePlans.stream()
             .map(DefaultServices::toServicePlan)
             .collect(Collectors.toList());
+    }
+
+    private static Mono<UpdateServiceInstanceResponse> updateServiceInstance(CloudFoundryClient cloudFoundryClient, UpdateServiceInstanceRequest request, String serviceInstanceId,
+                                                                             String servicePlanId) {
+        org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest.UpdateServiceInstanceRequestBuilder builder = org.cloudfoundry.client.v2.serviceinstances
+            .UpdateServiceInstanceRequest.builder();
+
+        if (!servicePlanId.isEmpty()) {
+            builder.servicePlanId(servicePlanId);
+        }
+
+        if (!request.getParameters().isEmpty()) {
+            builder.parameters(request.getParameters());
+        }
+
+        if (!request.getTags().isEmpty()) {
+            builder.tags(request.getTags());
+        }
+
+        return cloudFoundryClient.serviceInstances()
+            .update(builder
+                .acceptsIncomplete(true)
+                .serviceInstanceId(serviceInstanceId)
+                .build());
     }
 
     private static Mono<Void> waitForCreateInstance(CloudFoundryClient cloudFoundryClient, AbstractServiceInstanceResource serviceInstance) {
