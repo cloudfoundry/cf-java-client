@@ -87,7 +87,7 @@ public final class DefaultSpaces implements Spaces {
             .when(ValidationUtils.validate(request), this.organizationId)
             .then(function((validRequest, organizationId) -> getOrganizationSpaceIdWhere(this.cloudFoundryClient, organizationId, validRequest.getName(), sshEnabled(false))))
             .then(spaceId -> requestUpdateSpaceSsh(this.cloudFoundryClient, spaceId, true))
-            .after();
+            .then();
     }
 
     @Override
@@ -118,7 +118,7 @@ public final class DefaultSpaces implements Spaces {
                     requestAssociateSpaceManagerByUsername(this.cloudFoundryClient, spaceId, username),
                     requestAssociateSpaceDeveloperByUsername(this.cloudFoundryClient, spaceId, username)
                 )))
-            .after();
+            .then();
     }
 
     @Override
@@ -135,7 +135,7 @@ public final class DefaultSpaces implements Spaces {
             .when(ValidationUtils.validate(request), this.organizationId)
             .then(function((validRequest, organizationId) -> getOrganizationSpaceIdWhere(this.cloudFoundryClient, organizationId, validRequest.getName(), sshEnabled(true))))
             .then(spaceId -> requestUpdateSpaceSsh(this.cloudFoundryClient, spaceId, false))
-            .after();
+            .then();
     }
 
     @Override
@@ -163,7 +163,7 @@ public final class DefaultSpaces implements Spaces {
             .then(function((validRequest, organizationId1) -> getOrganizationSpaceId(this.cloudFoundryClient, organizationId1, request.getName())
                 .and(Mono.just(validRequest))))
             .then(function((spaceId, validRequest) -> requestUpdateSpace(this.cloudFoundryClient, spaceId, validRequest.getNewName())))
-            .after();
+            .then();
 
     }
 

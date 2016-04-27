@@ -40,7 +40,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
                 .serviceName("p-redis") //TODO: Replace with derived value
                 .serviceInstanceName(serviceInstanceName)
                 .build())
-            .after(this.cloudFoundryOperations.services()
+            .then(this.cloudFoundryOperations.services()
                 .getInstance(GetServiceInstanceRequest.builder()
                     .name(serviceInstanceName)
                     .build()))

@@ -101,7 +101,7 @@ public final class DefaultServices implements Services {
                     Mono.just(validRequest)
                 )))
             .then(function((applicationId, serviceInstanceId, validRequest) -> createServiceBinding(this.cloudFoundryClient, applicationId, serviceInstanceId, validRequest.getParameters())))
-            .after();
+            .then();
     }
 
     @Override
@@ -121,8 +121,7 @@ public final class DefaultServices implements Services {
                     getServicePlanIdByName(this.cloudFoundryClient, serviceId, validRequest.getPlanName())
                 )))
             .then(function((validRequest, spaceId, planId) -> createServiceInstance(this.cloudFoundryClient, spaceId, planId, validRequest)))
-            .then(serviceInstance -> waitForCreateInstance(this.cloudFoundryClient, serviceInstance))
-            .after();
+            .then(serviceInstance -> waitForCreateInstance(this.cloudFoundryClient, serviceInstance));
     }
 
     @Override
@@ -135,7 +134,7 @@ public final class DefaultServices implements Services {
                     getSpaceServiceInstanceId(this.cloudFoundryClient, validRequest.getServiceInstanceName(), spaceId)
                 )))
             .then(function((validRequest, serviceInstanceId) -> requestCreateServiceKey(this.cloudFoundryClient, serviceInstanceId, validRequest.getServiceKeyName(), validRequest.getParameters())))
-            .after();
+            .then();
     }
 
     @Override
@@ -150,7 +149,7 @@ public final class DefaultServices implements Services {
                     .spaceId(spaceId)
                     .syslogDrainUrl(validRequest.getSyslogDrainUrl())
                     .build())))
-            .after();
+            .then();
     }
 
     @Override
@@ -159,7 +158,7 @@ public final class DefaultServices implements Services {
             .when(ValidationUtils.validate(request), this.spaceId)
             .then(function((validRequest, spaceId) -> getSpaceServiceInstance(this.cloudFoundryClient, validRequest.getName(), spaceId)))
             .then(serviceInstance -> deleteServiceInstance(this.cloudFoundryClient, serviceInstance))
-            .after();
+            .then();
     }
 
     @Override
@@ -228,7 +227,7 @@ public final class DefaultServices implements Services {
             .then(function((validRequest, serviceInstance) ->
                 renameServiceInstance(this.cloudFoundryClient, serviceInstance, validRequest.getNewName())
             ))
-            .after();
+            .then();
     }
 
     @Override
@@ -243,7 +242,7 @@ public final class DefaultServices implements Services {
                 )))
             .then(function((serviceInstanceName, applicationId, serviceInstanceId) -> getServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId, serviceInstanceName)))
             .then(serviceBindingId -> deleteServiceBinding(this.cloudFoundryClient, serviceBindingId))
-            .after();
+            .then();
     }
 
     private static ServiceInstanceType convertToInstanceType(String type) {
@@ -631,7 +630,7 @@ public final class DefaultServices implements Services {
             .map(DefaultServices::extractState)
             .where(DefaultServices::isNotInProgress)
             .repeatWhenEmpty(DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
-            .after();
+            .then();
     }
 
     private Mono<List<ServicePlanResource>> getServicePlans(CloudFoundryClient cloudFoundryClient, String serviceId) {

@@ -90,7 +90,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
                 getOrganizationQuotaId(this.cloudFoundryClient, validRequest.getQuotaName())
             ))
             .then(function(((organizationId, quotaDefinitionId) -> requestUpdateOrganization(this.cloudFoundryClient, organizationId, quotaDefinitionId))))
-            .after();
+            .then();
     }
 
     @Override

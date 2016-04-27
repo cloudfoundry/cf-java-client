@@ -93,7 +93,7 @@ public final class DefaultRoutes implements Routes {
                     Mono.just(validRequest)
                 )))
             .then(function((spaceId, domainId, validRequest) -> requestCreateRoute(this.cloudFoundryClient, domainId, validRequest.getHost(), validRequest.getPath(), spaceId)))
-            .after();
+            .then();
     }
 
     @Override
@@ -116,7 +116,7 @@ public final class DefaultRoutes implements Routes {
                 .and(Mono.just(routeId)))
             .filter(predicate((applicationResources, routeId) -> isOrphan(applicationResources)))
             .flatMap(function((applicationResources, routeId) -> deleteRoute(this.cloudFoundryClient, routeId)))
-            .after();
+            .then();
     }
 
     @Override
@@ -144,7 +144,7 @@ public final class DefaultRoutes implements Routes {
                     getApplicationId(this.cloudFoundryClient, validRequest.getApplicationName(), spaceId)
                 )))
             .then(function((routeId, applicationId) -> requestAssociateRoute(this.cloudFoundryClient, applicationId, routeId)))
-            .after();
+            .then();
     }
 
     @Override

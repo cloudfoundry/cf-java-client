@@ -23,7 +23,7 @@ Most projects will need two dependencies; the Operations API and an implementati
     <dependency>
         <groupId>io.projectreactor</groupId>
         <artifactId>reactor-core</artifactId>
-        <version>2.5.0.M3</version>
+        <version>2.5.0.BUILD-SNAPSHOT</version>
     </dependency>
     ...
 </dependencies>
@@ -148,14 +148,14 @@ Once you've got a reference to the `CloudFoundryOperations`, it's time to start 
 cloudFoundryOperations.organizations()
     .list()
     .map(Organization::getName)
-    .consume(System.out::println);
+    .subscribe(System.out::println);
 ```
 
 To relate the example to the description above the following happens:
 
 1. `.list()` – Lists the Cloud Foundry organizations as a `Flux` of elements of type `Organization`.
 1. `.map(...)` – Maps each organization to its name (type `String`).  This example uses a method reference; the equivalent lambda would look like `organization -> organization.getName()`.
-1. `consume...` – The terminal operation that consumes each name in the `Flux`.  Again, this example uses a method reference and the equivalent lambda would look like `name -> System.out.println(name)`.
+1. `subscribe...` – The terminal operation that receives each name in the `Flux`.  Again, this example uses a method reference and the equivalent lambda would look like `name -> System.out.println(name)`.
 
 ### `CloudFoundryClient` APIs
 

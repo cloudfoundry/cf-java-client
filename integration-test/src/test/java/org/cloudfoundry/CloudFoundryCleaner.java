@@ -151,23 +151,23 @@ final class CloudFoundryCleaner {
                     .orElse(r -> true);
 
                 return Flux.empty()
-                    .after(cleanBuildpacks(this.cloudFoundryClient, buildpackPredicate))
-                    .after(cleanFeatureFlags(this.cloudFoundryClient, featureFlagPredicate))
-                    .after(cleanRoutes(this.cloudFoundryClient, routePredicate))
-                    .after(cleanApplicationsV2(this.cloudFoundryClient, applicationV2Predicate))
-                    .after(cleanApplicationsV3(this.cloudFoundryClient, applicationsV3Predicate))
-                    .after(cleanPackages(this.cloudFoundryClient, packagePredicate))
-                    .after(cleanServiceInstances(this.cloudFoundryClient, serviceInstancePredicate))
-                    .after(cleanUserProvidedServiceInstances(this.cloudFoundryClient, userProvidedServiceInstancePredicate))
-                    .after(cleanDomains(this.cloudFoundryClient, domainPredicate))
-                    .after(cleanPrivateDomains(this.cloudFoundryClient, privateDomainPredicate))
-                    .after(cleanSpaces(this.cloudFoundryClient, spacePredicate))
-                    .after(cleanOrganizations(this.cloudFoundryClient, organizationPredicate));
+                    .thenMany(cleanBuildpacks(this.cloudFoundryClient, buildpackPredicate))
+                    .thenMany(cleanFeatureFlags(this.cloudFoundryClient, featureFlagPredicate))
+                    .thenMany(cleanRoutes(this.cloudFoundryClient, routePredicate))
+                    .thenMany(cleanApplicationsV2(this.cloudFoundryClient, applicationV2Predicate))
+                    .thenMany(cleanApplicationsV3(this.cloudFoundryClient, applicationsV3Predicate))
+                    .thenMany(cleanPackages(this.cloudFoundryClient, packagePredicate))
+                    .thenMany(cleanServiceInstances(this.cloudFoundryClient, serviceInstancePredicate))
+                    .thenMany(cleanUserProvidedServiceInstances(this.cloudFoundryClient, userProvidedServiceInstancePredicate))
+                    .thenMany(cleanDomains(this.cloudFoundryClient, domainPredicate))
+                    .thenMany(cleanPrivateDomains(this.cloudFoundryClient, privateDomainPredicate))
+                    .thenMany(cleanSpaces(this.cloudFoundryClient, spacePredicate))
+                    .thenMany(cleanOrganizations(this.cloudFoundryClient, organizationPredicate));
             }))
             .doOnSubscribe(s -> this.logger.debug(">> CLEANUP <<"))
             .doOnError(Throwable::printStackTrace)
             .doOnComplete(() -> this.logger.debug("<< CLEANUP >>"))
-            .after()
+            .then()
             .get(Duration.ofMinutes(10));
     }
 
@@ -180,7 +180,7 @@ final class CloudFoundryCleaner {
             .filter(predicate)
             .map(ResourceUtils::getId)
             .flatMap(applicationId -> removeServiceBindings(cloudFoundryClient, applicationId)
-                .after(() -> Flux.just(applicationId)))
+                .thenMany(Flux.just(applicationId)))
             .flatMap(applicationId -> cloudFoundryClient.applicationsV2()
                 .delete(DeleteApplicationRequest.builder()
                     .applicationId(applicationId)
@@ -248,7 +248,7 @@ final class CloudFoundryCleaner {
                             .name(flagEntity.getName())
                             .enabled(standardFeatureFlags.get(flagEntity.getName()))
                             .build())
-                        .after();
+                        .then();
                 }
                 return Mono.empty();
             });

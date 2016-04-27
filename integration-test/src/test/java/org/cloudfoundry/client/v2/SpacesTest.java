@@ -269,7 +269,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .async(true)
                     .build())
                 .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))
-                .after(Mono.just(spaceId)))
+                .then(Mono.just(spaceId)))
             .flatMap(spaceId -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.spaces()
                     .list(ListSpacesRequest.builder()
@@ -1404,7 +1404,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .organizationId(organizationId)
                 .username(username)
                 .build())
-            .after(PaginationUtils
+            .then(PaginationUtils
                 .requestResources(page -> cloudFoundryClient.users()
                     .list(ListUsersRequest.builder()
                         .organizationId(organizationId)

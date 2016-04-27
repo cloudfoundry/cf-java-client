@@ -114,7 +114,7 @@ public final class DefaultOrganizations implements Organizations {
             .then(validRequest -> getOrganizationId(this.cloudFoundryClient, validRequest.getName())
                 .and(Mono.just(validRequest)))
             .then(function((organizationId, validRequest) -> requestUpdateOrganization(this.cloudFoundryClient, organizationId, validRequest.getNewName())))
-            .after();
+            .then();
     }
 
     private static Mono<String> createOrganization(CloudFoundryClient cloudFoundryClient, CreateOrganizationRequest request) {
@@ -312,7 +312,7 @@ public final class DefaultOrganizations implements Organizations {
                 requestAssociateOrganizationManagerByUsername(cloudFoundryClient, organizationId, username),
                 requestAssociateOrganizationUserByUsername(cloudFoundryClient, organizationId, username)
             )
-            .after();
+            .then();
     }
 
     private static OrganizationDetail toOrganizationDetail(List<String> domains, OrganizationQuota organizationQuota, List<SpaceQuota> spacesQuotas, List<String> spaces,

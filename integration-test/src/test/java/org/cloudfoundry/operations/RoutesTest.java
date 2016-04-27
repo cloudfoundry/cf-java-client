@@ -67,7 +67,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = getPath();
 
         createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
-            .after(this.cloudFoundryOperations.routes()
+            .then(this.cloudFoundryOperations.routes()
                 .check(CheckRouteRequest.builder()
                     .domain(domainName)
                     .host(hostName)
@@ -84,7 +84,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = getPath();
 
         createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
-            .after(this.cloudFoundryOperations.routes()
+            .then(this.cloudFoundryOperations.routes()
                 .check(CheckRouteRequest.builder()
                     .domain(domainName)
                     .host(hostName)
@@ -118,13 +118,13 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = getPath();
 
         createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
-            .after(this.cloudFoundryOperations.routes()
+            .then(this.cloudFoundryOperations.routes()
                 .delete(DeleteRouteRequest.builder()
                     .domain(domainName)
                     .host(hostName)
                     .path(path)
                     .build()))
-            .after(this.cloudFoundryOperations.routes()
+            .then(this.cloudFoundryOperations.routes()
                 .check(CheckRouteRequest.builder()
                     .domain(domainName)
                     .host(hostName)
@@ -157,9 +157,9 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = getPath();
 
         createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
-            .after(this.cloudFoundryOperations.routes()
+            .then(this.cloudFoundryOperations.routes()
                 .deleteOrphanedRoutes())
-            .after(this.cloudFoundryOperations.routes()
+            .then(this.cloudFoundryOperations.routes()
                 .check(CheckRouteRequest.builder()
                     .domain(domainName)
                     .host(hostName)
@@ -176,8 +176,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = getPath();
 
         createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
-            .flux()
-            .after(() -> this.cloudFoundryOperations.routes()
+            .thenMany(this.cloudFoundryOperations.routes()
                 .list(ListRoutesRequest.builder()
                     .level(ORGANIZATION)
                     .build()))
@@ -193,8 +192,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = getPath();
 
         createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
-            .flux()
-            .after(() -> this.cloudFoundryOperations.routes()
+            .thenMany(this.cloudFoundryOperations.routes()
                 .list(ListRoutesRequest.builder()
                     .level(SPACE)
                     .build()))
@@ -212,7 +210,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = getPath();
 
         createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
-            .after(this.cloudFoundryOperations.routes()
+            .then(this.cloudFoundryOperations.routes()
                 .map(MapRouteRequest.builder()
                     .applicationName(applicationName)
                     .domain(domainName)
@@ -232,7 +230,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = getPath();
 
         createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
-            .after(this.cloudFoundryOperations.routes()
+            .then(this.cloudFoundryOperations.routes()
                 .unmap(UnmapRouteRequest.builder()
                     .applicationName(applicationName)
                     .domain(domainName)
@@ -249,7 +247,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .domain(domainName)
                 .organization(organizationName)
                 .build())
-            .after(cloudFoundryOperations.routes()
+            .then(cloudFoundryOperations.routes()
                 .create(CreateRouteRequest.builder()
                     .domain(domainName)
                     .host(hostName)

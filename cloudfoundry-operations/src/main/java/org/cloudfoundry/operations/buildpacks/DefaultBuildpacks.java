@@ -52,7 +52,7 @@ public final class DefaultBuildpacks implements Buildpacks {
                     requestCreateBuildpack(this.cloudFoundryClient, validRequest.getName(), validRequest.getPosition(), validRequest.getEnable())
                 ))
             .then(function((validRequest, response) -> requestUploadBuildpackBits(this.cloudFoundryClient, ResourceUtils.getId(response), validRequest.getFileName(), validRequest.getBuildpack())))
-            .after();
+            .then();
     }
 
     @Override

@@ -58,8 +58,7 @@ public final class JobUtils {
 
         return job
             .where(entity -> "failed".equals(entity.getStatus()))
-            .then(JobUtils::getError)
-            .after();
+            .then(JobUtils::getError);
     }
 
     private static Mono<Void> getError(JobEntity entity) {

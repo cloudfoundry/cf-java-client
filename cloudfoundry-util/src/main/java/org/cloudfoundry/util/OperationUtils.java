@@ -58,7 +58,7 @@ public final class OperationUtils {
         return source -> source
             .then(in -> thenFunction
                 .apply(in)
-                .after(Mono.just(in)));
+                .then(Mono.just(in)));
     }
 
 }

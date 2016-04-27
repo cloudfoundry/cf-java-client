@@ -1055,13 +1055,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     private static Mono<ApplicationInstanceInfo> startApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestUpdateApplicationState(cloudFoundryClient, applicationId, "STARTED")
-            .after(waitForStagingApplication(cloudFoundryClient, applicationId))
-            .after(waitForStartingInstanceInfo(cloudFoundryClient, applicationId));
+            .then(waitForStagingApplication(cloudFoundryClient, applicationId))
+            .then(waitForStartingInstanceInfo(cloudFoundryClient, applicationId));
     }
 
     private static Mono<ApplicationInstanceInfo> uploadAndStartApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return uploadApplication(cloudFoundryClient, applicationId)
-            .after(startApplication(cloudFoundryClient, applicationId));
+            .then(startApplication(cloudFoundryClient, applicationId));
     }
 
     private static Mono<Void> uploadApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {

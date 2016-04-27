@@ -53,7 +53,6 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .domain("invalid-domain")
                 .organization(this.organizationName)
                 .build())
-            .after()
             .subscribe(testSubscriber()
                 .assertError(CloudFoundryException.class, "CF-DomainInvalid(130001): The domain is invalid: name format"));
     }
@@ -64,8 +63,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
         String targetOrganizationName = getOrganizationName();
 
         requestCreateOrganization(this.cloudFoundryOperations, targetOrganizationName)
-            .after(requestCreateDomain(this.cloudFoundryOperations, domainName, this.organizationName))
-            .after(this.cloudFoundryOperations.domains()
+            .then(requestCreateDomain(this.cloudFoundryOperations, domainName, this.organizationName))
+            .then(this.cloudFoundryOperations.domains()
                 .share(ShareDomainRequest.builder()
                     .domain(domainName)
                     .organization(targetOrganizationName)
@@ -79,9 +78,9 @@ public final class DomainsTest extends AbstractIntegrationTest {
         String targetOrganizationName = getOrganizationName();
 
         requestCreateOrganization(this.cloudFoundryOperations, targetOrganizationName)
-            .after(requestCreateDomain(this.cloudFoundryOperations, domainName, this.organizationName))
-            .after(requestShareDomain(this.cloudFoundryOperations, targetOrganizationName, domainName))
-            .after(this.cloudFoundryOperations.domains()
+            .then(requestCreateDomain(this.cloudFoundryOperations, domainName, this.organizationName))
+            .then(requestShareDomain(this.cloudFoundryOperations, targetOrganizationName, domainName))
+            .then(this.cloudFoundryOperations.domains()
                 .unshare(UnshareDomainRequest.builder()
                     .domain(domainName)
                     .organization(targetOrganizationName)

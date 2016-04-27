@@ -49,14 +49,14 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
         fail("TODO: finish story https://www.pivotaltracker.com/projects/816799/stories/101527322");
     }
 
+    @Ignore("TODO: ensure that a created quota exists in the list")
     @Test
     public void list() {
-
-        PaginationUtils.requestResources(page -> this.cloudFoundryClient.organizationQuotaDefinitions()
-            .list(ListOrganizationQuotaDefinitionsRequest.builder()
-                .page(page)
-                .build()))
-            .after()
+        PaginationUtils
+            .requestResources(page -> this.cloudFoundryClient.organizationQuotaDefinitions()
+                .list(ListOrganizationQuotaDefinitionsRequest.builder()
+                    .page(page)
+                    .build()))
             .subscribe(this.testSubscriber());
     }
 

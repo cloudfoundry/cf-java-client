@@ -72,7 +72,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
             .then(organizationId -> requestCreatePrivateDomain(this.cloudFoundryClient, organizationId, privateDomainName))
             .then(privateDomainResource -> requestDeletePrivateDomain(this.cloudFoundryClient, ResourceUtils.getId(privateDomainResource))
                 .then(jobResource -> JobUtils.waitForCompletion(this.cloudFoundryClient, jobResource))
-                .after(Mono.just(privateDomainResource)))
+                .then(Mono.just(privateDomainResource)))
             .then(privateDomainResource -> requestGetPrivateDomain(this.cloudFoundryClient, ResourceUtils.getId(privateDomainResource)))
             .subscribe(testSubscriber()
                 .assertErrorMatch(CloudFoundryException.class, "CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"));

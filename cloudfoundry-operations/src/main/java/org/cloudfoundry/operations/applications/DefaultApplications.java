@@ -156,12 +156,11 @@ public final class DefaultApplications implements Applications {
                 .when(
                     Mono.just(validRequest),
                     copyBits(this.cloudFoundryClient, sourceApplicationId, targetApplicationId)
-                        .after(Mono.just(targetApplicationId))
+                        .then(Mono.just(targetApplicationId))
                 )))
             .where(predicate((validRequest, targetApplicationId) -> Optional.ofNullable(validRequest.getRestart()).orElse(false)))
             .then(function((validRequest, targetApplicationId) ->
-                restartApplication(this.cloudFoundryClient, validRequest.getTargetName(), targetApplicationId, validRequest.getStagingTimeout(), validRequest.getStartupTimeout())))
-            .after();
+                restartApplication(this.cloudFoundryClient, validRequest.getTargetName(), targetApplicationId, validRequest.getStagingTimeout(), validRequest.getStartupTimeout())));
     }
 
     @Override
@@ -170,7 +169,7 @@ public final class DefaultApplications implements Applications {
             .when(ValidationUtils.validate(request), this.spaceId)
             .then(function((validRequest, spaceId) -> getRoutesAndApplicationId(this.cloudFoundryClient, validRequest, spaceId, Optional.ofNullable(request.getDeleteRoutes()).orElse(false))))
             .then(function((routes, applicationId) -> deleteRoutes(this.cloudFoundryClient, routes)
-                .after(Mono.just(applicationId))))
+                .then(Mono.just(applicationId))))
             .as(thenKeep(applicationId -> removeServiceBindings(this.cloudFoundryClient, applicationId)))
             .then(applicationId -> requestDeleteApplication(this.cloudFoundryClient, applicationId));
     }
@@ -181,7 +180,7 @@ public final class DefaultApplications implements Applications {
             .when(ValidationUtils.validate(request), this.spaceId)
             .then(function((validRequest, spaceId) -> getApplicationIdWhere(this.cloudFoundryClient, validRequest.getName(), spaceId, sshEnabled(true))))
             .then(applicationId -> requestUpdateApplicationSsh(this.cloudFoundryClient, applicationId, false))
-            .after();
+            .then();
     }
 
     @Override
@@ -190,7 +189,7 @@ public final class DefaultApplications implements Applications {
             .when(ValidationUtils.validate(request), this.spaceId)
             .then(function((validRequest, spaceId) -> getApplicationIdWhere(this.cloudFoundryClient, validRequest.getName(), spaceId, sshEnabled(false))))
             .then(applicationId -> requestUpdateApplicationSsh(this.cloudFoundryClient, applicationId, true))
-            .after();
+            .then();
     }
 
     @Override
@@ -284,8 +283,7 @@ public final class DefaultApplications implements Applications {
             .as(thenKeep(function((applicationId, validRequest) -> stopApplication(this.cloudFoundryClient, applicationId))))
             .where(predicate((applicationId, validRequest) -> !Optional.ofNullable(validRequest.getNoStart()).orElse(false)))
             .then(function((applicationId, validRequest) -> startApplicationAndWait(this.cloudFoundryClient, validRequest.getName(), applicationId, validRequest.getStagingTimeout(),
-                validRequest.getStartupTimeout())))
-            .after();
+                validRequest.getStartupTimeout())));
     }
 
     @Override
@@ -298,7 +296,7 @@ public final class DefaultApplications implements Applications {
                     Mono.just(validRequest.getNewName())
                 )))
             .then(function((applicationId, newName) -> requestUpdateApplicationRename(this.cloudFoundryClient, applicationId, newName)))
-            .after();
+            .then();
     }
 
     @Override
@@ -309,8 +307,7 @@ public final class DefaultApplications implements Applications {
                 .just(validRequest)
                 .and(getApplicationId(this.cloudFoundryClient, validRequest.getName(), spaceId))))
             .then(function((validRequest, applicationId) -> restageApplication(this.cloudFoundryClient, validRequest.getName(), applicationId, validRequest.getStagingTimeout(),
-                validRequest.getStartupTimeout())))
-            .after();
+                validRequest.getStartupTimeout())));
     }
 
     @Override
@@ -321,8 +318,7 @@ public final class DefaultApplications implements Applications {
                 .and(Mono.just(validRequest))))
             .then(function((resource, validRequest) -> stopApplicationIfNotStopped(cloudFoundryClient, resource)
                 .then(stoppedApplication -> startApplicationAndWait(this.cloudFoundryClient, validRequest.getName(), ResourceUtils.getId(stoppedApplication), validRequest.getStagingTimeout(),
-                    validRequest.getStartupTimeout()))))
-            .after();
+                    validRequest.getStartupTimeout()))));
     }
 
     @Override
@@ -358,8 +354,7 @@ public final class DefaultApplications implements Applications {
                 )))
             .where(predicate(DefaultApplications::isRestartRequired))
             .then(function((validRequest, resource) ->
-                restartApplication(this.cloudFoundryClient, validRequest.getName(), ResourceUtils.getId(resource), validRequest.getStagingTimeout(), validRequest.getStartupTimeout())))
-            .after();
+                restartApplication(this.cloudFoundryClient, validRequest.getName(), ResourceUtils.getId(resource), validRequest.getStagingTimeout(), validRequest.getStartupTimeout())));
     }
 
     @Override
@@ -377,7 +372,7 @@ public final class DefaultApplications implements Applications {
                     ResourceUtils.getId(resource),
                     addToEnvironment(getEnvironment(resource), validRequest.getVariableName(), validRequest.getVariableValue())
                 )))
-            .after();
+            .then();
     }
 
     @Override
@@ -390,7 +385,7 @@ public final class DefaultApplications implements Applications {
                     Mono.just(request.getType())
                 )))
             .then(function((applicationId, type) -> updateHealthCheck(this.cloudFoundryClient, applicationId, type)))
-            .after();
+            .then();
     }
 
     @Override
@@ -408,8 +403,7 @@ public final class DefaultApplications implements Applications {
             .then(function((validRequest, spaceId) -> getApplicationIdWhere(this.cloudFoundryClient, validRequest.getName(), spaceId, isNotIn(STARTED_STATE))
                 .and(Mono.just(validRequest))))
             .then(function((applicationId, validRequest) ->
-                startApplicationAndWait(this.cloudFoundryClient, validRequest.getName(), applicationId, validRequest.getStagingTimeout(), validRequest.getStartupTimeout())))
-            .after();
+                startApplicationAndWait(this.cloudFoundryClient, validRequest.getName(), applicationId, validRequest.getStagingTimeout(), validRequest.getStartupTimeout())));
     }
 
     @Override
@@ -418,7 +412,7 @@ public final class DefaultApplications implements Applications {
             .when(ValidationUtils.validate(request), this.spaceId)
             .then(function((validRequest, spaceId) -> getApplicationIdWhere(this.cloudFoundryClient, validRequest.getName(), spaceId, isNotIn(STOPPED_STATE))))
             .then(applicationId -> stopApplication(this.cloudFoundryClient, applicationId))
-            .after();
+            .then();
     }
 
     @Override
@@ -432,7 +426,7 @@ public final class DefaultApplications implements Applications {
                     ResourceUtils.getId(resource),
                     removeFromEnvironment(getEnvironment(resource), validRequest.getVariableName())
                 )))
-            .after();
+            .then();
     }
 
     private static Map<String, Object> addToEnvironment(Map<String, Object> environment, String variableName, Object variableValue) {
@@ -493,7 +487,7 @@ public final class DefaultApplications implements Applications {
             .orElse(Flux.empty())
             .map(Route::getId)
             .flatMap(routeId -> deleteRoute(cloudFoundryClient, routeId))
-            .after();
+            .then();
     }
 
     private static String deriveHostname(PushApplicationRequest request, RandomWords randomWords) {
@@ -805,7 +799,7 @@ public final class DefaultApplications implements Applications {
             .then(organizationId -> getDomainId(cloudFoundryClient, validRequest.getDomain(), organizationId))
             .then(domainId -> getPushRouteId(cloudFoundryClient, domainId, validRequest, spaceId, randomWords))
             .then(routeId -> requestAssociateRoute(cloudFoundryClient, applicationId, routeId))
-            .after();
+            .then();
     }
 
     private static Map<String, Object> removeFromEnvironment(Map<String, Object> environment, String variableName) {
@@ -818,7 +812,7 @@ public final class DefaultApplications implements Applications {
         return requestListServiceBindings(cloudFoundryClient, applicationId)
             .map(ResourceUtils::getId)
             .flatMap(serviceBindingId -> requestRemoveServiceBinding(cloudFoundryClient, applicationId, serviceBindingId))
-            .after();
+            .then();
     }
 
     private static Mono<ApplicationEnvironmentResponse> requestApplicationEnvironment(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -1162,25 +1156,25 @@ public final class DefaultApplications implements Applications {
                 .build());
     }
 
-    private static Mono<String> restageApplication(CloudFoundryClient cloudFoundryClient, String application, String applicationId, Duration stagingTimeout, Duration startupTimeout) {
+    private static Mono<Void> restageApplication(CloudFoundryClient cloudFoundryClient, String application, String applicationId, Duration stagingTimeout, Duration startupTimeout) {
         return requestRestageApplication(cloudFoundryClient, applicationId)
             .then(response -> waitForStaging(cloudFoundryClient, application, applicationId, stagingTimeout))
-            .then(state -> waitForRunning(cloudFoundryClient, application, applicationId, startupTimeout));
+            .then(waitForRunning(cloudFoundryClient, application, applicationId, startupTimeout));
     }
 
-    private static Mono<String> restartApplication(CloudFoundryClient cloudFoundryClient, String application, String applicationId, Duration stagingTimeout, Duration startupTimeout) {
+    private static Mono<Void> restartApplication(CloudFoundryClient cloudFoundryClient, String application, String applicationId, Duration stagingTimeout, Duration startupTimeout) {
         return stopApplication(cloudFoundryClient, applicationId)
-            .then(abstractApplicationResource -> startApplicationAndWait(cloudFoundryClient, application, applicationId, stagingTimeout, startupTimeout));
+            .then(startApplicationAndWait(cloudFoundryClient, application, applicationId, stagingTimeout, startupTimeout));
     }
 
     private static Predicate<AbstractApplicationResource> sshEnabled(Boolean enabled) {
         return resource -> enabled.equals(ResourceUtils.getEntity(resource).getEnableSsh());
     }
 
-    private static Mono<String> startApplicationAndWait(CloudFoundryClient cloudFoundryClient, String application, String applicationId, Duration stagingTimeout, Duration startupTimeout) {
+    private static Mono<Void> startApplicationAndWait(CloudFoundryClient cloudFoundryClient, String application, String applicationId, Duration stagingTimeout, Duration startupTimeout) {
         return requestUpdateApplicationState(cloudFoundryClient, applicationId, STARTED_STATE)
             .then(response -> waitForStaging(cloudFoundryClient, application, applicationId, stagingTimeout))
-            .then(state -> waitForRunning(cloudFoundryClient, application, applicationId, startupTimeout));
+            .then(waitForRunning(cloudFoundryClient, application, applicationId, startupTimeout));
     }
 
     private static Mono<AbstractApplicationResource> stopApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -1330,7 +1324,7 @@ public final class DefaultApplications implements Applications {
             .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
-    private static Mono<String> waitForRunning(CloudFoundryClient cloudFoundryClient, String application, String applicationId, Duration startupTimeout) {
+    private static Mono<Void> waitForRunning(CloudFoundryClient cloudFoundryClient, String application, String applicationId, Duration startupTimeout) {
         Duration timeout = Optional.ofNullable(startupTimeout).orElse(Duration.ofMinutes(5));
 
         return requestApplicationInstances(cloudFoundryClient, applicationId)
@@ -1341,10 +1335,11 @@ public final class DefaultApplications implements Applications {
             .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), timeout))
             .where(isRunning())
             .otherwiseIfEmpty(ExceptionUtils.illegalState("Application %s failed during start", application))
-            .otherwise(ExceptionUtils.replace(DelayTimeoutException.class, () -> ExceptionUtils.illegalState("Application %s timed out during start", application)));
+            .otherwise(ExceptionUtils.replace(DelayTimeoutException.class, () -> ExceptionUtils.illegalState("Application %s timed out during start", application)))
+            .then();
     }
 
-    private static Mono<String> waitForStaging(CloudFoundryClient cloudFoundryClient, String application, String applicationId, Duration stagingTimeout) {
+    private static Mono<Void> waitForStaging(CloudFoundryClient cloudFoundryClient, String application, String applicationId, Duration stagingTimeout) {
         Duration timeout = Optional.ofNullable(stagingTimeout).orElse(Duration.ofMinutes(15));
 
         return requestGetApplication(cloudFoundryClient, applicationId)
@@ -1353,7 +1348,8 @@ public final class DefaultApplications implements Applications {
             .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), timeout))
             .where(isStaged())
             .otherwiseIfEmpty(ExceptionUtils.illegalState("Application %s failed during staging", application))
-            .otherwise(ExceptionUtils.replace(DelayTimeoutException.class, () -> ExceptionUtils.illegalState("Application %s timed out during staging", application)));
+            .otherwise(ExceptionUtils.replace(DelayTimeoutException.class, () -> ExceptionUtils.illegalState("Application %s timed out during staging", application)))
+            .then();
     }
 
 }
