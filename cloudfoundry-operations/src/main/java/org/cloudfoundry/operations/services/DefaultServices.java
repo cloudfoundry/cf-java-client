@@ -38,7 +38,9 @@ import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceResource;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse;
-import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyResponse;
+import org.cloudfoundry.client.v2.servicekeys.AbstractServiceKeyResource;
+import org.cloudfoundry.client.v2.servicekeys.ListServiceKeysRequest;
+import org.cloudfoundry.client.v2.servicekeys.ServiceKeyResource;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanRequest;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanResponse;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
@@ -183,6 +185,19 @@ public final class DefaultServices implements Services {
                     getServiceEntity(this.cloudFoundryClient, Optional.ofNullable(servicePlanEntity.getServiceId()))
                 )))
             .map(function(DefaultServices::toServiceInstance));
+    }
+
+    @Override
+    public Mono<ServiceKey> getServiceKey(GetServiceKeyRequest request) {
+        return Mono
+            .when(ValidationUtils.validate(request), this.spaceId)
+            .then(function((validRequest, spaceId) -> Mono
+                .when(
+                    Mono.just(validRequest.getServiceKeyName()),
+                    getSpaceServiceInstanceId(this.cloudFoundryClient, validRequest.getServiceInstanceName(), spaceId)
+                )))
+            .then(function((serviceKey, serviceInstanceId) -> getServiceKey(this.cloudFoundryClient, serviceInstanceId, serviceKey)))
+            .map(DefaultServices::toServiceKey);
     }
 
     @Override
@@ -379,6 +394,12 @@ public final class DefaultServices implements Services {
             .map(ResourceUtils::getId);
     }
 
+    private static Mono<ServiceKeyResource> getServiceKey(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKey) {
+        return requestListServiceKeys(cloudFoundryClient, serviceInstanceId, serviceKey)
+            .single()
+            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Service key %s does not exist", serviceKey)));
+    }
+
     private static Mono<ServicePlanEntity> getServicePlanEntity(CloudFoundryClient cloudFoundryClient, String servicePlanId) {
         return Mono
             .justOrEmpty(servicePlanId)
@@ -480,13 +501,14 @@ public final class DefaultServices implements Services {
                 .build());
     }
 
-    private static Mono<CreateServiceKeyResponse> requestCreateServiceKey(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKey, Map<String, Object> parameters) {
+    private static Mono<AbstractServiceKeyResource> requestCreateServiceKey(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKey, Map<String, Object> parameters) {
         return cloudFoundryClient.serviceKeys()
             .create(org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyRequest.builder()
                 .serviceInstanceId(serviceInstanceId)
                 .name(serviceKey)
                 .parameters(parameters)
-                .build());
+                .build())
+            .cast(AbstractServiceKeyResource.class);
     }
 
     private static Mono<DeleteServiceBindingResponse> requestDeleteServiceBinding(CloudFoundryClient cloudFoundryClient, String serviceBindingId) {
@@ -590,6 +612,16 @@ public final class DefaultServices implements Services {
                     .build()));
     }
 
+    private static Flux<ServiceKeyResource> requestListServiceKeys(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKey) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.serviceKeys()
+                .list(ListServiceKeysRequest.builder()
+                    .serviceInstanceId(serviceInstanceId)
+                    .name(serviceKey)
+                    .page(page)
+                    .build()));
+    }
+
     private static Flux<ServicePlanVisibilityResource> requestListServicePlanVisibilities(CloudFoundryClient cloudFoundryClient, String organizationId, String servicePlanId) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.servicePlanVisibilities()
@@ -669,6 +701,13 @@ public final class DefaultServices implements Services {
             .tags(serviceInstanceEntity.getTags())
             .type(convertToInstanceType(serviceInstanceEntity.getType()))
             .updatedAt(lastOperation.getUpdatedAt())
+            .build();
+    }
+
+    private static ServiceKey toServiceKey(AbstractServiceKeyResource resource) {
+        return ServiceKey.builder()
+            .credentials(ResourceUtils.getEntity(resource).getCredentials())
+            .serviceKeyId(ResourceUtils.getId(resource))
             .build();
     }
 
