@@ -38,7 +38,7 @@ public final class ServicePlanVisibilityEntity {
     /**
      * The organization url
      *
-     * @param spaceUrl the organization url
+     * @param organizationUrl the organization url
      * @return the organization url
      */
     private final String organizationUrl;

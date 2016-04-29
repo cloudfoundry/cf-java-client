@@ -31,6 +31,7 @@ import org.cloudfoundry.client.v2.servicebindings.ServiceBindings;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
 import org.cloudfoundry.client.v2.servicekeys.ServiceKeys;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlans;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilities;
 import org.cloudfoundry.client.v2.services.Services;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
@@ -102,6 +103,8 @@ public abstract class AbstractOperationsTest {
 
     protected final ServicePlans servicePlans = mock(ServicePlans.class, RETURNS_SMART_NULLS);
 
+    protected final ServicePlanVisibilities servicePlanVisibilities = mock(ServicePlanVisibilities.class, RETURNS_SMART_NULLS);
+
     protected final Services services = mock(Services.class, RETURNS_SMART_NULLS);
 
     protected final SharedDomains sharedDomains = mock(SharedDomains.class, RETURNS_SMART_NULLS);
@@ -134,6 +137,7 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.serviceInstances()).thenReturn(this.serviceInstances);
         when(this.cloudFoundryClient.serviceKeys()).thenReturn(this.serviceKeys);
         when(this.cloudFoundryClient.servicePlans()).thenReturn(this.servicePlans);
+        when(this.cloudFoundryClient.servicePlanVisibilities()).thenReturn(this.servicePlanVisibilities);
         when(this.cloudFoundryClient.services()).thenReturn(this.services);
         when(this.cloudFoundryClient.sharedDomains()).thenReturn(this.sharedDomains);
         when(this.cloudFoundryClient.spaceQuotaDefinitions()).thenReturn(this.spaceQuotaDefinitions);
