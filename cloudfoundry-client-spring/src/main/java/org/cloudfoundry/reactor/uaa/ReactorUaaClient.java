@@ -31,19 +31,19 @@ import reactor.io.netty.http.HttpClient;
 /**
  * The Spring-based implementation of {@link UaaClient}
  */
-public final class SpringUaaClient implements UaaClient {
+public final class ReactorUaaClient implements UaaClient {
 
     private final SpringAccessTokenAdministration accessTokenAdministration;
 
     private final SpringIdentityZoneManagement identityZoneManagement;
 
     @Builder
-    SpringUaaClient(ConnectionContextSupplier cloudFoundryClient) {
+    ReactorUaaClient(ConnectionContextSupplier cloudFoundryClient) {
         this(cloudFoundryClient.getConnectionContext2().getAuthorizationProvider(), cloudFoundryClient.getConnectionContext2().getHttpClient(),
             cloudFoundryClient.getConnectionContext2().getObjectMapper(), cloudFoundryClient.getConnectionContext2().getRoot("token_endpoint"));
     }
 
-    SpringUaaClient(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
+    ReactorUaaClient(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
         this.accessTokenAdministration = new SpringAccessTokenAdministration(authorizationProvider, httpClient, objectMapper, root);
         this.identityZoneManagement = new SpringIdentityZoneManagement(authorizationProvider, httpClient, objectMapper, root);
     }

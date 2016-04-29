@@ -14,29 +14,25 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.logging;
+package org.cloudfoundry.reactor.uaa;
 
-import reactor.core.publisher.Flux;
+import org.cloudfoundry.reactor.AbstractRestTest;
+import org.junit.Test;
 
-/**
- * Main entry point to the Logging Client API
- */
-public interface LoggingClient {
+import static org.junit.Assert.assertNotNull;
 
-    /**
-     * Makes the Recent Logs request
-     *
-     * @param request the Recent Logs request
-     * @return the response from the Recent Logs request
-     */
-    Flux<LogMessage> recent(RecentLogsRequest request);
+public final class ReactorUaaClientTest extends AbstractRestTest {
 
-    /**
-     * Makes the Stream Logs request
-     *
-     * @param request the Stream Logs request
-     * @return the response from the Stream Logs request
-     */
-    Flux<LogMessage> stream(StreamLogsRequest request);
+    private final ReactorUaaClient client = new ReactorUaaClient(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+    @Test
+    public void accessTokenAdministration() {
+        assertNotNull(this.client.accessTokenAdministration());
+    }
+
+    @Test
+    public void identityZoneManagement() {
+        assertNotNull(this.client.identityZoneManagement());
+    }
 
 }

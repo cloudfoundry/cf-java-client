@@ -39,7 +39,7 @@ import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.cloudfoundry.client.v2.stacks.Stacks;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstances;
 import org.cloudfoundry.client.v2.users.Users;
-import org.cloudfoundry.logging.LoggingClient;
+import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.accesstokenadministration.AccessTokenAdministration;
 import org.junit.Before;
@@ -79,13 +79,13 @@ public abstract class AbstractOperationsTest {
 
     protected final Domains domains = mock(Domains.class, RETURNS_SMART_NULLS);
 
+    protected final DopplerClient dopplerClient = mock(DopplerClient.class, RETURNS_SMART_NULLS);
+
     protected final Events events = mock(Events.class, RETURNS_SMART_NULLS);
 
     protected final FeatureFlags featureFlags = mock(FeatureFlags.class, RETURNS_SMART_NULLS);
 
     protected final Jobs jobs = mock(Jobs.class, RETURNS_SMART_NULLS);
-
-    protected final LoggingClient loggingClient = mock(LoggingClient.class, RETURNS_SMART_NULLS);
 
     protected final OrganizationQuotaDefinitions organizationQuotaDefinitions = mock(OrganizationQuotaDefinitions.class, RETURNS_SMART_NULLS);
 
@@ -101,9 +101,9 @@ public abstract class AbstractOperationsTest {
 
     protected final ServiceKeys serviceKeys = mock(ServiceKeys.class, RETURNS_SMART_NULLS);
 
-    protected final ServicePlans servicePlans = mock(ServicePlans.class, RETURNS_SMART_NULLS);
-
     protected final ServicePlanVisibilities servicePlanVisibilities = mock(ServicePlanVisibilities.class, RETURNS_SMART_NULLS);
+
+    protected final ServicePlans servicePlans = mock(ServicePlans.class, RETURNS_SMART_NULLS);
 
     protected final Services services = mock(Services.class, RETURNS_SMART_NULLS);
 

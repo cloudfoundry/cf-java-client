@@ -118,9 +118,7 @@ public final class DefaultConnectionContext implements ConnectionContext {
     private static UriComponents normalize(UriComponentsBuilder builder) {
         UriComponents components = builder.build();
 
-        if ("wss".equals(components.getScheme())) {
-            builder.scheme("https");
-        }
+        builder.scheme("https");
 
         if (UNDEFINED_PORT == components.getPort()) {
             builder.port(DEFAULT_PORT);

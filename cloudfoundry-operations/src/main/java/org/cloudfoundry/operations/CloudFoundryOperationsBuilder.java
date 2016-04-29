@@ -21,7 +21,7 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
-import org.cloudfoundry.logging.LoggingClient;
+import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.PaginationUtils;
@@ -38,7 +38,7 @@ public final class CloudFoundryOperationsBuilder {
 
     private CloudFoundryClient cloudFoundryClient;
 
-    private LoggingClient loggingClient;
+    private DopplerClient dopplerClient;
 
     private String organization;
 
@@ -61,7 +61,7 @@ public final class CloudFoundryOperationsBuilder {
         Mono<String> spaceId = getSpaceId(this.cloudFoundryClient, organizationId, this.space);
         Mono<String> username = getUsername(this.cloudFoundryClient, this.uaaClient);
 
-        return new DefaultCloudFoundryOperations(this.cloudFoundryClient, getLoggingClient(this.loggingClient), organizationId, spaceId, username);
+        return new DefaultCloudFoundryOperations(this.cloudFoundryClient, getDopplerClient(this.dopplerClient), organizationId, spaceId, username);
     }
 
     /**
@@ -76,13 +76,13 @@ public final class CloudFoundryOperationsBuilder {
     }
 
     /**
-     * Configure the {@link LoggingClient} to use
+     * Configure the {@link DopplerClient} to use
      *
-     * @param loggingClient the {@link LoggingClient} to use
+     * @param dopplerClient the {@link DopplerClient} to use
      * @return {@code this}
      */
-    public CloudFoundryOperationsBuilder loggingClient(LoggingClient loggingClient) {
-        this.loggingClient = loggingClient;
+    public CloudFoundryOperationsBuilder dopplerClient(DopplerClient dopplerClient) {
+        this.dopplerClient = dopplerClient;
         return this;
     }
 
@@ -121,12 +121,12 @@ public final class CloudFoundryOperationsBuilder {
         return this;
     }
 
-    private static Mono<LoggingClient> getLoggingClient(LoggingClient loggingClient) {
-        if (loggingClient == null) {
-            return Mono.error(new IllegalStateException("LoggingClient must be set"));
+    private static Mono<DopplerClient> getDopplerClient(DopplerClient dopplerClient) {
+        if (dopplerClient == null) {
+            return Mono.error(new IllegalStateException("DopplerClient must be set"));
         }
 
-        return Mono.just(loggingClient);
+        return Mono.just(dopplerClient);
     }
 
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {

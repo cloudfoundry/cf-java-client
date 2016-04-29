@@ -25,12 +25,12 @@ import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
-import org.cloudfoundry.logging.LoggingClient;
+import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.CloudFoundryOperationsBuilder;
+import org.cloudfoundry.reactor.doppler.ReactorDopplerClient;
 import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
-import org.cloudfoundry.spring.logging.SpringLoggingClient;
-import org.cloudfoundry.reactor.uaa.SpringUaaClient;
+import org.cloudfoundry.reactor.uaa.ReactorUaaClient;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
@@ -80,18 +80,18 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    CloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient, LoggingClient loggingClient, UaaClient uaaClient, String organizationName, String spaceName) {
+    CloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient, DopplerClient dopplerClient, UaaClient uaaClient, String organizationName, String spaceName) {
         return new CloudFoundryOperationsBuilder()
             .cloudFoundryClient(cloudFoundryClient)
-            .loggingClient(loggingClient)
+            .dopplerClient(dopplerClient)
             .uaaClient(uaaClient)
             .target(organizationName, spaceName)
             .build();
     }
 
     @Bean
-    SpringLoggingClient loggingClient(SpringCloudFoundryClient cloudFoundryClient) {
-        return SpringLoggingClient.builder()
+    DopplerClient loggingClient(SpringCloudFoundryClient cloudFoundryClient) {
+        return ReactorDopplerClient.builder()
             .cloudFoundryClient(cloudFoundryClient)
             .build();
     }
@@ -250,8 +250,8 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    SpringUaaClient uaaClient(SpringCloudFoundryClient cloudFoundryClient) {
-        return SpringUaaClient.builder()
+    ReactorUaaClient uaaClient(SpringCloudFoundryClient cloudFoundryClient) {
+        return ReactorUaaClient.builder()
             .cloudFoundryClient(cloudFoundryClient)
             .build();
     }
