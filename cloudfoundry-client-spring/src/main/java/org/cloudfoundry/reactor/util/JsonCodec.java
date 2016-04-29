@@ -18,11 +18,11 @@ package org.cloudfoundry.reactor.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.Unpooled;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSource;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoSource;
 import reactor.core.subscriber.SubscriberBarrier;
@@ -30,35 +30,37 @@ import reactor.core.util.Exceptions;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
-public final class JsonCodec {
+final class JsonCodec {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    public static <T> Function<Flux<InputStream>, Flux<T>> decode(Class<T> type) {
+    static <T> Function<Flux<ByteBuf>, Mono<T>> decode(Class<T> type) {
         return decode(OBJECT_MAPPER, type);
     }
 
-    public static <T> Function<Flux<InputStream>, Flux<T>> decode(ObjectMapper objectMapper, Class<T> type) {
+    static <T> Function<Flux<ByteBuf>, Mono<T>> decode(ObjectMapper objectMapper, Class<T> type) {
         return source -> new JsonDecoder<>(source, objectMapper, type);
     }
 
-    public static <T> Function<Mono<T>, Mono<ByteBuf>> encode() {
+    static <T> Function<Mono<T>, Mono<ByteBuf>> encode() {
         return encode(OBJECT_MAPPER);
     }
 
-    public static <T> Function<Mono<T>, Mono<ByteBuf>> encode(ObjectMapper objectMapper) {
+    static <T> Function<Mono<T>, Mono<ByteBuf>> encode(ObjectMapper objectMapper) {
         return source -> new JsonEncoder<>(source, objectMapper);
     }
 
-    private static final class JsonDecoder<T> extends FluxSource<InputStream, T> {
+    private static final class JsonDecoder<T> extends MonoSource<ByteBuf, T> {
 
         private final ObjectMapper objectMapper;
 
         private final Class<T> type;
 
-        private JsonDecoder(Publisher<? extends InputStream> source, ObjectMapper objectMapper, Class<T> type) {
+        private JsonDecoder(Publisher<? extends ByteBuf> source, ObjectMapper objectMapper, Class<T> type) {
             super(source);
             this.objectMapper = objectMapper;
             this.type = type;
@@ -70,7 +72,9 @@ public final class JsonCodec {
         }
     }
 
-    private static final class JsonDecoderSubscriber<T> extends SubscriberBarrier<InputStream, T> {
+    private static final class JsonDecoderSubscriber<T> extends SubscriberBarrier<ByteBuf, T> {
+
+        private final List<ByteBuf> byteBufs = new ArrayList<>();
 
         private final ObjectMapper objectMapper;
 
@@ -90,6 +94,12 @@ public final class JsonCodec {
                 return;
             }
 
+            try {
+                this.subscriber.onNext(this.objectMapper.readValue(getInputStream(this.byteBufs), this.type));
+            } catch (IOException e) {
+                onError(e);
+            }
+
             this.done = true;
             this.subscriber.onComplete();
         }
@@ -106,17 +116,18 @@ public final class JsonCodec {
         }
 
         @Override
-        protected void doNext(InputStream inputStream) {
+        protected void doNext(ByteBuf byteBuf) {
             if (this.done) {
-                Exceptions.onNextDropped(inputStream);
+                Exceptions.onNextDropped(byteBuf);
                 return;
             }
 
-            try {
-                this.subscriber.onNext(this.objectMapper.readValue(inputStream, this.type));
-            } catch (IOException e) {
-                onError(e);
-            }
+            this.byteBufs.add(byteBuf);
+        }
+
+        private static InputStream getInputStream(List<ByteBuf> byteBufs) {
+            ByteBuf composite = Unpooled.wrappedBuffer(byteBufs.toArray(new ByteBuf[byteBufs.size()]));
+            return new ByteBufInputStream(composite);
         }
 
     }

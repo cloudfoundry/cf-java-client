@@ -17,7 +17,7 @@
 package org.cloudfoundry.reactor.uaa.accesstokenadministration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.cloudfoundry.reactor.util.AbstractReactorOperations;
+import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.uaa.accesstokenadministration.AccessTokenAdministration;
 import org.cloudfoundry.uaa.accesstokenadministration.GetTokenKeyRequest;
@@ -28,7 +28,7 @@ import reactor.io.netty.http.HttpClient;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 
 
-public final class SpringAccessTokenAdministration extends AbstractReactorOperations implements AccessTokenAdministration {
+public final class SpringAccessTokenAdministration extends AbstractUaaOperations implements AccessTokenAdministration {
 
     /**
      * Creates an instance

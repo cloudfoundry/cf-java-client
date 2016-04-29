@@ -44,6 +44,8 @@ public final class DefaultConnectionContext implements ConnectionContext {
 
     private final ObjectMapper objectMapper;
 
+    private final Mono<String> root;
+
     private final Optional<SslCertificateTruster> sslCertificateTruster;
 
     @Builder
@@ -51,7 +53,8 @@ public final class DefaultConnectionContext implements ConnectionContext {
         this.authorizationProvider = authorizationProvider;
         this.sslCertificateTruster = createSslCertificateTruster(trustCertificates);
         this.httpClient = createHttpClient(this.sslCertificateTruster);
-        this.info = getInfo(host, this.httpClient, port, this.sslCertificateTruster);
+        this.root = getRoot(host, port, this.sslCertificateTruster);
+        this.info = getInfo(this.httpClient, this.root);
         this.objectMapper = getObjectMapper(objectMapper);
     }
 
@@ -68,6 +71,11 @@ public final class DefaultConnectionContext implements ConnectionContext {
     @Override
     public ObjectMapper getObjectMapper() {
         return this.objectMapper;
+    }
+
+    @Override
+    public Mono<String> getRoot() {
+        return this.root;
     }
 
     @Override
@@ -94,8 +102,22 @@ public final class DefaultConnectionContext implements ConnectionContext {
     }
 
     @SuppressWarnings("unchecked")
-    private static Mono<Map<String, String>> getInfo(String host, HttpClient httpClient, Integer port, Optional<SslCertificateTruster> sslCertificateTruster) {
-        UriComponentsBuilder builder = UriComponentsBuilder.newInstance().scheme("https").host(host).pathSegment("v2", "info");
+    private static Mono<Map<String, String>> getInfo(HttpClient httpClient, Mono<String> root) {
+        return root
+            .map(uri -> UriComponentsBuilder.fromUriString(uri).pathSegment("v2", "info").build().toUriString())
+            .then(httpClient::get)
+            .flatMap(HttpInbound::receive)
+            .as(JsonCodec.decode(Map.class))
+            .map(m -> (Map<String, String>) m)
+            .cache();
+    }
+
+    private static ObjectMapper getObjectMapper(ObjectMapper objectMapper) {
+        return Optional.ofNullable(objectMapper).orElse(new ObjectMapper());
+    }
+
+    private static Mono<String> getRoot(String host, Integer port, Optional<SslCertificateTruster> sslCertificateTruster) {
+        UriComponentsBuilder builder = UriComponentsBuilder.newInstance().scheme("https").host(host);
         if (port != null) {
             builder.port(port);
         }
@@ -103,16 +125,7 @@ public final class DefaultConnectionContext implements ConnectionContext {
         UriComponents components = normalize(builder);
         trust(components, sslCertificateTruster);
 
-        return httpClient.get(components.toUriString())
-            .flatMap(HttpInbound::receiveInputStream)
-            .as(JsonCodec.decode(Map.class))
-            .map(m -> (Map<String, String>) m)
-            .single()
-            .cache();
-    }
-
-    private static ObjectMapper getObjectMapper(ObjectMapper objectMapper) {
-        return Optional.ofNullable(objectMapper).orElse(new ObjectMapper());
+        return Mono.just(components.toUriString());
     }
 
     private static UriComponents normalize(UriComponentsBuilder builder) {

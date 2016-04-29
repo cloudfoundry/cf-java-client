@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.util;
+package org.cloudfoundry.reactor.doppler;
 
-public interface ConnectionContextSupplier {
+import org.cloudfoundry.reactor.AbstractApiTest;
 
-    ConnectionContext getConnectionContext();  // TODO: Change once everything is over to Reactor
+abstract class AbstractDopplerApiTest<REQ, RSP> extends AbstractApiTest<REQ, RSP> {
 
 }

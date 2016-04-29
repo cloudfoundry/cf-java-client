@@ -42,7 +42,7 @@ public final class InteractionContext {
         this.response = response;
     }
 
-    InteractionContext getErrorResponse() {
+    public InteractionContext getErrorResponse() {
         return this.toBuilder()
             .response(ERROR_RESPONSE)
             .build();

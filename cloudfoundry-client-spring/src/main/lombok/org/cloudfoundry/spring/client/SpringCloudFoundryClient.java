@@ -84,9 +84,9 @@ import org.cloudfoundry.spring.client.v2.serviceusageevents.SpringServiceUsageEv
 import org.cloudfoundry.spring.client.v2.shareddomains.SpringSharedDomains;
 import org.cloudfoundry.spring.client.v2.spacequotadefinitions.SpringSpaceQuotaDefinitions;
 import org.cloudfoundry.spring.client.v2.spaces.SpringSpaces;
-import org.cloudfoundry.spring.client.v2.stacks.SpringStacks;
+import org.cloudfoundry.reactor.client.v2.stacks.ReactorStacks;
 import org.cloudfoundry.spring.client.v2.userprovidedserviceinstances.SpringUserProvidedServiceInstances;
-import org.cloudfoundry.spring.client.v2.users.SpringUsers;
+import org.cloudfoundry.reactor.client.v2.users.ReactorUsers;
 import org.cloudfoundry.spring.client.v3.applications.SpringApplicationsV3;
 import org.cloudfoundry.spring.client.v3.droplets.SpringDroplets;
 import org.cloudfoundry.spring.client.v3.packages.SpringPackages;
@@ -127,8 +127,6 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
 
     private final Buildpacks buildpacks;
 
-    private final ConnectionContext connectionContext;
-
     private final Domains domains;
 
     private final Droplets droplets;
@@ -153,7 +151,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
 
     private final Processes processes;
 
-    private final org.cloudfoundry.reactor.util.ConnectionContext reactorConnectionContext;
+    private final org.cloudfoundry.reactor.util.ConnectionContext connectionContext;
 
     private final RouteMappings routeMappings;
 
@@ -207,8 +205,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         new CloudFoundryClientCompatibilityChecker(this.info).check();
     }
 
-    SpringCloudFoundryClient(ConnectionContext connectionContext, String host, Integer port, Boolean skipSslValidation, RestOperations restOperations, URI root, Scheduler schedulerGroup,
-                             OAuth2TokenProvider tokenProvider) {
+    SpringCloudFoundryClient(String host, Integer port, Boolean skipSslValidation, RestOperations restOperations, URI root, Scheduler schedulerGroup, OAuth2TokenProvider tokenProvider) {
         this.applicationUsageEvents = new SpringApplicationUsageEvents(restOperations, root, schedulerGroup);
         this.applicationsV2 = new SpringApplicationsV2(restOperations, root, schedulerGroup);
         this.applicationsV3 = new SpringApplicationsV3(restOperations, root, schedulerGroup);
@@ -239,18 +236,12 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         this.services = new SpringServices(restOperations, root, schedulerGroup);
         this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(restOperations, root, schedulerGroup);
         this.spaces = new SpringSpaces(restOperations, root, schedulerGroup);
-        this.stacks = new SpringStacks(restOperations, root, schedulerGroup);
         this.tasks = new SpringTasks(restOperations, root, schedulerGroup);
         this.userProvidedServiceInstances = new SpringUserProvidedServiceInstances(restOperations, root, schedulerGroup);
-        this.users = new SpringUsers(restOperations, root, schedulerGroup);
-
-        this.connectionContext = connectionContext.toBuilder()
-            .cloudFoundryClient(this)
-            .build();
 
         this.tokenProvider = tokenProvider;
 
-        this.reactorConnectionContext = DefaultConnectionContext.builder()
+        this.connectionContext = DefaultConnectionContext.builder()
             .authorizationProvider(outbound -> tokenProvider.getToken()
                 .map(token -> String.format("bearer %s", token))
                 .map(token -> outbound.addHeader("Authorization", token)))
@@ -260,19 +251,21 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
             .port(port)
             .trustCertificates(skipSslValidation)
             .build();
+
+        Mono<String> root2 = this.connectionContext.getRoot();  // TODO: Change name once Spring is gone
+        this.stacks = new ReactorStacks(this.connectionContext.getAuthorizationProvider(), this.connectionContext.getHttpClient(), this.connectionContext.getObjectMapper(), root2);
+        this.users = new ReactorUsers(this.connectionContext.getAuthorizationProvider(), this.connectionContext.getHttpClient(), this.connectionContext.getObjectMapper(), root2);
     }
 
     // Let's take a moment to reflect on the fact that this bridge constructor is needed to counter a useless compiler constraint
     private SpringCloudFoundryClient(ConnectionContext connectionContext, String host, Integer port, Boolean skipSslValidation, Scheduler schedulerGroup, List<DeserializationProblemHandler>
         problemHandlers) {
-        this(connectionContext, host, port, skipSslValidation, getRestOperations(connectionContext, problemHandlers), getRoot(host, port, connectionContext.getSslCertificateTruster()),
-            schedulerGroup);
+        this(host, port, skipSslValidation, getRestOperations(connectionContext, problemHandlers), getRoot(host, port, connectionContext.getSslCertificateTruster()), schedulerGroup);
     }
 
     // Let's take a moment to reflect on the fact that this bridge constructor is needed to counter a useless compiler constraint
-    private SpringCloudFoundryClient(ConnectionContext connectionContext, String host, Integer port, Boolean skipSslValidation, OAuth2RestOperations restOperations, URI root, Scheduler
-        schedulerGroup) {
-        this(connectionContext, host, port, skipSslValidation, restOperations, root, schedulerGroup, new OAuth2RestOperationsOAuth2TokenProvider(restOperations));
+    private SpringCloudFoundryClient(String host, Integer port, Boolean skipSslValidation, OAuth2RestOperations restOperations, URI root, Scheduler schedulerGroup) {
+        this(host, port, skipSslValidation, restOperations, root, schedulerGroup, new OAuth2RestOperationsOAuth2TokenProvider(restOperations));
     }
 
     @Override
@@ -325,18 +318,9 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         return this.tokenProvider.getToken();
     }
 
-    /**
-     * Returns the Spring-based connection context
-     *
-     * @return the Spring-based connection context
-     */
-    public ConnectionContext getConnectionContext() {
-        return this.connectionContext;
-    }
-
     @Override
-    public org.cloudfoundry.reactor.util.ConnectionContext getConnectionContext2() {
-        return this.reactorConnectionContext;
+    public org.cloudfoundry.reactor.util.ConnectionContext getConnectionContext() {
+        return this.connectionContext;
     }
 
     @Override

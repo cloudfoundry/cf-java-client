@@ -29,11 +29,15 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Data
 public final class TestRequest {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    private static final Pattern PATH_PATTERN = Pattern.compile("[A-Z]+ (.*) [A-Z0-9\\./]+");
 
     private final Optional<Boolean> anyPayload;
 
@@ -53,7 +57,7 @@ public final class TestRequest {
 
     public void assertEquals(RecordedRequest request) {
         Assert.assertEquals(this.method.toString(), request.getMethod());
-        Assert.assertEquals(this.path, request.getPath());
+        Assert.assertEquals(this.path, extractPath(request));
 
         if (!this.anyPayload.orElse(false)) {
             if (this.payload.isPresent()) {
@@ -79,6 +83,16 @@ public final class TestRequest {
             return new Buffer().readFrom(new ClassPathResource(path).getInputStream());
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private String extractPath(RecordedRequest request) {
+        Matcher matcher = PATH_PATTERN.matcher(request.getRequestLine());
+
+        if (matcher.find()) {
+            return matcher.group(1);
+        } else {
+            throw new IllegalArgumentException(String.format("Request Line %s does not contain a valid path", request.getRequestLine()));
         }
     }
 
