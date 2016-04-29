@@ -95,9 +95,6 @@ public final class SpacesTest extends AbstractIntegrationTest {
     private Mono<String> organizationId;
 
     @Autowired
-    private String spaceName;
-
-    @Autowired
     private String stackName;
 
     @Autowired
@@ -723,6 +720,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     @Test
     public void listFilterByOrganizationId() {
         String organizationName = getOrganizationName();
+        String spaceName = getSpaceName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.just(organizationId)
