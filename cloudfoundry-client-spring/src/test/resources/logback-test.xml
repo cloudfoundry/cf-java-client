@@ -25,7 +25,7 @@
 
     <logger name="cloudfoundry-client.request" level="${CLIENT_LOGGING_LEVEL:-INFO}"/>
     <logger name="okhttp3" level="INFO"/>
-    <logger name="reactor.io.netty" level="DEBUG"/>
+    <logger name="reactor.io.netty" level="INFO"/>
     <logger name="stream" level="INFO"/>
 
     <root level="WARN">

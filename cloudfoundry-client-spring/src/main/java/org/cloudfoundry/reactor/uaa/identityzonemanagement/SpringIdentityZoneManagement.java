@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.uaa.identityzonemanagement;
+package org.cloudfoundry.reactor.uaa.identityzonemanagement;
 
-import lombok.ToString;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.cloudfoundry.reactor.util.AbstractReactorOperations;
+import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.uaa.identityzonemanagement.CreateIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzonemanagement.CreateIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzonemanagement.DeleteIdentityZoneRequest;
@@ -29,52 +30,51 @@ import org.cloudfoundry.uaa.identityzonemanagement.ListIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzonemanagement.ListIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzonemanagement.UpdateIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzonemanagement.UpdateIdentityZoneResponse;
-import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
+import reactor.io.netty.http.HttpClient;
 
-import java.net.URI;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 
 /**
  * The Spring-based implementation of {@link IdentityZoneManagement}
  */
-@ToString(callSuper = true)
-public final class SpringIdentityZoneManagement extends AbstractSpringOperations implements IdentityZoneManagement {
+public final class SpringIdentityZoneManagement extends AbstractReactorOperations implements IdentityZoneManagement {
 
     /**
      * Creates an instance
      *
-     * @param restOperations the {@link RestOperations} to use to communicate with the server
-     * @param root           the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
-     * @param schedulerGroup The group to use when making requests
+     * @param authorizationProvider the {@link AuthorizationProvider} to use when communicating with the server
+     * @param httpClient            the {@link HttpClient} to use when communicating with the server
+     * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
+     * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
      */
-    public SpringIdentityZoneManagement(RestOperations restOperations, URI root, Scheduler schedulerGroup) {
-        super(restOperations, root, schedulerGroup);
+    public SpringIdentityZoneManagement(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
+        super(authorizationProvider, httpClient, objectMapper, root);
     }
 
     @Override
     public Mono<CreateIdentityZoneResponse> create(CreateIdentityZoneRequest request) {
-        return post(request, CreateIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones"));
+        return post(request, CreateIdentityZoneResponse.class, consumer((builder, validRequest) -> builder.pathSegment("identity-zones")));
     }
 
     @Override
     public Mono<DeleteIdentityZoneResponse> delete(DeleteIdentityZoneRequest request) {
-        return delete(request, DeleteIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones", request.getIdentityZoneId()));
+        return delete(request, DeleteIdentityZoneResponse.class, consumer((builder, validRequest) -> builder.pathSegment("identity-zones", validRequest.getIdentityZoneId())));
     }
 
     @Override
     public Mono<GetIdentityZoneResponse> get(GetIdentityZoneRequest request) {
-        return get(request, GetIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones", request.getIdentityZoneId()));
+        return get(request, GetIdentityZoneResponse.class, consumer((builder, validRequest) -> builder.pathSegment("identity-zones", validRequest.getIdentityZoneId())));
     }
 
     @Override
     public Mono<ListIdentityZoneResponse> list(ListIdentityZoneRequest request) {
-        return get(request, ListIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones"));
+        return get(request, ListIdentityZoneResponse.class, consumer((builder, validRequest) -> builder.pathSegment("identity-zones")));
     }
 
     @Override
     public Mono<UpdateIdentityZoneResponse> update(UpdateIdentityZoneRequest request) {
-        return put(request, UpdateIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones", request.getIdentityZoneId()));
+        return put(request, UpdateIdentityZoneResponse.class, consumer((builder, validRequest) -> builder.pathSegment("identity-zones", validRequest.getIdentityZoneId())));
     }
 
 }

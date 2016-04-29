@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.spring.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import lombok.Builder;
 import lombok.NonNull;
@@ -110,6 +111,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
@@ -253,6 +255,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
                 .map(token -> String.format("bearer %s", token))
                 .map(token -> outbound.addHeader("Authorization", token)))
             .host(host)
+            .objectMapper(new ObjectMapper()
+                .setSerializationInclusion(NON_NULL))
             .port(port)
             .trustCertificates(skipSslValidation)
             .build();

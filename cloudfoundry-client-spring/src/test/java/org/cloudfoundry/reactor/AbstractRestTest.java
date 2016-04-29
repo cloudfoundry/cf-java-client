@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -26,9 +27,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static org.junit.Assert.assertTrue;
 
-abstract class AbstractRestTest {
+public abstract class AbstractRestTest {
 
     static {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
@@ -38,6 +40,9 @@ abstract class AbstractRestTest {
     protected final AuthorizationProvider authorizationProvider = outbound -> Mono.just(outbound.addHeader("Authorization", "test-authorization"));
 
     protected final HttpClient httpClient = HttpClient.create();
+
+    protected final ObjectMapper objectMapper = new ObjectMapper()
+        .setSerializationInclusion(NON_NULL);
 
     private final MockWebServer mockWebServer = new MockWebServer();
 

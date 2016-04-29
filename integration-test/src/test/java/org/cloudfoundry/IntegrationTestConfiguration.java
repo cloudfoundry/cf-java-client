@@ -30,7 +30,7 @@ import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.CloudFoundryOperationsBuilder;
 import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
 import org.cloudfoundry.spring.logging.SpringLoggingClient;
-import org.cloudfoundry.spring.uaa.SpringUaaClient;
+import org.cloudfoundry.reactor.uaa.SpringUaaClient;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;

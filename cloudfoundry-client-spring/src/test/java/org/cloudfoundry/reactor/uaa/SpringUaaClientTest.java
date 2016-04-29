@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.uaa;
+package org.cloudfoundry.reactor.uaa;
 
-import org.cloudfoundry.spring.AbstractRestTest;
+import org.cloudfoundry.reactor.AbstractRestTest;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 
 public final class SpringUaaClientTest extends AbstractRestTest {
 
-    private final SpringUaaClient client = new SpringUaaClient(this.restTemplate, this.root, PROCESSOR_GROUP);
+    private final SpringUaaClient client = new SpringUaaClient(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
 
     @Test
     public void accessTokenAdministration() {

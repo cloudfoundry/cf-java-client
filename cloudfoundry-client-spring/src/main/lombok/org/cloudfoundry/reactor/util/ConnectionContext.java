@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
@@ -24,6 +25,8 @@ public interface ConnectionContext {
     AuthorizationProvider getAuthorizationProvider();
 
     HttpClient getHttpClient();
+
+    ObjectMapper getObjectMapper();
 
     Mono<String> getRoot(String key);
 

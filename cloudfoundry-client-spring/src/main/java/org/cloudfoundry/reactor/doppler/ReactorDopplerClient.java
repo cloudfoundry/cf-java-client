@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.doppler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
 import org.cloudfoundry.doppler.ContainerMetric;
 import org.cloudfoundry.doppler.ContainerMetricsRequest;
@@ -54,11 +55,11 @@ public final class ReactorDopplerClient extends AbstractReactorOperations implem
     @Builder
     ReactorDopplerClient(ConnectionContextSupplier cloudFoundryClient) {
         this(cloudFoundryClient.getConnectionContext2().getAuthorizationProvider(), cloudFoundryClient.getConnectionContext2().getHttpClient(),
-            cloudFoundryClient.getConnectionContext2().getRoot("doppler_logging_endpoint"));
+            cloudFoundryClient.getConnectionContext2().getObjectMapper(), cloudFoundryClient.getConnectionContext2().getRoot("doppler_logging_endpoint"));
     }
 
-    ReactorDopplerClient(AuthorizationProvider authorizationProvider, HttpClient httpClient, Mono<String> root) {
-        super(authorizationProvider, httpClient, root);
+    ReactorDopplerClient(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
+        super(authorizationProvider, httpClient, objectMapper, root);
     }
 
     @Override

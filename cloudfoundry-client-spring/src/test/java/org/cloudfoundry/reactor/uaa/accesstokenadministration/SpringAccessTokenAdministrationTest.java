@@ -14,33 +14,41 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.uaa.accesstokenadministration;
+package org.cloudfoundry.reactor.uaa.accesstokenadministration;
 
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.uaa.accesstokenadministration.GetTokenKeyRequest;
 import org.cloudfoundry.uaa.accesstokenadministration.GetTokenKeyResponse;
 import reactor.core.publisher.Mono;
 
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpStatus.OK;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class SpringAccessTokenAdministrationTest {
 
     public static final class Get extends AbstractApiTest<GetTokenKeyRequest, GetTokenKeyResponse> {
 
-        private final SpringAccessTokenAdministration accessTokenAdministration = new SpringAccessTokenAdministration(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final SpringAccessTokenAdministration accessTokenAdministration = new SpringAccessTokenAdministration(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/token_key")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/token_key/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetTokenKeyRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/token_key")
-                .status(OK)
-                .responsePayload("fixtures/uaa/token_key/GET_response.json");
         }
 
         @Override

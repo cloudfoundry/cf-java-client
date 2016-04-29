@@ -35,7 +35,7 @@ public final class ReactorDopplerClientTest {
 
     public static final class ContainerMetrics extends AbstractApiTest<ContainerMetricsRequest, ContainerMetric> {
 
-        private final ReactorDopplerClient dopplerClient = new ReactorDopplerClient(this.authorizationProvider, this.httpClient, this.root);
+        private final ReactorDopplerClient dopplerClient = new ReactorDopplerClient(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -97,7 +97,7 @@ public final class ReactorDopplerClientTest {
 
     public static final class RecentLogs extends AbstractApiTest<RecentLogsRequest, LogMessage> {
 
-        private final ReactorDopplerClient dopplerClient = new ReactorDopplerClient(this.authorizationProvider, this.httpClient, this.root);
+        private final ReactorDopplerClient dopplerClient = new ReactorDopplerClient(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {

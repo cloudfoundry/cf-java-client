@@ -36,7 +36,7 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
         this.testSubscriber.assertError(CloudFoundryException.class, "CF-UnprocessableEntity(10008): The request is semantically invalid: space_guid and name unique");
         invoke(getValidRequest()).subscribe(this.testSubscriber);
 
-        this.testSubscriber.verify(Duration.ofDays(5));
+        this.testSubscriber.verify(Duration.ofSeconds(5));
         verify();
     }
 

@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
 import lombok.NonNull;
 import org.springframework.web.util.UriComponents;
@@ -41,14 +42,17 @@ public final class DefaultConnectionContext implements ConnectionContext {
 
     private final Mono<Map<String, String>> info;
 
+    private final ObjectMapper objectMapper;
+
     private final Optional<SslCertificateTruster> sslCertificateTruster;
 
     @Builder
-    DefaultConnectionContext(@NonNull AuthorizationProvider authorizationProvider, @NonNull String host, Integer port, Boolean trustCertificates) {
+    DefaultConnectionContext(@NonNull AuthorizationProvider authorizationProvider, @NonNull String host, ObjectMapper objectMapper, Integer port, Boolean trustCertificates) {
+        this.authorizationProvider = authorizationProvider;
         this.sslCertificateTruster = createSslCertificateTruster(trustCertificates);
         this.httpClient = createHttpClient(this.sslCertificateTruster);
         this.info = getInfo(host, this.httpClient, port, this.sslCertificateTruster);
-        this.authorizationProvider = authorizationProvider;
+        this.objectMapper = getObjectMapper(objectMapper);
     }
 
     @Override
@@ -59,6 +63,11 @@ public final class DefaultConnectionContext implements ConnectionContext {
     @Override
     public HttpClient getHttpClient() {
         return this.httpClient;
+    }
+
+    @Override
+    public ObjectMapper getObjectMapper() {
+        return this.objectMapper;
     }
 
     @Override
@@ -100,6 +109,10 @@ public final class DefaultConnectionContext implements ConnectionContext {
             .map(m -> (Map<String, String>) m)
             .single()
             .cache();
+    }
+
+    private static ObjectMapper getObjectMapper(ObjectMapper objectMapper) {
+        return Optional.ofNullable(objectMapper).orElse(new ObjectMapper());
     }
 
     private static UriComponents normalize(UriComponentsBuilder builder) {
