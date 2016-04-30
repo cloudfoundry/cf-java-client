@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.cloudfoundry.logging.LogMessage;
+import org.cloudfoundry.doppler.LogMessage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

@@ -73,10 +73,11 @@ import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.stacks.StackResource;
-import org.cloudfoundry.logging.LogMessage;
-import org.cloudfoundry.logging.LoggingClient;
-import org.cloudfoundry.logging.RecentLogsRequest;
-import org.cloudfoundry.logging.StreamLogsRequest;
+import org.cloudfoundry.doppler.DopplerClient;
+import org.cloudfoundry.doppler.Event;
+import org.cloudfoundry.doppler.LogMessage;
+import org.cloudfoundry.doppler.RecentLogsRequest;
+import org.cloudfoundry.doppler.StreamRequest;
 import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.DelayTimeoutException;
 import org.cloudfoundry.util.ExceptionUtils;
@@ -86,7 +87,6 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.StringMap;
 import org.cloudfoundry.util.ValidationUtils;
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple2;
@@ -125,19 +125,19 @@ public final class DefaultApplications implements Applications {
 
     private final CloudFoundryClient cloudFoundryClient;
 
-    private final Mono<LoggingClient> loggingClient;
+    private final Mono<DopplerClient> dopplerClient;
 
     private final RandomWords randomWords;
 
     private final Mono<String> spaceId;
 
-    public DefaultApplications(CloudFoundryClient cloudFoundryClient, Mono<LoggingClient> loggingClient, Mono<String> spaceId) {
+    public DefaultApplications(CloudFoundryClient cloudFoundryClient, Mono<DopplerClient> loggingClient, Mono<String> spaceId) {
         this(cloudFoundryClient, loggingClient, spaceId, new WordListRandomWords());
     }
 
-    DefaultApplications(CloudFoundryClient cloudFoundryClient, Mono<LoggingClient> loggingClient, Mono<String> spaceId, RandomWords randomWords) {
+    DefaultApplications(CloudFoundryClient cloudFoundryClient, Mono<DopplerClient> dopplerClient, Mono<String> spaceId, RandomWords randomWords) {
         this.cloudFoundryClient = cloudFoundryClient;
-        this.loggingClient = loggingClient;
+        this.dopplerClient = dopplerClient;
         this.spaceId = spaceId;
         this.randomWords = randomWords;
     }
@@ -258,7 +258,7 @@ public final class DefaultApplications implements Applications {
             .when(ValidationUtils.validate(request), this.spaceId)
             .then(function((validRequest, spaceId) -> getApplicationId(this.cloudFoundryClient, validRequest.getName(), spaceId)
                 .and(Mono.just(validRequest))))
-            .flatMap(function((applicationId, logsRequest) -> getLogs(this.loggingClient, applicationId, logsRequest.getRecent())));
+            .flatMap(function((applicationId, logsRequest) -> getLogs(this.dopplerClient, applicationId, logsRequest.getRecent())));
     }
 
     @Override
@@ -636,11 +636,15 @@ public final class DefaultApplications implements Applications {
         return ResourceUtils.getEntity(resource).getEnvironmentJsons();
     }
 
-    private static Publisher<LogMessage> getLogs(Mono<LoggingClient> loggingClient, String applicationId, Boolean recent) {
+    private static Flux<LogMessage> getLogs(Mono<DopplerClient> dopplerClient, String applicationId, Boolean recent) {
         if (Optional.ofNullable(recent).orElse(false)) {
-            return requestLogsRecent(loggingClient, applicationId);
+            return requestLogsRecent(dopplerClient, applicationId)
+                .toSortedList((a, b) -> a.getTimestamp().compareTo(b.getTimestamp()))
+                .flatMap(Flux::fromIterable);
         } else {
-            return requestLogsStream(loggingClient, applicationId);
+            return requestLogsStream(dopplerClient, applicationId)
+                .filter(e -> LogMessage.class.isAssignableFrom(e.getClass()))
+                .cast(LogMessage.class);
         }
     }
 
@@ -940,18 +944,18 @@ public final class DefaultApplications implements Applications {
                     .build()));
     }
 
-    private static Publisher<LogMessage> requestLogsRecent(Mono<LoggingClient> loggingClient, String applicationId) {
-        return loggingClient
-            .flatMap(loggingClient1 -> loggingClient1
-                .recent(RecentLogsRequest.builder()
+    private static Flux<LogMessage> requestLogsRecent(Mono<DopplerClient> dopplerClient, String applicationId) {
+        return dopplerClient
+            .flatMap(client -> client
+                .recentLogs(RecentLogsRequest.builder()
                     .applicationId(applicationId)
                     .build()));
     }
 
-    private static Publisher<LogMessage> requestLogsStream(Mono<LoggingClient> loggingClient, String applicationId) {
-        return loggingClient
-            .flatMap(loggingClient1 -> loggingClient1
-                .stream(StreamLogsRequest.builder()
+    private static Flux<Event> requestLogsStream(Mono<DopplerClient> dopplerClient, String applicationId) {
+        return dopplerClient
+            .flatMap(client -> client
+                .stream(StreamRequest.builder()
                     .applicationId(applicationId)
                     .build()));
     }

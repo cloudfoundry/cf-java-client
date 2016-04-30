@@ -40,8 +40,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
+            <groupId>com.squareup.wire</groupId>
+            <artifactId>wire-runtime</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -62,6 +62,21 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>com.squareup.wire</groupId>
+                <artifactId>wire-maven-plugin</artifactId>
+                <configuration>
+                    <protoFiles>
+                        <param>envelope.proto</param>
+                        <param>error.proto</param>
+                        <param>http.proto</param>
+                        <param>log.proto</param>
+                        <param>metric.proto</param>
+                        <param>uuid.proto</param>
+                    </protoFiles>
+                    <protoSourceDirectory>${project.basedir}/../vendor/dropsonde-protocol/events</protoSourceDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
@@ -74,7 +89,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
                     <sourceFileExcludes>
-                        <exclude>org/cloudfoundry/logging/LoggregatorProtocolBuffers.java</exclude>
+                        <exclude>org/cloudfoundry/dropsonde/events/*</exclude>
                     </sourceFileExcludes>
                 </configuration>
             </plugin>

@@ -17,7 +17,6 @@
 package org.cloudfoundry.spring;
 
 import lombok.Getter;
-import org.cloudfoundry.spring.logging.LoggregatorMessageHttpMessageConverter;
 import org.cloudfoundry.spring.util.SchedulerGroupBuilder;
 import org.cloudfoundry.spring.util.network.FallbackHttpMessageConverter;
 import org.cloudfoundry.spring.util.network.OAuth2RestTemplateBuilder;
@@ -62,7 +61,6 @@ public abstract class AbstractRestTest {
     protected final OAuth2RestTemplate restTemplate = new OAuth2RestTemplateBuilder()
         .clientContext(new DefaultOAuth2ClientContext(new DefaultOAuth2AccessToken("test-access-token")))
         .protectedResourceDetails(new ClientCredentialsResourceDetails())
-        .messageConverter(new LoggregatorMessageHttpMessageConverter())
         .messageConverter(new FallbackHttpMessageConverter())
         .problemHandler(new FailingDeserializationProblemHandler())
         .build();

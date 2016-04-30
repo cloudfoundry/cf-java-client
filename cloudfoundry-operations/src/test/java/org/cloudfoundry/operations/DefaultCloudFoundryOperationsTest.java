@@ -23,7 +23,7 @@ import static org.junit.Assert.assertNotNull;
 
 public final class DefaultCloudFoundryOperationsTest extends AbstractOperationsTest {
 
-    private final DefaultCloudFoundryOperations operations = new DefaultCloudFoundryOperations(this.cloudFoundryClient, Mono.just(this.loggingClient), MISSING_ID, MISSING_ID,
+    private final DefaultCloudFoundryOperations operations = new DefaultCloudFoundryOperations(this.cloudFoundryClient, Mono.just(this.dopplerClient), MISSING_ID, MISSING_ID,
         Mono.just(TEST_USERNAME));
 
     @Test

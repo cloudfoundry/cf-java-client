@@ -17,17 +17,17 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.logging.LoggingClient;
+import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.operations.applications.Applications;
 import org.cloudfoundry.operations.applications.DefaultApplications;
 import org.cloudfoundry.operations.buildpacks.Buildpacks;
 import org.cloudfoundry.operations.buildpacks.DefaultBuildpacks;
 import org.cloudfoundry.operations.domains.DefaultDomains;
 import org.cloudfoundry.operations.domains.Domains;
-import org.cloudfoundry.operations.organizations.DefaultOrganizations;
-import org.cloudfoundry.operations.organizations.Organizations;
 import org.cloudfoundry.operations.organizationadmin.DefaultOrganizationAdmin;
 import org.cloudfoundry.operations.organizationadmin.OrganizationAdmin;
+import org.cloudfoundry.operations.organizations.DefaultOrganizations;
+import org.cloudfoundry.operations.organizations.Organizations;
 import org.cloudfoundry.operations.routes.DefaultRoutes;
 import org.cloudfoundry.operations.routes.Routes;
 import org.cloudfoundry.operations.services.DefaultServices;
@@ -62,8 +62,8 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
 
     private final Stacks stacks;
 
-    DefaultCloudFoundryOperations(CloudFoundryClient cloudFoundryClient, Mono<LoggingClient> loggingClient, Mono<String> organizationId, Mono<String> spaceId, Mono<String> username) {
-        this.applications = new DefaultApplications(cloudFoundryClient, loggingClient, spaceId);
+    DefaultCloudFoundryOperations(CloudFoundryClient cloudFoundryClient, Mono<DopplerClient> dopplerClient, Mono<String> organizationId, Mono<String> spaceId, Mono<String> username) {
+        this.applications = new DefaultApplications(cloudFoundryClient, dopplerClient, spaceId);
         this.buildpacks = new DefaultBuildpacks(cloudFoundryClient);
         this.domains = new DefaultDomains(cloudFoundryClient);
         this.organizationAdmin = new DefaultOrganizationAdmin(cloudFoundryClient);

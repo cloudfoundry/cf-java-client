@@ -26,7 +26,8 @@ import static org.junit.Assert.assertSame;
 
 public final class SpringCloudFoundryClientTest extends AbstractRestTest {
 
-    private final SpringCloudFoundryClient client = new SpringCloudFoundryClient(ConnectionContext.builder().build(), this.restTemplate, this.root, PROCESSOR_GROUP, this.tokenProvider);
+    private final SpringCloudFoundryClient client = new SpringCloudFoundryClient(ConnectionContext.builder().build(), "test-host", null, null, this.restTemplate, this.root, PROCESSOR_GROUP,
+        this.tokenProvider);
 
     @Test
     public void applicationUsageEvents() {
