@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2;
+package org.cloudfoundry.reactor.client;
 
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.junit.Test;

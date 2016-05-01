@@ -28,6 +28,8 @@ public interface ConnectionContext {
 
     ObjectMapper getObjectMapper();
 
+    Mono<String> getRoot();
+
     Mono<String> getRoot(String key);
 
 }

@@ -17,17 +17,14 @@
 package org.cloudfoundry.spring.client;
 
 import org.cloudfoundry.spring.AbstractRestTest;
-import org.cloudfoundry.spring.util.network.ConnectionContext;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
 
 public final class SpringCloudFoundryClientTest extends AbstractRestTest {
 
-    private final SpringCloudFoundryClient client = new SpringCloudFoundryClient(ConnectionContext.builder().build(), "test-host", null, null, this.restTemplate, this.root, PROCESSOR_GROUP,
-        this.tokenProvider);
+    private final SpringCloudFoundryClient client = new SpringCloudFoundryClient("test-host", null, null, this.restTemplate, this.root, PROCESSOR_GROUP, this.tokenProvider);
 
     @Test
     public void applicationUsageEvents() {
@@ -77,11 +74,6 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
     @Test
     public void getAccessToken() {
         assertEquals(this.tokenProvider.getToken(), this.client.getAccessToken());
-    }
-
-    @Test
-    public void getConnectionContext() {
-        assertSame(this.client, this.client.getConnectionContext().getCloudFoundryClient());
     }
 
     @Test

@@ -19,8 +19,6 @@ package org.cloudfoundry.reactor.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.Validatable;
-import org.cloudfoundry.spring.client.v2.CloudFoundryExceptionBuilder;
-import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.ValidationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +28,6 @@ import reactor.core.tuple.Tuple;
 import reactor.core.tuple.Tuple2;
 import reactor.io.netty.common.NettyInbound;
 import reactor.io.netty.http.HttpClient;
-import reactor.io.netty.http.HttpException;
 import reactor.io.netty.http.HttpInbound;
 import reactor.io.netty.http.HttpOutbound;
 
@@ -58,22 +55,19 @@ public abstract class AbstractReactorOperations {
         this.root = root;
     }
 
-    protected final <REQ extends Validatable, RSP> Mono<RSP> delete(REQ request, Class<RSP> responseType, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
+    protected <REQ extends Validatable, RSP> Mono<RSP> delete(REQ request, Class<RSP> responseType, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
         return Mono
             .when(ValidationUtils.validate(request), this.root)
             .map(function((validRequest, root) -> buildUri(root, validRequest, builderCallback)))
             .doOnSuccess(uri -> this.logger.debug("DELETE {}", uri))
             .then(uri -> this.httpClient.delete(uri,
                 outbound -> this.authorizationProvider.addAuthorization(outbound)
-                    .map(HttpOutbound::removeTransferEncodingChunked) // TODO: Remove once Reactor updated
                     .then(HttpOutbound::sendHeaders)))
-            .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build))
-            .flatMap(NettyInbound::receiveInputStream)
-            .as(JsonCodec.decode(this.objectMapper, responseType))
-            .singleOrEmpty();
+            .flatMap(NettyInbound::receive)
+            .as(JsonCodec.decode(this.objectMapper, responseType));
     }
 
-    protected final <REQ extends Validatable, RSP> Mono<RSP> get(REQ request, Class<RSP> responseType, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
+    protected <REQ extends Validatable, RSP> Mono<RSP> get(REQ request, Class<RSP> responseType, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
         return Mono
             .when(ValidationUtils.validate(request), this.root)
             .map(function((validRequest, root) -> buildUri(root, validRequest, builderCallback)))
@@ -81,24 +75,21 @@ public abstract class AbstractReactorOperations {
             .then(uri -> this.httpClient.get(uri,
                 outbound -> this.authorizationProvider.addAuthorization(outbound)
                     .then(HttpOutbound::sendHeaders)))
-            .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build))
-            .flatMap(NettyInbound::receiveInputStream)
-            .as(JsonCodec.decode(this.objectMapper, responseType))
-            .single();
+            .flatMap(NettyInbound::receive)
+            .as(JsonCodec.decode(this.objectMapper, responseType));
     }
 
-    protected final <REQ extends Validatable> Mono<HttpInbound> get(REQ request, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
+    protected <REQ extends Validatable> Mono<HttpInbound> get(REQ request, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
         return Mono
             .when(ValidationUtils.validate(request), this.root)
             .map(function((validRequest, root) -> buildUri(root, validRequest, builderCallback)))
             .doOnSuccess(uri -> this.logger.debug("GET    {}", uri))
             .then(uri -> this.httpClient.get(uri,
                 outbound -> this.authorizationProvider.addAuthorization(outbound)
-                    .then(HttpOutbound::sendHeaders)))
-            .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build));
+                    .then(HttpOutbound::sendHeaders)));
     }
 
-    protected final <REQ extends Validatable, RSP> Mono<RSP> post(REQ request, Class<RSP> responseType, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
+    protected <REQ extends Validatable, RSP> Mono<RSP> post(REQ request, Class<RSP> responseType, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
         return Mono
             .when(ValidationUtils.validate(request), this.root)
             .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, builderCallback))))
@@ -108,43 +99,40 @@ public abstract class AbstractReactorOperations {
                     .and(Mono.just(validRequest)
                         .as(JsonCodec.encode(this.objectMapper)))
                     .then(function(HttpOutbound::sendOne)))))
-            .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build))
-            .flatMap(NettyInbound::receiveInputStream)
-            .as(JsonCodec.decode(this.objectMapper, responseType))
-            .single();
+            .flatMap(NettyInbound::receive)
+            .as(JsonCodec.decode(this.objectMapper, responseType));
     }
 
-    protected final <REQ extends Validatable, RSP> Mono<RSP> put(REQ request, Class<RSP> responseType, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
+    protected <REQ extends Validatable, RSP> Mono<RSP> put(REQ request, Class<RSP> responseType, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
         return Mono
             .when(ValidationUtils.validate(request), this.root)
             .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, builderCallback))))
-            .doOnSuccess(consumer((validRequest, uri) -> this.logger.debug("PUT   {}", uri)))
+            .doOnSuccess(consumer((validRequest, uri) -> this.logger.debug("PUT    {}", uri)))
             .then(function((validRequest, uri) -> this.httpClient.put(uri,
                 outbound -> this.authorizationProvider.addAuthorization(outbound)
                     .and(Mono.just(validRequest)
                         .as(JsonCodec.encode(this.objectMapper)))
                     .then(function(HttpOutbound::sendOne)))))
-            .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build))
-            .flatMap(NettyInbound::receiveInputStream)
-            .as(JsonCodec.decode(this.objectMapper, responseType))
-            .single();
+            .flatMap(NettyInbound::receive)
+            .as(JsonCodec.decode(this.objectMapper, responseType));
     }
 
-    protected final <REQ extends Validatable> Mono<HttpInbound> ws(REQ request, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
+    protected <REQ extends Validatable> Mono<HttpInbound> ws(REQ request, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
         return Mono
             .when(ValidationUtils.validate(request), this.root)
             .map(function((validRequest, root) -> buildUri(root, validRequest, builderCallback)))
             .doOnSuccess(uri -> this.logger.debug("WS     {}", uri))
             .then(uri -> this.httpClient.get(uri,
                 outbound -> this.authorizationProvider.addAuthorization(outbound)
-                    .then(HttpOutbound::upgradeToWebsocket)))
-            .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build));
+                    .then(HttpOutbound::upgradeToWebsocket)));
     }
 
     private static <REQ extends Validatable> String buildUri(String root, REQ validRequest, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(root);
         builderCallback.accept(Tuple.of(builder, validRequest));
-        return builder.build().encode().toUriString();
+
+        String uri = builder.build().encode().toUriString();
+        return UriComponentsBuilder.fromUriString(uri).build().encode().toUriString();  // TODO: Rector strips encoding before sending
     }
 
 }

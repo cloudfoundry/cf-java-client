@@ -18,7 +18,7 @@ package org.cloudfoundry.spring.util;
 
 import lombok.ToString;
 import org.cloudfoundry.Validatable;
-import org.cloudfoundry.spring.client.v2.CloudFoundryExceptionBuilder;
+import org.cloudfoundry.reactor.client.CloudFoundryExceptionBuilder;
 import org.cloudfoundry.util.ValidationUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;

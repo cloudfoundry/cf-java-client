@@ -21,7 +21,6 @@ import org.cloudfoundry.doppler.ContainerMetricsRequest;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.LogMessage.MessageType;
 import org.cloudfoundry.doppler.RecentLogsRequest;
-import org.cloudfoundry.reactor.AbstractApiTest;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -33,7 +32,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorDopplerClientTest {
 
-    public static final class ContainerMetrics extends AbstractApiTest<ContainerMetricsRequest, ContainerMetric> {
+    public static final class ContainerMetrics extends AbstractDopplerApiTest<ContainerMetricsRequest, ContainerMetric> {
 
         private final ReactorDopplerClient dopplerClient = new ReactorDopplerClient(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
 
@@ -95,7 +94,7 @@ public final class ReactorDopplerClientTest {
 
     }
 
-    public static final class RecentLogs extends AbstractApiTest<RecentLogsRequest, LogMessage> {
+    public static final class RecentLogs extends AbstractDopplerApiTest<RecentLogsRequest, LogMessage> {
 
         private final ReactorDopplerClient dopplerClient = new ReactorDopplerClient(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
 

@@ -14,45 +14,45 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.users;
+package org.cloudfoundry.reactor.client.v2.users;
 
-import lombok.ToString;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.ListUsersResponse;
 import org.cloudfoundry.client.v2.users.Users;
+import org.cloudfoundry.reactor.client.AbstractClientOperations;
+import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.spring.client.v2.FilterBuilder;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.spring.util.QueryBuilder;
-import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
+import reactor.io.netty.http.HttpClient;
 
-import java.net.URI;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 
 /**
  * The Spring-based implementation of {@link Users}
  */
-@ToString(callSuper = true)
-public final class SpringUsers extends AbstractSpringOperations implements Users {
+public final class ReactorUsers extends AbstractClientOperations implements Users {
 
     /**
      * Creates an instance
      *
-     * @param restOperations the {@link RestOperations} to use to communicate with the server
-     * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
-     * @param schedulerGroup The group to use when making requests
+     * @param authorizationProvider the {@link AuthorizationProvider} to use when communicating with the server
+     * @param httpClient            the {@link HttpClient} to use when communicating with the server
+     * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
+     * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
      */
-    public SpringUsers(RestOperations restOperations, URI root, Scheduler schedulerGroup) {
-        super(restOperations, root, schedulerGroup);
+    public ReactorUsers(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
+        super(authorizationProvider, httpClient, objectMapper, root);
     }
 
     @Override
     public Mono<ListUsersResponse> list(ListUsersRequest request) {
-        return get(request, ListUsersResponse.class, builder -> {
+        return get(request, ListUsersResponse.class, consumer((builder, validRequest) -> {
             builder.pathSegment("v2", "users");
             FilterBuilder.augment(builder, request);
             QueryBuilder.augment(builder, request);
-        });
+        }));
     }
 
 }

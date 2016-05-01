@@ -14,52 +14,52 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.stacks;
+package org.cloudfoundry.reactor.client.v2.stacks;
 
-import lombok.ToString;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksResponse;
 import org.cloudfoundry.client.v2.stacks.Stacks;
+import org.cloudfoundry.reactor.client.AbstractClientOperations;
+import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.spring.client.v2.FilterBuilder;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.spring.util.QueryBuilder;
-import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
+import reactor.io.netty.http.HttpClient;
 
-import java.net.URI;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 
 /**
  * The Spring-based implementation of {@link Stacks}
  */
-@ToString(callSuper = true)
-public final class SpringStacks extends AbstractSpringOperations implements Stacks {
+public final class ReactorStacks extends AbstractClientOperations implements Stacks {
 
     /**
      * Creates an instance
      *
-     * @param restOperations the {@link RestOperations} to use to communicate with the server
-     * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
-     * @param schedulerGroup The group to use when making requests
+     * @param authorizationProvider the {@link AuthorizationProvider} to use when communicating with the server
+     * @param httpClient            the {@link HttpClient} to use when communicating with the server
+     * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
+     * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
      */
-    public SpringStacks(RestOperations restOperations, URI root, Scheduler schedulerGroup) {
-        super(restOperations, root, schedulerGroup);
+    public ReactorStacks(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
+        super(authorizationProvider, httpClient, objectMapper, root);
     }
 
     @Override
     public Mono<GetStackResponse> get(GetStackRequest request) {
-        return get(request, GetStackResponse.class, builder -> builder.pathSegment("v2", "stacks", request.getStackId()));
+        return get(request, GetStackResponse.class, consumer((builder, validRequest) -> builder.pathSegment("v2", "stacks", validRequest.getStackId())));
     }
 
     @Override
     public Mono<ListStacksResponse> list(ListStacksRequest request) {
-        return get(request, ListStacksResponse.class, builder -> {
+        return get(request, ListStacksResponse.class, consumer((builder, validRequest) -> {
             builder.pathSegment("v2", "stacks");
             FilterBuilder.augment(builder, request);
             QueryBuilder.augment(builder, request);
-        });
+        }));
     }
 
 }

@@ -52,7 +52,7 @@ public abstract class AbstractRestTest {
 
     private InteractionContext interactionContext;
 
-    final void mockRequest(InteractionContext interactionContext) {
+    protected final void mockRequest(InteractionContext interactionContext) {
         this.interactionContext = interactionContext;
         this.mockWebServer.setDispatcher(new Dispatcher() {
 
@@ -69,7 +69,7 @@ public abstract class AbstractRestTest {
         });
     }
 
-    final void verify() {
+    protected final void verify() {
         if (this.interactionContext != null) {
             assertTrue("Expected request not received", this.interactionContext.isDone());
         }

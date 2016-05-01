@@ -33,7 +33,6 @@ import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
 import org.cloudfoundry.doppler.ValueMetric;
 import org.cloudfoundry.dropsonde.events.Envelope;
-import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.reactor.util.ConnectionContextSupplier;
 import reactor.core.publisher.Flux;
@@ -50,12 +49,12 @@ import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 /**
  * The Reactor-based implementation of {@link DopplerClient}
  */
-public final class ReactorDopplerClient extends AbstractReactorOperations implements DopplerClient {
+public final class ReactorDopplerClient extends AbstractDopplerOperations implements DopplerClient {
 
     @Builder
     ReactorDopplerClient(ConnectionContextSupplier cloudFoundryClient) {
-        this(cloudFoundryClient.getConnectionContext2().getAuthorizationProvider(), cloudFoundryClient.getConnectionContext2().getHttpClient(),
-            cloudFoundryClient.getConnectionContext2().getObjectMapper(), cloudFoundryClient.getConnectionContext2().getRoot("doppler_logging_endpoint"));
+        this(cloudFoundryClient.getConnectionContext().getAuthorizationProvider(), cloudFoundryClient.getConnectionContext().getHttpClient(),
+            cloudFoundryClient.getConnectionContext().getObjectMapper(), cloudFoundryClient.getConnectionContext().getRoot("doppler_logging_endpoint"));
     }
 
     ReactorDopplerClient(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {

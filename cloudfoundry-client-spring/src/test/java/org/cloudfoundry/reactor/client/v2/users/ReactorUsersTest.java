@@ -14,36 +14,44 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.users;
+package org.cloudfoundry.reactor.client.v2.users;
 
 import org.cloudfoundry.client.v2.Resource.Metadata;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.ListUsersResponse;
 import org.cloudfoundry.client.v2.users.UserEntity;
 import org.cloudfoundry.client.v2.users.UserResource;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpStatus.OK;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class SpringUsersTest {
+public final class ReactorUsersTest {
 
-    public static final class List extends AbstractApiTest<ListUsersRequest, ListUsersResponse> {
+    public static final class List extends AbstractClientApiTest<ListUsersRequest, ListUsersResponse> {
 
-        private final SpringUsers users = new SpringUsers(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorUsers users = new ReactorUsers(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/users?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/users/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListUsersRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/users?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/users/GET_response.json");
         }
 
         @Override

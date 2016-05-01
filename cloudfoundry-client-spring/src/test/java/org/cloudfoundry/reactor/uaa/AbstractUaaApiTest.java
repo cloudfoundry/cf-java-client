@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.util;
+package org.cloudfoundry.reactor.uaa;
 
-public interface ConnectionContextSupplier {
+import org.cloudfoundry.reactor.AbstractApiTest;
 
-    ConnectionContext getConnectionContext();  // TODO: Change once everything is over to Reactor
+public abstract class AbstractUaaApiTest<REQ, RSP> extends AbstractApiTest<REQ, RSP> {
 
 }

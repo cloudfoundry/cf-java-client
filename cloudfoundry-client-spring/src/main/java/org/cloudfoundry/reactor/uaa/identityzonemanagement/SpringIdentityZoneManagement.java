@@ -17,7 +17,7 @@
 package org.cloudfoundry.reactor.uaa.identityzonemanagement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.cloudfoundry.reactor.util.AbstractReactorOperations;
+import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.uaa.identityzonemanagement.CreateIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzonemanagement.CreateIdentityZoneResponse;
@@ -38,7 +38,7 @@ import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 /**
  * The Spring-based implementation of {@link IdentityZoneManagement}
  */
-public final class SpringIdentityZoneManagement extends AbstractReactorOperations implements IdentityZoneManagement {
+public final class SpringIdentityZoneManagement extends AbstractUaaOperations implements IdentityZoneManagement {
 
     /**
      * Creates an instance

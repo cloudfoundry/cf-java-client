@@ -16,10 +16,10 @@
 
 package org.cloudfoundry.reactor.uaa.identityzonemanagement;
 
-import org.cloudfoundry.reactor.AbstractApiTest;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
 import org.cloudfoundry.uaa.identityzonemanagement.CreateIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzonemanagement.CreateIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzonemanagement.DeleteIdentityZoneRequest;
@@ -42,7 +42,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class SpringIdentityZoneManagementTest {
 
-    public static final class Create extends AbstractApiTest<CreateIdentityZoneRequest, CreateIdentityZoneResponse> {
+    public static final class Create extends AbstractUaaApiTest<CreateIdentityZoneRequest, CreateIdentityZoneResponse> {
 
         private final SpringIdentityZoneManagement identityZoneManagement = new SpringIdentityZoneManagement(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
 
@@ -93,7 +93,7 @@ public final class SpringIdentityZoneManagementTest {
         }
     }
 
-    public static final class Delete extends AbstractApiTest<DeleteIdentityZoneRequest, DeleteIdentityZoneResponse> {
+    public static final class Delete extends AbstractUaaApiTest<DeleteIdentityZoneRequest, DeleteIdentityZoneResponse> {
 
         private final SpringIdentityZoneManagement identityZoneManagement = new SpringIdentityZoneManagement(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
 
@@ -141,7 +141,7 @@ public final class SpringIdentityZoneManagementTest {
         }
     }
 
-    public static final class Get extends AbstractApiTest<GetIdentityZoneRequest, GetIdentityZoneResponse> {
+    public static final class Get extends AbstractUaaApiTest<GetIdentityZoneRequest, GetIdentityZoneResponse> {
 
         private final SpringIdentityZoneManagement identityZoneManagement = new SpringIdentityZoneManagement(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
 
@@ -189,7 +189,7 @@ public final class SpringIdentityZoneManagementTest {
         }
     }
 
-    public static final class List extends AbstractApiTest<ListIdentityZoneRequest, ListIdentityZoneResponse> {
+    public static final class List extends AbstractUaaApiTest<ListIdentityZoneRequest, ListIdentityZoneResponse> {
 
         private final SpringIdentityZoneManagement identityZoneManagement = new SpringIdentityZoneManagement(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
 
@@ -246,7 +246,7 @@ public final class SpringIdentityZoneManagementTest {
         }
     }
 
-    public static final class Update extends AbstractApiTest<UpdateIdentityZoneRequest, UpdateIdentityZoneResponse> {
+    public static final class Update extends AbstractUaaApiTest<UpdateIdentityZoneRequest, UpdateIdentityZoneResponse> {
 
         private final SpringIdentityZoneManagement identityZoneManagement = new SpringIdentityZoneManagement(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
 

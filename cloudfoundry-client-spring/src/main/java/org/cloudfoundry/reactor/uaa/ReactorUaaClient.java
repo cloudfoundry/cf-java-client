@@ -39,8 +39,8 @@ public final class ReactorUaaClient implements UaaClient {
 
     @Builder
     ReactorUaaClient(ConnectionContextSupplier cloudFoundryClient) {
-        this(cloudFoundryClient.getConnectionContext2().getAuthorizationProvider(), cloudFoundryClient.getConnectionContext2().getHttpClient(),
-            cloudFoundryClient.getConnectionContext2().getObjectMapper(), cloudFoundryClient.getConnectionContext2().getRoot("token_endpoint"));
+        this(cloudFoundryClient.getConnectionContext().getAuthorizationProvider(), cloudFoundryClient.getConnectionContext().getHttpClient(),
+            cloudFoundryClient.getConnectionContext().getObjectMapper(), cloudFoundryClient.getConnectionContext().getRoot("token_endpoint"));
     }
 
     ReactorUaaClient(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {

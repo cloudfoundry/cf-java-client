@@ -16,10 +16,10 @@
 
 package org.cloudfoundry.reactor.uaa.accesstokenadministration;
 
-import org.cloudfoundry.reactor.AbstractApiTest;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
 import org.cloudfoundry.uaa.accesstokenadministration.GetTokenKeyRequest;
 import org.cloudfoundry.uaa.accesstokenadministration.GetTokenKeyResponse;
 import reactor.core.publisher.Mono;
@@ -29,7 +29,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class SpringAccessTokenAdministrationTest {
 
-    public static final class Get extends AbstractApiTest<GetTokenKeyRequest, GetTokenKeyResponse> {
+    public static final class Get extends AbstractUaaApiTest<GetTokenKeyRequest, GetTokenKeyResponse> {
 
         private final SpringAccessTokenAdministration accessTokenAdministration = new SpringAccessTokenAdministration(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
 
