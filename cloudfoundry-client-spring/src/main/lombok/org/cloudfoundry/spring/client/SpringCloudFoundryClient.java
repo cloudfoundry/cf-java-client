@@ -56,6 +56,7 @@ import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
 import org.cloudfoundry.client.v3.tasks.Tasks;
+import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.reactor.util.ConnectionContextSupplier;
 import org.cloudfoundry.reactor.util.DefaultConnectionContext;
 import org.cloudfoundry.spring.client.v2.applications.SpringApplicationsV2;
@@ -106,6 +107,7 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
+import reactor.io.netty.http.HttpClient;
 
 import java.net.URI;
 import java.util.List;
@@ -252,9 +254,13 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
             .trustCertificates(skipSslValidation)
             .build();
 
+        AuthorizationProvider authorizationProvider = this.connectionContext.getAuthorizationProvider();
+        HttpClient httpClient = this.connectionContext.getHttpClient();
+        ObjectMapper objectMapper = this.connectionContext.getObjectMapper();
         Mono<String> root2 = this.connectionContext.getRoot();  // TODO: Change name once Spring is gone
-        this.stacks = new ReactorStacks(this.connectionContext.getAuthorizationProvider(), this.connectionContext.getHttpClient(), this.connectionContext.getObjectMapper(), root2);
-        this.users = new ReactorUsers(this.connectionContext.getAuthorizationProvider(), this.connectionContext.getHttpClient(), this.connectionContext.getObjectMapper(), root2);
+
+        this.stacks = new ReactorStacks(authorizationProvider, httpClient, objectMapper, root2);
+        this.users = new ReactorUsers(authorizationProvider, httpClient, objectMapper, root2);
     }
 
     // Let's take a moment to reflect on the fact that this bridge constructor is needed to counter a useless compiler constraint
