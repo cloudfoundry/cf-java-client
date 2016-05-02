@@ -55,6 +55,15 @@ public final class CreateTaskRequest implements Validatable {
     private final String command;
 
     /**
+     * The droplet id
+     *
+     * @param dropletId the droplet id
+     * @return the droplet id
+     */
+    @Getter(onMethod = @__(@JsonProperty("droplet_guid")))
+    private final String dropletId;
+
+    /**
      * The environment variables
      *
      * @param environmentVariables the environment variables
@@ -82,9 +91,10 @@ public final class CreateTaskRequest implements Validatable {
     private final String name;
 
     @Builder
-    CreateTaskRequest(String applicationId, String command, @Singular Map<String, String> environmentVariables, String name, Integer memoryInMb) {
+    CreateTaskRequest(String applicationId, String command, String dropletId, @Singular Map<String, String> environmentVariables, String name, Integer memoryInMb) {
         this.applicationId = applicationId;
         this.command = command;
+        this.dropletId = dropletId;
         this.environmentVariables = environmentVariables;
         this.name = name;
         this.memoryInMb = memoryInMb;

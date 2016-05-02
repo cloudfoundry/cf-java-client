@@ -120,6 +120,7 @@ public abstract class Process {
                       @JsonProperty("ports") @Singular List<Integer> ports,
                       @JsonProperty("type") String type,
                       @JsonProperty("updated_at") String updatedAt) {
+
         this.command = command;
         this.createdAt = createdAt;
         this.diskInMb = diskInMb;
