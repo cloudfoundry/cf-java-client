@@ -21,6 +21,7 @@ import lombok.Data;
 import lombok.Singular;
 import org.cloudfoundry.client.v3.Link;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -86,6 +87,14 @@ public abstract class Process {
     private final Integer memoryInMb;
 
     /**
+     * The ports opened to the application
+     *
+     * @param ports the ports opened to the application
+     * @return the ports opened to the application
+     */
+    private final List<Integer> ports;
+
+    /**
      * The type
      *
      * @param type the type
@@ -108,6 +117,7 @@ public abstract class Process {
                       @JsonProperty("instances") Integer instances,
                       @JsonProperty("links") @Singular Map<String, Link> links,
                       @JsonProperty("memory_in_mb") Integer memoryInMb,
+                      @JsonProperty("ports") @Singular List<Integer> ports,
                       @JsonProperty("type") String type,
                       @JsonProperty("updated_at") String updatedAt) {
         this.command = command;
@@ -117,6 +127,7 @@ public abstract class Process {
         this.instances = instances;
         this.links = links;
         this.memoryInMb = memoryInMb;
+        this.ports = ports;
         this.type = type;
         this.updatedAt = updatedAt;
     }

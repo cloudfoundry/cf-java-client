@@ -35,8 +35,6 @@ import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
-import org.cloudfoundry.client.v3.applications.GetApplicationStatisticsRequest;
-import org.cloudfoundry.client.v3.applications.GetApplicationStatisticsResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationTaskRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationTaskResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationDropletsRequest;
@@ -58,6 +56,7 @@ import org.cloudfoundry.client.v3.applications.StopApplicationResponse;
 import org.cloudfoundry.client.v3.applications.TerminateApplicationInstanceRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
+import org.cloudfoundry.client.v3.processes.AbstractProcessDetailedStatistics.PortMapping;
 import org.cloudfoundry.client.v3.processes.ProcessUsage;
 import org.cloudfoundry.client.v3.tasks.Task;
 import org.cloudfoundry.client.v3.tasks.TaskResource;
@@ -484,29 +483,25 @@ public final class SpringApplicationsV3Test {
         @Override
         protected GetApplicationProcessDetailedStatisticsResponse getResponse() {
             return GetApplicationProcessDetailedStatisticsResponse.builder()
-                .pagination(Pagination.builder()
-                    .first(Link.builder().href("/v3/apps/guid-ee511630-0f3a-4397-b072-b27c9ada901c/processes/web/stats")
-                        .build())
-                    .last(Link.builder().href("/v3/apps/guid-ee511630-0f3a-4397-b072-b27c9ada901c/processes/web/stats")
-                        .build())
-                    .totalResults(1)
-                    .build())
                 .resource(GetApplicationProcessDetailedStatisticsResponse.Resource.builder()
+                    .type("web")
+                    .index(0)
+                    .state("RUNNING")
+                    .usage(ProcessUsage.builder()
+                        .time("2016-03-23T23:17:30.476314154Z")
+                        .cpu(0.00038711029163348665)
+                        .memory(19177472L)
+                        .disk(69705728L)
+                        .build())
+                    .host("10.244.16.10")
+                    .instancePort(PortMapping.builder()
+                        .external(64546)
+                        .internal(8080)
+                        .build())
+                    .uptime(9042L)
+                    .memoryQuota(268435456L)
                     .diskQuota(1073741824L)
                     .fdsQuota(16384)
-                    .host("toast")
-                    .index(0)
-                    .memoryQuota(1073741824L)
-                    .port(8080)
-                    .state("RUNNING")
-                    .type("web")
-                    .uptime(1L)
-                    .usage(ProcessUsage.builder()
-                        .cpu(80.0)
-                        .disk(1024L)
-                        .memory(128L)
-                        .time("2016-01-26 22:20:33 UTC")
-                        .build())
                     .build())
                 .build();
         }
@@ -522,62 +517,6 @@ public final class SpringApplicationsV3Test {
         @Override
         protected Mono<GetApplicationProcessDetailedStatisticsResponse> invoke(GetApplicationProcessDetailedStatisticsRequest request) {
             return this.applications.getProcessDetailedStatistics(request);
-        }
-
-    }
-
-    public static final class GetApplicationStatistics extends AbstractApiTest<GetApplicationStatisticsRequest, GetApplicationStatisticsResponse> {
-
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
-
-        @Override
-        protected GetApplicationStatisticsRequest getInvalidRequest() {
-            return GetApplicationStatisticsRequest.builder()
-                .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v3/apps/test-id/stats")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/apps/GET_{id}_stats_response.json");
-        }
-
-        @Override
-        protected GetApplicationStatisticsResponse getResponse() {
-            GetApplicationStatisticsResponse.Statistics.StatisticsBuilder statisticBuilder = GetApplicationStatisticsResponse.Statistics.builder()
-                .diskQuota(1073741824L)
-                .fdsQuota(16384)
-                .host("toast")
-                .memoryQuota(1073741824L)
-                .port(8080)
-                .state("RUNNING")
-                .type("web")
-                .uptime(1L)
-                .usage(ProcessUsage.builder()
-                    .cpu(80D)
-                    .disk(1024L)
-                    .memory(128L)
-                    .time("2016-01-26 22:20:35 UTC")
-                    .build());
-
-            return GetApplicationStatisticsResponse.builder()
-                .process(statisticBuilder.index(0).build())
-                .process(statisticBuilder.index(1).build())
-                .build();
-        }
-
-        @Override
-        protected GetApplicationStatisticsRequest getValidRequest() throws Exception {
-            return GetApplicationStatisticsRequest.builder()
-                .applicationId("test-id")
-                .build();
-        }
-
-        @Override
-        protected Mono<GetApplicationStatisticsResponse> invoke(GetApplicationStatisticsRequest request) {
-            return this.applications.getStatistics(request);
         }
 
     }
@@ -656,25 +595,27 @@ public final class SpringApplicationsV3Test {
         @Override
         protected GetApplicationProcessResponse getResponse() {
             return GetApplicationProcessResponse.builder()
-                .id("36815434-f608-44e5-a122-b81b923d8c63")
+                .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
                 .type("web")
-                .instances(1)
-                .memoryInMb(1_024)
+                .command("rackup")
+                .instances(5)
+                .memoryInMb(256)
                 .diskInMb(1_024)
-                .createdAt("2016-01-26T22:20:33Z")
-                .updatedAt("2016-01-26T22:20:33Z")
+                .port(8080)
+                .createdAt("2016-03-23T18:48:22Z")
+                .updatedAt("2016-03-23T18:48:42Z")
                 .link("self", Link.builder()
-                    .href("/v3/processes/36815434-f608-44e5-a122-b81b923d8c63")
+                    .href("/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82")
                     .build())
                 .link("scale", Link.builder()
-                    .href("/v3/processes/36815434-f608-44e5-a122-b81b923d8c63/scale")
+                    .href("/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/scale")
                     .method("PUT")
                     .build())
                 .link("app", Link.builder()
-                    .href("/v3/apps/guid-cc7f8382-e230-4484-8c93-b2f67a9dee9b")
+                    .href("/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
                     .build())
                 .link("space", Link.builder()
-                    .href("/v2/spaces/e9d413f1-4e26-494f-abdd-7e3a9f857907")
+                    .href("/v2/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
                     .build())
                 .build();
         }
@@ -1096,34 +1037,62 @@ public final class SpringApplicationsV3Test {
         protected ListApplicationProcessesResponse getResponse() {
             return ListApplicationProcessesResponse.builder()
                 .pagination(Pagination.builder()
-                    .totalResults(1)
+                    .totalResults(3)
                     .first(Link.builder()
-                        .href("/v3/apps/guid-2fb5e39b-b6ee-4556-b2b1-ec6777283d9f/processes?page=1&per_page=50")
+                        .href("/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/processes?page=1&per_page=2")
                         .build())
                     .last(Link.builder()
-                        .href("/v3/apps/guid-2fb5e39b-b6ee-4556-b2b1-ec6777283d9f/processes?page=1&per_page=50")
+                        .href("/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/processes?page=2&per_page=2")
+                        .build())
+                    .next(Link.builder()
+                        .href("/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/processes?page=2&per_page=2")
                         .build())
                     .build())
                 .resource(ListApplicationProcessesResponse.Resource.builder()
-                    .id("d143a22b-be23-4889-a82f-5fac11a68bb2")
+                    .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
                     .type("web")
-                    .instances(1)
-                    .memoryInMb(1_024)
+                    .command("rackup")
+                    .instances(5)
+                    .memoryInMb(256)
                     .diskInMb(1_024)
-                    .createdAt("2016-01-26T22:20:33Z")
-                    .updatedAt("2016-01-26T22:20:33Z")
+                    .port(8080)
+                    .createdAt("2016-03-23T18:48:22Z")
+                    .updatedAt("2016-03-23T18:48:42Z")
                     .link("self", Link.builder()
-                        .href("/v3/processes/d143a22b-be23-4889-a82f-5fac11a68bb2")
+                        .href("/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82")
                         .build())
                     .link("scale", Link.builder()
-                        .href("/v3/processes/d143a22b-be23-4889-a82f-5fac11a68bb2/scale")
+                        .href("/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/scale")
                         .method("PUT")
                         .build())
                     .link("app", Link.builder()
-                        .href("/v3/apps/guid-2fb5e39b-b6ee-4556-b2b1-ec6777283d9f")
+                        .href("/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
                         .build())
                     .link("space", Link.builder()
-                        .href("/v2/spaces/ef266785-8ebc-434f-b0ec-8aafecf9317d")
+                        .href("/v2/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
+                        .build())
+                    .build())
+                .resource(ListApplicationProcessesResponse.Resource.builder()
+                    .id("3fccacd9-4b02-4b96-8d02-8e865865e9eb")
+                    .type("worker")
+                    .command("bundle exec rake worker")
+                    .instances(1)
+                    .memoryInMb(256)
+                    .diskInMb(1_024)
+                    .createdAt("2016-03-23T18:48:22Z")
+                    .updatedAt("2016-03-23T18:48:42Z")
+                    .link("self", Link.builder()
+                        .href("/v3/processes/3fccacd9-4b02-4b96-8d02-8e865865e9eb")
+                        .build())
+                    .link("scale", Link.builder()
+                        .href("/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/scale")
+                        .method("PUT")
+                        .build())
+                    .link("app", Link.builder()
+                        .href("/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
+                        .build())
+                    .link("space", Link.builder()
+                        .href("/v2/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
                         .build())
                     .build())
                 .build();
@@ -1251,25 +1220,27 @@ public final class SpringApplicationsV3Test {
         @Override
         protected ScaleApplicationResponse getResponse() {
             return ScaleApplicationResponse.builder()
-                .id("4b9c7e7a-689d-4745-8d10-e9b821747416")
+                .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
                 .type("web")
-                .instances(3)
-                .memoryInMb(100)
-                .diskInMb(100)
-                .createdAt("2016-01-26T22:20:33Z")
-                .updatedAt("2016-01-26T22:20:33Z")
+                .command("rackup")
+                .instances(5)
+                .memoryInMb(256)
+                .diskInMb(1_024)
+                .port(8080)
+                .createdAt("2016-03-23T18:48:22Z")
+                .updatedAt("2016-03-23T18:48:42Z")
                 .link("self", Link.builder()
-                    .href("/v3/processes/4b9c7e7a-689d-4745-8d10-e9b821747416")
+                    .href("/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82")
                     .build())
                 .link("scale", Link.builder()
-                    .href("/v3/processes/4b9c7e7a-689d-4745-8d10-e9b821747416/scale")
+                    .href("/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/scale")
                     .method("PUT")
                     .build())
                 .link("app", Link.builder()
-                    .href("/v3/apps/guid-cc6f0823-7cbd-4d54-b11a-86a1877bca69")
+                    .href("/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
                     .build())
                 .link("space", Link.builder()
-                    .href("/v2/spaces/15db41ec-b713-4683-bf33-932a82a55b42")
+                    .href("/v2/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
                     .build())
                 .build();
         }
@@ -1277,11 +1248,11 @@ public final class SpringApplicationsV3Test {
         @Override
         protected ScaleApplicationRequest getValidRequest() throws Exception {
             return ScaleApplicationRequest.builder()
-                .diskInMb(100)
                 .applicationId("test-application-id")
-                .instances(3)
-                .memoryInMb(100)
                 .type("web")
+                .instances(5)
+                .memoryInMb(256)
+                .diskInMb(1_024)
                 .build();
         }
 

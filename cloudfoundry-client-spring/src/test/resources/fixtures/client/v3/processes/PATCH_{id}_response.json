@@ -1,25 +1,28 @@
 {
-  "guid": "d416ae86-16a7-4143-844a-6e707919b6ee",
+  "guid": "6a901b7c-9417-4dc1-8189-d3234aa0ab82",
   "type": "web",
-  "command": "X",
-  "instances": 1,
-  "memory_in_mb": 1024,
+  "command": "rackup",
+  "instances": 5,
+  "memory_in_mb": 256,
   "disk_in_mb": 1024,
-  "created_at": "2016-01-26T22:20:11Z",
-  "updated_at": "2016-01-26T22:20:11Z",
+  "ports": [
+    8080
+  ],
+  "created_at": "2016-03-23T18:48:22Z",
+  "updated_at": "2016-03-23T18:48:42Z",
   "links": {
     "self": {
-      "href": "/v3/processes/d416ae86-16a7-4143-844a-6e707919b6ee"
+      "href": "/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82"
     },
     "scale": {
-      "href": "/v3/processes/d416ae86-16a7-4143-844a-6e707919b6ee/scale",
+      "href": "/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/scale",
       "method": "PUT"
     },
     "app": {
-      "href": "/v3/apps/"
+      "href": "/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5"
     },
     "space": {
-      "href": "/v2/spaces/fc10c41e-ef1b-450d-818e-a117fd21a4c7"
+      "href": "/v2/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576"
     }
   }
 }

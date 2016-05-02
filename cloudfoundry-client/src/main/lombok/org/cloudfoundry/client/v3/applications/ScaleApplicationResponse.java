@@ -25,6 +25,7 @@ import lombok.ToString;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.processes.Process;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,9 +44,10 @@ public final class ScaleApplicationResponse extends Process {
                              @JsonProperty("instances") Integer instances,
                              @JsonProperty("links") @Singular Map<String, Link> links,
                              @JsonProperty("memory_in_mb") Integer memoryInMb,
+                             @JsonProperty("ports") @Singular List<Integer> ports,
                              @JsonProperty("type") String type,
                              @JsonProperty("updated_at") String updatedAt) {
-        super(command, createdAt, diskInMb, id, instances, links, memoryInMb, type, updatedAt);
+        super(command, createdAt, diskInMb, id, instances, links, memoryInMb, ports, type, updatedAt);
     }
 
 }

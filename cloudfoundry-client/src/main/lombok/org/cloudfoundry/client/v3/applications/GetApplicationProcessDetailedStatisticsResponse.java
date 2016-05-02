@@ -55,13 +55,14 @@ public final class GetApplicationProcessDetailedStatisticsResponse extends Pagin
                  @JsonProperty("fds_quota") Integer fdsQuota,
                  @JsonProperty("host") String host,
                  @JsonProperty("index") Integer index,
+                 @JsonProperty("instance_ports") @Singular List<PortMapping> instancePorts,
                  @JsonProperty("mem_quota") Long memoryQuota,
-                 @JsonProperty("port") Integer port,
                  @JsonProperty("state") String state,
                  @JsonProperty("type") String type,
                  @JsonProperty("uptime") Long uptime,
                  @JsonProperty("usage") ProcessUsage usage) {
-            super(diskQuota, fdsQuota, host, index, memoryQuota, port, state, type, uptime, usage);
+
+            super(diskQuota, fdsQuota, host, index, instancePorts, memoryQuota, state, type, uptime, usage);
         }
 
     }

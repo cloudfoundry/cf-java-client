@@ -5,28 +5,22 @@
       "index": 0,
       "state": "RUNNING",
       "usage": {
-        "time": "2016-01-26 22:20:11 UTC",
-        "cpu": 80,
-        "mem": 128,
-        "disk": 1024
+        "time": "2016-03-23T23:17:30.476314154Z",
+        "cpu": 0.00038711029163348665,
+        "mem": 19177472,
+        "disk": 69705728
       },
-      "host": "toast",
-      "port": 8080,
-      "uptime": 1,
-      "mem_quota": 1073741824,
+      "host": "10.244.16.10",
+      "instance_ports": [
+        {
+          "external": 64546,
+          "internal": 8080
+        }
+      ],
+      "uptime": 9042,
+      "mem_quota": 268435456,
       "disk_quota": 1073741824,
       "fds_quota": 16384
     }
-  ],
-  "pagination": {
-    "total_results": 1,
-    "first": {
-      "href": "/v3/processes/8480ec7f-b06c-4df7-92c1-11afc823f967/stats"
-    },
-    "last": {
-      "href": "/v3/processes/8480ec7f-b06c-4df7-92c1-11afc823f967/stats"
-    },
-    "next": null,
-    "previous": null
-  }
+  ]
 }
