@@ -55,6 +55,14 @@ public abstract class Process {
     private final Integer diskInMb;
 
     /**
+     * The health check
+     *
+     * @param healthCheck the healthCheck
+     * @return the healthCheck
+     */
+    private final HealthCheck healthCheck;
+
+    /**
      * The id
      *
      * @param id the id
@@ -113,6 +121,7 @@ public abstract class Process {
     protected Process(@JsonProperty("command") String command,
                       @JsonProperty("created_at") String createdAt,
                       @JsonProperty("disk_in_mb") Integer diskInMb,
+                      @JsonProperty("health_check") HealthCheck healthCheck,
                       @JsonProperty("guid") String id,
                       @JsonProperty("instances") Integer instances,
                       @JsonProperty("links") @Singular Map<String, Link> links,
@@ -124,6 +133,7 @@ public abstract class Process {
         this.command = command;
         this.createdAt = createdAt;
         this.diskInMb = diskInMb;
+        this.healthCheck = healthCheck;
         this.id = id;
         this.instances = instances;
         this.links = links;

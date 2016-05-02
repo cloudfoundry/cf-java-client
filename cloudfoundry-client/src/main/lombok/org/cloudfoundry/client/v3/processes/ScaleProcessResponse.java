@@ -39,6 +39,7 @@ public final class ScaleProcessResponse extends Process {
     ScaleProcessResponse(@JsonProperty("command") String command,
                          @JsonProperty("created_at") String createdAt,
                          @JsonProperty("disk_in_mb") Integer diskInMb,
+                         @JsonProperty("health_check") HealthCheck healthCheck,
                          @JsonProperty("guid") String id,
                          @JsonProperty("instances") Integer instances,
                          @JsonProperty("links") @Singular Map<String, Link> links,
@@ -46,7 +47,8 @@ public final class ScaleProcessResponse extends Process {
                          @JsonProperty("ports") @Singular List<Integer> ports,
                          @JsonProperty("type") String type,
                          @JsonProperty("updated_at") String updatedAt) {
-        super(command, createdAt, diskInMb, id, instances, links, memoryInMb, ports, type, updatedAt);
+
+        super(command, createdAt, diskInMb, healthCheck, id, instances, links, memoryInMb, ports, type, updatedAt);
     }
 
 }

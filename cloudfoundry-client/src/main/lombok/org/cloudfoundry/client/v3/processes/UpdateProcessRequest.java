@@ -42,6 +42,15 @@ public final class UpdateProcessRequest implements Validatable {
     private final String command;
 
     /**
+     * The health check
+     *
+     * @param healthCheck the health check
+     * @return the health check
+     */
+    @Getter(onMethod = @__(@JsonProperty("health_check")))
+    private final HealthCheck healthCheck;
+
+    /**
      * The ports
      *
      * @param ports the ports
@@ -60,8 +69,9 @@ public final class UpdateProcessRequest implements Validatable {
     private final String processId;
 
     @Builder
-    UpdateProcessRequest(String command, List<Integer> ports, String processId) {
+    UpdateProcessRequest(String command, HealthCheck healthCheck, List<Integer> ports, String processId) {
         this.command = command;
+        this.healthCheck = healthCheck;
         this.ports = ports;
         this.processId = processId;
     }

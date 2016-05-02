@@ -23,6 +23,12 @@
       "ports": [
         8080
       ],
+      "health_check": {
+        "type": "port",
+        "data": {
+          "timeout": null
+        }
+      },
       "created_at": "2016-03-23T18:48:22Z",
       "updated_at": "2016-03-23T18:48:42Z",
       "links": {
@@ -49,6 +55,12 @@
       "memory_in_mb": 256,
       "disk_in_mb": 1024,
       "ports": [],
+      "health_check": {
+        "type": "process",
+        "data": {
+          "timeout": null
+        }
+      },
       "created_at": "2016-03-23T18:48:22Z",
       "updated_at": "2016-03-23T18:48:42Z",
       "links": {

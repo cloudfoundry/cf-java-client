@@ -22,6 +22,8 @@ import org.cloudfoundry.client.v3.processes.GetProcessDetailedStatisticsRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessDetailedStatisticsResponse;
 import org.cloudfoundry.client.v3.processes.GetProcessRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessResponse;
+import org.cloudfoundry.client.v3.processes.HealthCheck;
+import org.cloudfoundry.client.v3.processes.HealthCheck.Type;
 import org.cloudfoundry.client.v3.processes.ListProcessesRequest;
 import org.cloudfoundry.client.v3.processes.ListProcessesResponse;
 import org.cloudfoundry.client.v3.processes.ProcessUsage;
@@ -110,6 +112,10 @@ public final class SpringProcessesTest {
                 .memoryInMb(256)
                 .diskInMb(1_024)
                 .port(8080)
+                .healthCheck(HealthCheck.builder()
+                    .type(Type.PORT)
+                    .data("timeout", null)
+                    .build())
                 .createdAt("2016-03-23T18:48:22Z")
                 .updatedAt("2016-03-23T18:48:42Z")
                 .link("self", Link.builder()
@@ -242,6 +248,10 @@ public final class SpringProcessesTest {
                     .memoryInMb(256)
                     .diskInMb(1_024)
                     .port(8080)
+                    .healthCheck(HealthCheck.builder()
+                        .type(Type.PORT)
+                        .data("timeout", null)
+                        .build())
                     .createdAt("2016-03-23T18:48:22Z")
                     .updatedAt("2016-03-23T18:48:42Z")
                     .link("self", Link.builder()
@@ -265,6 +275,10 @@ public final class SpringProcessesTest {
                     .instances(1)
                     .memoryInMb(256)
                     .diskInMb(1_024)
+                    .healthCheck(HealthCheck.builder()
+                        .type(Type.PROCESS)
+                        .data("timeout", null)
+                        .build())
                     .createdAt("2016-03-23T18:48:22Z")
                     .updatedAt("2016-03-23T18:48:42Z")
                     .link("self", Link.builder()
@@ -328,6 +342,10 @@ public final class SpringProcessesTest {
                 .memoryInMb(256)
                 .diskInMb(1_024)
                 .port(8080)
+                .healthCheck(HealthCheck.builder()
+                    .type(Type.PORT)
+                    .data("timeout", null)
+                    .build())
                 .createdAt("2016-03-23T18:48:22Z")
                 .updatedAt("2016-03-23T18:48:42Z")
                 .link("self", Link.builder()
@@ -391,6 +409,10 @@ public final class SpringProcessesTest {
                 .memoryInMb(256)
                 .diskInMb(1_024)
                 .port(8080)
+                .healthCheck(HealthCheck.builder()
+                    .type(Type.PORT)
+                    .data("timeout", null)
+                    .build())
                 .createdAt("2016-03-23T18:48:22Z")
                 .updatedAt("2016-03-23T18:48:42Z")
                 .link("self", Link.builder()
