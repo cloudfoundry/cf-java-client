@@ -24,6 +24,8 @@ import lombok.Getter;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
+import java.util.List;
+
 /**
  * The request payload for the Update Process operation
  */
@@ -40,6 +42,15 @@ public final class UpdateProcessRequest implements Validatable {
     private final String command;
 
     /**
+     * The ports
+     *
+     * @param ports the ports
+     * @return the ports;
+     */
+    @Getter(onMethod = @__(@JsonProperty("ports")))
+    private final List<Integer> ports;
+
+    /**
      * The process id
      *
      * @param processId the process id
@@ -49,8 +60,9 @@ public final class UpdateProcessRequest implements Validatable {
     private final String processId;
 
     @Builder
-    UpdateProcessRequest(String command, String processId) {
+    UpdateProcessRequest(String command, List<Integer> ports, String processId) {
         this.command = command;
+        this.ports = ports;
         this.processId = processId;
     }
 

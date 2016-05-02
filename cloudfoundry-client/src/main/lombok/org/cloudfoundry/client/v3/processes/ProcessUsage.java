@@ -44,4 +44,5 @@ public final class ProcessUsage {
         this.memory = memory;
         this.time = time;
     }
+
 }

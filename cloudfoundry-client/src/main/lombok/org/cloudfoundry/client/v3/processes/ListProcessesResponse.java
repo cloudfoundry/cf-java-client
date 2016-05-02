@@ -58,9 +58,10 @@ public final class ListProcessesResponse extends PaginatedResponse<ListProcesses
                  @JsonProperty("instances") Integer instances,
                  @JsonProperty("links") @Singular Map<String, Link> links,
                  @JsonProperty("memory_in_mb") Integer memoryInMb,
+                 @JsonProperty("ports") @Singular List<Integer> ports,
                  @JsonProperty("type") String type,
                  @JsonProperty("updated_at") String updatedAt) {
-            super(command, createdAt, diskInMb, id, instances, links, memoryInMb, type, updatedAt);
+            super(command, createdAt, diskInMb, id, instances, links, memoryInMb, ports, type, updatedAt);
         }
 
     }

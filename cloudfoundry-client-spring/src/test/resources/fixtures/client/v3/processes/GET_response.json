@@ -14,52 +14,56 @@
   },
   "resources": [
     {
-      "guid": "4de53195-876d-4b97-a4f6-79b0b65e9f30",
+      "guid": "6a901b7c-9417-4dc1-8189-d3234aa0ab82",
       "type": "web",
-      "command": null,
-      "instances": 1,
-      "memory_in_mb": 1024,
+      "command": "rackup",
+      "instances": 5,
+      "memory_in_mb": 256,
       "disk_in_mb": 1024,
-      "created_at": "2016-01-26T22:20:11Z",
-      "updated_at": "2016-01-26T22:20:11Z",
+      "ports": [
+        8080
+      ],
+      "created_at": "2016-03-23T18:48:22Z",
+      "updated_at": "2016-03-23T18:48:42Z",
       "links": {
         "self": {
-          "href": "/v3/processes/4de53195-876d-4b97-a4f6-79b0b65e9f30"
+          "href": "/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82"
         },
         "scale": {
-          "href": "/v3/processes/4de53195-876d-4b97-a4f6-79b0b65e9f30/scale",
+          "href": "/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/scale",
           "method": "PUT"
         },
         "app": {
-          "href": "/v3/apps/guid-8fb1c462-d4ca-43b8-9b7b-a3e76158cb06"
+          "href": "/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5"
         },
         "space": {
-          "href": "/v2/spaces/fba1181c-5acc-4c6b-96b5-13abaaba7381"
+          "href": "/v2/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576"
         }
       }
     },
     {
-      "guid": "e6020111-0a8c-4515-97f0-120e50f8ab53",
-      "type": "web",
-      "command": null,
+      "guid": "3fccacd9-4b02-4b96-8d02-8e865865e9eb",
+      "type": "worker",
+      "command": "bundle exec rake worker",
       "instances": 1,
-      "memory_in_mb": 1024,
+      "memory_in_mb": 256,
       "disk_in_mb": 1024,
-      "created_at": "2016-01-26T22:20:11Z",
-      "updated_at": "2016-01-26T22:20:11Z",
+      "ports": [],
+      "created_at": "2016-03-23T18:48:22Z",
+      "updated_at": "2016-03-23T18:48:42Z",
       "links": {
         "self": {
-          "href": "/v3/processes/e6020111-0a8c-4515-97f0-120e50f8ab53"
+          "href": "/v3/processes/3fccacd9-4b02-4b96-8d02-8e865865e9eb"
         },
         "scale": {
-          "href": "/v3/processes/e6020111-0a8c-4515-97f0-120e50f8ab53/scale",
+          "href": "/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/scale",
           "method": "PUT"
         },
         "app": {
-          "href": "/v3/apps/"
+          "href": "/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5"
         },
         "space": {
-          "href": "/v2/spaces/fba1181c-5acc-4c6b-96b5-13abaaba7381"
+          "href": "/v2/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576"
         }
       }
     }

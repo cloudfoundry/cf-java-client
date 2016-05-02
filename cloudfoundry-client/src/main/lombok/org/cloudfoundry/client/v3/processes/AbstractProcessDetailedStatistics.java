@@ -17,7 +17,11 @@
 package org.cloudfoundry.client.v3.processes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Singular;
+
+import java.util.List;
 
 /**
  * Process details statistics
@@ -33,9 +37,9 @@ public abstract class AbstractProcessDetailedStatistics {
 
     protected final int index;
 
-    protected final long memoryQuota;
+    protected final List<PortMapping> instancePorts;
 
-    protected final int port;
+    protected final long memoryQuota;
 
     protected final String state;
 
@@ -49,8 +53,8 @@ public abstract class AbstractProcessDetailedStatistics {
                                                 @JsonProperty("fds_quota") Integer fdsQuota,
                                                 @JsonProperty("host") String host,
                                                 @JsonProperty("index") Integer index,
+                                                @JsonProperty("instance_ports") @Singular List<PortMapping> instancePorts,
                                                 @JsonProperty("mem_quota") Long memoryQuota,
-                                                @JsonProperty("port") Integer port,
                                                 @JsonProperty("state") String state,
                                                 @JsonProperty("type") String type,
                                                 @JsonProperty("uptime") Long uptime,
@@ -59,11 +63,30 @@ public abstract class AbstractProcessDetailedStatistics {
         this.fdsQuota = fdsQuota;
         this.host = host;
         this.index = index;
+        this.instancePorts = instancePorts;
         this.memoryQuota = memoryQuota;
-        this.port = port;
         this.state = state;
         this.type = type;
         this.usage = usage;
         this.uptime = uptime;
     }
+
+    @Data
+    public static final class PortMapping {
+
+        private final Integer external;
+
+        private final Integer internal;
+
+        @Builder
+        PortMapping(@JsonProperty("external") Integer external,
+                    @JsonProperty("internal") Integer internal) {
+
+            this.external = external;
+            this.internal = internal;
+        }
+
+    }
+
 }
+
