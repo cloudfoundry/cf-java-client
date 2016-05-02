@@ -134,7 +134,7 @@ final class CloudFoundryCleaner {
 
                 Predicate<FeatureFlagEntity> featureFlagPredicate = f -> !protectedFeatureFlags.contains(f.getName());
 
-                Predicate<RouteResource> routePredicate = r -> true;
+                Predicate<RouteResource> routePredicate = r -> true;  // TODO: Filter out interesting organizations
 
                 Predicate<DomainResource> domainPredicate = protectedDomainId
                     .map(id -> (Predicate<DomainResource>) r -> !ResourceUtils.getId(r).equals(id))
