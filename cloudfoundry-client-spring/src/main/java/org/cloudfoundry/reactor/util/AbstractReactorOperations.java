@@ -131,8 +131,7 @@ public abstract class AbstractReactorOperations {
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(root);
         builderCallback.accept(Tuple.of(builder, validRequest));
 
-        String uri = builder.build().encode().toUriString();
-        return UriComponentsBuilder.fromUriString(uri).build().encode().toUriString();  // TODO: Rector strips encoding before sending
+        return builder.build().encode().toUriString();
     }
 
 }
