@@ -1,31 +1,32 @@
 {
-  "guid": "f501634a-c6a8-44a7-aafc-88862ec727ba",
-  "name": "name-2124",
+  "guid": "2ee5ef3f-3884-4240-ab99-c747ea21663b",
+  "name": "name-1136",
   "routes": [
     {
-      "guid": "7b0b080a-c567-48a3-acee-28a2c252e959",
-      "host": "host-18",
+      "guid": "704e6015-9785-42a3-b23c-06598154594d",
+      "host": "host-23",
+      "port": null,
+      "path": "",
       "domain": {
-        "guid": "011461ec-476b-444d-a048-b0e2a3ff0f30",
-        "name": "domain-55.example.com",
-        "router_group_types": []
+        "guid": "ebddac49-b094-4ce7-8c9b-0e00b4bc7525",
+        "name": "domain-72.example.com"
       }
     }
   ],
   "running_instances": 0,
   "services": [
     {
-      "guid": "b74ee576-9eb9-4e7e-8185-0c48db893d97",
-      "name": "name-2126",
+      "guid": "01826f41-9d8b-4458-88c6-9b8ddb04d0e8",
+      "name": "name-1138",
       "bound_app_count": 1,
       "last_operation": null,
       "dashboard_url": null,
       "service_plan": {
-        "guid": "192be526-c7c0-4899-aa2a-3aca7996ccb0",
-        "name": "name-2127",
+        "guid": "6dce1c90-929b-466c-98d1-1b856dc6e221",
+        "name": "name-1139",
         "service": {
-          "guid": "0e586250-a340-4924-8e2e-f13250f595ce",
-          "label": "label-75",
+          "guid": "994dae37-1a53-4959-aaa6-ba85e77d35e6",
+          "label": "label-46",
           "provider": null,
           "version": null
         }
@@ -34,33 +35,34 @@
   ],
   "available_domains": [
     {
-      "guid": "011461ec-476b-444d-a048-b0e2a3ff0f30",
-      "name": "domain-55.example.com",
-      "owning_organization_guid": "aadb707d-bf3b-4a0e-8b22-c06aabad53c4",
-      "router_group_types": []
+      "guid": "ebddac49-b094-4ce7-8c9b-0e00b4bc7525",
+      "name": "domain-72.example.com",
+      "owning_organization_guid": "48e781a9-3ccd-469c-a5cc-91bc86722924"
     },
     {
-      "guid": "7c4e943b-5e9b-44ac-85ce-fcff57134d3b",
+      "guid": "4f6e6f6e-695a-44df-816b-3d48ec05702b",
       "name": "customer-app-domain1.com",
-      "router_group_types": []
+      "router_group_guid": null,
+      "router_group_type": null
     },
     {
-      "guid": "1477a304-2af6-48d0-9e8f-6e2cdf06a9a2",
+      "guid": "43c8f83f-95b4-46fe-94cc-7748565d9a2b",
       "name": "customer-app-domain2.com",
-      "router_group_types": []
+      "router_group_guid": null,
+      "router_group_type": null
     }
   ],
   "production": false,
-  "space_guid": "3736ea8c-7ff0-44ba-8ed0-bd60971e8155",
-  "stack_guid": "21a9a6e8-127a-41ce-886a-0294d807c5e9",
+  "space_guid": "1fa31e11-a974-45b6-873c-ef690ce93e2b",
+  "stack_guid": "4a447da1-c518-4acb-b691-8d370df83b48",
   "buildpack": null,
   "detected_buildpack": null,
-  "environment_json": {},
+  "environment_json": null,
   "memory": 1024,
   "instances": 1,
   "disk_quota": 1024,
   "state": "STOPPED",
-  "version": "53188475-8b6c-4e13-b321-2955431b27de",
+  "version": "0a5fecd5-d790-43cc-a9bf-640db1b00b1b",
   "command": null,
   "console": false,
   "debug": null,
@@ -72,7 +74,7 @@
   "staging_failed_description": null,
   "diego": false,
   "docker_image": null,
-  "package_updated_at": "2015-07-27T22:43:29Z",
+  "package_updated_at": "2016-04-22T19:33:29Z",
   "detected_start_command": "",
   "enable_ssh": true,
   "docker_credentials_json": {

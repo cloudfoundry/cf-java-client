@@ -42,10 +42,21 @@ public final class SharedDomainEntity {
      */
     private final String routerGroupId;
 
+    /**
+     * The router group type
+     *
+     * @param routerGroupType the router group type
+     * @return the router group type
+     */
+    private final String routerGroupType;
+
     @Builder
     SharedDomainEntity(@JsonProperty("name") String name,
-                       @JsonProperty("router_group_guid") String routerGroupId) {
+                       @JsonProperty("router_group_guid") String routerGroupId,
+                       @JsonProperty("router_group_type") String routerGroupType) {
+
         this.name = name;
         this.routerGroupId = routerGroupId;
+        this.routerGroupType = routerGroupType;
     }
 }

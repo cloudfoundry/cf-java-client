@@ -1,12 +1,13 @@
 {
   "metadata": {
-    "guid": "5e9d838e-6d4f-42cd-ba13-789bfae2277c",
-    "url": "/v2/shared_domains/5e9d838e-6d4f-42cd-ba13-789bfae2277c",
-    "created_at": "2015-12-22T18:28:19Z",
+    "guid": "d6c7d452-70bb-4edd-bbf1-a925dd51732c",
+    "url": "/v2/shared_domains/d6c7d452-70bb-4edd-bbf1-a925dd51732c",
+    "created_at": "2016-04-22T19:33:17Z",
     "updated_at": null
   },
   "entity": {
-    "name": "shared-domain.com",
-    "router_group_guid": "random-guid"
+    "name": "example.com",
+    "router_group_guid": "my-random-guid",
+    "router_group_type": "tcp"
   }
 }
