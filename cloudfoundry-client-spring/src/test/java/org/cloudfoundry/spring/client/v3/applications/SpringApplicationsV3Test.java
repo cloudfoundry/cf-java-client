@@ -57,6 +57,8 @@ import org.cloudfoundry.client.v3.applications.TerminateApplicationInstanceReque
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v3.processes.AbstractProcessDetailedStatistics.PortMapping;
+import org.cloudfoundry.client.v3.processes.HealthCheck;
+import org.cloudfoundry.client.v3.processes.HealthCheck.Type;
 import org.cloudfoundry.client.v3.processes.ProcessUsage;
 import org.cloudfoundry.client.v3.tasks.Task;
 import org.cloudfoundry.client.v3.tasks.TaskResource;
@@ -602,6 +604,10 @@ public final class SpringApplicationsV3Test {
                 .memoryInMb(256)
                 .diskInMb(1_024)
                 .port(8080)
+                .healthCheck(HealthCheck.builder()
+                    .type(Type.PORT)
+                    .data("timeout", null)
+                    .build())
                 .createdAt("2016-03-23T18:48:22Z")
                 .updatedAt("2016-03-23T18:48:42Z")
                 .link("self", Link.builder()
@@ -1056,6 +1062,10 @@ public final class SpringApplicationsV3Test {
                     .memoryInMb(256)
                     .diskInMb(1_024)
                     .port(8080)
+                    .healthCheck(HealthCheck.builder()
+                        .type(Type.PORT)
+                        .data("timeout", null)
+                        .build())
                     .createdAt("2016-03-23T18:48:22Z")
                     .updatedAt("2016-03-23T18:48:42Z")
                     .link("self", Link.builder()
@@ -1079,6 +1089,10 @@ public final class SpringApplicationsV3Test {
                     .instances(1)
                     .memoryInMb(256)
                     .diskInMb(1_024)
+                    .healthCheck(HealthCheck.builder()
+                        .type(Type.PROCESS)
+                        .data("timeout", null)
+                        .build())
                     .createdAt("2016-03-23T18:48:22Z")
                     .updatedAt("2016-03-23T18:48:42Z")
                     .link("self", Link.builder()
@@ -1227,6 +1241,10 @@ public final class SpringApplicationsV3Test {
                 .memoryInMb(256)
                 .diskInMb(1_024)
                 .port(8080)
+                .healthCheck(HealthCheck.builder()
+                    .type(Type.PORT)
+                    .data("timeout", null)
+                    .build())
                 .createdAt("2016-03-23T18:48:22Z")
                 .updatedAt("2016-03-23T18:48:42Z")
                 .link("self", Link.builder()
