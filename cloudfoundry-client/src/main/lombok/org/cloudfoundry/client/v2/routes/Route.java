@@ -59,15 +59,26 @@ public final class Route {
      */
     private final String path;
 
+    /**
+     * The port
+     *
+     * @param port the port
+     * @return the port
+     */
+    private final Integer port;
+
     @Builder
     Route(@JsonProperty("domain") Domain domain,
           @JsonProperty("host") String host,
           @JsonProperty("guid") String id,
-          @JsonProperty("path") String path) {
+          @JsonProperty("path") String path,
+          @JsonProperty("port") Integer port) {
+
         this.domain = domain;
         this.host = host;
         this.id = id;
         this.path = path;
+        this.port = port;
     }
 
 }

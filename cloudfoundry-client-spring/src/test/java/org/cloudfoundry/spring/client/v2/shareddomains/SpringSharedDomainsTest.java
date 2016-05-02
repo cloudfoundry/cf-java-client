@@ -56,13 +56,14 @@ public final class SpringSharedDomainsTest {
         protected CreateSharedDomainResponse getResponse() {
             return CreateSharedDomainResponse.builder()
                 .metadata(Resource.Metadata.builder()
-                    .id("5e9d838e-6d4f-42cd-ba13-789bfae2277c")
-                    .url("/v2/shared_domains/5e9d838e-6d4f-42cd-ba13-789bfae2277c")
-                    .createdAt("2015-12-22T18:28:19Z")
+                    .id("d6c7d452-70bb-4edd-bbf1-a925dd51732c")
+                    .url("/v2/shared_domains/d6c7d452-70bb-4edd-bbf1-a925dd51732c")
+                    .createdAt("2016-04-22T19:33:17Z")
                     .build())
                 .entity(SharedDomainEntity.builder()
-                    .name("shared-domain.com")
-                    .routerGroupId("random-guid")
+                    .name("example.com")
+                    .routerGroupId("my-random-guid")
+                    .routerGroupType("tcp")
                     .build())
                 .build();
         }
