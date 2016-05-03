@@ -20,26 +20,44 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Singular;
 import lombok.ToString;
+
+import java.util.List;
 
 /**
  * The response from the token key request
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public final class GetTokenKeyResponse extends AbstractTokenKey {
+public final class ListTokenKeysResponse {
+
+    private final List<TokenKey> keys;
 
     @Builder
-    GetTokenKeyResponse(@JsonProperty("alg") String algorithm,
-                        @JsonProperty("e") String e,
-                        @JsonProperty("kid") String id,
-                        @JsonProperty("kty") KeyType keyType,
-                        @JsonProperty("n") String n,
-                        @JsonProperty("use") String use,
-                        @JsonProperty("value") String value) {
+    ListTokenKeysResponse(@JsonProperty("keys") @Singular List<TokenKey> keys) {
+        this.keys = keys;
+    }
 
-        super(algorithm, e, id, keyType, n, use, value);
+    /**
+     * The token key
+     */
+    @Data
+    @EqualsAndHashCode(callSuper = true)
+    @ToString(callSuper = true)
+    public static final class TokenKey extends AbstractTokenKey {
+
+        @Builder
+        TokenKey(@JsonProperty("alg") String algorithm,
+                 @JsonProperty("e") String e,
+                 @JsonProperty("kid") String id,
+                 @JsonProperty("kty") KeyType keyType,
+                 @JsonProperty("n") String n,
+                 @JsonProperty("use") String use,
+                 @JsonProperty("value") String value) {
+
+            super(algorithm, e, id, keyType, n, use, value);
+        }
+
     }
 
 }

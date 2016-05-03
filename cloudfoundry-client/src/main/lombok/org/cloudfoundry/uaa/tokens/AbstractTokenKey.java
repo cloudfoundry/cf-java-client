@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-abstract class AbstractTokenKey {
+public abstract class AbstractTokenKey {
 
     /**
      * The algorithm
@@ -52,7 +52,7 @@ abstract class AbstractTokenKey {
      * @param keyType the keyType
      * @return the key type
      */
-    private final String keyType;
+    private final KeyType keyType;
 
     /**
      * The modulus
@@ -81,7 +81,7 @@ abstract class AbstractTokenKey {
     AbstractTokenKey(@JsonProperty("alg") String algorithm,
                      @JsonProperty("e") String e,
                      @JsonProperty("kid") String id,
-                     @JsonProperty("kty") String keyType,
+                     @JsonProperty("kty") KeyType keyType,
                      @JsonProperty("n") String n,
                      @JsonProperty("use") String use,
                      @JsonProperty("value") String value) {
@@ -93,6 +93,22 @@ abstract class AbstractTokenKey {
         this.n = n;
         this.use = use;
         this.value = value;
+    }
+
+    /**
+     * The key type
+     */
+    public enum KeyType {
+
+        /**
+         * The MAC key type
+         */
+        MAC,
+
+        /**
+         * The RSA key type
+         */
+        RSA
     }
 
 }

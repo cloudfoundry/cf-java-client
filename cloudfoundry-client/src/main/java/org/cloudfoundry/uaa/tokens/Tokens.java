@@ -31,4 +31,12 @@ public interface Tokens {
      */
     Mono<GetTokenKeyResponse> getKey(GetTokenKeyRequest request);
 
+    /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#token-keys">Token Keys</a> request
+     *
+     * @param request the Token Keys request
+     * @return the Token Keys response
+     */
+    Mono<ListTokenKeysResponse> listKeys(ListTokenKeysRequest request);
+
 }

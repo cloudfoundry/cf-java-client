@@ -19,9 +19,11 @@ package org.cloudfoundry.reactor.uaa.accesstokenadministration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
-import org.cloudfoundry.uaa.tokens.Tokens;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyResponse;
+import org.cloudfoundry.uaa.tokens.ListTokenKeysRequest;
+import org.cloudfoundry.uaa.tokens.ListTokenKeysResponse;
+import org.cloudfoundry.uaa.tokens.Tokens;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
@@ -45,6 +47,11 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
     @Override
     public Mono<GetTokenKeyResponse> getKey(GetTokenKeyRequest request) {
         return get(request, GetTokenKeyResponse.class, function((builder, validRequest) -> builder.pathSegment("token_key")));
+    }
+
+    @Override
+    public Mono<ListTokenKeysResponse> listKeys(ListTokenKeysRequest request) {
+        return get(request, ListTokenKeysResponse.class, function((builder, validRequest) -> builder.pathSegment("token_keys")));
     }
 
 }
