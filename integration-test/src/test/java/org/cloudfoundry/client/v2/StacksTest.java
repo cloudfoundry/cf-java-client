@@ -28,6 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import static org.cloudfoundry.util.PaginationUtils.requestResources;
+
 public final class StacksTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -50,11 +52,14 @@ public final class StacksTest extends AbstractIntegrationTest {
 
     @Test
     public void list() {
-        PaginationUtils
-            .requestResources(page -> this.cloudFoundryClient.stacks()
-                .list(ListStacksRequest.builder()
-                    .page(page)
-                    .build()))
+        getStackId(this.cloudFoundryClient, this.stackName)
+            .flatMap(stackId ->
+                PaginationUtils
+                    .requestResources(page -> this.cloudFoundryClient.stacks()
+                        .list(ListStacksRequest.builder()
+                            .page(page)
+                            .build()))
+                    .filter(resource -> ResourceUtils.getId(resource).equals(stackId)))
             .map(resource -> resource.getEntity().getName())
             .subscribe(this.testSubscriber()
                 .assertEquals(this.stackName));
@@ -62,12 +67,11 @@ public final class StacksTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByName() {
-        PaginationUtils
-            .requestResources(page -> this.cloudFoundryClient.stacks()
-                .list(ListStacksRequest.builder()
-                    .name(this.stackName)
-                    .page(page)
-                    .build()))
+        requestResources(page -> this.cloudFoundryClient.stacks()
+            .list(ListStacksRequest.builder()
+                .name(this.stackName)
+                .page(page)
+                .build()))
             .map(resource -> resource.getEntity().getName())
             .subscribe(this.testSubscriber()
                 .assertEquals(this.stackName));
@@ -80,8 +84,8 @@ public final class StacksTest extends AbstractIntegrationTest {
     }
 
     private static Flux<StackResource> requestListStacks(CloudFoundryClient cloudFoundryClient, String stackName) {
-        return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.stacks()
+        return
+            requestResources(page -> cloudFoundryClient.stacks()
                 .list(ListStacksRequest.builder()
                     .name(stackName)
                     .page(page)
