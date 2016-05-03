@@ -830,7 +830,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		serviceRequest.put("space_guid", sessionSpace.getMeta().getGuid());
 		serviceRequest.put("name", service.getName());
 		serviceRequest.put("service_plan_guid", cloudServicePlan.getMeta().getGuid());
-		getRestTemplate().postForObject(getUrl("/v2/service_instances"), serviceRequest, String.class);
+		getRestTemplate().postForObject(getUrl("/v2/service_instances?accepts_incomplete=true"), serviceRequest, String.class);
 	}
 
 	private CloudServicePlan findPlanForService(CloudService service) {
