@@ -1,0 +1,24 @@
+{
+  "total_results": 1,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "9803ec3c-8d97-4bd8-bf86-e44cc835a154",
+        "url": "/v2/service_keys/05f3ec3c-8d97-4bd8-bf86-e44cc835a154",
+        "created_at": "2016-05-04T22:43:09Z",
+        "updated_at": null
+      },
+      "entity": {
+        "service_instance_guid": "c6a0890e-edbf-4da9-ae90-dce24af308a1",
+        "credentials": {
+          "credential-key": "credential-value"
+        },
+        "name": "test-service-key",
+        "service_instance_url": "/v2/service_instances/c6a0890e-edbf-4da9-ae90-dce24af308a1"
+      }
+    }
+  ]
+}
