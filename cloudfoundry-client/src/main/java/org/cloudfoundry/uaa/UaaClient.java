@@ -25,6 +25,11 @@ import org.cloudfoundry.uaa.tokens.Tokens;
 public interface UaaClient {
 
     /**
+     * The currently supported UAA API version
+     */
+    String SUPPORTED_API_VERSION = "3.3.0";
+
+    /**
      * Main entry point to the UAA Identity Zone Client API
      *
      * @return the UAA Identity Zone Client API
