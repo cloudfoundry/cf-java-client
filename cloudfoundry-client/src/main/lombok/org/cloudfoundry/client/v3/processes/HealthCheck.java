@@ -70,6 +70,12 @@ public final class HealthCheck {
          */
         PROCESS;
 
+        @JsonValue
+        @Override
+        public String toString() {
+            return name().toLowerCase();
+        }
+
         @JsonCreator
         static Type fromString(String s) {
             if (PORT.toString().equals(s)) {
@@ -79,12 +85,6 @@ public final class HealthCheck {
             } else {
                 throw new IllegalArgumentException(String.format("Type %s is not a valid type", s));
             }
-        }
-
-        @JsonValue
-        @Override
-        public String toString() {
-            return name().toLowerCase();
         }
 
     }
