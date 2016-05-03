@@ -32,7 +32,7 @@ public final class HealthCheck {
     /**
      * The data
      *
-     * @param data the data
+     * @param datas the data
      * @return the data
      */
     @Getter(onMethod = @__(@JsonProperty("data")))
