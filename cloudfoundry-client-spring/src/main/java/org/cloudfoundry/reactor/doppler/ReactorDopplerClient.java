@@ -44,7 +44,7 @@ import reactor.io.netty.http.HttpInbound;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
  * The Reactor-based implementation of {@link DopplerClient}
@@ -63,7 +63,7 @@ public final class ReactorDopplerClient extends AbstractDopplerOperations implem
 
     @Override
     public Flux<ContainerMetric> containerMetrics(ContainerMetricsRequest request) {
-        return get(request, consumer((builder, validRequest) -> builder.pathSegment("apps", validRequest.getApplicationId(), "containermetrics")))
+        return get(request, function((builder, validRequest) -> builder.pathSegment("apps", validRequest.getApplicationId(), "containermetrics")))
             .flatMap(inbound -> inbound.receiveMultipart().receiveInputStream())
             .map(ReactorDopplerClient::toEnvelope)
             .map(ReactorDopplerClient::toEvent);
@@ -71,7 +71,7 @@ public final class ReactorDopplerClient extends AbstractDopplerOperations implem
 
     @Override
     public Flux<Event> firehose(FirehoseRequest request) {
-        return ws(request, consumer((builder, validRequest) -> builder.pathSegment("firehose", validRequest.getSubscriptionId())))
+        return ws(request, function((builder, validRequest) -> builder.pathSegment("firehose", validRequest.getSubscriptionId())))
             .flatMap(HttpInbound::receiveInputStream)
             .map(ReactorDopplerClient::toEnvelope)
             .map(ReactorDopplerClient::toEvent);
@@ -79,7 +79,7 @@ public final class ReactorDopplerClient extends AbstractDopplerOperations implem
 
     @Override
     public Flux<LogMessage> recentLogs(RecentLogsRequest request) {
-        return get(request, consumer((builder, validRequest) -> builder.pathSegment("apps", validRequest.getApplicationId(), "recentlogs")))
+        return get(request, function((builder, validRequest) -> builder.pathSegment("apps", validRequest.getApplicationId(), "recentlogs")))
             .flatMap(inbound -> inbound.receiveMultipart().receiveInputStream())
             .map(ReactorDopplerClient::toEnvelope)
             .map(ReactorDopplerClient::toEvent);
@@ -87,7 +87,7 @@ public final class ReactorDopplerClient extends AbstractDopplerOperations implem
 
     @Override
     public Flux<Event> stream(StreamRequest request) {
-        return ws(request, consumer((builder, validRequest) -> builder.pathSegment("apps", validRequest.getApplicationId(), "stream")))
+        return ws(request, function((builder, validRequest) -> builder.pathSegment("apps", validRequest.getApplicationId(), "stream")))
             .flatMap(HttpInbound::receiveInputStream)
             .map(ReactorDopplerClient::toEnvelope)
             .map(ReactorDopplerClient::toEvent);

@@ -27,7 +27,7 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
  * The Spring-based implementation of {@link Stacks}
@@ -48,12 +48,12 @@ public final class ReactorStacks extends AbstractClientV2Operations implements S
 
     @Override
     public Mono<GetStackResponse> get(GetStackRequest request) {
-        return get(request, GetStackResponse.class, consumer((builder, validRequest) -> builder.pathSegment("v2", "stacks", validRequest.getStackId())));
+        return get(request, GetStackResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "stacks", validRequest.getStackId())));
     }
 
     @Override
     public Mono<ListStacksResponse> list(ListStacksRequest request) {
-        return get(request, ListStacksResponse.class, consumer((builder, validRequest) -> builder.pathSegment("v2", "stacks")));
+        return get(request, ListStacksResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "stacks")));
     }
 
 }

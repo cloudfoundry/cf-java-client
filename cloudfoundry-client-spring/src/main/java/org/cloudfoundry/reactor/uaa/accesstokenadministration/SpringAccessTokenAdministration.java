@@ -25,7 +25,7 @@ import org.cloudfoundry.uaa.accesstokenadministration.GetTokenKeyResponse;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 
 public final class SpringAccessTokenAdministration extends AbstractUaaOperations implements AccessTokenAdministration {
@@ -44,7 +44,7 @@ public final class SpringAccessTokenAdministration extends AbstractUaaOperations
 
     @Override
     public Mono<GetTokenKeyResponse> getTokenKey(GetTokenKeyRequest request) {
-        return get(request, GetTokenKeyResponse.class, consumer((builder, validRequest) -> builder.pathSegment("token_key")));
+        return get(request, GetTokenKeyResponse.class, function((builder, validRequest) -> builder.pathSegment("token_key")));
     }
 
 }

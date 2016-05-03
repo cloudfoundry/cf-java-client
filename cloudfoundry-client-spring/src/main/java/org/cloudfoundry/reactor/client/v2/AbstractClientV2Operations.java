@@ -19,9 +19,9 @@ package org.cloudfoundry.reactor.client.v2;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.reactor.client.CloudFoundryExceptionBuilder;
+import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
-import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
@@ -31,9 +31,9 @@ import reactor.io.netty.http.HttpClient;
 import reactor.io.netty.http.HttpException;
 import reactor.io.netty.http.HttpInbound;
 
-import java.util.function.Consumer;
+import java.util.function.Function;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public abstract class AbstractClientV2Operations extends AbstractReactorOperations {
 
@@ -41,41 +41,38 @@ public abstract class AbstractClientV2Operations extends AbstractReactorOperatio
         super(authorizationProvider, httpClient, objectMapper, root);
     }
 
-    protected final <REQ extends Validatable, RSP> Mono<RSP> delete(REQ request, Class<RSP> responseType, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
-        return doDelete(request, responseType, getUriAugmenter(builderCallback))
+    protected final <REQ extends Validatable, RSP> Mono<RSP> delete(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
+        return doDelete(request, responseType, getUriAugmenter(uriTransformer), function((outbound, validRequest) -> outbound))
             .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build));
     }
 
-    protected final <REQ extends Validatable, RSP> Mono<RSP> get(REQ request, Class<RSP> responseType, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
-        return doGet(request, responseType, getUriAugmenter(builderCallback))
+    protected final <REQ extends Validatable, RSP> Mono<RSP> get(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
+        return doGet(request, responseType, getUriAugmenter(uriTransformer), function((outbound, validRequest) -> outbound))
             .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build));
     }
 
-    protected final <REQ extends Validatable> Mono<HttpInbound> get(REQ request, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
-        return doGet(request, getUriAugmenter(builderCallback))
+    protected final <REQ extends Validatable> Mono<HttpInbound> get(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
+        return doGet(request, getUriAugmenter(uriTransformer), function((outbound, validRequest) -> outbound))
             .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build));
     }
 
-    protected final <REQ extends Validatable, RSP> Mono<RSP> post(REQ request, Class<RSP> responseType, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
-        return doPost(request, responseType, getUriAugmenter(builderCallback))
+    protected final <REQ extends Validatable, RSP> Mono<RSP> post(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
+        return doPost(request, responseType, getUriAugmenter(uriTransformer), function((outbound, validRequest) -> outbound))
             .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build));
     }
 
-    protected final <REQ extends Validatable, RSP> Mono<RSP> put(REQ request, Class<RSP> responseType, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
-        return doPut(request, responseType, getUriAugmenter(builderCallback))
+    protected final <REQ extends Validatable, RSP> Mono<RSP> put(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
+        return doPut(request, responseType, getUriAugmenter(uriTransformer), function((outbound, validRequest) -> outbound))
             .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build));
     }
 
-    protected final <REQ extends Validatable> Mono<HttpInbound> ws(REQ request, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
-        return doWs(request, getUriAugmenter(builderCallback))
-            .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build));
-    }
+    private static <REQ extends Validatable> Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> getUriAugmenter(
+        Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
 
-    private static <REQ extends Validatable> Consumer<Tuple2<UriComponentsBuilder, REQ>> getUriAugmenter(Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
-        return consumer((builder, validRequest) -> {
-            builderCallback.accept(Tuple.of(builder, validRequest));
+        return function((builder, validRequest) -> {
             FilterBuilder.augment(builder, validRequest);
             QueryBuilder.augment(builder, validRequest);
+            return uriTransformer.apply(Tuple.of(builder, validRequest));
         });
     }
 

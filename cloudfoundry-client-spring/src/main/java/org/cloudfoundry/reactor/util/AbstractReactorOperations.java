@@ -31,7 +31,7 @@ import reactor.io.netty.http.HttpClient;
 import reactor.io.netty.http.HttpInbound;
 import reactor.io.netty.http.HttpOutbound;
 
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
@@ -55,47 +55,48 @@ public abstract class AbstractReactorOperations {
         this.root = root;
     }
 
-    protected final <REQ extends Validatable, RSP> Mono<RSP> doDelete(REQ request, Class<RSP> responseType, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
+    protected final <REQ extends Validatable, RSP> Mono<RSP> doDelete(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
+                                                                      Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
         return Mono
             .when(ValidationUtils.validate(request), this.root)
-            .map(function((validRequest, root) -> buildUri(root, validRequest, builderCallback)))
-            .doOnSuccess(uri -> this.logger.debug("DELETE {}", uri))
-            .then(uri -> this.httpClient.delete(uri,
+            .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, uriTransformer))))
+            .doOnSuccess(consumer((validRequest, uri) -> this.logger.debug("DELETE {}", uri)))
+            .then(function((validRequest, uri) -> this.httpClient.delete(uri,
                 outbound -> this.authorizationProvider.addAuthorization(outbound)
-                    .then(HttpOutbound::sendHeaders)))
+                    .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
+                    .then(HttpOutbound::sendHeaders))))
             .flatMap(NettyInbound::receive)
             .as(JsonCodec.decode(this.objectMapper, responseType));
     }
 
-    protected final <REQ extends Validatable, RSP> Mono<RSP> doGet(REQ request, Class<RSP> responseType, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.root)
-            .map(function((validRequest, root) -> buildUri(root, validRequest, builderCallback)))
-            .doOnSuccess(uri -> this.logger.debug("GET    {}", uri))
-            .then(uri -> this.httpClient.get(uri,
-                outbound -> this.authorizationProvider.addAuthorization(outbound)
-                    .then(HttpOutbound::sendHeaders)))
+    protected final <REQ extends Validatable, RSP> Mono<RSP> doGet(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
+                                                                   Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
+        return doGet(request, uriTransformer, requestTransformer)
             .flatMap(NettyInbound::receive)
             .as(JsonCodec.decode(this.objectMapper, responseType));
     }
 
-    protected final <REQ extends Validatable> Mono<HttpInbound> doGet(REQ request, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
+    protected final <REQ extends Validatable> Mono<HttpInbound> doGet(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
+                                                                      Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
         return Mono
             .when(ValidationUtils.validate(request), this.root)
-            .map(function((validRequest, root) -> buildUri(root, validRequest, builderCallback)))
-            .doOnSuccess(uri -> this.logger.debug("GET    {}", uri))
-            .then(uri -> this.httpClient.get(uri,
+            .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, uriTransformer))))
+            .doOnSuccess(consumer((validRequest, uri) -> this.logger.debug("GET    {}", uri)))
+            .then(function((validRequest, uri) -> this.httpClient.get(uri,
                 outbound -> this.authorizationProvider.addAuthorization(outbound)
-                    .then(HttpOutbound::sendHeaders)));
+                    .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
+                    .then(HttpOutbound::sendHeaders))));
     }
 
-    protected final <REQ extends Validatable, RSP> Mono<RSP> doPost(REQ request, Class<RSP> responseType, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
+    protected final <REQ extends Validatable, RSP> Mono<RSP> doPost(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
+                                                                    Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
         return Mono
             .when(ValidationUtils.validate(request), this.root)
-            .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, builderCallback))))
+            .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, uriTransformer))))
             .doOnSuccess(consumer((validRequest, uri) -> this.logger.debug("POST   {}", uri)))
             .then(function((validRequest, uri) -> this.httpClient.post(uri,
                 outbound -> this.authorizationProvider.addAuthorization(outbound)
+                    .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
                     .and(Mono.just(validRequest)
                         .as(JsonCodec.encode(this.objectMapper)))
                     .then(function(HttpOutbound::sendOne)))))
@@ -103,13 +104,15 @@ public abstract class AbstractReactorOperations {
             .as(JsonCodec.decode(this.objectMapper, responseType));
     }
 
-    protected final <REQ extends Validatable, RSP> Mono<RSP> doPut(REQ request, Class<RSP> responseType, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
+    protected final <REQ extends Validatable, RSP> Mono<RSP> doPut(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
+                                                                   Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
         return Mono
             .when(ValidationUtils.validate(request), this.root)
-            .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, builderCallback))))
+            .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, uriTransformer))))
             .doOnSuccess(consumer((validRequest, uri) -> this.logger.debug("PUT    {}", uri)))
             .then(function((validRequest, uri) -> this.httpClient.put(uri,
                 outbound -> this.authorizationProvider.addAuthorization(outbound)
+                    .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
                     .and(Mono.just(validRequest)
                         .as(JsonCodec.encode(this.objectMapper)))
                     .then(function(HttpOutbound::sendOne)))))
@@ -117,21 +120,23 @@ public abstract class AbstractReactorOperations {
             .as(JsonCodec.decode(this.objectMapper, responseType));
     }
 
-    protected final <REQ extends Validatable> Mono<HttpInbound> doWs(REQ request, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
+    protected final <REQ extends Validatable> Mono<HttpInbound> doWs(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
+                                                                     Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
+
         return Mono
             .when(ValidationUtils.validate(request), this.root)
-            .map(function((validRequest, root) -> buildUri(root, validRequest, builderCallback)))
-            .doOnSuccess(uri -> this.logger.debug("WS     {}", uri))
-            .then(uri -> this.httpClient.get(uri,
+            .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, uriTransformer))))
+            .doOnSuccess(consumer((validRequest, uri) -> this.logger.debug("WS     {}", uri)))
+            .then(function((validRequest, uri) -> this.httpClient.get(uri,
                 outbound -> this.authorizationProvider.addAuthorization(outbound)
-                    .then(HttpOutbound::upgradeToWebsocket)));
+                    .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
+                    .then(HttpOutbound::upgradeToTextWebsocket))));
     }
 
-    private static <REQ extends Validatable> String buildUri(String root, REQ validRequest, Consumer<Tuple2<UriComponentsBuilder, REQ>> builderCallback) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(root);
-        builderCallback.accept(Tuple.of(builder, validRequest));
-
-        return builder.build().encode().toUriString();
+    private static <REQ extends Validatable> String buildUri(String root, REQ validRequest, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
+        return uriTransformer
+            .apply(Tuple.of(UriComponentsBuilder.fromUriString(root), validRequest))
+            .build().encode().toUriString();
     }
 
 }
