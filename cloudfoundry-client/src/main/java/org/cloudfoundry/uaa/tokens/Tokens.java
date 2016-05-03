@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.accesstokens;
+package org.cloudfoundry.uaa.tokens;
 
 import reactor.core.publisher.Mono;
 
 /**
  * Main entry point to the UAA Access Token Administration Client API
  */
-public interface AccessTokens {
+public interface Tokens {
 
     /**
-     * Makes the <a href="https://github.com/cloudfoundry/uaa/blob/master/docs/UAA-APIs.rst#get-the-token-signing-key-get-token-key">Token Key</a> request
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#token-key">Token Key</a> request
      *
      * @param request the Token Key request
      * @return the response from the Token Key request
      */
-    Mono<GetTokenKeyResponse> getTokenKey(GetTokenKeyRequest request);
+    Mono<GetTokenKeyResponse> getKey(GetTokenKeyRequest request);
 
 }

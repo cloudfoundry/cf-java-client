@@ -22,6 +22,7 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
+import org.cloudfoundry.util.test.FailingDeserializationProblemHandler;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
@@ -42,6 +43,7 @@ public abstract class AbstractRestTest {
     protected final HttpClient httpClient = HttpClient.create();
 
     protected final ObjectMapper objectMapper = new ObjectMapper()
+        .addHandler(new FailingDeserializationProblemHandler())
         .setSerializationInclusion(NON_NULL);
 
     private final MockWebServer mockWebServer = new MockWebServer();

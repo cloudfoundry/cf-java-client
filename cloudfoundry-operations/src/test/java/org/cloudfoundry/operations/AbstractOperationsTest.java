@@ -41,7 +41,7 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServi
 import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.uaa.UaaClient;
-import org.cloudfoundry.uaa.accesstokens.AccessTokens;
+import org.cloudfoundry.uaa.tokens.Tokens;
 import org.junit.Before;
 import reactor.core.publisher.Mono;
 
@@ -69,7 +69,7 @@ public abstract class AbstractOperationsTest {
 
     protected static final String TEST_USERNAME = "test-username";
 
-    protected final AccessTokens accessTokens = mock(AccessTokens.class, RETURNS_SMART_NULLS);
+    protected final Tokens tokens = mock(Tokens.class, RETURNS_SMART_NULLS);
 
     protected final ApplicationsV2 applications = mock(ApplicationsV2.class, RETURNS_SMART_NULLS);
 
@@ -146,7 +146,7 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.userProvidedServiceInstances()).thenReturn(this.userProvidedServiceInstances);
         when(this.cloudFoundryClient.users()).thenReturn(this.users);
 
-        when(this.uaaClient.accessTokens()).thenReturn(this.accessTokens);
+        when(this.uaaClient.tokens()).thenReturn(this.tokens);
     }
 
 }
