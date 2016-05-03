@@ -23,9 +23,9 @@ import org.cloudfoundry.client.v2.serviceusageevents.ListServiceUsageEventsReque
 import org.cloudfoundry.client.v2.serviceusageevents.ListServiceUsageEventsResponse;
 import org.cloudfoundry.client.v2.serviceusageevents.PurgeAndReseedServiceUsageEventsRequest;
 import org.cloudfoundry.client.v2.serviceusageevents.ServiceUsageEvents;
-import org.cloudfoundry.spring.client.v2.FilterBuilder;
+import org.cloudfoundry.reactor.client.v2.FilterBuilder;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.QueryBuilder;
+import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;

@@ -24,7 +24,7 @@ import org.cloudfoundry.client.v2.applicationusageevents.ListApplicationUsageEve
 import org.cloudfoundry.client.v2.applicationusageevents.ListApplicationUsageEventsResponse;
 import org.cloudfoundry.client.v2.applicationusageevents.PurgeAndReseedApplicationUsageEventsRequest;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.QueryBuilder;
+import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;

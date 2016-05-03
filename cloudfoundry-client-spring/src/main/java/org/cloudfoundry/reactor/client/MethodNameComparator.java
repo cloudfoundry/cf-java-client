@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.util;
+package org.cloudfoundry.reactor.client;
 
 import java.lang.reflect.Method;
 import java.util.Comparator;

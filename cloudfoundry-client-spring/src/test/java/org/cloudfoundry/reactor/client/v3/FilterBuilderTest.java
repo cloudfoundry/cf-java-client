@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v3;
+package org.cloudfoundry.reactor.client.v3;
 
 import org.cloudfoundry.client.v3.FilterParameter;
 import org.junit.Test;

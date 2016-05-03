@@ -28,9 +28,9 @@ import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQ
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitions;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.UpdateOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.UpdateOrganizationQuotaDefinitionResponse;
-import org.cloudfoundry.spring.client.v2.FilterBuilder;
+import org.cloudfoundry.reactor.client.v2.FilterBuilder;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.QueryBuilder;
+import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
@@ -85,5 +85,5 @@ public final class SpringOrganizationQuotaDefinitions extends AbstractSpringOper
     public Mono<UpdateOrganizationQuotaDefinitionResponse> update(UpdateOrganizationQuotaDefinitionRequest request) {
         return put(request, UpdateOrganizationQuotaDefinitionResponse.class, builder -> builder.pathSegment("v2", "quota_definitions", request.getOrganizationQuotaDefinitionId()));
     }
-    
+
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.util;
+package org.cloudfoundry.reactor.client;
 
 import org.cloudfoundry.QueryParameter;
 import org.springframework.core.annotation.AnnotationUtils;

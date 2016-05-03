@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2;
+package org.cloudfoundry.reactor.client.v2;
 
 import org.cloudfoundry.client.v2.GreaterThanFilterParameter;
 import org.cloudfoundry.client.v2.GreaterThanOrEqualToFilterParameter;

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v3;
+package org.cloudfoundry.reactor.client.v3;
 
 import org.cloudfoundry.client.v3.FilterParameter;
-import org.cloudfoundry.spring.util.MethodNameComparator;
+import org.cloudfoundry.reactor.client.MethodNameComparator;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;

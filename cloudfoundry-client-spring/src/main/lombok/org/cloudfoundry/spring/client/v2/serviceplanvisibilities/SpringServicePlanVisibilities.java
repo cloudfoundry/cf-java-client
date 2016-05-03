@@ -28,9 +28,9 @@ import org.cloudfoundry.client.v2.serviceplanvisibilities.ListServicePlanVisibil
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilities;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.UpdateServicePlanVisibilityRequest;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.UpdateServicePlanVisibilityResponse;
-import org.cloudfoundry.spring.client.v2.FilterBuilder;
+import org.cloudfoundry.reactor.client.v2.FilterBuilder;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.QueryBuilder;
+import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;

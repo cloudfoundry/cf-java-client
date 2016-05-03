@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2;
+package org.cloudfoundry.reactor.client.v2;
 
 import org.cloudfoundry.client.v2.FilterParameter;
-import org.cloudfoundry.spring.util.MethodNameComparator;
+import org.cloudfoundry.reactor.client.MethodNameComparator;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 /**
  * A builder for Cloud Foundry V2 filters
  */
-public final class FilterBuilder {
+public final class FilterBuilder {  // TODO: reduce visibility once Spring is gone
 
     private FilterBuilder() {
     }

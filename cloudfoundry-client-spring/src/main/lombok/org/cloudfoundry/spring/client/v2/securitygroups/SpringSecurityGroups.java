@@ -29,7 +29,7 @@ import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultR
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupStagingDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupStagingDefaultResponse;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.QueryBuilder;
+import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
@@ -88,5 +88,5 @@ public class SpringSecurityGroups extends AbstractSpringOperations implements Se
     public Mono<SetSecurityGroupStagingDefaultResponse> setStagingDefault(SetSecurityGroupStagingDefaultRequest request) {
         return put(request, SetSecurityGroupStagingDefaultResponse.class, builder -> builder.pathSegment("v2", "config", "staging_security_groups", request.getSecurityGroupStagingDefaultId()));
     }
-    
+
 }
