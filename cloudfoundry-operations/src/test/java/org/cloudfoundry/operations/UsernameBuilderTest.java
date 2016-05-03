@@ -20,8 +20,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.Base64Codec;
 import org.cloudfoundry.uaa.UaaClient;
-import org.cloudfoundry.uaa.accesstokenadministration.GetTokenKeyRequest;
-import org.cloudfoundry.uaa.accesstokenadministration.GetTokenKeyResponse;
+import org.cloudfoundry.uaa.accesstokens.GetTokenKeyRequest;
+import org.cloudfoundry.uaa.accesstokens.GetTokenKeyResponse;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
 
@@ -79,7 +79,7 @@ public final class UsernameBuilderTest extends AbstractOperationsTest {
     }
 
     private static void requestTokenKey(UaaClient uaaClient, String key) {
-        when(uaaClient.accessTokenAdministration()
+        when(uaaClient.accessTokens()
             .getTokenKey(GetTokenKeyRequest.builder()
                 .build()))
             .thenReturn(Mono

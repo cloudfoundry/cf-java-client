@@ -14,25 +14,26 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.uaa;
+package org.cloudfoundry.uaa.accesstokens;
 
-import org.cloudfoundry.reactor.AbstractRestTest;
-import org.junit.Test;
+import lombok.Builder;
+import lombok.Data;
+import org.cloudfoundry.Validatable;
+import org.cloudfoundry.ValidationResult;
 
-import static org.junit.Assert.assertNotNull;
+/**
+ * The request payload for the token key operation
+ */
+@Data
+public final class GetTokenKeyRequest implements Validatable {
 
-public final class ReactorUaaClientTest extends AbstractRestTest {
-
-    private final ReactorUaaClient client = new ReactorUaaClient(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
-
-    @Test
-    public void accessTokenAdministration() {
-        assertNotNull(this.client.accessTokens());
+    @Builder
+    GetTokenKeyRequest() {
     }
 
-    @Test
-    public void identityZoneManagement() {
-        assertNotNull(this.client.identityZones());
+    @Override
+    public ValidationResult isValid() {
+        return ValidationResult.builder().build();
     }
 
 }

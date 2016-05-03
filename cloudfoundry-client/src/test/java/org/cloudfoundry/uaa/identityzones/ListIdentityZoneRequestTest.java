@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.uaa;
+package org.cloudfoundry.uaa.identityzones;
 
-import org.cloudfoundry.reactor.AbstractRestTest;
+import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.cloudfoundry.ValidationResult.Status.VALID;
+import static org.junit.Assert.assertEquals;
 
-public final class ReactorUaaClientTest extends AbstractRestTest {
-
-    private final ReactorUaaClient client = new ReactorUaaClient(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
-
-    @Test
-    public void accessTokenAdministration() {
-        assertNotNull(this.client.accessTokens());
-    }
+public final class ListIdentityZoneRequestTest {
 
     @Test
-    public void identityZoneManagement() {
-        assertNotNull(this.client.identityZones());
+    public void isValid() {
+        ValidationResult result = ListIdentityZoneRequest.builder()
+            .build()
+            .isValid();
+
+        assertEquals(VALID, result.getStatus());
     }
 
 }

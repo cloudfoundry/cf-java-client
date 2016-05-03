@@ -25,8 +25,8 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.uaa.UaaClient;
-import org.cloudfoundry.uaa.accesstokenadministration.GetTokenKeyRequest;
-import org.cloudfoundry.uaa.accesstokenadministration.GetTokenKeyResponse;
+import org.cloudfoundry.uaa.accesstokens.GetTokenKeyRequest;
+import org.cloudfoundry.uaa.accesstokens.GetTokenKeyResponse;
 import reactor.core.publisher.Mono;
 
 import java.security.GeneralSecurityException;
@@ -83,7 +83,7 @@ final class UsernameBuilder {
     }
 
     private static Mono<GetTokenKeyResponse> requestTokenKey(UaaClient uaaClient) {
-        return uaaClient.accessTokenAdministration()
+        return uaaClient.accessTokens()
             .getTokenKey(GetTokenKeyRequest.builder()
                 .build());
     }

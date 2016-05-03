@@ -18,13 +18,13 @@ package org.cloudfoundry.reactor.uaa;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
-import org.cloudfoundry.reactor.uaa.accesstokenadministration.SpringAccessTokenAdministration;
-import org.cloudfoundry.reactor.uaa.identityzonemanagement.SpringIdentityZoneManagement;
+import org.cloudfoundry.reactor.uaa.accesstokenadministration.ReactorAccessTokens;
+import org.cloudfoundry.reactor.uaa.identityzonemanagement.ReactorIdentityZones;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.reactor.util.ConnectionContextSupplier;
 import org.cloudfoundry.uaa.UaaClient;
-import org.cloudfoundry.uaa.accesstokenadministration.AccessTokenAdministration;
-import org.cloudfoundry.uaa.identityzonemanagement.IdentityZoneManagement;
+import org.cloudfoundry.uaa.accesstokens.AccessTokens;
+import org.cloudfoundry.uaa.identityzones.IdentityZones;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
@@ -33,9 +33,9 @@ import reactor.io.netty.http.HttpClient;
  */
 public final class ReactorUaaClient implements UaaClient {
 
-    private final SpringAccessTokenAdministration accessTokenAdministration;
+    private final AccessTokens accessTokens;
 
-    private final SpringIdentityZoneManagement identityZoneManagement;
+    private final IdentityZones identityZones;
 
     @Builder
     ReactorUaaClient(ConnectionContextSupplier cloudFoundryClient) {
@@ -44,18 +44,18 @@ public final class ReactorUaaClient implements UaaClient {
     }
 
     ReactorUaaClient(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
-        this.accessTokenAdministration = new SpringAccessTokenAdministration(authorizationProvider, httpClient, objectMapper, root);
-        this.identityZoneManagement = new SpringIdentityZoneManagement(authorizationProvider, httpClient, objectMapper, root);
+        this.accessTokens = new ReactorAccessTokens(authorizationProvider, httpClient, objectMapper, root);
+        this.identityZones = new ReactorIdentityZones(authorizationProvider, httpClient, objectMapper, root);
     }
 
     @Override
-    public AccessTokenAdministration accessTokenAdministration() {
-        return this.accessTokenAdministration;
+    public AccessTokens accessTokens() {
+        return this.accessTokens;
     }
 
     @Override
-    public IdentityZoneManagement identityZoneManagement() {
-        return this.identityZoneManagement;
+    public IdentityZones identityZones() {
+        return this.identityZones;
     }
 
 }

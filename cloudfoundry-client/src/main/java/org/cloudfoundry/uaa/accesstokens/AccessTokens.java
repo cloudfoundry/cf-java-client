@@ -14,25 +14,21 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.uaa;
+package org.cloudfoundry.uaa.accesstokens;
 
-import org.cloudfoundry.reactor.AbstractRestTest;
-import org.junit.Test;
+import reactor.core.publisher.Mono;
 
-import static org.junit.Assert.assertNotNull;
+/**
+ * Main entry point to the UAA Access Token Administration Client API
+ */
+public interface AccessTokens {
 
-public final class ReactorUaaClientTest extends AbstractRestTest {
-
-    private final ReactorUaaClient client = new ReactorUaaClient(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
-
-    @Test
-    public void accessTokenAdministration() {
-        assertNotNull(this.client.accessTokens());
-    }
-
-    @Test
-    public void identityZoneManagement() {
-        assertNotNull(this.client.identityZones());
-    }
+    /**
+     * Makes the <a href="https://github.com/cloudfoundry/uaa/blob/master/docs/UAA-APIs.rst#get-the-token-signing-key-get-token-key">Token Key</a> request
+     *
+     * @param request the Token Key request
+     * @return the response from the Token Key request
+     */
+    Mono<GetTokenKeyResponse> getTokenKey(GetTokenKeyRequest request);
 
 }
