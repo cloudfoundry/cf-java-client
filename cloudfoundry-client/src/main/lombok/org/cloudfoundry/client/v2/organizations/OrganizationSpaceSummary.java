@@ -27,10 +27,10 @@ import lombok.Data;
 public final class OrganizationSpaceSummary {
 
     /**
-     * The app count
+     * The application count
      *
-     * @param appCount the app count
-     * @return the app count
+     * @param appCount the application count
+     * @return the application count
      */
     private final Integer appCount;
 

@@ -24,7 +24,7 @@ import org.cloudfoundry.ValidationResult;
 import java.util.Optional;
 
 /**
- * Records resource usage of an app in a container
+ * Records resource usage of an application in a container
  */
 @Data
 public final class ContainerMetric implements Event, Validatable {

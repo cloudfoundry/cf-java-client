@@ -40,7 +40,7 @@ public final class CopyApplicationRequest implements Validatable {
     private final String applicationId;
 
     /**
-     * The source app id
+     * The source application id
      *
      * @param sourceApplicationId the source application id
      * @return the source application id

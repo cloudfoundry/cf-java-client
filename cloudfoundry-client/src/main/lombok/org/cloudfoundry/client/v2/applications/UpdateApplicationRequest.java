@@ -46,25 +46,25 @@ public final class UpdateApplicationRequest implements Validatable {
     private final String applicationId;
 
     /**
-     * Buildpack to build the app.
+     * Buildpack to build the application.
      *
-     * @param buildpack the buildpack to build the app
-     * @return buildpack to build the app
+     * @param buildpack the buildpack to build the application
+     * @return buildpack to build the application
      */
     @Getter(onMethod = @__(@JsonProperty("buildpack")))
     private final String buildpack;
 
     /**
-     * The command to start the app after it is staged.
+     * The command to start the application after it is staged.
      *
-     * @param command the command to start the app
-     * @return the command to start the app
+     * @param command the command to start the application
+     * @return the command to start the application
      */
     @Getter(onMethod = @__(@JsonProperty("command")))
     private final String command;
 
     /**
-     * Open the console port for the app (at $CONSOLE_PORT).
+     * Open the console port for the application (at $CONSOLE_PORT).
      *
      * @param console whether to open the console port
      * @return whether to open the console port
@@ -73,7 +73,7 @@ public final class UpdateApplicationRequest implements Validatable {
     private final Boolean console;
 
     /**
-     * Open the debug port for the app (at $DEBUG_PORT).
+     * Open the debug port for the application (at $DEBUG_PORT).
      *
      * @param debug whether to open the debug port
      * @return whether to open the debug port
@@ -91,7 +91,7 @@ public final class UpdateApplicationRequest implements Validatable {
     private final Boolean diego;
 
     /**
-     * The maximum amount of disk available to an instance of an app. In megabytes.
+     * The maximum amount of disk available to an instance of an application. In megabytes.
      *
      * @param diskQuota the maximum amount of disk available to an instance
      * @return the maximum amount of disk available to an instance
@@ -109,7 +109,7 @@ public final class UpdateApplicationRequest implements Validatable {
     private final Map<String, Object> dockerCredentialsJsons;
 
     /**
-     * Name of the Docker image containing the app.
+     * Name of the Docker image containing the application.
      *
      * @param dockerImage the name of the Docker image
      * @return name of the Docker image
@@ -127,16 +127,16 @@ public final class UpdateApplicationRequest implements Validatable {
     private final Boolean enableSsh;
 
     /**
-     * Key/value pairs of all the environment variables to run in your app. Does not include any system or service variables.
+     * Key/value pairs of all the environment variables to run in your application. Does not include any system or service variables.
      *
-     * @param environmentJsons the environment variables to run in your app
-     * @return the environment variables to run in your app
+     * @param environmentJsons the environment variables to run in your application
+     * @return the environment variables to run in your application
      */
     @Getter(onMethod = @__({@JsonProperty("environment_json"), @JsonInclude(NON_EMPTY)}))
     private final Map<String, Object> environmentJsons;
 
     /**
-     * Timeout for health checking of an staged app when starting up.
+     * Timeout for health checking of an staged application when starting up.
      *
      * @param healthCheckTimeout timeout for health checking
      * @return timeout for health checking
@@ -154,7 +154,7 @@ public final class UpdateApplicationRequest implements Validatable {
     private final String healthCheckType;
 
     /**
-     * The number of instances of the app to run. To ensure optimal availability, ensure there are at least 2 instances.
+     * The number of instances of the application to run. To ensure optimal availability, ensure there are at least 2 instances.
      *
      * @param instances the number of instances to run
      * @return the number of instances to run
@@ -172,19 +172,19 @@ public final class UpdateApplicationRequest implements Validatable {
     private final Integer memory;
 
     /**
-     * The name of the app.
+     * The name of the application.
      *
-     * @param name the name of the app
-     * @return the name of the app
+     * @param name the name of the application
+     * @return the name of the application
      */
     @Getter(onMethod = @__(@JsonProperty("name")))
     private final String name;
 
     /**
-     * Whether the app is production
+     * Whether the application is production
      *
-     * @param production whether the app is production
-     * @return whether the app is production
+     * @param production whether the application is production
+     * @return whether the application is production
      */
     @Getter(onMethod = @__({@JsonProperty("production"), @Deprecated}))
     private final Boolean production;
@@ -208,10 +208,10 @@ public final class UpdateApplicationRequest implements Validatable {
     private final String stackId;
 
     /**
-     * The current desired state of the app.
+     * The current desired state of the application.
      *
-     * @param state the current desired state of the app
-     * @return the current desired state of the app
+     * @param state the current desired state of the application
+     * @return the current desired state of the application
      */
     @Getter(onMethod = @__(@JsonProperty("state")))
     private final String state;

@@ -39,13 +39,13 @@ import java.util.List;
 public final class ListOrganizationSpacesRequest extends PaginatedRequest implements Validatable {
 
     /**
-     * The app ids
+     * The application ids
      *
-     * @param appIds the app ids
-     * @return the app ids
+     * @param applicationIds the application ids
+     * @return the application ids
      */
     @Getter(onMethod = @__(@InFilterParameter("app_guid")))
-    private final List<String> appIds;
+    private final List<String> applicationIds;
 
     /**
      * The developer ids
@@ -76,13 +76,13 @@ public final class ListOrganizationSpacesRequest extends PaginatedRequest implem
 
     @Builder
     ListOrganizationSpacesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
-                                  @Singular List<String> appIds,
+                                  @Singular List<String> applicationIds,
                                   @Singular List<String> developerIds,
                                   @Singular List<String> names,
                                   String organizationId) {
         super(orderDirection, page, resultsPerPage);
 
-        this.appIds = appIds;
+        this.applicationIds = applicationIds;
         this.developerIds = developerIds;
         this.names = names;
         this.organizationId = organizationId;

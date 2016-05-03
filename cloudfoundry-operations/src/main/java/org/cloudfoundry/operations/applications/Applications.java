@@ -26,7 +26,7 @@ import reactor.core.publisher.Mono;
 public interface Applications {
 
     /**
-     * Copy the app source code from this application to another.
+     * Copy the source code from this application to another.
      *
      * @param request the copy source application request
      * @return a completion indicator
