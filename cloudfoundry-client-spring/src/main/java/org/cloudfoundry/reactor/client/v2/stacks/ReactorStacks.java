@@ -22,10 +22,8 @@ import org.cloudfoundry.client.v2.stacks.GetStackResponse;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksResponse;
 import org.cloudfoundry.client.v2.stacks.Stacks;
-import org.cloudfoundry.reactor.client.AbstractClientOperations;
+import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
-import org.cloudfoundry.spring.client.v2.FilterBuilder;
-import org.cloudfoundry.spring.util.QueryBuilder;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
@@ -34,7 +32,7 @@ import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 /**
  * The Spring-based implementation of {@link Stacks}
  */
-public final class ReactorStacks extends AbstractClientOperations implements Stacks {
+public final class ReactorStacks extends AbstractClientV2Operations implements Stacks {
 
     /**
      * Creates an instance
@@ -55,11 +53,7 @@ public final class ReactorStacks extends AbstractClientOperations implements Sta
 
     @Override
     public Mono<ListStacksResponse> list(ListStacksRequest request) {
-        return get(request, ListStacksResponse.class, consumer((builder, validRequest) -> {
-            builder.pathSegment("v2", "stacks");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        }));
+        return get(request, ListStacksResponse.class, consumer((builder, validRequest) -> builder.pathSegment("v2", "stacks")));
     }
 
 }

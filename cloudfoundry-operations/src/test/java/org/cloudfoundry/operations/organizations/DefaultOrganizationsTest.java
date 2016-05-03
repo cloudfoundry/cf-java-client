@@ -312,7 +312,7 @@ public final class DefaultOrganizationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke() {
+        protected Mono<Void> invoke() {
             return this.organizations
                 .create(CreateOrganizationRequest.builder()
                     .organizationName(TEST_ORGANIZATION_NAME)

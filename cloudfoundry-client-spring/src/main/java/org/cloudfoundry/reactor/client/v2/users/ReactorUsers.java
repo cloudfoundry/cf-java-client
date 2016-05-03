@@ -20,10 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.ListUsersResponse;
 import org.cloudfoundry.client.v2.users.Users;
-import org.cloudfoundry.reactor.client.AbstractClientOperations;
+import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
-import org.cloudfoundry.spring.client.v2.FilterBuilder;
-import org.cloudfoundry.spring.util.QueryBuilder;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
@@ -32,7 +30,7 @@ import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 /**
  * The Spring-based implementation of {@link Users}
  */
-public final class ReactorUsers extends AbstractClientOperations implements Users {
+public final class ReactorUsers extends AbstractClientV2Operations implements Users {
 
     /**
      * Creates an instance
@@ -48,11 +46,7 @@ public final class ReactorUsers extends AbstractClientOperations implements User
 
     @Override
     public Mono<ListUsersResponse> list(ListUsersRequest request) {
-        return get(request, ListUsersResponse.class, consumer((builder, validRequest) -> {
-            builder.pathSegment("v2", "users");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        }));
+        return get(request, ListUsersResponse.class, consumer((builder, validRequest) -> builder.pathSegment("v2", "users")));
     }
 
 }
