@@ -18,13 +18,13 @@ package org.cloudfoundry.reactor.uaa;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
-import org.cloudfoundry.reactor.uaa.accesstokenadministration.ReactorAccessTokens;
+import org.cloudfoundry.reactor.uaa.accesstokenadministration.ReactorTokens;
 import org.cloudfoundry.reactor.uaa.identityzonemanagement.ReactorIdentityZones;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.reactor.util.ConnectionContextSupplier;
 import org.cloudfoundry.uaa.UaaClient;
-import org.cloudfoundry.uaa.accesstokens.AccessTokens;
 import org.cloudfoundry.uaa.identityzones.IdentityZones;
+import org.cloudfoundry.uaa.tokens.Tokens;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
@@ -33,9 +33,9 @@ import reactor.io.netty.http.HttpClient;
  */
 public final class ReactorUaaClient implements UaaClient {
 
-    private final AccessTokens accessTokens;
-
     private final IdentityZones identityZones;
+
+    private final Tokens tokens;
 
     @Builder
     ReactorUaaClient(ConnectionContextSupplier cloudFoundryClient) {
@@ -44,18 +44,18 @@ public final class ReactorUaaClient implements UaaClient {
     }
 
     ReactorUaaClient(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
-        this.accessTokens = new ReactorAccessTokens(authorizationProvider, httpClient, objectMapper, root);
         this.identityZones = new ReactorIdentityZones(authorizationProvider, httpClient, objectMapper, root);
-    }
-
-    @Override
-    public AccessTokens accessTokens() {
-        return this.accessTokens;
+        this.tokens = new ReactorTokens(authorizationProvider, httpClient, objectMapper, root);
     }
 
     @Override
     public IdentityZones identityZones() {
         return this.identityZones;
+    }
+
+    @Override
+    public Tokens tokens() {
+        return this.tokens;
     }
 
 }

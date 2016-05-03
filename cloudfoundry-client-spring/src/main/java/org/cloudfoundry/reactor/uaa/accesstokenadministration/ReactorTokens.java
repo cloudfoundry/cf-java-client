@@ -19,16 +19,16 @@ package org.cloudfoundry.reactor.uaa.accesstokenadministration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
-import org.cloudfoundry.uaa.accesstokens.AccessTokens;
-import org.cloudfoundry.uaa.accesstokens.GetTokenKeyRequest;
-import org.cloudfoundry.uaa.accesstokens.GetTokenKeyResponse;
+import org.cloudfoundry.uaa.tokens.Tokens;
+import org.cloudfoundry.uaa.tokens.GetTokenKeyRequest;
+import org.cloudfoundry.uaa.tokens.GetTokenKeyResponse;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 
-public final class ReactorAccessTokens extends AbstractUaaOperations implements AccessTokens {
+public final class ReactorTokens extends AbstractUaaOperations implements Tokens {
 
     /**
      * Creates an instance
@@ -38,12 +38,12 @@ public final class ReactorAccessTokens extends AbstractUaaOperations implements 
      * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
      * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
      */
-    public ReactorAccessTokens(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
+    public ReactorTokens(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
         super(authorizationProvider, httpClient, objectMapper, root);
     }
 
     @Override
-    public Mono<GetTokenKeyResponse> getTokenKey(GetTokenKeyRequest request) {
+    public Mono<GetTokenKeyResponse> getKey(GetTokenKeyRequest request) {
         return get(request, GetTokenKeyResponse.class, function((builder, validRequest) -> builder.pathSegment("token_key")));
     }
 

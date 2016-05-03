@@ -17,23 +17,23 @@
 package org.cloudfoundry.uaa;
 
 import org.cloudfoundry.AbstractIntegrationTest;
-import org.cloudfoundry.uaa.accesstokens.GetTokenKeyRequest;
-import org.cloudfoundry.uaa.accesstokens.GetTokenKeyResponse;
+import org.cloudfoundry.uaa.tokens.GetTokenKeyRequest;
+import org.cloudfoundry.uaa.tokens.GetTokenKeyResponse;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public final class AccessTokensTest extends AbstractIntegrationTest {
+public final class TokensTest extends AbstractIntegrationTest {
 
     @Autowired
     private UaaClient uaaClient;
 
     @Test
     public void getTokenKey() {
-        this.uaaClient.accessTokens()
-            .getTokenKey(GetTokenKeyRequest.builder()
+        this.uaaClient.tokens()
+            .getKey(GetTokenKeyRequest.builder()
                 .build())
             .subscribe(this.<GetTokenKeyResponse>testSubscriber()
                 .assertThat(response -> {

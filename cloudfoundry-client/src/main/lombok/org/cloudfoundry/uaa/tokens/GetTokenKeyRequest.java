@@ -14,23 +14,26 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.accesstokens;
+package org.cloudfoundry.uaa.tokens;
 
+import lombok.Builder;
+import lombok.Data;
+import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
-import org.junit.Test;
 
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
+/**
+ * The request payload for the token key operation
+ */
+@Data
+public final class GetTokenKeyRequest implements Validatable {
 
-public final class GetTokenKeyRequestTest {
+    @Builder
+    GetTokenKeyRequest() {
+    }
 
-    @Test
-    public void isValid() {
-        ValidationResult result = GetTokenKeyRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    @Override
+    public ValidationResult isValid() {
+        return ValidationResult.builder().build();
     }
 
 }

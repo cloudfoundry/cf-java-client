@@ -27,7 +27,7 @@ public final class ReactorUaaClientTest extends AbstractRestTest {
 
     @Test
     public void accessTokenAdministration() {
-        assertNotNull(this.client.accessTokens());
+        assertNotNull(this.client.tokens());
     }
 
     @Test

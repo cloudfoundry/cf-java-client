@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.accesstokens;
+package org.cloudfoundry.uaa.tokens;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
 
-/**
- * The response from the token key request
- */
 @Data
-public final class GetTokenKeyResponse {
+abstract class AbstractTokenKey {
 
     /**
      * The algorithm
@@ -41,6 +37,14 @@ public final class GetTokenKeyResponse {
      * @return the exponent
      */
     private final String e;
+
+    /**
+     * The id
+     *
+     * @param id the id;
+     * @return the id;
+     */
+    private final String id;
 
     /**
      * The key type
@@ -74,15 +78,17 @@ public final class GetTokenKeyResponse {
      */
     private final String value;
 
-    @Builder
-    GetTokenKeyResponse(@JsonProperty("alg") String algorithm,
-                        @JsonProperty("e") String e,
-                        @JsonProperty("kty") String keyType,
-                        @JsonProperty("n") String n,
-                        @JsonProperty("use") String use,
-                        @JsonProperty("value") String value) {
+    AbstractTokenKey(@JsonProperty("alg") String algorithm,
+                     @JsonProperty("e") String e,
+                     @JsonProperty("kid") String id,
+                     @JsonProperty("kty") String keyType,
+                     @JsonProperty("n") String n,
+                     @JsonProperty("use") String use,
+                     @JsonProperty("value") String value) {
+
         this.algorithm = algorithm;
         this.e = e;
+        this.id = id;
         this.keyType = keyType;
         this.n = n;
         this.use = use;
