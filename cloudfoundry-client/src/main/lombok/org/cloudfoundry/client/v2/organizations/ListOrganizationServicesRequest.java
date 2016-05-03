@@ -26,6 +26,7 @@ import lombok.ToString;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.IsFilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 
 import java.util.List;
@@ -44,7 +45,7 @@ public final class ListOrganizationServicesRequest extends PaginatedRequest impl
      * @param active the active flag
      * @return the active flag
      */
-    @Getter(onMethod = @__(@InFilterParameter("active")))
+    @Getter(onMethod = @__(@IsFilterParameter("active")))
     private final Boolean active;
 
     /**
