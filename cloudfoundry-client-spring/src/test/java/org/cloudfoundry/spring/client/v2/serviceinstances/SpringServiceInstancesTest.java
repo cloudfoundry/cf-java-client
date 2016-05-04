@@ -33,12 +33,16 @@ import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceBindingsRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceBindingsResponse;
+import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceKeysRequest;
+import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceKeysResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse;
+import org.cloudfoundry.client.v2.servicekeys.ServiceKeyEntity;
+import org.cloudfoundry.client.v2.servicekeys.ServiceKeyResource;
 import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
@@ -497,6 +501,62 @@ public final class SpringServiceInstancesTest {
         @Override
         protected Mono<ListServiceInstanceServiceBindingsResponse> invoke(ListServiceInstanceServiceBindingsRequest request) {
             return this.serviceInstances.listServiceBindings(request);
+        }
+
+    }
+
+    public static final class ListServiceKeys extends AbstractApiTest<ListServiceInstanceServiceKeysRequest, ListServiceInstanceServiceKeysResponse> {
+
+        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected ListServiceInstanceServiceKeysRequest getInvalidRequest() {
+            return ListServiceInstanceServiceKeysRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET)
+                .path("v2/service_instances/test-service-instance-id/service_keys?q=name%20IN%20test-service-key&page=-1")
+                .status(OK)
+                .responsePayload("fixtures/client/v2/service_instances/GET_{id}_service_keys_response.json");
+        }
+
+        @Override
+        protected ListServiceInstanceServiceKeysResponse getResponse() {
+            return ListServiceInstanceServiceKeysResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(ServiceKeyResource.builder()
+                    .metadata(Resource.Metadata.builder()
+                        .createdAt("2016-05-04T22:43:09Z")
+                        .id("9803ec3c-8d97-4bd8-bf86-e44cc835a154")
+                        .url("/v2/service_keys/05f3ec3c-8d97-4bd8-bf86-e44cc835a154")
+                        .build())
+                    .entity(ServiceKeyEntity.builder()
+                        .serviceInstanceId("c6a0890e-edbf-4da9-ae90-dce24af308a1")
+                        .credential("credential-key", "credential-value")
+                        .name("test-service-key")
+                        .serviceInstanceUrl("/v2/service_instances/c6a0890e-edbf-4da9-ae90-dce24af308a1")
+                        .build())
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListServiceInstanceServiceKeysRequest getValidRequest() throws Exception {
+            return ListServiceInstanceServiceKeysRequest.builder()
+                .serviceInstanceId("test-service-instance-id")
+                .name("test-service-key")
+                .page(-1)
+                .build();
+        }
+
+        @Override
+        protected Mono<ListServiceInstanceServiceKeysResponse> invoke(ListServiceInstanceServiceKeysRequest request) {
+            return this.serviceInstances.listServiceKeys(request);
         }
 
     }
