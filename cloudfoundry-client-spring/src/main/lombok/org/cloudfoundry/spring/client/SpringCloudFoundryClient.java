@@ -56,6 +56,11 @@ import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
 import org.cloudfoundry.client.v3.tasks.Tasks;
+import org.cloudfoundry.reactor.client.v2.events.ReactorEvents;
+import org.cloudfoundry.reactor.client.v2.info.ReactorInfo;
+import org.cloudfoundry.reactor.client.v2.jobs.ReactorJobs;
+import org.cloudfoundry.reactor.client.v2.stacks.ReactorStacks;
+import org.cloudfoundry.reactor.client.v2.users.ReactorUsers;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.reactor.util.ConnectionContextSupplier;
 import org.cloudfoundry.reactor.util.DefaultConnectionContext;
@@ -64,10 +69,7 @@ import org.cloudfoundry.spring.client.v2.applicationusageevents.SpringApplicatio
 import org.cloudfoundry.spring.client.v2.buildpacks.SpringBuildpacks;
 import org.cloudfoundry.spring.client.v2.domains.SpringDomains;
 import org.cloudfoundry.spring.client.v2.environmentvariablegroups.SpringEnvironmentVariableGroups;
-import org.cloudfoundry.spring.client.v2.events.SpringEvents;
 import org.cloudfoundry.spring.client.v2.featureflags.SpringFeatureFlags;
-import org.cloudfoundry.reactor.client.v2.info.ReactorInfo;
-import org.cloudfoundry.reactor.client.v2.jobs.ReactorJobs;
 import org.cloudfoundry.spring.client.v2.organizationquotadefinitions.SpringOrganizationQuotaDefinitions;
 import org.cloudfoundry.spring.client.v2.organizations.SpringOrganizations;
 import org.cloudfoundry.spring.client.v2.privatedomains.SpringPrivateDomains;
@@ -85,9 +87,7 @@ import org.cloudfoundry.spring.client.v2.serviceusageevents.SpringServiceUsageEv
 import org.cloudfoundry.spring.client.v2.shareddomains.SpringSharedDomains;
 import org.cloudfoundry.spring.client.v2.spacequotadefinitions.SpringSpaceQuotaDefinitions;
 import org.cloudfoundry.spring.client.v2.spaces.SpringSpaces;
-import org.cloudfoundry.reactor.client.v2.stacks.ReactorStacks;
 import org.cloudfoundry.spring.client.v2.userprovidedserviceinstances.SpringUserProvidedServiceInstances;
-import org.cloudfoundry.reactor.client.v2.users.ReactorUsers;
 import org.cloudfoundry.spring.client.v3.applications.SpringApplicationsV3;
 import org.cloudfoundry.spring.client.v3.droplets.SpringDroplets;
 import org.cloudfoundry.spring.client.v3.packages.SpringPackages;
@@ -129,6 +129,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
 
     private final Buildpacks buildpacks;
 
+    private final org.cloudfoundry.reactor.util.ConnectionContext connectionContext;
+
     private final Domains domains;
 
     private final Droplets droplets;
@@ -152,8 +154,6 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
     private final PrivateDomains privateDomains;
 
     private final Processes processes;
-
-    private final org.cloudfoundry.reactor.util.ConnectionContext connectionContext;
 
     private final RouteMappings routeMappings;
 
@@ -215,7 +215,6 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         this.domains = new SpringDomains(restOperations, root, schedulerGroup);
         this.droplets = new SpringDroplets(restOperations, root, schedulerGroup);
         this.environmentVariableGroups = new SpringEnvironmentVariableGroups(restOperations, root, schedulerGroup);
-        this.events = new SpringEvents(restOperations, root, schedulerGroup);
         this.featureFlags = new SpringFeatureFlags(restOperations, root, schedulerGroup);
         this.organizations = new SpringOrganizations(restOperations, root, schedulerGroup);
         this.organizationQuotaDefinitions = new SpringOrganizationQuotaDefinitions(restOperations, root, schedulerGroup);
@@ -257,6 +256,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         ObjectMapper objectMapper = this.connectionContext.getObjectMapper();
         Mono<String> root2 = this.connectionContext.getRoot();  // TODO: Change name once Spring is gone
 
+        this.events = new ReactorEvents(authorizationProvider, httpClient, objectMapper, root2);
         this.info = new ReactorInfo(authorizationProvider, httpClient, objectMapper, root2);
         this.jobs = new ReactorJobs(authorizationProvider, httpClient, objectMapper, root2);
         this.stacks = new ReactorStacks(authorizationProvider, httpClient, objectMapper, root2);

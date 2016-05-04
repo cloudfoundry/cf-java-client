@@ -18,11 +18,13 @@ package org.cloudfoundry.reactor.client;
 
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.reactor.AbstractApiTest;
+import org.junit.Test;
 
 import java.time.Duration;
 
 public abstract class AbstractClientApiTest<REQ, RSP> extends AbstractApiTest<REQ, RSP> {
 
+    @Test
     public final void error() throws Exception {
         mockRequest(getInteractionContext().getErrorResponse());
         this.testSubscriber.assertError(CloudFoundryException.class, "CF-UnprocessableEntity(10008): The request is semantically invalid: space_guid and name unique");

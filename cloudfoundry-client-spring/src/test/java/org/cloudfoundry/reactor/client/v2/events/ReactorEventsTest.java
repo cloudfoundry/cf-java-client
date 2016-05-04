@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.events;
+package org.cloudfoundry.reactor.client.v2.events;
 
 import org.cloudfoundry.client.v2.events.EventEntity;
 import org.cloudfoundry.client.v2.events.EventResource;
@@ -22,33 +22,41 @@ import org.cloudfoundry.client.v2.events.GetEventRequest;
 import org.cloudfoundry.client.v2.events.GetEventResponse;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.client.v2.events.ListEventsResponse;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.client.v2.Resource.Metadata;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringEventsTest {
+public final class ReactorEventsTest {
 
-    public static final class Get extends AbstractApiTest<GetEventRequest, GetEventResponse> {
+    public static final class Get extends AbstractClientApiTest<GetEventRequest, GetEventResponse> {
 
-        private final SpringEvents events = new SpringEvents(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorEvents events = new ReactorEvents(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/events/test-event-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/events/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetEventRequest getInvalidRequest() {
             return GetEventRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/events/test-event-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/events/GET_{id}_response.json");
         }
 
         @Override
@@ -89,21 +97,26 @@ public final class SpringEventsTest {
 
     }
 
-    public static final class List extends AbstractApiTest<ListEventsRequest, ListEventsResponse> {
+    public static final class List extends AbstractClientApiTest<ListEventsRequest, ListEventsResponse> {
 
-        private final SpringEvents events = new SpringEvents(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorEvents events = new ReactorEvents(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/events?q=actee%20IN%20test-actee&page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/events/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListEventsRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/events?q=actee%20IN%20test-actee&page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/events/GET_response.json");
         }
 
         @Override
