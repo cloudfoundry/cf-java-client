@@ -14,36 +14,44 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.jobs;
+package org.cloudfoundry.reactor.client.v2.jobs;
 
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.jobs.GetJobRequest;
 import org.cloudfoundry.client.v2.jobs.GetJobResponse;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpStatus.OK;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class SpringJobsTest {
+public final class ReactorJobsTest {
 
-    public static final class Get extends AbstractApiTest<GetJobRequest, GetJobResponse> {
+    public static final class Get extends AbstractClientApiTest<GetJobRequest, GetJobResponse> {
 
-        private final SpringJobs jobs = new SpringJobs(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorJobs jobs = new ReactorJobs(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/jobs/test-job-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/jobs/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetJobRequest getInvalidRequest() {
             return GetJobRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/jobs/test-job-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/jobs/GET_{id}_response.json");
         }
 
         @Override

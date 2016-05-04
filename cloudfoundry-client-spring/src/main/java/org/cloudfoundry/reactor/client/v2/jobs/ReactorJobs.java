@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.client.v2.users;
+package org.cloudfoundry.reactor.client.v2.jobs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.cloudfoundry.client.v2.users.ListUsersRequest;
-import org.cloudfoundry.client.v2.users.ListUsersResponse;
-import org.cloudfoundry.client.v2.users.Users;
+import org.cloudfoundry.client.v2.jobs.GetJobRequest;
+import org.cloudfoundry.client.v2.jobs.GetJobResponse;
+import org.cloudfoundry.client.v2.jobs.Jobs;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
@@ -28,9 +28,9 @@ import reactor.io.netty.http.HttpClient;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
- * The Reactor-based implementation of {@link Users}
+ * The Reactor-based implementation of {@link Jobs}
  */
-public final class ReactorUsers extends AbstractClientV2Operations implements Users {
+public final class ReactorJobs extends AbstractClientV2Operations implements Jobs {
 
     /**
      * Creates an instance
@@ -40,13 +40,13 @@ public final class ReactorUsers extends AbstractClientV2Operations implements Us
      * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
      * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
      */
-    public ReactorUsers(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
+    public ReactorJobs(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
         super(authorizationProvider, httpClient, objectMapper, root);
     }
 
     @Override
-    public Mono<ListUsersResponse> list(ListUsersRequest request) {
-        return get(request, ListUsersResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "users")));
+    public Mono<GetJobResponse> get(GetJobRequest request) {
+        return get(request, GetJobResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "jobs", validRequest.getJobId())));
     }
 
 }

@@ -30,7 +30,7 @@ import reactor.io.netty.http.HttpClient;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
- * The Spring-based implementation of {@link Stacks}
+ * The Reactor-based implementation of {@link Stacks}
  */
 public final class ReactorStacks extends AbstractClientV2Operations implements Stacks {
 

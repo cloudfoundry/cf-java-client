@@ -29,7 +29,7 @@ import reactor.io.netty.http.HttpClient;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
- * The Spring-based implementation of {@link Info}
+ * The Reactor-based implementation of {@link Info}
  */
 public final class ReactorInfo extends AbstractClientV2Operations implements Info {
 
