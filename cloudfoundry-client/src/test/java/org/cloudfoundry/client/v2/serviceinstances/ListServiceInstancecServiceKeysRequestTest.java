@@ -45,15 +45,4 @@ public final class ListServiceInstancecServiceKeysRequestTest {
         assertEquals(VALID, result.getStatus());
     }
 
-    @Test
-    public void isValidWithName() {
-        ValidationResult result = ListServiceInstanceServiceKeysRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .name("test-service-key")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
-
 }
