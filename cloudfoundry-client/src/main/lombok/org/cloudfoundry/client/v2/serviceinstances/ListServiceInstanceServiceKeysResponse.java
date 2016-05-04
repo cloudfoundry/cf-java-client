@@ -41,6 +41,7 @@ public final class ListServiceInstanceServiceKeysResponse extends PaginatedRespo
                                            @JsonProperty("resources") @Singular List<ServiceKeyResource> resources,
                                            @JsonProperty("total_pages") Integer totalPages,
                                            @JsonProperty("total_results") Integer totalResults) {
+
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 

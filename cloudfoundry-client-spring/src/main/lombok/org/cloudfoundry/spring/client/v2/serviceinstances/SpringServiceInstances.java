@@ -113,11 +113,7 @@ public final class SpringServiceInstances extends AbstractSpringOperations imple
 
     @Override
     public Mono<ListServiceInstanceServiceKeysResponse> listServiceKeys(ListServiceInstanceServiceKeysRequest request) {
-        return get(request, ListServiceInstanceServiceKeysResponse.class, builder -> {
-            builder.pathSegment("v2", "service_instances", request.getServiceInstanceId(), "service_keys");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListServiceInstanceServiceKeysResponse.class, builder -> builder.pathSegment("v2", "service_instances", request.getServiceInstanceId(), "service_keys"));
     }
 
     @Override

@@ -531,15 +531,15 @@ public final class SpringServiceInstancesTest {
                 .totalPages(1)
                 .resource(ServiceKeyResource.builder()
                     .metadata(Resource.Metadata.builder()
-                        .createdAt("2016-05-04T22:43:09Z")
-                        .id("9803ec3c-8d97-4bd8-bf86-e44cc835a154")
-                        .url("/v2/service_keys/05f3ec3c-8d97-4bd8-bf86-e44cc835a154")
+                        .id("03ddc0ba-f792-4762-b4e4-dc08b307dc4f")
+                        .url("/v2/service_keys/03ddc0ba-f792-4762-b4e4-dc08b307dc4f")
+                        .createdAt("2016-05-04T04:49:09Z")
                         .build())
                     .entity(ServiceKeyEntity.builder()
-                        .serviceInstanceId("c6a0890e-edbf-4da9-ae90-dce24af308a1")
-                        .credential("credential-key", "credential-value")
-                        .name("test-service-key")
-                        .serviceInstanceUrl("/v2/service_instances/c6a0890e-edbf-4da9-ae90-dce24af308a1")
+                        .name("a-service-key")
+                        .serviceInstanceId("28120eae-4a44-42da-a3db-2a34aea8dcaa")
+                        .credential("creds-key-68", "creds-val-68")
+                        .serviceInstanceUrl("/v2/service_instances/28120eae-4a44-42da-a3db-2a34aea8dcaa")
                         .build())
                     .build())
                 .build();
@@ -549,7 +549,6 @@ public final class SpringServiceInstancesTest {
         protected ListServiceInstanceServiceKeysRequest getValidRequest() throws Exception {
             return ListServiceInstanceServiceKeysRequest.builder()
                 .serviceInstanceId("test-service-instance-id")
-                .name("test-service-key")
                 .page(-1)
                 .build();
         }

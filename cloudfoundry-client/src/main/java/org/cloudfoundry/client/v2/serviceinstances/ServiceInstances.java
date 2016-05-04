@@ -81,7 +81,7 @@ public interface ServiceInstances {
     Mono<ListServiceInstanceServiceBindingsResponse> listServiceBindings(ListServiceInstanceServiceBindingsRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/service_instances/list_all_service_keys_for_the_service_instance.html">List all Service keys for the Service
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/service_instances/retrieving_service_keys_associated_with_a_service_instance.html">List all Service keys for the Service
      * Instance</a> request
      *
      * @param request the List Service Keys request

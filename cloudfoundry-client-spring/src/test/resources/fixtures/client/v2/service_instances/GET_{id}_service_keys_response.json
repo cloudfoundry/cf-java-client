@@ -6,18 +6,18 @@
   "resources": [
     {
       "metadata": {
-        "guid": "9803ec3c-8d97-4bd8-bf86-e44cc835a154",
-        "url": "/v2/service_keys/05f3ec3c-8d97-4bd8-bf86-e44cc835a154",
-        "created_at": "2016-05-04T22:43:09Z",
+        "guid": "03ddc0ba-f792-4762-b4e4-dc08b307dc4f",
+        "url": "/v2/service_keys/03ddc0ba-f792-4762-b4e4-dc08b307dc4f",
+        "created_at": "2016-05-04T04:49:09Z",
         "updated_at": null
       },
       "entity": {
-        "service_instance_guid": "c6a0890e-edbf-4da9-ae90-dce24af308a1",
+        "name": "a-service-key",
+        "service_instance_guid": "28120eae-4a44-42da-a3db-2a34aea8dcaa",
         "credentials": {
-          "credential-key": "credential-value"
+          "creds-key-68": "creds-val-68"
         },
-        "name": "test-service-key",
-        "service_instance_url": "/v2/service_instances/c6a0890e-edbf-4da9-ae90-dce24af308a1"
+        "service_instance_url": "/v2/service_instances/28120eae-4a44-42da-a3db-2a34aea8dcaa"
       }
     }
   ]

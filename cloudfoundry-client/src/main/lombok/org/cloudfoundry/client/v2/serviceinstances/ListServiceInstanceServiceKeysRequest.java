@@ -21,14 +21,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
-import org.cloudfoundry.client.v2.InFilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
-
-import java.util.List;
 
 /**
  * The request payload for the List all Service Keys for the Service Instance operation
@@ -37,15 +33,6 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class ListServiceInstanceServiceKeysRequest extends PaginatedRequest implements Validatable {
-
-    /**
-     * The names of the service keys to filter
-     *
-     * @param names the names of the service keys to filter
-     * @return the names of the service keys to filter
-     */
-    @Getter(onMethod = @__(@InFilterParameter("name")))
-    private final List<String> names;
 
     /**
      * The service instance id
@@ -58,10 +45,9 @@ public final class ListServiceInstanceServiceKeysRequest extends PaginatedReques
 
     @Builder
     ListServiceInstanceServiceKeysRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
-                                          @Singular List<String> names,
                                           String serviceInstanceId) {
+
         super(orderDirection, page, resultsPerPage);
-        this.names = names;
         this.serviceInstanceId = serviceInstanceId;
     }
 
@@ -75,4 +61,5 @@ public final class ListServiceInstanceServiceKeysRequest extends PaginatedReques
 
         return builder.build();
     }
+
 }
