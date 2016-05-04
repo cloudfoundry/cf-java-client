@@ -19,9 +19,9 @@ package org.cloudfoundry.client.v2.servicebindings;
 import reactor.core.publisher.Mono;
 
 /**
- * Main entry point to the Cloud Foundry Service Bindings Client API
+ * Main entry point to the Cloud Foundry Service Bindings V2 Client API
  */
-public interface ServiceBindings {
+public interface ServiceBindingsV2 {
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/service_bindings/create_a_service_binding.html">Create Service Binding</a> request
