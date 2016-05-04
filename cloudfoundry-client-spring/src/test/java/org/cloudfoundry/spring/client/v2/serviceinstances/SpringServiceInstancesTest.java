@@ -33,12 +33,16 @@ import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceBindingsRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceBindingsResponse;
+import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceKeysRequest;
+import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceKeysResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse;
+import org.cloudfoundry.client.v2.servicekeys.ServiceKeyEntity;
+import org.cloudfoundry.client.v2.servicekeys.ServiceKeyResource;
 import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
@@ -497,6 +501,61 @@ public final class SpringServiceInstancesTest {
         @Override
         protected Mono<ListServiceInstanceServiceBindingsResponse> invoke(ListServiceInstanceServiceBindingsRequest request) {
             return this.serviceInstances.listServiceBindings(request);
+        }
+
+    }
+
+    public static final class ListServiceKeys extends AbstractApiTest<ListServiceInstanceServiceKeysRequest, ListServiceInstanceServiceKeysResponse> {
+
+        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected ListServiceInstanceServiceKeysRequest getInvalidRequest() {
+            return ListServiceInstanceServiceKeysRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET)
+                .path("v2/service_instances/test-service-instance-id/service_keys?q=name%20IN%20test-service-key&page=-1")
+                .status(OK)
+                .responsePayload("fixtures/client/v2/service_instances/GET_{id}_service_keys_response.json");
+        }
+
+        @Override
+        protected ListServiceInstanceServiceKeysResponse getResponse() {
+            return ListServiceInstanceServiceKeysResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(ServiceKeyResource.builder()
+                    .metadata(Resource.Metadata.builder()
+                        .id("03ddc0ba-f792-4762-b4e4-dc08b307dc4f")
+                        .url("/v2/service_keys/03ddc0ba-f792-4762-b4e4-dc08b307dc4f")
+                        .createdAt("2016-05-04T04:49:09Z")
+                        .build())
+                    .entity(ServiceKeyEntity.builder()
+                        .name("a-service-key")
+                        .serviceInstanceId("28120eae-4a44-42da-a3db-2a34aea8dcaa")
+                        .credential("creds-key-68", "creds-val-68")
+                        .serviceInstanceUrl("/v2/service_instances/28120eae-4a44-42da-a3db-2a34aea8dcaa")
+                        .build())
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListServiceInstanceServiceKeysRequest getValidRequest() throws Exception {
+            return ListServiceInstanceServiceKeysRequest.builder()
+                .serviceInstanceId("test-service-instance-id")
+                .page(-1)
+                .build();
+        }
+
+        @Override
+        protected Mono<ListServiceInstanceServiceKeysResponse> invoke(ListServiceInstanceServiceKeysRequest request) {
+            return this.serviceInstances.listServiceKeys(request);
         }
 
     }
