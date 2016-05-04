@@ -519,7 +519,7 @@ public final class SpringServiceInstancesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(GET)
-                .path("v2/service_instances/test-service-instance-id/service_keys?q=name%20IN%20test-service-key&page=-1")
+                .path("v2/service_instances/test-service-instance-id/service_keys?page=-1")
                 .status(OK)
                 .responsePayload("fixtures/client/v2/service_instances/GET_{id}_service_keys_response.json");
         }
