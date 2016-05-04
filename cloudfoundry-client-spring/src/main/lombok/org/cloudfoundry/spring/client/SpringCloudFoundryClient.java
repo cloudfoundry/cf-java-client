@@ -66,7 +66,7 @@ import org.cloudfoundry.spring.client.v2.domains.SpringDomains;
 import org.cloudfoundry.spring.client.v2.environmentvariablegroups.SpringEnvironmentVariableGroups;
 import org.cloudfoundry.spring.client.v2.events.SpringEvents;
 import org.cloudfoundry.spring.client.v2.featureflags.SpringFeatureFlags;
-import org.cloudfoundry.spring.client.v2.info.SpringInfo;
+import org.cloudfoundry.reactor.client.v2.info.ReactorInfo;
 import org.cloudfoundry.spring.client.v2.jobs.SpringJobs;
 import org.cloudfoundry.spring.client.v2.organizationquotadefinitions.SpringOrganizationQuotaDefinitions;
 import org.cloudfoundry.spring.client.v2.organizations.SpringOrganizations;
@@ -217,7 +217,6 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         this.environmentVariableGroups = new SpringEnvironmentVariableGroups(restOperations, root, schedulerGroup);
         this.events = new SpringEvents(restOperations, root, schedulerGroup);
         this.featureFlags = new SpringFeatureFlags(restOperations, root, schedulerGroup);
-        this.info = new SpringInfo(restOperations, root, schedulerGroup);
         this.jobs = new SpringJobs(restOperations, root, schedulerGroup);
         this.organizations = new SpringOrganizations(restOperations, root, schedulerGroup);
         this.organizationQuotaDefinitions = new SpringOrganizationQuotaDefinitions(restOperations, root, schedulerGroup);
@@ -259,6 +258,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         ObjectMapper objectMapper = this.connectionContext.getObjectMapper();
         Mono<String> root2 = this.connectionContext.getRoot();  // TODO: Change name once Spring is gone
 
+        this.info = new ReactorInfo(authorizationProvider, httpClient, objectMapper, root2);
         this.stacks = new ReactorStacks(authorizationProvider, httpClient, objectMapper, root2);
         this.users = new ReactorUsers(authorizationProvider, httpClient, objectMapper, root2);
     }

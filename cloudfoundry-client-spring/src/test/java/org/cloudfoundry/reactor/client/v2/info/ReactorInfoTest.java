@@ -14,33 +14,42 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.info;
+package org.cloudfoundry.reactor.client.v2.info;
 
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpStatus.OK;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class SpringInfoTest {
 
-    public static final class Get extends AbstractApiTest<GetInfoRequest, GetInfoResponse> {
+public final class ReactorInfoTest {
 
-        private final SpringInfo info = new SpringInfo(this.restTemplate, this.root, PROCESSOR_GROUP);
+    public static final class Get extends AbstractClientApiTest<GetInfoRequest, GetInfoResponse> {
+
+        private final ReactorInfo info = new ReactorInfo(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/info")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/info/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetInfoRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/info")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/info/GET_response.json");
         }
 
         @Override
