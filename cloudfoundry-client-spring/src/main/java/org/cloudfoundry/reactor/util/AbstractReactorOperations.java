@@ -97,9 +97,8 @@ public abstract class AbstractReactorOperations {
             .then(function((validRequest, uri) -> this.httpClient.post(uri,
                 outbound -> this.authorizationProvider.addAuthorization(outbound)
                     .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
-                    .and(Mono.just(validRequest)
-                        .as(JsonCodec.encode(this.objectMapper)))
-                    .then(function(HttpOutbound::sendOne)))))
+                    .then(o -> o.send(Mono.just(validRequest)
+                        .as(JsonCodec.encode(this.objectMapper)))))))
             .flatMap(NettyInbound::receive)
             .as(JsonCodec.decode(this.objectMapper, responseType));
     }
@@ -113,9 +112,8 @@ public abstract class AbstractReactorOperations {
             .then(function((validRequest, uri) -> this.httpClient.put(uri,
                 outbound -> this.authorizationProvider.addAuthorization(outbound)
                     .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
-                    .and(Mono.just(validRequest)
-                        .as(JsonCodec.encode(this.objectMapper)))
-                    .then(function(HttpOutbound::sendOne)))))
+                    .then(o -> o.send(Mono.just(validRequest)
+                        .as(JsonCodec.encode(this.objectMapper)))))))
             .flatMap(NettyInbound::receive)
             .as(JsonCodec.decode(this.objectMapper, responseType));
     }

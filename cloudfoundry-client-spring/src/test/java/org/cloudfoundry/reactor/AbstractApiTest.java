@@ -24,6 +24,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.Optional;
 
 public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
 
@@ -69,7 +70,9 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
     protected abstract RSP getResponse();
 
     protected Publisher<RSP> getResponses() {
-        return Mono.just(getResponse());
+        return Optional.ofNullable(getResponse())
+            .map(Mono::just)
+            .orElse(Mono.empty());
     }
 
     protected abstract REQ getValidRequest() throws Exception;

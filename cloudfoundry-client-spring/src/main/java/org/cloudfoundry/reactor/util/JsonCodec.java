@@ -94,10 +94,12 @@ final class JsonCodec {
                 return;
             }
 
-            try {
-                this.subscriber.onNext(this.objectMapper.readValue(getInputStream(this.byteBufs), this.type));
-            } catch (IOException e) {
-                onError(e);
+            if (!this.byteBufs.isEmpty()) {
+                try {
+                    this.subscriber.onNext(this.objectMapper.readValue(getInputStream(this.byteBufs), this.type));
+                } catch (IOException e) {
+                    onError(e);
+                }
             }
 
             this.done = true;
@@ -183,6 +185,10 @@ final class JsonCodec {
         protected void doNext(T t) {
             if (this.done) {
                 Exceptions.onNextDropped(t);
+                return;
+            }
+
+            if (!this.objectMapper.canSerialize(t.getClass())) {
                 return;
             }
 

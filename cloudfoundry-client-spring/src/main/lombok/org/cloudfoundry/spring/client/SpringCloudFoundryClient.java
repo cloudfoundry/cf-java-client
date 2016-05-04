@@ -65,7 +65,7 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.reactor.util.ConnectionContextSupplier;
 import org.cloudfoundry.reactor.util.DefaultConnectionContext;
 import org.cloudfoundry.spring.client.v2.applications.SpringApplicationsV2;
-import org.cloudfoundry.spring.client.v2.applicationusageevents.SpringApplicationUsageEvents;
+import org.cloudfoundry.reactor.client.v2.applicationusageevents.ReactorApplicationUsageEvents;
 import org.cloudfoundry.spring.client.v2.buildpacks.SpringBuildpacks;
 import org.cloudfoundry.spring.client.v2.domains.SpringDomains;
 import org.cloudfoundry.spring.client.v2.environmentvariablegroups.SpringEnvironmentVariableGroups;
@@ -208,7 +208,6 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
     }
 
     SpringCloudFoundryClient(String host, Integer port, Boolean skipSslValidation, RestOperations restOperations, URI root, Scheduler schedulerGroup, OAuth2TokenProvider tokenProvider) {
-        this.applicationUsageEvents = new SpringApplicationUsageEvents(restOperations, root, schedulerGroup);
         this.applicationsV2 = new SpringApplicationsV2(restOperations, root, schedulerGroup);
         this.applicationsV3 = new SpringApplicationsV3(restOperations, root, schedulerGroup);
         this.buildpacks = new SpringBuildpacks(restOperations, root, schedulerGroup);
@@ -256,6 +255,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         ObjectMapper objectMapper = this.connectionContext.getObjectMapper();
         Mono<String> root2 = this.connectionContext.getRoot();  // TODO: Change name once Spring is gone
 
+        this.applicationUsageEvents = new ReactorApplicationUsageEvents(authorizationProvider, httpClient, objectMapper, root2);
         this.events = new ReactorEvents(authorizationProvider, httpClient, objectMapper, root2);
         this.info = new ReactorInfo(authorizationProvider, httpClient, objectMapper, root2);
         this.jobs = new ReactorJobs(authorizationProvider, httpClient, objectMapper, root2);
