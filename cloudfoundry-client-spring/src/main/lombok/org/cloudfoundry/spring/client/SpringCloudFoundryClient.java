@@ -56,6 +56,9 @@ import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
 import org.cloudfoundry.client.v3.tasks.Tasks;
+import org.cloudfoundry.reactor.client.v2.applicationusageevents.ReactorApplicationUsageEvents;
+import org.cloudfoundry.reactor.client.v2.domains.ReactorDomains;
+import org.cloudfoundry.reactor.client.v2.environmentvariablegroups.ReactorEnvironmentVariableGroups;
 import org.cloudfoundry.reactor.client.v2.events.ReactorEvents;
 import org.cloudfoundry.reactor.client.v2.info.ReactorInfo;
 import org.cloudfoundry.reactor.client.v2.jobs.ReactorJobs;
@@ -65,10 +68,7 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.reactor.util.ConnectionContextSupplier;
 import org.cloudfoundry.reactor.util.DefaultConnectionContext;
 import org.cloudfoundry.spring.client.v2.applications.SpringApplicationsV2;
-import org.cloudfoundry.reactor.client.v2.applicationusageevents.ReactorApplicationUsageEvents;
 import org.cloudfoundry.spring.client.v2.buildpacks.SpringBuildpacks;
-import org.cloudfoundry.reactor.client.v2.domains.ReactorDomains;
-import org.cloudfoundry.spring.client.v2.environmentvariablegroups.SpringEnvironmentVariableGroups;
 import org.cloudfoundry.spring.client.v2.featureflags.SpringFeatureFlags;
 import org.cloudfoundry.spring.client.v2.organizationquotadefinitions.SpringOrganizationQuotaDefinitions;
 import org.cloudfoundry.spring.client.v2.organizations.SpringOrganizations;
@@ -212,7 +212,6 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         this.applicationsV3 = new SpringApplicationsV3(restOperations, root, schedulerGroup);
         this.buildpacks = new SpringBuildpacks(restOperations, root, schedulerGroup);
         this.droplets = new SpringDroplets(restOperations, root, schedulerGroup);
-        this.environmentVariableGroups = new SpringEnvironmentVariableGroups(restOperations, root, schedulerGroup);
         this.featureFlags = new SpringFeatureFlags(restOperations, root, schedulerGroup);
         this.organizations = new SpringOrganizations(restOperations, root, schedulerGroup);
         this.organizationQuotaDefinitions = new SpringOrganizationQuotaDefinitions(restOperations, root, schedulerGroup);
@@ -256,6 +255,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
 
         this.applicationUsageEvents = new ReactorApplicationUsageEvents(authorizationProvider, httpClient, objectMapper, root2);
         this.domains = new ReactorDomains(authorizationProvider, httpClient, objectMapper, root2);
+        this.environmentVariableGroups = new ReactorEnvironmentVariableGroups(authorizationProvider, httpClient, objectMapper, root2);
         this.events = new ReactorEvents(authorizationProvider, httpClient, objectMapper, root2);
         this.info = new ReactorInfo(authorizationProvider, httpClient, objectMapper, root2);
         this.jobs = new ReactorJobs(authorizationProvider, httpClient, objectMapper, root2);

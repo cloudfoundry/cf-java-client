@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.environmentvariablegroups;
+package org.cloudfoundry.reactor.client.v2.environmentvariablegroups;
 
-import lombok.ToString;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v2.environmentvariablegroups.EnvironmentVariableGroups;
 import org.cloudfoundry.client.v2.environmentvariablegroups.GetRunningEnvironmentVariablesRequest;
 import org.cloudfoundry.client.v2.environmentvariablegroups.GetRunningEnvironmentVariablesResponse;
@@ -26,48 +26,48 @@ import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateRunningEnviron
 import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateRunningEnvironmentVariablesResponse;
 import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateStagingEnvironmentVariablesRequest;
 import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateStagingEnvironmentVariablesResponse;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.springframework.web.client.RestOperations;
+import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
+import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
+import reactor.io.netty.http.HttpClient;
 
-import java.net.URI;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
- * The Spring-based implementation of {@link EnvironmentVariableGroups}
+ * The Reactor-based implementation of {@link EnvironmentVariableGroups}
  */
-@ToString(callSuper = true)
-public final class SpringEnvironmentVariableGroups extends AbstractSpringOperations implements EnvironmentVariableGroups {
+public final class ReactorEnvironmentVariableGroups extends AbstractClientV2Operations implements EnvironmentVariableGroups {
 
     /**
      * Creates an instance
      *
-     * @param restOperations the {@link RestOperations} to use to communicate with the server
-     * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
-     * @param schedulerGroup The group to use when making requests
+     * @param authorizationProvider the {@link AuthorizationProvider} to use when communicating with the server
+     * @param httpClient            the {@link HttpClient} to use when communicating with the server
+     * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
+     * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
      */
-    public SpringEnvironmentVariableGroups(RestOperations restOperations, URI root, Scheduler schedulerGroup) {
-        super(restOperations, root, schedulerGroup);
+    public ReactorEnvironmentVariableGroups(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
+        super(authorizationProvider, httpClient, objectMapper, root);
     }
 
     @Override
     public Mono<GetRunningEnvironmentVariablesResponse> getRunningEnvironmentVariables(GetRunningEnvironmentVariablesRequest request) {
-        return get(request, GetRunningEnvironmentVariablesResponse.class, builder -> builder.pathSegment("v2", "config", "environment_variable_groups", "running"));
+        return get(request, GetRunningEnvironmentVariablesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "config", "environment_variable_groups", "running")));
     }
 
     @Override
     public Mono<GetStagingEnvironmentVariablesResponse> getStagingEnvironmentVariables(GetStagingEnvironmentVariablesRequest request) {
-        return get(request, GetStagingEnvironmentVariablesResponse.class, builder -> builder.pathSegment("v2", "config", "environment_variable_groups", "staging"));
+        return get(request, GetStagingEnvironmentVariablesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "config", "environment_variable_groups", "staging")));
     }
 
     @Override
     public Mono<UpdateRunningEnvironmentVariablesResponse> updateRunningEnvironmentVariables(UpdateRunningEnvironmentVariablesRequest request) {
-        return put(request, UpdateRunningEnvironmentVariablesResponse.class, builder -> builder.pathSegment("v2", "config", "environment_variable_groups", "running"));
+        return put(request, UpdateRunningEnvironmentVariablesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "config", "environment_variable_groups", "running")));
     }
 
     @Override
     public Mono<UpdateStagingEnvironmentVariablesResponse> updateStagingEnvironmentVariables(UpdateStagingEnvironmentVariablesRequest request) {
-        return put(request, UpdateStagingEnvironmentVariablesResponse.class, builder -> builder.pathSegment("v2", "config", "environment_variable_groups", "staging"));
+        return put(request, UpdateStagingEnvironmentVariablesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "config", "environment_variable_groups", "staging")));
     }
 
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.environmentvariablegroups;
+package org.cloudfoundry.reactor.client.v2.environmentvariablegroups;
 
 import org.cloudfoundry.client.v2.environmentvariablegroups.GetRunningEnvironmentVariablesRequest;
 import org.cloudfoundry.client.v2.environmentvariablegroups.GetRunningEnvironmentVariablesResponse;
@@ -24,30 +24,39 @@ import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateRunningEnviron
 import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateRunningEnvironmentVariablesResponse;
 import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateStagingEnvironmentVariablesRequest;
 import org.cloudfoundry.client.v2.environmentvariablegroups.UpdateStagingEnvironmentVariablesResponse;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpStatus.OK;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public class SpringEnvironmentVariableGroupsTest {
 
-    public static final class GetRunningEnvironmentVariables extends AbstractApiTest<GetRunningEnvironmentVariablesRequest, GetRunningEnvironmentVariablesResponse> {
+public class ReactorEnvironmentVariableGroupsTest {
 
-        private SpringEnvironmentVariableGroups environmentVariableGroups = new SpringEnvironmentVariableGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
+    public static final class GetRunningEnvironmentVariables extends AbstractClientApiTest<GetRunningEnvironmentVariablesRequest, GetRunningEnvironmentVariablesResponse> {
+
+        private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/config/environment_variable_groups/running")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/environment_variable_groups/GET_running_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetRunningEnvironmentVariablesRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/config/environment_variable_groups/running")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/environment_variable_groups/GET_running_response.json");
         }
 
         @Override
@@ -70,21 +79,26 @@ public class SpringEnvironmentVariableGroupsTest {
         }
     }
 
-    public static final class GetStagingEnvironmentVariables extends AbstractApiTest<GetStagingEnvironmentVariablesRequest, GetStagingEnvironmentVariablesResponse> {
+    public static final class GetStagingEnvironmentVariables extends AbstractClientApiTest<GetStagingEnvironmentVariablesRequest, GetStagingEnvironmentVariablesResponse> {
 
-        private SpringEnvironmentVariableGroups environmentVariableGroups = new SpringEnvironmentVariableGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/config/environment_variable_groups/staging")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/environment_variable_groups/GET_staging_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetStagingEnvironmentVariablesRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/config/environment_variable_groups/staging")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/environment_variable_groups/GET_staging_response.json");
         }
 
         @Override
@@ -107,22 +121,27 @@ public class SpringEnvironmentVariableGroupsTest {
         }
     }
 
-    public static final class UpdateRunningEnvironmentVariables extends AbstractApiTest<UpdateRunningEnvironmentVariablesRequest, UpdateRunningEnvironmentVariablesResponse> {
+    public static final class UpdateRunningEnvironmentVariables extends AbstractClientApiTest<UpdateRunningEnvironmentVariablesRequest, UpdateRunningEnvironmentVariablesResponse> {
 
-        private SpringEnvironmentVariableGroups environmentVariableGroups = new SpringEnvironmentVariableGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/config/environment_variable_groups/running")
+                    .payload("fixtures/client/v2/environment_variable_groups/PUT_running_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/environment_variable_groups/PUT_running_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected UpdateRunningEnvironmentVariablesRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/config/environment_variable_groups/running")
-                .requestPayload("fixtures/client/v2/environment_variable_groups/PUT_running_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/environment_variable_groups/PUT_running_response.json");
         }
 
         @Override
@@ -147,22 +166,27 @@ public class SpringEnvironmentVariableGroupsTest {
         }
     }
 
-    public static final class UpdateStagingEnvironmentVariables extends AbstractApiTest<UpdateStagingEnvironmentVariablesRequest, UpdateStagingEnvironmentVariablesResponse> {
+    public static final class UpdateStagingEnvironmentVariables extends AbstractClientApiTest<UpdateStagingEnvironmentVariablesRequest, UpdateStagingEnvironmentVariablesResponse> {
 
-        private SpringEnvironmentVariableGroups environmentVariableGroups = new SpringEnvironmentVariableGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/config/environment_variable_groups/staging")
+                    .payload("fixtures/client/v2/environment_variable_groups/PUT_staging_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/environment_variable_groups/PUT_staging_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected UpdateStagingEnvironmentVariablesRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/config/environment_variable_groups/staging")
-                .requestPayload("fixtures/client/v2/environment_variable_groups/PUT_staging_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/environment_variable_groups/PUT_staging_response.json");
         }
 
         @Override
