@@ -65,6 +65,15 @@ public interface Services {
     Mono<Void> deleteInstance(DeleteServiceInstanceRequest request);
 
     /**
+     * Delete a service key
+     *
+     * @param request the delete service key request
+     * @return a completion indicator
+     */
+    Mono<Void> deleteServiceKey(DeleteServiceKeyRequest request);
+
+
+    /**
      * Get a service instance
      *
      * @param request the get service instance request
