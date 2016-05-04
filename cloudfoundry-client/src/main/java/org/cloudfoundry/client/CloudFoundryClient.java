@@ -31,7 +31,7 @@ import org.cloudfoundry.client.v2.privatedomains.PrivateDomains;
 import org.cloudfoundry.client.v2.routemappings.RouteMappings;
 import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroups;
-import org.cloudfoundry.client.v2.servicebindings.ServiceBindings;
+import org.cloudfoundry.client.v2.servicebindings.ServiceBindingsV2;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokers;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
 import org.cloudfoundry.client.v2.servicekeys.ServiceKeys;
@@ -49,6 +49,7 @@ import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
+import org.cloudfoundry.client.v3.servicebindings.ServiceBindingsV3;
 import org.cloudfoundry.client.v3.tasks.Tasks;
 import reactor.core.publisher.Mono;
 
@@ -203,11 +204,18 @@ public interface CloudFoundryClient {
     SecurityGroups securityGroups();
 
     /**
-     * Main entry point to the Cloud Foundry Service Bindings Client API
+     * Main entry point to the Cloud Foundry Service Bindings V2 Client API
      *
-     * @return the Cloud Foundry Service Bindings Client API
+     * @return the Cloud Foundry Service Bindings V2 Client API
      */
-    ServiceBindings serviceBindings();
+    ServiceBindingsV2 serviceBindingsV2();
+
+    /**
+     * Main entry point to the Cloud Foundry Service Bindings V3 Client API
+     *
+     * @return the Cloud Foundry Service Bindings V3 Client API
+     */
+    ServiceBindingsV3 serviceBindingsV3();
 
     /**
      * Main entry point to the Cloud Foundry Service Brokers Client API

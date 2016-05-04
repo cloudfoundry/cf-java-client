@@ -127,8 +127,13 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
     }
 
     @Test
-    public void serviceBindings() {
-        assertNotNull(this.client.serviceBindings());
+    public void serviceBindingsV2() {
+        assertNotNull(this.client.serviceBindingsV2());
+    }
+
+    @Test
+    public void serviceBindingsV3() {
+        assertNotNull(this.client.serviceBindingsV3());
     }
 
     @Test

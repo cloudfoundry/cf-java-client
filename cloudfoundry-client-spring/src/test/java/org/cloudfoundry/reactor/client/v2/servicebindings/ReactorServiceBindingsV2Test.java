@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.servicebindings;
+package org.cloudfoundry.reactor.client.v2.servicebindings;
 
 
 import org.cloudfoundry.client.v2.Resource;
@@ -29,38 +29,46 @@ import org.cloudfoundry.client.v2.servicebindings.ListServiceBindingsRequest;
 import org.cloudfoundry.client.v2.servicebindings.ListServiceBindingsResponse;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpStatus.ACCEPTED;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class SpringServiceBindingsTest {
+public final class ReactorServiceBindingsV2Test {
 
-    public static final class Create extends AbstractApiTest<CreateServiceBindingRequest, CreateServiceBindingResponse> {
+    public static final class Create extends AbstractClientApiTest<CreateServiceBindingRequest, CreateServiceBindingResponse> {
 
-        private final SpringServiceBindings serviceBindings = new SpringServiceBindings(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceBindingsV2 serviceBindings = new ReactorServiceBindingsV2(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v2/service_bindings")
+                    .payload("fixtures/client/v2/service_bindings/POST_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v2/service_bindings/POST_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected CreateServiceBindingRequest getInvalidRequest() {
             return CreateServiceBindingRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v2/service_bindings")
-                .requestPayload("fixtures/client/v2/service_bindings/POST_request.json")
-                .status(CREATED)
-                .responsePayload("fixtures/client/v2/service_bindings/POST_response.json");
         }
 
         @Override
@@ -98,21 +106,26 @@ public final class SpringServiceBindingsTest {
 
     }
 
-    public static final class Delete extends AbstractApiTest<DeleteServiceBindingRequest, DeleteServiceBindingResponse> {
+    public static final class Delete extends AbstractClientApiTest<DeleteServiceBindingRequest, DeleteServiceBindingResponse> {
 
-        private final SpringServiceBindings serviceBindings = new SpringServiceBindings(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceBindingsV2 serviceBindings = new ReactorServiceBindingsV2(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/service_bindings/test-service-binding-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteServiceBindingRequest getInvalidRequest() {
             return DeleteServiceBindingRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/service_bindings/test-service-binding-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -134,22 +147,27 @@ public final class SpringServiceBindingsTest {
 
     }
 
-    public static final class DeleteAsync extends AbstractApiTest<DeleteServiceBindingRequest, DeleteServiceBindingResponse> {
+    public static final class DeleteAsync extends AbstractClientApiTest<DeleteServiceBindingRequest, DeleteServiceBindingResponse> {
 
-        private final SpringServiceBindings serviceBindings = new SpringServiceBindings(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceBindingsV2 serviceBindings = new ReactorServiceBindingsV2(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/service_bindings/test-service-binding-id?async=true")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(ACCEPTED)
+                    .payload("fixtures/client/v2/service_bindings/DELETE_{id}_async_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteServiceBindingRequest getInvalidRequest() {
             return DeleteServiceBindingRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/service_bindings/test-service-binding-id?async=true")
-                .status(ACCEPTED)
-                .responsePayload("fixtures/client/v2/service_bindings/DELETE_{id}_async_response.json");
         }
 
         @Override
@@ -182,22 +200,27 @@ public final class SpringServiceBindingsTest {
 
     }
 
-    public static final class Get extends AbstractApiTest<GetServiceBindingRequest, GetServiceBindingResponse> {
+    public static final class Get extends AbstractClientApiTest<GetServiceBindingRequest, GetServiceBindingResponse> {
 
-        private final SpringServiceBindings serviceBindings = new SpringServiceBindings(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceBindingsV2 serviceBindings = new ReactorServiceBindingsV2(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/service_bindings/test-service-binding-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/service_bindings/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetServiceBindingRequest getInvalidRequest() {
             return GetServiceBindingRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/service_bindings/test-service-binding-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/service_bindings/GET_{id}_response.json");
         }
 
         @Override
@@ -234,21 +257,26 @@ public final class SpringServiceBindingsTest {
 
     }
 
-    public static final class List extends AbstractApiTest<ListServiceBindingsRequest, ListServiceBindingsResponse> {
+    public static final class List extends AbstractClientApiTest<ListServiceBindingsRequest, ListServiceBindingsResponse> {
 
-        private final SpringServiceBindings serviceBindings = new SpringServiceBindings(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceBindingsV2 serviceBindings = new ReactorServiceBindingsV2(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/service_bindings?q=app_guid%20IN%20dd44fd4f-5e20-4c52-b66d-7af6e201f01e&page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/service_bindings/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListServiceBindingsRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/service_bindings?q=app_guid%20IN%20dd44fd4f-5e20-4c52-b66d-7af6e201f01e&page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/service_bindings/GET_response.json");
         }
 
         @Override

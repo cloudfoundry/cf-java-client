@@ -37,7 +37,7 @@ import org.cloudfoundry.client.v2.privatedomains.PrivateDomains;
 import org.cloudfoundry.client.v2.routemappings.RouteMappings;
 import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroups;
-import org.cloudfoundry.client.v2.servicebindings.ServiceBindings;
+import org.cloudfoundry.client.v2.servicebindings.ServiceBindingsV2;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokers;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
 import org.cloudfoundry.client.v2.servicekeys.ServiceKeys;
@@ -55,6 +55,7 @@ import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
+import org.cloudfoundry.client.v3.servicebindings.ServiceBindingsV3;
 import org.cloudfoundry.client.v3.tasks.Tasks;
 import org.cloudfoundry.reactor.client.v2.applicationusageevents.ReactorApplicationUsageEvents;
 import org.cloudfoundry.reactor.client.v2.domains.ReactorDomains;
@@ -62,8 +63,10 @@ import org.cloudfoundry.reactor.client.v2.environmentvariablegroups.ReactorEnvir
 import org.cloudfoundry.reactor.client.v2.events.ReactorEvents;
 import org.cloudfoundry.reactor.client.v2.info.ReactorInfo;
 import org.cloudfoundry.reactor.client.v2.jobs.ReactorJobs;
+import org.cloudfoundry.reactor.client.v2.servicebindings.ReactorServiceBindingsV2;
 import org.cloudfoundry.reactor.client.v2.stacks.ReactorStacks;
 import org.cloudfoundry.reactor.client.v2.users.ReactorUsers;
+import org.cloudfoundry.reactor.client.v3.servicebindings.ReactorServiceBindingsV3;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.reactor.util.ConnectionContextSupplier;
 import org.cloudfoundry.reactor.util.DefaultConnectionContext;
@@ -76,7 +79,6 @@ import org.cloudfoundry.spring.client.v2.privatedomains.SpringPrivateDomains;
 import org.cloudfoundry.spring.client.v2.routemappings.SpringRouteMappings;
 import org.cloudfoundry.spring.client.v2.routes.SpringRoutes;
 import org.cloudfoundry.spring.client.v2.securitygroups.SpringSecurityGroups;
-import org.cloudfoundry.spring.client.v2.servicebindings.SpringServiceBindings;
 import org.cloudfoundry.spring.client.v2.servicebrokers.SpringServiceBrokers;
 import org.cloudfoundry.spring.client.v2.serviceinstances.SpringServiceInstances;
 import org.cloudfoundry.spring.client.v2.servicekeys.SpringServiceKeys;
@@ -161,7 +163,9 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
 
     private final SecurityGroups securityGroups;
 
-    private final ServiceBindings serviceBindings;
+    private final ServiceBindingsV2 serviceBindingsV2;
+
+    private final ServiceBindingsV3 serviceBindingsV3;
 
     private final ServiceBrokers serviceBrokers;
 
@@ -222,7 +226,6 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         this.routes = new SpringRoutes(restOperations, root, schedulerGroup);
         this.securityGroups = new SpringSecurityGroups(restOperations, root, schedulerGroup);
         this.sharedDomains = new SpringSharedDomains(restOperations, root, schedulerGroup);
-        this.serviceBindings = new SpringServiceBindings(restOperations, root, schedulerGroup);
         this.serviceBrokers = new SpringServiceBrokers(restOperations, root, schedulerGroup);
         this.serviceInstances = new SpringServiceInstances(restOperations, root, schedulerGroup);
         this.serviceKeys = new SpringServiceKeys(restOperations, root, schedulerGroup);
@@ -259,6 +262,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         this.events = new ReactorEvents(authorizationProvider, httpClient, objectMapper, root2);
         this.info = new ReactorInfo(authorizationProvider, httpClient, objectMapper, root2);
         this.jobs = new ReactorJobs(authorizationProvider, httpClient, objectMapper, root2);
+        this.serviceBindingsV2 = new ReactorServiceBindingsV2(authorizationProvider, httpClient, objectMapper, root2);
+        this.serviceBindingsV3 = new ReactorServiceBindingsV3(authorizationProvider, httpClient, objectMapper, root2);
         this.stacks = new ReactorStacks(authorizationProvider, httpClient, objectMapper, root2);
         this.users = new ReactorUsers(authorizationProvider, httpClient, objectMapper, root2);
     }
@@ -380,8 +385,13 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
     }
 
     @Override
-    public ServiceBindings serviceBindings() {
-        return this.serviceBindings;
+    public ServiceBindingsV2 serviceBindingsV2() {
+        return this.serviceBindingsV2;
+    }
+
+    @Override
+    public ServiceBindingsV3 serviceBindingsV3() {
+        return this.serviceBindingsV3;
     }
 
     @Override

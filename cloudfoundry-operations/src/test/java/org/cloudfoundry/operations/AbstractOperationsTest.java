@@ -27,7 +27,7 @@ import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuota
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomains;
 import org.cloudfoundry.client.v2.routes.Routes;
-import org.cloudfoundry.client.v2.servicebindings.ServiceBindings;
+import org.cloudfoundry.client.v2.servicebindings.ServiceBindingsV2;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
 import org.cloudfoundry.client.v2.servicekeys.ServiceKeys;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlans;
@@ -95,7 +95,7 @@ public abstract class AbstractOperationsTest {
 
     protected final Routes routes = mock(Routes.class, RETURNS_SMART_NULLS);
 
-    protected final ServiceBindings serviceBindings = mock(ServiceBindings.class, RETURNS_SMART_NULLS);
+    protected final ServiceBindingsV2 serviceBindingsV2 = mock(ServiceBindingsV2.class, RETURNS_SMART_NULLS);
 
     protected final ServiceInstances serviceInstances = mock(ServiceInstances.class, RETURNS_SMART_NULLS);
 
@@ -133,7 +133,7 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.organizationQuotaDefinitions()).thenReturn(this.organizationQuotaDefinitions);
         when(this.cloudFoundryClient.privateDomains()).thenReturn(this.privateDomains);
         when(this.cloudFoundryClient.routes()).thenReturn(this.routes);
-        when(this.cloudFoundryClient.serviceBindings()).thenReturn(this.serviceBindings);
+        when(this.cloudFoundryClient.serviceBindings()).thenReturn(this.serviceBindingsV2);
         when(this.cloudFoundryClient.serviceInstances()).thenReturn(this.serviceInstances);
         when(this.cloudFoundryClient.serviceKeys()).thenReturn(this.serviceKeys);
         when(this.cloudFoundryClient.servicePlans()).thenReturn(this.servicePlans);
