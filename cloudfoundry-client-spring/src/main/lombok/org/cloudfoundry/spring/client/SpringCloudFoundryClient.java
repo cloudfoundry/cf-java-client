@@ -67,7 +67,7 @@ import org.cloudfoundry.reactor.util.DefaultConnectionContext;
 import org.cloudfoundry.spring.client.v2.applications.SpringApplicationsV2;
 import org.cloudfoundry.reactor.client.v2.applicationusageevents.ReactorApplicationUsageEvents;
 import org.cloudfoundry.spring.client.v2.buildpacks.SpringBuildpacks;
-import org.cloudfoundry.spring.client.v2.domains.SpringDomains;
+import org.cloudfoundry.reactor.client.v2.domains.ReactorDomains;
 import org.cloudfoundry.spring.client.v2.environmentvariablegroups.SpringEnvironmentVariableGroups;
 import org.cloudfoundry.spring.client.v2.featureflags.SpringFeatureFlags;
 import org.cloudfoundry.spring.client.v2.organizationquotadefinitions.SpringOrganizationQuotaDefinitions;
@@ -211,7 +211,6 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         this.applicationsV2 = new SpringApplicationsV2(restOperations, root, schedulerGroup);
         this.applicationsV3 = new SpringApplicationsV3(restOperations, root, schedulerGroup);
         this.buildpacks = new SpringBuildpacks(restOperations, root, schedulerGroup);
-        this.domains = new SpringDomains(restOperations, root, schedulerGroup);
         this.droplets = new SpringDroplets(restOperations, root, schedulerGroup);
         this.environmentVariableGroups = new SpringEnvironmentVariableGroups(restOperations, root, schedulerGroup);
         this.featureFlags = new SpringFeatureFlags(restOperations, root, schedulerGroup);
@@ -256,6 +255,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         Mono<String> root2 = this.connectionContext.getRoot();  // TODO: Change name once Spring is gone
 
         this.applicationUsageEvents = new ReactorApplicationUsageEvents(authorizationProvider, httpClient, objectMapper, root2);
+        this.domains = new ReactorDomains(authorizationProvider, httpClient, objectMapper, root2);
         this.events = new ReactorEvents(authorizationProvider, httpClient, objectMapper, root2);
         this.info = new ReactorInfo(authorizationProvider, httpClient, objectMapper, root2);
         this.jobs = new ReactorJobs(authorizationProvider, httpClient, objectMapper, root2);

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.domains;
+package org.cloudfoundry.reactor.client.v2.domains;
 
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
@@ -32,38 +32,46 @@ import org.cloudfoundry.client.v2.domains.ListDomainsResponse;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.client.v2.Resource.Metadata;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpStatus.ACCEPTED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringDomainsTest {
+public final class ReactorDomainsTest {
 
-    public static final class Create extends AbstractApiTest<CreateDomainRequest, CreateDomainResponse> {
+    public static final class Create extends AbstractClientApiTest<CreateDomainRequest, CreateDomainResponse> {
 
-        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorDomains domains = new ReactorDomains(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v2/domains")
+                    .payload("fixtures/client/v2/domains/POST_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/domains/POST_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected CreateDomainRequest getInvalidRequest() {
             return CreateDomainRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v2/domains")
-                .requestPayload("fixtures/client/v2/domains/POST_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/domains/POST_response.json");
         }
 
         @Override
@@ -99,21 +107,26 @@ public final class SpringDomainsTest {
         }
     }
 
-    public static final class Delete extends AbstractApiTest<DeleteDomainRequest, DeleteDomainResponse> {
+    public static final class Delete extends AbstractClientApiTest<DeleteDomainRequest, DeleteDomainResponse> {
 
-        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorDomains domains = new ReactorDomains(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/domains/test-domain-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteDomainRequest getInvalidRequest() {
             return DeleteDomainRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/domains/test-domain-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -134,22 +147,27 @@ public final class SpringDomainsTest {
         }
     }
 
-    public static final class DeleteAsync extends AbstractApiTest<DeleteDomainRequest, DeleteDomainResponse> {
+    public static final class DeleteAsync extends AbstractClientApiTest<DeleteDomainRequest, DeleteDomainResponse> {
 
-        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorDomains domains = new ReactorDomains(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/domains/test-domain-id?async=true")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(ACCEPTED)
+                    .payload("fixtures/client/v2/domains/DELETE_{id}_async_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteDomainRequest getInvalidRequest() {
             return DeleteDomainRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/domains/test-domain-id?async=true")
-                .status(ACCEPTED)
-                .responsePayload("fixtures/client/v2/domains/DELETE_{id}_async_response.json");
         }
 
         @Override
@@ -181,22 +199,27 @@ public final class SpringDomainsTest {
         }
     }
 
-    public static final class Get extends AbstractApiTest<GetDomainRequest, GetDomainResponse> {
+    public static final class Get extends AbstractClientApiTest<GetDomainRequest, GetDomainResponse> {
 
-        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorDomains domains = new ReactorDomains(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/domains/test-domain-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/domains/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetDomainRequest getInvalidRequest() {
             return GetDomainRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/domains/test-domain-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/domains/GET_{id}_response.json");
         }
 
         @Override
@@ -227,21 +250,26 @@ public final class SpringDomainsTest {
 
     }
 
-    public static final class ListDomains extends AbstractApiTest<ListDomainsRequest, ListDomainsResponse> {
+    public static final class ListDomains extends AbstractClientApiTest<ListDomainsRequest, ListDomainsResponse> {
 
-        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorDomains domains = new ReactorDomains(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/domains?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/domains/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListDomainsRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/domains?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/domains/GET_response.json");
         }
 
         @Override
@@ -308,22 +336,27 @@ public final class SpringDomainsTest {
         }
     }
 
-    public static final class ListSpaces extends AbstractApiTest<ListDomainSpacesRequest, ListDomainSpacesResponse> {
+    public static final class ListSpaces extends AbstractClientApiTest<ListDomainSpacesRequest, ListDomainSpacesResponse> {
 
-        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorDomains domains = new ReactorDomains(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/domains/test-domain-id/spaces?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/domains/GET_{id}_spaces_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListDomainSpacesRequest getInvalidRequest() {
             return ListDomainSpacesRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/domains/test-domain-id/spaces?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/domains/GET_{id}_spaces_response.json");
         }
 
         @Override
