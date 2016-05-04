@@ -78,15 +78,15 @@ public abstract class AbstractSpringOperations {
                     try {
                         T result = exchange.apply(signalEmitter);
                         if (result != null) {
-                            signalEmitter.onNext(result);
+                            signalEmitter.tryEmit(result);
                         }
 
-                        signalEmitter.onComplete();
+                        signalEmitter.complete();
                     } catch (HttpStatusCodeException e) {
-                        signalEmitter.onError(CloudFoundryExceptionBuilder.build(e));
+                        signalEmitter.fail(CloudFoundryExceptionBuilder.build(e));
                     } catch (Throwable t) {
                         Exceptions.throwIfFatal(t);
-                        signalEmitter.onError(t);
+                        signalEmitter.fail(t);
                     }
                 }))
             .subscribeOn(this.schedulerGroup)
@@ -105,7 +105,7 @@ public abstract class AbstractSpringOperations {
     }
 
     protected final Flux<byte[]> getStream(Validatable request, Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, (Function<SignalEmitter<byte[]>, byte[]>) signalEmitter -> {
+        return exchange(request, signalEmitter -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
             builderCallback.accept(builder);
             URI uri = builder.build().encode().toUri();
@@ -120,7 +120,7 @@ public abstract class AbstractSpringOperations {
                         emission = signalEmitter.emit(Arrays.copyOf(buffer, len));
                     }
 
-                    return null;
+                    return (byte[]) null;
                 }
             });
         });
