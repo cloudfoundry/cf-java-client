@@ -35,10 +35,13 @@ import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse
 import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
+import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceKeysRequest;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceResource;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyResponse;
+import org.cloudfoundry.client.v2.servicekeys.ServiceKeyEntity;
+import org.cloudfoundry.client.v2.servicekeys.ServiceKeyResource;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanRequest;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanResponse;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
@@ -202,6 +205,15 @@ public final class DefaultServices implements Services {
                     getServiceEntity(this.cloudFoundryClient, Optional.ofNullable(servicePlanEntity.getServiceId()))
                 )))
             .map(function(DefaultServices::toServiceInstance));
+    }
+
+    @Override
+    public Flux<ServiceKey> listServiceKeys(ListServiceKeysRequest request) {
+        return Mono
+            .when(ValidationUtils.validate(request), this.spaceId)
+            .then(function((request1, spaceId) -> getSpaceServiceInstanceId(this.cloudFoundryClient, request1.getServiceInstanceName(), spaceId)))
+            .flatMap(serviceInstanceId -> requestListServiceKeys(this.cloudFoundryClient, serviceInstanceId))
+            .map(DefaultServices::toServiceKey);
     }
 
     @Override
@@ -590,6 +602,15 @@ public final class DefaultServices implements Services {
                     .build()));
     }
 
+    private static Flux<ServiceKeyResource> requestListServiceKeys(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.serviceInstances()
+                .listServiceKeys(ListServiceInstanceServiceKeysRequest.builder()
+                    .page(page)
+                    .serviceInstanceId(serviceInstanceId)
+                    .build()));
+    }
+
     private static Flux<ServicePlanVisibilityResource> requestListServicePlanVisibilities(CloudFoundryClient cloudFoundryClient, String organizationId, String servicePlanId) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.servicePlanVisibilities()
@@ -680,6 +701,14 @@ public final class DefaultServices implements Services {
             .id(ResourceUtils.getId(resource))
             .label(entity.getLabel())
             .servicePlans(toServicePlans(servicePlans))
+            .build();
+    }
+
+    private static ServiceKey toServiceKey(ServiceKeyResource resource) {
+        ServiceKeyEntity entity = resource.getEntity();
+
+        return ServiceKey.builder()
+            .name(entity.getName())
             .build();
     }
 
