@@ -19,10 +19,15 @@ package org.cloudfoundry.client.v2.userprovidedserviceinstances;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
+import org.cloudfoundry.client.v2.InFilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
+
+import java.util.List;
 
 /**
  * The request payload for the List User Provided Service Instances operation
@@ -32,9 +37,42 @@ import org.cloudfoundry.client.v2.PaginatedRequest;
 @ToString(callSuper = true)
 public final class ListUserProvidedServiceInstancesRequest extends PaginatedRequest implements Validatable {
 
+    /**
+     * The names
+     *
+     * @param names the names
+     * @return the names
+     */
+    @Getter(onMethod = @__(@InFilterParameter("name")))
+    private final List<String> names;
+
+    /**
+     * The organization ids
+     *
+     * @param organizationIds the organization ids
+     * @return the organization ids
+     */
+    @Getter(onMethod = @__(@InFilterParameter("organization_guid")))
+    private final List<String> organizationIds;
+
+    /**
+     * The space ids
+     *
+     * @param spaceIds the space ids
+     * @return the space ids
+     */
+    @Getter(onMethod = @__(@InFilterParameter("space_guid")))
+    private final List<String> spaceIds;
+
     @Builder
-    ListUserProvidedServiceInstancesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage) {
+    ListUserProvidedServiceInstancesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
+                                            @Singular List<String> names,
+                                            @Singular List<String> organizationIds,
+                                            @Singular List<String> spaceIds) {
         super(orderDirection, page, resultsPerPage);
+        this.names = names;
+        this.organizationIds = organizationIds;
+        this.spaceIds = spaceIds;
     }
 
     @Override

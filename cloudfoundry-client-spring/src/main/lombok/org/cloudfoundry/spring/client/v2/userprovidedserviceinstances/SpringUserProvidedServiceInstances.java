@@ -74,6 +74,7 @@ public final class SpringUserProvidedServiceInstances extends AbstractSpringOper
     public Mono<ListUserProvidedServiceInstancesResponse> list(ListUserProvidedServiceInstancesRequest request) {
         return get(request, ListUserProvidedServiceInstancesResponse.class, builder -> {
             builder.pathSegment("v2", "user_provided_service_instances");
+            FilterBuilder.augment(builder, request);
             QueryBuilder.augment(builder, request);
         });
     }
