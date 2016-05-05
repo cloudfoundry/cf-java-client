@@ -18,9 +18,12 @@ package org.cloudfoundry;
 
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -34,19 +37,27 @@ import static org.junit.Assert.assertEquals;
 @SpringApplicationConfiguration(IntegrationTestConfiguration.class)
 public abstract class AbstractIntegrationTest {
 
+    private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.test");
+
     @Rule
     public final TestName testName = new TestName();
 
     private final TestSubscriber<?> testSubscriber = new TestSubscriber<>()
-        .setScanningLoggerName(() -> String.format("%s.%s", this.getClass().getSimpleName(), this.testName.getMethodName()))
-        .setPerformanceLoggerName(() -> String.format("%s.%s", this.getClass().getSimpleName(), this.testName.getMethodName()));
+        .setScanningLoggerName(this::getTestName)
+        .setPerformanceLoggerName(this::getTestName);
 
     @Autowired
     private NameFactory nameFactory;
 
+    @Before
+    public void testEntry() {
+        this.logger.debug(">> {} <<", getTestName());
+    }
+
     @After
     public final void verify() throws InterruptedException {
         this.testSubscriber.verify(Duration.ofMinutes(5));
+        this.logger.debug("<< {} >>", getTestName());
     }
 
     protected final <T> void assertTupleEquality(Tuple2<T, T> tuple) {
@@ -91,6 +102,10 @@ public abstract class AbstractIntegrationTest {
     @SuppressWarnings("unchecked")
     protected final <T> TestSubscriber<T> testSubscriber() {
         return (TestSubscriber<T>) this.testSubscriber;
+    }
+
+    private String getTestName() {
+        return String.format("%s.%s", this.getClass().getSimpleName(), this.testName.getMethodName());
     }
 
 }
