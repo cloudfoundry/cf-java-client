@@ -66,7 +66,8 @@ public abstract class AbstractReactorOperations {
                     .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
                     .doOnSubscribe(s -> this.requestLogger.debug("DELETE {}", uri))
                     .then(HttpOutbound::sendHeaders))
-                .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))))
+                .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))
+                .doOnSuccess(inbound -> printWarnings(inbound, this.responseLogger, uri))))
             .flatMap(NettyInbound::receive)
             .as(JsonCodec.decode(this.objectMapper, responseType));
     }
@@ -88,7 +89,8 @@ public abstract class AbstractReactorOperations {
                     .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
                     .doOnSubscribe(s -> this.requestLogger.debug("GET    {}", uri))
                     .then(HttpOutbound::sendHeaders))
-                .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))));
+                .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))
+                .doOnSuccess(inbound -> printWarnings(inbound, this.responseLogger, uri))));
     }
 
     protected final <REQ extends Validatable, RSP> Mono<RSP> doPost(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
@@ -102,7 +104,8 @@ public abstract class AbstractReactorOperations {
                     .doOnSubscribe(s -> this.requestLogger.debug("POST   {}", uri))
                     .then(o -> o.send(Mono.just(validRequest)
                         .as(JsonCodec.encode(this.objectMapper)))))
-                .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))))
+                .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))
+                .doOnSuccess(inbound -> printWarnings(inbound, this.responseLogger, uri))))
             .flatMap(NettyInbound::receive)
             .as(JsonCodec.decode(this.objectMapper, responseType));
     }
@@ -118,14 +121,14 @@ public abstract class AbstractReactorOperations {
                     .doOnSubscribe(s -> this.requestLogger.debug("PUT    {}", uri))
                     .then(o -> o.send(Mono.just(validRequest)
                         .as(JsonCodec.encode(this.objectMapper)))))
-                .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))))
+                .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))
+                .doOnSuccess(inbound -> printWarnings(inbound, this.responseLogger, uri))))
             .flatMap(NettyInbound::receive)
             .as(JsonCodec.decode(this.objectMapper, responseType));
     }
 
     protected final <REQ extends Validatable> Mono<HttpInbound> doWs(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
                                                                      Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
-
         return Mono
             .when(ValidationUtils.validate(request), this.root)
             .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, uriTransformer))))
@@ -134,13 +137,19 @@ public abstract class AbstractReactorOperations {
                     .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
                     .doOnSubscribe(s -> this.requestLogger.debug("WS     {}", uri))
                     .then(HttpOutbound::upgradeToTextWebsocket))
-                .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))));
+                .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))
+                .doOnSuccess(inbound -> printWarnings(inbound, this.responseLogger, uri))));
     }
 
     private static <REQ extends Validatable> String buildUri(String root, REQ validRequest, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
         return uriTransformer
             .apply(Tuple.of(UriComponentsBuilder.fromUriString(root), validRequest))
             .build().encode().toUriString();
+    }
+
+    private static void printWarnings(HttpInbound inbound, Logger logger, String uri) {
+        inbound.responseHeaders().getAll("X-Cf-Warnings")
+            .forEach(warning -> logger.warn("{} ({})", warning, uri));
     }
 
 }
