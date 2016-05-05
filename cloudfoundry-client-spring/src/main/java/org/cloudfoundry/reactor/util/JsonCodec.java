@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.Unpooled;
+import io.netty.util.ReferenceCounted;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import reactor.core.publisher.Flux;
@@ -103,6 +104,7 @@ final class JsonCodec {
             }
 
             this.done = true;
+            this.byteBufs.forEach(ReferenceCounted::release);
             this.subscriber.onComplete();
         }
 
@@ -114,6 +116,7 @@ final class JsonCodec {
             }
 
             this.done = true;
+            this.byteBufs.forEach(ReferenceCounted::release);
             this.subscriber.onError(throwable);
         }
 
