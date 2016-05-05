@@ -998,7 +998,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     private static Mono<CreateServiceBindingResponse> requestCreateServiceBinding(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId) {
-        return cloudFoundryClient.serviceBindings()
+        return cloudFoundryClient.serviceBindingsV2()
             .create(CreateServiceBindingRequest.builder()
                 .applicationId(applicationId)
                 .serviceInstanceId(serviceInstanceId)

@@ -133,7 +133,7 @@ public final class DefaultServicesTest {
     }
 
     private static void requestCreateServiceBinding(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId, Map<String, Object> parameters) {
-        when(cloudFoundryClient.serviceBindings()
+        when(cloudFoundryClient.serviceBindingsV2()
             .create(CreateServiceBindingRequest.builder()
                 .applicationId(applicationId)
                 .parameters(parameters)
@@ -145,7 +145,7 @@ public final class DefaultServicesTest {
     }
 
     private static void requestCreateServiceBindingError(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId, Map<String, Object> parameters, int code) {
-        when(cloudFoundryClient.serviceBindings()
+        when(cloudFoundryClient.serviceBindingsV2()
             .create(CreateServiceBindingRequest.builder()
                 .applicationId(applicationId)
                 .parameters(parameters)
@@ -213,7 +213,7 @@ public final class DefaultServicesTest {
     }
 
     private static void requestDeleteServiceBinding(CloudFoundryClient cloudFoundryClient, String serviceBindingId) {
-        when(cloudFoundryClient.serviceBindings()
+        when(cloudFoundryClient.serviceBindingsV2()
             .delete(DeleteServiceBindingRequest.builder()
                 .serviceBindingId(serviceBindingId)
                 .async(true)
@@ -369,7 +369,7 @@ public final class DefaultServicesTest {
     }
 
     private static void requestListServiceBindings(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String applicationId) {
-        when(cloudFoundryClient.serviceBindings()
+        when(cloudFoundryClient.serviceBindingsV2()
             .list(ListServiceBindingsRequest.builder()
                 .page(1)
                 .serviceInstanceId(serviceInstanceId)
@@ -385,7 +385,7 @@ public final class DefaultServicesTest {
     }
 
     private static void requestListServiceBindingsEmpty(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
-        when(cloudFoundryClient.serviceBindings()
+        when(cloudFoundryClient.serviceBindingsV2()
             .list(ListServiceBindingsRequest.builder()
                 .page(1)
                 .serviceInstanceId(serviceInstanceId)

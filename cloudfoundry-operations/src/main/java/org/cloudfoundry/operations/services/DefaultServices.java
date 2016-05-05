@@ -459,7 +459,7 @@ public final class DefaultServices implements Services {
 
     private static Mono<CreateServiceBindingResponse> requestCreateServiceBinding(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId,
                                                                                   Map<String, Object> parameters) {
-        return cloudFoundryClient.serviceBindings()
+        return cloudFoundryClient.serviceBindingsV2()
             .create(CreateServiceBindingRequest.builder()
                 .applicationId(applicationId)
                 .parameters(parameters)
@@ -490,7 +490,7 @@ public final class DefaultServices implements Services {
     }
 
     private static Mono<DeleteServiceBindingResponse> requestDeleteServiceBinding(CloudFoundryClient cloudFoundryClient, String serviceBindingId) {
-        return cloudFoundryClient.serviceBindings()
+        return cloudFoundryClient.serviceBindingsV2()
             .delete(DeleteServiceBindingRequest.builder()
                 .serviceBindingId(serviceBindingId)
                 .async(true)
@@ -562,7 +562,7 @@ public final class DefaultServices implements Services {
 
     private static Flux<ServiceBindingResource> requestListServiceBindings(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.serviceBindings()
+            .requestResources(page -> cloudFoundryClient.serviceBindingsV2()
                 .list(ListServiceBindingsRequest.builder()
                     .page(page)
                     .serviceInstanceId(serviceInstanceId)

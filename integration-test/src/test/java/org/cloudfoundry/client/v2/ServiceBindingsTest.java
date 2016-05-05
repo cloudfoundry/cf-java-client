@@ -227,7 +227,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
     }
 
     private static Mono<CreateServiceBindingResponse> requestCreateServiceBinding(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId) {
-        return cloudFoundryClient.serviceBindings()
+        return cloudFoundryClient.serviceBindingsV2()
             .create(CreateServiceBindingRequest.builder()
                 .applicationId(applicationId)
                 .serviceInstanceId(serviceInstanceId)
@@ -243,14 +243,14 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
     }
 
     private static Mono<DeleteServiceBindingResponse> requestDeleteServiceBinding(CloudFoundryClient cloudFoundryClient, String serviceBindingId) {
-        return cloudFoundryClient.serviceBindings()
+        return cloudFoundryClient.serviceBindingsV2()
             .delete(DeleteServiceBindingRequest.builder()
                 .serviceBindingId(serviceBindingId)
                 .build());
     }
 
     private static Mono<GetServiceBindingResponse> requestGetServiceBinding(CloudFoundryClient cloudFoundryClient, String serviceBindingId) {
-        return cloudFoundryClient.serviceBindings()
+        return cloudFoundryClient.serviceBindingsV2()
             .get(GetServiceBindingRequest.builder()
                 .serviceBindingId(serviceBindingId)
                 .build());
@@ -263,7 +263,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
         Optional.ofNullable(serviceInstanceId).map(builder::serviceInstanceId);
 
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.serviceBindings()
+            .requestResources(page -> cloudFoundryClient.serviceBindingsV2()
                 .list(builder
                     .page(page)
                     .build()));

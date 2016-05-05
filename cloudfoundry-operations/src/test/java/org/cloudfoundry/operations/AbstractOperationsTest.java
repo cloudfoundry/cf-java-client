@@ -133,7 +133,7 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.organizationQuotaDefinitions()).thenReturn(this.organizationQuotaDefinitions);
         when(this.cloudFoundryClient.privateDomains()).thenReturn(this.privateDomains);
         when(this.cloudFoundryClient.routes()).thenReturn(this.routes);
-        when(this.cloudFoundryClient.serviceBindings()).thenReturn(this.serviceBindingsV2);
+        when(this.cloudFoundryClient.serviceBindingsV2()).thenReturn(this.serviceBindingsV2);
         when(this.cloudFoundryClient.serviceInstances()).thenReturn(this.serviceInstances);
         when(this.cloudFoundryClient.serviceKeys()).thenReturn(this.serviceKeys);
         when(this.cloudFoundryClient.servicePlans()).thenReturn(this.servicePlans);
