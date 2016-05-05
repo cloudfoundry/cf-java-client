@@ -19,8 +19,8 @@ package org.cloudfoundry.reactor.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
+import io.netty.buffer.CompositeByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.util.ReferenceCounted;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import reactor.core.publisher.Flux;
@@ -31,8 +31,6 @@ import reactor.core.util.Exceptions;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Function;
 
 final class JsonCodec {
@@ -75,11 +73,11 @@ final class JsonCodec {
 
     private static final class JsonDecoderSubscriber<T> extends SubscriberBarrier<ByteBuf, T> {
 
-        private final List<ByteBuf> byteBufs = new ArrayList<>();
-
         private final ObjectMapper objectMapper;
 
         private final Class<T> type;
+
+        private CompositeByteBuf byteBuf;
 
         private boolean done = false;
 
@@ -95,16 +93,19 @@ final class JsonCodec {
                 return;
             }
 
-            if (!this.byteBufs.isEmpty()) {
-                try {
-                    this.subscriber.onNext(this.objectMapper.readValue(getInputStream(this.byteBufs), this.type));
+            if (this.byteBuf != null) {
+                this.byteBuf.setIndex(0, this.byteBuf.capacity());
+
+                try (InputStream in = new ByteBufInputStream(this.byteBuf)) {
+                    this.subscriber.onNext(this.objectMapper.readValue(in, this.type));
                 } catch (IOException e) {
                     onError(e);
+                } finally {
+                    this.byteBuf.release();
                 }
             }
 
             this.done = true;
-            this.byteBufs.forEach(ReferenceCounted::release);
             this.subscriber.onComplete();
         }
 
@@ -115,8 +116,11 @@ final class JsonCodec {
                 return;
             }
 
+            if (this.byteBuf != null) {
+                this.byteBuf.release();
+            }
+
             this.done = true;
-            this.byteBufs.forEach(ReferenceCounted::release);
             this.subscriber.onError(throwable);
         }
 
@@ -127,12 +131,11 @@ final class JsonCodec {
                 return;
             }
 
-            this.byteBufs.add(byteBuf);
-        }
+            if (this.byteBuf == null) {
+                this.byteBuf = Unpooled.compositeBuffer();
+            }
 
-        private static InputStream getInputStream(List<ByteBuf> byteBufs) {
-            ByteBuf composite = Unpooled.wrappedBuffer(byteBufs.toArray(new ByteBuf[byteBufs.size()]));
-            return new ByteBufInputStream(composite);
+            this.byteBuf.addComponent(byteBuf.retain());
         }
 
     }

@@ -33,18 +33,19 @@ import reactor.io.netty.http.HttpOutbound;
 
 import java.util.function.Function;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public abstract class AbstractReactorOperations {
-
-    private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.request");
 
     private final AuthorizationProvider authorizationProvider;
 
     private final HttpClient httpClient;
 
     private final ObjectMapper objectMapper;
+
+    private final Logger requestLogger = LoggerFactory.getLogger("cloudfoundry-client.request");
+
+    private final Logger responseLogger = LoggerFactory.getLogger("cloudfoundry-client.response");
 
     private final Mono<String> root;
 
@@ -60,11 +61,12 @@ public abstract class AbstractReactorOperations {
         return Mono
             .when(ValidationUtils.validate(request), this.root)
             .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, uriTransformer))))
-            .doOnSuccess(consumer((validRequest, uri) -> this.logger.debug("DELETE {}", uri)))
             .then(function((validRequest, uri) -> this.httpClient.delete(uri,
                 outbound -> this.authorizationProvider.addAuthorization(outbound)
                     .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
-                    .then(HttpOutbound::sendHeaders))))
+                    .doOnSubscribe(s -> this.requestLogger.debug("DELETE {}", uri))
+                    .then(HttpOutbound::sendHeaders))
+                .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))))
             .flatMap(NettyInbound::receive)
             .as(JsonCodec.decode(this.objectMapper, responseType));
     }
@@ -81,11 +83,12 @@ public abstract class AbstractReactorOperations {
         return Mono
             .when(ValidationUtils.validate(request), this.root)
             .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, uriTransformer))))
-            .doOnSuccess(consumer((validRequest, uri) -> this.logger.debug("GET    {}", uri)))
             .then(function((validRequest, uri) -> this.httpClient.get(uri,
                 outbound -> this.authorizationProvider.addAuthorization(outbound)
                     .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
-                    .then(HttpOutbound::sendHeaders))));
+                    .doOnSubscribe(s -> this.requestLogger.debug("GET    {}", uri))
+                    .then(HttpOutbound::sendHeaders))
+                .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))));
     }
 
     protected final <REQ extends Validatable, RSP> Mono<RSP> doPost(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
@@ -93,12 +96,13 @@ public abstract class AbstractReactorOperations {
         return Mono
             .when(ValidationUtils.validate(request), this.root)
             .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, uriTransformer))))
-            .doOnSuccess(consumer((validRequest, uri) -> this.logger.debug("POST   {}", uri)))
             .then(function((validRequest, uri) -> this.httpClient.post(uri,
                 outbound -> this.authorizationProvider.addAuthorization(outbound)
                     .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
+                    .doOnSubscribe(s -> this.requestLogger.debug("POST   {}", uri))
                     .then(o -> o.send(Mono.just(validRequest)
-                        .as(JsonCodec.encode(this.objectMapper)))))))
+                        .as(JsonCodec.encode(this.objectMapper)))))
+                .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))))
             .flatMap(NettyInbound::receive)
             .as(JsonCodec.decode(this.objectMapper, responseType));
     }
@@ -108,12 +112,13 @@ public abstract class AbstractReactorOperations {
         return Mono
             .when(ValidationUtils.validate(request), this.root)
             .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, uriTransformer))))
-            .doOnSuccess(consumer((validRequest, uri) -> this.logger.debug("PUT    {}", uri)))
             .then(function((validRequest, uri) -> this.httpClient.put(uri,
                 outbound -> this.authorizationProvider.addAuthorization(outbound)
                     .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
+                    .doOnSubscribe(s -> this.requestLogger.debug("PUT    {}", uri))
                     .then(o -> o.send(Mono.just(validRequest)
-                        .as(JsonCodec.encode(this.objectMapper)))))))
+                        .as(JsonCodec.encode(this.objectMapper)))))
+                .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))))
             .flatMap(NettyInbound::receive)
             .as(JsonCodec.decode(this.objectMapper, responseType));
     }
@@ -124,11 +129,12 @@ public abstract class AbstractReactorOperations {
         return Mono
             .when(ValidationUtils.validate(request), this.root)
             .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, uriTransformer))))
-            .doOnSuccess(consumer((validRequest, uri) -> this.logger.debug("WS     {}", uri)))
             .then(function((validRequest, uri) -> this.httpClient.get(uri,
                 outbound -> this.authorizationProvider.addAuthorization(outbound)
                     .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
-                    .then(HttpOutbound::upgradeToTextWebsocket))));
+                    .doOnSubscribe(s -> this.requestLogger.debug("WS     {}", uri))
+                    .then(HttpOutbound::upgradeToTextWebsocket))
+                .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))));
     }
 
     private static <REQ extends Validatable> String buildUri(String root, REQ validRequest, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {

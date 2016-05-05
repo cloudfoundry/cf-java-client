@@ -19,13 +19,14 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%-30thread %-34logger %msg%n</pattern>
+            <pattern>%-18thread %-35logger %msg%n</pattern>
         </encoder>
     </appender>
 
     <logger name="cloudfoundry-client.delay" level="${CLIENT_LOGGING_LEVEL:-DEBUG}"/>
     <logger name="cloudfoundry-client.performance" level="${PERFORMANCE_LOGGING_LEVEL:-INFO}"/>
     <logger name="cloudfoundry-client.request" level="${CLIENT_LOGGING_LEVEL:-DEBUG}"/>
+    <logger name="cloudfoundry-client.response" level="${CLIENT_LOGGING_LEVEL:-DEBUG}"/>
     <logger name="cloudfoundry-client.scan" level="${SCAN_LOGGING_LEVEL:-INFO}"/>
     <logger name="cloudfoundry-client.test" level="${TEST_LOGGING_LEVEL:-DEBUG}"/>
     <logger name="reactor.io.netty" level="INFO"/>
