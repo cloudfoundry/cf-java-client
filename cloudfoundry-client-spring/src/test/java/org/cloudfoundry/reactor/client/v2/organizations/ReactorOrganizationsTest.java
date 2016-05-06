@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.organizations;
+package org.cloudfoundry.reactor.client.v2.organizations;
 
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.domains.DomainEntity;
@@ -98,37 +98,45 @@ import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.users.UserEntity;
 import org.cloudfoundry.client.v2.users.UserResource;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.client.v2.Resource.Metadata;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpStatus.ACCEPTED;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringOrganizationsTest {
+public final class ReactorOrganizationsTest {
 
-    public static final class AssociateOrganizationAuditor extends AbstractApiTest<AssociateOrganizationAuditorRequest, AssociateOrganizationAuditorResponse> {
+    public static final class AssociateOrganizationAuditor extends AbstractClientApiTest<AssociateOrganizationAuditorRequest, AssociateOrganizationAuditorResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/organizations/test-organization-id/auditors/uaa-id-71")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v2/organizations/PUT_{id}_auditors_{auditor-id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected AssociateOrganizationAuditorRequest getInvalidRequest() {
             return AssociateOrganizationAuditorRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/organizations/test-organization-id/auditors/uaa-id-71")
-                .status(CREATED)
-                .responsePayload("fixtures/client/v2/organizations/PUT_{id}_auditors_{auditor-id}_response.json");
         }
 
         @Override
@@ -173,23 +181,28 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class AssociateOrganizationAuditorByUsername extends AbstractApiTest<AssociateOrganizationAuditorByUsernameRequest, AssociateOrganizationAuditorByUsernameResponse> {
+    public static final class AssociateOrganizationAuditorByUsername extends AbstractClientApiTest<AssociateOrganizationAuditorByUsernameRequest, AssociateOrganizationAuditorByUsernameResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/organizations/test-organization-id/auditors")
+                    .payload("fixtures/client/v2/organizations/PUT_{id}_auditors_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/PUT_{id}_auditors_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected AssociateOrganizationAuditorByUsernameRequest getInvalidRequest() {
             return AssociateOrganizationAuditorByUsernameRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/organizations/test-organization-id/auditors")
-                .requestPayload("fixtures/client/v2/organizations/PUT_{id}_auditors_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/PUT_{id}_auditors_response.json");
         }
 
         @Override
@@ -234,22 +247,27 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class AssociateOrganizationBillingManager extends AbstractApiTest<AssociateOrganizationBillingManagerRequest, AssociateOrganizationBillingManagerResponse> {
+    public static final class AssociateOrganizationBillingManager extends AbstractClientApiTest<AssociateOrganizationBillingManagerRequest, AssociateOrganizationBillingManagerResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/organizations/test-organization-id/billing_managers/test-billing-manager-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/PUT_{id}_billing_managers_{billing-manager-id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected AssociateOrganizationBillingManagerRequest getInvalidRequest() {
             return AssociateOrganizationBillingManagerRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/organizations/test-organization-id/billing_managers/test-billing-manager-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/PUT_{id}_billing_managers_{billing-manager-id}_response.json");
         }
 
         @Override
@@ -295,23 +313,28 @@ public final class SpringOrganizationsTest {
     }
 
     public static final class AssociateOrganizationBillingManagerByUsername
-        extends AbstractApiTest<AssociateOrganizationBillingManagerByUsernameRequest, AssociateOrganizationBillingManagerByUsernameResponse> {
+        extends AbstractClientApiTest<AssociateOrganizationBillingManagerByUsernameRequest, AssociateOrganizationBillingManagerByUsernameResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/organizations/test-organization-id/billing_managers")
+                    .payload("fixtures/client/v2/organizations/PUT_{id}_billing_managers_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/PUT_{id}_billing_managers_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected AssociateOrganizationBillingManagerByUsernameRequest getInvalidRequest() {
             return AssociateOrganizationBillingManagerByUsernameRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/organizations/test-organization-id/billing_managers")
-                .requestPayload("fixtures/client/v2/organizations/PUT_{id}_billing_managers_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/PUT_{id}_billing_managers_response.json");
         }
 
         @Override
@@ -356,22 +379,27 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class AssociateOrganizationManager extends AbstractApiTest<AssociateOrganizationManagerRequest, AssociateOrganizationManagerResponse> {
+    public static final class AssociateOrganizationManager extends AbstractClientApiTest<AssociateOrganizationManagerRequest, AssociateOrganizationManagerResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/organizations/test-organization-id/managers/test-manager-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/PUT_{id}_managers_{manager-id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected AssociateOrganizationManagerRequest getInvalidRequest() {
             return AssociateOrganizationManagerRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/organizations/test-organization-id/managers/test-manager-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/PUT_{id}_managers_{manager-id}_response.json");
         }
 
         @Override
@@ -416,23 +444,28 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class AssociateOrganizationManagerByUsername extends AbstractApiTest<AssociateOrganizationManagerByUsernameRequest, AssociateOrganizationManagerByUsernameResponse> {
+    public static final class AssociateOrganizationManagerByUsername extends AbstractClientApiTest<AssociateOrganizationManagerByUsernameRequest, AssociateOrganizationManagerByUsernameResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/organizations/test-organization-id/managers")
+                    .payload("fixtures/client/v2/organizations/PUT_{id}_managers_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/PUT_{id}_managers_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected AssociateOrganizationManagerByUsernameRequest getInvalidRequest() {
             return AssociateOrganizationManagerByUsernameRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/organizations/test-organization-id/managers")
-                .requestPayload("fixtures/client/v2/organizations/PUT_{id}_managers_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/PUT_{id}_managers_response.json");
         }
 
         @Override
@@ -477,22 +510,27 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class AssociateOrganizationUser extends AbstractApiTest<AssociateOrganizationUserRequest, AssociateOrganizationUserResponse> {
+    public static final class AssociateOrganizationUser extends AbstractClientApiTest<AssociateOrganizationUserRequest, AssociateOrganizationUserResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/organizations/test-organization-id/users/test-user-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/PUT_{id}_users_{user-id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected AssociateOrganizationUserRequest getInvalidRequest() {
             return AssociateOrganizationUserRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/organizations/test-organization-id/users/test-user-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/PUT_{id}_users_{user-id}_response.json");
         }
 
         @Override
@@ -537,23 +575,28 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class AssociateOrganizationUserByUsername extends AbstractApiTest<AssociateOrganizationUserByUsernameRequest, AssociateOrganizationUserByUsernameResponse> {
+    public static final class AssociateOrganizationUserByUsername extends AbstractClientApiTest<AssociateOrganizationUserByUsernameRequest, AssociateOrganizationUserByUsernameResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/organizations/test-organization-id/users")
+                    .payload("fixtures/client/v2/organizations/PUT_{id}_users_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/PUT_{id}_users_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected AssociateOrganizationUserByUsernameRequest getInvalidRequest() {
             return AssociateOrganizationUserByUsernameRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/organizations/test-organization-id/users")
-                .requestPayload("fixtures/client/v2/organizations/PUT_{id}_users_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/PUT_{id}_users_response.json");
         }
 
         @Override
@@ -598,22 +641,27 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class AssociatePrivateDomain extends AbstractApiTest<AssociateOrganizationPrivateDomainRequest, AssociateOrganizationPrivateDomainResponse> {
+    public static final class AssociatePrivateDomain extends AbstractClientApiTest<AssociateOrganizationPrivateDomainRequest, AssociateOrganizationPrivateDomainResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/organizations/test-organization-id/private_domains/test-private-domain-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/PUT_{id}_private_domains_{private-domain-id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected AssociateOrganizationPrivateDomainRequest getInvalidRequest() {
             return AssociateOrganizationPrivateDomainRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/organizations/test-organization-id/private_domains/test-private-domain-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/PUT_{id}_private_domains_{private-domain-id}_response.json");
         }
 
         @Override
@@ -658,23 +706,28 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class Create extends AbstractApiTest<CreateOrganizationRequest, CreateOrganizationResponse> {
+    public static final class Create extends AbstractClientApiTest<CreateOrganizationRequest, CreateOrganizationResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v2/organizations")
+                    .payload("fixtures/client/v2/organizations/POST_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/POST_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected CreateOrganizationRequest getInvalidRequest() {
             return CreateOrganizationRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v2/organizations")
-                .requestPayload("fixtures/client/v2/organizations/POST_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/POST_response.json");
         }
 
         @Override
@@ -719,21 +772,26 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class Delete extends AbstractApiTest<DeleteOrganizationRequest, DeleteOrganizationResponse> {
+    public static final class Delete extends AbstractClientApiTest<DeleteOrganizationRequest, DeleteOrganizationResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/organizations/test-organization-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteOrganizationRequest getInvalidRequest() {
             return DeleteOrganizationRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/organizations/test-organization-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -755,22 +813,27 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class DeleteAsync extends AbstractApiTest<DeleteOrganizationRequest, DeleteOrganizationResponse> {
+    public static final class DeleteAsync extends AbstractClientApiTest<DeleteOrganizationRequest, DeleteOrganizationResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/organizations/test-organization-id?async=true")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(ACCEPTED)
+                    .payload("fixtures/client/v2/organizations/DELETE_{id}_async_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteOrganizationRequest getInvalidRequest() {
             return DeleteOrganizationRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/organizations/test-organization-id?async=true")
-                .status(ACCEPTED)
-                .responsePayload("fixtures/client/v2/organizations/DELETE_{id}_async_response.json");
         }
 
         @Override
@@ -803,22 +866,27 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class Get extends AbstractApiTest<GetOrganizationRequest, GetOrganizationResponse> {
+    public static final class Get extends AbstractClientApiTest<GetOrganizationRequest, GetOrganizationResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/organizations/test-organization-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetOrganizationRequest getInvalidRequest() {
             return GetOrganizationRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/organizations/test-organization-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/GET_{id}_response.json");
         }
 
         @Override
@@ -862,22 +930,27 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class GetInstanceUsage extends AbstractApiTest<GetOrganizationInstanceUsageRequest, GetOrganizationInstanceUsageResponse> {
+    public static final class GetInstanceUsage extends AbstractClientApiTest<GetOrganizationInstanceUsageRequest, GetOrganizationInstanceUsageResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/organizations/test-organization-id/instance_usage")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/GET_{id}_instance_usage_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetOrganizationInstanceUsageRequest getInvalidRequest() {
             return GetOrganizationInstanceUsageRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/organizations/test-organization-id/instance_usage")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/GET_{id}_instance_usage_response.json");
         }
 
         @Override
@@ -901,22 +974,27 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class GetMemoryUsage extends AbstractApiTest<GetOrganizationMemoryUsageRequest, GetOrganizationMemoryUsageResponse> {
+    public static final class GetMemoryUsage extends AbstractClientApiTest<GetOrganizationMemoryUsageRequest, GetOrganizationMemoryUsageResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/organizations/test-organization-id/memory_usage")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/GET_{id}_memory_usage_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetOrganizationMemoryUsageRequest getInvalidRequest() {
             return GetOrganizationMemoryUsageRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/organizations/test-organization-id/memory_usage")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/GET_{id}_memory_usage_response.json");
         }
 
         @Override
@@ -940,22 +1018,27 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class GetUserRoles extends AbstractApiTest<GetOrganizationUserRolesRequest, GetOrganizationUserRolesResponse> {
+    public static final class GetUserRoles extends AbstractClientApiTest<GetOrganizationUserRolesRequest, GetOrganizationUserRolesResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/organizations/test-organization-id/user_roles?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/GET_{id}_user_roles_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetOrganizationUserRolesRequest getInvalidRequest() {
             return GetOrganizationUserRolesRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/organizations/test-organization-id/user_roles?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/GET_{id}_user_roles_response.json");
         }
 
         @Override
@@ -1006,21 +1089,26 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class List extends AbstractApiTest<ListOrganizationsRequest, ListOrganizationsResponse> {
+    public static final class List extends AbstractClientApiTest<ListOrganizationsRequest, ListOrganizationsResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/organizations?q=name%20IN%20test-name&page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListOrganizationsRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/organizations?q=name%20IN%20test-name&page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/GET_response.json");
         }
 
         @Override
@@ -1069,22 +1157,27 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class ListAuditors extends AbstractApiTest<ListOrganizationAuditorsRequest, ListOrganizationAuditorsResponse> {
+    public static final class ListAuditors extends AbstractClientApiTest<ListOrganizationAuditorsRequest, ListOrganizationAuditorsResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/organizations/test-organization-id/auditors?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/GET_{id}_auditors_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListOrganizationAuditorsRequest getInvalidRequest() {
             return ListOrganizationAuditorsRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/organizations/test-organization-id/auditors?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/GET_{id}_auditors_response.json");
         }
 
         @Override
@@ -1130,22 +1223,27 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class ListBillingManagers extends AbstractApiTest<ListOrganizationBillingManagersRequest, ListOrganizationBillingManagersResponse> {
+    public static final class ListBillingManagers extends AbstractClientApiTest<ListOrganizationBillingManagersRequest, ListOrganizationBillingManagersResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/organizations/test-organization-id/billing_managers?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/GET_{id}_billing_managers_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListOrganizationBillingManagersRequest getInvalidRequest() {
             return ListOrganizationBillingManagersRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/organizations/test-organization-id/billing_managers?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/GET_{id}_billing_managers_response.json");
         }
 
         @Override
@@ -1191,22 +1289,27 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class ListDomains extends AbstractApiTest<ListOrganizationDomainsRequest, ListOrganizationDomainsResponse> {
+    public static final class ListDomains extends AbstractClientApiTest<ListOrganizationDomainsRequest, ListOrganizationDomainsResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/organizations/test-organization-id/domains?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/GET_{id}_domains_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListOrganizationDomainsRequest getInvalidRequest() {
             return ListOrganizationDomainsRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/organizations/test-organization-id/domains?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/GET_{id}_domains_response.json");
         }
 
         @Override
@@ -1252,22 +1355,27 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class ListManagers extends AbstractApiTest<ListOrganizationManagersRequest, ListOrganizationManagersResponse> {
+    public static final class ListManagers extends AbstractClientApiTest<ListOrganizationManagersRequest, ListOrganizationManagersResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/organizations/test-organization-id/managers?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/GET_{id}_managers_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListOrganizationManagersRequest getInvalidRequest() {
             return ListOrganizationManagersRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/organizations/test-organization-id/managers?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/GET_{id}_managers_response.json");
         }
 
         @Override
@@ -1332,22 +1440,27 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class ListPrivateDomains extends AbstractApiTest<ListOrganizationPrivateDomainsRequest, ListOrganizationPrivateDomainsResponse> {
+    public static final class ListPrivateDomains extends AbstractClientApiTest<ListOrganizationPrivateDomainsRequest, ListOrganizationPrivateDomainsResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/organizations/test-organization-id/private_domains?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/GET_{id}_private_domains_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListOrganizationPrivateDomainsRequest getInvalidRequest() {
             return ListOrganizationPrivateDomainsRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/organizations/test-organization-id/private_domains?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/GET_{id}_private_domains_response.json");
         }
 
         @Override
@@ -1387,22 +1500,27 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class ListServices extends AbstractApiTest<ListOrganizationServicesRequest, ListOrganizationServicesResponse> {
+    public static final class ListServices extends AbstractClientApiTest<ListOrganizationServicesRequest, ListOrganizationServicesResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/organizations/test-organization-id/services?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/GET_{id}_services_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListOrganizationServicesRequest getInvalidRequest() {
             return ListOrganizationServicesRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/organizations/test-organization-id/services?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/GET_{id}_services_response.json");
         }
 
         @Override
@@ -1445,22 +1563,27 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class ListSpaceQuotaDefinitions extends AbstractApiTest<ListOrganizationSpaceQuotaDefinitionsRequest, ListOrganizationSpaceQuotaDefinitionsResponse> {
+    public static final class ListSpaceQuotaDefinitions extends AbstractClientApiTest<ListOrganizationSpaceQuotaDefinitionsRequest, ListOrganizationSpaceQuotaDefinitionsResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/organizations/test-organization-id/space_quota_definitions?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/GET_{id}_space_quota_definitions_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListOrganizationSpaceQuotaDefinitionsRequest getInvalidRequest() {
             return ListOrganizationSpaceQuotaDefinitionsRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/organizations/test-organization-id/space_quota_definitions?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/GET_{id}_space_quota_definitions_response.json");
         }
 
         @Override
@@ -1504,22 +1627,27 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class ListSpaces extends AbstractApiTest<ListOrganizationSpacesRequest, ListOrganizationSpacesResponse> {
+    public static final class ListSpaces extends AbstractClientApiTest<ListOrganizationSpacesRequest, ListOrganizationSpacesResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/organizations/test-organization-id/spaces?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/GET_{id}_spaces_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListOrganizationSpacesRequest getInvalidRequest() {
             return ListOrganizationSpacesRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/organizations/test-organization-id/spaces?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/GET_{id}_spaces_response.json");
         }
 
         @Override
@@ -1569,22 +1697,27 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class ListUsers extends AbstractApiTest<ListOrganizationUsersRequest, ListOrganizationUsersResponse> {
+    public static final class ListUsers extends AbstractClientApiTest<ListOrganizationUsersRequest, ListOrganizationUsersResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/organizations/test-organization-id/users?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/GET_{id}_users_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListOrganizationUsersRequest getInvalidRequest() {
             return ListOrganizationUsersRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/organizations/test-organization-id/users?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/GET_{id}_users_response.json");
         }
 
         @Override
@@ -1630,21 +1763,26 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class RemoveAuditor extends AbstractApiTest<RemoveOrganizationAuditorRequest, Void> {
+    public static final class RemoveAuditor extends AbstractClientApiTest<RemoveOrganizationAuditorRequest, Void> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/organizations/test-organization-id/auditors/test-auditor-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected RemoveOrganizationAuditorRequest getInvalidRequest() {
             return RemoveOrganizationAuditorRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/organizations/test-organization-id/auditors/test-auditor-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -1667,22 +1805,27 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class RemoveAuditorByUsername extends AbstractApiTest<RemoveOrganizationAuditorByUsernameRequest, Void> {
+    public static final class RemoveAuditorByUsername extends AbstractClientApiTest<RemoveOrganizationAuditorByUsernameRequest, Void> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/organizations/test-organization-id/auditors")
+                    .payload("fixtures/client/v2/organizations/DELETE_{id}_auditors_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected RemoveOrganizationAuditorByUsernameRequest getInvalidRequest() {
             return RemoveOrganizationAuditorByUsernameRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/organizations/test-organization-id/auditors")
-                .requestPayload("fixtures/client/v2/organizations/DELETE_{id}_auditors_request.json")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -1705,21 +1848,26 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class RemoveBillingManager extends AbstractApiTest<RemoveOrganizationBillingManagerRequest, Void> {
+    public static final class RemoveBillingManager extends AbstractClientApiTest<RemoveOrganizationBillingManagerRequest, Void> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/organizations/test-organization-id/billing_managers/test-billing-manager-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected RemoveOrganizationBillingManagerRequest getInvalidRequest() {
             return RemoveOrganizationBillingManagerRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/organizations/test-organization-id/billing_managers/test-billing-manager-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -1742,21 +1890,26 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class RemoveManager extends AbstractApiTest<RemoveOrganizationManagerRequest, Void> {
+    public static final class RemoveManager extends AbstractClientApiTest<RemoveOrganizationManagerRequest, Void> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/organizations/test-organization-id/managers/test-manager-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected RemoveOrganizationManagerRequest getInvalidRequest() {
             return RemoveOrganizationManagerRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/organizations/test-organization-id/managers/test-manager-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -1779,22 +1932,27 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class RemoveOrganizationBillingManagerByUsername extends AbstractApiTest<RemoveOrganizationBillingManagerByUsernameRequest, Void> {
+    public static final class RemoveOrganizationBillingManagerByUsername extends AbstractClientApiTest<RemoveOrganizationBillingManagerByUsernameRequest, Void> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/organizations/test-organization-id/billing_managers")
+                    .payload("fixtures/client/v2/organizations/DELETE_{id}_billing_managers_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected RemoveOrganizationBillingManagerByUsernameRequest getInvalidRequest() {
             return RemoveOrganizationBillingManagerByUsernameRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/organizations/test-organization-id/billing_managers")
-                .requestPayload("fixtures/client/v2/organizations/DELETE_{id}_billing_managers_request.json")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -1817,22 +1975,27 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class RemoveOrganizationManagerByUsername extends AbstractApiTest<RemoveOrganizationManagerByUsernameRequest, Void> {
+    public static final class RemoveOrganizationManagerByUsername extends AbstractClientApiTest<RemoveOrganizationManagerByUsernameRequest, Void> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/organizations/test-organization-id/managers")
+                    .payload("fixtures/client/v2/organizations/DELETE_{id}_managers_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected RemoveOrganizationManagerByUsernameRequest getInvalidRequest() {
             return RemoveOrganizationManagerByUsernameRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/organizations/test-organization-id/managers")
-                .requestPayload("fixtures/client/v2/organizations/DELETE_{id}_managers_request.json")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -1855,21 +2018,26 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class RemovePrivateDomain extends AbstractApiTest<RemoveOrganizationPrivateDomainRequest, Void> {
+    public static final class RemovePrivateDomain extends AbstractClientApiTest<RemoveOrganizationPrivateDomainRequest, Void> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/organizations/test-organization-id/private_domains/test-private-domain-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected RemoveOrganizationPrivateDomainRequest getInvalidRequest() {
             return RemoveOrganizationPrivateDomainRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/organizations/test-organization-id/private_domains/test-private-domain-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -1891,21 +2059,26 @@ public final class SpringOrganizationsTest {
         }
     }
 
-    public static final class RemoveUser extends AbstractApiTest<RemoveOrganizationUserRequest, Void> {
+    public static final class RemoveUser extends AbstractClientApiTest<RemoveOrganizationUserRequest, Void> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/organizations/test-organization-id/users/test-user-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected RemoveOrganizationUserRequest getInvalidRequest() {
             return RemoveOrganizationUserRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/organizations/test-organization-id/users/test-user-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -1927,22 +2100,27 @@ public final class SpringOrganizationsTest {
         }
     }
 
-    public static final class RemoveUserByUsername extends AbstractApiTest<RemoveOrganizationUserByUsernameRequest, Void> {
+    public static final class RemoveUserByUsername extends AbstractClientApiTest<RemoveOrganizationUserByUsernameRequest, Void> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/organizations/test-organization-id/users")
+                    .payload("fixtures/client/v2/organizations/DELETE_{id}_users_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected RemoveOrganizationUserByUsernameRequest getInvalidRequest() {
             return RemoveOrganizationUserByUsernameRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/organizations/test-organization-id/users")
-                .requestPayload("fixtures/client/v2/organizations/DELETE_{id}_users_request.json")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -1965,22 +2143,27 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class Summary extends AbstractApiTest<SummaryOrganizationRequest, SummaryOrganizationResponse> {
+    public static final class Summary extends AbstractClientApiTest<SummaryOrganizationRequest, SummaryOrganizationResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/organizations/test-organization-id/summary")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/GET_{id}_summary_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected SummaryOrganizationRequest getInvalidRequest() {
             return SummaryOrganizationRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/organizations/test-organization-id/summary")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/GET_{id}_summary_response.json");
         }
 
         @Override
@@ -2014,23 +2197,28 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class Update extends AbstractApiTest<UpdateOrganizationRequest, UpdateOrganizationResponse> {
+    public static final class Update extends AbstractClientApiTest<UpdateOrganizationRequest, UpdateOrganizationResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/organizations/test-organization-id")
+                    .payload("fixtures/client/v2/organizations/PUT_{id}_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/organizations/PUT_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected UpdateOrganizationRequest getInvalidRequest() {
             return UpdateOrganizationRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/organizations/test-organization-id")
-                .requestPayload("fixtures/client/v2/organizations/PUT_{id}_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/organizations/PUT_{id}_response.json");
         }
 
         @Override

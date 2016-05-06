@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.organizations;
+package org.cloudfoundry.reactor.client.v2.organizations;
 
-import lombok.ToString;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorByUsernameResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorRequest;
@@ -81,258 +81,226 @@ import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationResponse;
-import org.cloudfoundry.reactor.client.v2.FilterBuilder;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.reactor.client.QueryBuilder;
-import org.springframework.web.client.RestOperations;
+import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
+import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
+import reactor.io.netty.http.HttpClient;
 
-import java.net.URI;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
- * The Spring-based implementation of {@link Organizations}
+ * The Reactor-based implementation of {@link Organizations}
  */
-@ToString(callSuper = true)
-public final class SpringOrganizations extends AbstractSpringOperations implements Organizations {
+public final class ReactorOrganizations extends AbstractClientV2Operations implements Organizations {
 
     /**
      * Creates an instance
      *
-     * @param restOperations the {@link RestOperations} to use to communicate with the server
-     * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
-     * @param schedulerGroup The group to use when making requests
+     * @param authorizationProvider the {@link AuthorizationProvider} to use when communicating with the server
+     * @param httpClient            the {@link HttpClient} to use when communicating with the server
+     * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
+     * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
      */
-    public SpringOrganizations(RestOperations restOperations, URI root, Scheduler schedulerGroup) {
-        super(restOperations, root, schedulerGroup);
+    public ReactorOrganizations(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
+        super(authorizationProvider, httpClient, objectMapper, root);
     }
 
     @Override
     public Mono<AssociateOrganizationAuditorResponse> associateAuditor(AssociateOrganizationAuditorRequest request) {
-        return put(request, AssociateOrganizationAuditorResponse.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "auditors", request.getAuditorId()));
+        return put(request, AssociateOrganizationAuditorResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "auditors", validRequest.getAuditorId())));
     }
 
     @Override
     public Mono<AssociateOrganizationAuditorByUsernameResponse> associateAuditorByUsername(AssociateOrganizationAuditorByUsernameRequest request) {
-        return put(request, AssociateOrganizationAuditorByUsernameResponse.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "auditors"));
+        return put(request, AssociateOrganizationAuditorByUsernameResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "auditors")));
     }
 
     @Override
     public Mono<AssociateOrganizationBillingManagerResponse> associateBillingManager(AssociateOrganizationBillingManagerRequest request) {
-        return put(request, AssociateOrganizationBillingManagerResponse.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "billing_managers",
-            request.getBillingManagerId()));
+        return put(request, AssociateOrganizationBillingManagerResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "billing_managers", validRequest.getBillingManagerId())));
     }
 
     @Override
     public Mono<AssociateOrganizationBillingManagerByUsernameResponse> associateBillingManagerByUsername(AssociateOrganizationBillingManagerByUsernameRequest request) {
-        return put(request, AssociateOrganizationBillingManagerByUsernameResponse.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "billing_managers"));
+        return put(request, AssociateOrganizationBillingManagerByUsernameResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "billing_managers")));
     }
 
     @Override
     public Mono<AssociateOrganizationManagerResponse> associateManager(AssociateOrganizationManagerRequest request) {
-        return put(request, AssociateOrganizationManagerResponse.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "managers", request.getManagerId()));
+        return put(request, AssociateOrganizationManagerResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "managers", validRequest.getManagerId())));
     }
 
     @Override
     public Mono<AssociateOrganizationManagerByUsernameResponse> associateManagerByUsername(AssociateOrganizationManagerByUsernameRequest request) {
-        return put(request, AssociateOrganizationManagerByUsernameResponse.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "managers"));
+        return put(request, AssociateOrganizationManagerByUsernameResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "managers")));
     }
 
     @Override
     public Mono<AssociateOrganizationPrivateDomainResponse> associatePrivateDomain(AssociateOrganizationPrivateDomainRequest request) {
-        return put(request, AssociateOrganizationPrivateDomainResponse.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "private_domains",
-            request.getPrivateDomainId()));
+        return put(request, AssociateOrganizationPrivateDomainResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "private_domains", validRequest.getPrivateDomainId())));
     }
 
     @Override
     public Mono<AssociateOrganizationUserResponse> associateUser(AssociateOrganizationUserRequest request) {
-        return put(request, AssociateOrganizationUserResponse.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "users", request.getUserId()));
+        return put(request, AssociateOrganizationUserResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "users", validRequest.getUserId())));
     }
 
     @Override
     public Mono<AssociateOrganizationUserByUsernameResponse> associateUserByUsername(AssociateOrganizationUserByUsernameRequest request) {
-        return put(request, AssociateOrganizationUserByUsernameResponse.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "users"));
+        return put(request, AssociateOrganizationUserByUsernameResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "users")));
     }
 
     @Override
     public Mono<CreateOrganizationResponse> create(CreateOrganizationRequest request) {
-        return post(request, CreateOrganizationResponse.class, builder -> builder.pathSegment("v2", "organizations"));
+        return post(request, CreateOrganizationResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "organizations")));
     }
 
     @Override
     public Mono<DeleteOrganizationResponse> delete(DeleteOrganizationRequest request) {
-        return delete(request, DeleteOrganizationResponse.class, builder -> {
-            builder.pathSegment("v2", "organizations", request.getOrganizationId());
-            QueryBuilder.augment(builder, request);
-        });
+        return delete(request, DeleteOrganizationResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId())));
     }
 
     @Override
     public Mono<GetOrganizationResponse> get(GetOrganizationRequest request) {
-        return get(request, GetOrganizationResponse.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId()));
+        return get(request, GetOrganizationResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId())));
     }
 
     @Override
     public Mono<GetOrganizationInstanceUsageResponse> getInstanceUsage(GetOrganizationInstanceUsageRequest request) {
-        return get(request, GetOrganizationInstanceUsageResponse.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "instance_usage"));
+        return get(request, GetOrganizationInstanceUsageResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "instance_usage")));
     }
 
     @Override
     public Mono<GetOrganizationMemoryUsageResponse> getMemoryUsage(GetOrganizationMemoryUsageRequest request) {
-        return get(request, GetOrganizationMemoryUsageResponse.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "memory_usage"));
+        return get(request, GetOrganizationMemoryUsageResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "memory_usage")));
     }
 
     @Override
     public Mono<GetOrganizationUserRolesResponse> getUserRoles(GetOrganizationUserRolesRequest request) {
-        return get(request, GetOrganizationUserRolesResponse.class, builder -> {
-            builder.pathSegment("v2", "organizations", request.getOrganizationId(), "user_roles");
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, GetOrganizationUserRolesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "user_roles")));
     }
 
     @Override
     public Mono<ListOrganizationsResponse> list(ListOrganizationsRequest request) {
-        return get(request, ListOrganizationsResponse.class, builder -> {
-            builder.pathSegment("v2", "organizations");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListOrganizationsResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "organizations")));
     }
 
     @Override
     public Mono<ListOrganizationAuditorsResponse> listAuditors(ListOrganizationAuditorsRequest request) {
-        return get(request, ListOrganizationAuditorsResponse.class, builder -> {
-            builder.pathSegment("v2", "organizations", request.getOrganizationId(), "auditors");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListOrganizationAuditorsResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "auditors")));
     }
 
     @Override
     public Mono<ListOrganizationBillingManagersResponse> listBillingManagers(ListOrganizationBillingManagersRequest request) {
-        return get(request, ListOrganizationBillingManagersResponse.class, builder -> {
-            builder.pathSegment("v2", "organizations", request.getOrganizationId(), "billing_managers");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListOrganizationBillingManagersResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "billing_managers")));
     }
 
     @Override
     public Mono<ListOrganizationDomainsResponse> listDomains(ListOrganizationDomainsRequest request) {
-        return get(request, ListOrganizationDomainsResponse.class, builder -> {
-            builder.pathSegment("v2", "organizations", request.getOrganizationId(), "domains");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListOrganizationDomainsResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "domains")));
     }
 
     @Override
     public Mono<ListOrganizationManagersResponse> listManagers(ListOrganizationManagersRequest request) {
-        return get(request, ListOrganizationManagersResponse.class, builder -> {
-            builder.pathSegment("v2", "organizations", request.getOrganizationId(), "managers");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListOrganizationManagersResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "managers")));
     }
 
     @Override
     public Mono<ListOrganizationPrivateDomainsResponse> listPrivateDomains(ListOrganizationPrivateDomainsRequest request) {
-        return get(request, ListOrganizationPrivateDomainsResponse.class, builder -> {
-            builder.pathSegment("v2", "organizations", request.getOrganizationId(), "private_domains");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListOrganizationPrivateDomainsResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "private_domains")));
     }
 
     @Override
     public Mono<ListOrganizationServicesResponse> listServices(ListOrganizationServicesRequest request) {
-        return get(request, ListOrganizationServicesResponse.class, builder -> {
-            builder.pathSegment("v2", "organizations", request.getOrganizationId(), "services");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListOrganizationServicesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "services")));
     }
 
     @Override
     public Mono<ListOrganizationSpaceQuotaDefinitionsResponse> listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest request) {
-        return get(request, ListOrganizationSpaceQuotaDefinitionsResponse.class, builder -> {
-            builder.pathSegment("v2", "organizations", request.getOrganizationId(), "space_quota_definitions");
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListOrganizationSpaceQuotaDefinitionsResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "space_quota_definitions")));
     }
 
     @Override
     public Mono<ListOrganizationSpacesResponse> listSpaces(ListOrganizationSpacesRequest request) {
-        return get(request, ListOrganizationSpacesResponse.class, builder -> {
-            builder.pathSegment("v2", "organizations", request.getOrganizationId(), "spaces");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListOrganizationSpacesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "spaces")));
     }
 
     @Override
     public Mono<ListOrganizationUsersResponse> listUsers(ListOrganizationUsersRequest request) {
-        return get(request, ListOrganizationUsersResponse.class, builder -> {
-            builder.pathSegment("v2", "organizations", request.getOrganizationId(), "users");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListOrganizationUsersResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "users")));
     }
 
     @Override
     public Mono<Void> removeAuditor(RemoveOrganizationAuditorRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "auditors", request.getAuditorId()));
+        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "auditors", validRequest.getAuditorId())));
     }
 
     @Override
     public Mono<Void> removeAuditorByUsername(RemoveOrganizationAuditorByUsernameRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "auditors"));
+        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "auditors")));
     }
 
     @Override
     public Mono<Void> removeBillingManager(RemoveOrganizationBillingManagerRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "billing_managers", request.getBillingManagerId()));
+        return delete(request, Void.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "billing_managers", validRequest.getBillingManagerId())));
     }
 
     @Override
     public Mono<Void> removeBillingManagerByUsername(RemoveOrganizationBillingManagerByUsernameRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "billing_managers"));
+        return delete(request, Void.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "billing_managers")));
     }
 
     @Override
     public Mono<Void> removeManager(RemoveOrganizationManagerRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "managers", request.getManagerId()));
+        return delete(request, Void.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "managers", validRequest.getManagerId())));
     }
 
     @Override
     public Mono<Void> removeManagerByUsername(RemoveOrganizationManagerByUsernameRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "managers"));
+        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "managers")));
     }
 
     @Override
     public Mono<Void> removePrivateDomain(RemoveOrganizationPrivateDomainRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "private_domains",
-            request.getPrivateDomainId()));
+        return delete(request, Void.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "private_domains", validRequest.getPrivateDomainId())));
     }
 
     @Override
     public Mono<Void> removeUser(RemoveOrganizationUserRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "users", request.getUserId()));
+        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "users", validRequest.getUserId())));
     }
 
     @Override
     public Mono<Void> removeUserByUsername(RemoveOrganizationUserByUsernameRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "users"));
+        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "users")));
     }
 
     @Override
     public Mono<SummaryOrganizationResponse> summary(SummaryOrganizationRequest request) {
-        return get(request, SummaryOrganizationResponse.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "summary"));
+        return get(request, SummaryOrganizationResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId(), "summary")));
     }
 
     @Override
     public Mono<UpdateOrganizationResponse> update(UpdateOrganizationRequest request) {
-        return put(request, UpdateOrganizationResponse.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId()));
+        return put(request, UpdateOrganizationResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "organizations", validRequest.getOrganizationId())));
     }
 
 }
