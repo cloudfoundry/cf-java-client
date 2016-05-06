@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.organizationquotadefinitions;
+package org.cloudfoundry.reactor.client.v2.organizationquotadefinitions;
 
 import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionResponse;
@@ -28,38 +28,46 @@ import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuota
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionResource;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.UpdateOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.UpdateOrganizationQuotaDefinitionResponse;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.client.v2.Resource.Metadata;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringOrganizationQuotaDefinitionsTest {
+public final class ReactorOrganizationQuotaDefinitionsTest {
 
-    public static final class CreateQuotaDefinition extends AbstractApiTest<CreateOrganizationQuotaDefinitionRequest, CreateOrganizationQuotaDefinitionResponse> {
+    public static final class CreateQuotaDefinition extends AbstractClientApiTest<CreateOrganizationQuotaDefinitionRequest, CreateOrganizationQuotaDefinitionResponse> {
 
-        private final SpringOrganizationQuotaDefinitions quotaDefinitions = new SpringOrganizationQuotaDefinitions(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizationQuotaDefinitions quotaDefinitions = new ReactorOrganizationQuotaDefinitions(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v2/quota_definitions")
+                    .payload("fixtures/client/v2/quota_definitions/POST_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v2/quota_definitions/POST_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected CreateOrganizationQuotaDefinitionRequest getInvalidRequest() {
             return CreateOrganizationQuotaDefinitionRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v2/quota_definitions")
-                .requestPayload("fixtures/client/v2/quota_definitions/POST_request.json")
-                .status(CREATED)
-                .responsePayload("fixtures/client/v2/quota_definitions/POST_response.json");
         }
 
         @Override
@@ -107,20 +115,25 @@ public final class SpringOrganizationQuotaDefinitionsTest {
 
     }
 
-    public static final class DeleteQuotaDefinition extends AbstractApiTest<DeleteOrganizationQuotaDefinitionRequest, DeleteOrganizationQuotaDefinitionResponse> {
+    public static final class DeleteQuotaDefinition extends AbstractClientApiTest<DeleteOrganizationQuotaDefinitionRequest, DeleteOrganizationQuotaDefinitionResponse> {
 
-        private final SpringOrganizationQuotaDefinitions quotaDefinitions = new SpringOrganizationQuotaDefinitions(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizationQuotaDefinitions quotaDefinitions = new ReactorOrganizationQuotaDefinitions(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/quota_definitions/test-quota-definition-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteOrganizationQuotaDefinitionRequest getInvalidRequest() {
             return DeleteOrganizationQuotaDefinitionRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/quota_definitions/test-quota-definition-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -142,22 +155,27 @@ public final class SpringOrganizationQuotaDefinitionsTest {
 
     }
 
-    public static final class GetQuotaDefinition extends AbstractApiTest<GetOrganizationQuotaDefinitionRequest, GetOrganizationQuotaDefinitionResponse> {
+    public static final class GetQuotaDefinition extends AbstractClientApiTest<GetOrganizationQuotaDefinitionRequest, GetOrganizationQuotaDefinitionResponse> {
 
-        private final SpringOrganizationQuotaDefinitions quotaDefinitions = new SpringOrganizationQuotaDefinitions(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizationQuotaDefinitions quotaDefinitions = new ReactorOrganizationQuotaDefinitions(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/quota_definitions/test-quota-definition-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/quota_definitions/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetOrganizationQuotaDefinitionRequest getInvalidRequest() {
             return GetOrganizationQuotaDefinitionRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/quota_definitions/test-quota-definition-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/quota_definitions/GET_{id}_response.json");
         }
 
         @Override
@@ -198,21 +216,26 @@ public final class SpringOrganizationQuotaDefinitionsTest {
 
     }
 
-    public static final class ListOrganizationQuotaDefinitions extends AbstractApiTest<ListOrganizationQuotaDefinitionsRequest, ListOrganizationQuotaDefinitionsResponse> {
+    public static final class ListOrganizationQuotaDefinitions extends AbstractClientApiTest<ListOrganizationQuotaDefinitionsRequest, ListOrganizationQuotaDefinitionsResponse> {
 
-        private final SpringOrganizationQuotaDefinitions quotaDefinitions = new SpringOrganizationQuotaDefinitions(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizationQuotaDefinitions quotaDefinitions = new ReactorOrganizationQuotaDefinitions(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/quota_definitions?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/quota_definitions/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListOrganizationQuotaDefinitionsRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/quota_definitions?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/quota_definitions/GET_response.json");
         }
 
         @Override
@@ -257,23 +280,28 @@ public final class SpringOrganizationQuotaDefinitionsTest {
 
     }
 
-    public static final class UpdateQuotaDefinition extends AbstractApiTest<UpdateOrganizationQuotaDefinitionRequest, UpdateOrganizationQuotaDefinitionResponse> {
+    public static final class UpdateQuotaDefinition extends AbstractClientApiTest<UpdateOrganizationQuotaDefinitionRequest, UpdateOrganizationQuotaDefinitionResponse> {
 
-        private final SpringOrganizationQuotaDefinitions quotaDefinitions = new SpringOrganizationQuotaDefinitions(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorOrganizationQuotaDefinitions quotaDefinitions = new ReactorOrganizationQuotaDefinitions(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/quota_definitions/test-quota-definition-id")
+                    .payload("fixtures/client/v2/quota_definitions/PUT_{id}_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v2/quota_definitions/PUT_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected UpdateOrganizationQuotaDefinitionRequest getInvalidRequest() {
             return UpdateOrganizationQuotaDefinitionRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/quota_definitions/test-quota-definition-id")
-                .requestPayload("fixtures/client/v2/quota_definitions/PUT_{id}_request.json")
-                .status(CREATED)
-                .responsePayload("fixtures/client/v2/quota_definitions/PUT_{id}_response.json");
         }
 
         @Override
