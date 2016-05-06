@@ -17,7 +17,7 @@
 package org.cloudfoundry.uaa;
 
 /**
- * An interface that indicates that a UAA request can specify and identity zone
+ * An interface that indicates that a UAA request can specify an identity zone
  */
 public interface IdentityZoned {
 
