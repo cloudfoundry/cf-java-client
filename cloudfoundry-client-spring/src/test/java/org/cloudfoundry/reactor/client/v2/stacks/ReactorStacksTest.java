@@ -23,10 +23,10 @@ import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksResponse;
 import org.cloudfoundry.client.v2.stacks.StackEntity;
 import org.cloudfoundry.client.v2.stacks.StackResource;
-import org.cloudfoundry.reactor.AbstractApiTest;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -34,7 +34,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorStacksTest {
 
-    public static final class Get extends AbstractApiTest<GetStackRequest, GetStackResponse> {
+    public static final class Get extends AbstractClientApiTest<GetStackRequest, GetStackResponse> {
 
         private final ReactorStacks stacks = new ReactorStacks(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
 
@@ -86,7 +86,7 @@ public final class ReactorStacksTest {
 
     }
 
-    public static final class List extends AbstractApiTest<ListStacksRequest, ListStacksResponse> {
+    public static final class List extends AbstractClientApiTest<ListStacksRequest, ListStacksResponse> {
 
         private final ReactorStacks stacks = new ReactorStacks(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
 

@@ -63,6 +63,7 @@ import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.net.ssl.SSLException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -164,6 +165,7 @@ final class CloudFoundryCleaner {
                     .thenMany(cleanSpaces(this.cloudFoundryClient, spacePredicate))
                     .thenMany(cleanOrganizations(this.cloudFoundryClient, organizationPredicate));
             }))
+            .retry(5, t -> t instanceof SSLException)
             .doOnSubscribe(s -> this.logger.debug(">> CLEANUP <<"))
             .doOnError(Throwable::printStackTrace)
             .doOnComplete(() -> this.logger.debug("<< CLEANUP >>"))
