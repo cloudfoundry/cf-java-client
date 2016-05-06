@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v3.tasks;
+package org.cloudfoundry.reactor.client.v3.tasks;
 
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.PaginatedResponse;
@@ -28,35 +28,43 @@ import org.cloudfoundry.client.v3.tasks.ListTasksRequest;
 import org.cloudfoundry.client.v3.tasks.ListTasksResponse;
 import org.cloudfoundry.client.v3.tasks.Task;
 import org.cloudfoundry.client.v3.tasks.TaskResource;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpStatus.ACCEPTED;
-import static org.springframework.http.HttpStatus.OK;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class SpringTasksTest {
+public final class ReactorTasksTest {
 
-    public static final class Cancel extends AbstractApiTest<CancelTaskRequest, CancelTaskResponse> {
+    public static final class Cancel extends AbstractClientApiTest<CancelTaskRequest, CancelTaskResponse> {
 
-        private final SpringTasks tasks = new SpringTasks(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorTasks tasks = new ReactorTasks(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v3/tasks/test-id/cancel")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(ACCEPTED)
+                    .payload("fixtures/client/v3/tasks/PUT_{id}_cancel_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected CancelTaskRequest getInvalidRequest() {
             return CancelTaskRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v3/tasks/test-id/cancel")
-                .status(ACCEPTED)
-                .responsePayload("fixtures/client/v3/tasks/PUT_{id}_cancel_response.json");
         }
 
         @Override
@@ -94,23 +102,28 @@ public final class SpringTasksTest {
 
     }
 
-    public static final class Create extends AbstractApiTest<CreateTaskRequest, CreateTaskResponse> {
+    public static final class Create extends AbstractClientApiTest<CreateTaskRequest, CreateTaskResponse> {
 
-        private final SpringTasks tasks = new SpringTasks(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorTasks tasks = new ReactorTasks(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v3/apps/test-application-id/tasks")
+                    .payload("fixtures/client/v3/tasks/POST_apps_{id}_tasks_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(ACCEPTED)
+                    .payload("fixtures/client/v3/tasks/POST_apps_{id}_tasks_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected CreateTaskRequest getInvalidRequest() {
             return CreateTaskRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v3/apps/test-application-id/tasks")
-                .requestPayload("fixtures/client/v3/tasks/POST_apps_{id}_tasks_request.json")
-                .status(ACCEPTED)
-                .responsePayload("fixtures/client/v3/tasks/POST_apps_{id}_tasks_response.json");
         }
 
         @Override
@@ -151,22 +164,27 @@ public final class SpringTasksTest {
 
     }
 
-    public static final class Get extends AbstractApiTest<GetTaskRequest, GetTaskResponse> {
+    public static final class Get extends AbstractClientApiTest<GetTaskRequest, GetTaskResponse> {
 
-        private final SpringTasks tasks = new SpringTasks(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorTasks tasks = new ReactorTasks(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/tasks/test-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/tasks/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetTaskRequest getInvalidRequest() {
             return GetTaskRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v3/tasks/test-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/tasks/GET_{id}_response.json");
         }
 
         @Override
@@ -204,23 +222,28 @@ public final class SpringTasksTest {
 
     }
 
-    public static final class List extends AbstractApiTest<ListTasksRequest, ListTasksResponse> {
+    public static final class List extends AbstractClientApiTest<ListTasksRequest, ListTasksResponse> {
 
-        private final SpringTasks tasks = new SpringTasks(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorTasks tasks = new ReactorTasks(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/tasks?page=1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/tasks/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListTasksRequest getInvalidRequest() {
             return ListTasksRequest.builder()
                 .page(-1)
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v3/tasks?page=1")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/tasks/GET_response.json");
         }
 
         @Override

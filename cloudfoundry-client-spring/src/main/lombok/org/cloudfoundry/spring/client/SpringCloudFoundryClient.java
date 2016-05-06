@@ -67,6 +67,7 @@ import org.cloudfoundry.reactor.client.v2.servicebindings.ReactorServiceBindings
 import org.cloudfoundry.reactor.client.v2.stacks.ReactorStacks;
 import org.cloudfoundry.reactor.client.v2.users.ReactorUsers;
 import org.cloudfoundry.reactor.client.v3.servicebindings.ReactorServiceBindingsV3;
+import org.cloudfoundry.reactor.client.v3.tasks.ReactorTasks;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.reactor.util.ConnectionContextSupplier;
 import org.cloudfoundry.reactor.util.DefaultConnectionContext;
@@ -94,7 +95,6 @@ import org.cloudfoundry.spring.client.v3.applications.SpringApplicationsV3;
 import org.cloudfoundry.spring.client.v3.droplets.SpringDroplets;
 import org.cloudfoundry.spring.client.v3.packages.SpringPackages;
 import org.cloudfoundry.spring.client.v3.processes.SpringProcesses;
-import org.cloudfoundry.spring.client.v3.tasks.SpringTasks;
 import org.cloudfoundry.spring.util.CloudFoundryClientCompatibilityChecker;
 import org.cloudfoundry.spring.util.SchedulerGroupBuilder;
 import org.cloudfoundry.spring.util.network.ConnectionContext;
@@ -235,7 +235,6 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         this.services = new SpringServices(restOperations, root, schedulerGroup);
         this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(restOperations, root, schedulerGroup);
         this.spaces = new SpringSpaces(restOperations, root, schedulerGroup);
-        this.tasks = new SpringTasks(restOperations, root, schedulerGroup);
         this.userProvidedServiceInstances = new SpringUserProvidedServiceInstances(restOperations, root, schedulerGroup);
 
         this.tokenProvider = tokenProvider;
@@ -265,6 +264,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         this.serviceBindingsV2 = new ReactorServiceBindingsV2(authorizationProvider, httpClient, objectMapper, root2);
         this.serviceBindingsV3 = new ReactorServiceBindingsV3(authorizationProvider, httpClient, objectMapper, root2);
         this.stacks = new ReactorStacks(authorizationProvider, httpClient, objectMapper, root2);
+        this.tasks = new ReactorTasks(authorizationProvider, httpClient, objectMapper, root2);
         this.users = new ReactorUsers(authorizationProvider, httpClient, objectMapper, root2);
     }
 
