@@ -56,6 +56,11 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
             .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build));
     }
 
+    protected final <REQ extends Validatable, RSP> Mono<RSP> patch(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
+        return doPatch(request, responseType, getUriAugmenter(uriTransformer), function((outbound, validRequest) -> outbound))
+            .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build));
+    }
+
     protected final <REQ extends Validatable, RSP> Mono<RSP> post(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
         return doPost(request, responseType, getUriAugmenter(uriTransformer), function((outbound, validRequest) -> outbound))
             .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build));

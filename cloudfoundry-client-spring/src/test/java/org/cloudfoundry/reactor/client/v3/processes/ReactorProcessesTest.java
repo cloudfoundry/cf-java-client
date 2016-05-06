@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v3.processes;
+package org.cloudfoundry.reactor.client.v3.processes;
 
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.processes.AbstractProcessDetailedStatistics.PortMapping;
@@ -32,36 +32,43 @@ import org.cloudfoundry.client.v3.processes.ScaleProcessResponse;
 import org.cloudfoundry.client.v3.processes.TerminateProcessInstanceRequest;
 import org.cloudfoundry.client.v3.processes.UpdateProcessRequest;
 import org.cloudfoundry.client.v3.processes.UpdateProcessResponse;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.PATCH;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.client.v3.PaginatedResponse.Pagination;
 import static org.cloudfoundry.client.v3.processes.ListProcessesResponse.Resource;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.PATCH;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringProcessesTest {
+public final class ReactorProcessesTest {
 
-    public static final class DeleteInstance extends AbstractApiTest<TerminateProcessInstanceRequest, Void> {
+    public static final class DeleteInstance extends AbstractClientApiTest<TerminateProcessInstanceRequest, Void> {
 
-        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorProcesses processes = new ReactorProcesses(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
 
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v3/processes/test-process-id/instances/test-index")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected TerminateProcessInstanceRequest getInvalidRequest() {
             return TerminateProcessInstanceRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v3/processes/test-process-id/instances/test-index")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -84,22 +91,27 @@ public final class SpringProcessesTest {
 
     }
 
-    public static final class Get extends AbstractApiTest<GetProcessRequest, GetProcessResponse> {
+    public static final class Get extends AbstractClientApiTest<GetProcessRequest, GetProcessResponse> {
 
-        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorProcesses processes = new ReactorProcesses(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/processes/test-process-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/processes/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetProcessRequest getInvalidRequest() {
             return GetProcessRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v3/processes/test-process-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/processes/GET_{id}_response.json");
         }
 
         @Override
@@ -148,22 +160,27 @@ public final class SpringProcessesTest {
 
     }
 
-    public static final class GetDetailedProcessStatistics extends AbstractApiTest<GetProcessDetailedStatisticsRequest, GetProcessDetailedStatisticsResponse> {
+    public static final class GetDetailedProcessStatistics extends AbstractClientApiTest<GetProcessDetailedStatisticsRequest, GetProcessDetailedStatisticsResponse> {
 
-        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorProcesses processes = new ReactorProcesses(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/processes/test-id/stats")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/processes/GET_{id}_stats_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetProcessDetailedStatisticsRequest getInvalidRequest() {
             return GetProcessDetailedStatisticsRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v3/processes/test-id/stats")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/processes/GET_{id}_stats_response.json");
         }
 
         @Override
@@ -206,23 +223,28 @@ public final class SpringProcessesTest {
 
     }
 
-    public static final class List extends AbstractApiTest<ListProcessesRequest, ListProcessesResponse> {
+    public static final class List extends AbstractClientApiTest<ListProcessesRequest, ListProcessesResponse> {
 
-        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorProcesses processes = new ReactorProcesses(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/processes?page=1&per_page=2")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/processes/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListProcessesRequest getInvalidRequest() {
             return ListProcessesRequest.builder()
                 .page(-1)
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v3/processes?page=1&per_page=2")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/processes/GET_response.json");
         }
 
         @Override
@@ -313,23 +335,28 @@ public final class SpringProcessesTest {
 
     }
 
-    public static final class Scale extends AbstractApiTest<ScaleProcessRequest, ScaleProcessResponse> {
+    public static final class Scale extends AbstractClientApiTest<ScaleProcessRequest, ScaleProcessResponse> {
 
-        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorProcesses processes = new ReactorProcesses(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v3/processes/test-process-id/scale")
+                    .payload("fixtures/client/v3/processes/PUT_{id}_scale_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/processes/PUT_{id}_scale_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ScaleProcessRequest getInvalidRequest() {
             return ScaleProcessRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v3/processes/test-process-id/scale")
-                .requestPayload("fixtures/client/v3/processes/PUT_{id}_scale_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/processes/PUT_{id}_scale_response.json");
         }
 
         @Override
@@ -380,23 +407,28 @@ public final class SpringProcessesTest {
         }
     }
 
-    public static final class Update extends AbstractApiTest<UpdateProcessRequest, UpdateProcessResponse> {
+    public static final class Update extends AbstractClientApiTest<UpdateProcessRequest, UpdateProcessResponse> {
 
-        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorProcesses processes = new ReactorProcesses(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PATCH).path("/v3/processes/test-process-id")
+                    .payload("fixtures/client/v3/processes/PATCH_{id}_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/processes/PATCH_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected UpdateProcessRequest getInvalidRequest() {
             return UpdateProcessRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PATCH).path("/v3/processes/test-process-id")
-                .requestPayload("fixtures/client/v3/processes/PATCH_{id}_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/processes/PATCH_{id}_response.json");
         }
 
         @Override

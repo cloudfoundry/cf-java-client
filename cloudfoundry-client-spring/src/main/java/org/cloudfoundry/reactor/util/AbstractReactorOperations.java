@@ -33,6 +33,7 @@ import reactor.io.netty.http.HttpOutbound;
 
 import java.util.function.Function;
 
+import static io.netty.handler.codec.http.HttpMethod.PATCH;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public abstract class AbstractReactorOperations {
@@ -91,6 +92,23 @@ public abstract class AbstractReactorOperations {
                     .then(HttpOutbound::sendHeaders))
                 .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))
                 .doOnSuccess(inbound -> printWarnings(inbound, this.responseLogger, uri))));
+    }
+
+    protected final <REQ extends Validatable, RSP> Mono<RSP> doPatch(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
+                                                                     Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
+        return Mono
+            .when(ValidationUtils.validate(request), this.root)
+            .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, uriTransformer))))
+            .then(function((validRequest, uri) -> this.httpClient.request(PATCH, uri,  // TODO: Convert to top-level method once Reacto adds it.
+                outbound -> this.authorizationProvider.addAuthorization(outbound)
+                    .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
+                    .doOnSubscribe(s -> this.requestLogger.debug("PUT    {}", uri))
+                    .then(o -> o.send(Mono.just(validRequest)
+                        .as(JsonCodec.encode(this.objectMapper)))))
+                .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))
+                .doOnSuccess(inbound -> printWarnings(inbound, this.responseLogger, uri))))
+            .flatMap(NettyInbound::receive)
+            .as(JsonCodec.decode(this.objectMapper, responseType));
     }
 
     protected final <REQ extends Validatable, RSP> Mono<RSP> doPost(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,

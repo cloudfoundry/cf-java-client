@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v3.processes;
+package org.cloudfoundry.reactor.client.v3.processes;
 
-import lombok.ToString;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v3.processes.GetProcessDetailedStatisticsRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessDetailedStatisticsResponse;
 import org.cloudfoundry.client.v3.processes.GetProcessRequest;
@@ -29,65 +29,58 @@ import org.cloudfoundry.client.v3.processes.ScaleProcessResponse;
 import org.cloudfoundry.client.v3.processes.TerminateProcessInstanceRequest;
 import org.cloudfoundry.client.v3.processes.UpdateProcessRequest;
 import org.cloudfoundry.client.v3.processes.UpdateProcessResponse;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.reactor.client.QueryBuilder;
-import org.springframework.web.client.RestOperations;
+import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
+import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
+import reactor.io.netty.http.HttpClient;
 
-import java.net.URI;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
- * The Spring-based implementation of {@link Processes}
+ * The Reactor-based implementation of {@link Processes}
  */
-@ToString(callSuper = true)
-public final class SpringProcesses extends AbstractSpringOperations implements Processes {
+public final class ReactorProcesses extends AbstractClientV3Operations implements Processes {
 
     /**
      * Creates an instance
      *
-     * @param restOperations the {@link RestOperations} to use to communicate with the server
-     * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
-     * @param schedulerGroup The group to use when making requests
+     * @param authorizationProvider the {@link AuthorizationProvider} to use when communicating with the server
+     * @param httpClient            the {@link HttpClient} to use when communicating with the server
+     * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
+     * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
      */
-    public SpringProcesses(RestOperations restOperations, URI root, Scheduler schedulerGroup) {
-        super(restOperations, root, schedulerGroup);
+    public ReactorProcesses(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
+        super(authorizationProvider, httpClient, objectMapper, root);
     }
 
     @Override
     public Mono<GetProcessResponse> get(GetProcessRequest request) {
-        return get(request, GetProcessResponse.class, builder -> builder.pathSegment("v3", "processes", request.getProcessId()));
+        return get(request, GetProcessResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "processes", validRequest.getProcessId())));
     }
 
     @Override
     public Mono<GetProcessDetailedStatisticsResponse> getDetailedStatistics(GetProcessDetailedStatisticsRequest request) {
-        return get(request, GetProcessDetailedStatisticsResponse.class, builder -> {
-            builder.pathSegment("v3", "processes", request.getProcessId(), "stats");
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, GetProcessDetailedStatisticsResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "processes", validRequest.getProcessId(), "stats")));
     }
 
     @Override
     public Mono<ListProcessesResponse> list(ListProcessesRequest request) {
-        return get(request, ListProcessesResponse.class, builder -> {
-            builder.pathSegment("v3", "processes");
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListProcessesResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "processes")));
     }
 
     @Override
     public Mono<ScaleProcessResponse> scale(ScaleProcessRequest request) {
-        return put(request, ScaleProcessResponse.class, builder -> builder.pathSegment("v3", "processes", request.getProcessId(), "scale"));
+        return put(request, ScaleProcessResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "processes", validRequest.getProcessId(), "scale")));
     }
 
     @Override
     public Mono<Void> terminateInstance(TerminateProcessInstanceRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v3", "processes", request.getProcessId(), "instances", request.getIndex()));
+        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v3", "processes", validRequest.getProcessId(), "instances", validRequest.getIndex())));
     }
 
     @Override
     public Mono<UpdateProcessResponse> update(UpdateProcessRequest request) {
-        return patch(request, UpdateProcessResponse.class, builder -> builder.pathSegment("v3", "processes", request.getProcessId()));
+        return patch(request, UpdateProcessResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "processes", validRequest.getProcessId())));
     }
 
 }
