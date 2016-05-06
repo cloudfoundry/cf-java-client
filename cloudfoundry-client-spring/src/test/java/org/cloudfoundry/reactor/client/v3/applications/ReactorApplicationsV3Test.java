@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v3.applications;
+package org.cloudfoundry.reactor.client.v3.applications;
 
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
@@ -62,43 +62,51 @@ import org.cloudfoundry.client.v3.processes.HealthCheck.Type;
 import org.cloudfoundry.client.v3.processes.ProcessUsage;
 import org.cloudfoundry.client.v3.tasks.Task;
 import org.cloudfoundry.client.v3.tasks.TaskResource;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.cloudfoundry.util.StringMap;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.PATCH;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.client.v3.PaginatedResponse.Pagination;
 import static org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse.Resource;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.PATCH;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpStatus.ACCEPTED;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringApplicationsV3Test {
+public final class ReactorApplicationsV3Test {
 
-    public static final class AssignDroplet extends AbstractApiTest<AssignApplicationDropletRequest, AssignApplicationDropletResponse> {
+    public static final class AssignDroplet extends AbstractClientApiTest<AssignApplicationDropletRequest, AssignApplicationDropletResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v3/apps/test-application-id/current_droplet")
+                    .payload("fixtures/client/v3/apps/PUT_{id}_current_droplet_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/apps/PUT_{id}_current_droplet_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected AssignApplicationDropletRequest getInvalidRequest() {
             return AssignApplicationDropletRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v3/apps/test-application-id/current_droplet")
-                .requestPayload("fixtures/client/v3/apps/PUT_{id}_current_droplet_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/apps/PUT_{id}_current_droplet_response.json");
         }
 
         @Override
@@ -166,22 +174,27 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class CancelTask extends AbstractApiTest<CancelApplicationTaskRequest, CancelApplicationTaskResponse> {
+    public static final class CancelTask extends AbstractClientApiTest<CancelApplicationTaskRequest, CancelApplicationTaskResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v3/apps/test-application-id/tasks/test-task-id/cancel")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(ACCEPTED)
+                    .payload("fixtures/client/v3/apps/PUT_{id}_tasks_{id}_cancel_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected CancelApplicationTaskRequest getInvalidRequest() {
             return CancelApplicationTaskRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v3/apps/test-application-id/tasks/test-task-id/cancel")
-                .status(ACCEPTED)
-                .responsePayload("fixtures/client/v3/apps/PUT_{id}_tasks_{id}_cancel_response.json");
         }
 
         @Override
@@ -220,23 +233,28 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class Create extends AbstractApiTest<CreateApplicationRequest, CreateApplicationResponse> {
+    public static final class Create extends AbstractClientApiTest<CreateApplicationRequest, CreateApplicationResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v3/apps")
+                    .payload("fixtures/client/v3/apps/POST_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v3/apps/POST_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected CreateApplicationRequest getInvalidRequest() {
             return CreateApplicationRequest
                 .builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v3/apps")
-                .requestPayload("fixtures/client/v3/apps/POST_request.json")
-                .status(CREATED)
-                .responsePayload("fixtures/client/v3/apps/POST_response.json");
         }
 
         @Override
@@ -308,21 +326,26 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class Delete extends AbstractApiTest<DeleteApplicationRequest, Void> {
+    public static final class Delete extends AbstractClientApiTest<DeleteApplicationRequest, Void> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v3/apps/test-application-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteApplicationRequest getInvalidRequest() {
             return DeleteApplicationRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v3/apps/test-application-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -344,21 +367,26 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class DeleteProcess extends AbstractApiTest<TerminateApplicationInstanceRequest, Void> {
+    public static final class DeleteProcess extends AbstractClientApiTest<TerminateApplicationInstanceRequest, Void> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v3/apps/test-application-id/processes/test-type/instances/test-index")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected TerminateApplicationInstanceRequest getInvalidRequest() {
             return TerminateApplicationInstanceRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v3/apps/test-application-id/processes/test-type/instances/test-index")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -382,22 +410,27 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class Get extends AbstractApiTest<GetApplicationRequest, GetApplicationResponse> {
+    public static final class Get extends AbstractClientApiTest<GetApplicationRequest, GetApplicationResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/apps/test-application-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/apps/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetApplicationRequest getInvalidRequest() {
             return GetApplicationRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v3/apps/test-application-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/apps/GET_{id}_response.json");
         }
 
         @Override
@@ -464,22 +497,27 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class GetApplicationProcessDetailedStatistics extends AbstractApiTest<GetApplicationProcessDetailedStatisticsRequest, GetApplicationProcessDetailedStatisticsResponse> {
+    public static final class GetApplicationProcessDetailedStatistics extends AbstractClientApiTest<GetApplicationProcessDetailedStatisticsRequest, GetApplicationProcessDetailedStatisticsResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/apps/test-id/processes/test-type/stats")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/apps/GET_{id}_processes_{type}_stats_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetApplicationProcessDetailedStatisticsRequest getInvalidRequest() {
             return GetApplicationProcessDetailedStatisticsRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v3/apps/test-id/processes/test-type/stats")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/apps/GET_{id}_processes_{type}_stats_response.json");
         }
 
         @Override
@@ -523,22 +561,27 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class GetEnvironment extends AbstractApiTest<GetApplicationEnvironmentRequest, GetApplicationEnvironmentResponse> {
+    public static final class GetEnvironment extends AbstractClientApiTest<GetApplicationEnvironmentRequest, GetApplicationEnvironmentResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/apps/test-application-id/env")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/apps/GET_{id}_env_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetApplicationEnvironmentRequest getInvalidRequest() {
             return GetApplicationEnvironmentRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v3/apps/test-application-id/env")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/apps/GET_{id}_env_response.json");
         }
 
         @Override
@@ -576,22 +619,27 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class GetProcess extends AbstractApiTest<GetApplicationProcessRequest, GetApplicationProcessResponse> {
+    public static final class GetProcess extends AbstractClientApiTest<GetApplicationProcessRequest, GetApplicationProcessResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/apps/test-application-id/processes/web")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/apps/GET_{id}_processes_{type}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetApplicationProcessRequest getInvalidRequest() {
             return GetApplicationProcessRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v3/apps/test-application-id/processes/web")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/apps/GET_{id}_processes_{type}_response.json");
         }
 
         @Override
@@ -641,22 +689,27 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class GetTask extends AbstractApiTest<GetApplicationTaskRequest, GetApplicationTaskResponse> {
+    public static final class GetTask extends AbstractClientApiTest<GetApplicationTaskRequest, GetApplicationTaskResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/apps/test-application-id/tasks/test-task-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/apps/GET_{id}_tasks_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetApplicationTaskRequest getInvalidRequest() {
             return GetApplicationTaskRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v3/apps/test-application-id/tasks/test-task-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/apps/GET_{id}_tasks_{id}_response.json");
         }
 
         @Override
@@ -695,23 +748,28 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class List extends AbstractApiTest<ListApplicationsRequest, ListApplicationsResponse> {
+    public static final class List extends AbstractClientApiTest<ListApplicationsRequest, ListApplicationsResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/apps?names=test-name&order_by=%2Bcreated_at&page=1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/apps/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListApplicationsRequest getInvalidRequest() {
             return ListApplicationsRequest.builder()
                 .page(-1)
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v3/apps?names=test-name&order_by=%2Bcreated_at&page=1")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/apps/GET_response.json");
         }
 
         @Override
@@ -833,22 +891,27 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class ListDroplets extends AbstractApiTest<ListApplicationDropletsRequest, ListApplicationDropletsResponse> {
+    public static final class ListDroplets extends AbstractClientApiTest<ListApplicationDropletsRequest, ListApplicationDropletsResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/apps/test-application-id/droplets?order_by=-created_at&page=1&per_page=2")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/apps/GET_{id}_droplets_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListApplicationDropletsRequest getInvalidRequest() {
             return ListApplicationDropletsRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v3/apps/test-application-id/droplets?order_by=-created_at&page=1&per_page=2")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/apps/GET_{id}_droplets_response.json");
         }
 
         @Override
@@ -944,22 +1007,27 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class ListPackages extends AbstractApiTest<ListApplicationPackagesRequest, ListApplicationPackagesResponse> {
+    public static final class ListPackages extends AbstractClientApiTest<ListApplicationPackagesRequest, ListApplicationPackagesResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/apps/test-application-id/packages?page=1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/apps/GET_{id}_packages_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListApplicationPackagesRequest getInvalidRequest() {
             return ListApplicationPackagesRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v3/apps/test-application-id/packages")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/apps/GET_{id}_packages_response.json");
         }
 
         @Override
@@ -1021,22 +1089,27 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class ListProcesses extends AbstractApiTest<ListApplicationProcessesRequest, ListApplicationProcessesResponse> {
+    public static final class ListProcesses extends AbstractClientApiTest<ListApplicationProcessesRequest, ListApplicationProcessesResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/apps/test-application-id/processes?page=1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/apps/GET_{id}_processes_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListApplicationProcessesRequest getInvalidRequest() {
             return ListApplicationProcessesRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v3/apps/test-application-id/processes")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/apps/GET_{id}_processes_response.json");
         }
 
         @Override
@@ -1127,22 +1200,27 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class ListTasks extends AbstractApiTest<ListApplicationTasksRequest, ListApplicationTasksResponse> {
+    public static final class ListTasks extends AbstractClientApiTest<ListApplicationTasksRequest, ListApplicationTasksResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/apps/test-application-id/tasks?page=1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/apps/GET_{id}_tasks_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListApplicationTasksRequest getInvalidRequest() {
             return ListApplicationTasksRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v3/apps/test-application-id/tasks")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/apps/GET_{id}_tasks_response.json");
         }
 
         @Override
@@ -1212,23 +1290,28 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class Scale extends AbstractApiTest<ScaleApplicationRequest, ScaleApplicationResponse> {
+    public static final class Scale extends AbstractClientApiTest<ScaleApplicationRequest, ScaleApplicationResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v3/apps/test-application-id/processes/web/scale")
+                    .payload("fixtures/client/v3/apps/PUT_{id}_processes_{type}_scale_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/apps/PUT_{id}_processes_{type}_scale_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ScaleApplicationRequest getInvalidRequest() {
             return ScaleApplicationRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v3/apps/test-application-id/processes/web/scale")
-                .requestPayload("fixtures/client/v3/apps/PUT_{id}_processes_{type}_scale_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/apps/PUT_{id}_processes_{type}_scale_response.json");
         }
 
         @Override
@@ -1281,22 +1364,27 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class Start extends AbstractApiTest<StartApplicationRequest, StartApplicationResponse> {
+    public static final class Start extends AbstractClientApiTest<StartApplicationRequest, StartApplicationResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v3/apps/test-application-id/start")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/apps/PUT_{id}_start_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected StartApplicationRequest getInvalidRequest() {
             return StartApplicationRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v3/apps/test-application-id/start")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/apps/PUT_{id}_start_response.json");
         }
 
         @Override
@@ -1363,22 +1451,27 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class Stop extends AbstractApiTest<StopApplicationRequest, StopApplicationResponse> {
+    public static final class Stop extends AbstractClientApiTest<StopApplicationRequest, StopApplicationResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v3/apps/test-application-id/stop")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/apps/PUT_{id}_stop_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected StopApplicationRequest getInvalidRequest() {
             return StopApplicationRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v3/apps/test-application-id/stop")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/apps/PUT_{id}_stop_response.json");
         }
 
         @Override
@@ -1445,23 +1538,28 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class Update extends AbstractApiTest<UpdateApplicationRequest, UpdateApplicationResponse> {
+    public static final class Update extends AbstractClientApiTest<UpdateApplicationRequest, UpdateApplicationResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PATCH).path("/v3/apps/test-application-id")
+                    .payload("fixtures/client/v3/apps/PATCH_{id}_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/apps/PATCH_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected UpdateApplicationRequest getInvalidRequest() {
             return UpdateApplicationRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PATCH).path("/v3/apps/test-application-id")
-                .requestPayload("fixtures/client/v3/apps/PATCH_{id}_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/apps/PATCH_{id}_response.json");
         }
 
         @Override

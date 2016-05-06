@@ -33,18 +33,18 @@ import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractRestTest {
 
+    protected static final HttpClient HTTP_CLIENT = HttpClient.create();
+
+    protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+        .addHandler(new FailingDeserializationProblemHandler())
+        .setSerializationInclusion(NON_NULL);
+
     static {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
     }
 
     protected final AuthorizationProvider authorizationProvider = outbound -> Mono.just(outbound.addHeader("Authorization", "test-authorization"));
-
-    protected final HttpClient httpClient = HttpClient.create();
-
-    protected final ObjectMapper objectMapper = new ObjectMapper()
-        .addHandler(new FailingDeserializationProblemHandler())
-        .setSerializationInclusion(NON_NULL);
 
     private final MockWebServer mockWebServer = new MockWebServer();
 

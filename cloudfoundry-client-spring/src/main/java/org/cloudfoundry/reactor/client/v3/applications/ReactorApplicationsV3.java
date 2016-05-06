@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v3.applications;
+package org.cloudfoundry.reactor.client.v3.applications;
 
-import lombok.ToString;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletRequest;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletResponse;
@@ -54,136 +54,129 @@ import org.cloudfoundry.client.v3.applications.StopApplicationResponse;
 import org.cloudfoundry.client.v3.applications.TerminateApplicationInstanceRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
-import org.cloudfoundry.reactor.client.v3.FilterBuilder;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.reactor.client.QueryBuilder;
-import org.springframework.web.client.RestOperations;
+import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
+import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
+import reactor.io.netty.http.HttpClient;
 
-import java.net.URI;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
- * The Spring-based implementation of {@link ApplicationsV3}
+ * The Reactor-based implementation of {@link ApplicationsV3}
  */
-@ToString(callSuper = true)
-public final class SpringApplicationsV3 extends AbstractSpringOperations implements ApplicationsV3 {
+public final class ReactorApplicationsV3 extends AbstractClientV3Operations implements ApplicationsV3 {
 
     /**
      * Creates an instance
      *
-     * @param restOperations the {@link RestOperations} to use to communicate with the server
-     * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
-     * @param schedulerGroup The group to use when making requests
+     * @param authorizationProvider the {@link AuthorizationProvider} to use when communicating with the server
+     * @param httpClient            the {@link HttpClient} to use when communicating with the server
+     * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
+     * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
      */
-    public SpringApplicationsV3(RestOperations restOperations, URI root, Scheduler schedulerGroup) {
-        super(restOperations, root, schedulerGroup);
+    public ReactorApplicationsV3(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
+        super(authorizationProvider, httpClient, objectMapper, root);
     }
 
     @Override
     public Mono<AssignApplicationDropletResponse> assignDroplet(AssignApplicationDropletRequest request) {
-        return put(request, AssignApplicationDropletResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "current_droplet"));
+        return put(request, AssignApplicationDropletResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "apps", validRequest.getApplicationId(), "current_droplet")));
     }
 
     @Override
     public Mono<CancelApplicationTaskResponse> cancelTask(CancelApplicationTaskRequest request) {
-        return put(request, CancelApplicationTaskResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "tasks", request.getTaskId(), "cancel"));
+        return put(request, CancelApplicationTaskResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v3", "apps", validRequest.getApplicationId(), "tasks", validRequest.getTaskId(), "cancel")));
     }
 
     @Override
     public Mono<CreateApplicationResponse> create(CreateApplicationRequest request) {
-        return post(request, CreateApplicationResponse.class, builder -> builder.pathSegment("v3", "apps"));
+        return post(request, CreateApplicationResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "apps")));
     }
 
     @Override
     public Mono<Void> delete(DeleteApplicationRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId()));
+        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v3", "apps", validRequest.getApplicationId())));
     }
 
     @Override
     public Mono<GetApplicationResponse> get(GetApplicationRequest request) {
-        return get(request, GetApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId()));
+        return get(request, GetApplicationResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "apps", validRequest.getApplicationId())));
     }
 
     @Override
     public Mono<GetApplicationEnvironmentResponse> getEnvironment(GetApplicationEnvironmentRequest request) {
-        return get(request, GetApplicationEnvironmentResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "env"));
+        return get(request, GetApplicationEnvironmentResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "apps", validRequest.getApplicationId(), "env")));
     }
 
     @Override
     public Mono<GetApplicationProcessResponse> getProcess(GetApplicationProcessRequest request) {
-        return get(request, GetApplicationProcessResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType()));
+        return get(request, GetApplicationProcessResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v3", "apps", validRequest.getApplicationId(), "processes", validRequest.getType())));
     }
 
     @Override
     public Mono<GetApplicationProcessDetailedStatisticsResponse> getProcessDetailedStatistics(GetApplicationProcessDetailedStatisticsRequest request) {
-        return get(request, GetApplicationProcessDetailedStatisticsResponse.class, builder -> {
-            builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "stats");
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, GetApplicationProcessDetailedStatisticsResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v3", "apps", validRequest.getApplicationId(), "processes", validRequest.getType(), "stats")));
     }
 
     @Override
     public Mono<GetApplicationTaskResponse> getTask(GetApplicationTaskRequest request) {
-        return get(request, GetApplicationTaskResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "tasks", request.getTaskId()));
+        return get(request, GetApplicationTaskResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v3", "apps", validRequest.getApplicationId(), "tasks", validRequest.getTaskId())));
     }
 
     @Override
     public Mono<ListApplicationsResponse> list(ListApplicationsRequest request) {
-        return get(request, ListApplicationsResponse.class, builder -> {
-            builder.pathSegment("v3", "apps");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListApplicationsResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "apps")));
     }
 
     @Override
     public Mono<ListApplicationDropletsResponse> listDroplets(ListApplicationDropletsRequest request) {
-        return get(request, ListApplicationDropletsResponse.class, builder -> {
-            builder.pathSegment("v3", "apps", request.getApplicationId(), "droplets");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListApplicationDropletsResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "apps", validRequest.getApplicationId(), "droplets")));
     }
 
     @Override
     public Mono<ListApplicationPackagesResponse> listPackages(ListApplicationPackagesRequest request) {
-        return get(request, ListApplicationPackagesResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "packages"));
+        return get(request, ListApplicationPackagesResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "apps", validRequest.getApplicationId(), "packages")));
     }
 
     @Override
     public Mono<ListApplicationProcessesResponse> listProcesses(ListApplicationProcessesRequest request) {
-        return get(request, ListApplicationProcessesResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "processes"));
+        return get(request, ListApplicationProcessesResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "apps", validRequest.getApplicationId(), "processes")));
     }
 
     @Override
     public Mono<ListApplicationTasksResponse> listTasks(ListApplicationTasksRequest request) {
-        return get(request, ListApplicationTasksResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "tasks"));
+        return get(request, ListApplicationTasksResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "apps", validRequest.getApplicationId(), "tasks")));
     }
 
     @Override
     public Mono<ScaleApplicationResponse> scale(ScaleApplicationRequest request) {
-        return put(request, ScaleApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "scale"));
+        return put(request, ScaleApplicationResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v3", "apps", validRequest.getApplicationId(), "processes", validRequest.getType(), "scale")));
     }
 
     @Override
     public Mono<StartApplicationResponse> start(StartApplicationRequest request) {
-        return put(request, StartApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "start"));
+        return put(request, StartApplicationResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "apps", validRequest.getApplicationId(), "start")));
     }
 
     @Override
     public Mono<StopApplicationResponse> stop(StopApplicationRequest request) {
-        return put(request, StopApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "stop"));
+        return put(request, StopApplicationResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "apps", validRequest.getApplicationId(), "stop")));
     }
 
     @Override
     public Mono<Void> terminateInstance(TerminateApplicationInstanceRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "instances", request.getIndex()));
+        return delete(request, Void.class,
+            function((builder, validRequest) -> builder.pathSegment("v3", "apps", validRequest.getApplicationId(), "processes", validRequest.getType(), "instances", validRequest.getIndex())));
     }
 
     @Override
     public Mono<UpdateApplicationResponse> update(UpdateApplicationRequest request) {
-        return patch(request, UpdateApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId()));
+        return patch(request, UpdateApplicationResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "apps", validRequest.getApplicationId())));
     }
 
 }

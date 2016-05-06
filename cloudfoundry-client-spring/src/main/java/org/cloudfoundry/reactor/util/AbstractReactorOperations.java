@@ -33,7 +33,6 @@ import reactor.io.netty.http.HttpOutbound;
 
 import java.util.function.Function;
 
-import static io.netty.handler.codec.http.HttpMethod.PATCH;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public abstract class AbstractReactorOperations {
@@ -99,12 +98,12 @@ public abstract class AbstractReactorOperations {
         return Mono
             .when(ValidationUtils.validate(request), this.root)
             .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, uriTransformer))))
-            .then(function((validRequest, uri) -> this.httpClient.request(PATCH, uri,  // TODO: Convert to top-level method once Reacto adds it.
+            .then(function((validRequest, uri) -> this.httpClient.patch(uri,
                 outbound -> this.authorizationProvider.addAuthorization(outbound)
                     .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
-                    .doOnSubscribe(s -> this.requestLogger.debug("PUT    {}", uri))
+                    .doOnSubscribe(s -> this.requestLogger.debug("PATCH  {}", uri))
                     .then(o -> o.send(Mono.just(validRequest)
-                        .as(JsonCodec.encode(this.objectMapper)))))
+                        .as(JsonCodec.encode(this.objectMapper, o)))))
                 .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))
                 .doOnSuccess(inbound -> printWarnings(inbound, this.responseLogger, uri))))
             .flatMap(NettyInbound::receive)
@@ -121,7 +120,7 @@ public abstract class AbstractReactorOperations {
                     .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
                     .doOnSubscribe(s -> this.requestLogger.debug("POST   {}", uri))
                     .then(o -> o.send(Mono.just(validRequest)
-                        .as(JsonCodec.encode(this.objectMapper)))))
+                        .as(JsonCodec.encode(this.objectMapper, o)))))
                 .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))
                 .doOnSuccess(inbound -> printWarnings(inbound, this.responseLogger, uri))))
             .flatMap(NettyInbound::receive)
@@ -138,7 +137,7 @@ public abstract class AbstractReactorOperations {
                     .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
                     .doOnSubscribe(s -> this.requestLogger.debug("PUT    {}", uri))
                     .then(o -> o.send(Mono.just(validRequest)
-                        .as(JsonCodec.encode(this.objectMapper)))))
+                        .as(JsonCodec.encode(this.objectMapper, o)))))
                 .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))
                 .doOnSuccess(inbound -> printWarnings(inbound, this.responseLogger, uri))))
             .flatMap(NettyInbound::receive)

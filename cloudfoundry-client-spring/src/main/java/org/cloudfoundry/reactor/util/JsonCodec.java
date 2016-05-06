@@ -21,6 +21,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.CompositeByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.util.AsciiString;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import reactor.core.publisher.Flux;
@@ -28,12 +29,17 @@ import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoSource;
 import reactor.core.subscriber.SubscriberBarrier;
 import reactor.core.util.Exceptions;
+import reactor.io.netty.http.HttpOutbound;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Function;
 
+import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
+
 final class JsonCodec {
+
+    private static final AsciiString APPLICATION_JSON = new AsciiString("application/json");
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -45,11 +51,12 @@ final class JsonCodec {
         return source -> new JsonDecoder<>(source, objectMapper, type);
     }
 
-    static <T> Function<Mono<T>, Mono<ByteBuf>> encode() {
-        return encode(OBJECT_MAPPER);
+    static <T> Function<Mono<T>, Mono<ByteBuf>> encode(HttpOutbound httpOutbound) {
+        return encode(OBJECT_MAPPER, httpOutbound);
     }
 
-    static <T> Function<Mono<T>, Mono<ByteBuf>> encode(ObjectMapper objectMapper) {
+    static <T> Function<Mono<T>, Mono<ByteBuf>> encode(ObjectMapper objectMapper, HttpOutbound httpOutbound) {
+        httpOutbound.header(CONTENT_TYPE, APPLICATION_JSON);
         return source -> new JsonEncoder<>(source, objectMapper);
     }
 

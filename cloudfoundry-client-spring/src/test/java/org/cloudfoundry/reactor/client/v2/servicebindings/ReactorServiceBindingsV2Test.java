@@ -49,7 +49,7 @@ public final class ReactorServiceBindingsV2Test {
 
     public static final class Create extends AbstractClientApiTest<CreateServiceBindingRequest, CreateServiceBindingResponse> {
 
-        private final ReactorServiceBindingsV2 serviceBindings = new ReactorServiceBindingsV2(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+        private final ReactorServiceBindingsV2 serviceBindings = new ReactorServiceBindingsV2(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -108,7 +108,7 @@ public final class ReactorServiceBindingsV2Test {
 
     public static final class Delete extends AbstractClientApiTest<DeleteServiceBindingRequest, DeleteServiceBindingResponse> {
 
-        private final ReactorServiceBindingsV2 serviceBindings = new ReactorServiceBindingsV2(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+        private final ReactorServiceBindingsV2 serviceBindings = new ReactorServiceBindingsV2(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -149,7 +149,7 @@ public final class ReactorServiceBindingsV2Test {
 
     public static final class DeleteAsync extends AbstractClientApiTest<DeleteServiceBindingRequest, DeleteServiceBindingResponse> {
 
-        private final ReactorServiceBindingsV2 serviceBindings = new ReactorServiceBindingsV2(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+        private final ReactorServiceBindingsV2 serviceBindings = new ReactorServiceBindingsV2(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -202,7 +202,7 @@ public final class ReactorServiceBindingsV2Test {
 
     public static final class Get extends AbstractClientApiTest<GetServiceBindingRequest, GetServiceBindingResponse> {
 
-        private final ReactorServiceBindingsV2 serviceBindings = new ReactorServiceBindingsV2(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+        private final ReactorServiceBindingsV2 serviceBindings = new ReactorServiceBindingsV2(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -259,7 +259,7 @@ public final class ReactorServiceBindingsV2Test {
 
     public static final class List extends AbstractClientApiTest<ListServiceBindingsRequest, ListServiceBindingsResponse> {
 
-        private final ReactorServiceBindingsV2 serviceBindings = new ReactorServiceBindingsV2(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+        private final ReactorServiceBindingsV2 serviceBindings = new ReactorServiceBindingsV2(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {

@@ -92,7 +92,7 @@ import org.cloudfoundry.spring.client.v2.shareddomains.SpringSharedDomains;
 import org.cloudfoundry.spring.client.v2.spacequotadefinitions.SpringSpaceQuotaDefinitions;
 import org.cloudfoundry.spring.client.v2.spaces.SpringSpaces;
 import org.cloudfoundry.spring.client.v2.userprovidedserviceinstances.SpringUserProvidedServiceInstances;
-import org.cloudfoundry.spring.client.v3.applications.SpringApplicationsV3;
+import org.cloudfoundry.reactor.client.v3.applications.ReactorApplicationsV3;
 import org.cloudfoundry.spring.client.v3.droplets.SpringDroplets;
 import org.cloudfoundry.spring.client.v3.packages.SpringPackages;
 import org.cloudfoundry.spring.util.CloudFoundryClientCompatibilityChecker;
@@ -213,7 +213,6 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
 
     SpringCloudFoundryClient(String host, Integer port, Boolean skipSslValidation, RestOperations restOperations, URI root, Scheduler schedulerGroup, OAuth2TokenProvider tokenProvider) {
         this.applicationsV2 = new SpringApplicationsV2(restOperations, root, schedulerGroup);
-        this.applicationsV3 = new SpringApplicationsV3(restOperations, root, schedulerGroup);
         this.buildpacks = new SpringBuildpacks(restOperations, root, schedulerGroup);
         this.droplets = new SpringDroplets(restOperations, root, schedulerGroup);
         this.featureFlags = new SpringFeatureFlags(restOperations, root, schedulerGroup);
@@ -254,6 +253,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         ObjectMapper objectMapper = this.connectionContext.getObjectMapper();
         Mono<String> root2 = this.connectionContext.getRoot();  // TODO: Change name once Spring is gone
 
+        this.applicationsV3 = new ReactorApplicationsV3(authorizationProvider, httpClient, objectMapper, root2);
         this.applicationUsageEvents = new ReactorApplicationUsageEvents(authorizationProvider, httpClient, objectMapper, root2);
         this.domains = new ReactorDomains(authorizationProvider, httpClient, objectMapper, root2);
         this.environmentVariableGroups = new ReactorEnvironmentVariableGroups(authorizationProvider, httpClient, objectMapper, root2);

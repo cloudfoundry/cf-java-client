@@ -44,7 +44,7 @@ public final class ReactorIdentityZonesTest {
 
     public static final class Create extends AbstractUaaApiTest<CreateIdentityZoneRequest, CreateIdentityZoneResponse> {
 
-        private final ReactorIdentityZones identityZoneManagement = new ReactorIdentityZones(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+        private final ReactorIdentityZones identityZoneManagement = new ReactorIdentityZones(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -95,7 +95,7 @@ public final class ReactorIdentityZonesTest {
 
     public static final class Delete extends AbstractUaaApiTest<DeleteIdentityZoneRequest, DeleteIdentityZoneResponse> {
 
-        private final ReactorIdentityZones identityZoneManagement = new ReactorIdentityZones(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+        private final ReactorIdentityZones identityZoneManagement = new ReactorIdentityZones(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -143,7 +143,7 @@ public final class ReactorIdentityZonesTest {
 
     public static final class Get extends AbstractUaaApiTest<GetIdentityZoneRequest, GetIdentityZoneResponse> {
 
-        private final ReactorIdentityZones identityZoneManagement = new ReactorIdentityZones(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+        private final ReactorIdentityZones identityZoneManagement = new ReactorIdentityZones(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -191,7 +191,7 @@ public final class ReactorIdentityZonesTest {
 
     public static final class List extends AbstractUaaApiTest<ListIdentityZoneRequest, ListIdentityZoneResponse> {
 
-        private final ReactorIdentityZones identityZoneManagement = new ReactorIdentityZones(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+        private final ReactorIdentityZones identityZoneManagement = new ReactorIdentityZones(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -248,7 +248,7 @@ public final class ReactorIdentityZonesTest {
 
     public static final class Update extends AbstractUaaApiTest<UpdateIdentityZoneRequest, UpdateIdentityZoneResponse> {
 
-        private final ReactorIdentityZones identityZoneManagement = new ReactorIdentityZones(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+        private final ReactorIdentityZones identityZoneManagement = new ReactorIdentityZones(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {

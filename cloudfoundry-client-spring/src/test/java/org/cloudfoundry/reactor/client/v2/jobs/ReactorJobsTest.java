@@ -33,7 +33,7 @@ public final class ReactorJobsTest {
 
     public static final class Get extends AbstractClientApiTest<GetJobRequest, GetJobResponse> {
 
-        private final ReactorJobs jobs = new ReactorJobs(this.authorizationProvider, this.httpClient, this.objectMapper, this.root);
+        private final ReactorJobs jobs = new ReactorJobs(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
