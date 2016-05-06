@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v3.droplets;
+package org.cloudfoundry.reactor.client.v3.droplets;
 
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
@@ -23,34 +23,42 @@ import org.cloudfoundry.client.v3.droplets.GetDropletRequest;
 import org.cloudfoundry.client.v3.droplets.GetDropletResponse;
 import org.cloudfoundry.client.v3.droplets.ListDropletsRequest;
 import org.cloudfoundry.client.v3.droplets.ListDropletsResponse;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.cloudfoundry.util.StringMap;
 import reactor.core.publisher.Mono;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.client.v3.PaginatedResponse.Pagination;
 import static org.cloudfoundry.client.v3.droplets.ListDropletsResponse.Resource;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringDropletsTest {
+public final class ReactorDropletsTest {
 
-    public static final class Delete extends AbstractApiTest<DeleteDropletRequest, Void> {
+    public static final class Delete extends AbstractClientApiTest<DeleteDropletRequest, Void> {
 
-        private final SpringDroplets droplets = new SpringDroplets(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorDroplets droplets = new ReactorDroplets(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v3/droplets/test-droplet-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteDropletRequest getInvalidRequest() {
             return DeleteDropletRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v3/droplets/test-droplet-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -72,23 +80,27 @@ public final class SpringDropletsTest {
 
     }
 
-    public static final class Get extends AbstractApiTest<GetDropletRequest, GetDropletResponse> {
+    public static final class Get extends AbstractClientApiTest<GetDropletRequest, GetDropletResponse> {
 
-        private final SpringDroplets droplets = new SpringDroplets(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorDroplets droplets = new ReactorDroplets(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/droplets/test-droplet-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/droplets/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetDropletRequest getInvalidRequest() {
             return GetDropletRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v3/droplets/test-droplet-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/droplets/GET_{id}_response.json");
         }
 
         @Override
@@ -143,23 +155,28 @@ public final class SpringDropletsTest {
 
     }
 
-    public static final class List extends AbstractApiTest<ListDropletsRequest, ListDropletsResponse> {
+    public static final class List extends AbstractClientApiTest<ListDropletsRequest, ListDropletsResponse> {
 
-        private final SpringDroplets droplets = new SpringDroplets(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorDroplets droplets = new ReactorDroplets(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/droplets")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/droplets/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListDropletsRequest getInvalidRequest() {
             return ListDropletsRequest.builder()
                 .page(0)
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v3/droplets")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/droplets/GET_response.json");
         }
 
         @Override

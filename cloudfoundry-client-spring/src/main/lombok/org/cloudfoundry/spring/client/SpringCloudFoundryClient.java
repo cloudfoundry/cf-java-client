@@ -93,7 +93,7 @@ import org.cloudfoundry.spring.client.v2.spacequotadefinitions.SpringSpaceQuotaD
 import org.cloudfoundry.spring.client.v2.spaces.SpringSpaces;
 import org.cloudfoundry.spring.client.v2.userprovidedserviceinstances.SpringUserProvidedServiceInstances;
 import org.cloudfoundry.reactor.client.v3.applications.ReactorApplicationsV3;
-import org.cloudfoundry.spring.client.v3.droplets.SpringDroplets;
+import org.cloudfoundry.reactor.client.v3.droplets.ReactorDroplets;
 import org.cloudfoundry.spring.client.v3.packages.SpringPackages;
 import org.cloudfoundry.spring.util.CloudFoundryClientCompatibilityChecker;
 import org.cloudfoundry.spring.util.SchedulerGroupBuilder;
@@ -214,7 +214,6 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
     SpringCloudFoundryClient(String host, Integer port, Boolean skipSslValidation, RestOperations restOperations, URI root, Scheduler schedulerGroup, OAuth2TokenProvider tokenProvider) {
         this.applicationsV2 = new SpringApplicationsV2(restOperations, root, schedulerGroup);
         this.buildpacks = new SpringBuildpacks(restOperations, root, schedulerGroup);
-        this.droplets = new SpringDroplets(restOperations, root, schedulerGroup);
         this.featureFlags = new SpringFeatureFlags(restOperations, root, schedulerGroup);
         this.organizations = new SpringOrganizations(restOperations, root, schedulerGroup);
         this.organizationQuotaDefinitions = new SpringOrganizationQuotaDefinitions(restOperations, root, schedulerGroup);
@@ -256,6 +255,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         this.applicationsV3 = new ReactorApplicationsV3(authorizationProvider, httpClient, objectMapper, root2);
         this.applicationUsageEvents = new ReactorApplicationUsageEvents(authorizationProvider, httpClient, objectMapper, root2);
         this.domains = new ReactorDomains(authorizationProvider, httpClient, objectMapper, root2);
+        this.droplets = new ReactorDroplets(authorizationProvider, httpClient, objectMapper, root2);
         this.environmentVariableGroups = new ReactorEnvironmentVariableGroups(authorizationProvider, httpClient, objectMapper, root2);
         this.events = new ReactorEvents(authorizationProvider, httpClient, objectMapper, root2);
         this.info = new ReactorInfo(authorizationProvider, httpClient, objectMapper, root2);
