@@ -17,8 +17,6 @@
 package org.cloudfoundry.reactor.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.netty.buffer.ByteBufInputStream;
-import io.netty.buffer.Unpooled;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.springframework.web.client.HttpStatusCodeException;
 import reactor.core.publisher.Mono;
@@ -26,7 +24,6 @@ import reactor.core.util.Exceptions;
 import reactor.io.netty.http.HttpException;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map;
 
 public final class CloudFoundryExceptionBuilder {
@@ -65,12 +62,9 @@ public final class CloudFoundryExceptionBuilder {
      */
     @SuppressWarnings("unchecked")
     public static <T> Mono<T> build(HttpException cause) {
-        return cause.getChannel().receive()
-            .reduceWith(Unpooled::compositeBuffer, (prev, next) -> prev.addComponent(next.retain()))
-            .then(byteBufs -> {
-                byteBufs.setIndex(0, byteBufs.capacity());
-
-                try (InputStream in = new ByteBufInputStream(byteBufs)) {
+        return cause.getChannel().receive().aggregate().toInputStream()
+            .then(in -> {
+                try {
                     Map<String, ?> response = OBJECT_MAPPER.readValue(in, Map.class);
                     Integer code = (Integer) response.get("code");
                     String description = (String) response.get("description");
@@ -79,8 +73,6 @@ public final class CloudFoundryExceptionBuilder {
                     return Mono.error(new CloudFoundryException(code, description, errorCode, cause));
                 } catch (IOException e) {
                     throw Exceptions.propagate(e);
-                } finally {
-                    byteBufs.release();
                 }
             });
     }

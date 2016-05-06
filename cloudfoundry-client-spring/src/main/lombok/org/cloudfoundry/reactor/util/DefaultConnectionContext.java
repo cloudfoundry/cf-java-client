@@ -24,7 +24,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.config.ClientOptions;
 import reactor.io.netty.http.HttpClient;
-import reactor.io.netty.http.HttpInbound;
 
 import java.time.Duration;
 import java.util.Map;
@@ -54,8 +53,8 @@ public final class DefaultConnectionContext implements ConnectionContext {
         this.sslCertificateTruster = createSslCertificateTruster(trustCertificates);
         this.httpClient = createHttpClient(this.sslCertificateTruster);
         this.root = getRoot(host, port, this.sslCertificateTruster);
-        this.info = getInfo(this.httpClient, this.root);
         this.objectMapper = getObjectMapper(objectMapper);
+        this.info = getInfo(this.httpClient, this.objectMapper, this.root);
     }
 
     @Override
@@ -102,12 +101,12 @@ public final class DefaultConnectionContext implements ConnectionContext {
     }
 
     @SuppressWarnings("unchecked")
-    private static Mono<Map<String, String>> getInfo(HttpClient httpClient, Mono<String> root) {
+    private static Mono<Map<String, String>> getInfo(HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
         return root
             .map(uri -> UriComponentsBuilder.fromUriString(uri).pathSegment("v2", "info").build().toUriString())
             .then(httpClient::get)
-            .flatMap(HttpInbound::receive)
-            .as(JsonCodec.decode(Map.class))
+            .then(inbound -> inbound.receive().aggregate().toInputStream())
+            .map(JsonCodec.decode(objectMapper, Map.class))
             .map(m -> (Map<String, String>) m)
             .cache();
     }

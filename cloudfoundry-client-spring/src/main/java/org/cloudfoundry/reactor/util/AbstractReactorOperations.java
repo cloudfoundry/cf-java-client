@@ -26,7 +26,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple;
 import reactor.core.tuple.Tuple2;
-import reactor.io.netty.common.NettyInbound;
 import reactor.io.netty.http.HttpClient;
 import reactor.io.netty.http.HttpInbound;
 import reactor.io.netty.http.HttpOutbound;
@@ -66,18 +65,19 @@ public abstract class AbstractReactorOperations {
                     .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
                     .doOnSubscribe(s -> this.requestLogger.debug("DELETE {}", uri))
                     .then(o -> o.send(Mono.just(validRequest)
-                        .as(JsonCodec.encode(this.objectMapper, o)))))
+                        .where(req -> this.objectMapper.canSerialize(req.getClass()))
+                        .map(JsonCodec.encode(this.objectMapper, o)))))
                 .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))
                 .doOnSuccess(inbound -> printWarnings(inbound, this.responseLogger, uri))))
-            .flatMap(NettyInbound::receive)
-            .as(JsonCodec.decode(this.objectMapper, responseType));
+            .then(inbound -> inbound.receive().aggregate().toInputStream())
+            .map(JsonCodec.decode(this.objectMapper, responseType));
     }
 
     protected final <REQ extends Validatable, RSP> Mono<RSP> doGet(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
                                                                    Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
         return doGet(request, uriTransformer, requestTransformer)
-            .flatMap(NettyInbound::receive)
-            .as(JsonCodec.decode(this.objectMapper, responseType));
+            .then(inbound -> inbound.receive().aggregate().toInputStream())
+            .map(JsonCodec.decode(this.objectMapper, responseType));
     }
 
     protected final <REQ extends Validatable> Mono<HttpInbound> doGet(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
@@ -104,11 +104,12 @@ public abstract class AbstractReactorOperations {
                     .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
                     .doOnSubscribe(s -> this.requestLogger.debug("PATCH  {}", uri))
                     .then(o -> o.send(Mono.just(validRequest)
-                        .as(JsonCodec.encode(this.objectMapper, o)))))
+                        .where(req -> this.objectMapper.canSerialize(req.getClass()))
+                        .map(JsonCodec.encode(this.objectMapper, o)))))
                 .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))
                 .doOnSuccess(inbound -> printWarnings(inbound, this.responseLogger, uri))))
-            .flatMap(NettyInbound::receive)
-            .as(JsonCodec.decode(this.objectMapper, responseType));
+            .then(inbound -> inbound.receive().aggregate().toInputStream())
+            .map(JsonCodec.decode(this.objectMapper, responseType));
     }
 
     protected final <REQ extends Validatable, RSP> Mono<RSP> doPost(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
@@ -121,11 +122,12 @@ public abstract class AbstractReactorOperations {
                     .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
                     .doOnSubscribe(s -> this.requestLogger.debug("POST   {}", uri))
                     .then(o -> o.send(Mono.just(validRequest)
-                        .as(JsonCodec.encode(this.objectMapper, o)))))
+                        .where(req -> this.objectMapper.canSerialize(req.getClass()))
+                        .map(JsonCodec.encode(this.objectMapper, o)))))
                 .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))
                 .doOnSuccess(inbound -> printWarnings(inbound, this.responseLogger, uri))))
-            .flatMap(NettyInbound::receive)
-            .as(JsonCodec.decode(this.objectMapper, responseType));
+            .then(inbound -> inbound.receive().aggregate().toInputStream())
+            .map(JsonCodec.decode(this.objectMapper, responseType));
     }
 
     protected final <REQ extends Validatable, RSP> Mono<RSP> doPut(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
@@ -138,11 +140,12 @@ public abstract class AbstractReactorOperations {
                     .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
                     .doOnSubscribe(s -> this.requestLogger.debug("PUT    {}", uri))
                     .then(o -> o.send(Mono.just(validRequest)
-                        .as(JsonCodec.encode(this.objectMapper, o)))))
+                        .where(req -> this.objectMapper.canSerialize(req.getClass()))
+                        .map(JsonCodec.encode(this.objectMapper, o)))))
                 .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))
                 .doOnSuccess(inbound -> printWarnings(inbound, this.responseLogger, uri))))
-            .flatMap(NettyInbound::receive)
-            .as(JsonCodec.decode(this.objectMapper, responseType));
+            .then(inbound -> inbound.receive().aggregate().toInputStream())
+            .map(JsonCodec.decode(this.objectMapper, responseType));
     }
 
     protected final <REQ extends Validatable> Mono<HttpInbound> doWs(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
