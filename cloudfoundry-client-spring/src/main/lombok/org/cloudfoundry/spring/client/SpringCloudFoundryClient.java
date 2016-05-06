@@ -74,7 +74,7 @@ import org.cloudfoundry.reactor.util.ConnectionContextSupplier;
 import org.cloudfoundry.reactor.util.DefaultConnectionContext;
 import org.cloudfoundry.spring.client.v2.applications.SpringApplicationsV2;
 import org.cloudfoundry.spring.client.v2.buildpacks.SpringBuildpacks;
-import org.cloudfoundry.spring.client.v2.featureflags.SpringFeatureFlags;
+import org.cloudfoundry.reactor.client.v2.featureflags.ReactorFeatureFlags;
 import org.cloudfoundry.spring.client.v2.organizationquotadefinitions.SpringOrganizationQuotaDefinitions;
 import org.cloudfoundry.spring.client.v2.organizations.SpringOrganizations;
 import org.cloudfoundry.spring.client.v2.privatedomains.SpringPrivateDomains;
@@ -214,7 +214,6 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
     SpringCloudFoundryClient(String host, Integer port, Boolean skipSslValidation, RestOperations restOperations, URI root, Scheduler schedulerGroup, OAuth2TokenProvider tokenProvider) {
         this.applicationsV2 = new SpringApplicationsV2(restOperations, root, schedulerGroup);
         this.buildpacks = new SpringBuildpacks(restOperations, root, schedulerGroup);
-        this.featureFlags = new SpringFeatureFlags(restOperations, root, schedulerGroup);
         this.organizations = new SpringOrganizations(restOperations, root, schedulerGroup);
         this.organizationQuotaDefinitions = new SpringOrganizationQuotaDefinitions(restOperations, root, schedulerGroup);
         this.packages = new SpringPackages(restOperations, root, schedulerGroup);
@@ -257,6 +256,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         this.domains = new ReactorDomains(authorizationProvider, httpClient, objectMapper, root2);
         this.droplets = new ReactorDroplets(authorizationProvider, httpClient, objectMapper, root2);
         this.environmentVariableGroups = new ReactorEnvironmentVariableGroups(authorizationProvider, httpClient, objectMapper, root2);
+        this.featureFlags = new ReactorFeatureFlags(authorizationProvider, httpClient, objectMapper, root2);
         this.events = new ReactorEvents(authorizationProvider, httpClient, objectMapper, root2);
         this.info = new ReactorInfo(authorizationProvider, httpClient, objectMapper, root2);
         this.jobs = new ReactorJobs(authorizationProvider, httpClient, objectMapper, root2);

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.featureflags;
+package org.cloudfoundry.reactor.client.v2.featureflags;
 
 import org.cloudfoundry.client.v2.featureflags.FeatureFlagEntity;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagRequest;
@@ -23,32 +23,40 @@ import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsRequest;
 import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsResponse;
 import org.cloudfoundry.client.v2.featureflags.SetFeatureFlagRequest;
 import org.cloudfoundry.client.v2.featureflags.SetFeatureFlagResponse;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpStatus.OK;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 
-public final class SpringFeatureFlagsTest {
+public final class ReactorFeatureFlagsTest {
 
-    public static final class GetAppScaling extends AbstractApiTest<GetFeatureFlagRequest, GetFeatureFlagResponse> {
+    public static final class GetAppScaling extends AbstractClientApiTest<GetFeatureFlagRequest, GetFeatureFlagResponse> {
 
-        private final SpringFeatureFlags featureFlags = new SpringFeatureFlags(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/config/feature_flags/app_scaling")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/feature_flags/GET_app_scaling_flag_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetFeatureFlagRequest getInvalidRequest() {
             return GetFeatureFlagRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/config/feature_flags/app_scaling")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/feature_flags/GET_app_scaling_flag_response.json");
         }
 
         @Override
@@ -74,22 +82,27 @@ public final class SpringFeatureFlagsTest {
 
     }
 
-    public static final class GetUserRoles extends AbstractApiTest<GetFeatureFlagRequest, GetFeatureFlagResponse> {
+    public static final class GetUserRoles extends AbstractClientApiTest<GetFeatureFlagRequest, GetFeatureFlagResponse> {
 
-        private final SpringFeatureFlags featureFlags = new SpringFeatureFlags(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/config/feature_flags/set_roles_by_username")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/feature_flags/GET_set_user_roles_flag_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetFeatureFlagRequest getInvalidRequest() {
             return GetFeatureFlagRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/config/feature_flags/set_roles_by_username")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/feature_flags/GET_set_user_roles_flag_response.json");
         }
 
         @Override
@@ -115,21 +128,26 @@ public final class SpringFeatureFlagsTest {
 
     }
 
-    public static final class List extends AbstractApiTest<ListFeatureFlagsRequest, ListFeatureFlagsResponse> {
+    public static final class List extends AbstractClientApiTest<ListFeatureFlagsRequest, ListFeatureFlagsResponse> {
 
-        private SpringFeatureFlags featureFlags = new SpringFeatureFlags(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/config/feature_flags")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/feature_flags/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListFeatureFlagsRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/config/feature_flags")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/feature_flags/GET_response.json");
         }
 
         @Override
@@ -223,23 +241,28 @@ public final class SpringFeatureFlagsTest {
 
     }
 
-    public static final class Set extends AbstractApiTest<SetFeatureFlagRequest, SetFeatureFlagResponse> {
+    public static final class Set extends AbstractClientApiTest<SetFeatureFlagRequest, SetFeatureFlagResponse> {
 
-        private final SpringFeatureFlags featureFlags = new SpringFeatureFlags(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/config/feature_flags/user_org_creation")
+                    .payload("fixtures/client/v2/feature_flags/PUT_user_org_creation_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/feature_flags/PUT_user_org_creation_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected SetFeatureFlagRequest getInvalidRequest() {
             return SetFeatureFlagRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/config/feature_flags/user_org_creation")
-                .requestPayload("fixtures/client/v2/feature_flags/PUT_user_org_creation_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/feature_flags/PUT_user_org_creation_response.json");
         }
 
         @Override
