@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.routemappings;
+package org.cloudfoundry.reactor.client.v2.routemappings;
 
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
@@ -28,36 +28,44 @@ import org.cloudfoundry.client.v2.routemappings.ListRouteMappingsRequest;
 import org.cloudfoundry.client.v2.routemappings.ListRouteMappingsResponse;
 import org.cloudfoundry.client.v2.routemappings.RouteMappingEntity;
 import org.cloudfoundry.client.v2.routemappings.RouteMappingResource;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpStatus.ACCEPTED;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class SpringRouteMappingsTest {
+public final class ReactorRouteMappingsTest {
 
-    public static final class Create extends AbstractApiTest<CreateRouteMappingRequest, CreateRouteMappingResponse> {
+    public static final class Create extends AbstractClientApiTest<CreateRouteMappingRequest, CreateRouteMappingResponse> {
 
-        private final SpringRouteMappings routeMappings = new SpringRouteMappings(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorRouteMappings routeMappings = new ReactorRouteMappings(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v2/route_mappings")
+                    .payload("fixtures/client/v2/route_mappings/POST_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v2/route_mappings/POST_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected CreateRouteMappingRequest getInvalidRequest() {
             return CreateRouteMappingRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v2/route_mappings")
-                .requestPayload("fixtures/client/v2/route_mappings/POST_request.json")
-                .status(CREATED)
-                .responsePayload("fixtures/client/v2/route_mappings/POST_response.json");
         }
 
         @Override
@@ -93,20 +101,25 @@ public final class SpringRouteMappingsTest {
         }
     }
 
-    public static final class Delete extends AbstractApiTest<DeleteRouteMappingRequest, DeleteRouteMappingResponse> {
+    public static final class Delete extends AbstractClientApiTest<DeleteRouteMappingRequest, DeleteRouteMappingResponse> {
 
-        private final SpringRouteMappings routeMappings = new SpringRouteMappings(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorRouteMappings routeMappings = new ReactorRouteMappings(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/route_mappings/random-route-mapping-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteRouteMappingRequest getInvalidRequest() {
             return DeleteRouteMappingRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/route_mappings/random-route-mapping-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -127,22 +140,27 @@ public final class SpringRouteMappingsTest {
         }
     }
 
-    public static final class DeleteAsync extends AbstractApiTest<DeleteRouteMappingRequest, DeleteRouteMappingResponse> {
+    public static final class DeleteAsync extends AbstractClientApiTest<DeleteRouteMappingRequest, DeleteRouteMappingResponse> {
 
-        private final SpringRouteMappings routeMappings = new SpringRouteMappings(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorRouteMappings routeMappings = new ReactorRouteMappings(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/route_mappings/random-route-mapping-id?async=true")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(ACCEPTED)
+                    .payload("fixtures/client/v2/route_mappings/DELETE_{id}_async_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteRouteMappingRequest getInvalidRequest() {
             return DeleteRouteMappingRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/route_mappings/random-route-mapping-id?async=true")
-                .status(ACCEPTED)
-                .responsePayload("fixtures/client/v2/route_mappings/DELETE_{id}_async_response.json");
         }
 
         @Override
@@ -175,21 +193,26 @@ public final class SpringRouteMappingsTest {
 
     }
 
-    public static final class Get extends AbstractApiTest<GetRouteMappingRequest, GetRouteMappingResponse> {
+    public static final class Get extends AbstractClientApiTest<GetRouteMappingRequest, GetRouteMappingResponse> {
 
-        private final SpringRouteMappings routeMappings = new SpringRouteMappings(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorRouteMappings routeMappings = new ReactorRouteMappings(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/route_mappings/route-mapping-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/route_mappings/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetRouteMappingRequest getInvalidRequest() {
             return GetRouteMappingRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/route_mappings/route-mapping-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/route_mappings/GET_{id}_response.json");
         }
 
         @Override
@@ -223,21 +246,26 @@ public final class SpringRouteMappingsTest {
         }
     }
 
-    public static final class List extends AbstractApiTest<ListRouteMappingsRequest, ListRouteMappingsResponse> {
+    public static final class List extends AbstractClientApiTest<ListRouteMappingsRequest, ListRouteMappingsResponse> {
 
-        private final SpringRouteMappings routeMappings = new SpringRouteMappings(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorRouteMappings routeMappings = new ReactorRouteMappings(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/route_mappings?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/route_mappings/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListRouteMappingsRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/route_mappings?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/route_mappings/GET_response.json");
         }
 
         @Override
