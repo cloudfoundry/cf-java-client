@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.servicebrokers;
+package org.cloudfoundry.reactor.client.v2.servicebrokers;
 
-import lombok.ToString;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerRequest;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerResponse;
 import org.cloudfoundry.client.v2.servicebrokers.DeleteServiceBrokerRequest;
@@ -27,59 +27,53 @@ import org.cloudfoundry.client.v2.servicebrokers.ListServiceBrokersResponse;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokers;
 import org.cloudfoundry.client.v2.servicebrokers.UpdateServiceBrokerRequest;
 import org.cloudfoundry.client.v2.servicebrokers.UpdateServiceBrokerResponse;
-import org.cloudfoundry.reactor.client.v2.FilterBuilder;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.reactor.client.QueryBuilder;
-import org.springframework.web.client.RestOperations;
+import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
+import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
+import reactor.io.netty.http.HttpClient;
 
-import java.net.URI;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
- * The Spring-based implementation of {@link ServiceBrokers}
+ * The Reactor-based implementation of {@link ServiceBrokers}
  */
-@ToString(callSuper = true)
-public final class SpringServiceBrokers extends AbstractSpringOperations implements ServiceBrokers {
+public final class ReactorServiceBrokers extends AbstractClientV2Operations implements ServiceBrokers {
 
     /**
      * Creates an instance
      *
-     * @param restOperations the {@link RestOperations} to use to communicate with the server
-     * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
-     * @param schedulerGroup The group to use when making requests
+     * @param authorizationProvider the {@link AuthorizationProvider} to use when communicating with the server
+     * @param httpClient            the {@link HttpClient} to use when communicating with the server
+     * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
+     * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
      */
-    public SpringServiceBrokers(RestOperations restOperations, URI root, Scheduler schedulerGroup) {
-        super(restOperations, root, schedulerGroup);
+    public ReactorServiceBrokers(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
+        super(authorizationProvider, httpClient, objectMapper, root);
     }
 
     @Override
     public Mono<CreateServiceBrokerResponse> create(CreateServiceBrokerRequest request) {
-        return post(request, CreateServiceBrokerResponse.class, builder -> builder.pathSegment("v2", "service_brokers"));
+        return post(request, CreateServiceBrokerResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_brokers")));
     }
 
     @Override
     public Mono<Void> delete(DeleteServiceBrokerRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "service_brokers", request.getServiceBrokerId()));
+        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_brokers", validRequest.getServiceBrokerId())));
     }
 
     @Override
     public Mono<GetServiceBrokerResponse> get(GetServiceBrokerRequest request) {
-        return get(request, GetServiceBrokerResponse.class, builder -> builder.pathSegment("v2", "service_brokers", request.getServiceBrokerId()));
+        return get(request, GetServiceBrokerResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_brokers", validRequest.getServiceBrokerId())));
     }
 
     @Override
     public Mono<ListServiceBrokersResponse> list(ListServiceBrokersRequest request) {
-        return get(request, ListServiceBrokersResponse.class, builder -> {
-            builder.pathSegment("v2", "service_brokers");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListServiceBrokersResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_brokers")));
     }
 
     @Override
     public Mono<UpdateServiceBrokerResponse> update(UpdateServiceBrokerRequest request) {
-        return put(request, UpdateServiceBrokerResponse.class, builder -> builder.pathSegment("v2", "service_brokers", request.getServiceBrokerId()));
+        return put(request, UpdateServiceBrokerResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_brokers", validRequest.getServiceBrokerId())));
     }
 
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.servicebrokers;
+package org.cloudfoundry.reactor.client.v2.servicebrokers;
 
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerRequest;
@@ -28,37 +28,45 @@ import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokerEntity;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokerResource;
 import org.cloudfoundry.client.v2.servicebrokers.UpdateServiceBrokerRequest;
 import org.cloudfoundry.client.v2.servicebrokers.UpdateServiceBrokerResponse;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class SpringServiceBrokersTest {
+public final class ReactorServiceBrokersTest {
 
-    public static final class Create extends AbstractApiTest<CreateServiceBrokerRequest, CreateServiceBrokerResponse> {
+    public static final class Create extends AbstractClientApiTest<CreateServiceBrokerRequest, CreateServiceBrokerResponse> {
 
-        private final SpringServiceBrokers serviceBrokers = new SpringServiceBrokers(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceBrokers serviceBrokers = new ReactorServiceBrokers(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v2/service_brokers")
+                    .payload("fixtures/client/v2/service_brokers/POST_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v2/service_brokers/POST_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected CreateServiceBrokerRequest getInvalidRequest() {
             return CreateServiceBrokerRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v2/service_brokers")
-                .requestPayload("fixtures/client/v2/service_brokers/POST_request.json")
-                .status(CREATED)
-                .responsePayload("fixtures/client/v2/service_brokers/POST_response.json");
         }
 
         @Override
@@ -94,21 +102,26 @@ public final class SpringServiceBrokersTest {
 
     }
 
-    public static final class Delete extends AbstractApiTest<DeleteServiceBrokerRequest, Void> {
+    public static final class Delete extends AbstractClientApiTest<DeleteServiceBrokerRequest, Void> {
 
-        private final SpringServiceBrokers serviceBrokers = new SpringServiceBrokers(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceBrokers serviceBrokers = new ReactorServiceBrokers(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/service_brokers/test-service-broker-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteServiceBrokerRequest getInvalidRequest() {
             return DeleteServiceBrokerRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/service_brokers/test-service-broker-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -129,21 +142,26 @@ public final class SpringServiceBrokersTest {
         }
     }
 
-    public static final class Get extends AbstractApiTest<GetServiceBrokerRequest, GetServiceBrokerResponse> {
+    public static final class Get extends AbstractClientApiTest<GetServiceBrokerRequest, GetServiceBrokerResponse> {
 
-        private final SpringServiceBrokers serviceBrokers = new SpringServiceBrokers(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceBrokers serviceBrokers = new ReactorServiceBrokers(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/service_brokers/test-service-broker-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/service_brokers/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetServiceBrokerRequest getInvalidRequest() {
             return GetServiceBrokerRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/service_brokers/test-service-broker-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/service_brokers/GET_{id}_response.json");
         }
 
         @Override
@@ -177,21 +195,26 @@ public final class SpringServiceBrokersTest {
         }
     }
 
-    public static final class List extends AbstractApiTest<ListServiceBrokersRequest, ListServiceBrokersResponse> {
+    public static final class List extends AbstractClientApiTest<ListServiceBrokersRequest, ListServiceBrokersResponse> {
 
-        private final SpringServiceBrokers serviceBrokers = new SpringServiceBrokers(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceBrokers serviceBrokers = new ReactorServiceBrokers(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/service_brokers?q=name%20IN%20test-name&page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/service_brokers/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListServiceBrokersRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/service_brokers?q=name%20IN%20test-name&page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/service_brokers/GET_response.json");
         }
 
         @Override
@@ -254,22 +277,27 @@ public final class SpringServiceBrokersTest {
         }
     }
 
-    public static final class Update extends AbstractApiTest<UpdateServiceBrokerRequest, UpdateServiceBrokerResponse> {
+    public static final class Update extends AbstractClientApiTest<UpdateServiceBrokerRequest, UpdateServiceBrokerResponse> {
 
-        private final SpringServiceBrokers serviceBrokers = new SpringServiceBrokers(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceBrokers serviceBrokers = new ReactorServiceBrokers(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/service_brokers/test-service-broker-id")
+                    .payload("fixtures/client/v2/service_brokers/PUT_{id}_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/service_brokers/PUT_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected UpdateServiceBrokerRequest getInvalidRequest() {
             return UpdateServiceBrokerRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/service_brokers/test-service-broker-id")
-                .requestPayload("fixtures/client/v2/service_brokers/PUT_{id}_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/service_brokers/PUT_{id}_response.json");
         }
 
         @Override
