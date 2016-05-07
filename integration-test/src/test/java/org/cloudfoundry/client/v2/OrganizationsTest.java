@@ -1626,12 +1626,14 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 this.userId
             )
             .as(thenKeep(function((organizationId, userId) -> requestAssociateAuditor(this.cloudFoundryClient, organizationId, userId))))
-            .then(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
+            .as(thenKeep(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
                 .removeAuditor(RemoveOrganizationAuditorRequest.builder()
                     .auditorId(userId)
                     .organizationId(organizationId)
-                    .build())))
-            .subscribe(testSubscriber());
+                    .build()))))
+            .flatMap(function((organizationId, userId) -> requestListOrganizationAuditors(this.cloudFoundryClient, organizationId)))
+            .subscribe(testSubscriber()
+                .assertCount(0));
     }
 
     @Test
@@ -1644,12 +1646,14 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 this.userId
             )
             .as(thenKeep(function((organizationId, userId) -> requestAssociateAuditor(this.cloudFoundryClient, organizationId, userId))))
-            .then(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
+            .as(thenKeep(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
                 .removeAuditorByUsername(RemoveOrganizationAuditorByUsernameRequest.builder()
                     .username(this.userName)
                     .organizationId(organizationId)
-                    .build())))
-            .subscribe(testSubscriber());
+                    .build()))))
+            .flatMap(function((organizationId, userId) -> requestListOrganizationAuditors(this.cloudFoundryClient, organizationId)))
+            .subscribe(testSubscriber()
+                .assertCount(0));
     }
 
     @Test
@@ -1662,12 +1666,14 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 this.userId
             )
             .as(thenKeep(function((organizationId, userId) -> requestAssociateBillingManager(this.cloudFoundryClient, organizationId, userId))))
-            .then(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
+            .as(thenKeep(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
                 .removeBillingManager(RemoveOrganizationBillingManagerRequest.builder()
                     .billingManagerId(userId)
                     .organizationId(organizationId)
-                    .build())))
-            .subscribe(testSubscriber());
+                    .build()))))
+            .flatMap(function((organizationId, userId) -> requestListOrganizationBillingManagers(this.cloudFoundryClient, organizationId)))
+            .subscribe(testSubscriber()
+                .assertCount(0));
     }
 
     @Test
@@ -1680,12 +1686,14 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 this.userId
             )
             .as(thenKeep(function((organizationId, userId) -> requestAssociateBillingManager(this.cloudFoundryClient, organizationId, userId))))
-            .then(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
+            .as(thenKeep(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
                 .removeBillingManagerByUsername(RemoveOrganizationBillingManagerByUsernameRequest.builder()
                     .username(this.userName)
                     .organizationId(organizationId)
-                    .build())))
-            .subscribe(testSubscriber());
+                    .build()))))
+            .flatMap(function((organizationId, userId) -> requestListOrganizationBillingManagers(this.cloudFoundryClient, organizationId)))
+            .subscribe(testSubscriber()
+                .assertCount(0));
     }
 
     @Test
@@ -1698,12 +1706,14 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 this.userId
             )
             .as(thenKeep(function((organizationId, userId) -> requestAssociateManager(this.cloudFoundryClient, organizationId, userId))))
-            .then(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
+            .as(thenKeep(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
                 .removeManager(RemoveOrganizationManagerRequest.builder()
                     .managerId(userId)
                     .organizationId(organizationId)
-                    .build())))
-            .subscribe(testSubscriber());
+                    .build()))))
+            .flatMap(function((organizationId, userId) -> requestListOrganizationManagers(this.cloudFoundryClient, organizationId)))
+            .subscribe(testSubscriber()
+                .assertCount(0));
     }
 
     @Test
@@ -1716,12 +1726,14 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 this.userId
             )
             .as(thenKeep(function((organizationId, userId) -> requestAssociateManager(this.cloudFoundryClient, organizationId, userId))))
-            .then(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
+            .as(thenKeep(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
                 .removeManagerByUsername(RemoveOrganizationManagerByUsernameRequest.builder()
                     .username(this.userName)
                     .organizationId(organizationId)
-                    .build())))
-            .subscribe(testSubscriber());
+                    .build()))))
+            .flatMap(function((organizationId, userId) -> requestListOrganizationManagers(this.cloudFoundryClient, organizationId)))
+            .subscribe(testSubscriber()
+                .assertCount(0));
     }
 
     @Test
@@ -1741,12 +1753,14 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     createPrivateDomainId(this.cloudFoundryClient, defaultOrganizationId, domainName)
                 )))
             .as(thenKeep(function((organizationId, privateDomainId) -> requestAssociatePrivateDomain(this.cloudFoundryClient, organizationId, privateDomainId))))
-            .then(function((organizationId, privateDomainId) -> this.cloudFoundryClient.organizations()
+            .as(thenKeep(function((organizationId, privateDomainId) -> this.cloudFoundryClient.organizations()
                 .removePrivateDomain(RemoveOrganizationPrivateDomainRequest.builder()
                     .privateDomainId(privateDomainId)
                     .organizationId(organizationId)
-                    .build())))
-            .subscribe(this.testSubscriber());
+                    .build()))))
+            .flatMap(function((organizationId, privateDomainId) -> requestListOrganizationPrivateDomains(this.cloudFoundryClient, organizationId)))
+            .subscribe(this.testSubscriber()
+                .assertCount(0));
     }
 
     @Test
@@ -1759,12 +1773,14 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 this.userId
             )
             .as(thenKeep(function((organizationId, userId) -> requestAssociateUser(this.cloudFoundryClient, organizationId, userId))))
-            .then(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
+            .as(thenKeep(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
                 .removeUser(RemoveOrganizationUserRequest.builder()
                     .userId(userId)
                     .organizationId(organizationId)
-                    .build())))
-            .subscribe(testSubscriber());
+                    .build()))))
+            .flatMap(function((organizationId, userId) -> requestListOrganizationUsers(this.cloudFoundryClient, organizationId)))
+            .subscribe(testSubscriber()
+                .assertCount(0));
     }
 
     @Test
@@ -1777,12 +1793,14 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 this.userId
             )
             .as(thenKeep(function((organizationId, userId) -> requestAssociateUser(this.cloudFoundryClient, organizationId, userId))))
-            .then(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
+            .as(thenKeep(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
                 .removeUserByUsername(RemoveOrganizationUserByUsernameRequest.builder()
                     .username(this.userName)
                     .organizationId(organizationId)
-                    .build())))
-            .subscribe(testSubscriber());
+                    .build()))))
+            .flatMap(function((organizationId, userId) -> requestListOrganizationUsers(this.cloudFoundryClient, organizationId)))
+            .subscribe(testSubscriber()
+                .assertCount(0));
     }
 
     @Test
@@ -1805,13 +1823,14 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName2 = getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> this.cloudFoundryClient.organizations()
+            .as(thenKeep(organizationId -> this.cloudFoundryClient.organizations()
                 .update(UpdateOrganizationRequest.builder()
                     .organizationId(organizationId)
                     .name(organizationName2)
-                    .build())
-                .map(ResourceUtils::getEntity)
-                .map(OrganizationEntity::getName))
+                    .build())))
+            .then(organizationId -> requestGetOrganization(this.cloudFoundryClient, organizationId))
+            .map(ResourceUtils::getEntity)
+            .map(OrganizationEntity::getName)
             .subscribe(this.testSubscriber()
                 .assertEquals(organizationName2));
     }
