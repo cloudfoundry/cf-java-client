@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.routes;
+package org.cloudfoundry.reactor.client.v2.routes;
 
-import lombok.ToString;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationResponse;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
@@ -34,97 +34,79 @@ import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.routes.UpdateRouteRequest;
 import org.cloudfoundry.client.v2.routes.UpdateRouteResponse;
-import org.cloudfoundry.reactor.client.v2.FilterBuilder;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.reactor.client.QueryBuilder;
+import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
+import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.util.ExceptionUtils;
-import org.springframework.web.client.RestOperations;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
+import reactor.io.netty.http.HttpClient;
 
-import java.net.URI;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
- * The Spring-based implementation of {@link Routes}
+ * The Reactor-based implementation of {@link Routes}
  */
-@ToString(callSuper = true)
-public final class SpringRoutes extends AbstractSpringOperations implements Routes {
+public final class ReactorRoutes extends AbstractClientV2Operations implements Routes {
 
     private static final int CF_NOT_FOUND = 10000;
 
     /**
      * Creates an instance
      *
-     * @param restOperations the {@link RestOperations} to use to communicate with the server
-     * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
-     * @param schedulerGroup The group to use when making requests
+     * @param authorizationProvider the {@link AuthorizationProvider} to use when communicating with the server
+     * @param httpClient            the {@link HttpClient} to use when communicating with the server
+     * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
+     * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
      */
-    public SpringRoutes(RestOperations restOperations, URI root, Scheduler schedulerGroup) {
-        super(restOperations, root, schedulerGroup);
+    public ReactorRoutes(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
+        super(authorizationProvider, httpClient, objectMapper, root);
     }
 
     @Override
     public Mono<AssociateRouteApplicationResponse> associateApplication(AssociateRouteApplicationRequest request) {
-        return put(request, AssociateRouteApplicationResponse.class, builder -> builder.pathSegment("v2", "routes", request.getRouteId(), "apps", request.getApplicationId()));
+        return put(request, AssociateRouteApplicationResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "routes", validRequest.getRouteId(), "apps", validRequest.getApplicationId())));
     }
 
     @Override
     public Mono<CreateRouteResponse> create(CreateRouteRequest request) {
-        return post(request, CreateRouteResponse.class, builder -> {
-            builder.pathSegment("v2", "routes");
-            QueryBuilder.augment(builder, request);
-        });
+        return post(request, CreateRouteResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "routes")));
     }
 
     @Override
     public Mono<DeleteRouteResponse> delete(DeleteRouteRequest request) {
-        return delete(request, DeleteRouteResponse.class, builder -> {
-            builder.pathSegment("v2", "routes", request.getRouteId());
-            QueryBuilder.augment(builder, request);
-        });
+        return delete(request, DeleteRouteResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "routes", validRequest.getRouteId())));
     }
 
     @Override
     public Mono<Boolean> exists(RouteExistsRequest request) {
-        return get(request, Boolean.class, builder -> {
-            builder.pathSegment("v2", "routes", "reserved", "domain", request.getDomainId(), "host", request.getHost());
-            QueryBuilder.augment(builder, request);
-        })
+        return get(request, Boolean.class, function((builder, validRequest) -> builder.pathSegment("v2", "routes", "reserved", "domain", validRequest.getDomainId(), "host", validRequest.getHost())))
             .defaultIfEmpty(true)
             .otherwise(ExceptionUtils.replace(CF_NOT_FOUND, () -> Mono.just(false)));
     }
 
     @Override
     public Mono<GetRouteResponse> get(GetRouteRequest request) {
-        return get(request, GetRouteResponse.class, builder -> builder.pathSegment("v2", "routes", request.getRouteId()));
+        return get(request, GetRouteResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "routes", validRequest.getRouteId())));
     }
 
     @Override
     public Mono<ListRoutesResponse> list(ListRoutesRequest request) {
-        return get(request, ListRoutesResponse.class, builder -> {
-            builder.pathSegment("v2", "routes");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListRoutesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "routes")));
     }
 
     @Override
     public Mono<ListRouteApplicationsResponse> listApplications(ListRouteApplicationsRequest request) {
-        return get(request, ListRouteApplicationsResponse.class, builder -> {
-            builder.pathSegment("v2", "routes", request.getRouteId(), "apps");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListRouteApplicationsResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "routes", validRequest.getRouteId(), "apps")));
     }
 
     @Override
     public Mono<Void> removeApplication(RemoveRouteApplicationRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "routes", request.getRouteId(), "apps", request.getApplicationId()));
+        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v2", "routes", validRequest.getRouteId(), "apps", validRequest.getApplicationId())));
     }
 
     @Override
     public Mono<UpdateRouteResponse> update(UpdateRouteRequest request) {
-        return put(request, UpdateRouteResponse.class, builder -> builder.pathSegment("v2", "routes", request.getRouteId()));
+        return put(request, UpdateRouteResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "routes", validRequest.getRouteId())));
     }
 
 }

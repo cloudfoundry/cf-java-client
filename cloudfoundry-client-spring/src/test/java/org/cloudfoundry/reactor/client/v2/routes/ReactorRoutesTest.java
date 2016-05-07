@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.routes;
+package org.cloudfoundry.reactor.client.v2.routes;
 
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
@@ -38,36 +38,44 @@ import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.routes.UpdateRouteRequest;
 import org.cloudfoundry.client.v2.routes.UpdateRouteResponse;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpStatus.ACCEPTED;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class SpringRoutesTest {
+public final class ReactorRoutesTest {
 
-    public static final class AssociateApplication extends AbstractApiTest<AssociateRouteApplicationRequest, AssociateRouteApplicationResponse> {
+    public static final class AssociateApplication extends AbstractClientApiTest<AssociateRouteApplicationRequest, AssociateRouteApplicationResponse> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorRoutes routes = new ReactorRoutes(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/routes/test-route-id/apps/test-app-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/routes/PUT_{id}_apps_{app-id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected AssociateRouteApplicationRequest getInvalidRequest() {
             return AssociateRouteApplicationRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/routes/test-route-id/apps/test-app-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/routes/PUT_{id}_apps_{app-id}_response.json");
         }
 
         @Override
@@ -107,23 +115,28 @@ public final class SpringRoutesTest {
 
     }
 
-    public static final class Create extends AbstractApiTest<CreateRouteRequest, CreateRouteResponse> {
+    public static final class Create extends AbstractClientApiTest<CreateRouteRequest, CreateRouteResponse> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorRoutes routes = new ReactorRoutes(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v2/routes")
+                    .payload("fixtures/client/v2/routes/POST_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/routes/POST_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected CreateRouteRequest getInvalidRequest() {
             return CreateRouteRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v2/routes")
-                .requestPayload("fixtures/client/v2/routes/POST_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/routes/POST_response.json");
         }
 
         @Override
@@ -164,21 +177,26 @@ public final class SpringRoutesTest {
 
     }
 
-    public static final class Delete extends AbstractApiTest<DeleteRouteRequest, DeleteRouteResponse> {
+    public static final class Delete extends AbstractClientApiTest<DeleteRouteRequest, DeleteRouteResponse> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorRoutes routes = new ReactorRoutes(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/routes/test-route-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteRouteRequest getInvalidRequest() {
             return DeleteRouteRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/routes/test-route-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -200,22 +218,27 @@ public final class SpringRoutesTest {
 
     }
 
-    public static final class DeleteAsync extends AbstractApiTest<DeleteRouteRequest, DeleteRouteResponse> {
+    public static final class DeleteAsync extends AbstractClientApiTest<DeleteRouteRequest, DeleteRouteResponse> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorRoutes routes = new ReactorRoutes(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/routes/test-route-id?async=true")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(ACCEPTED)
+                    .payload("fixtures/client/v2/routes/DELETE_{id}_async_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteRouteRequest getInvalidRequest() {
             return DeleteRouteRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/routes/test-route-id?async=true")
-                .status(ACCEPTED)
-                .responsePayload("fixtures/client/v2/routes/DELETE_{id}_async_response.json");
         }
 
         @Override
@@ -248,21 +271,26 @@ public final class SpringRoutesTest {
 
     }
 
-    public static final class Exists extends AbstractApiTest<RouteExistsRequest, Boolean> {
+    public static final class Exists extends AbstractClientApiTest<RouteExistsRequest, Boolean> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorRoutes routes = new ReactorRoutes(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/routes/reserved/domain/test-domain-id/host/test-host?path=test-path")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected RouteExistsRequest getInvalidRequest() {
             return RouteExistsRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/routes/reserved/domain/test-domain-id/host/test-host?path=test-path")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -285,22 +313,27 @@ public final class SpringRoutesTest {
         }
     }
 
-    public static final class Get extends AbstractApiTest<GetRouteRequest, GetRouteResponse> {
+    public static final class Get extends AbstractClientApiTest<GetRouteRequest, GetRouteResponse> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorRoutes routes = new ReactorRoutes(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/routes/test-route-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/routes/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetRouteRequest getInvalidRequest() {
             return GetRouteRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/routes/test-route-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/routes/GET_{id}_response.json");
         }
 
         @Override
@@ -341,21 +374,26 @@ public final class SpringRoutesTest {
 
     }
 
-    public static final class List extends AbstractApiTest<ListRoutesRequest, ListRoutesResponse> {
+    public static final class List extends AbstractClientApiTest<ListRoutesRequest, ListRoutesResponse> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorRoutes routes = new ReactorRoutes(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/routes?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/routes/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListRoutesRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/routes?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/routes/GET_response.json");
         }
 
         @Override
@@ -400,22 +438,27 @@ public final class SpringRoutesTest {
 
     }
 
-    public static final class ListApplications extends AbstractApiTest<ListRouteApplicationsRequest, ListRouteApplicationsResponse> {
+    public static final class ListApplications extends AbstractClientApiTest<ListRouteApplicationsRequest, ListRouteApplicationsResponse> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorRoutes routes = new ReactorRoutes(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/routes/test-route-id/apps?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/routes/GET_{id}_apps_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListRouteApplicationsRequest getInvalidRequest() {
             return ListRouteApplicationsRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/routes/test-route-id/apps?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/routes/GET_{id}_apps_response.json");
         }
 
         @Override
@@ -474,21 +517,26 @@ public final class SpringRoutesTest {
 
     }
 
-    public static final class RemoveApplication extends AbstractApiTest<RemoveRouteApplicationRequest, Void> {
+    public static final class RemoveApplication extends AbstractClientApiTest<RemoveRouteApplicationRequest, Void> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorRoutes routes = new ReactorRoutes(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/routes/test-route-id/apps/test-app-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected RemoveRouteApplicationRequest getInvalidRequest() {
             return RemoveRouteApplicationRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/routes/test-route-id/apps/test-app-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -511,23 +559,28 @@ public final class SpringRoutesTest {
 
     }
 
-    public static final class Update extends AbstractApiTest<UpdateRouteRequest, UpdateRouteResponse> {
+    public static final class Update extends AbstractClientApiTest<UpdateRouteRequest, UpdateRouteResponse> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorRoutes routes = new ReactorRoutes(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/routes/test-route-id")
+                    .payload("fixtures/client/v2/routes/PUT_{id}_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v2/routes/PUT_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected UpdateRouteRequest getInvalidRequest() {
             return UpdateRouteRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/routes/test-route-id")
-                .requestPayload("fixtures/client/v2/routes/PUT_{id}_request.json")
-                .status(CREATED)
-                .responsePayload("fixtures/client/v2/routes/PUT_{id}_response.json");
         }
 
         @Override
