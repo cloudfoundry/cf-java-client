@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.serviceinstances;
+package org.cloudfoundry.reactor.client.v2.serviceinstances;
 
-import lombok.ToString;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v2.serviceinstances.BindServiceInstanceToRouteRequest;
 import org.cloudfoundry.client.v2.serviceinstances.BindServiceInstanceToRouteResponse;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceRequest;
@@ -36,95 +36,77 @@ import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse;
-import org.cloudfoundry.reactor.client.v2.FilterBuilder;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.reactor.client.QueryBuilder;
-import org.springframework.web.client.RestOperations;
+import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
+import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
+import reactor.io.netty.http.HttpClient;
 
-import java.net.URI;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
- * The Spring-based implementation of {@link ServiceInstances}
+ * The Reactor-based implementation of {@link ServiceInstances}
  */
-@ToString(callSuper = true)
-public final class SpringServiceInstances extends AbstractSpringOperations implements ServiceInstances {
+public final class ReactorServiceInstances extends AbstractClientV2Operations implements ServiceInstances {
 
     /**
      * Creates an instance
      *
-     * @param restOperations the {@link RestOperations} to use to communicate with the server
-     * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
-     * @param schedulerGroup The group to use when making requests
+     * @param authorizationProvider the {@link AuthorizationProvider} to use when communicating with the server
+     * @param httpClient            the {@link HttpClient} to use when communicating with the server
+     * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
+     * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
      */
-    public SpringServiceInstances(RestOperations restOperations, URI root, Scheduler schedulerGroup) {
-        super(restOperations, root, schedulerGroup);
+    public ReactorServiceInstances(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
+        super(authorizationProvider, httpClient, objectMapper, root);
     }
 
     @Override
     public Mono<BindServiceInstanceToRouteResponse> bindToRoute(BindServiceInstanceToRouteRequest request) {
-        return put(request, BindServiceInstanceToRouteResponse.class, builder -> builder.pathSegment("v2", "service_instances", request.getServiceInstanceId(), "routes", request.getRouteId()));
+        return put(request, BindServiceInstanceToRouteResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "service_instances", validRequest.getServiceInstanceId(), "routes", validRequest.getRouteId())));
     }
 
     @Override
     public Mono<CreateServiceInstanceResponse> create(CreateServiceInstanceRequest request) {
-        return post(request, CreateServiceInstanceResponse.class, builder -> {
-            builder.pathSegment("v2", "service_instances");
-            QueryBuilder.augment(builder, request);
-        });
+        return post(request, CreateServiceInstanceResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_instances")));
     }
 
     @Override
     public Mono<DeleteServiceInstanceResponse> delete(DeleteServiceInstanceRequest request) {
-        return delete(request, DeleteServiceInstanceResponse.class, builder -> {
-            builder.pathSegment("v2", "service_instances", request.getServiceInstanceId());
-            QueryBuilder.augment(builder, request);
-        });
+        return delete(request, DeleteServiceInstanceResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_instances", validRequest.getServiceInstanceId())));
     }
 
     @Override
     public Mono<GetServiceInstanceResponse> get(GetServiceInstanceRequest request) {
-        return get(request, GetServiceInstanceResponse.class, builder -> builder.pathSegment("v2", "service_instances", request.getServiceInstanceId()));
+        return get(request, GetServiceInstanceResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_instances", validRequest.getServiceInstanceId())));
     }
 
     @Override
     public Mono<GetServiceInstancePermissionsResponse> getPermissions(GetServiceInstancePermissionsRequest request) {
-        return get(request, GetServiceInstancePermissionsResponse.class, builder -> builder.pathSegment("v2", "service_instances", request.getServiceInstanceId(), "permissions"));
+        return get(request, GetServiceInstancePermissionsResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "service_instances", validRequest.getServiceInstanceId(), "permissions")));
     }
 
     @Override
     public Mono<ListServiceInstancesResponse> list(ListServiceInstancesRequest request) {
-        return get(request, ListServiceInstancesResponse.class, builder -> {
-            builder.pathSegment("v2", "service_instances");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListServiceInstancesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_instances")));
     }
 
     @Override
     public Mono<ListServiceInstanceServiceBindingsResponse> listServiceBindings(ListServiceInstanceServiceBindingsRequest request) {
-        return get(request, ListServiceInstanceServiceBindingsResponse.class, builder -> {
-            builder.pathSegment("v2", "service_instances", request.getServiceInstanceId(), "service_bindings");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListServiceInstanceServiceBindingsResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "service_instances", validRequest.getServiceInstanceId(), "service_bindings")));
     }
 
     @Override
     public Mono<ListServiceInstanceServiceKeysResponse> listServiceKeys(ListServiceInstanceServiceKeysRequest request) {
-        return get(request, ListServiceInstanceServiceKeysResponse.class, builder -> {
-            builder.pathSegment("v2", "service_instances", request.getServiceInstanceId(), "service_keys");
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListServiceInstanceServiceKeysResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "service_instances", validRequest.getServiceInstanceId(), "service_keys")));
     }
 
     @Override
     public Mono<UpdateServiceInstanceResponse> update(UpdateServiceInstanceRequest request) {
-        return put(request, UpdateServiceInstanceResponse.class, builder -> {
-            builder.pathSegment("v2", "service_instances", request.getServiceInstanceId());
-            QueryBuilder.augment(builder, request);
-        });
+        return put(request, UpdateServiceInstanceResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_instances", validRequest.getServiceInstanceId())));
     }
 
 }

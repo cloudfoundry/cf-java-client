@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.serviceinstances;
+package org.cloudfoundry.reactor.client.v2.serviceinstances;
 
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
@@ -43,38 +43,46 @@ import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse;
 import org.cloudfoundry.client.v2.servicekeys.ServiceKeyEntity;
 import org.cloudfoundry.client.v2.servicekeys.ServiceKeyResource;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.client.v2.Resource.Metadata;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpStatus.ACCEPTED;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringServiceInstancesTest {
+public final class ReactorServiceInstancesTest {
 
-    public static final class BindToRoute extends AbstractApiTest<BindServiceInstanceToRouteRequest, BindServiceInstanceToRouteResponse> {
+    public static final class BindToRoute extends AbstractClientApiTest<BindServiceInstanceToRouteRequest, BindServiceInstanceToRouteResponse> {
 
-        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/service_instances/test-service-instance-id/routes/route-id")
+                    .payload("fixtures/client/v2/service_instances/PUT_{id}_routes_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v2/service_instances/PUT_{id}_routes_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected BindServiceInstanceToRouteRequest getInvalidRequest() {
             return BindServiceInstanceToRouteRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/service_instances/test-service-instance-id/routes/route-id")
-                .requestPayload("fixtures/client/v2/service_instances/PUT_{id}_routes_request.json")
-                .status(CREATED)
-                .responsePayload("fixtures/client/v2/service_instances/PUT_{id}_routes_response.json");
         }
 
         @Override
@@ -116,23 +124,28 @@ public final class SpringServiceInstancesTest {
 
     }
 
-    public static final class Create extends AbstractApiTest<CreateServiceInstanceRequest, CreateServiceInstanceResponse> {
+    public static final class Create extends AbstractClientApiTest<CreateServiceInstanceRequest, CreateServiceInstanceResponse> {
 
-        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v2/service_instances?accepts_incomplete=true")
+                    .payload("fixtures/client/v2/service_instances/POST_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v2/service_instances/POST_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected CreateServiceInstanceRequest getInvalidRequest() {
             return CreateServiceInstanceRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v2/service_instances?accepts_incomplete=true")
-                .requestPayload("fixtures/client/v2/service_instances/POST_request.json")
-                .status(CREATED)
-                .responsePayload("fixtures/client/v2/service_instances/POST_response.json");
         }
 
         @Override
@@ -186,21 +199,26 @@ public final class SpringServiceInstancesTest {
 
     }
 
-    public static final class Delete extends AbstractApiTest<DeleteServiceInstanceRequest, DeleteServiceInstanceResponse> {
+    public static final class Delete extends AbstractClientApiTest<DeleteServiceInstanceRequest, DeleteServiceInstanceResponse> {
 
-        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/service_instances/test-service-instance-id?accepts_incomplete=true&purge=true")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteServiceInstanceRequest getInvalidRequest() {
             return DeleteServiceInstanceRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/service_instances/test-service-instance-id?accepts_incomplete=true&purge=true")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -224,22 +242,27 @@ public final class SpringServiceInstancesTest {
 
     }
 
-    public static final class DeleteAsync extends AbstractApiTest<DeleteServiceInstanceRequest, DeleteServiceInstanceResponse> {
+    public static final class DeleteAsync extends AbstractClientApiTest<DeleteServiceInstanceRequest, DeleteServiceInstanceResponse> {
 
-        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/service_instances/test-service-instance-id?accepts_incomplete=true&async=true&purge=true")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(ACCEPTED)
+                    .payload("fixtures/client/v2/service_instances/DELETE_{id}_async_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteServiceInstanceRequest getInvalidRequest() {
             return DeleteServiceInstanceRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/service_instances/test-service-instance-id?accepts_incomplete=true&async=true&purge=true")
-                .status(ACCEPTED)
-                .responsePayload("fixtures/client/v2/service_instances/DELETE_{id}_async_response.json");
         }
 
         @Override
@@ -274,22 +297,27 @@ public final class SpringServiceInstancesTest {
 
     }
 
-    public static final class Get extends AbstractApiTest<GetServiceInstanceRequest, GetServiceInstanceResponse> {
+    public static final class Get extends AbstractClientApiTest<GetServiceInstanceRequest, GetServiceInstanceResponse> {
 
-        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/service_instances/test-service-instance-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/service_instances/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetServiceInstanceRequest getInvalidRequest() {
             return GetServiceInstanceRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/service_instances/test-service-instance-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/service_instances/GET_{id}_response.json");
         }
 
         @Override
@@ -339,21 +367,26 @@ public final class SpringServiceInstancesTest {
 
     }
 
-    public static final class GetPermissions extends AbstractApiTest<GetServiceInstancePermissionsRequest, GetServiceInstancePermissionsResponse> {
+    public static final class GetPermissions extends AbstractClientApiTest<GetServiceInstancePermissionsRequest, GetServiceInstancePermissionsResponse> {
 
-        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/service_instances/test-service-instance-id/permissions")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/service_instances/GET_{id}_permissions_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetServiceInstancePermissionsRequest getInvalidRequest() {
             return GetServiceInstancePermissionsRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/service_instances/test-service-instance-id/permissions")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/service_instances/GET_{id}_permissions_response.json");
         }
 
         @Override
@@ -377,22 +410,26 @@ public final class SpringServiceInstancesTest {
 
     }
 
+    public static final class List extends AbstractClientApiTest<ListServiceInstancesRequest, ListServiceInstancesResponse> {
 
-    public static final class List extends AbstractApiTest<ListServiceInstancesRequest, ListServiceInstancesResponse> {
+        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
-        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/service_instances?q=name%20IN%20test-name&page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/service_instances/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListServiceInstancesRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/service_instances?q=name%20IN%20test-name&page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/service_instances/GET_response.json");
         }
 
         @Override
@@ -447,23 +484,27 @@ public final class SpringServiceInstancesTest {
 
     }
 
-    public static final class ListServiceBindings extends AbstractApiTest<ListServiceInstanceServiceBindingsRequest, ListServiceInstanceServiceBindingsResponse> {
+    public static final class ListServiceBindings extends AbstractClientApiTest<ListServiceInstanceServiceBindingsRequest, ListServiceInstanceServiceBindingsResponse> {
 
-        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/service_instances/test-service-instance-id/service_bindings?q=app_guid%20IN%20test-application-id&page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/service_instances/GET_{id}_service_bindings_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListServiceInstanceServiceBindingsRequest getInvalidRequest() {
             return ListServiceInstanceServiceBindingsRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET)
-                .path("v2/service_instances/test-service-instance-id/service_bindings?q=app_guid%20IN%20test-application-id&page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/service_instances/GET_{id}_service_bindings_response.json");
         }
 
         @Override
@@ -505,23 +546,27 @@ public final class SpringServiceInstancesTest {
 
     }
 
-    public static final class ListServiceKeys extends AbstractApiTest<ListServiceInstanceServiceKeysRequest, ListServiceInstanceServiceKeysResponse> {
+    public static final class ListServiceKeys extends AbstractClientApiTest<ListServiceInstanceServiceKeysRequest, ListServiceInstanceServiceKeysResponse> {
 
-        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/service_instances/test-service-instance-id/service_keys?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/service_instances/GET_{id}_service_keys_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListServiceInstanceServiceKeysRequest getInvalidRequest() {
             return ListServiceInstanceServiceKeysRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET)
-                .path("v2/service_instances/test-service-instance-id/service_keys?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/service_instances/GET_{id}_service_keys_response.json");
         }
 
         @Override
@@ -560,23 +605,28 @@ public final class SpringServiceInstancesTest {
 
     }
 
-    public static final class Update extends AbstractApiTest<UpdateServiceInstanceRequest, UpdateServiceInstanceResponse> {
+    public static final class Update extends AbstractClientApiTest<UpdateServiceInstanceRequest, UpdateServiceInstanceResponse> {
 
-        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/service_instances/test-service-instance-id?accepts_incomplete=true")
+                    .payload("fixtures/client/v2/service_instances/PUT_{id}_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v2/service_instances/PUT_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected UpdateServiceInstanceRequest getInvalidRequest() {
             return UpdateServiceInstanceRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/service_instances/test-service-instance-id?accepts_incomplete=true")
-                .requestPayload("fixtures/client/v2/service_instances/PUT_{id}_request.json")
-                .status(CREATED)
-                .responsePayload("fixtures/client/v2/service_instances/PUT_{id}_response.json");
         }
 
         @Override
