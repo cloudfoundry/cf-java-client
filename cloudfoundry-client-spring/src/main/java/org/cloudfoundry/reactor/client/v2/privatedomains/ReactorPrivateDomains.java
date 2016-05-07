@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.privatedomains;
+package org.cloudfoundry.reactor.client.v2.privatedomains;
 
-import lombok.ToString;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
 import org.cloudfoundry.client.v2.privatedomains.DeletePrivateDomainRequest;
@@ -26,57 +26,48 @@ import org.cloudfoundry.client.v2.privatedomains.GetPrivateDomainResponse;
 import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsResponse;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomains;
-import org.cloudfoundry.reactor.client.v2.FilterBuilder;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.reactor.client.QueryBuilder;
-import org.springframework.web.client.RestOperations;
+import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
+import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
+import reactor.io.netty.http.HttpClient;
 
-import java.net.URI;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
- * The Spring-based implementation of {@link PrivateDomains}
+ * The Reactor-based implementation of {@link PrivateDomains}
  */
-@ToString(callSuper = true)
-public final class SpringPrivateDomains extends AbstractSpringOperations implements PrivateDomains {
+public final class ReactorPrivateDomains extends AbstractClientV2Operations implements PrivateDomains {
 
     /**
      * Creates an instance
      *
-     * @param restOperations the {@link RestOperations} to use to communicate with the server
-     * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
-     * @param schedulerGroup The group to use when making requests
+     * @param authorizationProvider the {@link AuthorizationProvider} to use when communicating with the server
+     * @param httpClient            the {@link HttpClient} to use when communicating with the server
+     * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
+     * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
      */
-    public SpringPrivateDomains(RestOperations restOperations, URI root, Scheduler schedulerGroup) {
-        super(restOperations, root, schedulerGroup);
+    public ReactorPrivateDomains(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
+        super(authorizationProvider, httpClient, objectMapper, root);
     }
 
     @Override
     public Mono<CreatePrivateDomainResponse> create(CreatePrivateDomainRequest request) {
-        return post(request, CreatePrivateDomainResponse.class, builder -> builder.pathSegment("v2", "private_domains"));
+        return post(request, CreatePrivateDomainResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "private_domains")));
     }
 
     @Override
     public Mono<DeletePrivateDomainResponse> delete(DeletePrivateDomainRequest request) {
-        return delete(request, DeletePrivateDomainResponse.class, builder -> {
-            builder.pathSegment("v2", "private_domains", request.getPrivateDomainId());
-            QueryBuilder.augment(builder, request);
-        });
+        return delete(request, DeletePrivateDomainResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "private_domains", validRequest.getPrivateDomainId())));
     }
 
     @Override
     public Mono<GetPrivateDomainResponse> get(GetPrivateDomainRequest request) {
-        return get(request, GetPrivateDomainResponse.class, builder -> builder.pathSegment("v2", "private_domains", request.getPrivateDomainId()));
+        return get(request, GetPrivateDomainResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "private_domains", validRequest.getPrivateDomainId())));
     }
 
     @Override
     public Mono<ListPrivateDomainsResponse> list(ListPrivateDomainsRequest request) {
-        return get(request, ListPrivateDomainsResponse.class, builder -> {
-            builder.pathSegment("v2", "private_domains");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListPrivateDomainsResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "private_domains")));
     }
 
 }

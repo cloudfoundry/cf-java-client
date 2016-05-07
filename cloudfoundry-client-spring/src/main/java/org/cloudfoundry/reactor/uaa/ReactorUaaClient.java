@@ -29,7 +29,7 @@ import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
 /**
- * The Spring-based implementation of {@link UaaClient}
+ * The Reactor-based implementation of {@link UaaClient}
  */
 public final class ReactorUaaClient implements UaaClient {
 

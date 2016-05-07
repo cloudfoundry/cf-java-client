@@ -36,7 +36,7 @@ import reactor.io.netty.http.HttpClient;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
- * The Spring-based implementation of {@link IdentityZones}
+ * The Reactor-based implementation of {@link IdentityZones}
  */
 public final class ReactorIdentityZones extends AbstractUaaOperations implements IdentityZones {
 
