@@ -88,6 +88,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 import static java.time.temporal.ChronoUnit.HOURS;
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
@@ -1327,12 +1328,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     private static Flux<ApplicationResource> requestListSpaceApplications(CloudFoundryClient cloudFoundryClient, String spaceId) {
-        return requestListSpaceApplications(cloudFoundryClient, spaceId, Function.identity());
+        return requestListSpaceApplications(cloudFoundryClient, spaceId, UnaryOperator.identity());
     }
 
     private static Flux<ApplicationResource> requestListSpaceApplications(CloudFoundryClient cloudFoundryClient, String spaceId,
-                                                                          Function<ListSpaceApplicationsRequest.ListSpaceApplicationsRequestBuilder,
-                                                                              ListSpaceApplicationsRequest.ListSpaceApplicationsRequestBuilder> transformer) {
+                                                                          UnaryOperator<ListSpaceApplicationsRequest.ListSpaceApplicationsRequestBuilder> transformer) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .listApplications(transformer.apply(ListSpaceApplicationsRequest.builder())
@@ -1342,11 +1342,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     private static Flux<DomainResource> requestListSpaceDomains(CloudFoundryClient cloudFoundryClient, String spaceId) {
-        return requestListSpaceDomains(cloudFoundryClient, spaceId, Function.identity());
+        return requestListSpaceDomains(cloudFoundryClient, spaceId, UnaryOperator.identity());
     }
 
     private static Flux<DomainResource> requestListSpaceDomains(CloudFoundryClient cloudFoundryClient, String spaceId,
-                                                                Function<ListSpaceDomainsRequest.ListSpaceDomainsRequestBuilder, ListSpaceDomainsRequest.ListSpaceDomainsRequestBuilder> transformer) {
+                                                                UnaryOperator<ListSpaceDomainsRequest.ListSpaceDomainsRequestBuilder> transformer) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .listDomains(transformer.apply(ListSpaceDomainsRequest.builder())
@@ -1356,11 +1356,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     private static Flux<EventResource> requestListSpaceEvents(CloudFoundryClient cloudFoundryClient, String spaceId) {
-        return requestListSpaceEvents(cloudFoundryClient, spaceId, Function.identity());
+        return requestListSpaceEvents(cloudFoundryClient, spaceId, UnaryOperator.identity());
     }
 
     private static Flux<EventResource> requestListSpaceEvents(CloudFoundryClient cloudFoundryClient, String spaceId,
-                                                              Function<ListSpaceEventsRequest.ListSpaceEventsRequestBuilder, ListSpaceEventsRequest.ListSpaceEventsRequestBuilder> transformer) {
+                                                              UnaryOperator<ListSpaceEventsRequest.ListSpaceEventsRequestBuilder> transformer) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .listEvents(transformer.apply(ListSpaceEventsRequest.builder())
@@ -1384,8 +1384,12 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .build()));
     }
 
+    private static Flux<RouteResource> requestListSpaceRoutes(CloudFoundryClient cloudFoundryClient, String spaceId) {
+        return requestListSpaceRoutes(cloudFoundryClient, spaceId, UnaryOperator.identity());
+    }
+
     private static Flux<RouteResource> requestListSpaceRoutes(CloudFoundryClient cloudFoundryClient, String spaceId,
-                                                              Function<ListSpaceRoutesRequest.ListSpaceRoutesRequestBuilder, ListSpaceRoutesRequest.ListSpaceRoutesRequestBuilder> transformer) {
+                                                              UnaryOperator<ListSpaceRoutesRequest.ListSpaceRoutesRequestBuilder> transformer) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .listRoutes(transformer.apply(ListSpaceRoutesRequest.builder())
@@ -1393,16 +1397,12 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .build()));
     }
 
-    private static Flux<RouteResource> requestListSpaceRoutes(CloudFoundryClient cloudFoundryClient, String spaceId) {
-        return requestListSpaceRoutes(cloudFoundryClient, spaceId, Function.identity());
-    }
-
     private static Flux<SpaceResource> requestListSpaces(CloudFoundryClient cloudFoundryClient) {
-        return requestListSpaces(cloudFoundryClient, Function.identity());
+        return requestListSpaces(cloudFoundryClient, UnaryOperator.identity());
     }
 
     private static Flux<SpaceResource> requestListSpaces(CloudFoundryClient cloudFoundryClient,
-                                                         Function<ListSpacesRequest.ListSpacesRequestBuilder, ListSpacesRequest.ListSpacesRequestBuilder> transformer) {
+                                                         UnaryOperator<ListSpacesRequest.ListSpacesRequestBuilder> transformer) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .list(transformer.apply(ListSpacesRequest.builder())
