@@ -18,23 +18,29 @@ package org.cloudfoundry.reactor.util;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.netty.buffer.ByteBuf;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.util.ValidationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple;
 import reactor.core.tuple.Tuple2;
 import reactor.io.netty.http.HttpClient;
+import reactor.io.netty.http.HttpException;
 import reactor.io.netty.http.HttpInbound;
 import reactor.io.netty.http.HttpOutbound;
 
+import java.util.List;
 import java.util.function.Function;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public abstract class AbstractReactorOperations {
+
+    private static final String CF_WARNINGS = "X-Cf-Warnings";
 
     private final AuthorizationProvider authorizationProvider;
 
@@ -57,109 +63,66 @@ public abstract class AbstractReactorOperations {
 
     protected final <REQ extends Validatable, RSP> Mono<RSP> doDelete(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
                                                                       Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.root)
-            .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, uriTransformer))))
-            .then(function((validRequest, uri) -> this.httpClient.delete(uri,
-                outbound -> this.authorizationProvider.addAuthorization(outbound)
-                    .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
-                    .doOnSubscribe(s -> this.requestLogger.debug("DELETE {}", uri))
-                    .then(o -> o.send(Mono.just(validRequest)
-                        .where(req -> this.objectMapper.canSerialize(req.getClass()))
-                        .map(JsonCodec.encode(this.objectMapper, o)))))
-                .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))
-                .doOnSuccess(inbound -> printWarnings(inbound, this.responseLogger, uri))))
-            .then(inbound -> inbound.receive().aggregate().toInputStream())
-            .map(JsonCodec.decode(this.objectMapper, responseType));
+        return prepareRequest(request, uriTransformer)
+            .then(function((validRequest, uri) -> this.httpClient.delete(uri, outbound -> transformRequest(outbound, validRequest, requestTransformer)
+                .doOnSubscribe(s -> this.requestLogger.debug("DELETE {}", uri))
+                .then(o -> o.send(serializedRequest(validRequest, o))))
+                .compose(logResponse(uri))))
+            .compose(deserializedResponse(responseType));
     }
 
     protected final <REQ extends Validatable, RSP> Mono<RSP> doGet(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
                                                                    Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
         return doGet(request, uriTransformer, requestTransformer)
-            .then(inbound -> inbound.receive().aggregate().toInputStream())
-            .map(JsonCodec.decode(this.objectMapper, responseType));
+            .compose(deserializedResponse(responseType));
     }
 
     protected final <REQ extends Validatable> Mono<HttpInbound> doGet(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
                                                                       Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.root)
-            .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, uriTransformer))))
-            .then(function((validRequest, uri) -> this.httpClient.get(uri,
-                outbound -> this.authorizationProvider.addAuthorization(outbound)
-                    .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
-                    .doOnSubscribe(s -> this.requestLogger.debug("GET    {}", uri))
-                    .then(HttpOutbound::sendHeaders))
-                .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))
-                .doOnSuccess(inbound -> printWarnings(inbound, this.responseLogger, uri))));
+        return prepareRequest(request, uriTransformer)
+            .then(function((validRequest, uri) -> this.httpClient.get(uri, outbound -> transformRequest(outbound, validRequest, requestTransformer)
+                .doOnSubscribe(s -> this.requestLogger.debug("GET    {}", uri))
+                .then(HttpOutbound::sendHeaders))
+                .compose(logResponse(uri))));
     }
 
     protected final <REQ extends Validatable, RSP> Mono<RSP> doPatch(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
                                                                      Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.root)
-            .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, uriTransformer))))
-            .then(function((validRequest, uri) -> this.httpClient.patch(uri,
-                outbound -> this.authorizationProvider.addAuthorization(outbound)
-                    .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
-                    .doOnSubscribe(s -> this.requestLogger.debug("PATCH  {}", uri))
-                    .then(o -> o.send(Mono.just(validRequest)
-                        .where(req -> this.objectMapper.canSerialize(req.getClass()))
-                        .map(JsonCodec.encode(this.objectMapper, o)))))
-                .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))
-                .doOnSuccess(inbound -> printWarnings(inbound, this.responseLogger, uri))))
-            .then(inbound -> inbound.receive().aggregate().toInputStream())
-            .map(JsonCodec.decode(this.objectMapper, responseType));
+        return prepareRequest(request, uriTransformer)
+            .then(function((validRequest, uri) -> this.httpClient.patch(uri, outbound -> transformRequest(outbound, validRequest, requestTransformer)
+                .doOnSubscribe(s -> this.requestLogger.debug("PATCH  {}", uri))
+                .then(o -> o.send(serializedRequest(validRequest, o))))
+                .compose(logResponse(uri))))
+            .compose(deserializedResponse(responseType));
     }
 
     protected final <REQ extends Validatable, RSP> Mono<RSP> doPost(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
                                                                     Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.root)
-            .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, uriTransformer))))
-            .then(function((validRequest, uri) -> this.httpClient.post(uri,
-                outbound -> this.authorizationProvider.addAuthorization(outbound)
-                    .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
-                    .doOnSubscribe(s -> this.requestLogger.debug("POST   {}", uri))
-                    .then(o -> o.send(Mono.just(validRequest)
-                        .where(req -> this.objectMapper.canSerialize(req.getClass()))
-                        .map(JsonCodec.encode(this.objectMapper, o)))))
-                .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))
-                .doOnSuccess(inbound -> printWarnings(inbound, this.responseLogger, uri))))
-            .then(inbound -> inbound.receive().aggregate().toInputStream())
-            .map(JsonCodec.decode(this.objectMapper, responseType));
+        return prepareRequest(request, uriTransformer)
+            .then(function((validRequest, uri) -> this.httpClient.post(uri, outbound -> transformRequest(outbound, validRequest, requestTransformer)
+                .doOnSubscribe(s -> this.requestLogger.debug("POST   {}", uri))
+                .then(o -> o.send(serializedRequest(validRequest, o))))
+                .compose(logResponse(uri))))
+            .compose(deserializedResponse(responseType));
     }
 
     protected final <REQ extends Validatable, RSP> Mono<RSP> doPut(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
                                                                    Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.root)
-            .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, uriTransformer))))
-            .then(function((validRequest, uri) -> this.httpClient.put(uri,
-                outbound -> this.authorizationProvider.addAuthorization(outbound)
-                    .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
-                    .doOnSubscribe(s -> this.requestLogger.debug("PUT    {}", uri))
-                    .then(o -> o.send(Mono.just(validRequest)
-                        .where(req -> this.objectMapper.canSerialize(req.getClass()))
-                        .map(JsonCodec.encode(this.objectMapper, o)))))
-                .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))
-                .doOnSuccess(inbound -> printWarnings(inbound, this.responseLogger, uri))))
-            .then(inbound -> inbound.receive().aggregate().toInputStream())
-            .map(JsonCodec.decode(this.objectMapper, responseType));
+        return prepareRequest(request, uriTransformer)
+            .then(function((validRequest, uri) -> this.httpClient.put(uri, outbound -> transformRequest(outbound, validRequest, requestTransformer)
+                .doOnSubscribe(s -> this.requestLogger.debug("PUT    {}", uri))
+                .then(o -> o.send(serializedRequest(validRequest, o))))
+                .compose(logResponse(uri))))
+            .compose(deserializedResponse(responseType));
     }
 
     protected final <REQ extends Validatable> Mono<HttpInbound> doWs(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
                                                                      Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.root)
-            .map(function((validRequest, root) -> Tuple.of(validRequest, buildUri(root, validRequest, uriTransformer))))
-            .then(function((validRequest, uri) -> this.httpClient.get(uri,
-                outbound -> this.authorizationProvider.addAuthorization(outbound)
-                    .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
-                    .doOnSubscribe(s -> this.requestLogger.debug("WS     {}", uri))
-                    .then(HttpOutbound::upgradeToTextWebsocket))
-                .doOnSuccess(inbound -> this.responseLogger.debug("{}    {}", inbound.status().code(), uri))
-                .doOnSuccess(inbound -> printWarnings(inbound, this.responseLogger, uri))));
+        return prepareRequest(request, uriTransformer)
+            .then(function((validRequest, uri) -> this.httpClient.get(uri, outbound -> transformRequest(outbound, validRequest, requestTransformer)
+                .doOnSubscribe(s -> this.requestLogger.debug("WS     {}", uri))
+                .then(HttpOutbound::upgradeToTextWebsocket))
+                .compose(logResponse(uri))));
     }
 
     private static <REQ extends Validatable> String buildUri(String root, REQ validRequest, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
@@ -168,9 +131,45 @@ public abstract class AbstractReactorOperations {
             .build().encode().toUriString();
     }
 
-    private static void printWarnings(HttpInbound inbound, Logger logger, String uri) {
-        inbound.responseHeaders().getAll("X-Cf-Warnings")
-            .forEach(warning -> logger.warn("{} ({})", warning, uri));
+    private <RSP> Function<Mono<HttpInbound>, Mono<RSP>> deserializedResponse(Class<RSP> responseType) {
+        return inbound -> inbound
+            .then(i -> i.receive().aggregate().toInputStream())
+            .map(JsonCodec.decode(this.objectMapper, responseType));
+    }
+
+    private Function<Mono<HttpInbound>, Mono<HttpInbound>> logResponse(String uri) {
+        return inbound -> inbound
+            .doOnSuccess(i -> {
+                List<String> warnings = i.responseHeaders().getAll(CF_WARNINGS);
+
+                if (warnings.isEmpty()) {
+                    this.responseLogger.debug("{}    {}", i.status().code(), uri);
+                } else {
+                    this.responseLogger.warn("{}    {} ({})", i.status().code(), uri, StringUtils.collectionToCommaDelimitedString(warnings));
+                }
+            })
+            .doOnError(t -> {
+                if (t instanceof HttpException) {
+                    this.responseLogger.debug("{}    {}", ((HttpException) t).getResponseStatus().code(), uri);
+                }
+            });
+    }
+
+    private <REQ extends Validatable> Mono<Tuple2<REQ, String>> prepareRequest(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
+        return Mono
+            .when(ValidationUtils.validate(request), this.root)
+            .map(function((validRequest, r) -> Tuple.of(validRequest, buildUri(r, validRequest, uriTransformer))));
+    }
+
+    private <REQ extends Validatable> Mono<ByteBuf> serializedRequest(REQ validRequest, HttpOutbound outbound) {
+        return Mono.just(validRequest)
+            .where(req -> this.objectMapper.canSerialize(req.getClass()))
+            .map(JsonCodec.encode(this.objectMapper, outbound));
+    }
+
+    private <REQ extends Validatable> Mono<HttpOutbound> transformRequest(HttpOutbound outbound, REQ validRequest, Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
+        return this.authorizationProvider.addAuthorization(outbound)
+            .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)));
     }
 
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.securitygroups;
+package org.cloudfoundry.reactor.client.v2.securitygroups;
 
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRunningDefaultRequest;
@@ -29,31 +29,39 @@ import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultR
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultResponse;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupStagingDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupStagingDefaultResponse;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class SpringSecurityGroupsTest {
+public final class ReactorSecurityGroupsTest {
 
-    public static final class DeleteRunning extends AbstractApiTest<DeleteSecurityGroupRunningDefaultRequest, Void> {
+    public static final class DeleteRunning extends AbstractClientApiTest<DeleteSecurityGroupRunningDefaultRequest, Void> {
 
-        private final SpringSecurityGroups securityGroups = new SpringSecurityGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/config/running_security_groups/test-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteSecurityGroupRunningDefaultRequest getInvalidRequest() {
             return DeleteSecurityGroupRunningDefaultRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/config/running_security_groups/test-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -75,20 +83,25 @@ public final class SpringSecurityGroupsTest {
 
     }
 
-    public static final class DeleteStaging extends AbstractApiTest<DeleteSecurityGroupStagingDefaultRequest, Void> {
+    public static final class DeleteStaging extends AbstractClientApiTest<DeleteSecurityGroupStagingDefaultRequest, Void> {
 
-        private final SpringSecurityGroups securityGroups = new SpringSecurityGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/config/staging_security_groups/test-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteSecurityGroupStagingDefaultRequest getInvalidRequest() {
             return DeleteSecurityGroupStagingDefaultRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/config/staging_security_groups/test-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -110,21 +123,26 @@ public final class SpringSecurityGroupsTest {
 
     }
 
-    public static final class ListRunning extends AbstractApiTest<ListSecurityGroupRunningDefaultsRequest, ListSecurityGroupRunningDefaultsResponse> {
+    public static final class ListRunning extends AbstractClientApiTest<ListSecurityGroupRunningDefaultsRequest, ListSecurityGroupRunningDefaultsResponse> {
 
-        private final SpringSecurityGroups securityGroups = new SpringSecurityGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/config/running_security_groups")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/config/GET_running_security_groups_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListSecurityGroupRunningDefaultsRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/config/running_security_groups")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/config/GET_running_security_groups_response.json");
         }
 
         @Override
@@ -164,21 +182,26 @@ public final class SpringSecurityGroupsTest {
 
     }
 
-    public static final class ListStaging extends AbstractApiTest<ListSecurityGroupStagingDefaultsRequest, ListSecurityGroupStagingDefaultsResponse> {
+    public static final class ListStaging extends AbstractClientApiTest<ListSecurityGroupStagingDefaultsRequest, ListSecurityGroupStagingDefaultsResponse> {
 
-        private final SpringSecurityGroups securityGroups = new SpringSecurityGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/config/staging_security_groups")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/config/GET_staging_security_groups_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListSecurityGroupStagingDefaultsRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/config/staging_security_groups")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/config/GET_staging_security_groups_response.json");
         }
 
         @Override
@@ -218,21 +241,26 @@ public final class SpringSecurityGroupsTest {
 
     }
 
-    public static final class SetRunning extends AbstractApiTest<SetSecurityGroupRunningDefaultRequest, SetSecurityGroupRunningDefaultResponse> {
+    public static final class SetRunning extends AbstractClientApiTest<SetSecurityGroupRunningDefaultRequest, SetSecurityGroupRunningDefaultResponse> {
 
-        private final SpringSecurityGroups securityGroups = new SpringSecurityGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/config/running_security_groups/test-security-group-default-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/config/PUT_{id}_running_security_groups_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected SetSecurityGroupRunningDefaultRequest getInvalidRequest() {
             return SetSecurityGroupRunningDefaultRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/config/running_security_groups/test-security-group-default-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/config/PUT_{id}_running_security_groups_response.json");
         }
 
         @Override
@@ -271,21 +299,26 @@ public final class SpringSecurityGroupsTest {
 
     }
 
-    public static final class SetStaging extends AbstractApiTest<SetSecurityGroupStagingDefaultRequest, SetSecurityGroupStagingDefaultResponse> {
+    public static final class SetStaging extends AbstractClientApiTest<SetSecurityGroupStagingDefaultRequest, SetSecurityGroupStagingDefaultResponse> {
 
-        private final SpringSecurityGroups securityGroups = new SpringSecurityGroups(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/config/staging_security_groups/test-security-group-default-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/config/PUT_{id}_staging_security_groups_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected SetSecurityGroupStagingDefaultRequest getInvalidRequest() {
             return SetSecurityGroupStagingDefaultRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/config/staging_security_groups/test-security-group-default-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/config/PUT_{id}_staging_security_groups_response.json");
         }
 
         @Override

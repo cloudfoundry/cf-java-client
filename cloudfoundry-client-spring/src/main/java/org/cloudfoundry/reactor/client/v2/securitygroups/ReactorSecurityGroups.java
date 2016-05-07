@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.securitygroups;
+package org.cloudfoundry.reactor.client.v2.securitygroups;
 
-import lombok.ToString;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRunningDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupStagingDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsRequest;
@@ -28,65 +28,60 @@ import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultR
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultResponse;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupStagingDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupStagingDefaultResponse;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.reactor.client.QueryBuilder;
-import org.springframework.web.client.RestOperations;
+import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
+import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
+import reactor.io.netty.http.HttpClient;
 
-import java.net.URI;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
- * The Spring-based implementation of {@link SecurityGroups}
+ * The Reactor-based implementation of {@link SecurityGroups}
  */
-@ToString(callSuper = true)
-public class SpringSecurityGroups extends AbstractSpringOperations implements SecurityGroups {
+public class ReactorSecurityGroups extends AbstractClientV2Operations implements SecurityGroups {
 
     /**
      * Creates an instance
      *
-     * @param restOperations the {@link RestOperations} to use to communicate with the server
-     * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
-     * @param schedulerGroup The group to use when making requests
+     * @param authorizationProvider the {@link AuthorizationProvider} to use when communicating with the server
+     * @param httpClient            the {@link HttpClient} to use when communicating with the server
+     * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
+     * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
      */
-    public SpringSecurityGroups(RestOperations restOperations, URI root, Scheduler schedulerGroup) {
-        super(restOperations, root, schedulerGroup);
+    public ReactorSecurityGroups(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
+        super(authorizationProvider, httpClient, objectMapper, root);
     }
 
     @Override
     public Mono<Void> deleteRunningDefault(DeleteSecurityGroupRunningDefaultRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "config", "running_security_groups", request.getSecurityGroupRunningDefaultId()));
+        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v2", "config", "running_security_groups", validRequest.getSecurityGroupRunningDefaultId())));
     }
 
     @Override
     public Mono<Void> deleteStagingDefault(DeleteSecurityGroupStagingDefaultRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "config", "staging_security_groups", request.getSecurityGroupStagingDefaultId()));
+        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v2", "config", "staging_security_groups", validRequest.getSecurityGroupStagingDefaultId())));
     }
 
     @Override
     public Mono<ListSecurityGroupRunningDefaultsResponse> listRunningDefaults(ListSecurityGroupRunningDefaultsRequest request) {
-        return get(request, ListSecurityGroupRunningDefaultsResponse.class, builder -> {
-            builder.pathSegment("v2", "config", "running_security_groups");
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListSecurityGroupRunningDefaultsResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "config", "running_security_groups")));
     }
 
     @Override
     public Mono<ListSecurityGroupStagingDefaultsResponse> listStagingDefaults(ListSecurityGroupStagingDefaultsRequest request) {
-        return get(request, ListSecurityGroupStagingDefaultsResponse.class, builder -> {
-            builder.pathSegment("v2", "config", "staging_security_groups");
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListSecurityGroupStagingDefaultsResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "config", "staging_security_groups")));
     }
 
     @Override
     public Mono<SetSecurityGroupRunningDefaultResponse> setRunningDefault(SetSecurityGroupRunningDefaultRequest request) {
-        return put(request, SetSecurityGroupRunningDefaultResponse.class, builder -> builder.pathSegment("v2", "config", "running_security_groups", request.getSecurityGroupRunningDefaultId()));
+        return put(request, SetSecurityGroupRunningDefaultResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "config", "running_security_groups", validRequest.getSecurityGroupRunningDefaultId())));
     }
 
     @Override
     public Mono<SetSecurityGroupStagingDefaultResponse> setStagingDefault(SetSecurityGroupStagingDefaultRequest request) {
-        return put(request, SetSecurityGroupStagingDefaultResponse.class, builder -> builder.pathSegment("v2", "config", "staging_security_groups", request.getSecurityGroupStagingDefaultId()));
+        return put(request, SetSecurityGroupStagingDefaultResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "config", "staging_security_groups", validRequest.getSecurityGroupStagingDefaultId())));
     }
 
 }
