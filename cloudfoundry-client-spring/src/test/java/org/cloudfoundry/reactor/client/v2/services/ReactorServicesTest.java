@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.services;
+package org.cloudfoundry.reactor.client.v2.services;
 
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
@@ -30,32 +30,40 @@ import org.cloudfoundry.client.v2.services.ListServicesRequest;
 import org.cloudfoundry.client.v2.services.ListServicesResponse;
 import org.cloudfoundry.client.v2.services.ServiceEntity;
 import org.cloudfoundry.client.v2.services.ServiceResource;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpStatus.ACCEPTED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 
-public final class SpringServicesTest {
+public final class ReactorServicesTest {
 
-    public static final class Delete extends AbstractApiTest<DeleteServiceRequest, DeleteServiceResponse> {
+    public static final class Delete extends AbstractClientApiTest<DeleteServiceRequest, DeleteServiceResponse> {
 
-        private final SpringServices services = new SpringServices(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServices services = new ReactorServices(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/services/test-service-id?purge=true")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteServiceRequest getInvalidRequest() {
             return DeleteServiceRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/services/test-service-id?purge=true")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -78,21 +86,26 @@ public final class SpringServicesTest {
 
     }
 
-    public static final class DeleteAsync extends AbstractApiTest<DeleteServiceRequest, DeleteServiceResponse> {
+    public static final class DeleteAsync extends AbstractClientApiTest<DeleteServiceRequest, DeleteServiceResponse> {
 
-        private final SpringServices services = new SpringServices(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServices services = new ReactorServices(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/services/test-service-id?async=true")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(ACCEPTED)
+                    .payload("fixtures/client/v2/services/DELETE_{id}_async_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteServiceRequest getInvalidRequest() {
             return DeleteServiceRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/services/test-service-id?async=true")
-                .status(ACCEPTED)
-                .responsePayload("fixtures/client/v2/services/DELETE_{id}_async_response.json");
         }
 
         @Override
@@ -125,22 +138,27 @@ public final class SpringServicesTest {
 
     }
 
-    public static final class Get extends AbstractApiTest<GetServiceRequest, GetServiceResponse> {
+    public static final class Get extends AbstractClientApiTest<GetServiceRequest, GetServiceResponse> {
 
-        private final SpringServices services = new SpringServices(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServices services = new ReactorServices(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/services/test-service-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/services/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetServiceRequest getInvalidRequest() {
             return GetServiceRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/services/test-service-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/services/GET_{id}_response.json");
         }
 
         @Override
@@ -178,21 +196,26 @@ public final class SpringServicesTest {
 
     }
 
-    public static final class List extends AbstractApiTest<ListServicesRequest, ListServicesResponse> {
+    public static final class List extends AbstractClientApiTest<ListServicesRequest, ListServicesResponse> {
 
-        private final SpringServices services = new SpringServices(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServices services = new ReactorServices(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/services?q=label%20IN%20test-label&page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/services/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListServicesRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/services?q=label%20IN%20test-label&page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/services/GET_response.json");
         }
 
         @Override
@@ -235,21 +258,26 @@ public final class SpringServicesTest {
 
     }
 
-    public static final class ListServicePlans extends AbstractApiTest<ListServiceServicePlansRequest, ListServiceServicePlansResponse> {
+    public static final class ListServicePlans extends AbstractClientApiTest<ListServiceServicePlansRequest, ListServiceServicePlansResponse> {
 
-        private final SpringServices services = new SpringServices(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServices services = new ReactorServices(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/services/f1b0edbe-fac4-4512-9071-8b26045413bb/service_plans?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/services/GET_{id}_service_plans_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListServiceServicePlansRequest getInvalidRequest() {
             return ListServiceServicePlansRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/services/f1b0edbe-fac4-4512-9071-8b26045413bb/service_plans?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/services/GET_{id}_service_plans_response.json");
         }
 
         @Override
