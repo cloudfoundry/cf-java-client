@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.serviceusageevents;
+package org.cloudfoundry.reactor.client.v2.serviceusageevents;
 
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventRequest;
@@ -24,31 +24,39 @@ import org.cloudfoundry.client.v2.serviceusageevents.ListServiceUsageEventsRespo
 import org.cloudfoundry.client.v2.serviceusageevents.PurgeAndReseedServiceUsageEventsRequest;
 import org.cloudfoundry.client.v2.serviceusageevents.ServiceUsageEventEntity;
 import org.cloudfoundry.client.v2.serviceusageevents.ServiceUsageEventResource;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class SpringServiceUsageEventsTest {
+public final class ReactorServiceUsageEventsTest {
 
-    public static final class Get extends AbstractApiTest<GetServiceUsageEventRequest, GetServiceUsageEventResponse> {
+    public static final class Get extends AbstractClientApiTest<GetServiceUsageEventRequest, GetServiceUsageEventResponse> {
 
-        private final SpringServiceUsageEvents serviceUsageEvents = new SpringServiceUsageEvents(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceUsageEvents serviceUsageEvents = new ReactorServiceUsageEvents(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/service_usage_events/9470627d-0488-4d9a-8564-f97571487893")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/service_usage_events/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetServiceUsageEventRequest getInvalidRequest() {
             return GetServiceUsageEventRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/service_usage_events/9470627d-0488-4d9a-8564-f97571487893")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/service_usage_events/GET_{id}_response.json");
         }
 
         @Override
@@ -88,21 +96,26 @@ public final class SpringServiceUsageEventsTest {
         }
     }
 
-    public static final class List extends AbstractApiTest<ListServiceUsageEventsRequest, ListServiceUsageEventsResponse> {
+    public static final class List extends AbstractClientApiTest<ListServiceUsageEventsRequest, ListServiceUsageEventsResponse> {
 
-        private final SpringServiceUsageEvents serviceUsageEvents = new SpringServiceUsageEvents(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceUsageEvents serviceUsageEvents = new ReactorServiceUsageEvents(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/service_usage_events?after_guid=e5defac2-4ae1-44ac-a3d0-1684ae657453&page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/service_usage_events/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListServiceUsageEventsRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/service_usage_events?after_guid=e5defac2-4ae1-44ac-a3d0-1684ae657453&page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/service_usage_events/GET_response.json");
         }
 
         @Override
@@ -148,20 +161,25 @@ public final class SpringServiceUsageEventsTest {
         }
     }
 
-    public static final class PurgeAndReseed extends AbstractApiTest<PurgeAndReseedServiceUsageEventsRequest, Void> {
+    public static final class PurgeAndReseed extends AbstractClientApiTest<PurgeAndReseedServiceUsageEventsRequest, Void> {
 
-        private final SpringServiceUsageEvents serviceUsageEvents = new SpringServiceUsageEvents(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceUsageEvents serviceUsageEvents = new ReactorServiceUsageEvents(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v2/service_usage_events/destructively_purge_all_and_reseed_existing_instances")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected PurgeAndReseedServiceUsageEventsRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v2/service_usage_events/destructively_purge_all_and_reseed_existing_instances")
-                .status(NO_CONTENT);
         }
 
         @Override
