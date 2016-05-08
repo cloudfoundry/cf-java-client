@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.serviceplanvisibilities;
+package org.cloudfoundry.reactor.client.v2.serviceplanvisibilities;
 
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
@@ -31,37 +31,45 @@ import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilityE
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilityResource;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.UpdateServicePlanVisibilityRequest;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.UpdateServicePlanVisibilityResponse;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpStatus.ACCEPTED;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 
-public final class SpringServicePlanVisibilitiesTest {
+public final class ReactorServicePlanVisibilitiesTest {
 
-    public static final class Create extends AbstractApiTest<CreateServicePlanVisibilityRequest, CreateServicePlanVisibilityResponse> {
+    public static final class Create extends AbstractClientApiTest<CreateServicePlanVisibilityRequest, CreateServicePlanVisibilityResponse> {
 
-        private final ServicePlanVisibilities servicePlanVisibilities = new SpringServicePlanVisibilities(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ServicePlanVisibilities servicePlanVisibilities = new ReactorServicePlanVisibilities(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v2/service_plan_visibilities")
+                    .payload("fixtures/client/v2/service_plan_visibilities/POST_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v2/service_plan_visibilities/POST_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected CreateServicePlanVisibilityRequest getInvalidRequest() {
             return CreateServicePlanVisibilityRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v2/service_plan_visibilities")
-                .requestPayload("fixtures/client/v2/service_plan_visibilities/POST_request.json")
-                .status(CREATED)
-                .responsePayload("fixtures/client/v2/service_plan_visibilities/POST_response.json");
         }
 
         @Override
@@ -95,20 +103,25 @@ public final class SpringServicePlanVisibilitiesTest {
         }
     }
 
-    public static final class Delete extends AbstractApiTest<DeleteServicePlanVisibilityRequest, DeleteServicePlanVisibilityResponse> {
+    public static final class Delete extends AbstractClientApiTest<DeleteServicePlanVisibilityRequest, DeleteServicePlanVisibilityResponse> {
 
-        private final ServicePlanVisibilities servicePlanVisibilities = new SpringServicePlanVisibilities(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ServicePlanVisibilities servicePlanVisibilities = new ReactorServicePlanVisibilities(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/service_plan_visibilities/test-service-plan-visibility-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteServicePlanVisibilityRequest getInvalidRequest() {
             return DeleteServicePlanVisibilityRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/service_plan_visibilities/test-service-plan-visibility-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -129,21 +142,26 @@ public final class SpringServicePlanVisibilitiesTest {
         }
     }
 
-    public static final class DeleteAsync extends AbstractApiTest<DeleteServicePlanVisibilityRequest, DeleteServicePlanVisibilityResponse> {
+    public static final class DeleteAsync extends AbstractClientApiTest<DeleteServicePlanVisibilityRequest, DeleteServicePlanVisibilityResponse> {
 
-        private final ServicePlanVisibilities servicePlanVisibilities = new SpringServicePlanVisibilities(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ServicePlanVisibilities servicePlanVisibilities = new ReactorServicePlanVisibilities(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/service_plan_visibilities/test-service-plan-visibility-id?async=true")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(ACCEPTED)
+                    .payload("fixtures/client/v2/service_plan_visibilities/DELETE_{id}_async_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteServicePlanVisibilityRequest getInvalidRequest() {
             return DeleteServicePlanVisibilityRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/service_plan_visibilities/test-service-plan-visibility-id?async=true")
-                .status(ACCEPTED)
-                .responsePayload("fixtures/client/v2/service_plan_visibilities/DELETE_{id}_async_response.json");
         }
 
         @Override
@@ -175,21 +193,26 @@ public final class SpringServicePlanVisibilitiesTest {
         }
     }
 
-    public static final class Get extends AbstractApiTest<GetServicePlanVisibilityRequest, GetServicePlanVisibilityResponse> {
+    public static final class Get extends AbstractClientApiTest<GetServicePlanVisibilityRequest, GetServicePlanVisibilityResponse> {
 
-        private final ServicePlanVisibilities servicePlanVisibilities = new SpringServicePlanVisibilities(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ServicePlanVisibilities servicePlanVisibilities = new ReactorServicePlanVisibilities(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/service_plan_visibilities/test-service-plan-visibility-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/service_plan_visibilities/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetServicePlanVisibilityRequest getInvalidRequest() {
             return GetServicePlanVisibilityRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/service_plan_visibilities/test-service-plan-visibility-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/service_plan_visibilities/GET_{id}_response.json");
         }
 
         @Override
@@ -222,21 +245,26 @@ public final class SpringServicePlanVisibilitiesTest {
         }
     }
 
-    public static final class List extends AbstractApiTest<ListServicePlanVisibilitiesRequest, ListServicePlanVisibilitiesResponse> {
+    public static final class List extends AbstractClientApiTest<ListServicePlanVisibilitiesRequest, ListServicePlanVisibilitiesResponse> {
 
-        private final ServicePlanVisibilities servicePlanVisibilities = new SpringServicePlanVisibilities(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ServicePlanVisibilities servicePlanVisibilities = new ReactorServicePlanVisibilities(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/service_plan_visibilities?q=organization_guid%20IN%20test-organization-id&page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/service_plan_visibilities/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListServicePlanVisibilitiesRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/service_plan_visibilities?q=organization_guid%20IN%20test-organization-id&page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/service_plan_visibilities/GET_response.json");
         }
 
         @Override
@@ -274,22 +302,27 @@ public final class SpringServicePlanVisibilitiesTest {
         }
     }
 
-    public static final class Update extends AbstractApiTest<UpdateServicePlanVisibilityRequest, UpdateServicePlanVisibilityResponse> {
+    public static final class Update extends AbstractClientApiTest<UpdateServicePlanVisibilityRequest, UpdateServicePlanVisibilityResponse> {
 
-        private final ServicePlanVisibilities servicePlanVisibilities = new SpringServicePlanVisibilities(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ServicePlanVisibilities servicePlanVisibilities = new ReactorServicePlanVisibilities(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/service_plan_visibilities/test-service-plan-visibility-id")
+                    .payload("fixtures/client/v2/service_plan_visibilities/PUT_{id}_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v2/service_plan_visibilities/PUT_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected UpdateServicePlanVisibilityRequest getInvalidRequest() {
             return UpdateServicePlanVisibilityRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/service_plan_visibilities/test-service-plan-visibility-id")
-                .requestPayload("fixtures/client/v2/service_plan_visibilities/PUT_{id}_request.json")
-                .status(CREATED)
-                .responsePayload("fixtures/client/v2/service_plan_visibilities/PUT_{id}_response.json");
         }
 
         @Override
