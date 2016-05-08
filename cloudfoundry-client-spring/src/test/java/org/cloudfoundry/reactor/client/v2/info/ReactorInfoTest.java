@@ -32,7 +32,7 @@ public final class ReactorInfoTest {
 
     public static final class Get extends AbstractClientApiTest<GetInfoRequest, GetInfoResponse> {
 
-        private final ReactorInfo info = new ReactorInfo(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorInfo info = new ReactorInfo(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {

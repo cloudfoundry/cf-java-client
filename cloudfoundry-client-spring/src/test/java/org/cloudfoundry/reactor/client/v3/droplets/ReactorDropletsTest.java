@@ -41,7 +41,7 @@ public final class ReactorDropletsTest {
 
     public static final class Delete extends AbstractClientApiTest<DeleteDropletRequest, Void> {
 
-        private final ReactorDroplets droplets = new ReactorDroplets(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorDroplets droplets = new ReactorDroplets(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -82,7 +82,7 @@ public final class ReactorDropletsTest {
 
     public static final class Get extends AbstractClientApiTest<GetDropletRequest, GetDropletResponse> {
 
-        private final ReactorDroplets droplets = new ReactorDroplets(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorDroplets droplets = new ReactorDroplets(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -157,7 +157,7 @@ public final class ReactorDropletsTest {
 
     public static final class List extends AbstractClientApiTest<ListDropletsRequest, ListDropletsResponse> {
 
-        private final ReactorDroplets droplets = new ReactorDroplets(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorDroplets droplets = new ReactorDroplets(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {

@@ -34,7 +34,7 @@ public final class ReactorUsersTest {
 
     public static final class List extends AbstractClientApiTest<ListUsersRequest, ListUsersResponse> {
 
-        private final ReactorUsers users = new ReactorUsers(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorUsers users = new ReactorUsers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {

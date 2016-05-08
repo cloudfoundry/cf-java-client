@@ -47,7 +47,7 @@ public final class ReactorRouteMappingsTest {
 
     public static final class Create extends AbstractClientApiTest<CreateRouteMappingRequest, CreateRouteMappingResponse> {
 
-        private final ReactorRouteMappings routeMappings = new ReactorRouteMappings(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorRouteMappings routeMappings = new ReactorRouteMappings(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -103,7 +103,7 @@ public final class ReactorRouteMappingsTest {
 
     public static final class Delete extends AbstractClientApiTest<DeleteRouteMappingRequest, DeleteRouteMappingResponse> {
 
-        private final ReactorRouteMappings routeMappings = new ReactorRouteMappings(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorRouteMappings routeMappings = new ReactorRouteMappings(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -142,7 +142,7 @@ public final class ReactorRouteMappingsTest {
 
     public static final class DeleteAsync extends AbstractClientApiTest<DeleteRouteMappingRequest, DeleteRouteMappingResponse> {
 
-        private final ReactorRouteMappings routeMappings = new ReactorRouteMappings(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorRouteMappings routeMappings = new ReactorRouteMappings(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -195,7 +195,7 @@ public final class ReactorRouteMappingsTest {
 
     public static final class Get extends AbstractClientApiTest<GetRouteMappingRequest, GetRouteMappingResponse> {
 
-        private final ReactorRouteMappings routeMappings = new ReactorRouteMappings(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorRouteMappings routeMappings = new ReactorRouteMappings(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -248,7 +248,7 @@ public final class ReactorRouteMappingsTest {
 
     public static final class List extends AbstractClientApiTest<ListRouteMappingsRequest, ListRouteMappingsResponse> {
 
-        private final ReactorRouteMappings routeMappings = new ReactorRouteMappings(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorRouteMappings routeMappings = new ReactorRouteMappings(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {

@@ -35,7 +35,7 @@ public final class ReactorTokensTest {
 
     public static final class GetKey extends AbstractUaaApiTest<GetTokenKeyRequest, GetTokenKeyResponse> {
 
-        private final ReactorTokens tokens = new ReactorTokens(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -93,7 +93,7 @@ public final class ReactorTokensTest {
 
     public static final class ListKeys extends AbstractUaaApiTest<ListTokenKeysRequest, ListTokenKeysResponse> {
 
-        private final ReactorTokens tokens = new ReactorTokens(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {

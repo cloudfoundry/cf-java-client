@@ -38,7 +38,7 @@ public final class ReactorFeatureFlagsTest {
 
     public static final class GetAppScaling extends AbstractClientApiTest<GetFeatureFlagRequest, GetFeatureFlagResponse> {
 
-        private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -84,7 +84,7 @@ public final class ReactorFeatureFlagsTest {
 
     public static final class GetUserRoles extends AbstractClientApiTest<GetFeatureFlagRequest, GetFeatureFlagResponse> {
 
-        private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -130,7 +130,7 @@ public final class ReactorFeatureFlagsTest {
 
     public static final class List extends AbstractClientApiTest<ListFeatureFlagsRequest, ListFeatureFlagsResponse> {
 
-        private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -243,7 +243,7 @@ public final class ReactorFeatureFlagsTest {
 
     public static final class Set extends AbstractClientApiTest<SetFeatureFlagRequest, SetFeatureFlagResponse> {
 
-        private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {

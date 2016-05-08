@@ -30,7 +30,7 @@ public final class ReactorServiceBindingsV3Test {
 
     public static final class Delete extends AbstractClientApiTest<DeleteServiceBindingRequest, Void> {
 
-        private final ReactorServiceBindingsV3 serviceBindings = new ReactorServiceBindingsV3(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceBindingsV3 serviceBindings = new ReactorServiceBindingsV3(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {

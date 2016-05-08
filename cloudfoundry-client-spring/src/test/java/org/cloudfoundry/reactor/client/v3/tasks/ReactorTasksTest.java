@@ -46,7 +46,7 @@ public final class ReactorTasksTest {
 
     public static final class Cancel extends AbstractClientApiTest<CancelTaskRequest, CancelTaskResponse> {
 
-        private final ReactorTasks tasks = new ReactorTasks(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorTasks tasks = new ReactorTasks(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -104,7 +104,7 @@ public final class ReactorTasksTest {
 
     public static final class Create extends AbstractClientApiTest<CreateTaskRequest, CreateTaskResponse> {
 
-        private final ReactorTasks tasks = new ReactorTasks(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorTasks tasks = new ReactorTasks(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -166,7 +166,7 @@ public final class ReactorTasksTest {
 
     public static final class Get extends AbstractClientApiTest<GetTaskRequest, GetTaskResponse> {
 
-        private final ReactorTasks tasks = new ReactorTasks(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorTasks tasks = new ReactorTasks(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -224,7 +224,7 @@ public final class ReactorTasksTest {
 
     public static final class List extends AbstractClientApiTest<ListTasksRequest, ListTasksResponse> {
 
-        private final ReactorTasks tasks = new ReactorTasks(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorTasks tasks = new ReactorTasks(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {

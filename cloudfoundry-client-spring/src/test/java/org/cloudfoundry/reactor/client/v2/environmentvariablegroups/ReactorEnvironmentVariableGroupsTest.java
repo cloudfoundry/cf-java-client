@@ -39,7 +39,7 @@ public class ReactorEnvironmentVariableGroupsTest {
 
     public static final class GetRunningEnvironmentVariables extends AbstractClientApiTest<GetRunningEnvironmentVariablesRequest, GetRunningEnvironmentVariablesResponse> {
 
-        private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -81,7 +81,7 @@ public class ReactorEnvironmentVariableGroupsTest {
 
     public static final class GetStagingEnvironmentVariables extends AbstractClientApiTest<GetStagingEnvironmentVariablesRequest, GetStagingEnvironmentVariablesResponse> {
 
-        private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -123,7 +123,7 @@ public class ReactorEnvironmentVariableGroupsTest {
 
     public static final class UpdateRunningEnvironmentVariables extends AbstractClientApiTest<UpdateRunningEnvironmentVariablesRequest, UpdateRunningEnvironmentVariablesResponse> {
 
-        private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -168,7 +168,7 @@ public class ReactorEnvironmentVariableGroupsTest {
 
     public static final class UpdateStagingEnvironmentVariables extends AbstractClientApiTest<UpdateStagingEnvironmentVariablesRequest, UpdateStagingEnvironmentVariablesResponse> {
 
-        private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {

@@ -47,7 +47,7 @@ public final class ReactorServiceBrokersTest {
 
     public static final class Create extends AbstractClientApiTest<CreateServiceBrokerRequest, CreateServiceBrokerResponse> {
 
-        private final ReactorServiceBrokers serviceBrokers = new ReactorServiceBrokers(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceBrokers serviceBrokers = new ReactorServiceBrokers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -104,7 +104,7 @@ public final class ReactorServiceBrokersTest {
 
     public static final class Delete extends AbstractClientApiTest<DeleteServiceBrokerRequest, Void> {
 
-        private final ReactorServiceBrokers serviceBrokers = new ReactorServiceBrokers(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceBrokers serviceBrokers = new ReactorServiceBrokers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -144,7 +144,7 @@ public final class ReactorServiceBrokersTest {
 
     public static final class Get extends AbstractClientApiTest<GetServiceBrokerRequest, GetServiceBrokerResponse> {
 
-        private final ReactorServiceBrokers serviceBrokers = new ReactorServiceBrokers(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceBrokers serviceBrokers = new ReactorServiceBrokers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -197,7 +197,7 @@ public final class ReactorServiceBrokersTest {
 
     public static final class List extends AbstractClientApiTest<ListServiceBrokersRequest, ListServiceBrokersResponse> {
 
-        private final ReactorServiceBrokers serviceBrokers = new ReactorServiceBrokers(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceBrokers serviceBrokers = new ReactorServiceBrokers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -279,7 +279,7 @@ public final class ReactorServiceBrokersTest {
 
     public static final class Update extends AbstractClientApiTest<UpdateServiceBrokerRequest, UpdateServiceBrokerResponse> {
 
-        private final ReactorServiceBrokers serviceBrokers = new ReactorServiceBrokers(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceBrokers serviceBrokers = new ReactorServiceBrokers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {

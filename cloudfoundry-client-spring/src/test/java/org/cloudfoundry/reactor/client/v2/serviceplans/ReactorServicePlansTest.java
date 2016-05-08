@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.serviceplans;
+package org.cloudfoundry.reactor.client.v2.serviceplans;
 
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
@@ -32,35 +32,42 @@ import org.cloudfoundry.client.v2.serviceplans.ServicePlanEntity;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlanResource;
 import org.cloudfoundry.client.v2.serviceplans.UpdateServicePlanRequest;
 import org.cloudfoundry.client.v2.serviceplans.UpdateServicePlanResponse;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpStatus.ACCEPTED;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 
-public final class SpringServicePlansTest {
+public final class ReactorServicePlansTest {
 
-    public static final class Delete extends AbstractApiTest<DeleteServicePlanRequest, DeleteServicePlanResponse> {
+    public static final class Delete extends AbstractClientApiTest<DeleteServicePlanRequest, DeleteServicePlanResponse> {
 
-        private final SpringServicePlans servicePlans = new SpringServicePlans(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServicePlans servicePlans = new ReactorServicePlans(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/service_plans/test-service-plan-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteServicePlanRequest getInvalidRequest() {
             return DeleteServicePlanRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE)
-                .path("v2/service_plans/test-service-plan-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -82,22 +89,26 @@ public final class SpringServicePlansTest {
         }
     }
 
-    public static final class DeleteAsync extends AbstractApiTest<DeleteServicePlanRequest, DeleteServicePlanResponse> {
+    public static final class DeleteAsync extends AbstractClientApiTest<DeleteServicePlanRequest, DeleteServicePlanResponse> {
 
-        private final SpringServicePlans servicePlans = new SpringServicePlans(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServicePlans servicePlans = new ReactorServicePlans(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/service_plans/test-service-plan-id?async=true")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(ACCEPTED)
+                    .payload("fixtures/client/v2/service_plans/DELETE_{id}_async_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteServicePlanRequest getInvalidRequest() {
             return DeleteServicePlanRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE)
-                .path("v2/service_plans/test-service-plan-id?async=true")
-                .status(ACCEPTED)
-                .responsePayload("fixtures/client/v2/service_plans/DELETE_{id}_async_response.json");
         }
 
         @Override
@@ -130,22 +141,26 @@ public final class SpringServicePlansTest {
         }
     }
 
-    public static final class Get extends AbstractApiTest<GetServicePlanRequest, GetServicePlanResponse> {
+    public static final class Get extends AbstractClientApiTest<GetServicePlanRequest, GetServicePlanResponse> {
 
-        private final SpringServicePlans servicePlans = new SpringServicePlans(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServicePlans servicePlans = new ReactorServicePlans(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/service_plans/test-service-plan-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/service_plans/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetServicePlanRequest getInvalidRequest() {
             return GetServicePlanRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET)
-                .path("v2/service_plans/test-service-plan-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/service_plans/GET_{id}_response.json");
         }
 
         @Override
@@ -183,22 +198,26 @@ public final class SpringServicePlansTest {
         }
     }
 
-    public static final class List extends AbstractApiTest<ListServicePlansRequest, ListServicePlansResponse> {
+    public static final class List extends AbstractClientApiTest<ListServicePlansRequest, ListServicePlansResponse> {
 
-        private final SpringServicePlans servicePlans = new SpringServicePlans(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServicePlans servicePlans = new ReactorServicePlans(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/service_plans?q=service_guid%20IN%20test-service-id&page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/service_plans/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListServicePlansRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET)
-                .path("v2/service_plans?q=service_guid%20IN%20test-service-id&page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/service_plans/GET_response.json");
         }
 
         @Override
@@ -241,23 +260,27 @@ public final class SpringServicePlansTest {
         }
     }
 
-    public static final class ListServiceInstances extends AbstractApiTest<ListServicePlanServiceInstancesRequest, ListServicePlanServiceInstancesResponse> {
+    public static final class ListServiceInstances extends AbstractClientApiTest<ListServicePlanServiceInstancesRequest, ListServicePlanServiceInstancesResponse> {
 
-        private final SpringServicePlans servicePlans = new SpringServicePlans(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServicePlans servicePlans = new ReactorServicePlans(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/service_plans/test-service-plan-id/service_instances?q=space_guid%20IN%20test-space-id&page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/service_plans/GET_{id}_service_instances_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListServicePlanServiceInstancesRequest getInvalidRequest() {
             return ListServicePlanServiceInstancesRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET)
-                .path("v2/service_plans/test-service-plan-id/service_instances?q=space_guid%20IN%20test-space-id&page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/service_plans/GET_{id}_service_instances_response.json");
         }
 
         @Override
@@ -302,23 +325,28 @@ public final class SpringServicePlansTest {
 
     }
 
-    public static final class Update extends AbstractApiTest<UpdateServicePlanRequest, UpdateServicePlanResponse> {
+    public static final class Update extends AbstractClientApiTest<UpdateServicePlanRequest, UpdateServicePlanResponse> {
 
-        private final SpringServicePlans servicePlans = new SpringServicePlans(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServicePlans servicePlans = new ReactorServicePlans(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/service_plans/test-service-plan-id")
+                    .payload("fixtures/client/v2/service_plans/PUT_{id}_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v2/service_plans/PUT_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected UpdateServicePlanRequest getInvalidRequest() {
             return UpdateServicePlanRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/service_plans/test-service-plan-id")
-                .requestPayload("fixtures/client/v2/service_plans/PUT_{id}_request.json")
-                .status(CREATED)
-                .responsePayload("fixtures/client/v2/service_plans/PUT_{id}_response.json");
         }
 
         @Override

@@ -43,7 +43,7 @@ public final class ReactorServiceKeysTest {
 
     public static final class Create extends AbstractClientApiTest<CreateServiceKeyRequest, CreateServiceKeyResponse> {
 
-        private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -97,7 +97,7 @@ public final class ReactorServiceKeysTest {
 
     public static final class Delete extends AbstractClientApiTest<DeleteServiceKeyRequest, Void> {
 
-        private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -136,7 +136,7 @@ public final class ReactorServiceKeysTest {
 
     public static final class Get extends AbstractClientApiTest<GetServiceKeyRequest, GetServiceKeyResponse> {
 
-        private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -188,7 +188,7 @@ public final class ReactorServiceKeysTest {
 
     public static final class List extends AbstractClientApiTest<ListServiceKeysRequest, ListServiceKeysResponse> {
 
-        private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
