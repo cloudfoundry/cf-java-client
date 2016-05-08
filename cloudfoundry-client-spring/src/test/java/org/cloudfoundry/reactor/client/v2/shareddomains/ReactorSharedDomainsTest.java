@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.shareddomains;
+package org.cloudfoundry.reactor.client.v2.shareddomains;
 
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest;
@@ -23,33 +23,41 @@ import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainEntity;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.client.v2.Resource.Metadata;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringSharedDomainsTest {
+public final class ReactorSharedDomainsTest {
 
-    public static final class Create extends AbstractApiTest<CreateSharedDomainRequest, CreateSharedDomainResponse> {
+    public static final class Create extends AbstractClientApiTest<CreateSharedDomainRequest, CreateSharedDomainResponse> {
 
-        private final SpringSharedDomains sharedDomains = new SpringSharedDomains(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSharedDomains sharedDomains = new ReactorSharedDomains(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v2/shared_domains")
+                    .payload("fixtures/client/v2/shared_domains/POST_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/shared_domains/POST_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected CreateSharedDomainRequest getInvalidRequest() {
             return CreateSharedDomainRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v2/shared_domains")
-                .requestPayload("fixtures/client/v2/shared_domains/POST_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/shared_domains/POST_response.json");
         }
 
         @Override
@@ -83,21 +91,26 @@ public final class SpringSharedDomainsTest {
 
     }
 
-    public static final class ListSharedDomains extends AbstractApiTest<ListSharedDomainsRequest, ListSharedDomainsResponse> {
+    public static final class ListSharedDomains extends AbstractClientApiTest<ListSharedDomainsRequest, ListSharedDomainsResponse> {
 
-        private final SpringSharedDomains sharedDomains = new SpringSharedDomains(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSharedDomains sharedDomains = new ReactorSharedDomains(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/shared_domains?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/shared_domains/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListSharedDomainsRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/shared_domains?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/shared_domains/GET_response.json");
         }
 
         @Override
