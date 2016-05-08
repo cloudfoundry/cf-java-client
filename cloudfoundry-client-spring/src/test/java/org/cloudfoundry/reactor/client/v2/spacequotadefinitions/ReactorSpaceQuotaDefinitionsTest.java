@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.spacequotadefinitions;
+package org.cloudfoundry.reactor.client.v2.spacequotadefinitions;
 
 import org.cloudfoundry.client.v2.spacequotadefinitions.AssociateSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.AssociateSpaceQuotaDefinitionResponse;
@@ -25,34 +25,42 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinition
 import org.cloudfoundry.client.v2.spacequotadefinitions.RemoveSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.client.v2.Resource.Metadata;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringSpaceQuotaDefinitionsTest {
+public final class ReactorSpaceQuotaDefinitionsTest {
 
-    public static final class AssociateSpace extends AbstractApiTest<AssociateSpaceQuotaDefinitionRequest, AssociateSpaceQuotaDefinitionResponse> {
+    public static final class AssociateSpace extends AbstractClientApiTest<AssociateSpaceQuotaDefinitionRequest, AssociateSpaceQuotaDefinitionResponse> {
 
-        private final SpringSpaceQuotaDefinitions spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaceQuotaDefinitions spaceQuotaDefinitions = new ReactorSpaceQuotaDefinitions(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/space_quota_definitions/PUT_{id}_spaces_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected AssociateSpaceQuotaDefinitionRequest getInvalidRequest() {
             return AssociateSpaceQuotaDefinitionRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/space_quota_definitions/PUT_{id}_spaces_{id}_response.json");
         }
 
         @Override
@@ -92,22 +100,27 @@ public final class SpringSpaceQuotaDefinitionsTest {
         }
     }
 
-    public static final class GetSpaceQuotaDefinition extends AbstractApiTest<GetSpaceQuotaDefinitionRequest, GetSpaceQuotaDefinitionResponse> {
+    public static final class GetSpaceQuotaDefinition extends AbstractClientApiTest<GetSpaceQuotaDefinitionRequest, GetSpaceQuotaDefinitionResponse> {
 
-        private final SpringSpaceQuotaDefinitions spacequotadefinitions = new SpringSpaceQuotaDefinitions(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaceQuotaDefinitions spaceQuotaDefinitions = new ReactorSpaceQuotaDefinitions(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/space_quota_definitions/test-space-quota-definition-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/space_quota_definitions/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetSpaceQuotaDefinitionRequest getInvalidRequest() {
             return GetSpaceQuotaDefinitionRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/space_quota_definitions/test-space-quota-definition-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/space_quota_definitions/GET_{id}_response.json");
         }
 
         @Override
@@ -142,26 +155,31 @@ public final class SpringSpaceQuotaDefinitionsTest {
 
         @Override
         protected Mono<GetSpaceQuotaDefinitionResponse> invoke(GetSpaceQuotaDefinitionRequest request) {
-            return this.spacequotadefinitions.get(request);
+            return this.spaceQuotaDefinitions.get(request);
         }
 
     }
 
-    public static final class List extends AbstractApiTest<ListSpaceQuotaDefinitionsRequest, ListSpaceQuotaDefinitionsResponse> {
+    public static final class List extends AbstractClientApiTest<ListSpaceQuotaDefinitionsRequest, ListSpaceQuotaDefinitionsResponse> {
 
-        private final SpringSpaceQuotaDefinitions spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaceQuotaDefinitions spaceQuotaDefinitions = new ReactorSpaceQuotaDefinitions(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/space_quota_definitions?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/space_quota_definitions/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListSpaceQuotaDefinitionsRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/space_quota_definitions?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/space_quota_definitions/GET_response.json");
         }
 
         @Override
@@ -205,21 +223,26 @@ public final class SpringSpaceQuotaDefinitionsTest {
 
     }
 
-    public static final class RemoveSpace extends AbstractApiTest<RemoveSpaceQuotaDefinitionRequest, Void> {
+    public static final class RemoveSpace extends AbstractClientApiTest<RemoveSpaceQuotaDefinitionRequest, Void> {
 
-        private final SpringSpaceQuotaDefinitions spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaceQuotaDefinitions spaceQuotaDefinitions = new ReactorSpaceQuotaDefinitions(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected RemoveSpaceQuotaDefinitionRequest getInvalidRequest() {
             return RemoveSpaceQuotaDefinitionRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
-                .status(NO_CONTENT);
         }
 
         @Override
