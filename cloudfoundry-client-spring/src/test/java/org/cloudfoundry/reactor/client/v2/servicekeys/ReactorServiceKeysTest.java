@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.servicekeys;
+package org.cloudfoundry.reactor.client.v2.servicekeys;
 
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyRequest;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyResponse;
@@ -25,35 +25,43 @@ import org.cloudfoundry.client.v2.servicekeys.ListServiceKeysRequest;
 import org.cloudfoundry.client.v2.servicekeys.ListServiceKeysResponse;
 import org.cloudfoundry.client.v2.servicekeys.ServiceKeyEntity;
 import org.cloudfoundry.client.v2.servicekeys.ServiceKeyResource;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.client.v2.Resource.Metadata;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringServiceKeysTest {
+public final class ReactorServiceKeysTest {
 
-    public static final class Create extends AbstractApiTest<CreateServiceKeyRequest, CreateServiceKeyResponse> {
+    public static final class Create extends AbstractClientApiTest<CreateServiceKeyRequest, CreateServiceKeyResponse> {
 
-        private final SpringServiceKeys serviceKeys = new SpringServiceKeys(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v2/service_keys")
+                    .payload("fixtures/client/v2/service_keys/POST_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v2/service_keys/POST_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected CreateServiceKeyRequest getInvalidRequest() {
             return CreateServiceKeyRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v2/service_keys")
-                .requestPayload("fixtures/client/v2/service_keys/POST_request.json")
-                .status(CREATED)
-                .responsePayload("fixtures/client/v2/service_keys/POST_response.json");
         }
 
         @Override
@@ -87,20 +95,25 @@ public final class SpringServiceKeysTest {
         }
     }
 
-    public static final class Delete extends AbstractApiTest<DeleteServiceKeyRequest, Void> {
+    public static final class Delete extends AbstractClientApiTest<DeleteServiceKeyRequest, Void> {
 
-        private final SpringServiceKeys serviceKeys = new SpringServiceKeys(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/service_keys/test-service-key-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteServiceKeyRequest getInvalidRequest() {
             return DeleteServiceKeyRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/service_keys/test-service-key-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -121,21 +134,26 @@ public final class SpringServiceKeysTest {
         }
     }
 
-    public static final class Get extends AbstractApiTest<GetServiceKeyRequest, GetServiceKeyResponse> {
+    public static final class Get extends AbstractClientApiTest<GetServiceKeyRequest, GetServiceKeyResponse> {
 
-        private final SpringServiceKeys serviceKeys = new SpringServiceKeys(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/service_keys/test-service-key-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/service_keys/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetServiceKeyRequest getInvalidRequest() {
             return GetServiceKeyRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/service_keys/test-service-key-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/service_keys/GET_{id}_response.json");
         }
 
         @Override
@@ -168,21 +186,26 @@ public final class SpringServiceKeysTest {
         }
     }
 
-    public static final class List extends AbstractApiTest<ListServiceKeysRequest, ListServiceKeysResponse> {
+    public static final class List extends AbstractClientApiTest<ListServiceKeysRequest, ListServiceKeysResponse> {
 
-        private final SpringServiceKeys serviceKeys = new SpringServiceKeys(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(this.authorizationProvider, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/service_keys?q=name%20IN%20test-name&page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/service_keys/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListServiceKeysRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/service_keys?q=name%20IN%20test-name&page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/service_keys/GET_response.json");
         }
 
         @Override
