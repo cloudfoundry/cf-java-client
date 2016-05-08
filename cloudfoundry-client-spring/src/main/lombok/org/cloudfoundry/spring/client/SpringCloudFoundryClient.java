@@ -91,7 +91,7 @@ import org.cloudfoundry.reactor.client.v2.serviceusageevents.ReactorServiceUsage
 import org.cloudfoundry.reactor.client.v2.shareddomains.ReactorSharedDomains;
 import org.cloudfoundry.reactor.client.v2.spacequotadefinitions.ReactorSpaceQuotaDefinitions;
 import org.cloudfoundry.spring.client.v2.spaces.SpringSpaces;
-import org.cloudfoundry.spring.client.v2.userprovidedserviceinstances.SpringUserProvidedServiceInstances;
+import org.cloudfoundry.reactor.client.v2.userprovidedserviceinstances.ReactorUserProvidedServiceInstances;
 import org.cloudfoundry.reactor.client.v3.applications.ReactorApplicationsV3;
 import org.cloudfoundry.reactor.client.v3.droplets.ReactorDroplets;
 import org.cloudfoundry.spring.client.v3.packages.SpringPackages;
@@ -216,7 +216,6 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         this.buildpacks = new SpringBuildpacks(restOperations, root, schedulerGroup);
         this.packages = new SpringPackages(restOperations, root, schedulerGroup);
         this.spaces = new SpringSpaces(restOperations, root, schedulerGroup);
-        this.userProvidedServiceInstances = new SpringUserProvidedServiceInstances(restOperations, root, schedulerGroup);
 
         this.tokenProvider = tokenProvider;
 
@@ -266,6 +265,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         this.stacks = new ReactorStacks(authorizationProvider, httpClient, objectMapper, root2);
         this.tasks = new ReactorTasks(authorizationProvider, httpClient, objectMapper, root2);
         this.users = new ReactorUsers(authorizationProvider, httpClient, objectMapper, root2);
+        this.userProvidedServiceInstances = new ReactorUserProvidedServiceInstances(authorizationProvider, httpClient, objectMapper, root2);
     }
 
     // Let's take a moment to reflect on the fact that this bridge constructor is needed to counter a useless compiler constraint

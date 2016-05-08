@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.userprovidedserviceinstances;
+package org.cloudfoundry.reactor.client.v2.userprovidedserviceinstances;
 
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
@@ -32,36 +32,44 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvide
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceEntity;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceResource;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpStatus.ACCEPTED;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class SpringUserProvidedServiceInstancesTest {
+public final class ReactorUserProvidedServiceInstancesTest {
 
-    public static final class Create extends AbstractApiTest<CreateUserProvidedServiceInstanceRequest, CreateUserProvidedServiceInstanceResponse> {
+    public static final class Create extends AbstractClientApiTest<CreateUserProvidedServiceInstanceRequest, CreateUserProvidedServiceInstanceResponse> {
 
-        private final SpringUserProvidedServiceInstances userProvidedServiceInstances = new SpringUserProvidedServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorUserProvidedServiceInstances userProvidedServiceInstances = new ReactorUserProvidedServiceInstances(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v2/user_provided_service_instances")
+                    .payload("fixtures/client/v2/user_provided_service_instances/POST_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v2/user_provided_service_instances/POST_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected CreateUserProvidedServiceInstanceRequest getInvalidRequest() {
             return CreateUserProvidedServiceInstanceRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v2/user_provided_service_instances")
-                .requestPayload("fixtures/client/v2/user_provided_service_instances/POST_request.json")
-                .status(CREATED)
-                .responsePayload("fixtures/client/v2/user_provided_service_instances/POST_response.json");
         }
 
         @Override
@@ -103,20 +111,25 @@ public final class SpringUserProvidedServiceInstancesTest {
         }
     }
 
-    public static final class Delete extends AbstractApiTest<DeleteUserProvidedServiceInstanceRequest, Void> {
+    public static final class Delete extends AbstractClientApiTest<DeleteUserProvidedServiceInstanceRequest, Void> {
 
-        private final SpringUserProvidedServiceInstances userProvidedServiceInstances = new SpringUserProvidedServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorUserProvidedServiceInstances userProvidedServiceInstances = new ReactorUserProvidedServiceInstances(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/user_provided_service_instances/5b6b45c8-89be-48d2-affd-f64346ad4d93")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteUserProvidedServiceInstanceRequest getInvalidRequest() {
             return DeleteUserProvidedServiceInstanceRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/user_provided_service_instances/5b6b45c8-89be-48d2-affd-f64346ad4d93")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -137,21 +150,26 @@ public final class SpringUserProvidedServiceInstancesTest {
         }
     }
 
-    public static final class Get extends AbstractApiTest<GetUserProvidedServiceInstanceRequest, GetUserProvidedServiceInstanceResponse> {
+    public static final class Get extends AbstractClientApiTest<GetUserProvidedServiceInstanceRequest, GetUserProvidedServiceInstanceResponse> {
 
-        private final SpringUserProvidedServiceInstances userProvidedServiceInstances = new SpringUserProvidedServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorUserProvidedServiceInstances userProvidedServiceInstances = new ReactorUserProvidedServiceInstances(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/user_provided_service_instances/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetUserProvidedServiceInstanceRequest getInvalidRequest() {
             return GetUserProvidedServiceInstanceRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/user_provided_service_instances/GET_{id}_response.json");
         }
 
         @Override
@@ -188,21 +206,26 @@ public final class SpringUserProvidedServiceInstancesTest {
         }
     }
 
-    public static final class List extends AbstractApiTest<ListUserProvidedServiceInstancesRequest, ListUserProvidedServiceInstancesResponse> {
+    public static final class List extends AbstractClientApiTest<ListUserProvidedServiceInstancesRequest, ListUserProvidedServiceInstancesResponse> {
 
-        private final SpringUserProvidedServiceInstances userProvidedServiceInstances = new SpringUserProvidedServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorUserProvidedServiceInstances userProvidedServiceInstances = new ReactorUserProvidedServiceInstances(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/user_provided_service_instances?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/user_provided_service_instances/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListUserProvidedServiceInstancesRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/user_provided_service_instances?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/user_provided_service_instances/GET_response.json");
         }
 
         @Override
@@ -243,21 +266,26 @@ public final class SpringUserProvidedServiceInstancesTest {
         }
     }
 
-    public static final class ListServiceBindings extends AbstractApiTest<ListUserProvidedServiceInstanceServiceBindingsRequest, ListUserProvidedServiceInstanceServiceBindingsResponse> {
+    public static final class ListServiceBindings extends AbstractClientApiTest<ListUserProvidedServiceInstanceServiceBindingsRequest, ListUserProvidedServiceInstanceServiceBindingsResponse> {
 
-        private final SpringUserProvidedServiceInstances userProvidedServiceInstances = new SpringUserProvidedServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorUserProvidedServiceInstances userProvidedServiceInstances = new ReactorUserProvidedServiceInstances(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/user_provided_service_instances/test-user-provided-service-instance-id/service_bindings?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/user_provided_service_instances/GET_{id}_service_bindings_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListUserProvidedServiceInstanceServiceBindingsRequest getInvalidRequest() {
             return ListUserProvidedServiceInstanceServiceBindingsRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/user_provided_service_instances/16c81612-6a63-4faa-8cd5-acc80771b562/service_bindings?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/user_provided_service_instances/GET_{id}_service_bindings_response.json");
         }
 
         @Override
@@ -287,7 +315,7 @@ public final class SpringUserProvidedServiceInstancesTest {
         @Override
         protected ListUserProvidedServiceInstanceServiceBindingsRequest getValidRequest() throws Exception {
             return ListUserProvidedServiceInstanceServiceBindingsRequest.builder()
-                .userProvidedServiceInstanceId("16c81612-6a63-4faa-8cd5-acc80771b562")
+                .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
                 .page(-1)
                 .build();
         }
@@ -298,22 +326,27 @@ public final class SpringUserProvidedServiceInstancesTest {
         }
     }
 
-    public static final class Update extends AbstractApiTest<UpdateUserProvidedServiceInstanceRequest, UpdateUserProvidedServiceInstanceResponse> {
+    public static final class Update extends AbstractClientApiTest<UpdateUserProvidedServiceInstanceRequest, UpdateUserProvidedServiceInstanceResponse> {
 
-        private final SpringUserProvidedServiceInstances userProvidedServiceInstances = new SpringUserProvidedServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorUserProvidedServiceInstances userProvidedServiceInstances = new ReactorUserProvidedServiceInstances(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d")
+                    .payload("fixtures/client/v2/user_provided_service_instances/PUT_{id}_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(ACCEPTED)
+                    .payload("fixtures/client/v2/user_provided_service_instances/PUT_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected UpdateUserProvidedServiceInstanceRequest getInvalidRequest() {
             return UpdateUserProvidedServiceInstanceRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d")
-                .requestPayload("fixtures/client/v2/user_provided_service_instances/PUT_{id}_request.json")
-                .status(ACCEPTED)
-                .responsePayload("fixtures/client/v2/user_provided_service_instances/PUT_{id}_response.json");
         }
 
         @Override
