@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.spaces;
+package org.cloudfoundry.reactor.client.v2.spaces;
 
-import lombok.ToString;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorByUsernameResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
@@ -64,244 +64,199 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceUserRolesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceAuditorByUsernameRequest;
+import org.cloudfoundry.client.v2.spaces.RemoveSpaceAuditorByUsernameResponse;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceDeveloperByUsernameRequest;
+import org.cloudfoundry.client.v2.spaces.RemoveSpaceDeveloperByUsernameResponse;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceDeveloperRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceManagerByUsernameRequest;
+import org.cloudfoundry.client.v2.spaces.RemoveSpaceManagerByUsernameResponse;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceManagerRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceSecurityGroupRequest;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceResponse;
-import org.cloudfoundry.reactor.client.v2.FilterBuilder;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.reactor.client.QueryBuilder;
-import org.springframework.web.client.RestOperations;
+import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
+import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
+import reactor.io.netty.http.HttpClient;
 
-import java.net.URI;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
- * The Spring-based implementation of {@link Spaces}
+ * The Reactor-based implementation of {@link Spaces}
  */
-@ToString(callSuper = true)
-public final class SpringSpaces extends AbstractSpringOperations implements Spaces {
+public final class ReactorSpaces extends AbstractClientV2Operations implements Spaces {
 
     /**
      * Creates an instance
      *
-     * @param restOperations the {@link RestOperations} to use to communicate with the server
-     * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
-     * @param schedulerGroup The group to use when making requests
+     * @param authorizationProvider the {@link AuthorizationProvider} to use when communicating with the server
+     * @param httpClient            the {@link HttpClient} to use when communicating with the server
+     * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
+     * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
      */
-    public SpringSpaces(RestOperations restOperations, URI root, Scheduler schedulerGroup) {
-        super(restOperations, root, schedulerGroup);
+    public ReactorSpaces(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
+        super(authorizationProvider, httpClient, objectMapper, root);
     }
 
     @Override
     public Mono<AssociateSpaceAuditorResponse> associateAuditor(AssociateSpaceAuditorRequest request) {
-        return put(request, AssociateSpaceAuditorResponse.class, builder -> builder.pathSegment("v2", "spaces", request.getSpaceId(), "auditors", request.getAuditorId()));
+        return put(request, AssociateSpaceAuditorResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "auditors", validRequest.getAuditorId())));
     }
 
     @Override
     public Mono<AssociateSpaceAuditorByUsernameResponse> associateAuditorByUsername(AssociateSpaceAuditorByUsernameRequest request) {
-        return put(request, AssociateSpaceAuditorByUsernameResponse.class, builder -> builder.pathSegment("v2", "spaces", request.getSpaceId(), "auditors"));
+        return put(request, AssociateSpaceAuditorByUsernameResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "auditors")));
     }
 
     @Override
     public Mono<AssociateSpaceDeveloperResponse> associateDeveloper(AssociateSpaceDeveloperRequest request) {
-        return put(request, AssociateSpaceDeveloperResponse.class, builder -> builder.pathSegment("v2", "spaces", request.getSpaceId(), "developers", request.getDeveloperId()));
+        return put(request, AssociateSpaceDeveloperResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "developers", validRequest.getDeveloperId())));
     }
 
     @Override
     public Mono<AssociateSpaceDeveloperByUsernameResponse> associateDeveloperByUsername(AssociateSpaceDeveloperByUsernameRequest request) {
-        return put(request, AssociateSpaceDeveloperByUsernameResponse.class, builder -> builder.pathSegment("v2", "spaces", request.getSpaceId(), "developers"));
+        return put(request, AssociateSpaceDeveloperByUsernameResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "developers")));
     }
 
     @Override
     public Mono<AssociateSpaceManagerResponse> associateManager(AssociateSpaceManagerRequest request) {
-        return put(request, AssociateSpaceManagerResponse.class, builder -> builder.pathSegment("v2", "spaces", request.getSpaceId(), "managers", request.getManagerId()));
+        return put(request, AssociateSpaceManagerResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "managers", validRequest.getManagerId())));
     }
 
     @Override
     public Mono<AssociateSpaceManagerByUsernameResponse> associateManagerByUsername(AssociateSpaceManagerByUsernameRequest request) {
-        return put(request, AssociateSpaceManagerByUsernameResponse.class, builder -> builder.pathSegment("v2", "spaces", request.getSpaceId(), "managers"));
+        return put(request, AssociateSpaceManagerByUsernameResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "managers")));
     }
 
     @Override
     public Mono<AssociateSpaceSecurityGroupResponse> associateSecurityGroup(AssociateSpaceSecurityGroupRequest request) {
-        return put(request, AssociateSpaceSecurityGroupResponse.class, builder -> builder.pathSegment("v2", "spaces", request.getSpaceId(), "security_groups", request.getSecurityGroupId()));
+        return put(request, AssociateSpaceSecurityGroupResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "security_groups", validRequest.getSecurityGroupId())));
     }
 
     @Override
     public Mono<CreateSpaceResponse> create(CreateSpaceRequest request) {
-        return post(request, CreateSpaceResponse.class, builder -> builder.pathSegment("v2", "spaces"));
+        return post(request, CreateSpaceResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces")));
     }
 
     @Override
     public Mono<DeleteSpaceResponse> delete(DeleteSpaceRequest request) {
-        return delete(request, DeleteSpaceResponse.class, builder -> {
-            builder.pathSegment("v2", "spaces", request.getSpaceId());
-            QueryBuilder.augment(builder, request);
-        });
+        return delete(request, DeleteSpaceResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId())));
     }
 
     @Override
     public Mono<GetSpaceResponse> get(GetSpaceRequest request) {
-        return get(request, GetSpaceResponse.class, builder -> builder.pathSegment("v2", "spaces", request.getSpaceId()));
+        return get(request, GetSpaceResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId())));
     }
 
     @Override
     public Mono<GetSpaceSummaryResponse> getSummary(GetSpaceSummaryRequest request) {
-        return get(request, GetSpaceSummaryResponse.class, builder -> builder.pathSegment("v2", "spaces", request.getSpaceId(), "summary"));
+        return get(request, GetSpaceSummaryResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "summary")));
     }
 
     @Override
     public Mono<ListSpacesResponse> list(ListSpacesRequest request) {
-        return get(request, ListSpacesResponse.class, builder -> {
-            builder.pathSegment("v2", "spaces");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListSpacesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces")));
     }
 
     @Override
     public Mono<ListSpaceApplicationsResponse> listApplications(ListSpaceApplicationsRequest request) {
-        return get(request, ListSpaceApplicationsResponse.class, builder -> {
-            builder.pathSegment("v2", "spaces", request.getSpaceId(), "apps");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListSpaceApplicationsResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "apps")));
     }
 
     @Override
     public Mono<ListSpaceAuditorsResponse> listAuditors(ListSpaceAuditorsRequest request) {
-        return get(request, ListSpaceAuditorsResponse.class, builder -> {
-            builder.pathSegment("v2", "spaces", request.getSpaceId(), "auditors");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListSpaceAuditorsResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "auditors")));
     }
 
     @Override
     public Mono<ListSpaceDevelopersResponse> listDevelopers(ListSpaceDevelopersRequest request) {
-        return get(request, ListSpaceDevelopersResponse.class, builder -> {
-            builder.pathSegment("v2", "spaces", request.getSpaceId(), "developers");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListSpaceDevelopersResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "developers")));
     }
 
     @Override
     public Mono<ListSpaceDomainsResponse> listDomains(ListSpaceDomainsRequest request) {
-        return get(request, ListSpaceDomainsResponse.class, builder -> {
-            builder.pathSegment("v2", "spaces", request.getSpaceId(), "domains");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListSpaceDomainsResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "domains")));
     }
 
     @Override
     public Mono<ListSpaceEventsResponse> listEvents(ListSpaceEventsRequest request) {
-        return get(request, ListSpaceEventsResponse.class, builder -> {
-            builder.pathSegment("v2", "spaces", request.getSpaceId(), "events");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListSpaceEventsResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "events")));
     }
 
     @Override
     public Mono<ListSpaceManagersResponse> listManagers(ListSpaceManagersRequest request) {
-        return get(request, ListSpaceManagersResponse.class, builder -> {
-            builder.pathSegment("v2", "spaces", request.getSpaceId(), "managers");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListSpaceManagersResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "managers")));
     }
 
     @Override
     public Mono<ListSpaceRoutesResponse> listRoutes(ListSpaceRoutesRequest request) {
-        return get(request, ListSpaceRoutesResponse.class, builder -> {
-            builder.pathSegment("v2", "spaces", request.getSpaceId(), "routes");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListSpaceRoutesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "routes")));
     }
 
     @Override
     public Mono<ListSpaceSecurityGroupsResponse> listSecurityGroups(ListSpaceSecurityGroupsRequest request) {
-        return get(request, ListSpaceSecurityGroupsResponse.class, builder -> {
-            builder.pathSegment("v2", "spaces", request.getSpaceId(), "security_groups");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListSpaceSecurityGroupsResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "security_groups")));
     }
 
     @Override
     public Mono<ListSpaceServiceInstancesResponse> listServiceInstances(ListSpaceServiceInstancesRequest request) {
-        return get(request, ListSpaceServiceInstancesResponse.class, builder -> {
-            builder.pathSegment("v2", "spaces", request.getSpaceId(), "service_instances");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListSpaceServiceInstancesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "service_instances")));
     }
 
     @Override
     public Mono<ListSpaceServicesResponse> listServices(ListSpaceServicesRequest request) {
-        return get(request, ListSpaceServicesResponse.class, builder -> {
-            builder.pathSegment("v2", "spaces", request.getSpaceId(), "services");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListSpaceServicesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "services")));
     }
 
     @Override
     public Mono<ListSpaceUserRolesResponse> listUserRoles(ListSpaceUserRolesRequest request) {
-        return get(request, ListSpaceUserRolesResponse.class, builder -> {
-            builder.pathSegment("v2", "spaces", request.getSpaceId(), "user_roles");
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListSpaceUserRolesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "user_roles")));
     }
 
     @Override
     public Mono<Void> removeAuditor(RemoveSpaceAuditorRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "spaces", request.getSpaceId(), "auditors", request.getAuditorId()));
+        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "auditors", validRequest.getAuditorId())));
     }
 
     @Override
-    public Mono<Void> removeAuditorByUsername(RemoveSpaceAuditorByUsernameRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "spaces", request.getSpaceId(), "auditors"));
+    public Mono<RemoveSpaceAuditorByUsernameResponse> removeAuditorByUsername(RemoveSpaceAuditorByUsernameRequest request) {
+        return delete(request, RemoveSpaceAuditorByUsernameResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "auditors")));
     }
 
     @Override
     public Mono<Void> removeDeveloper(RemoveSpaceDeveloperRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "spaces", request.getSpaceId(), "developers", request.getDeveloperId()));
+        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "developers", validRequest.getDeveloperId())));
     }
 
     @Override
-    public Mono<Void> removeDeveloperByUsername(RemoveSpaceDeveloperByUsernameRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "spaces", request.getSpaceId(), "developers"));
+    public Mono<RemoveSpaceDeveloperByUsernameResponse> removeDeveloperByUsername(RemoveSpaceDeveloperByUsernameRequest request) {
+        return delete(request, RemoveSpaceDeveloperByUsernameResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "developers")));
     }
 
     @Override
     public Mono<Void> removeManager(RemoveSpaceManagerRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "spaces", request.getSpaceId(), "managers", request.getManagerId()));
+        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "managers", validRequest.getManagerId())));
     }
 
     @Override
-    public Mono<Void> removeManagerByUsername(RemoveSpaceManagerByUsernameRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "spaces", request.getSpaceId(), "managers"));
+    public Mono<RemoveSpaceManagerByUsernameResponse> removeManagerByUsername(RemoveSpaceManagerByUsernameRequest request) {
+        return delete(request, RemoveSpaceManagerByUsernameResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "managers")));
     }
 
     @Override
     public Mono<Void> removeSecurityGroup(RemoveSpaceSecurityGroupRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "spaces", request.getSpaceId(), "security_groups", request.getSecurityGroupId()));
+        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId(), "security_groups", validRequest.getSecurityGroupId())));
     }
 
     @Override
     public Mono<UpdateSpaceResponse> update(UpdateSpaceRequest request) {
-        return put(request, UpdateSpaceResponse.class, builder -> builder.pathSegment("v2", "spaces", request.getSpaceId()));
+        return put(request, UpdateSpaceResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "spaces", validRequest.getSpaceId())));
     }
 
 }

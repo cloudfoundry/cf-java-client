@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.spaces;
+package org.cloudfoundry.reactor.client.v2.spaces;
 
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
@@ -82,10 +82,13 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceUserRolesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceAuditorByUsernameRequest;
+import org.cloudfoundry.client.v2.spaces.RemoveSpaceAuditorByUsernameResponse;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceDeveloperByUsernameRequest;
+import org.cloudfoundry.client.v2.spaces.RemoveSpaceDeveloperByUsernameResponse;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceDeveloperRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceManagerByUsernameRequest;
+import org.cloudfoundry.client.v2.spaces.RemoveSpaceManagerByUsernameResponse;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceManagerRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceSecurityGroupRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
@@ -97,40 +100,48 @@ import org.cloudfoundry.client.v2.spaces.UserSpaceRoleEntity;
 import org.cloudfoundry.client.v2.spaces.UserSpaceRoleResource;
 import org.cloudfoundry.client.v2.users.UserEntity;
 import org.cloudfoundry.client.v2.users.UserResource;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.cloudfoundry.util.StringMap;
 import reactor.core.publisher.Mono;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.Service;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.builder;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpStatus.ACCEPTED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringSpacesTest {
+public final class ReactorSpacesTest {
 
-    public static final class AssociateAuditor extends AbstractApiTest<AssociateSpaceAuditorRequest, AssociateSpaceAuditorResponse> {
+    public static final class AssociateAuditor extends AbstractClientApiTest<AssociateSpaceAuditorRequest, AssociateSpaceAuditorResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/spaces/test-space-id/auditors/test-auditor-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/PUT_{id}_auditors_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected AssociateSpaceAuditorRequest getInvalidRequest() {
             return AssociateSpaceAuditorRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/spaces/test-space-id/auditors/test-auditor-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/PUT_{id}_auditors_{id}_response.json");
         }
 
         @Override
@@ -175,23 +186,28 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class AssociateAuditorByUsername extends AbstractApiTest<AssociateSpaceAuditorByUsernameRequest, AssociateSpaceAuditorByUsernameResponse> {
+    public static final class AssociateAuditorByUsername extends AbstractClientApiTest<AssociateSpaceAuditorByUsernameRequest, AssociateSpaceAuditorByUsernameResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/spaces/test-space-id/auditors")
+                    .payload("fixtures/client/v2/spaces/PUT_{id}_auditors_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/PUT_{id}_auditors_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected AssociateSpaceAuditorByUsernameRequest getInvalidRequest() {
             return AssociateSpaceAuditorByUsernameRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/spaces/test-space-id/auditors")
-                .requestPayload("fixtures/client/v2/spaces/PUT_{id}_auditors_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/PUT_{id}_auditors_response.json");
         }
 
         @Override
@@ -236,22 +252,27 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class AssociateDeveloper extends AbstractApiTest<AssociateSpaceDeveloperRequest, AssociateSpaceDeveloperResponse> {
+    public static final class AssociateDeveloper extends AbstractClientApiTest<AssociateSpaceDeveloperRequest, AssociateSpaceDeveloperResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/spaces/test-space-id/developers/test-developer-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/PUT_{id}_developers_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected AssociateSpaceDeveloperRequest getInvalidRequest() {
             return AssociateSpaceDeveloperRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/spaces/test-space-id/developers/test-developer-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/PUT_{id}_developers_{id}_response.json");
         }
 
         @Override
@@ -296,22 +317,27 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class AssociateManager extends AbstractApiTest<AssociateSpaceManagerRequest, AssociateSpaceManagerResponse> {
+    public static final class AssociateManager extends AbstractClientApiTest<AssociateSpaceManagerRequest, AssociateSpaceManagerResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/spaces/test-space-id/managers/test-manager-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/PUT_{id}_managers_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected AssociateSpaceManagerRequest getInvalidRequest() {
             return AssociateSpaceManagerRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/spaces/test-space-id/managers/test-manager-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/PUT_{id}_managers_{id}_response.json");
         }
 
         @Override
@@ -356,22 +382,27 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class AssociateSecurityGroup extends AbstractApiTest<AssociateSpaceSecurityGroupRequest, AssociateSpaceSecurityGroupResponse> {
+    public static final class AssociateSecurityGroup extends AbstractClientApiTest<AssociateSpaceSecurityGroupRequest, AssociateSpaceSecurityGroupResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/spaces/test-space-id/security_groups/test-security-group-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/PUT_{id}_security_group_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected AssociateSpaceSecurityGroupRequest getInvalidRequest() {
             return AssociateSpaceSecurityGroupRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/spaces/test-space-id/security_groups/test-security-group-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/PUT_{id}_security_group_{id}_response.json");
         }
 
         @Override
@@ -416,23 +447,28 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class AssociateSpaceDeveloperByUsername extends AbstractApiTest<AssociateSpaceDeveloperByUsernameRequest, AssociateSpaceDeveloperByUsernameResponse> {
+    public static final class AssociateSpaceDeveloperByUsername extends AbstractClientApiTest<AssociateSpaceDeveloperByUsernameRequest, AssociateSpaceDeveloperByUsernameResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/spaces/test-space-id/developers")
+                    .payload("fixtures/client/v2/spaces/PUT_{id}_developers_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/PUT_{id}_developers_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected AssociateSpaceDeveloperByUsernameRequest getInvalidRequest() {
             return AssociateSpaceDeveloperByUsernameRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/spaces/test-space-id/developers")
-                .requestPayload("fixtures/client/v2/spaces/PUT_{id}_developers_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/PUT_{id}_developers_response.json");
         }
 
         @Override
@@ -477,23 +513,28 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class AssociateSpaceManagerByUsername extends AbstractApiTest<AssociateSpaceManagerByUsernameRequest, AssociateSpaceManagerByUsernameResponse> {
+    public static final class AssociateSpaceManagerByUsername extends AbstractClientApiTest<AssociateSpaceManagerByUsernameRequest, AssociateSpaceManagerByUsernameResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/spaces/test-space-id/managers")
+                    .payload("fixtures/client/v2/spaces/PUT_{id}_managers_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/PUT_{id}_managers_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected AssociateSpaceManagerByUsernameRequest getInvalidRequest() {
             return AssociateSpaceManagerByUsernameRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/spaces/test-space-id/managers")
-                .requestPayload("fixtures/client/v2/spaces/PUT_{id}_managers_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/PUT_{id}_managers_response.json");
         }
 
         @Override
@@ -538,23 +579,28 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class Create extends AbstractApiTest<CreateSpaceRequest, CreateSpaceResponse> {
+    public static final class Create extends AbstractClientApiTest<CreateSpaceRequest, CreateSpaceResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v2/spaces")
+                    .payload("fixtures/client/v2/spaces/POST_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/POST_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected CreateSpaceRequest getInvalidRequest() {
             return CreateSpaceRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v2/spaces")
-                .requestPayload("fixtures/client/v2/spaces/POST_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/POST_response.json");
         }
 
         @Override
@@ -599,21 +645,26 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class Delete extends AbstractApiTest<DeleteSpaceRequest, DeleteSpaceResponse> {
+    public static final class Delete extends AbstractClientApiTest<DeleteSpaceRequest, DeleteSpaceResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/spaces/test-space-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteSpaceRequest getInvalidRequest() {
             return DeleteSpaceRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/spaces/test-space-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -635,22 +686,27 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class DeleteAsync extends AbstractApiTest<DeleteSpaceRequest, DeleteSpaceResponse> {
+    public static final class DeleteAsync extends AbstractClientApiTest<DeleteSpaceRequest, DeleteSpaceResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/spaces/test-space-id?async=true")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(ACCEPTED)
+                    .payload("fixtures/client/v2/spaces/DELETE_{id}_async_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteSpaceRequest getInvalidRequest() {
             return DeleteSpaceRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/spaces/test-space-id?async=true")
-                .status(ACCEPTED)
-                .responsePayload("fixtures/client/v2/spaces/DELETE_{id}_async_response.json");
         }
 
         @Override
@@ -683,22 +739,27 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class Get extends AbstractApiTest<GetSpaceRequest, GetSpaceResponse> {
+    public static final class Get extends AbstractClientApiTest<GetSpaceRequest, GetSpaceResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/spaces/test-space-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetSpaceRequest getInvalidRequest() {
             return GetSpaceRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/spaces/test-space-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/GET_{id}_response.json");
         }
 
         @Override
@@ -742,22 +803,27 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class GetSummary extends AbstractApiTest<GetSpaceSummaryRequest, GetSpaceSummaryResponse> {
+    public static final class GetSummary extends AbstractClientApiTest<GetSpaceSummaryRequest, GetSpaceSummaryResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/spaces/test-space-id/summary")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/GET_{id}_summary_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetSpaceSummaryRequest getInvalidRequest() {
             return GetSpaceSummaryRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/spaces/test-space-id/summary")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/GET_{id}_summary_response.json");
         }
 
         @Override
@@ -835,21 +901,26 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class List extends AbstractApiTest<ListSpacesRequest, ListSpacesResponse> {
+    public static final class List extends AbstractClientApiTest<ListSpacesRequest, ListSpacesResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/spaces?q=name%20IN%20test-name&page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListSpacesRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/spaces?q=name%20IN%20test-name&page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/GET_response.json");
         }
 
         @Override
@@ -898,21 +969,26 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class ListApplications extends AbstractApiTest<ListSpaceApplicationsRequest, ListSpaceApplicationsResponse> {
+    public static final class ListApplications extends AbstractClientApiTest<ListSpaceApplicationsRequest, ListSpaceApplicationsResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/spaces/test-space-id/apps?q=name%20IN%20test-name&page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/GET_{id}_apps_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListSpaceApplicationsRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/spaces/test-space-id/apps?q=name%20IN%20test-name&page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/GET_{id}_apps_response.json");
         }
 
         @Override
@@ -972,22 +1048,27 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class ListAuditors extends AbstractApiTest<ListSpaceAuditorsRequest, ListSpaceAuditorsResponse> {
+    public static final class ListAuditors extends AbstractClientApiTest<ListSpaceAuditorsRequest, ListSpaceAuditorsResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/spaces/test-space-id/auditors?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/GET_{id}_auditors_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListSpaceAuditorsRequest getInvalidRequest() {
             return ListSpaceAuditorsRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/spaces/test-space-id/auditors?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/GET_{id}_auditors_response.json");
         }
 
         @Override
@@ -1032,22 +1113,27 @@ public final class SpringSpacesTest {
         }
     }
 
-    public static final class ListDevelopers extends AbstractApiTest<ListSpaceDevelopersRequest, ListSpaceDevelopersResponse> {
+    public static final class ListDevelopers extends AbstractClientApiTest<ListSpaceDevelopersRequest, ListSpaceDevelopersResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/spaces/test-space-id/developers?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/GET_{id}_developers_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListSpaceDevelopersRequest getInvalidRequest() {
             return ListSpaceDevelopersRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/spaces/test-space-id/developers?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/GET_{id}_developers_response.json");
         }
 
         @Override
@@ -1093,22 +1179,27 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class ListDomains extends AbstractApiTest<ListSpaceDomainsRequest, ListSpaceDomainsResponse> {
+    public static final class ListDomains extends AbstractClientApiTest<ListSpaceDomainsRequest, ListSpaceDomainsResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/spaces/test-space-id/domains?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/GET_{id}_domains_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListSpaceDomainsRequest getInvalidRequest() {
             return ListSpaceDomainsRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/spaces/test-space-id/domains?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/GET_{id}_domains_response.json");
         }
 
         @Override
@@ -1153,22 +1244,27 @@ public final class SpringSpacesTest {
         }
     }
 
-    public static final class ListEvents extends AbstractApiTest<ListSpaceEventsRequest, ListSpaceEventsResponse> {
+    public static final class ListEvents extends AbstractClientApiTest<ListSpaceEventsRequest, ListSpaceEventsResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/spaces/test-space-id/events?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/GET_{id}_events_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListSpaceEventsRequest getInvalidRequest() {
             return ListSpaceEventsRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/spaces/test-space-id/events?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/GET_{id}_events_response.json");
         }
 
         @Override
@@ -1218,22 +1314,27 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class ListManagers extends AbstractApiTest<ListSpaceManagersRequest, ListSpaceManagersResponse> {
+    public static final class ListManagers extends AbstractClientApiTest<ListSpaceManagersRequest, ListSpaceManagersResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/spaces/test-space-id/managers?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/GET_{id}_managers_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListSpaceManagersRequest getInvalidRequest() {
             return ListSpaceManagersRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/spaces/test-space-id/managers?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/GET_{id}_managers_response.json");
         }
 
         @Override
@@ -1279,22 +1380,27 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class ListRoutes extends AbstractApiTest<ListSpaceRoutesRequest, ListSpaceRoutesResponse> {
+    public static final class ListRoutes extends AbstractClientApiTest<ListSpaceRoutesRequest, ListSpaceRoutesResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/spaces/test-space-id/routes?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/GET_{id}_routes_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListSpaceRoutesRequest getInvalidRequest() {
             return ListSpaceRoutesRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/spaces/test-space-id/routes?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/GET_{id}_routes_response.json");
         }
 
         @Override
@@ -1338,22 +1444,27 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class ListSecurityGroups extends AbstractApiTest<ListSpaceSecurityGroupsRequest, ListSpaceSecurityGroupsResponse> {
+    public static final class ListSecurityGroups extends AbstractClientApiTest<ListSpaceSecurityGroupsRequest, ListSpaceSecurityGroupsResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/spaces/test-space-id/security_groups?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/GET_{id}_security_groups_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListSpaceSecurityGroupsRequest getInvalidRequest() {
             return ListSpaceSecurityGroupsRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/spaces/test-space-id/security_groups?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/GET_{id}_security_groups_response.json");
         }
 
         @Override
@@ -1397,22 +1508,27 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class ListServiceInstances extends AbstractApiTest<ListSpaceServiceInstancesRequest, ListSpaceServiceInstancesResponse> {
+    public static final class ListServiceInstances extends AbstractClientApiTest<ListSpaceServiceInstancesRequest, ListSpaceServiceInstancesResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/spaces/test-space-id/service_instances?page=-1&return_user_provided_service_instances=true")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/GET_{id}_service_instances_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListSpaceServiceInstancesRequest getInvalidRequest() {
             return ListSpaceServiceInstancesRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/spaces/test-space-id/service_instances?page=-1&return_user_provided_service_instances=true")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/GET_{id}_service_instances_response.json");
         }
 
         @Override
@@ -1459,22 +1575,27 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class ListServices extends AbstractApiTest<ListSpaceServicesRequest, ListSpaceServicesResponse> {
+    public static final class ListServices extends AbstractClientApiTest<ListSpaceServicesRequest, ListSpaceServicesResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/spaces/test-space-id/services?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/GET_{id}_services_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListSpaceServicesRequest getInvalidRequest() {
             return ListSpaceServicesRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/spaces/test-space-id/services?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/GET_{id}_services_response.json");
         }
 
         @Override
@@ -1517,23 +1638,28 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class ListUserRoles extends AbstractApiTest<ListSpaceUserRolesRequest, ListSpaceUserRolesResponse> {
+    public static final class ListUserRoles extends AbstractClientApiTest<ListSpaceUserRolesRequest, ListSpaceUserRolesResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/spaces/test-space-id/user_roles?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/GET_{id}_user_roles_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListSpaceUserRolesRequest getInvalidRequest() {
             return ListSpaceUserRolesRequest.builder()
                 .page(-1)
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/spaces/test-space-id/user_roles?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/GET_{id}_user_roles_response.json");
         }
 
         @Override
@@ -1582,21 +1708,26 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class RemoveAuditor extends AbstractApiTest<RemoveSpaceAuditorRequest, Void> {
+    public static final class RemoveAuditor extends AbstractClientApiTest<RemoveSpaceAuditorRequest, Void> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/spaces/test-space-id/auditors/test-auditor-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected RemoveSpaceAuditorRequest getInvalidRequest() {
             return RemoveSpaceAuditorRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/spaces/test-space-id/auditors/test-auditor-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -1619,9 +1750,23 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class RemoveAuditorByUsername extends AbstractApiTest<RemoveSpaceAuditorByUsernameRequest, Void> {
+    public static final class RemoveAuditorByUsername extends AbstractClientApiTest<RemoveSpaceAuditorByUsernameRequest, RemoveSpaceAuditorByUsernameResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/spaces/test-space-id/auditors")
+                    .payload("fixtures/client/v2/spaces/DELETE_{id}_auditors_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/DELETE_{id}_auditors_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected RemoveSpaceAuditorByUsernameRequest getInvalidRequest() {
@@ -1630,16 +1775,30 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/spaces/test-space-id/auditors")
-                .requestPayload("fixtures/client/v2/spaces/DELETE_{id}_auditors_request.json")
-                .status(NO_CONTENT);
-        }
-
-        @Override
-        protected Void getResponse() {
-            return null;
+        protected RemoveSpaceAuditorByUsernameResponse getResponse() {
+            return RemoveSpaceAuditorByUsernameResponse.builder()
+                .metadata(Metadata.builder()
+                    .id("6ee704bb-fc88-40f6-9ab9-02fe8df35730")
+                    .url("/v2/spaces/6ee704bb-fc88-40f6-9ab9-02fe8df35730")
+                    .createdAt("2016-04-22T19:33:25Z")
+                    .build())
+                .entity(SpaceEntity.builder()
+                    .name("name-979")
+                    .organizationId("c6aa1f1e-e5b4-4eff-8ae5-3a430866f5ea")
+                    .allowSsh(true)
+                    .organizationUrl("/v2/organizations/c6aa1f1e-e5b4-4eff-8ae5-3a430866f5ea")
+                    .developersUrl("/v2/spaces/6ee704bb-fc88-40f6-9ab9-02fe8df35730/developers")
+                    .managersUrl("/v2/spaces/6ee704bb-fc88-40f6-9ab9-02fe8df35730/managers")
+                    .auditorsUrl("/v2/spaces/6ee704bb-fc88-40f6-9ab9-02fe8df35730/auditors")
+                    .applicationsUrl("/v2/spaces/6ee704bb-fc88-40f6-9ab9-02fe8df35730/apps")
+                    .routesUrl("/v2/spaces/6ee704bb-fc88-40f6-9ab9-02fe8df35730/routes")
+                    .domainsUrl("/v2/spaces/6ee704bb-fc88-40f6-9ab9-02fe8df35730/domains")
+                    .serviceInstancesUrl("/v2/spaces/6ee704bb-fc88-40f6-9ab9-02fe8df35730/service_instances")
+                    .applicationEventsUrl("/v2/spaces/6ee704bb-fc88-40f6-9ab9-02fe8df35730/app_events")
+                    .eventsUrl("/v2/spaces/6ee704bb-fc88-40f6-9ab9-02fe8df35730/events")
+                    .securityGroupsUrl("/v2/spaces/6ee704bb-fc88-40f6-9ab9-02fe8df35730/security_groups")
+                    .build())
+                .build();
         }
 
         @Override
@@ -1651,27 +1810,32 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Mono<Void> invoke(RemoveSpaceAuditorByUsernameRequest request) {
+        protected Mono<RemoveSpaceAuditorByUsernameResponse> invoke(RemoveSpaceAuditorByUsernameRequest request) {
             return this.spaces.removeAuditorByUsername(request);
         }
 
     }
 
-    public static final class RemoveDeveloper extends AbstractApiTest<RemoveSpaceDeveloperRequest, Void> {
+    public static final class RemoveDeveloper extends AbstractClientApiTest<RemoveSpaceDeveloperRequest, Void> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/spaces/test-space-id/developers/test-developer-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected RemoveSpaceDeveloperRequest getInvalidRequest() {
             return RemoveSpaceDeveloperRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/spaces/test-space-id/developers/test-developer-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -1693,9 +1857,23 @@ public final class SpringSpacesTest {
         }
     }
 
-    public static final class RemoveDeveloperByUsername extends AbstractApiTest<RemoveSpaceDeveloperByUsernameRequest, Void> {
+    public static final class RemoveDeveloperByUsername extends AbstractClientApiTest<RemoveSpaceDeveloperByUsernameRequest, RemoveSpaceDeveloperByUsernameResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/spaces/test-space-id/developers")
+                    .payload("fixtures/client/v2/spaces/DELETE_{id}_developers_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/DELETE_{id}_developers_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected RemoveSpaceDeveloperByUsernameRequest getInvalidRequest() {
@@ -1704,16 +1882,30 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/spaces/test-space-id/developers")
-                .requestPayload("fixtures/client/v2/spaces/DELETE_{id}_developers_request.json")
-                .status(NO_CONTENT);
-        }
-
-        @Override
-        protected Void getResponse() {
-            return null;
+        protected RemoveSpaceDeveloperByUsernameResponse getResponse() {
+            return RemoveSpaceDeveloperByUsernameResponse.builder()
+                .metadata(Metadata.builder()
+                    .id("998375df-21ec-4d73-a0fd-83c11b7c7c1d")
+                    .url("/v2/spaces/998375df-21ec-4d73-a0fd-83c11b7c7c1d")
+                    .createdAt("2016-04-22T19:33:26Z")
+                    .build())
+                .entity(SpaceEntity.builder()
+                    .name("name-1016")
+                    .organizationId("d2ba20ee-07f8-4bab-91c7-41a5e103ca57")
+                    .allowSsh(true)
+                    .organizationUrl("/v2/organizations/d2ba20ee-07f8-4bab-91c7-41a5e103ca57")
+                    .developersUrl("/v2/spaces/998375df-21ec-4d73-a0fd-83c11b7c7c1d/developers")
+                    .managersUrl("/v2/spaces/998375df-21ec-4d73-a0fd-83c11b7c7c1d/managers")
+                    .auditorsUrl("/v2/spaces/998375df-21ec-4d73-a0fd-83c11b7c7c1d/auditors")
+                    .applicationsUrl("/v2/spaces/998375df-21ec-4d73-a0fd-83c11b7c7c1d/apps")
+                    .routesUrl("/v2/spaces/998375df-21ec-4d73-a0fd-83c11b7c7c1d/routes")
+                    .domainsUrl("/v2/spaces/998375df-21ec-4d73-a0fd-83c11b7c7c1d/domains")
+                    .serviceInstancesUrl("/v2/spaces/998375df-21ec-4d73-a0fd-83c11b7c7c1d/service_instances")
+                    .applicationEventsUrl("/v2/spaces/998375df-21ec-4d73-a0fd-83c11b7c7c1d/app_events")
+                    .eventsUrl("/v2/spaces/998375df-21ec-4d73-a0fd-83c11b7c7c1d/events")
+                    .securityGroupsUrl("/v2/spaces/998375df-21ec-4d73-a0fd-83c11b7c7c1d/security_groups")
+                    .build())
+                .build();
         }
 
         @Override
@@ -1725,27 +1917,32 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Mono<Void> invoke(RemoveSpaceDeveloperByUsernameRequest request) {
+        protected Mono<RemoveSpaceDeveloperByUsernameResponse> invoke(RemoveSpaceDeveloperByUsernameRequest request) {
             return this.spaces.removeDeveloperByUsername(request);
         }
 
     }
 
-    public static final class RemoveManager extends AbstractApiTest<RemoveSpaceManagerRequest, Void> {
+    public static final class RemoveManager extends AbstractClientApiTest<RemoveSpaceManagerRequest, Void> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/spaces/test-space-id/managers/test-manager-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected RemoveSpaceManagerRequest getInvalidRequest() {
             return RemoveSpaceManagerRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/spaces/test-space-id/managers/test-manager-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -1768,9 +1965,23 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class RemoveManagerByUsername extends AbstractApiTest<RemoveSpaceManagerByUsernameRequest, Void> {
+    public static final class RemoveManagerByUsername extends AbstractClientApiTest<RemoveSpaceManagerByUsernameRequest, RemoveSpaceManagerByUsernameResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/spaces/test-space-id/managers")
+                    .payload("fixtures/client/v2/spaces/DELETE_{id}_managers_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/DELETE_{id}_managers_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected RemoveSpaceManagerByUsernameRequest getInvalidRequest() {
@@ -1779,16 +1990,30 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/spaces/test-space-id/managers")
-                .requestPayload("fixtures/client/v2/spaces/DELETE_{id}_managers_request.json")
-                .status(NO_CONTENT);
-        }
-
-        @Override
-        protected Void getResponse() {
-            return null;
+        protected RemoveSpaceManagerByUsernameResponse getResponse() {
+            return RemoveSpaceManagerByUsernameResponse.builder()
+                .metadata(Metadata.builder()
+                    .id("9f29c6d5-10cf-4d2c-a934-b0f2ea054bd2")
+                    .url("/v2/spaces/9f29c6d5-10cf-4d2c-a934-b0f2ea054bd2")
+                    .createdAt("2016-04-22T19:33:27Z")
+                    .build())
+                .entity(SpaceEntity.builder()
+                    .name("name-1041")
+                    .organizationId("2e1dbf6f-426e-4ad7-b48e-347bbd2bdaa6")
+                    .allowSsh(true)
+                    .organizationUrl("/v2/organizations/2e1dbf6f-426e-4ad7-b48e-347bbd2bdaa6")
+                    .developersUrl("/v2/spaces/9f29c6d5-10cf-4d2c-a934-b0f2ea054bd2/developers")
+                    .managersUrl("/v2/spaces/9f29c6d5-10cf-4d2c-a934-b0f2ea054bd2/managers")
+                    .auditorsUrl("/v2/spaces/9f29c6d5-10cf-4d2c-a934-b0f2ea054bd2/auditors")
+                    .applicationsUrl("/v2/spaces/9f29c6d5-10cf-4d2c-a934-b0f2ea054bd2/apps")
+                    .routesUrl("/v2/spaces/9f29c6d5-10cf-4d2c-a934-b0f2ea054bd2/routes")
+                    .domainsUrl("/v2/spaces/9f29c6d5-10cf-4d2c-a934-b0f2ea054bd2/domains")
+                    .serviceInstancesUrl("/v2/spaces/9f29c6d5-10cf-4d2c-a934-b0f2ea054bd2/service_instances")
+                    .applicationEventsUrl("/v2/spaces/9f29c6d5-10cf-4d2c-a934-b0f2ea054bd2/app_events")
+                    .eventsUrl("/v2/spaces/9f29c6d5-10cf-4d2c-a934-b0f2ea054bd2/events")
+                    .securityGroupsUrl("/v2/spaces/9f29c6d5-10cf-4d2c-a934-b0f2ea054bd2/security_groups")
+                    .build())
+                .build();
         }
 
         @Override
@@ -1800,27 +2025,32 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Mono<Void> invoke(RemoveSpaceManagerByUsernameRequest request) {
+        protected Mono<RemoveSpaceManagerByUsernameResponse> invoke(RemoveSpaceManagerByUsernameRequest request) {
             return this.spaces.removeManagerByUsername(request);
         }
 
     }
 
-    public static final class RemoveSecurityGroup extends AbstractApiTest<RemoveSpaceSecurityGroupRequest, Void> {
+    public static final class RemoveSecurityGroup extends AbstractClientApiTest<RemoveSpaceSecurityGroupRequest, Void> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/spaces/test-space-id/security_groups/test-security-group-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
 
         @Override
         protected RemoveSpaceSecurityGroupRequest getInvalidRequest() {
             return RemoveSpaceSecurityGroupRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/spaces/test-space-id/security_groups/test-security-group-id")
-                .status(NO_CONTENT);
         }
 
         @Override
@@ -1843,23 +2073,28 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class Update extends AbstractApiTest<UpdateSpaceRequest, UpdateSpaceResponse> {
+    public static final class Update extends AbstractClientApiTest<UpdateSpaceRequest, UpdateSpaceResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/spaces/test-space-id")
+                    .payload("fixtures/client/v2/spaces/PUT_{id}_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/spaces/PUT_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected UpdateSpaceRequest getInvalidRequest() {
             return UpdateSpaceRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/spaces/test-space-id")
-                .requestPayload("fixtures/client/v2/spaces/PUT_{id}_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/spaces/PUT_{id}_response.json");
         }
 
         @Override

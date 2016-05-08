@@ -221,7 +221,7 @@ public interface Spaces {
      * @param request the Disassociate Auditor with the Space by Username request
      * @return the response from the Disassociate Auditor with the Space by Username request
      */
-    Mono<Void> removeAuditorByUsername(RemoveSpaceAuditorByUsernameRequest request);
+    Mono<RemoveSpaceAuditorByUsernameResponse> removeAuditorByUsername(RemoveSpaceAuditorByUsernameRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/spaces/remove_developer_from_the_space.html">Remove Developer from the Space</a> request
@@ -237,7 +237,7 @@ public interface Spaces {
      * @param request the Disassociate Developer with the Space by Username request
      * @return the response from the Disassociate Developer with the Space by Username request
      */
-    Mono<Void> removeDeveloperByUsername(RemoveSpaceDeveloperByUsernameRequest request);
+    Mono<RemoveSpaceDeveloperByUsernameResponse> removeDeveloperByUsername(RemoveSpaceDeveloperByUsernameRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/spaces/remove_manager_from_the_space.html">Remove Manager from the Space</a> request
@@ -253,7 +253,7 @@ public interface Spaces {
      * @param request the Disassociate Manager with the Space by Username request
      * @return the response from the Disassociate Manager with the Space by Username request
      */
-    Mono<Void> removeManagerByUsername(RemoveSpaceManagerByUsernameRequest request);
+    Mono<RemoveSpaceManagerByUsernameResponse> removeManagerByUsername(RemoveSpaceManagerByUsernameRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/spaces/remove_security_group_from_the_space.html">Remove Security Group from the Space</a> request
