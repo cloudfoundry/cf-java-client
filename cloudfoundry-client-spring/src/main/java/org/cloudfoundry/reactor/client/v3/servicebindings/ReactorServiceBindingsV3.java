@@ -17,6 +17,8 @@
 package org.cloudfoundry.reactor.client.v3.servicebindings;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingRequest;
+import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingResponse;
 import org.cloudfoundry.client.v3.servicebindings.DeleteServiceBindingRequest;
 import org.cloudfoundry.client.v3.servicebindings.ServiceBindingsV3;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
@@ -41,6 +43,11 @@ public final class ReactorServiceBindingsV3 extends AbstractClientV3Operations i
      */
     public ReactorServiceBindingsV3(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
         super(authorizationProvider, httpClient, objectMapper, root);
+    }
+
+    @Override
+    public Mono<CreateServiceBindingResponse> create(CreateServiceBindingRequest request) {
+        return post(request, CreateServiceBindingResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "service_bindings")));
     }
 
     @Override
