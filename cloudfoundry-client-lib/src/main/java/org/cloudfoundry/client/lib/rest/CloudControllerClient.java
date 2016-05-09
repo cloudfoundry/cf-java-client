@@ -235,6 +235,8 @@ public interface CloudControllerClient {
 
 	void removeDomain(String domainName);
 
+	List<CloudRoute> getRoutes(String domainName);
+
 	List<CloudRoute> getRoutes(String domainName, String hostName);
 
 	void addRoute(String host, String domainName);

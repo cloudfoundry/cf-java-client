@@ -1979,7 +1979,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	public void deleteDomain(String domainName) {
 		assertSpaceProvided("delete domain");
 		UUID domainGuid = getDomainGuid(domainName, true);
-		List<CloudRoute> routes = getRoutes(domainName, null);
+		List<CloudRoute> routes = getRoutes(domainName);
 		if (routes.size() > 0) {
 			throw new IllegalStateException("Unable to remove domain that is in use --" +
 					" it has " + routes.size() + " routes.");
@@ -1997,6 +1997,11 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		assertSpaceProvided("get routes for domain");
 		UUID domainGuid = getDomainGuid(domainName, true);
 		return doGetRoutes(domainGuid, hostName);
+	}
+
+	@Override
+	public List<CloudRoute> getRoutes(String domainName) {
+		return getRoutes(domainName, null);
 	}
 
 	@Override
@@ -2059,7 +2064,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	private List<CloudRoute> fetchOrphanRoutes(String domainName) {
 		List<CloudRoute> orphanRoutes = new ArrayList<>();
-		for (CloudRoute cloudRoute : getRoutes(domainName, null)) {
+		for (CloudRoute cloudRoute : getRoutes(domainName)) {
 			if (isOrphanRoute(cloudRoute)) {
 				orphanRoutes.add(cloudRoute);
 			}
