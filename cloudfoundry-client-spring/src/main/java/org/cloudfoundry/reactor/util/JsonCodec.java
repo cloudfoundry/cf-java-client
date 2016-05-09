@@ -31,7 +31,7 @@ import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 
 final class JsonCodec {
 
-    private static final AsciiString APPLICATION_JSON = new AsciiString("application/json");
+    private static final AsciiString APPLICATION_JSON = new AsciiString("application/json; charset=utf-8");
 
     static <T> Function<InputStream, T> decode(ObjectMapper objectMapper, Class<T> type) {
         return in -> {
