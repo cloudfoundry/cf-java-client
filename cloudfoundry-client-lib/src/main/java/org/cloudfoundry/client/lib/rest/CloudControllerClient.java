@@ -239,6 +239,10 @@ public interface CloudControllerClient {
 
 	void addRoute(String host, String domainName);
 
+	void mapRoute(String route, String appName);
+
+	void unmapRoute(String route, String appName);
+
 	void deleteRoute(String host, String domainName);
 
 	List<CloudRoute> deleteOrphanedRoutes();

@@ -2007,6 +2007,20 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	@Override
+	public void mapRoute(String route, String appName) {
+		List<String> uris = Collections.<String>singletonList(route);
+		CloudApplication app = getApplication(appName);
+		addUris(uris, app.getMeta().getGuid());
+	}
+
+	@Override
+	public void unmapRoute(String route, String appName) {
+		List<String> uris = Collections.<String>singletonList(route);
+		CloudApplication app = getApplication(appName);
+		removeUris(uris, app.getMeta().getGuid());
+	}
+
+	@Override
 	public void deleteRoute(String host, String domainName) {
 		assertSpaceProvided("delete route for domain");
 		UUID domainGuid = getDomainGuid(domainName, true);

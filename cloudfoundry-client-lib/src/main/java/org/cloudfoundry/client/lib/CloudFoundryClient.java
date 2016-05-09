@@ -543,6 +543,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.addRoute(host, domainName);
 	}
 
+	public void mapRoute(String route, String appName) { cc.mapRoute(route, appName); }
+
+	public void unmapRoute(String route, String appName) { cc.unmapRoute(route, appName); }
+
 	public void deleteRoute(String host, String domainName) {
 		cc.deleteRoute(host, domainName);
 	}
