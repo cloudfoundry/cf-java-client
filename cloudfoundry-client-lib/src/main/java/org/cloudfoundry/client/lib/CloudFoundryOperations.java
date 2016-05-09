@@ -925,6 +925,14 @@ public interface CloudFoundryOperations {
 	 * Get the info for all routes for a domain.
 	 *
 	 * @param domainName the domain the routes belong to
+	 * @return list of routes
+	 */
+	List<CloudRoute> getRoutes(String domainName);
+
+	/**
+	 * Get the info for all routes for a domain.
+	 *
+	 * @param domainName the domain the routes belong to
 	 * @param hostName the hostname part of the uri
 	 * @return list of routes
 	 */

@@ -539,6 +539,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		return cc.getRoutes(domainName, hostName);
 	}
 
+	public List<CloudRoute> getRoutes(String domainName) {
+		return cc.getRoutes(domainName, null);
+	}
+
 	public void addRoute(String host, String domainName) {
 		cc.addRoute(host, domainName);
 	}

@@ -1743,12 +1743,12 @@ public class CloudFoundryClientTest {
 		connectedClient.addRoute("my_route1", TEST_DOMAIN);
 		connectedClient.addRoute("my_route2", TEST_DOMAIN);
 
-		List<CloudRoute> routes = connectedClient.getRoutes(TEST_DOMAIN, null);
+		List<CloudRoute> routes = connectedClient.getRoutes(TEST_DOMAIN);
 		assertNotNull(getRouteWithHost("my_route1", routes));
 		assertNotNull(getRouteWithHost("my_route2", routes));
 
 		connectedClient.deleteRoute("my_route2", TEST_DOMAIN);
-		routes = connectedClient.getRoutes(TEST_DOMAIN, null);
+		routes = connectedClient.getRoutes(TEST_DOMAIN);
 		assertNotNull(getRouteWithHost("my_route1", routes));
 		assertNull(getRouteWithHost("my_route2", routes));
 
@@ -1767,13 +1767,13 @@ public class CloudFoundryClientTest {
 		connectedClient.addDomain(TEST_DOMAIN);
 		connectedClient.addRoute("unbound_route", TEST_DOMAIN);
 
-		List<CloudRoute> routes = connectedClient.getRoutes(TEST_DOMAIN, null);
+		List<CloudRoute> routes = connectedClient.getRoutes(TEST_DOMAIN);
 		CloudRoute unboundRoute = getRouteWithHost("unbound_route", routes);
 		assertNotNull(unboundRoute);
 		assertEquals(0, unboundRoute.getAppsUsingRoute());
 
 		List<CloudRoute> deletedRoutes = connectedClient.deleteOrphanedRoutes();
-		assertNull(getRouteWithHost("unbound_route", connectedClient.getRoutes(TEST_DOMAIN, null)));
+		assertNull(getRouteWithHost("unbound_route", connectedClient.getRoutes(TEST_DOMAIN)));
 
 		assertTrue(deletedRoutes.size() > 0);
 		boolean found = false;
@@ -1794,12 +1794,12 @@ public class CloudFoundryClientTest {
 		connectedClient.addDomain(TEST_DOMAIN);
 		connectedClient.updateApplicationUris(appName, uris);
 
-		List<CloudRoute> routes = connectedClient.getRoutes(TEST_DOMAIN, null);
+		List<CloudRoute> routes = connectedClient.getRoutes(TEST_DOMAIN);
 		assertNotNull(getRouteWithHost("my_route3", routes));
 		assertEquals(1, getRouteWithHost("my_route3", routes).getAppsUsingRoute());
 		assertTrue(getRouteWithHost("my_route3", routes).inUse());
 
-		List<CloudRoute> defaultDomainRoutes = connectedClient.getRoutes(defaultDomainName, null);
+		List<CloudRoute> defaultDomainRoutes = connectedClient.getRoutes(defaultDomainName);
 		assertNotNull(getRouteWithHost(appName, defaultDomainRoutes));
 		assertEquals(1, getRouteWithHost(appName, defaultDomainRoutes).getAppsUsingRoute());
 		assertTrue(getRouteWithHost(appName, defaultDomainRoutes).inUse());
@@ -2619,7 +2619,7 @@ public class CloudFoundryClientTest {
 	private void clearTestDomainAndRoutes() {
 		CloudDomain domain = getDomainNamed(TEST_DOMAIN, connectedClient.getDomains());
 		if (domain != null) {
-			List<CloudRoute> routes = connectedClient.getRoutes(domain.getName(), null);
+			List<CloudRoute> routes = connectedClient.getRoutes(domain.getName());
 			for (CloudRoute route : routes) {
 				connectedClient.deleteRoute(route.getHost(), route.getDomain().getName());
 			}
