@@ -20,6 +20,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.ByteBuf;
 import io.netty.util.AsciiString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.util.Exceptions;
 import reactor.io.netty.http.HttpOutbound;
 
@@ -31,6 +33,8 @@ import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 
 final class JsonCodec {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JsonCodec.class);
+
     private static final AsciiString APPLICATION_JSON = new AsciiString("application/json; charset=utf-8");
 
     static <T> Function<InputStream, T> decode(ObjectMapper objectMapper, Class<T> type) {
@@ -39,6 +43,12 @@ final class JsonCodec {
                 return objectMapper.readValue(in, type);
             } catch (IOException e) {
                 throw Exceptions.propagate(e);
+            } finally {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    LOGGER.error("Unable to close input stream", e);
+                }
             }
         };
     }
