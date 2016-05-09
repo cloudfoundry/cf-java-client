@@ -240,7 +240,7 @@ final class CloudFoundryCleaner {
         return cloudFoundryClient.featureFlags()
             .list(ListFeatureFlagsRequest.builder()
                 .build())
-            .flatMap(Flux::fromIterable)
+            .flatMapIterable(d -> d)
             .filter(predicate)
             .flatMap(flagEntity -> {
                 if (standardFeatureFlags.containsKey(flagEntity.getName())

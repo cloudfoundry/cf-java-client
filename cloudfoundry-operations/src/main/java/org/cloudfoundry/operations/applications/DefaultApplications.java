@@ -640,7 +640,7 @@ public final class DefaultApplications implements Applications {
         if (Optional.ofNullable(recent).orElse(false)) {
             return requestLogsRecent(dopplerClient, applicationId)
                 .toSortedList((a, b) -> a.getTimestamp().compareTo(b.getTimestamp()))
-                .flatMap(Flux::fromIterable);
+                .flatMapIterable(d -> d);
         } else {
             return requestLogsStream(dopplerClient, applicationId)
                 .filter(e -> LogMessage.class.isAssignableFrom(e.getClass()))

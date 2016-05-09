@@ -69,7 +69,7 @@ public final class PaginationUtils {
                 .flatMap(pageSupplier)
                 .startWith(response)
                 .buffer()
-                .flatMap(Flux::fromIterable);
+                .flatMapIterable(d -> d);
         };
     }
 
