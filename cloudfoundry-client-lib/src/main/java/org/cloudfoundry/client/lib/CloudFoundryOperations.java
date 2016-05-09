@@ -939,6 +939,22 @@ public interface CloudFoundryOperations {
 	void addRoute(String host, String domainName);
 
 	/**
+	 * Associate route with an application.
+	 *
+	 * @param appName name of the app
+	 * @param route the route to associate
+	 */
+	void mapRoute(String appName, String route);
+
+	/**
+	 * Dissociate route from an application.
+	 *
+	 * @param appName name of the app
+	 * @param route the route to dissociate
+	 */
+	void unmapRoute(String appName, String route);
+
+	/**
 	 * Delete a registered route from the space of the current session.
 	 *
 	 * @param host the host of the route to delete
