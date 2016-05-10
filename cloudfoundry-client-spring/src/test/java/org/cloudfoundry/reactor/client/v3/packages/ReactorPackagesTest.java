@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v3.packages;
+package org.cloudfoundry.reactor.client.v3.packages;
 
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
@@ -33,43 +33,58 @@ import org.cloudfoundry.client.v3.packages.StagePackageRequest;
 import org.cloudfoundry.client.v3.packages.StagePackageResponse;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.cloudfoundry.util.StringMap;
 import org.cloudfoundry.util.test.TestSubscriber;
+import org.reactivestreams.Publisher;
 import org.springframework.core.io.ClassPathResource;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.nio.charset.Charset;
 import java.util.Collections;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.client.v3.packages.CreatePackageRequest.PackageType.DOCKER;
 import static org.cloudfoundry.client.v3.packages.ListPackagesResponse.Resource;
-import static org.hamcrest.core.StringStartsWith.startsWith;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-public final class SpringPackagesTest {
+public final class ReactorPackagesTest {
 
-    public static final class Copy extends AbstractApiTest<CopyPackageRequest, CopyPackageResponse> {
+    public static final class Copy extends AbstractClientApiTest<CopyPackageRequest, CopyPackageResponse> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorPackages packages = new ReactorPackages(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v3/apps/test-application-id/packages?source_package_guid=test-source-package-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/apps/POST_{id}_packages_copy_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected CopyPackageRequest getInvalidRequest() {
             return CopyPackageRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v3/apps/test-application-id/packages?source_package_guid=test-source-package-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/apps/POST_{id}_packages_copy_response.json");
         }
 
         @Override
@@ -108,23 +123,28 @@ public final class SpringPackagesTest {
 
     }
 
-    public static final class Create extends AbstractApiTest<CreatePackageRequest, CreatePackageResponse> {
+    public static final class Create extends AbstractClientApiTest<CreatePackageRequest, CreatePackageResponse> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorPackages packages = new ReactorPackages(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v3/apps/test-application-id/packages")
+                    .payload("fixtures/client/v3/apps/POST_{id}_packages_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v3/apps/POST_{id}_packages_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected CreatePackageRequest getInvalidRequest() {
             return CreatePackageRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v3/apps/test-application-id/packages")
-                .requestPayload("fixtures/client/v3/apps/POST_{id}_packages_request.json")
-                .status(CREATED)
-                .responsePayload("fixtures/client/v3/apps/POST_{id}_packages_response.json");
         }
 
         @Override
@@ -164,21 +184,26 @@ public final class SpringPackagesTest {
 
     }
 
-    public static final class Delete extends AbstractApiTest<DeletePackageRequest, Void> {
+    public static final class Delete extends AbstractClientApiTest<DeletePackageRequest, Void> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorPackages packages = new ReactorPackages(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v3/packages/test-package-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeletePackageRequest getInvalidRequest() {
             return DeletePackageRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v3/packages/test-package-id")
-                .status(OK);
         }
 
         @Override
@@ -200,14 +225,27 @@ public final class SpringPackagesTest {
 
     }
 
-    public static final class Download extends AbstractApiTest<DownloadPackageRequest, byte[]> {
+    public static final class Download extends AbstractClientApiTest<DownloadPackageRequest, byte[]> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorPackages packages = new ReactorPackages(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
-        protected void assertions(TestSubscriber<byte[]> testSubscriber, byte[] expected) {
-            testSubscriber
-                .assertThat(arrayEqualsExpectation(expected));
+        protected void assertions(TestSubscriber<byte[]> testSubscriber, Publisher<byte[]> expected) {
+            Flux.from(expected)
+                .subscribe(e -> testSubscriber.assertThat(a -> assertArrayEquals(e, a)));
+        }
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/packages/test-package-id/download")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/packages/GET_{id}_download_response.bin")
+                    .build())
+                .build();
         }
 
         @Override
@@ -217,16 +255,8 @@ public final class SpringPackagesTest {
         }
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v3/packages/test-package-id/download")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/packages/GET_{id}_download_response.bin");
-        }
-
-        @Override
         protected byte[] getResponse() {
-            return getContents(new ClassPathResource("fixtures/client/v3/packages/GET_{id}_download_response.bin"));
+            return getBytes("fixtures/client/v3/packages/GET_{id}_download_response.bin");
         }
 
         @Override
@@ -238,27 +268,33 @@ public final class SpringPackagesTest {
 
         @Override
         protected Mono<byte[]> invoke(DownloadPackageRequest request) {
-            return getContents(this.packages.download(request));
+            return this.packages.download(request)
+                .as(AbstractClientApiTest::collectByteArray);
         }
 
     }
 
-    public static final class Get extends AbstractApiTest<GetPackageRequest, GetPackageResponse> {
+    public static final class Get extends AbstractClientApiTest<GetPackageRequest, GetPackageResponse> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorPackages packages = new ReactorPackages(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/packages/test-package-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/packages/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetPackageRequest getInvalidRequest() {
             return GetPackageRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v3/packages/test-package-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/packages/GET_{id}_response.json");
         }
 
         @Override
@@ -308,23 +344,28 @@ public final class SpringPackagesTest {
 
     }
 
-    public static final class List extends AbstractApiTest<ListPackagesRequest, ListPackagesResponse> {
+    public static final class List extends AbstractClientApiTest<ListPackagesRequest, ListPackagesResponse> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorPackages packages = new ReactorPackages(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/packages")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/packages/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListPackagesRequest getInvalidRequest() {
             return ListPackagesRequest.builder()
                 .page(-1)
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v3/packages")
-                .status(OK)
-                .responsePayload("fixtures/client/v3/packages/GET_response.json");
         }
 
         @Override
@@ -404,24 +445,28 @@ public final class SpringPackagesTest {
 
     }
 
-    public static final class Stage extends AbstractApiTest<StagePackageRequest, StagePackageResponse> {
+    public static final class Stage extends AbstractClientApiTest<StagePackageRequest, StagePackageResponse> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorPackages packages = new ReactorPackages(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v3/packages/test-package-id/droplets")
+                    .payload("fixtures/client/v3/packages/POST_{id}_droplets_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v3/packages/POST_{id}_droplets_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected StagePackageRequest getInvalidRequest() {
             return StagePackageRequest.builder()
                 .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v3/packages/test-package-id/droplets")
-                .requestPayload("fixtures/client/v3/packages/POST_{id}_droplets_request.json")
-                .status(CREATED)
-                .responsePayload("fixtures/client/v3/packages/POST_{id}_droplets_response.json");
         }
 
         @Override
@@ -493,25 +538,45 @@ public final class SpringPackagesTest {
         }
     }
 
-    public static final class Upload extends AbstractApiTest<UploadPackageRequest, UploadPackageResponse> {
+    public static final class Upload extends AbstractClientApiTest<UploadPackageRequest, UploadPackageResponse> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private static final Pattern BOUNDARY = Pattern.compile("multipart/mixed; boundary=(.+)");
+
+        private final ReactorPackages packages = new ReactorPackages(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v3/packages/test-package-id/upload")
+                    .contents(consumer((headers, body) -> {
+                        String contentType = headers.get("Content-Type");
+                        assertNotNull(contentType);
+
+                        Matcher matcher = BOUNDARY.matcher(contentType);
+                        assertTrue(matcher.find());
+                        String boundary = matcher.group(1);
+
+                        assertEquals("--" + boundary + "\r\n" +
+                            "Content-Disposition: form-data; name=\"bits\"; filename=\"application.zip\"\r\n" +
+                            "Content-Type: application/zip\r\n" +
+                            "\r\n" +
+                            "test-content\n" +
+                            "\r\n" +
+                            "--" + boundary + "--", body.readString(Charset.defaultCharset()));
+                    }))
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v3/packages/POST_{id}_upload_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected UploadPackageRequest getInvalidRequest() {
             return UploadPackageRequest.builder()
                 .build();
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v3/packages/test-package-id/upload")
-                .requestMatcher(header("Content-Type", startsWith(MULTIPART_FORM_DATA_VALUE)))
-                .anyRequestPayload()
-                .status(CREATED)
-                .responsePayload("fixtures/client/v3/packages/POST_{id}_upload_response.json");
         }
 
         @Override

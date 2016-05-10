@@ -64,9 +64,10 @@ public abstract class AbstractReactorOperations {
     protected final <REQ extends Validatable, RSP> Mono<RSP> doDelete(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
                                                                       Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
         return prepareRequest(request, uriTransformer)
-            .then(function((validRequest, uri) -> this.httpClient.delete(uri, outbound -> transformRequest(outbound, validRequest, requestTransformer)
+            .then(function((validRequest, uri) -> this.httpClient.delete(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
+                .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
+                .then(o -> o.send(serializedRequest(o, validRequest))))
                 .doOnSubscribe(s -> this.requestLogger.debug("DELETE {}", uri))
-                .then(o -> o.send(serializedRequest(validRequest, o))))
                 .compose(logResponse(uri))))
             .compose(deserializedResponse(responseType));
     }
@@ -80,28 +81,37 @@ public abstract class AbstractReactorOperations {
     protected final <REQ extends Validatable> Mono<HttpInbound> doGet(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
                                                                       Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
         return prepareRequest(request, uriTransformer)
-            .then(function((validRequest, uri) -> this.httpClient.get(uri, outbound -> transformRequest(outbound, validRequest, requestTransformer)
-                .doOnSubscribe(s -> this.requestLogger.debug("GET    {}", uri))
+            .then(function((validRequest, uri) -> this.httpClient.get(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
+                .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
                 .then(HttpOutbound::sendHeaders))
+                .doOnSubscribe(s -> this.requestLogger.debug("GET    {}", uri))
                 .compose(logResponse(uri))));
     }
 
     protected final <REQ extends Validatable, RSP> Mono<RSP> doPatch(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
                                                                      Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
         return prepareRequest(request, uriTransformer)
-            .then(function((validRequest, uri) -> this.httpClient.patch(uri, outbound -> transformRequest(outbound, validRequest, requestTransformer)
+            .then(function((validRequest, uri) -> this.httpClient.patch(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
+                .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
+                .then(o -> o.send(serializedRequest(o, validRequest))))
                 .doOnSubscribe(s -> this.requestLogger.debug("PATCH  {}", uri))
-                .then(o -> o.send(serializedRequest(validRequest, o))))
                 .compose(logResponse(uri))))
             .compose(deserializedResponse(responseType));
     }
 
     protected final <REQ extends Validatable, RSP> Mono<RSP> doPost(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
                                                                     Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
+
+        return doPostComplete(request, responseType, uriTransformer, function((outbound, validRequest) -> requestTransformer.apply(Tuple.of(outbound, validRequest))
+            .send(serializedRequest(outbound, validRequest))));
+    }
+
+    protected final <REQ extends Validatable, RSP> Mono<RSP> doPostComplete(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
+                                                                            Function<Tuple2<HttpOutbound, REQ>, Mono<Void>> requestTransformer) {
         return prepareRequest(request, uriTransformer)
-            .then(function((validRequest, uri) -> this.httpClient.post(uri, outbound -> transformRequest(outbound, validRequest, requestTransformer)
+            .then(function((validRequest, uri) -> this.httpClient.post(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
+                .then(o -> requestTransformer.apply(Tuple.of(o, validRequest))))
                 .doOnSubscribe(s -> this.requestLogger.debug("POST   {}", uri))
-                .then(o -> o.send(serializedRequest(validRequest, o))))
                 .compose(logResponse(uri))))
             .compose(deserializedResponse(responseType));
     }
@@ -109,9 +119,10 @@ public abstract class AbstractReactorOperations {
     protected final <REQ extends Validatable, RSP> Mono<RSP> doPut(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
                                                                    Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
         return prepareRequest(request, uriTransformer)
-            .then(function((validRequest, uri) -> this.httpClient.put(uri, outbound -> transformRequest(outbound, validRequest, requestTransformer)
+            .then(function((validRequest, uri) -> this.httpClient.put(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
+                .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
+                .then(o -> o.send(serializedRequest(o, validRequest))))
                 .doOnSubscribe(s -> this.requestLogger.debug("PUT    {}", uri))
-                .then(o -> o.send(serializedRequest(validRequest, o))))
                 .compose(logResponse(uri))))
             .compose(deserializedResponse(responseType));
     }
@@ -119,9 +130,10 @@ public abstract class AbstractReactorOperations {
     protected final <REQ extends Validatable> Mono<HttpInbound> doWs(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
                                                                      Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
         return prepareRequest(request, uriTransformer)
-            .then(function((validRequest, uri) -> this.httpClient.get(uri, outbound -> transformRequest(outbound, validRequest, requestTransformer)
-                .doOnSubscribe(s -> this.requestLogger.debug("WS     {}", uri))
+            .then(function((validRequest, uri) -> this.httpClient.get(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
+                .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
                 .then(HttpOutbound::upgradeToTextWebsocket))
+                .doOnSubscribe(s -> this.requestLogger.debug("WS     {}", uri))
                 .compose(logResponse(uri))));
     }
 
@@ -161,15 +173,10 @@ public abstract class AbstractReactorOperations {
             .map(function((validRequest, r) -> Tuple.of(validRequest, buildUri(r, validRequest, uriTransformer))));
     }
 
-    private <REQ extends Validatable> Mono<ByteBuf> serializedRequest(REQ validRequest, HttpOutbound outbound) {
+    private <REQ extends Validatable> Mono<ByteBuf> serializedRequest(HttpOutbound outbound, REQ validRequest) {
         return Mono.just(validRequest)
             .where(req -> this.objectMapper.canSerialize(req.getClass()))
             .map(JsonCodec.encode(this.objectMapper, outbound));
-    }
-
-    private <REQ extends Validatable> Mono<HttpOutbound> transformRequest(HttpOutbound outbound, REQ validRequest, Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
-        return this.authorizationProvider.addAuthorization(outbound)
-            .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)));
     }
 
 }
