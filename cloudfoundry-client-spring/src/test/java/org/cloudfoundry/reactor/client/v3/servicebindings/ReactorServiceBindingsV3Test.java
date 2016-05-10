@@ -83,10 +83,15 @@ public final class ReactorServiceBindingsV3Test {
 
         @Override
         protected CreateServiceBindingRequest getValidRequest() throws Exception {
-            CreateServiceBindingRequest.Data data = new CreateServiceBindingRequest.Data(Collections.singletonMap("some_object_id", "for_the_service_broker"));
+            CreateServiceBindingRequest.Data data = CreateServiceBindingRequest.Data.builder()
+                .parameters(Collections.singletonMap("some_object_id", "for_the_service_broker"))
+                .build();
             Relationship applicationRelationship = Relationship.builder().id("74f7c078-0934-470f-9883-4fddss5b8f13").build();
             Relationship serviceInstanceRelationship = Relationship.builder().id("8bfe4c1b-9e18-45b1-83be-124163f31f9e").build();
-            CreateServiceBindingRequest.Relationships relationships = new CreateServiceBindingRequest.Relationships(applicationRelationship, serviceInstanceRelationship);
+            CreateServiceBindingRequest.Relationships relationships = CreateServiceBindingRequest.Relationships.builder()
+                .application(applicationRelationship)
+                .serviceInstance(serviceInstanceRelationship)
+                .build();
 
             return CreateServiceBindingRequest.builder()
                 .data(data)
