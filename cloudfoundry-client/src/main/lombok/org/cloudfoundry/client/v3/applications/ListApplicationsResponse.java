@@ -40,6 +40,7 @@ public final class ListApplicationsResponse extends PaginatedResponse<ListApplic
     @Builder
     ListApplicationsResponse(@JsonProperty("pagination") Pagination pagination,
                              @JsonProperty("resources") @Singular List<Resource> resources) {
+
         super(pagination, resources);
     }
 
@@ -61,6 +62,7 @@ public final class ListApplicationsResponse extends PaginatedResponse<ListApplic
                  @JsonProperty("name") String name,
                  @JsonProperty("total_desired_instances") Integer totalDesiredInstances,
                  @JsonProperty("updated_at") String updatedAt) {
+
             super(createdAt, desiredState, environmentVariables, id, lifecycle, links, name, totalDesiredInstances, updatedAt);
         }
 

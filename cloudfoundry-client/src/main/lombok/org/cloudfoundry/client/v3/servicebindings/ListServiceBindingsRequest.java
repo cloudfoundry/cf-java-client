@@ -60,6 +60,7 @@ public final class ListServiceBindingsRequest extends PaginatedAndSortedRequest 
     ListServiceBindingsRequest(Integer page, Integer perPage, String orderBy,
                                @Singular List<String> applicationIds,
                                @Singular List<String> serviceInstanceIds) {
+
         super(page, perPage, orderBy);
         this.applicationIds = applicationIds;
         this.serviceInstanceIds = serviceInstanceIds;

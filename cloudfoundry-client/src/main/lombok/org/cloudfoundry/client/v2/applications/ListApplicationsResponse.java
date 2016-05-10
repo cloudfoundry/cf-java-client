@@ -40,6 +40,7 @@ public final class ListApplicationsResponse extends PaginatedResponse<Applicatio
                              @JsonProperty("resources") @Singular List<ApplicationResource> resources,
                              @JsonProperty("total_pages") Integer totalPages,
                              @JsonProperty("total_results") Integer totalResults) {
+
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 
