@@ -22,26 +22,24 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
-import org.cloudfoundry.client.v3.PaginatedResponse;
 
 import java.util.List;
 
 /**
- * The response payload for the Get Detailed Stats for a Process operation
+ * The response payload for the Get Statistics for a Process operation
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public final class GetProcessDetailedStatisticsResponse extends PaginatedResponse<GetProcessDetailedStatisticsResponse.Resource> {
+public final class GetProcessStatisticsResponse {
+
+    private final List<Resource> resources;
 
     @Builder
-    GetProcessDetailedStatisticsResponse(@JsonProperty("pagination") Pagination pagination,
-                                         @JsonProperty("resources") @Singular List<Resource> resources) {
-        super(pagination, resources);
+    GetProcessStatisticsResponse(@JsonProperty("resources") @Singular List<Resource> resources) {
+        this.resources = resources;
     }
 
     /**
-     * The Resource response payload for the Get Detailed Stats for a Process operation
+     * The Resource response payload for the Get Statistics for a Process operation
      */
     @Data
     @EqualsAndHashCode(callSuper = true)
