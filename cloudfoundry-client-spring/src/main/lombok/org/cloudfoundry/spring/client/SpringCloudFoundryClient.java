@@ -61,26 +61,16 @@ import org.cloudfoundry.reactor.client.v2.applicationusageevents.ReactorApplicat
 import org.cloudfoundry.reactor.client.v2.domains.ReactorDomains;
 import org.cloudfoundry.reactor.client.v2.environmentvariablegroups.ReactorEnvironmentVariableGroups;
 import org.cloudfoundry.reactor.client.v2.events.ReactorEvents;
+import org.cloudfoundry.reactor.client.v2.featureflags.ReactorFeatureFlags;
 import org.cloudfoundry.reactor.client.v2.info.ReactorInfo;
 import org.cloudfoundry.reactor.client.v2.jobs.ReactorJobs;
-import org.cloudfoundry.reactor.client.v2.servicebindings.ReactorServiceBindingsV2;
-import org.cloudfoundry.reactor.client.v2.stacks.ReactorStacks;
-import org.cloudfoundry.reactor.client.v2.users.ReactorUsers;
-import org.cloudfoundry.reactor.client.v3.processes.ReactorProcesses;
-import org.cloudfoundry.reactor.client.v3.servicebindings.ReactorServiceBindingsV3;
-import org.cloudfoundry.reactor.client.v3.tasks.ReactorTasks;
-import org.cloudfoundry.reactor.util.AuthorizationProvider;
-import org.cloudfoundry.reactor.util.ConnectionContextSupplier;
-import org.cloudfoundry.reactor.util.DefaultConnectionContext;
-import org.cloudfoundry.spring.client.v2.applications.SpringApplicationsV2;
-import org.cloudfoundry.spring.client.v2.buildpacks.SpringBuildpacks;
-import org.cloudfoundry.reactor.client.v2.featureflags.ReactorFeatureFlags;
 import org.cloudfoundry.reactor.client.v2.organizationquotadefinitions.ReactorOrganizationQuotaDefinitions;
 import org.cloudfoundry.reactor.client.v2.organizations.ReactorOrganizations;
 import org.cloudfoundry.reactor.client.v2.privatedomains.ReactorPrivateDomains;
 import org.cloudfoundry.reactor.client.v2.routemappings.ReactorRouteMappings;
 import org.cloudfoundry.reactor.client.v2.routes.ReactorRoutes;
 import org.cloudfoundry.reactor.client.v2.securitygroups.ReactorSecurityGroups;
+import org.cloudfoundry.reactor.client.v2.servicebindings.ReactorServiceBindingsV2;
 import org.cloudfoundry.reactor.client.v2.servicebrokers.ReactorServiceBrokers;
 import org.cloudfoundry.reactor.client.v2.serviceinstances.ReactorServiceInstances;
 import org.cloudfoundry.reactor.client.v2.servicekeys.ReactorServiceKeys;
@@ -91,9 +81,19 @@ import org.cloudfoundry.reactor.client.v2.serviceusageevents.ReactorServiceUsage
 import org.cloudfoundry.reactor.client.v2.shareddomains.ReactorSharedDomains;
 import org.cloudfoundry.reactor.client.v2.spacequotadefinitions.ReactorSpaceQuotaDefinitions;
 import org.cloudfoundry.reactor.client.v2.spaces.ReactorSpaces;
+import org.cloudfoundry.reactor.client.v2.stacks.ReactorStacks;
 import org.cloudfoundry.reactor.client.v2.userprovidedserviceinstances.ReactorUserProvidedServiceInstances;
+import org.cloudfoundry.reactor.client.v2.users.ReactorUsers;
 import org.cloudfoundry.reactor.client.v3.applications.ReactorApplicationsV3;
 import org.cloudfoundry.reactor.client.v3.droplets.ReactorDroplets;
+import org.cloudfoundry.reactor.client.v3.processes.ReactorProcesses;
+import org.cloudfoundry.reactor.client.v3.servicebindings.ReactorServiceBindingsV3;
+import org.cloudfoundry.reactor.client.v3.tasks.ReactorTasks;
+import org.cloudfoundry.reactor.util.AuthorizationProvider;
+import org.cloudfoundry.reactor.util.ConnectionContextSupplier;
+import org.cloudfoundry.reactor.util.DefaultConnectionContext;
+import org.cloudfoundry.spring.client.v2.applications.SpringApplicationsV2;
+import org.cloudfoundry.spring.client.v2.buildpacks.SpringBuildpacks;
 import org.cloudfoundry.spring.client.v3.packages.SpringPackages;
 import org.cloudfoundry.spring.util.CloudFoundryClientCompatibilityChecker;
 import org.cloudfoundry.spring.util.SchedulerGroupBuilder;
@@ -281,7 +281,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
     // Let's take a moment to reflect on the fact that this bridge constructor is needed to counter a useless compiler constraint
     private SpringCloudFoundryClient(ConnectionContext connectionContext, String host, Integer port, String proxyHost, String proxyPassword, Integer proxyPort, String proxyUsername,
                                      Boolean skipSslValidation, Scheduler schedulerGroup, List<DeserializationProblemHandler>
-        problemHandlers) {
+                                         problemHandlers) {
         this(host, port, proxyHost, proxyPassword, proxyPort, proxyUsername, skipSslValidation, getRestOperations(connectionContext, problemHandlers), getRoot(host, port,
             connectionContext.getSslCertificateTruster()), schedulerGroup);
     }

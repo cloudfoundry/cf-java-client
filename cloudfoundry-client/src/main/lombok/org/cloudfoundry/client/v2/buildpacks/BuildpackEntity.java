@@ -26,14 +26,44 @@ import lombok.Data;
 @Data
 public final class BuildpackEntity {
 
+    /**
+     * Whether the buildpack is enabled
+     *
+     * @param enabled whether the buildpack is enabled
+     * @return whether the buildpack is enabled
+     */
     private final Boolean enabled;
 
+    /**
+     * The filename
+     *
+     * @param filename the filename
+     * @return the filename
+     */
     private final String filename;
 
+    /**
+     * Whether the buildpack is locked
+     *
+     * @param locked whether the buildpack is locked
+     * @return whether the buildpack is locked
+     */
     private final Boolean locked;
 
+    /**
+     * The name
+     *
+     * @param name the name
+     * @return the name
+     */
     private final String name;
 
+    /**
+     * The position
+     *
+     * @param position the position
+     * @return the position
+     */
     private final Integer position;
 
     @Builder
@@ -42,6 +72,7 @@ public final class BuildpackEntity {
                     @JsonProperty("locked") Boolean locked,
                     @JsonProperty("name") String name,
                     @JsonProperty("position") Integer position) {
+
         this.enabled = enabled;
         this.filename = filename;
         this.locked = locked;
