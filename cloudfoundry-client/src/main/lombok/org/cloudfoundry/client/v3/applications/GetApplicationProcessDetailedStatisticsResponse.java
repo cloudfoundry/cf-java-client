@@ -23,7 +23,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.v3.PaginatedResponse;
-import org.cloudfoundry.client.v3.processes.AbstractProcessDetailedStatistics;
+import org.cloudfoundry.client.v3.processes.AbstractProcessStatistics;
 import org.cloudfoundry.client.v3.processes.ProcessUsage;
 
 import java.util.List;
@@ -48,7 +48,7 @@ public final class GetApplicationProcessDetailedStatisticsResponse extends Pagin
     @Data
     @EqualsAndHashCode(callSuper = true)
     @ToString(callSuper = true)
-    public static final class Resource extends AbstractProcessDetailedStatistics {
+    public static final class Resource extends AbstractProcessStatistics {
 
         @Builder
         Resource(@JsonProperty("disk_quota") Long diskQuota,

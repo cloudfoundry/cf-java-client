@@ -17,7 +17,7 @@
 package org.cloudfoundry.reactor.client.v3.processes;
 
 import org.cloudfoundry.client.v3.Link;
-import org.cloudfoundry.client.v3.processes.AbstractProcessDetailedStatistics.PortMapping;
+import org.cloudfoundry.client.v3.processes.AbstractProcessStatistics.PortMapping;
 import org.cloudfoundry.client.v3.processes.GetProcessDetailedStatisticsRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessDetailedStatisticsResponse;
 import org.cloudfoundry.client.v3.processes.GetProcessRequest;

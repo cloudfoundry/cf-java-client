@@ -46,7 +46,7 @@ public final class GetProcessDetailedStatisticsResponse extends PaginatedRespons
     @Data
     @EqualsAndHashCode(callSuper = true)
     @ToString(callSuper = true)
-    public static final class Resource extends AbstractProcessDetailedStatistics {
+    public static final class Resource extends AbstractProcessStatistics {
 
         @Builder
         Resource(@JsonProperty("disk_quota") Long diskQuota,

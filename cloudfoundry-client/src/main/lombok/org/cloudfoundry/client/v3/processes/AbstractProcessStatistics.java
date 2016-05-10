@@ -27,7 +27,7 @@ import java.util.List;
  * Process details statistics
  */
 @Data
-public abstract class AbstractProcessDetailedStatistics {
+public abstract class AbstractProcessStatistics {
 
     protected final long diskQuota;
 
@@ -49,16 +49,16 @@ public abstract class AbstractProcessDetailedStatistics {
 
     protected final ProcessUsage usage;
 
-    protected AbstractProcessDetailedStatistics(@JsonProperty("disk_quota") Long diskQuota,
-                                                @JsonProperty("fds_quota") Integer fdsQuota,
-                                                @JsonProperty("host") String host,
-                                                @JsonProperty("index") Integer index,
-                                                @JsonProperty("instance_ports") @Singular List<PortMapping> instancePorts,
-                                                @JsonProperty("mem_quota") Long memoryQuota,
-                                                @JsonProperty("state") String state,
-                                                @JsonProperty("type") String type,
-                                                @JsonProperty("uptime") Long uptime,
-                                                @JsonProperty("usage") ProcessUsage usage) {
+    protected AbstractProcessStatistics(@JsonProperty("disk_quota") Long diskQuota,
+                                        @JsonProperty("fds_quota") Integer fdsQuota,
+                                        @JsonProperty("host") String host,
+                                        @JsonProperty("index") Integer index,
+                                        @JsonProperty("instance_ports") @Singular List<PortMapping> instancePorts,
+                                        @JsonProperty("mem_quota") Long memoryQuota,
+                                        @JsonProperty("state") String state,
+                                        @JsonProperty("type") String type,
+                                        @JsonProperty("uptime") Long uptime,
+                                        @JsonProperty("usage") ProcessUsage usage) {
         this.diskQuota = diskQuota;
         this.fdsQuota = fdsQuota;
         this.host = host;

@@ -56,7 +56,7 @@ import org.cloudfoundry.client.v3.applications.StopApplicationResponse;
 import org.cloudfoundry.client.v3.applications.TerminateApplicationInstanceRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
-import org.cloudfoundry.client.v3.processes.AbstractProcessDetailedStatistics.PortMapping;
+import org.cloudfoundry.client.v3.processes.AbstractProcessStatistics.PortMapping;
 import org.cloudfoundry.client.v3.processes.HealthCheck;
 import org.cloudfoundry.client.v3.processes.HealthCheck.Type;
 import org.cloudfoundry.client.v3.processes.ProcessUsage;
