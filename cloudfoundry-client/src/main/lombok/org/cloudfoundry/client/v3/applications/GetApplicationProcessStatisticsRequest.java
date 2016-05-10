@@ -19,18 +19,15 @@ package org.cloudfoundry.client.v3.applications;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
-import org.cloudfoundry.client.v3.PaginatedRequest;
 
 /**
  * The request payload for the Get Detailed Stats for an Application's Process operation
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-public final class GetApplicationProcessDetailedStatisticsRequest extends PaginatedRequest implements Validatable {
+public final class GetApplicationProcessStatisticsRequest implements Validatable {
 
     /**
      * The application id
@@ -51,11 +48,8 @@ public final class GetApplicationProcessDetailedStatisticsRequest extends Pagina
     private final String type;
 
     @Builder
-    GetApplicationProcessDetailedStatisticsRequest(Integer page,
-                                                   Integer perPage,
-                                                   String applicationId,
-                                                   String type) {
-        super(page, perPage);
+    GetApplicationProcessStatisticsRequest(String applicationId,
+                                           String type) {
         this.applicationId = applicationId;
         this.type = type;
     }

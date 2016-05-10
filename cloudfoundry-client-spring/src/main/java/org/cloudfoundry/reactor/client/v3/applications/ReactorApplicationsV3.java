@@ -27,8 +27,8 @@ import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
-import org.cloudfoundry.client.v3.applications.GetApplicationProcessDetailedStatisticsRequest;
-import org.cloudfoundry.client.v3.applications.GetApplicationProcessDetailedStatisticsResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
@@ -116,8 +116,8 @@ public final class ReactorApplicationsV3 extends AbstractClientV3Operations impl
     }
 
     @Override
-    public Mono<GetApplicationProcessDetailedStatisticsResponse> getProcessDetailedStatistics(GetApplicationProcessDetailedStatisticsRequest request) {
-        return get(request, GetApplicationProcessDetailedStatisticsResponse.class,
+    public Mono<GetApplicationProcessStatisticsResponse> getProcessStatistics(GetApplicationProcessStatisticsRequest request) {
+        return get(request, GetApplicationProcessStatisticsResponse.class,
             function((builder, validRequest) -> builder.pathSegment("v3", "apps", validRequest.getApplicationId(), "processes", validRequest.getType(), "stats")));
     }
 

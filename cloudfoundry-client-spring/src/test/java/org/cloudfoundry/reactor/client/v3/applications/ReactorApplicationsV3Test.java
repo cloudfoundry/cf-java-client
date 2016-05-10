@@ -29,10 +29,10 @@ import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
-import org.cloudfoundry.client.v3.applications.GetApplicationProcessDetailedStatisticsRequest;
-import org.cloudfoundry.client.v3.applications.GetApplicationProcessDetailedStatisticsResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationTaskRequest;
@@ -497,7 +497,7 @@ public final class ReactorApplicationsV3Test {
 
     }
 
-    public static final class GetApplicationProcessDetailedStatistics extends AbstractClientApiTest<GetApplicationProcessDetailedStatisticsRequest, GetApplicationProcessDetailedStatisticsResponse> {
+    public static final class GetApplicationProcessStatistics extends AbstractClientApiTest<GetApplicationProcessStatisticsRequest, GetApplicationProcessStatisticsResponse> {
 
         private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
@@ -515,15 +515,15 @@ public final class ReactorApplicationsV3Test {
         }
 
         @Override
-        protected GetApplicationProcessDetailedStatisticsRequest getInvalidRequest() {
-            return GetApplicationProcessDetailedStatisticsRequest.builder()
+        protected GetApplicationProcessStatisticsRequest getInvalidRequest() {
+            return GetApplicationProcessStatisticsRequest.builder()
                 .build();
         }
 
         @Override
-        protected GetApplicationProcessDetailedStatisticsResponse getResponse() {
-            return GetApplicationProcessDetailedStatisticsResponse.builder()
-                .resource(GetApplicationProcessDetailedStatisticsResponse.Resource.builder()
+        protected GetApplicationProcessStatisticsResponse getResponse() {
+            return GetApplicationProcessStatisticsResponse.builder()
+                .resource(GetApplicationProcessStatisticsResponse.Resource.builder()
                     .type("web")
                     .index(0)
                     .state("RUNNING")
@@ -547,16 +547,16 @@ public final class ReactorApplicationsV3Test {
         }
 
         @Override
-        protected GetApplicationProcessDetailedStatisticsRequest getValidRequest() throws Exception {
-            return GetApplicationProcessDetailedStatisticsRequest.builder()
+        protected GetApplicationProcessStatisticsRequest getValidRequest() throws Exception {
+            return GetApplicationProcessStatisticsRequest.builder()
                 .applicationId("test-id")
                 .type("test-type")
                 .build();
         }
 
         @Override
-        protected Mono<GetApplicationProcessDetailedStatisticsResponse> invoke(GetApplicationProcessDetailedStatisticsRequest request) {
-            return this.applications.getProcessDetailedStatistics(request);
+        protected Mono<GetApplicationProcessStatisticsResponse> invoke(GetApplicationProcessStatisticsRequest request) {
+            return this.applications.getProcessStatistics(request);
         }
 
     }

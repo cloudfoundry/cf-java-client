@@ -27,7 +27,7 @@ public final class GetApplicationProcessDetailedStatisticsRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = GetApplicationProcessDetailedStatisticsRequest.builder()
+        ValidationResult result = GetApplicationProcessStatisticsRequest.builder()
             .applicationId("test-id")
             .type("test-type")
             .build()
@@ -38,7 +38,7 @@ public final class GetApplicationProcessDetailedStatisticsRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = GetApplicationProcessDetailedStatisticsRequest.builder()
+        ValidationResult result = GetApplicationProcessStatisticsRequest.builder()
             .type("test-type")
             .build()
             .isValid();
@@ -49,7 +49,7 @@ public final class GetApplicationProcessDetailedStatisticsRequestTest {
 
     @Test
     public void isValidNoType() {
-        ValidationResult result = GetApplicationProcessDetailedStatisticsRequest.builder()
+        ValidationResult result = GetApplicationProcessStatisticsRequest.builder()
             .applicationId("test-id")
             .build()
             .isValid();
