@@ -84,6 +84,7 @@ public abstract class ServiceBinding {
                              @JsonProperty("links") @Singular Map<String, Link> links,
                              @JsonProperty("type") String type,
                              @JsonProperty("updated_at") String updatedAt) {
+
         this.createdAt = createdAt;
         this.datas = datas;
         this.id = id;

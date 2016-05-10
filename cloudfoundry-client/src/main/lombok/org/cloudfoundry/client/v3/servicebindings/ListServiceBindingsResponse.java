@@ -39,6 +39,7 @@ public final class ListServiceBindingsResponse extends PaginatedResponse<ListSer
     @Builder
     ListServiceBindingsResponse(@JsonProperty("pagination") Pagination pagination,
                                 @JsonProperty("resources") @Singular List<Resource> resources) {
+
         super(pagination, resources);
     }
 
@@ -57,6 +58,7 @@ public final class ListServiceBindingsResponse extends PaginatedResponse<ListSer
                  @JsonProperty("links") @Singular Map<String, Link> links,
                  @JsonProperty("type") String type,
                  @JsonProperty("updated_at") String updatedAt) {
+
             super(createdAt, datas, id, links, type, updatedAt);
         }
 

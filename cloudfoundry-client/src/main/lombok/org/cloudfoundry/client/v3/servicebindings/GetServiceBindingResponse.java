@@ -41,6 +41,7 @@ public final class GetServiceBindingResponse extends ServiceBinding {
                               @JsonProperty("links") @Singular Map<String, Link> links,
                               @JsonProperty("type") String type,
                               @JsonProperty("updated_at") String updatedAt) {
+
         super(createdAt, datas, id, links, type, updatedAt);
     }
 

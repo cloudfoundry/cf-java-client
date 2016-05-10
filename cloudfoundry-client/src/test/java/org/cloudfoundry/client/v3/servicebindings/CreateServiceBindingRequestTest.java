@@ -19,9 +19,10 @@ package org.cloudfoundry.client.v3.servicebindings;
 
 import org.cloudfoundry.ValidationResult;
 import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingRequest.Data;
+import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingRequest.Relationships;
+import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingRequest.ServiceBindingType;
 import org.junit.Test;
-
-import java.util.Collections;
 
 import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
@@ -30,11 +31,19 @@ import static org.junit.Assert.assertEquals;
 public final class CreateServiceBindingRequestTest {
 
     @Test
-    public void isNotValidNoAppRelationship() {
-        ValidationResult result = CreateServiceBindingRequest.builder()
-            .type(CreateServiceBindingRequest.ServiceBindingType.APP)
-            .relationships(CreateServiceBindingRequest.Relationships.builder()
-                .serviceInstance(Relationship.builder().id("test-service-instance-id").build())
+    public void dataIsValid() {
+        ValidationResult result = Data.builder()
+            .build()
+            .isValid();
+
+        assertEquals(VALID, result.getStatus());
+    }
+
+    @Test
+    public void relationshipsIsInvalidNoApplication() {
+        ValidationResult result = Relationships.builder()
+            .serviceInstance(Relationship.builder()
+                .id("test-service-instance-id")
                 .build())
             .build()
             .isValid();
@@ -44,11 +53,10 @@ public final class CreateServiceBindingRequestTest {
     }
 
     @Test
-    public void isNotValidNoServiceInstanceRelationship() {
-        ValidationResult result = CreateServiceBindingRequest.builder()
-            .type(CreateServiceBindingRequest.ServiceBindingType.APP)
-            .relationships(CreateServiceBindingRequest.Relationships.builder()
-                .application(Relationship.builder().id("test-application-id").build())
+    public void relationshipsIsInvalidNoServiceInstance() {
+        ValidationResult result = Relationships.builder()
+            .application(Relationship.builder()
+                .id("test-application-id")
                 .build())
             .build()
             .isValid();
@@ -58,11 +66,41 @@ public final class CreateServiceBindingRequestTest {
     }
 
     @Test
-    public void isNotValidNoType() {
+    public void relationshipsIsValid() {
+        ValidationResult result = Relationships.builder()
+            .application(Relationship.builder()
+                .id("test-application-id")
+                .build())
+            .serviceInstance(Relationship.builder()
+                .id("test-service-instance-id")
+                .build())
+            .build()
+            .isValid();
+
+        assertEquals(VALID, result.getStatus());
+    }
+
+    @Test
+    public void requestIsNotValidNoRelationships() {
         ValidationResult result = CreateServiceBindingRequest.builder()
-            .relationships(CreateServiceBindingRequest.Relationships.builder()
-                .application(Relationship.builder().id("test-application-id").build())
-                .serviceInstance(Relationship.builder().id("test-service-instance-id").build())
+            .type(ServiceBindingType.APP)
+            .build()
+            .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("relationships must be specified", result.getMessages().get(0));
+    }
+
+    @Test
+    public void requestIsNotValidNoType() {
+        ValidationResult result = CreateServiceBindingRequest.builder()
+            .relationships(Relationships.builder()
+                .application(Relationship.builder()
+                    .id("test-application-id")
+                    .build())
+                .serviceInstance(Relationship.builder()
+                    .id("test-service-instance-id")
+                    .build())
                 .build())
             .build()
             .isValid();
@@ -72,45 +110,17 @@ public final class CreateServiceBindingRequestTest {
     }
 
     @Test
-    public void isNotValidEmptyData() {
+    public void requestIsValid() {
         ValidationResult result = CreateServiceBindingRequest.builder()
-            .type(CreateServiceBindingRequest.ServiceBindingType.APP)
-            .relationships(CreateServiceBindingRequest.Relationships.builder()
-                .application(Relationship.builder().id("test-application-id").build())
-                .serviceInstance(Relationship.builder().id("test-service-instance-id").build())
+            .relationships(Relationships.builder()
+                .application(Relationship.builder()
+                    .id("test-application-id")
+                    .build())
+                .serviceInstance(Relationship.builder()
+                    .id("test-service-instance-id")
+                    .build())
                 .build())
-            .data(CreateServiceBindingRequest.Data.builder()
-                .build())
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("parameters cannot be empty if specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isNotValidNoRelationShips() {
-        ValidationResult result = CreateServiceBindingRequest.builder()
-            .type(CreateServiceBindingRequest.ServiceBindingType.APP)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("relationships must be specified", result.getMessages().get(0));
-    }
-
-
-    @Test
-    public void isValid() {
-        ValidationResult result = CreateServiceBindingRequest.builder()
-            .type(CreateServiceBindingRequest.ServiceBindingType.APP)
-            .relationships(CreateServiceBindingRequest.Relationships.builder()
-                .application(Relationship.builder().id("test-application-id").build())
-                .serviceInstance(Relationship.builder().id("test-service-instance-id").build())
-                .build())
-            .data(CreateServiceBindingRequest.Data.builder()
-                .parameters(Collections.singletonMap("test-key", "test-value"))
-                .build())
+            .type(ServiceBindingType.APP)
             .build()
             .isValid();
 

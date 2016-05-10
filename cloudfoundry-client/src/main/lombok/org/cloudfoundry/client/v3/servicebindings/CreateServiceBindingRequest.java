@@ -20,7 +20,6 @@ package org.cloudfoundry.client.v3.servicebindings;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
@@ -31,7 +30,7 @@ import java.util.Map;
 /**
  * The request payload for the Delete Service Binding operation.
  */
-@Data
+@lombok.Data
 public final class CreateServiceBindingRequest implements Validatable {
 
     /**
@@ -79,21 +78,13 @@ public final class CreateServiceBindingRequest implements Validatable {
         }
 
         if (this.data != null) {
-            if (this.data.getParameters() == null) {
-                builder.message("parameters cannot be empty if specified"); //TODO: Is this true?
-            }
+            builder.messages(this.data.isValid().getMessages());
         }
 
         if (this.relationships == null) {
             builder.message("relationships must be specified");
         } else {
-            if (this.relationships.getApplication() == null) {
-                builder.message("application relationship must be specified");
-            }
-
-            if (this.relationships.getServiceInstance() == null) {
-                builder.message("service instance relationship must be specified");
-            }
+            builder.messages(this.relationships.isValid().getMessages());
         }
 
         return builder.build();
@@ -118,7 +109,7 @@ public final class CreateServiceBindingRequest implements Validatable {
     }
 
     @lombok.Data
-    public static final class Data {
+    public static final class Data implements Validatable {
 
         @Getter(onMethod = @__(@JsonProperty("parameters")))
         private final Map<String, Object> parameters;
@@ -128,10 +119,15 @@ public final class CreateServiceBindingRequest implements Validatable {
             this.parameters = parameters;
         }
 
+        @Override
+        public ValidationResult isValid() {
+            return ValidationResult.builder().build();
+        }
+
     }
 
     @lombok.Data
-    public static final class Relationships {
+    public static final class Relationships implements Validatable {
 
         @Getter(onMethod = @__(@JsonProperty("app")))
         private final Relationship application;
@@ -143,6 +139,21 @@ public final class CreateServiceBindingRequest implements Validatable {
         public Relationships(Relationship application, Relationship serviceInstance) {
             this.application = application;
             this.serviceInstance = serviceInstance;
+        }
+
+        @Override
+        public ValidationResult isValid() {
+            ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
+
+            if (this.application == null) {
+                builder.message("application relationship must be specified");
+            }
+
+            if (this.serviceInstance == null) {
+                builder.message("service instance relationship must be specified");
+            }
+
+            return builder.build();
         }
 
     }
