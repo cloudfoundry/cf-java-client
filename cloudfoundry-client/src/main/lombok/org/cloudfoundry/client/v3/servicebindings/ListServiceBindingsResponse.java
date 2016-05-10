@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.applications;
+package org.cloudfoundry.client.v3.servicebindings;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -22,7 +22,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
-import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.PaginatedResponse;
 
@@ -30,38 +29,35 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The response payload for the List Applications operation
+ * The response payload for the List Service Bindings operation
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ListApplicationsResponse extends PaginatedResponse<ListApplicationsResponse.Resource> {
+public final class ListServiceBindingsResponse extends PaginatedResponse<ListServiceBindingsResponse.Resource> {
 
     @Builder
-    ListApplicationsResponse(@JsonProperty("pagination") Pagination pagination,
-                             @JsonProperty("resources") @Singular List<Resource> resources) {
+    ListServiceBindingsResponse(@JsonProperty("pagination") Pagination pagination,
+                                @JsonProperty("resources") @Singular List<Resource> resources) {
         super(pagination, resources);
     }
 
     /**
-     * The Resource response payload for the List Applications operation
+     * The Resource response payload for the List Service Bindings operation
      */
     @Data
     @EqualsAndHashCode(callSuper = true)
     @ToString(callSuper = true)
-    public static final class Resource extends Application {
+    public static final class Resource extends ServiceBinding {
 
         @Builder
         Resource(@JsonProperty("created_at") String createdAt,
-                 @JsonProperty("desired_state") String desiredState,
-                 @JsonProperty("environment_variables") @Singular Map<String, String> environmentVariables,
+                 @JsonProperty("data") @Singular Map<String, Object> datas,
                  @JsonProperty("guid") String id,
-                 @JsonProperty("lifecycle") Lifecycle lifecycle,
                  @JsonProperty("links") @Singular Map<String, Link> links,
-                 @JsonProperty("name") String name,
-                 @JsonProperty("total_desired_instances") Integer totalDesiredInstances,
+                 @JsonProperty("type") String type,
                  @JsonProperty("updated_at") String updatedAt) {
-            super(createdAt, desiredState, environmentVariables, id, lifecycle, links, name, totalDesiredInstances, updatedAt);
+            super(createdAt, datas, id, links, type, updatedAt);
         }
 
     }

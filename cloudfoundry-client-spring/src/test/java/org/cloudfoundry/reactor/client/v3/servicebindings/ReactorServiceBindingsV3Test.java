@@ -23,6 +23,8 @@ import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingResponse;
 import org.cloudfoundry.client.v3.servicebindings.DeleteServiceBindingRequest;
 import org.cloudfoundry.client.v3.servicebindings.GetServiceBindingRequest;
 import org.cloudfoundry.client.v3.servicebindings.GetServiceBindingResponse;
+import org.cloudfoundry.client.v3.servicebindings.ListServiceBindingsRequest;
+import org.cloudfoundry.client.v3.servicebindings.ListServiceBindingsResponse;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -37,6 +39,7 @@ import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.cloudfoundry.client.v3.PaginatedResponse.Pagination;
 import static org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingRequest.ServiceBindingType.APP;
 
 public final class ReactorServiceBindingsV3Test {
@@ -209,5 +212,94 @@ public final class ReactorServiceBindingsV3Test {
 
     }
 
+    public static final class List extends AbstractClientApiTest<ListServiceBindingsRequest, ListServiceBindingsResponse> {
+
+        private final ReactorServiceBindingsV3 serviceBindings = new ReactorServiceBindingsV3(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/service_bindings?app_guids=test-application-id&order_by=%2Bcreated_at&page=1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/servicebindings/GET_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListServiceBindingsRequest getInvalidRequest() {
+            return ListServiceBindingsRequest.builder()
+                .page(-1)
+                .build();
+        }
+
+        @Override
+        protected ListServiceBindingsResponse getResponse() {
+            return ListServiceBindingsResponse.builder()
+                .pagination(Pagination.builder()
+                    .totalResults(3)
+                    .first(Link.builder()
+                        .href("/v3/service_bindings?page=1&per_page=2")
+                        .build())
+                    .last(Link.builder()
+                        .href("/v3/service_bindings?page=2&per_page=2")
+                        .build())
+                    .next(Link.builder()
+                        .href("/v3/service_bindings?page=2&per_page=2")
+                        .build())
+                    .build())
+                .resource(ListServiceBindingsResponse.Resource.builder()
+                    .id("dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
+                    .type("app")
+                    .data("credentials", Collections.singletonMap("super-secret", "password"))
+                    .data("syslog_drain_url", "syslog://drain.url.com")
+                    .createdAt("2015-11-13T17:02:56Z")
+                    .link("self", Link.builder()
+                        .href("/v3/service_bindings/dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
+                        .build())
+                    .link("service_instance", Link.builder()
+                        .href("/v3/service_instances/8bfe4c1b-9e18-45b1-83be-124163f31f9e")
+                        .build())
+                    .link("app", Link.builder()
+                        .href("/v3/apps/74f7c078-0934-470f-9883-4fddss5b8f13")
+                        .build())
+                    .build())
+                .resource(ListServiceBindingsResponse.Resource.builder()
+                    .id("7aa37bad-6ccb-4ef9-ba48-9ce3a91b2b62")
+                    .type("app")
+                    .data("credentials", Collections.singletonMap("super-secret", "password"))
+                    .data("syslog_drain_url", "syslog://drain.url.com")
+                    .createdAt("2015-11-13T17:02:56Z")
+                    .link("self", Link.builder()
+                        .href("/v3/service_bindings/7aa37bad-6ccb-4ef9-ba48-9ce3a91b2b62")
+                        .build())
+                    .link("service_instance", Link.builder()
+                        .href("/v3/service_instances/8bf356j3-9e18-45b1-3333-124163f31f9e")
+                        .build())
+                    .link("app", Link.builder()
+                        .href("/v3/apps/74f7c078-0934-470f-9883-4fddss5b8f13")
+                        .build())
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListServiceBindingsRequest getValidRequest() throws Exception {
+            return ListServiceBindingsRequest.builder()
+                .page(1)
+                .orderBy("+created_at")
+                .applicationId("test-application-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<ListServiceBindingsResponse> invoke(ListServiceBindingsRequest request) {
+            return this.serviceBindings.list(request);
+        }
+
+    }
 
 }
