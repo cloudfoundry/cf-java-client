@@ -23,11 +23,11 @@ import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class GetProcessDetailedStatisticsRequestTest {
+public final class GetProcessStatisticsRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = GetProcessDetailedStatisticsRequest.builder()
+        ValidationResult result = GetProcessStatisticsRequest.builder()
             .processId("test-id")
             .build()
             .isValid();
@@ -37,7 +37,7 @@ public final class GetProcessDetailedStatisticsRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = GetProcessDetailedStatisticsRequest.builder()
+        ValidationResult result = GetProcessStatisticsRequest.builder()
             .build()
             .isValid();
 

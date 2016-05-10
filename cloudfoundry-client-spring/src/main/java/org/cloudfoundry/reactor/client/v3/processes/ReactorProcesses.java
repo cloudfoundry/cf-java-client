@@ -17,8 +17,8 @@
 package org.cloudfoundry.reactor.client.v3.processes;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.cloudfoundry.client.v3.processes.GetProcessDetailedStatisticsRequest;
-import org.cloudfoundry.client.v3.processes.GetProcessDetailedStatisticsResponse;
+import org.cloudfoundry.client.v3.processes.GetProcessStatisticsRequest;
+import org.cloudfoundry.client.v3.processes.GetProcessStatisticsResponse;
 import org.cloudfoundry.client.v3.processes.GetProcessRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessResponse;
 import org.cloudfoundry.client.v3.processes.ListProcessesRequest;
@@ -59,8 +59,8 @@ public final class ReactorProcesses extends AbstractClientV3Operations implement
     }
 
     @Override
-    public Mono<GetProcessDetailedStatisticsResponse> getDetailedStatistics(GetProcessDetailedStatisticsRequest request) {
-        return get(request, GetProcessDetailedStatisticsResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "processes", validRequest.getProcessId(), "stats")));
+    public Mono<GetProcessStatisticsResponse> getStatistics(GetProcessStatisticsRequest request) {
+        return get(request, GetProcessStatisticsResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "processes", validRequest.getProcessId(), "stats")));
     }
 
     @Override

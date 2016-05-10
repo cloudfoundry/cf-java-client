@@ -18,8 +18,8 @@ package org.cloudfoundry.reactor.client.v3.processes;
 
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.processes.AbstractProcessStatistics.PortMapping;
-import org.cloudfoundry.client.v3.processes.GetProcessDetailedStatisticsRequest;
-import org.cloudfoundry.client.v3.processes.GetProcessDetailedStatisticsResponse;
+import org.cloudfoundry.client.v3.processes.GetProcessStatisticsRequest;
+import org.cloudfoundry.client.v3.processes.GetProcessStatisticsResponse;
 import org.cloudfoundry.client.v3.processes.GetProcessRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessResponse;
 import org.cloudfoundry.client.v3.processes.HealthCheck;
@@ -160,7 +160,7 @@ public final class ReactorProcessesTest {
 
     }
 
-    public static final class GetDetailedProcessStatistics extends AbstractClientApiTest<GetProcessDetailedStatisticsRequest, GetProcessDetailedStatisticsResponse> {
+    public static final class GetProcessStatistics extends AbstractClientApiTest<GetProcessStatisticsRequest, GetProcessStatisticsResponse> {
 
         private final ReactorProcesses processes = new ReactorProcesses(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
@@ -178,15 +178,15 @@ public final class ReactorProcessesTest {
         }
 
         @Override
-        protected GetProcessDetailedStatisticsRequest getInvalidRequest() {
-            return GetProcessDetailedStatisticsRequest.builder()
+        protected GetProcessStatisticsRequest getInvalidRequest() {
+            return GetProcessStatisticsRequest.builder()
                 .build();
         }
 
         @Override
-        protected GetProcessDetailedStatisticsResponse getResponse() {
-            return GetProcessDetailedStatisticsResponse.builder()
-                .resource(GetProcessDetailedStatisticsResponse.Resource.builder()
+        protected GetProcessStatisticsResponse getResponse() {
+            return GetProcessStatisticsResponse.builder()
+                .resource(GetProcessStatisticsResponse.Resource.builder()
                     .type("web")
                     .index(0)
                     .state("RUNNING")
@@ -210,15 +210,15 @@ public final class ReactorProcessesTest {
         }
 
         @Override
-        protected GetProcessDetailedStatisticsRequest getValidRequest() throws Exception {
-            return GetProcessDetailedStatisticsRequest.builder()
+        protected GetProcessStatisticsRequest getValidRequest() throws Exception {
+            return GetProcessStatisticsRequest.builder()
                 .processId("test-id")
                 .build();
         }
 
         @Override
-        protected Mono<GetProcessDetailedStatisticsResponse> invoke(GetProcessDetailedStatisticsRequest request) {
-            return this.processes.getDetailedStatistics(request);
+        protected Mono<GetProcessStatisticsResponse> invoke(GetProcessStatisticsRequest request) {
+            return this.processes.getStatistics(request);
         }
 
     }

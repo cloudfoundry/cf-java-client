@@ -19,18 +19,15 @@ package org.cloudfoundry.client.v3.processes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
-import org.cloudfoundry.client.v3.PaginatedRequest;
 
 /**
- * The request payload for the Get Detailed Statistics for a Process operation
+ * The request payload for the Get Statistics for a Process operation
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-public final class GetProcessDetailedStatisticsRequest extends PaginatedRequest implements Validatable {
+public final class GetProcessStatisticsRequest implements Validatable {
 
     /**
      * The process id
@@ -42,8 +39,7 @@ public final class GetProcessDetailedStatisticsRequest extends PaginatedRequest 
     private final String processId;
 
     @Builder
-    GetProcessDetailedStatisticsRequest(Integer page, Integer perPage, String processId) {
-        super(page, perPage);
+    GetProcessStatisticsRequest(String processId) {
         this.processId = processId;
     }
 
