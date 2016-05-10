@@ -73,6 +73,14 @@ public interface Services {
     Mono<ServiceInstance> getInstance(GetServiceInstanceRequest request);
 
     /**
+     * Get a service key
+     *
+     * @param request the get service key request
+     * @return the service key
+     */
+    Mono<ServiceKey> getServiceKey(GetServiceKeyRequest request);
+
+    /**
      * List the service instances in the targeted space
      *
      * @return the service instances

@@ -14,27 +14,42 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.servicekeys;
+package org.cloudfoundry.operations.services;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Singular;
+
+import java.util.Map;
 
 /**
- * The resource response payload for the Get Service Key Response
+ * A service key
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public final class GetServiceKeyResponse extends AbstractServiceKeyResource {
+public final class ServiceKey {
+
+    /**
+     * The credentials
+     *
+     * @param credentials the credentials
+     * @return the credentials
+     */
+    private final Map<String, Object> credentials;
+
+
+    /**
+     * The service key id
+     *
+     * @param id the service key id
+     * @return the service key id
+     */
+    private final String id;
 
     @Builder
-    GetServiceKeyResponse(@JsonProperty("entity") ServiceKeyEntity entity,
-                          @JsonProperty("metadata") Metadata metadata) {
-
-        super(entity, metadata);
+    ServiceKey(@Singular Map<String, Object> credentials,
+               String id) {
+        this.credentials = credentials;
+        this.id = id;
     }
 
 }

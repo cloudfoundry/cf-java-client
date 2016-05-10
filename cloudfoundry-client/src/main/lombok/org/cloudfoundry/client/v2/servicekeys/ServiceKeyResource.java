@@ -21,7 +21,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.cloudfoundry.client.v2.Resource;
 
 /**
  * Service Key in responses
@@ -29,11 +28,12 @@ import org.cloudfoundry.client.v2.Resource;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ServiceKeyResource extends Resource<ServiceKeyEntity> {
+public final class ServiceKeyResource extends AbstractServiceKeyResource {
 
     @Builder
     ServiceKeyResource(@JsonProperty("entity") ServiceKeyEntity entity,
                        @JsonProperty("metadata") Metadata metadata) {
+
         super(entity, metadata);
     }
 

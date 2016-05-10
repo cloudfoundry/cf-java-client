@@ -17,22 +17,21 @@
 package org.cloudfoundry.client.v2.servicekeys;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.cloudfoundry.client.v2.Resource;
 
 /**
- * The resource response payload for the Get Service Key Response
+ * The resource response payload for Service Keys
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class GetServiceKeyResponse extends AbstractServiceKeyResource {
+public abstract class AbstractServiceKeyResource extends Resource<ServiceKeyEntity> {
 
-    @Builder
-    GetServiceKeyResponse(@JsonProperty("entity") ServiceKeyEntity entity,
-                          @JsonProperty("metadata") Metadata metadata) {
+    AbstractServiceKeyResource(@JsonProperty("entity") ServiceKeyEntity entity,
+                               @JsonProperty("metadata") Metadata metadata) {
 
         super(entity, metadata);
     }

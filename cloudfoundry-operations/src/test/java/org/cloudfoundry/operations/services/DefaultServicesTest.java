@@ -40,11 +40,15 @@ import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
+import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceKeysRequest;
+import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceKeysResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceResource;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyResponse;
+import org.cloudfoundry.client.v2.servicekeys.ServiceKeyEntity;
+import org.cloudfoundry.client.v2.servicekeys.ServiceKeyResource;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanRequest;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanResponse;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
@@ -333,7 +337,7 @@ public final class DefaultServicesTest {
 
                     @Override
                     public Mono<GetJobResponse> get() {
-                        return Mono.just(responses.poll());
+                        return Mono.just(this.responses.poll());
                     }
 
                 }));
@@ -362,7 +366,7 @@ public final class DefaultServicesTest {
 
                     @Override
                     public Mono<GetJobResponse> get() {
-                        return Mono.just(responses.poll());
+                        return Mono.just(this.responses.poll());
                     }
 
                 }));
@@ -392,6 +396,36 @@ public final class DefaultServicesTest {
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListServiceBindingsResponse.builder())
+                    .build()));
+    }
+
+    private static void requestListServiceInstanceServiceKeys(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKey, String credentialKey, String credentialValue) {
+        when(cloudFoundryClient.serviceInstances()
+            .listServiceKeys(ListServiceInstanceServiceKeysRequest.builder()
+                .page(1)
+                .serviceInstanceId(serviceInstanceId)
+                .name(serviceKey)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListServiceInstanceServiceKeysResponse.builder())
+                    .resource(fill(ServiceKeyResource.builder(), "service-key-")
+                        .entity(ServiceKeyEntity.builder()
+                            .name(serviceKey)
+                            .credential(credentialKey, credentialValue)
+                            .build())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestListServiceInstanceServiceKeysEmpty(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKey) {
+        when(cloudFoundryClient.serviceInstances()
+            .listServiceKeys(ListServiceInstanceServiceKeysRequest.builder()
+                .page(1)
+                .serviceInstanceId(serviceInstanceId)
+                .name(serviceKey)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListServiceInstanceServiceKeysResponse.builder())
                     .build()));
     }
 
@@ -1183,6 +1217,63 @@ public final class DefaultServicesTest {
             return this.services
                 .getInstance(org.cloudfoundry.operations.services.GetServiceInstanceRequest.builder()
                     .name("test-service-instance-name")
+                    .build());
+        }
+
+    }
+
+    public static final class GetServiceKey extends AbstractOperationsApiTest<ServiceKey> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+            requestListServiceInstanceServiceKeys(this.cloudFoundryClient, "test-service-instance-id", "test-service-key-name", "key", "val");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ServiceKey> testSubscriber) {
+            testSubscriber
+                .assertEquals(ServiceKey.builder()
+                    .credential("key", "val")
+                    .id("test-service-key-id")
+                    .build());
+        }
+
+        @Override
+        protected Publisher<ServiceKey> invoke() {
+            return this.services
+                .getServiceKey(org.cloudfoundry.operations.services.GetServiceKeyRequest.builder()
+                    .serviceInstanceName("test-service-instance-name")
+                    .serviceKeyName("test-service-key-name")
+                    .build());
+        }
+
+    }
+
+    public static final class GetServiceKeyNoKeys extends AbstractOperationsApiTest<ServiceKey> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+            requestListServiceInstanceServiceKeysEmpty(this.cloudFoundryClient, "test-service-instance-id", "test-service-key-not-found");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ServiceKey> testSubscriber) {
+            testSubscriber
+                .assertError(IllegalArgumentException.class, "Service key test-service-key-not-found does not exist");
+        }
+
+        @Override
+        protected Publisher<ServiceKey> invoke() {
+            return this.services
+                .getServiceKey(org.cloudfoundry.operations.services.GetServiceKeyRequest.builder()
+                    .serviceInstanceName("test-service-instance-name")
+                    .serviceKeyName("test-service-key-not-found")
                     .build());
         }
 
