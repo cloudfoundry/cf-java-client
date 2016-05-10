@@ -26,17 +26,6 @@ import static org.junit.Assert.assertEquals;
 public final class DeleteServiceKeyRequestTest {
 
     @Test
-    public void isInvalid() {
-        ValidationResult result = DeleteServiceKeyRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service instance must be specified", result.getMessages().get(0));
-        assertEquals("service key must be specified", result.getMessages().get(1));
-    }
-
-    @Test
     public void isInvalidNoServiceInstance() {
         ValidationResult result = DeleteServiceKeyRequest.builder()
             .serviceKeyName("test-service-key-name")
@@ -68,4 +57,5 @@ public final class DeleteServiceKeyRequestTest {
 
         assertEquals(VALID, result.getStatus());
     }
+
 }

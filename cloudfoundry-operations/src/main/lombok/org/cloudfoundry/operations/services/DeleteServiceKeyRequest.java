@@ -53,11 +53,11 @@ public final class DeleteServiceKeyRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (serviceInstanceName == null) {
+        if (this.serviceInstanceName == null) {
             builder.message("service instance must be specified");
         }
 
-        if (serviceKeyName == null) {
+        if (this.serviceKeyName == null) {
             builder.message("service key must be specified");
         }
 

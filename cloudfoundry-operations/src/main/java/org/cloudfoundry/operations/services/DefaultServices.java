@@ -170,16 +170,16 @@ public final class DefaultServices implements Services {
     }
 
     @Override
-    public Mono<Void> deleteServiceKey(DeleteServiceKeyRequest deleteServiceKeyRequest) {
+    public Mono<Void> deleteServiceKey(DeleteServiceKeyRequest request) {
         return Mono
-            .when(ValidationUtils.validate(deleteServiceKeyRequest), this.spaceId)
-            .then(function((request, spaceId) -> Mono
+            .when(ValidationUtils.validate(request), this.spaceId)
+            .then(function((validRequest, spaceId) -> Mono
                 .when(
-                    Mono.just(request),
-                    getSpaceServiceInstanceId(this.cloudFoundryClient, request.getServiceInstanceName(), spaceId)
+                    Mono.just(validRequest.getServiceKeyName()),
+                    getSpaceServiceInstanceId(this.cloudFoundryClient, validRequest.getServiceInstanceName(), spaceId)
                 )))
-            .then(function((request, serviceInstanceId) -> getServiceKeyIdByName(this.cloudFoundryClient, serviceInstanceId, request.getServiceKeyName())))
-            .then(serviceKeyId -> deleteServiceKey(this.cloudFoundryClient, serviceKeyId));
+            .then(function((serviceKey, serviceInstanceId) -> getServiceKey(this.cloudFoundryClient, serviceInstanceId, serviceKey)))
+            .then(serviceKeyResource -> requestDeleteServiceKey(this.cloudFoundryClient, ResourceUtils.getId(serviceKeyResource)));
     }
 
     @Override
@@ -356,10 +356,6 @@ public final class DefaultServices implements Services {
         }
     }
 
-    private static Mono<Void> deleteServiceKey(CloudFoundryClient cloudFoundryClient, String serviceKeyId) {
-        return requestDeleteServiceKey(cloudFoundryClient, serviceKeyId);
-    }
-
     private static String extractState(AbstractServiceInstanceResource serviceInstance) {
         return ResourceUtils.getEntity(serviceInstance).getLastOperation().getState();
     }
@@ -422,28 +418,12 @@ public final class DefaultServices implements Services {
             .map(ResourceUtils::getId);
     }
 
-<<<<<<< 28791428960974b2b8e8a3f44fb6eee98a96609c
     private static Mono<ServiceKeyResource> getServiceKey(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKey) {
         return requestListServiceInstanceServiceKeys(cloudFoundryClient, serviceInstanceId, serviceKey)
             .single()
             .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Service key %s does not exist", serviceKey)));
     }
 
-||||||| merged common ancestors
-=======
-    private static Mono<ServiceKeyResource> getServiceKey(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKeyName) {
-        return requestListServiceKeys(cloudFoundryClient, serviceInstanceId)
-            .filter(resource -> serviceKeyName.equals(ResourceUtils.getEntity(resource).getName()))
-            .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Service key %s does not exist", serviceKeyName)));
-    }
-
-    private static Mono<String> getServiceKeyIdByName(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKeyName) {
-        return getServiceKey(cloudFoundryClient, serviceInstanceId, serviceKeyName)
-            .map(ResourceUtils::getId);
-    }
-
->>>>>>> Delete Service Key Operation
     private static Mono<ServicePlanEntity> getServicePlanEntity(CloudFoundryClient cloudFoundryClient, String servicePlanId) {
         return Mono
             .justOrEmpty(servicePlanId)
@@ -678,15 +658,6 @@ public final class DefaultServices implements Services {
                     .returnUserProvidedServiceInstances(true)
                     .name(serviceInstanceName)
                     .spaceId(spaceId)
-                    .build()));
-    }
-
-    private static Flux<ServiceKeyResource> requestListServiceKeys(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
-        return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.serviceInstances()
-                .listServiceKeys(ListServiceInstanceServiceKeysRequest.builder()
-                    .page(page)
-                    .serviceInstanceId(serviceInstanceId)
                     .build()));
     }
 

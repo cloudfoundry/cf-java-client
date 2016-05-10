@@ -610,36 +610,6 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
-    private static void requestListServiceKeys(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
-        when(cloudFoundryClient.serviceInstances()
-            .listServiceKeys(ListServiceInstanceServiceKeysRequest.builder()
-                .serviceInstanceId(serviceInstanceId)
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fillPage(ListServiceInstanceServiceKeysResponse.builder())
-                    .resource(ServiceKeyResource.builder()
-                        .metadata(Resource.Metadata.builder()
-                            .id("test-service-key-id")
-                            .build())
-                        .entity(fill(ServiceKeyEntity.builder())
-                            .name("test-service-key")
-                            .build())
-                        .build())
-                    .build()));
-    }
-
-    private static void requestListServiceKeysEmpty(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
-        when(cloudFoundryClient.serviceInstances()
-            .listServiceKeys(ListServiceInstanceServiceKeysRequest.builder()
-                .serviceInstanceId(serviceInstanceId)
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fillPage(ListServiceInstanceServiceKeysResponse.builder())
-                    .build()));
-    }
-
     private static void requestListServicePlanVisibilities(CloudFoundryClient cloudFoundryClient, String organizationId, String servicePlanId) {
         when(cloudFoundryClient.servicePlanVisibilities()
             .list(ListServicePlanVisibilitiesRequest.builder()
@@ -1177,11 +1147,10 @@ public final class DefaultServicesTest {
 
         @Before
         public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance", TEST_SPACE_ID);
-            requestListServiceKeys(this.cloudFoundryClient, "test-service-instance-id");
+            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+            requestListServiceInstanceServiceKeys(this.cloudFoundryClient, "test-service-instance-id", "test-service-key-name", "key", "val");
             requestDeleteServiceKey(this.cloudFoundryClient, "test-service-key-id");
         }
-
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
@@ -1192,8 +1161,8 @@ public final class DefaultServicesTest {
         protected Mono<Void> invoke() {
             return this.services
                 .deleteServiceKey(DeleteServiceKeyRequest.builder()
-                    .serviceInstanceName("test-service-instance")
-                    .serviceKeyName("test-service-key")
+                    .serviceInstanceName("test-service-instance-name")
+                    .serviceKeyName("test-service-key-name")
                     .build());
         }
 
@@ -1206,9 +1175,7 @@ public final class DefaultServicesTest {
         @Before
         public void setUp() throws Exception {
             requestListServiceInstancesEmpty(this.cloudFoundryClient, "test-service-instance", TEST_SPACE_ID);
-            requestListServiceKeys(this.cloudFoundryClient, "test-service-instance-id");
         }
-
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
@@ -1233,24 +1200,22 @@ public final class DefaultServicesTest {
 
         @Before
         public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance", TEST_SPACE_ID);
-            requestListServiceKeysEmpty(this.cloudFoundryClient, "test-service-instance-id");
-            requestDeleteServiceKey(this.cloudFoundryClient, "test-service-key-id");
+            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+            requestListServiceInstanceServiceKeysEmpty(this.cloudFoundryClient, "test-service-instance-id", "test-service-key-not-found");
         }
-
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber.assertError(IllegalArgumentException.class,
-                String.format("Service key %s does not exist", "test-service-key"));
+                String.format("Service key %s does not exist", "test-service-key-not-found"));
         }
 
         @Override
         protected Mono<Void> invoke() {
             return this.services
                 .deleteServiceKey(DeleteServiceKeyRequest.builder()
-                    .serviceInstanceName("test-service-instance")
-                    .serviceKeyName("test-service-key")
+                    .serviceInstanceName("test-service-instance-name")
+                    .serviceKeyName("test-service-key-not-found")
                     .build());
         }
 

@@ -72,7 +72,6 @@ public interface Services {
      */
     Mono<Void> deleteServiceKey(DeleteServiceKeyRequest request);
 
-
     /**
      * Get a service instance
      *

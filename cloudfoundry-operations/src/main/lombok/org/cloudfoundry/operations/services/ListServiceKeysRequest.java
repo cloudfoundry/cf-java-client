@@ -41,7 +41,7 @@ public final class ListServiceKeysRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if(serviceInstanceName == null) {
+        if(this.serviceInstanceName == null) {
             builder.message("service instance name must be specified");
         }
 
