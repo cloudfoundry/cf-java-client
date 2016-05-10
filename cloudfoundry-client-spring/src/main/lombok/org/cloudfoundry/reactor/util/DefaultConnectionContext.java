@@ -29,6 +29,8 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 
+import static reactor.io.netty.config.NettyHandlerNames.SslHandler;
+
 public final class DefaultConnectionContext implements ConnectionContext {
 
     private static final int DEFAULT_PORT = 443;
@@ -48,10 +50,20 @@ public final class DefaultConnectionContext implements ConnectionContext {
     private final Optional<SslCertificateTruster> sslCertificateTruster;
 
     @Builder
-    DefaultConnectionContext(@NonNull AuthorizationProvider authorizationProvider, @NonNull String host, ObjectMapper objectMapper, Integer port, Boolean trustCertificates) {
+    DefaultConnectionContext(@NonNull AuthorizationProvider authorizationProvider, @NonNull String host, ObjectMapper objectMapper, Integer port, String proxyHost, String proxyPassword,
+                             Integer proxyPort, String proxyUsername, Boolean trustCertificates) {
+
+        ProxyContext proxyContext = ProxyContext.builder()
+            .host(proxyHost)
+            .password(proxyPassword)
+            .port(proxyPort)
+            .username(proxyUsername)
+            .build();
+
+        this.sslCertificateTruster = createSslCertificateTruster(proxyContext, trustCertificates);
+        this.httpClient = createHttpClient(proxyContext, this.sslCertificateTruster);
+
         this.authorizationProvider = authorizationProvider;
-        this.sslCertificateTruster = createSslCertificateTruster(trustCertificates);
-        this.httpClient = createHttpClient(this.sslCertificateTruster);
         this.root = getRoot(host, port, this.sslCertificateTruster);
         this.objectMapper = getObjectMapper(objectMapper);
         this.info = getInfo(this.httpClient, this.objectMapper, this.root);
@@ -86,15 +98,16 @@ public final class DefaultConnectionContext implements ConnectionContext {
             .cache();
     }
 
-    private static HttpClient createHttpClient(Optional<SslCertificateTruster> sslCertificateTruster) {
-        ClientOptions clientOptions = ClientOptions.create().sslSupport();
-        sslCertificateTruster.ifPresent(trustManager -> clientOptions.ssl().trustManager(new StaticTrustManagerFactory(trustManager)));
-        return HttpClient.create(clientOptions);
+    private static HttpClient createHttpClient(ProxyContext proxyContext, Optional<SslCertificateTruster> sslCertificateTruster) {
+        return HttpClient.create(ClientOptions.create()
+            .sslSupport()
+            .pipelineConfigurer(pipeline -> proxyContext.getHttpProxyHandler().ifPresent(handler -> pipeline.addBefore(SslHandler, null, handler)))
+            .sslConfigurer(ssl -> sslCertificateTruster.ifPresent(trustManager -> ssl.trustManager(new StaticTrustManagerFactory(trustManager)))));
     }
 
-    private static Optional<SslCertificateTruster> createSslCertificateTruster(Boolean trustCertificates) {
+    private static Optional<SslCertificateTruster> createSslCertificateTruster(ProxyContext proxyContext, Boolean trustCertificates) {
         if (Optional.ofNullable(trustCertificates).orElse(false)) {
-            return Optional.of(new DefaultSslCertificateTruster());
+            return Optional.of(new DefaultSslCertificateTruster(proxyContext));
         } else {
             return Optional.empty();
         }
