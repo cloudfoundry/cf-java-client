@@ -21,6 +21,8 @@ import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingResponse;
 import org.cloudfoundry.client.v3.servicebindings.DeleteServiceBindingRequest;
+import org.cloudfoundry.client.v3.servicebindings.GetServiceBindingRequest;
+import org.cloudfoundry.client.v3.servicebindings.GetServiceBindingResponse;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -30,9 +32,11 @@ import reactor.core.publisher.Mono;
 import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingRequest.ServiceBindingType.APP;
 
 public final class ReactorServiceBindingsV3Test {
@@ -147,5 +151,63 @@ public final class ReactorServiceBindingsV3Test {
         }
 
     }
+
+    public static final class Get extends AbstractClientApiTest<GetServiceBindingRequest, GetServiceBindingResponse> {
+
+        private final ReactorServiceBindingsV3 serviceBindings = new ReactorServiceBindingsV3(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/service_bindings/test-service-binding-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/servicebindings/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected GetServiceBindingRequest getInvalidRequest() {
+            return GetServiceBindingRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected GetServiceBindingResponse getResponse() {
+            return GetServiceBindingResponse.builder()
+                .id("dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
+                .type("app")
+                .data("credentials", Collections.singletonMap("super-secret", "password"))
+                .data("syslog_drain_url", "syslog://drain.url.com")
+                .createdAt("2015-11-13T17:02:56Z")
+                .link("self", Link.builder()
+                    .href("/v3/service_bindings/dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
+                    .build())
+                .link("service_instance", Link.builder()
+                    .href("/v3/service_instances/8bfe4c1b-9e18-45b1-83be-124163f31f9e")
+                    .build())
+                .link("app", Link.builder()
+                    .href("/v3/apps/74f7c078-0934-470f-9883-4fddss5b8f13")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected GetServiceBindingRequest getValidRequest() throws Exception {
+            return GetServiceBindingRequest.builder()
+                .serviceBindingId("test-service-binding-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<GetServiceBindingResponse> invoke(GetServiceBindingRequest request) {
+            return this.serviceBindings.get(request);
+        }
+
+    }
+
 
 }
