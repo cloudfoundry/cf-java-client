@@ -88,6 +88,14 @@ public interface Services {
     Flux<ServiceInstance> listInstances();
 
     /**
+     * List the service keys for a service instance
+     *
+     * @param request the list service keys request
+     * @return the service keys
+     */
+    Flux<ServiceKey> listServiceKeys(ListServiceKeysRequest request);
+
+    /**
      * List available services offerings in the marketplace
      *
      * @param request The list service offerings request

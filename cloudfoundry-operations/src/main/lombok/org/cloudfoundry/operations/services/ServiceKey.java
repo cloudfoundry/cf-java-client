@@ -45,11 +45,22 @@ public final class ServiceKey {
      */
     private final String id;
 
+    /**
+     * Service key name
+     *
+     * @param name The service key name
+     * @return the names
+     */
+    private final String name;
+
+
     @Builder
     ServiceKey(@Singular Map<String, Object> credentials,
-               String id) {
+               String id,
+               String name) {
         this.credentials = credentials;
         this.id = id;
+        this.name = name;
     }
 
 }
