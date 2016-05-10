@@ -18,17 +18,16 @@ package org.cloudfoundry.reactor.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.tuple.Tuple2;
+import reactor.io.netty.config.ClientOptions;
+import reactor.io.netty.http.HttpClient;
+import reactor.io.netty.http.HttpException;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
-import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -40,15 +39,20 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static reactor.io.netty.config.NettyHandlerNames.SslHandler;
+
 final class DefaultSslCertificateTruster implements SslCertificateTruster {
 
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.trust");
 
     private final AtomicReference<X509TrustManager> delegate;
 
+    private final ProxyContext proxyContext;
+
     private final Set<Tuple2<String, Integer>> trustedHostsAndPorts;
 
-    DefaultSslCertificateTruster() {
+    DefaultSslCertificateTruster(ProxyContext proxyContext) {
+        this.proxyContext = proxyContext;
         this.delegate = new AtomicReference<>(getTrustManager(getTrustManagerFactory(null)));
         this.trustedHostsAndPorts = Collections.newSetFromMap(new ConcurrentHashMap<>());
     }
@@ -78,7 +82,7 @@ final class DefaultSslCertificateTruster implements SslCertificateTruster {
         this.logger.warn("Trusting SSL Certificate for {}:{}", host, port);
 
         X509TrustManager trustManager = this.delegate.get();
-        X509Certificate[] untrustedCertificates = getUntrustedCertificates(host, port, duration, trustManager);
+        X509Certificate[] untrustedCertificates = getUntrustedCertificates(host, port, duration, this.proxyContext, trustManager);
 
         if (untrustedCertificates != null) {
             KeyStore trustStore = addToTrustStore(untrustedCertificates, trustManager);
@@ -107,6 +111,13 @@ final class DefaultSslCertificateTruster implements SslCertificateTruster {
         }
     }
 
+    private static HttpClient getHttpClient(ProxyContext proxyContext, CertificateCollectingTrustManager collector) {
+        return HttpClient.create(ClientOptions.create()
+            .sslSupport()
+            .pipelineConfigurer(pipeline -> proxyContext.getHttpProxyHandler().ifPresent(handler -> pipeline.addBefore(SslHandler, null, handler)))
+            .sslConfigurer(ssl -> ssl.trustManager(new StaticTrustManagerFactory(collector))));
+    }
+
     private static X509TrustManager getTrustManager(TrustManagerFactory trustManagerFactory) {
         for (TrustManager trustManager : trustManagerFactory.getTrustManagers()) {
             if (trustManager instanceof X509TrustManager) {
@@ -128,37 +139,31 @@ final class DefaultSslCertificateTruster implements SslCertificateTruster {
         }
     }
 
-    private static X509Certificate[] getUntrustedCertificates(String host, int port, Duration duration, X509TrustManager delegate) {
+    private static X509Certificate[] getUntrustedCertificates(String host, int port, Duration duration, ProxyContext proxyContext, X509TrustManager delegate) {
+        CertificateCollectingTrustManager collector = new CertificateCollectingTrustManager(delegate);
+
         try {
-            CertificateCollectingTrustManager collector = new CertificateCollectingTrustManager(delegate);
-
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, new TrustManager[]{collector}, null);
-
-            SSLSocketFactory factory = sslContext.getSocketFactory();
-            SSLSocket socket = (SSLSocket) factory.createSocket(host, port);
-            socket.setSoTimeout((int) duration.toMillis());
-
-            try {
-                socket.startHandshake();
-                socket.close();
-            } catch (SSLException e) {
-                // Swallow exception
-            }
-
-            X509Certificate[] chain = collector.getCollectedCertificateChain();
-            if (chain == null) {
-                throw new IllegalStateException("Could not obtain server certificate chain");
-            }
-
-            if (collector.isTrusted()) {
-                return null;
-            } else {
-                return chain;
-            }
-        } catch (IOException | NoSuchAlgorithmException | KeyManagementException e) {
-            throw new RuntimeException(e);
+            getHttpClient(proxyContext, collector)
+                .get(getUri(host, port))
+                .get(duration);
+        } catch (HttpException e) {
+            // swallow expected exception
         }
+
+        X509Certificate[] chain = collector.getCollectedCertificateChain();
+        if (chain == null) {
+            throw new IllegalStateException("Could not obtain server certificate chain");
+        }
+
+        if (collector.isTrusted()) {
+            return null;
+        } else {
+            return chain;
+        }
+    }
+
+    private static String getUri(String host, int port) {
+        return UriComponentsBuilder.newInstance().scheme("https").host(host).port(port).toUriString();
     }
 
 }

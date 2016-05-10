@@ -203,15 +203,21 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
                              Boolean skipSslValidation,
                              String clientId,
                              String clientSecret,
+                             String proxyHost,
+                             String proxyPassword,
+                             Integer proxyPort,
+                             String proxyUsername,
                              @NonNull String username,
                              @NonNull String password,
                              @Singular List<DeserializationProblemHandler> problemHandlers) {
 
-        this(getConnectionContext(host, port, skipSslValidation, clientId, clientSecret, username, password), host, port, skipSslValidation, getSchedulerGroup(), problemHandlers);
+        this(getConnectionContext(host, port, skipSslValidation, clientId, clientSecret, username, password), host, port, proxyHost, proxyPassword, proxyPort, proxyUsername, skipSslValidation,
+            getSchedulerGroup(), problemHandlers);
         new CloudFoundryClientCompatibilityChecker(this.info).check();
     }
 
-    SpringCloudFoundryClient(String host, Integer port, Boolean skipSslValidation, RestOperations restOperations, URI root, Scheduler schedulerGroup, OAuth2TokenProvider tokenProvider) {
+    SpringCloudFoundryClient(String host, Integer port, String proxyHost, String proxyPassword, Integer proxyPort, String proxyUsername, Boolean skipSslValidation, RestOperations restOperations,
+                             URI root, Scheduler schedulerGroup, OAuth2TokenProvider tokenProvider) {
         this.applicationsV2 = new SpringApplicationsV2(restOperations, root, schedulerGroup);
         this.buildpacks = new SpringBuildpacks(restOperations, root, schedulerGroup);
         this.packages = new SpringPackages(restOperations, root, schedulerGroup);
@@ -226,6 +232,10 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
             .objectMapper(new ObjectMapper()
                 .setSerializationInclusion(NON_NULL))
             .port(port)
+            .proxyHost(proxyHost)
+            .proxyPassword(proxyPassword)
+            .proxyPort(proxyPort)
+            .proxyUsername(proxyUsername)
             .trustCertificates(skipSslValidation)
             .build();
 
@@ -269,14 +279,17 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
     }
 
     // Let's take a moment to reflect on the fact that this bridge constructor is needed to counter a useless compiler constraint
-    private SpringCloudFoundryClient(ConnectionContext connectionContext, String host, Integer port, Boolean skipSslValidation, Scheduler schedulerGroup, List<DeserializationProblemHandler>
+    private SpringCloudFoundryClient(ConnectionContext connectionContext, String host, Integer port, String proxyHost, String proxyPassword, Integer proxyPort, String proxyUsername,
+                                     Boolean skipSslValidation, Scheduler schedulerGroup, List<DeserializationProblemHandler>
         problemHandlers) {
-        this(host, port, skipSslValidation, getRestOperations(connectionContext, problemHandlers), getRoot(host, port, connectionContext.getSslCertificateTruster()), schedulerGroup);
+        this(host, port, proxyHost, proxyPassword, proxyPort, proxyUsername, skipSslValidation, getRestOperations(connectionContext, problemHandlers), getRoot(host, port,
+            connectionContext.getSslCertificateTruster()), schedulerGroup);
     }
 
     // Let's take a moment to reflect on the fact that this bridge constructor is needed to counter a useless compiler constraint
-    private SpringCloudFoundryClient(String host, Integer port, Boolean skipSslValidation, OAuth2RestOperations restOperations, URI root, Scheduler schedulerGroup) {
-        this(host, port, skipSslValidation, restOperations, root, schedulerGroup, new OAuth2RestOperationsOAuth2TokenProvider(restOperations));
+    private SpringCloudFoundryClient(String host, Integer port, String proxyHost, String proxyPassword, Integer proxyPort, String proxyUsername, Boolean skipSslValidation,
+                                     OAuth2RestOperations restOperations, URI root, Scheduler schedulerGroup) {
+        this(host, port, proxyHost, proxyPassword, proxyPort, proxyUsername, skipSslValidation, restOperations, root, schedulerGroup, new OAuth2RestOperationsOAuth2TokenProvider(restOperations));
     }
 
     @Override

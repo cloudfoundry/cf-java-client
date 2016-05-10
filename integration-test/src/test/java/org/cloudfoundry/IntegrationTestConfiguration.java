@@ -29,8 +29,8 @@ import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.CloudFoundryOperationsBuilder;
 import org.cloudfoundry.reactor.doppler.ReactorDopplerClient;
-import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
 import org.cloudfoundry.reactor.uaa.ReactorUaaClient;
+import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
@@ -68,13 +68,21 @@ public class IntegrationTestConfiguration {
     SpringCloudFoundryClient cloudFoundryClient(@Value("${test.host}") String host,
                                                 @Value("${test.username}") String username,
                                                 @Value("${test.password}") String password,
-                                                @Value("${test.skipSslValidation:false}") Boolean skipSslValidation) {
+                                                @Value("${test.skipSslValidation:false}") Boolean skipSslValidation,
+                                                @Value("${test.proxyHost:}") String proxyHost,
+                                                @Value("${test.proxyPassword:}") String proxyPassword,
+                                                @Value("${test.proxyPort:}") Integer proxyPort,
+                                                @Value("${test.proxyUsername:}") String proxyUsername) {
 
         return SpringCloudFoundryClient.builder()
             .host(host)
             .username(username)
             .password(password)
             .skipSslValidation(skipSslValidation)
+            .proxyHost(proxyHost)
+            .proxyPassword(proxyPassword)
+            .proxyPort(proxyPort)
+            .proxyUsername(proxyUsername)
             .problemHandler(new FailingDeserializationProblemHandler())  // Test-only problem handler
             .build();
     }
