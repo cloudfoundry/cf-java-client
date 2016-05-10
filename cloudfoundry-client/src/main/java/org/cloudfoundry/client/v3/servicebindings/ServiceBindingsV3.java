@@ -24,6 +24,14 @@ import reactor.core.publisher.Mono;
 public interface ServiceBindingsV3 {
 
     /**
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#create-a-service-binding">Create a Service Binding</a> request
+     *
+     * @param request the Create Service Binding request
+     * @return the response from the Create Service Binding request
+     */
+    Mono<CreateServiceBindingResponse> create(CreateServiceBindingRequest request);
+
+    /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#delete-a-service-binding">Delete the Service Binding</a> request
      *
      * @param request the Delete Service Binding request
