@@ -62,7 +62,6 @@ import org.cloudfoundry.client.v3.processes.HealthCheck.Type;
 import org.cloudfoundry.client.v3.processes.ProcessUsage;
 import org.cloudfoundry.client.v3.tasks.Task;
 import org.cloudfoundry.client.v3.tasks.TaskResource;
-import org.cloudfoundry.reactor.AbstractRestTest;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
