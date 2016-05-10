@@ -20,6 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingResponse;
 import org.cloudfoundry.client.v3.servicebindings.DeleteServiceBindingRequest;
+import org.cloudfoundry.client.v3.servicebindings.GetServiceBindingRequest;
+import org.cloudfoundry.client.v3.servicebindings.GetServiceBindingResponse;
 import org.cloudfoundry.client.v3.servicebindings.ServiceBindingsV3;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
@@ -53,6 +55,11 @@ public final class ReactorServiceBindingsV3 extends AbstractClientV3Operations i
     @Override
     public Mono<Void> delete(DeleteServiceBindingRequest request) {
         return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v3", "service_bindings", validRequest.getServiceBindingId())));
+    }
+
+    @Override
+    public Mono<GetServiceBindingResponse> get(GetServiceBindingRequest request) {
+        return get(request, GetServiceBindingResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "service_bindings", validRequest.getServiceBindingId())));
     }
 
 }
