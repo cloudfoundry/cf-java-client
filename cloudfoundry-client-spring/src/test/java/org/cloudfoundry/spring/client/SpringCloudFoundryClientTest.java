@@ -19,12 +19,15 @@ package org.cloudfoundry.spring.client;
 import org.cloudfoundry.spring.AbstractRestTest;
 import org.junit.Test;
 
+import java.util.Collections;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public final class SpringCloudFoundryClientTest extends AbstractRestTest {
 
-    private final SpringCloudFoundryClient client = new SpringCloudFoundryClient("test-host", null, null, null, null, null, null, this.restTemplate, this.root, PROCESSOR_GROUP, this.tokenProvider);
+    private final SpringCloudFoundryClient client = new SpringCloudFoundryClient("test-host", null, null, null, null, null, null, this.restTemplate, this.root, PROCESSOR_GROUP, this.tokenProvider,
+        Collections.emptyList());
 
     @Test
     public void applicationUsageEvents() {

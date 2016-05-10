@@ -116,6 +116,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
@@ -217,20 +218,24 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
     }
 
     SpringCloudFoundryClient(String host, Integer port, String proxyHost, String proxyPassword, Integer proxyPort, String proxyUsername, Boolean skipSslValidation, RestOperations restOperations,
-                             URI root, Scheduler schedulerGroup, OAuth2TokenProvider tokenProvider) {
+                             URI root, Scheduler schedulerGroup, OAuth2TokenProvider tokenProvider, List<DeserializationProblemHandler> problemHandlers) {
         this.applicationsV2 = new SpringApplicationsV2(restOperations, root, schedulerGroup);
         this.buildpacks = new SpringBuildpacks(restOperations, root, schedulerGroup);
         this.packages = new SpringPackages(restOperations, root, schedulerGroup);
 
         this.tokenProvider = tokenProvider;
 
+        ObjectMapper objectMapper = new ObjectMapper()
+            .setSerializationInclusion(NON_NULL)
+            .disable(FAIL_ON_UNKNOWN_PROPERTIES);
+        problemHandlers.forEach(objectMapper::addHandler);
+
         this.connectionContext = DefaultConnectionContext.builder()
             .authorizationProvider(outbound -> tokenProvider.getToken()
                 .map(token -> String.format("bearer %s", token))
                 .map(token -> outbound.addHeader("Authorization", token)))
             .host(host)
-            .objectMapper(new ObjectMapper()
-                .setSerializationInclusion(NON_NULL))
+            .objectMapper(objectMapper)
             .port(port)
             .proxyHost(proxyHost)
             .proxyPassword(proxyPassword)
@@ -241,7 +246,6 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
 
         AuthorizationProvider authorizationProvider = this.connectionContext.getAuthorizationProvider();
         HttpClient httpClient = this.connectionContext.getHttpClient();
-        ObjectMapper objectMapper = this.connectionContext.getObjectMapper();
         Mono<String> root2 = this.connectionContext.getRoot();  // TODO: Change name once Spring is gone
 
         this.applicationsV3 = new ReactorApplicationsV3(authorizationProvider, httpClient, objectMapper, root2);
@@ -280,16 +284,16 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
 
     // Let's take a moment to reflect on the fact that this bridge constructor is needed to counter a useless compiler constraint
     private SpringCloudFoundryClient(ConnectionContext connectionContext, String host, Integer port, String proxyHost, String proxyPassword, Integer proxyPort, String proxyUsername,
-                                     Boolean skipSslValidation, Scheduler schedulerGroup, List<DeserializationProblemHandler>
-                                         problemHandlers) {
+                                     Boolean skipSslValidation, Scheduler schedulerGroup, List<DeserializationProblemHandler> problemHandlers) {
         this(host, port, proxyHost, proxyPassword, proxyPort, proxyUsername, skipSslValidation, getRestOperations(connectionContext, problemHandlers), getRoot(host, port,
-            connectionContext.getSslCertificateTruster()), schedulerGroup);
+            connectionContext.getSslCertificateTruster()), schedulerGroup, problemHandlers);
     }
 
     // Let's take a moment to reflect on the fact that this bridge constructor is needed to counter a useless compiler constraint
     private SpringCloudFoundryClient(String host, Integer port, String proxyHost, String proxyPassword, Integer proxyPort, String proxyUsername, Boolean skipSslValidation,
-                                     OAuth2RestOperations restOperations, URI root, Scheduler schedulerGroup) {
-        this(host, port, proxyHost, proxyPassword, proxyPort, proxyUsername, skipSslValidation, restOperations, root, schedulerGroup, new OAuth2RestOperationsOAuth2TokenProvider(restOperations));
+                                     OAuth2RestOperations restOperations, URI root, Scheduler schedulerGroup, List<DeserializationProblemHandler> problemHandlers) {
+        this(host, port, proxyHost, proxyPassword, proxyPort, proxyUsername, skipSslValidation, restOperations, root, schedulerGroup, new OAuth2RestOperationsOAuth2TokenProvider(restOperations),
+            problemHandlers);
     }
 
     @Override
