@@ -32,6 +32,7 @@ public abstract class AbstractServiceKeyResource extends Resource<ServiceKeyEnti
 
     AbstractServiceKeyResource(@JsonProperty("entity") ServiceKeyEntity entity,
                                @JsonProperty("metadata") Metadata metadata) {
+
         super(entity, metadata);
     }
 

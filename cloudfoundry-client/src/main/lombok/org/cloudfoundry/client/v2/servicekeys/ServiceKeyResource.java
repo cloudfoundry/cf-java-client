@@ -33,6 +33,7 @@ public final class ServiceKeyResource extends AbstractServiceKeyResource {
     @Builder
     ServiceKeyResource(@JsonProperty("entity") ServiceKeyEntity entity,
                        @JsonProperty("metadata") Metadata metadata) {
+
         super(entity, metadata);
     }
 

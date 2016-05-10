@@ -35,6 +35,7 @@ public final class CreateServiceKeyResponse extends AbstractServiceKeyResource {
     @Builder
     CreateServiceKeyResponse(@JsonProperty("entity") ServiceKeyEntity entity,
                              @JsonProperty("metadata") Metadata metadata) {
+
         super(entity, metadata);
     }
 

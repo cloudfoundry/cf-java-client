@@ -46,6 +46,7 @@ public final class GetServiceKeyRequest implements Validatable {
     @Builder
     GetServiceKeyRequest(String serviceInstanceName,
                          String serviceKeyName) {
+
         this.serviceInstanceName = serviceInstanceName;
         this.serviceKeyName = serviceKeyName;
     }

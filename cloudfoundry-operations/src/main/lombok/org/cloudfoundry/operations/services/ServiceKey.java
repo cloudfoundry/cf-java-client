@@ -40,16 +40,16 @@ public final class ServiceKey {
     /**
      * The service key id
      *
-     * @param serviceKeyId the service key id
+     * @param id the service key id
      * @return the service key id
      */
-    private final String serviceKeyId;
+    private final String id;
 
     @Builder
     ServiceKey(@Singular Map<String, Object> credentials,
-               String serviceKeyId) {
+               String id) {
         this.credentials = credentials;
-        this.serviceKeyId = serviceKeyId;
+        this.id = id;
     }
 
 }
