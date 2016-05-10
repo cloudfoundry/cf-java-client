@@ -14,39 +14,51 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.servicekeys;
+package org.cloudfoundry.operations.services;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
+/**
+ * The request options for the deleting the service key
+ */
 @Data
 public final class DeleteServiceKeyRequest implements Validatable {
 
     /**
-     * The service key id
+     * The name of the service instance
      *
-     * @param serviceKeyId the service key id
-     * @return the service key id
+     * @param serviceInstanceName the name of the service instance
+     * @return the name of the service instance
      */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String serviceKeyId;
+    private final String serviceInstanceName;
+
+    /**
+     * The name of the service key to delete
+     *
+     * @param serviceKeyName the name of the service key to delete
+     * @return the name of the service key to delete
+     */
+    private final String serviceKeyName;
 
     @Builder
-    DeleteServiceKeyRequest(String serviceKeyId) {
-        this.serviceKeyId = serviceKeyId;
+    DeleteServiceKeyRequest(String serviceInstanceName, String serviceKeyName) {
+        this.serviceInstanceName = serviceInstanceName;
+        this.serviceKeyName = serviceKeyName;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.serviceKeyId == null) {
-            builder.message("service key id must be specified");
+        if (this.serviceInstanceName == null) {
+            builder.message("service instance must be specified");
+        }
+
+        if (this.serviceKeyName == null) {
+            builder.message("service key must be specified");
         }
 
         return builder.build();

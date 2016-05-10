@@ -170,6 +170,19 @@ public final class DefaultServices implements Services {
     }
 
     @Override
+    public Mono<Void> deleteServiceKey(DeleteServiceKeyRequest request) {
+        return Mono
+            .when(ValidationUtils.validate(request), this.spaceId)
+            .then(function((validRequest, spaceId) -> Mono
+                .when(
+                    Mono.just(validRequest.getServiceKeyName()),
+                    getSpaceServiceInstanceId(this.cloudFoundryClient, validRequest.getServiceInstanceName(), spaceId)
+                )))
+            .then(function((serviceKey, serviceInstanceId) -> getServiceKey(this.cloudFoundryClient, serviceInstanceId, serviceKey)))
+            .then(serviceKeyResource -> requestDeleteServiceKey(this.cloudFoundryClient, ResourceUtils.getId(serviceKeyResource)));
+    }
+
+    @Override
     public Mono<ServiceInstance> getInstance(GetServiceInstanceRequest request) {
         return Mono
             .when(ValidationUtils.validate(request), this.spaceId)
@@ -534,6 +547,13 @@ public final class DefaultServices implements Services {
             .delete(org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest.builder()
                 .serviceInstanceId(serviceInstanceId)
                 .async(true)
+                .build());
+    }
+
+    private static Mono<Void> requestDeleteServiceKey(CloudFoundryClient cloudFoundryClient, String serviceKeyId) {
+        return cloudFoundryClient.serviceKeys()
+            .delete(org.cloudfoundry.client.v2.servicekeys.DeleteServiceKeyRequest.builder()
+                .serviceKeyId(serviceKeyId)
                 .build());
     }
 
