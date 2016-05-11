@@ -147,10 +147,14 @@ public final class CreateServiceBindingRequest implements Validatable {
 
             if (this.application == null) {
                 builder.message("application relationship must be specified");
+            } else {
+                builder.messages(this.application.isValid().getMessages());
             }
 
             if (this.serviceInstance == null) {
                 builder.message("service instance relationship must be specified");
+            } else {
+                builder.messages(this.serviceInstance.isValid().getMessages());
             }
 
             return builder.build();
