@@ -213,12 +213,12 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
                              @Singular List<DeserializationProblemHandler> problemHandlers) {
 
         this(getConnectionContext(host, port, skipSslValidation, clientId, clientSecret, username, password), host, port, proxyHost, proxyPassword, proxyPort, proxyUsername, skipSslValidation,
-            getSchedulerGroup(), problemHandlers);
+            getSchedulerGroup(), problemHandlers, clientId, clientSecret);
         new CloudFoundryClientCompatibilityChecker(this.info).check();
     }
 
     SpringCloudFoundryClient(String host, Integer port, String proxyHost, String proxyPassword, Integer proxyPort, String proxyUsername, Boolean skipSslValidation, RestOperations restOperations,
-                             URI root, Scheduler schedulerGroup, OAuth2TokenProvider tokenProvider, List<DeserializationProblemHandler> problemHandlers) {
+                             URI root, Scheduler schedulerGroup, OAuth2TokenProvider tokenProvider, List<DeserializationProblemHandler> problemHandlers, String clientId, String clientSecret) {
         this.applicationsV2 = new SpringApplicationsV2(restOperations, root, schedulerGroup);
 
         this.tokenProvider = tokenProvider;
@@ -232,6 +232,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
             .authorizationProvider(outbound -> tokenProvider.getToken()
                 .map(token -> String.format("bearer %s", token))
                 .map(token -> outbound.addHeader("Authorization", token)))
+            .clientId(clientId)
+            .clientSecret(clientSecret)
             .host(host)
             .objectMapper(objectMapper)
             .port(port)
@@ -284,16 +286,19 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
 
     // Let's take a moment to reflect on the fact that this bridge constructor is needed to counter a useless compiler constraint
     private SpringCloudFoundryClient(ConnectionContext connectionContext, String host, Integer port, String proxyHost, String proxyPassword, Integer proxyPort, String proxyUsername,
-                                     Boolean skipSslValidation, Scheduler schedulerGroup, List<DeserializationProblemHandler> problemHandlers) {
+                                     Boolean skipSslValidation, Scheduler schedulerGroup, List<DeserializationProblemHandler> problemHandlers, String clientId, String clientSecret) {
+
         this(host, port, proxyHost, proxyPassword, proxyPort, proxyUsername, skipSslValidation, getRestOperations(connectionContext, problemHandlers), getRoot(host, port,
-            connectionContext.getSslCertificateTruster()), schedulerGroup, problemHandlers);
+            connectionContext.getSslCertificateTruster()), schedulerGroup, problemHandlers, clientId, clientSecret);
     }
 
     // Let's take a moment to reflect on the fact that this bridge constructor is needed to counter a useless compiler constraint
     private SpringCloudFoundryClient(String host, Integer port, String proxyHost, String proxyPassword, Integer proxyPort, String proxyUsername, Boolean skipSslValidation,
-                                     OAuth2RestOperations restOperations, URI root, Scheduler schedulerGroup, List<DeserializationProblemHandler> problemHandlers) {
+                                     OAuth2RestOperations restOperations, URI root, Scheduler schedulerGroup, List<DeserializationProblemHandler> problemHandlers, String clientId,
+                                     String clientSecret) {
+
         this(host, port, proxyHost, proxyPassword, proxyPort, proxyUsername, skipSslValidation, restOperations, root, schedulerGroup, new OAuth2RestOperationsOAuth2TokenProvider(restOperations),
-            problemHandlers);
+            problemHandlers, clientId, clientSecret);
     }
 
     @Override

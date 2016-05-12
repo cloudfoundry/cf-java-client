@@ -17,10 +17,13 @@
 package org.cloudfoundry.uaa;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.uaa.tokens.CheckTokenRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyResponse;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.io.netty.http.HttpException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -28,7 +31,23 @@ import static org.junit.Assert.assertNotNull;
 public final class TokensTest extends AbstractIntegrationTest {
 
     @Autowired
+    private CloudFoundryClient cloudFoundryClient;
+
+    @Autowired
     private UaaClient uaaClient;
+
+    @Test
+    public void checkTokenNotAuthorized() {
+        this.cloudFoundryClient.getAccessToken()
+            .then(token -> this.uaaClient.tokens()
+                .check(CheckTokenRequest.builder()
+                    .token(token)
+                    .scope("password.write")
+                    .scope("scim.userids")
+                    .build()))
+            .subscribe(this.testSubscriber()
+            .assertError(HttpException.class, "HTTP request failed with code: 403"));
+    }
 
     @Test
     public void getTokenKey() {

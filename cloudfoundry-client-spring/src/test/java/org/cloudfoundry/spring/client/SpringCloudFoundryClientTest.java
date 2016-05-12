@@ -27,7 +27,7 @@ import static org.junit.Assert.assertNotNull;
 public final class SpringCloudFoundryClientTest extends AbstractRestTest {
 
     private final SpringCloudFoundryClient client = new SpringCloudFoundryClient("test-host", null, null, null, null, null, null, this.restTemplate, this.root, PROCESSOR_GROUP, this.tokenProvider,
-        Collections.emptyList());
+        Collections.emptyList(), null, null);
 
     @Test
     public void applicationUsageEvents() {
