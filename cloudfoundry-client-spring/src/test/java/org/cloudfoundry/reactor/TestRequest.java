@@ -20,15 +20,19 @@ import io.netty.handler.codec.http.HttpMethod;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
+import okhttp3.Headers;
 import okhttp3.mockwebserver.RecordedRequest;
 import okio.Buffer;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.springframework.core.io.ClassPathResource;
+import reactor.core.tuple.Tuple;
+import reactor.core.tuple.Tuple2;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,7 +43,7 @@ public final class TestRequest {
 
     private static final Pattern PATH_PATTERN = Pattern.compile("[A-Z]+ (.*) [A-Z0-9\\./]+");
 
-    private final Optional<Boolean> anyPayload;
+    private final Optional<Consumer<Tuple2<Headers, Buffer>>> contents;
 
     private final HttpMethod method;
 
@@ -48,8 +52,8 @@ public final class TestRequest {
     private final Optional<Buffer> payload;
 
     @Builder
-    TestRequest(Boolean anyPayload, @NonNull HttpMethod method, @NonNull String path, String payload) {
-        this.anyPayload = Optional.ofNullable(anyPayload);
+    TestRequest(Consumer<Tuple2<Headers, Buffer>> contents, @NonNull HttpMethod method, @NonNull String path, String payload) {
+        this.contents = Optional.ofNullable(contents);
         this.method = method;
         this.path = path;
         this.payload = Optional.ofNullable(payload).map(TestRequest::getBuffer);
@@ -59,12 +63,12 @@ public final class TestRequest {
         Assert.assertEquals(this.method.toString(), request.getMethod());
         Assert.assertEquals(this.path, extractPath(request));
 
-        if (!this.anyPayload.orElse(false)) {
-            if (this.payload.isPresent()) {
-                assertBodyEquals(this.payload.get(), request.getBody());
-            } else {
-                Assert.assertEquals(0, request.getBodySize());
-            }
+        if (this.payload.isPresent()) {
+            assertBodyEquals(this.payload.get(), request.getBody());
+        } else if (this.contents.isPresent()) {
+            this.contents.get().accept(Tuple.of(request.getHeaders(), request.getBody()));
+        } else {
+            Assert.assertEquals(0, request.getBodySize());
         }
     }
 
