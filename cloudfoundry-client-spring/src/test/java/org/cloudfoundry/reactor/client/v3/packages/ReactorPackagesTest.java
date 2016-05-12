@@ -540,7 +540,7 @@ public final class ReactorPackagesTest {
 
     public static final class Upload extends AbstractClientApiTest<UploadPackageRequest, UploadPackageResponse> {
 
-        private static final Pattern BOUNDARY = Pattern.compile("multipart/mixed; boundary=(.+)");
+        private static final Pattern BOUNDARY = Pattern.compile("multipart/form-data; boundary=(.+)");
 
         private final ReactorPackages packages = new ReactorPackages(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 

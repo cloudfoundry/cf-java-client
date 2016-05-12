@@ -18,12 +18,12 @@ package org.cloudfoundry.reactor.util;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.CompositeByteBuf;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.util.AsciiString;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxEmitter;
 import reactor.core.publisher.Mono;
+import reactor.core.util.Exceptions;
 import reactor.io.netty.http.HttpOutbound;
 
 import java.io.IOException;
@@ -39,7 +39,11 @@ public final class MultipartHttpOutbound {
     private static final byte[] BOUNDARY_CHARS = new byte[]{'-', '_', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
         'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
 
+    private static final AsciiString BOUNDARY_PREAMBLE = new AsciiString("; boundary=");
+
     private static final AsciiString CONTENT_DISPOSITION = new AsciiString("Content-Disposition");
+
+    private static final AsciiString CONTENT_LENGTH = new AsciiString("Content-Length");
 
     private static final AsciiString CONTENT_TYPE = new AsciiString("Content-Type");
 
@@ -49,7 +53,7 @@ public final class MultipartHttpOutbound {
 
     private static final AsciiString HEADER_DELIMITER = new AsciiString(": ");
 
-    private static final AsciiString MULTIPART_MIXED = new AsciiString("multipart/mixed");
+    private static final AsciiString MULTIPART_FORM_DATA = new AsciiString("multipart/form-data");
 
     private static final Random RND = new Random();
 
@@ -70,42 +74,15 @@ public final class MultipartHttpOutbound {
         AsciiString boundary = generateMultipartBoundary();
         ByteBufAllocator allocator = this.outbound.delegate().alloc();
 
+        CompositeByteBuf bodyBuf = allocator.compositeBuffer();
+        this.partConsumers.forEach(partConsumer -> bodyBuf.addComponent(getPart(allocator, boundary, partConsumer)));
+        bodyBuf.addComponent(getCloseDelimiter(allocator, boundary));
+
         return this.outbound
-            .addHeader(CONTENT_TYPE, MULTIPART_MIXED.concat("; boundary=").concat(boundary))
-            .send(Flux.create(emitter -> {
-                this.partConsumers.forEach(partConsumer -> emitPart(allocator, boundary, emitter, partConsumer));
-                emitCloseDelimiter(allocator, boundary, emitter);
-                emitter.complete();
-            }));
-    }
-
-    private static void emitCloseDelimiter(ByteBufAllocator allocator, AsciiString boundary, FluxEmitter<ByteBuf> emitter) {
-        AsciiString s = DOUBLE_DASH.concat(boundary).concat(DOUBLE_DASH);
-        ByteBuf byteBuf = allocator.directBuffer(s.length()).writeBytes(s.toByteArray());
-        emitter.next(byteBuf);
-    }
-
-    private static void emitPart(ByteBufAllocator allocator, AsciiString boundary, FluxEmitter<ByteBuf> emitter, Consumer<PartHttpOutbound> partConsumer) {
-        PartHttpOutbound part = new PartHttpOutbound();
-        partConsumer.accept(part);
-
-        AsciiString s = DOUBLE_DASH.concat(boundary).concat(CRLF);
-        for (Map.Entry<String, String> entry : part.getHeaders()) {
-            s = s.concat(new AsciiString(entry.getKey())).concat(HEADER_DELIMITER).concat(entry.getValue()).concat(CRLF);
-        }
-        s = s.concat(CRLF);
-
-        try (InputStream inputStream = part.getInputStream()) {
-            ByteBuf byteBuf = allocator.directBuffer(s.length() + inputStream.available() + CRLF.length());
-
-            byteBuf.writeBytes(s.toByteArray());
-            byteBuf.writeBytes(inputStream, inputStream.available());
-            byteBuf.writeBytes(CRLF.toByteArray());
-
-            emitter.next(byteBuf);
-        } catch (IOException e) {
-            emitter.fail(e);
-        }
+            .removeTransferEncodingChunked()
+            .addHeader(CONTENT_TYPE, MULTIPART_FORM_DATA.concat(BOUNDARY_PREAMBLE).concat(boundary))
+            .addHeader(CONTENT_LENGTH, String.valueOf(bodyBuf.capacity()))
+            .sendOne(bodyBuf.writerIndex(bodyBuf.capacity()));
     }
 
     private static AsciiString generateMultipartBoundary() {
@@ -114,6 +91,52 @@ public final class MultipartHttpOutbound {
             boundary[i] = BOUNDARY_CHARS[RND.nextInt(BOUNDARY_CHARS.length)];
         }
         return new AsciiString(boundary);
+    }
+
+    private static ByteBuf getCloseDelimiter(ByteBufAllocator allocator, AsciiString boundary) {
+        AsciiString s = DOUBLE_DASH.concat(boundary).concat(DOUBLE_DASH);
+        return allocator.directBuffer(s.length()).writeBytes(s.toByteArray());
+    }
+
+    private static ByteBuf getData(ByteBufAllocator allocator, InputStream inputStream) {
+        try (InputStream in = inputStream) {
+            ByteBuf dataBuf = allocator.directBuffer(CRLF.length() + inputStream.available() + CRLF.length());
+
+            dataBuf.writeBytes(CRLF.toByteArray());
+            dataBuf.writeBytes(in, in.available());
+            dataBuf.writeBytes(CRLF.toByteArray());
+
+            return dataBuf;
+        } catch (IOException e) {
+            throw Exceptions.propagate(e);
+        }
+    }
+
+    private static ByteBuf getDelimiter(ByteBufAllocator allocator, AsciiString boundary) {
+        AsciiString s = DOUBLE_DASH.concat(boundary).concat(CRLF);
+        return allocator.directBuffer(s.length()).writeBytes(s.toByteArray());
+    }
+
+    private static ByteBuf getHeaders(ByteBufAllocator allocator, HttpHeaders headers) {
+        AsciiString s = AsciiString.EMPTY_STRING;
+
+        for (Map.Entry<String, String> entry : headers) {
+            s = s.concat(new AsciiString(entry.getKey())).concat(HEADER_DELIMITER).concat(entry.getValue()).concat(CRLF);
+        }
+
+        return allocator.directBuffer(s.length()).writeBytes(s.toByteArray());
+    }
+
+    private static ByteBuf getPart(ByteBufAllocator allocator, AsciiString boundary, Consumer<PartHttpOutbound> partConsumer) {
+        PartHttpOutbound part = new PartHttpOutbound();
+        partConsumer.accept(part);
+
+        CompositeByteBuf body = allocator.compositeBuffer();
+        body.addComponent(getDelimiter(allocator, boundary));
+        body.addComponent(getHeaders(allocator, part.getHeaders()));
+        body.addComponent(getData(allocator, part.getInputStream()));
+
+        return body.writerIndex(body.capacity());
     }
 
     public static final class PartHttpOutbound {
