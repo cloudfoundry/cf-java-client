@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client;
 
+import okhttp3.Headers;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.reactor.AbstractApiTest;
 import org.junit.Test;
@@ -29,8 +30,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractClientApiTest<REQ, RSP> extends AbstractApiTest<REQ, RSP> {
+
+    private static final Pattern BOUNDARY = Pattern.compile("multipart/form-data; boundary=(.+)");
 
     @Test
     public final void error() throws Exception {
@@ -54,6 +62,16 @@ public abstract class AbstractClientApiTest<REQ, RSP> extends AbstractApiTest<RE
             })
             .map(ByteArrayOutputStream::toByteArray);
     }
+
+    protected static String extractBoundary(Headers headers) {
+        String contentType = headers.get("Content-Type");
+        assertNotNull(contentType);
+
+        Matcher matcher = BOUNDARY.matcher(contentType);
+        assertTrue(matcher.find());
+        return matcher.group(1);
+    }
+
 
     protected static byte[] getBytes(String path) {
         try (InputStream in = new FileInputStream(new File("src/test/resources", path)); ByteArrayOutputStream out = new ByteArrayOutputStream()) {

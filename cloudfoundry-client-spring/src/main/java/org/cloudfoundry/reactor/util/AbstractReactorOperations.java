@@ -19,6 +19,7 @@ package org.cloudfoundry.reactor.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.ByteBuf;
+import io.netty.util.AsciiString;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.util.ValidationUtils;
 import org.slf4j.Logger;
@@ -39,6 +40,10 @@ import java.util.function.Function;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public abstract class AbstractReactorOperations {
+
+    protected static final AsciiString APPLICATION_ZIP = new AsciiString("application/zip");
+
+    protected static final AsciiString CONTENT_TYPE = new AsciiString("Content-Type");
 
     private static final String CF_WARNINGS = "X-Cf-Warnings";
 
@@ -122,6 +127,16 @@ public abstract class AbstractReactorOperations {
             .then(function((validRequest, uri) -> this.httpClient.put(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
                 .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
                 .then(o -> o.send(serializedRequest(o, validRequest))))
+                .doOnSubscribe(s -> this.requestLogger.debug("PUT    {}", uri))
+                .compose(logResponse(uri))))
+            .compose(deserializedResponse(responseType));
+    }
+
+    protected final <REQ extends Validatable, RSP> Mono<RSP> doPutComplete(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
+                                                                           Function<Tuple2<HttpOutbound, REQ>, Mono<Void>> requestTransformer) {
+        return prepareRequest(request, uriTransformer)
+            .then(function((validRequest, uri) -> this.httpClient.put(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
+                .then(o -> requestTransformer.apply(Tuple.of(o, validRequest))))
                 .doOnSubscribe(s -> this.requestLogger.debug("PUT    {}", uri))
                 .compose(logResponse(uri))))
             .compose(deserializedResponse(responseType));

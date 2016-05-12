@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.buildpacks;
+package org.cloudfoundry.reactor.client.v2.buildpacks;
 
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.buildpacks.BuildpackEntity;
@@ -32,38 +32,47 @@ import org.cloudfoundry.client.v2.buildpacks.UpdateBuildpackResponse;
 import org.cloudfoundry.client.v2.buildpacks.UploadBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.UploadBuildpackResponse;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Mono;
 
-import static org.hamcrest.core.StringStartsWith.startsWith;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
+import java.nio.charset.Charset;
 
-public final class SpringBuildpacksTest {
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
+import static org.junit.Assert.assertEquals;
 
-    public static final class Create extends AbstractApiTest<CreateBuildpackRequest, CreateBuildpackResponse> {
+public final class ReactorBuildpacksTest {
 
-        private SpringBuildpacks buildpacks = new SpringBuildpacks(this.restTemplate, this.root, PROCESSOR_GROUP);
+    public static final class Create extends AbstractClientApiTest<CreateBuildpackRequest, CreateBuildpackResponse> {
+
+        private ReactorBuildpacks buildpacks = new ReactorBuildpacks(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v2/buildpacks")
+                    .payload("fixtures/client/v2/buildpacks/POST_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v2/buildpacks/POST_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected CreateBuildpackRequest getInvalidRequest() {
             return CreateBuildpackRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v2/buildpacks")
-                .requestPayload("fixtures/client/v2/buildpacks/POST_request.json")
-                .status(CREATED)
-                .responsePayload("fixtures/client/v2/buildpacks/POST_response.json");
         }
 
         @Override
@@ -98,21 +107,26 @@ public final class SpringBuildpacksTest {
 
     }
 
-    public static final class Delete extends AbstractApiTest<DeleteBuildpackRequest, DeleteBuildpackResponse> {
+    public static final class Delete extends AbstractClientApiTest<DeleteBuildpackRequest, DeleteBuildpackResponse> {
 
-        private SpringBuildpacks buildpacks = new SpringBuildpacks(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private ReactorBuildpacks buildpacks = new ReactorBuildpacks(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/buildpacks/test-buildpack-id?async=true")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/buildpacks/DELETE_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected DeleteBuildpackRequest getInvalidRequest() {
             return DeleteBuildpackRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/buildpacks/test-buildpack-id?async=true")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/buildpacks/DELETE_{id}_response.json");
         }
 
         @Override
@@ -145,21 +159,26 @@ public final class SpringBuildpacksTest {
 
     }
 
-    public static final class Get extends AbstractApiTest<GetBuildpackRequest, GetBuildpackResponse> {
+    public static final class Get extends AbstractClientApiTest<GetBuildpackRequest, GetBuildpackResponse> {
 
-        private SpringBuildpacks buildpacks = new SpringBuildpacks(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private ReactorBuildpacks buildpacks = new ReactorBuildpacks(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/buildpacks/test-buildpack-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/buildpacks/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected GetBuildpackRequest getInvalidRequest() {
             return GetBuildpackRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/buildpacks/test-buildpack-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/buildpacks/GET_{id}_response.json");
         }
 
         @Override
@@ -194,21 +213,26 @@ public final class SpringBuildpacksTest {
         }
     }
 
-    public static final class List extends AbstractApiTest<ListBuildpacksRequest, ListBuildpacksResponse> {
+    public static final class List extends AbstractClientApiTest<ListBuildpacksRequest, ListBuildpacksResponse> {
 
-        private SpringBuildpacks buildpacks = new SpringBuildpacks(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private ReactorBuildpacks buildpacks = new ReactorBuildpacks(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/buildpacks?q=name%20IN%20test-name&page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/buildpacks/GET_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected ListBuildpacksRequest getInvalidRequest() {
             return null;
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/buildpacks?q=name%20IN%20test-name&page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/buildpacks/GET_response.json");
         }
 
         @Override
@@ -276,22 +300,27 @@ public final class SpringBuildpacksTest {
 
     }
 
-    public static final class Update extends AbstractApiTest<UpdateBuildpackRequest, UpdateBuildpackResponse> {
+    public static final class Update extends AbstractClientApiTest<UpdateBuildpackRequest, UpdateBuildpackResponse> {
 
-        private SpringBuildpacks buildpacks = new SpringBuildpacks(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private ReactorBuildpacks buildpacks = new ReactorBuildpacks(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/buildpacks/test-buildpack-id")
+                    .payload("fixtures/client/v2/buildpacks/PUT_{id}_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v2/buildpacks/PUT_{id}_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected UpdateBuildpackRequest getInvalidRequest() {
             return UpdateBuildpackRequest.builder().build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/buildpacks/test-buildpack-id")
-                .requestPayload("fixtures/client/v2/buildpacks/PUT_{id}_request.json")
-                .status(CREATED)
-                .responsePayload("fixtures/client/v2/buildpacks/PUT_{id}_response.json");
         }
 
         @Override
@@ -327,24 +356,37 @@ public final class SpringBuildpacksTest {
         }
     }
 
-    public static final class Upload extends AbstractApiTest<UploadBuildpackRequest, UploadBuildpackResponse> {
+    public static final class Upload extends AbstractClientApiTest<UploadBuildpackRequest, UploadBuildpackResponse> {
 
-        private SpringBuildpacks buildpacks = new SpringBuildpacks(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private ReactorBuildpacks buildpacks = new ReactorBuildpacks(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/buildpacks/test-buildpack-id/bits")
+                    .contents(consumer((headers, body) -> {
+                        String boundary = extractBoundary(headers);
+
+                        assertEquals("--" + boundary + "\r\n" +
+                            "Content-Disposition: form-data; name=\"buildpack\"; filename=\"test-filename\"\r\n" +
+                            "Content-Type: application/zip\r\n" +
+                            "\r\n" +
+                            "test-content\n" +
+                            "\r\n" +
+                            "--" + boundary + "--", body.readString(Charset.defaultCharset()));
+                    }))
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v2/buildpacks/PUT_{id}_bits_response.json")
+                    .build())
+                .build();
+        }
 
         @Override
         protected UploadBuildpackRequest getInvalidRequest() {
             return UploadBuildpackRequest.builder().build();
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/buildpacks/test-buildpack-id/bits")
-                .requestMatcher(header("Content-Type", startsWith(MULTIPART_FORM_DATA_VALUE)))
-                .anyRequestPayload()
-                .status(CREATED)
-                .responsePayload("fixtures/client/v2/buildpacks/PUT_{id}_bits_response.json");
         }
 
         @Override
@@ -369,7 +411,7 @@ public final class SpringBuildpacksTest {
         @Override
         protected UploadBuildpackRequest getValidRequest() throws Exception {
             return UploadBuildpackRequest.builder()
-                .buildpack(new ClassPathResource("fixtures/client/v2/buildpacks/test_buildpack.zip").getInputStream())
+                .buildpack(new ClassPathResource("fixtures/client/v2/buildpacks/test-buildpack.zip").getInputStream())
                 .buildpackId("test-buildpack-id")
                 .filename("test-filename")
                 .build();

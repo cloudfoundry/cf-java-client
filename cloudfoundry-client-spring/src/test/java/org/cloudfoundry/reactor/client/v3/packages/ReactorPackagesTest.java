@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v3.packages;
 
+import okhttp3.Headers;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.PaginatedResponse.Pagination;
@@ -540,8 +541,6 @@ public final class ReactorPackagesTest {
 
     public static final class Upload extends AbstractClientApiTest<UploadPackageRequest, UploadPackageResponse> {
 
-        private static final Pattern BOUNDARY = Pattern.compile("multipart/form-data; boundary=(.+)");
-
         private final ReactorPackages packages = new ReactorPackages(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
@@ -550,12 +549,7 @@ public final class ReactorPackagesTest {
                 .request(TestRequest.builder()
                     .method(POST).path("/v3/packages/test-package-id/upload")
                     .contents(consumer((headers, body) -> {
-                        String contentType = headers.get("Content-Type");
-                        assertNotNull(contentType);
-
-                        Matcher matcher = BOUNDARY.matcher(contentType);
-                        assertTrue(matcher.find());
-                        String boundary = matcher.group(1);
+                        String boundary = extractBoundary(headers);
 
                         assertEquals("--" + boundary + "\r\n" +
                             "Content-Disposition: form-data; name=\"bits\"; filename=\"application.zip\"\r\n" +
@@ -616,7 +610,7 @@ public final class ReactorPackagesTest {
         @Override
         protected UploadPackageRequest getValidRequest() throws Exception {
             return UploadPackageRequest.builder()
-                .bits(new ClassPathResource("fixtures/client/v3/packages/test-file").getInputStream())
+                .bits(new ClassPathResource("fixtures/client/v3/packages/test-package.zip").getInputStream())
                 .packageId("test-package-id")
                 .build();
         }

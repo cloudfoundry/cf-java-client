@@ -94,7 +94,7 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.reactor.util.ConnectionContextSupplier;
 import org.cloudfoundry.reactor.util.DefaultConnectionContext;
 import org.cloudfoundry.spring.client.v2.applications.SpringApplicationsV2;
-import org.cloudfoundry.spring.client.v2.buildpacks.SpringBuildpacks;
+import org.cloudfoundry.reactor.client.v2.buildpacks.ReactorBuildpacks;
 import org.cloudfoundry.spring.util.CloudFoundryClientCompatibilityChecker;
 import org.cloudfoundry.spring.util.SchedulerGroupBuilder;
 import org.cloudfoundry.spring.util.network.ConnectionContext;
@@ -220,7 +220,6 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
     SpringCloudFoundryClient(String host, Integer port, String proxyHost, String proxyPassword, Integer proxyPort, String proxyUsername, Boolean skipSslValidation, RestOperations restOperations,
                              URI root, Scheduler schedulerGroup, OAuth2TokenProvider tokenProvider, List<DeserializationProblemHandler> problemHandlers) {
         this.applicationsV2 = new SpringApplicationsV2(restOperations, root, schedulerGroup);
-        this.buildpacks = new SpringBuildpacks(restOperations, root, schedulerGroup);
 
         this.tokenProvider = tokenProvider;
 
@@ -249,6 +248,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
 
         this.applicationsV3 = new ReactorApplicationsV3(authorizationProvider, httpClient, objectMapper, root2);
         this.applicationUsageEvents = new ReactorApplicationUsageEvents(authorizationProvider, httpClient, objectMapper, root2);
+        this.buildpacks = new ReactorBuildpacks(authorizationProvider, httpClient, objectMapper, root2);
         this.domains = new ReactorDomains(authorizationProvider, httpClient, objectMapper, root2);
         this.droplets = new ReactorDroplets(authorizationProvider, httpClient, objectMapper, root2);
         this.environmentVariableGroups = new ReactorEnvironmentVariableGroups(authorizationProvider, httpClient, objectMapper, root2);

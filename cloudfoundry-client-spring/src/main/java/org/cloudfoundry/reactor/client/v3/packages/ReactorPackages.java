@@ -17,7 +17,6 @@
 package org.cloudfoundry.reactor.client.v3.packages;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.netty.util.AsciiString;
 import org.cloudfoundry.client.v3.packages.CopyPackageRequest;
 import org.cloudfoundry.client.v3.packages.CopyPackageResponse;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
@@ -46,10 +45,6 @@ import static org.cloudfoundry.util.tuple.TupleUtils.function;
  * The Reactor-based implementation of {@link Packages}
  */
 public final class ReactorPackages extends AbstractClientV2Operations implements Packages {
-
-    private static final AsciiString APPLICATION_ZIP = new AsciiString("application/zip");
-
-    private static final AsciiString CONTENT_TYPE = new AsciiString("Content-Type");
 
     /**
      * Creates an instance
@@ -106,7 +101,7 @@ public final class ReactorPackages extends AbstractClientV2Operations implements
             function((outbound, validRequest) -> outbound
                 .addPart(part -> part.setContentDispositionFormData("bits", "application.zip")
                     .addHeader(CONTENT_TYPE, APPLICATION_ZIP)
-                    .sendInputStream(request.getBits()))
+                    .sendInputStream(validRequest.getBits()))
                 .done()));
     }
 

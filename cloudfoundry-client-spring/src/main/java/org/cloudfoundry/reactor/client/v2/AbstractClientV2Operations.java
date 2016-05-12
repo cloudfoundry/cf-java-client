@@ -75,6 +75,14 @@ public abstract class AbstractClientV2Operations extends AbstractReactorOperatio
             .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build));
     }
 
+    protected final <REQ extends Validatable, RSP> Mono<RSP> put(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
+                                                                 Function<Tuple2<MultipartHttpOutbound, REQ>, Mono<Void>> requestTransformer) {
+
+        return doPutComplete(request, responseType, getUriAugmenter(uriTransformer),
+            function((outbound, validRequest) -> requestTransformer.apply(Tuple.of(new MultipartHttpOutbound(outbound), validRequest))))
+            .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build));
+    }
+
     private static <REQ extends Validatable> Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> getUriAugmenter(
         Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
 
