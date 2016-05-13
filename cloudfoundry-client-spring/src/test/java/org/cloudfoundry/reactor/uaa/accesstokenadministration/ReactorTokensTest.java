@@ -21,14 +21,18 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
 import org.cloudfoundry.uaa.tokens.AbstractTokenKey.KeyType;
+import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeRequest;
+import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyResponse;
 import org.cloudfoundry.uaa.tokens.ListTokenKeysRequest;
 import org.cloudfoundry.uaa.tokens.ListTokenKeysResponse;
 import org.cloudfoundry.uaa.tokens.ListTokenKeysResponse.TokenKey;
+import org.cloudfoundry.uaa.tokens.TokenFormat;
 import reactor.core.publisher.Mono;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorTokensTest {
@@ -87,6 +91,59 @@ public final class ReactorTokensTest {
         @Override
         protected Mono<GetTokenKeyResponse> invoke(GetTokenKeyRequest request) {
             return this.tokens.getKey(request);
+        }
+
+    }
+
+    public static final class GetTokenByAuthorizationCode extends AbstractUaaApiTest<GetTokenByAuthorizationCodeRequest, GetTokenByAuthorizationCodeResponse> {
+
+        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/oauth/token?code=zI6Z1X&client_id=login&client_secret=loginsecret&redirect_uri=https://uaa.cloudfoundry.com/redirect/cf" +
+                        "&token_format=opaque&grant_type=authorization_code&response_type=token")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/tokens/GET_response_AC.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected GetTokenByAuthorizationCodeRequest getInvalidRequest() {
+            return GetTokenByAuthorizationCodeRequest.builder().build();
+        }
+
+        @Override
+        protected GetTokenByAuthorizationCodeResponse getResponse() {
+            return GetTokenByAuthorizationCodeResponse.builder()
+                .accessToken("555e2047bbc849628ff8cbfa7b342274")
+                .tokenType("bearer")
+                .refreshToken("555e2047bbc849628ff8cbfa7b342274-r")
+                .expiresInSeconds(43199)
+                .scopes("openid oauth.approvals")
+                .tokenId("555e2047bbc849628ff8cbfa7b342274")
+                .build();
+        }
+
+        @Override
+        protected GetTokenByAuthorizationCodeRequest getValidRequest() {
+            return GetTokenByAuthorizationCodeRequest.builder()
+                .clientId("login")
+                .clientSecret("loginsecret")
+                .authorizationCode("zI6Z1X")
+                .redirectUri("https://uaa.cloudfoundry.com/redirect/cf")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
+        }
+
+        @Override
+        protected Mono<GetTokenByAuthorizationCodeResponse> invoke(GetTokenByAuthorizationCodeRequest request) {
+            return this.tokens.getByAuthorizationCode(request);
         }
 
     }

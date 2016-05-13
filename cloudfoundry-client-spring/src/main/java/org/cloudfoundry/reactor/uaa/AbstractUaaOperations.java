@@ -18,10 +18,12 @@ package org.cloudfoundry.reactor.uaa;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.Validatable;
+import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
+import reactor.core.tuple.Tuple;
 import reactor.core.tuple.Tuple2;
 import reactor.io.netty.http.HttpClient;
 import reactor.io.netty.http.HttpInbound;
@@ -37,23 +39,32 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
     }
 
     protected final <REQ extends Validatable, RSP> Mono<RSP> delete(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
-        return doDelete(request, responseType, uriTransformer, function(IdentityZoneBuilder::augment));
+        return doDelete(request, responseType, getUriAugmenter(uriTransformer), function(IdentityZoneBuilder::augment));
     }
 
     protected final <REQ extends Validatable, RSP> Mono<RSP> get(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
-        return doGet(request, responseType, uriTransformer, function(IdentityZoneBuilder::augment));
+        return doGet(request, responseType, getUriAugmenter(uriTransformer), function(IdentityZoneBuilder::augment));
     }
 
     protected final <REQ extends Validatable> Mono<HttpInbound> get(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
-        return doGet(request, uriTransformer, function(IdentityZoneBuilder::augment));
+        return doGet(request, getUriAugmenter(uriTransformer), function(IdentityZoneBuilder::augment));
     }
 
     protected final <REQ extends Validatable, RSP> Mono<RSP> post(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
-        return doPost(request, responseType, uriTransformer, function(IdentityZoneBuilder::augment));
+        return doPost(request, responseType, getUriAugmenter(uriTransformer), function(IdentityZoneBuilder::augment));
     }
 
     protected final <REQ extends Validatable, RSP> Mono<RSP> put(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
-        return doPut(request, responseType, uriTransformer, function(IdentityZoneBuilder::augment));
+        return doPut(request, responseType, getUriAugmenter(uriTransformer), function(IdentityZoneBuilder::augment));
+    }
+
+    private static <REQ extends Validatable> Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> getUriAugmenter(
+        Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
+
+        return function((builder, validRequest) -> {
+            QueryBuilder.augment(builder, validRequest);
+            return uriTransformer.apply(Tuple.of(builder, validRequest));
+        });
     }
 
 }

@@ -19,6 +19,8 @@ package org.cloudfoundry.reactor.uaa.accesstokenadministration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
+import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeRequest;
+import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyResponse;
 import org.cloudfoundry.uaa.tokens.ListTokenKeysRequest;
@@ -42,6 +44,15 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
      */
     public ReactorTokens(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
         super(authorizationProvider, httpClient, objectMapper, root);
+    }
+
+    @Override
+    public Mono<GetTokenByAuthorizationCodeResponse> getByAuthorizationCode(GetTokenByAuthorizationCodeRequest request) {
+        return post(request, GetTokenByAuthorizationCodeResponse.class,
+            function((builder, validRequest) -> builder
+                .pathSegment("oauth", "token")
+                .queryParam("grant_type", "authorization_code")
+                .queryParam("response_type", "token")));
     }
 
     @Override
