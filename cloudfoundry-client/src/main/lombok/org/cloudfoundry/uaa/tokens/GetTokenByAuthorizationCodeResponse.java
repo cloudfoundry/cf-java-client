@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * The response from the token key request
+ * The response from the get token by authorization code request
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

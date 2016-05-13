@@ -24,7 +24,7 @@ import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
 /**
- * The request payload for the token key operation
+ * The request payload for the get token by authorization code operation
  */
 @Data
 public final class GetTokenByAuthorizationCodeRequest implements Validatable {
