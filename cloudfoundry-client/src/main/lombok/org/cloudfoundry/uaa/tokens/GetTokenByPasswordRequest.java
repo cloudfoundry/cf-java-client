@@ -24,10 +24,10 @@ import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
 /**
- * The request payload for the get token by client credentials operation
+ * The request payload for the get token by password operation
  */
 @Data
-public final class GetTokenByClientCredentialsRequest implements Validatable {
+public final class GetTokenByPasswordRequest implements Validatable {
 
     /**
      * The client identifier
@@ -48,6 +48,15 @@ public final class GetTokenByClientCredentialsRequest implements Validatable {
     private final String clientSecret;
 
     /**
+     * The password
+     *
+     * @param password the password
+     * @return the password
+     */
+    @Getter(onMethod = @__(@QueryParameter("password")))
+    private final String password;
+
+    /**
      * The token format
      *
      * @param tokenFormat the token format
@@ -56,11 +65,22 @@ public final class GetTokenByClientCredentialsRequest implements Validatable {
     @Getter(onMethod = @__(@QueryParameter("token_format")))
     private final TokenFormat tokenFormat;
 
+    /**
+     * The username
+     *
+     * @param username the username
+     * @return the username
+     */
+    @Getter(onMethod = @__(@QueryParameter("username")))
+    private final String username;
+
     @Builder
-    GetTokenByClientCredentialsRequest(String clientId, String clientSecret, TokenFormat tokenFormat) {
+    GetTokenByPasswordRequest(String clientId, String clientSecret, String password, TokenFormat tokenFormat, String username) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
+        this.password = password;
         this.tokenFormat = tokenFormat;
+        this.username = username;
     }
 
     @Override
@@ -72,6 +92,12 @@ public final class GetTokenByClientCredentialsRequest implements Validatable {
         }
         if (this.clientSecret == null) {
             builder.message("client secret must be specified");
+        }
+        if (this.password == null) {
+            builder.message("password must be specified");
+        }
+        if (this.username == null) {
+            builder.message("username must be specified");
         }
 
         return builder.build();

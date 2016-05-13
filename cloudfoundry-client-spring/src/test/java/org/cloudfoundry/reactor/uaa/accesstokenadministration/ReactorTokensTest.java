@@ -25,6 +25,8 @@ import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenByClientCredentialsRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenByClientCredentialsResponse;
+import org.cloudfoundry.uaa.tokens.GetTokenByPasswordRequest;
+import org.cloudfoundry.uaa.tokens.GetTokenByPasswordResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyResponse;
 import org.cloudfoundry.uaa.tokens.ListTokenKeysRequest;
@@ -195,6 +197,59 @@ public final class ReactorTokensTest {
         @Override
         protected Mono<GetTokenByClientCredentialsResponse> invoke(GetTokenByClientCredentialsRequest request) {
             return this.tokens.getByClientCredentials(request);
+        }
+
+    }
+
+    public static final class GetTokenByPassword extends AbstractUaaApiTest<GetTokenByPasswordRequest, GetTokenByPasswordResponse> {
+
+        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/oauth/token?client_id=app&client_secret=appclientsecret&password=secr3T&token_format=opaque&" +
+                        "username=jENeJj@test.org&grant_type=password&response_type=token")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/tokens/GET_response_PW.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected GetTokenByPasswordRequest getInvalidRequest() {
+            return GetTokenByPasswordRequest.builder().build();
+        }
+
+        @Override
+        protected GetTokenByPasswordResponse getResponse() {
+            return GetTokenByPasswordResponse.builder()
+                .accessToken("cd37a35114084fafb83d21c6f2af0e84")
+                .tokenType("bearer")
+                .refreshToken("cd37a35114084fafb83d21c6f2af0e84-r")
+                .expiresInSeconds(43199)
+                .scopes("scim.userids openid cloud_controller.read password.write cloud_controller.write")
+                .tokenId("cd37a35114084fafb83d21c6f2af0e84")
+                .build();
+        }
+
+        @Override
+        protected GetTokenByPasswordRequest getValidRequest() {
+            return GetTokenByPasswordRequest.builder()
+                .clientId("app")
+                .clientSecret("appclientsecret")
+                .password("secr3T")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .username("jENeJj@test.org")
+                .build();
+        }
+
+        @Override
+        protected Mono<GetTokenByPasswordResponse> invoke(GetTokenByPasswordRequest request) {
+            return this.tokens.getByPassword(request);
         }
 
     }

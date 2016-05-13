@@ -75,7 +75,7 @@ public final class GetTokenByAuthorizationCodeRequest implements Validatable {
     private final TokenFormat tokenFormat;
 
     @Builder
-    GetTokenByAuthorizationCodeRequest(String authorizationCode, String clientSecret, String clientId, String redirectUri, TokenFormat tokenFormat) {
+    GetTokenByAuthorizationCodeRequest(String authorizationCode, String clientId, String clientSecret, String redirectUri, TokenFormat tokenFormat) {
         this.authorizationCode = authorizationCode;
         this.clientId = clientId;
         this.clientSecret = clientSecret;

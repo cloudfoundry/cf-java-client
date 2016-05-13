@@ -40,6 +40,14 @@ public interface Tokens {
     Mono<GetTokenByClientCredentialsResponse> getByClientCredentials(GetTokenByClientCredentialsRequest request);
 
     /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#password-grant">Password Grant</a> request
+     *
+     * @param request the Password token request
+     * @return the response from the Password token request
+     */
+    Mono<GetTokenByPasswordResponse> getByPassword(GetTokenByPasswordRequest request);
+
+    /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#token-key">Token Key</a> request
      *
      * @param request the Token Key request
