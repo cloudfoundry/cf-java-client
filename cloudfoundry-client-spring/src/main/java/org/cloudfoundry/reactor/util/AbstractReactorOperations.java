@@ -35,6 +35,8 @@ import java.util.function.Function;
 
 public abstract class AbstractReactorOperations {
 
+    protected static final AsciiString APPLICATION_JSON = new AsciiString("application/json");
+
     protected static final AsciiString APPLICATION_X_WWW_FORM_URLENCODED = new AsciiString("application/x-www-form-urlencoded");
 
     protected static final AsciiString APPLICATION_ZIP = new AsciiString("application/zip");

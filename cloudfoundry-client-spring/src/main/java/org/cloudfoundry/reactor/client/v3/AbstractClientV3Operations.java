@@ -32,8 +32,11 @@ import java.util.function.Function;
 
 public abstract class AbstractClientV3Operations extends AbstractReactorOperations {
 
+    private final ObjectMapper objectMapper;
+
     protected AbstractClientV3Operations(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
         super(authorizationProvider, httpClient, objectMapper, root);
+        this.objectMapper = objectMapper;
     }
 
     protected final <T> Mono<T> delete(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
@@ -65,7 +68,7 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
                                      Function<MultipartHttpOutbound, Mono<Void>> requestTransformer) {
 
         return doPost(responseType, getUriAugmenter(request, uriTransformer),
-            outbound -> requestTransformer.apply(new MultipartHttpOutbound(outbound)))
+            outbound -> requestTransformer.apply(new MultipartHttpOutbound(this.objectMapper, outbound)))
             .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
     }
 

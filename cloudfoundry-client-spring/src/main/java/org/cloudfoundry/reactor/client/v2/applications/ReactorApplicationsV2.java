@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.applications;
+package org.cloudfoundry.reactor.client.v2.applications;
 
-import lombok.ToString;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
@@ -52,39 +52,28 @@ import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
-import org.cloudfoundry.reactor.client.QueryBuilder;
-import org.cloudfoundry.reactor.client.v2.FilterBuilder;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestOperations;
+import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
+import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
-
-import java.net.URI;
-import java.util.List;
+import reactor.io.netty.http.HttpClient;
+import reactor.io.netty.http.HttpInbound;
 
 /**
- * The Spring-based implementation of {@link ApplicationsV2}
+ * The Reactor-based implementation of {@link ApplicationsV2}
  */
-@ToString(callSuper = true)
-public final class SpringApplicationsV2 extends AbstractSpringOperations implements ApplicationsV2 {
+public final class ReactorApplicationsV2 extends AbstractClientV2Operations implements ApplicationsV2 {
 
     /**
      * Creates an instance
      *
-     * @param restOperations the {@link RestOperations} to use to communicate with the server
-     * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
-     * @param schedulerGroup The group to use when making requests
+     * @param authorizationProvider the {@link AuthorizationProvider} to use when communicating with the server
+     * @param httpClient            the {@link HttpClient} to use when communicating with the server
+     * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
+     * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
      */
-    public SpringApplicationsV2(RestOperations restOperations, URI root, Scheduler schedulerGroup) {
-        super(restOperations, root, schedulerGroup);
+    public ReactorApplicationsV2(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
+        super(authorizationProvider, httpClient, objectMapper, root);
     }
 
     @Override
@@ -109,54 +98,44 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
     @Override
     public Flux<byte[]> download(DownloadApplicationRequest request) {
-        return getStream(builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "download"));
+        return get(request, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "download"))
+            .flatMap(HttpInbound::receiveByteArray);
     }
 
     @Override
     public Flux<byte[]> downloadDroplet(DownloadApplicationDropletRequest request) {
-        return getStream(builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "droplet", "download"));
+        return get(request, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "droplet", "download"))
+            .flatMap(HttpInbound::receiveByteArray);
     }
 
     @Override
     public Mono<ApplicationEnvironmentResponse> environment(ApplicationEnvironmentRequest request) {
-        return get(ApplicationEnvironmentResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "env"));
+        return get(request, ApplicationEnvironmentResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "env"));
     }
 
     @Override
     public Mono<GetApplicationResponse> get(GetApplicationRequest request) {
-        return get(GetApplicationResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId()));
+        return get(request, GetApplicationResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId()));
     }
 
     @Override
     public Mono<ApplicationInstancesResponse> instances(ApplicationInstancesRequest request) {
-        return get(ApplicationInstancesResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "instances"));
+        return get(request, ApplicationInstancesResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "instances"));
     }
 
     @Override
     public Mono<ListApplicationsResponse> list(ListApplicationsRequest request) {
-        return get(ListApplicationsResponse.class, builder -> {
-            builder.pathSegment("v2", "apps");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListApplicationsResponse.class, builder -> builder.pathSegment("v2", "apps"));
     }
 
     @Override
     public Mono<ListApplicationRoutesResponse> listRoutes(ListApplicationRoutesRequest request) {
-        return get(ListApplicationRoutesResponse.class, builder -> {
-            builder.pathSegment("v2", "apps", request.getApplicationId(), "routes");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListApplicationRoutesResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "routes"));
     }
 
     @Override
     public Mono<ListApplicationServiceBindingsResponse> listServiceBindings(ListApplicationServiceBindingsRequest request) {
-        return get(ListApplicationServiceBindingsResponse.class, builder -> {
-            builder.pathSegment("v2", "apps", request.getApplicationId(), "service_bindings");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListApplicationServiceBindingsResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "service_bindings"));
     }
 
     @Override
@@ -176,12 +155,12 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
     @Override
     public Mono<ApplicationStatisticsResponse> statistics(ApplicationStatisticsRequest request) {
-        return get(ApplicationStatisticsResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "stats"));
+        return get(request, ApplicationStatisticsResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "stats"));
     }
 
     @Override
     public Mono<SummaryApplicationResponse> summary(SummaryApplicationRequest request) {
-        return get(SummaryApplicationResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "summary"));
+        return get(request, SummaryApplicationResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "summary"));
     }
 
     @Override
@@ -196,35 +175,15 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
     @Override
     public Mono<UploadApplicationResponse> upload(UploadApplicationRequest request) {
-        return putWithBody(() -> {
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("resources", getResourcesPart(request));
-            body.add("application", getApplicationPart(request));
-            return body;
-        }, UploadApplicationResponse.class, builder -> {
-            builder.pathSegment("v2", "apps", request.getApplicationId(), "bits");
-            QueryBuilder.augment(builder, request);
-        });
-    }
-
-    private static HttpEntity<Resource> getApplicationPart(UploadApplicationRequest request) {
-        Resource body = new InputStreamResource(request.getApplication());
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentDispositionFormData("application", "application.zip");
-        headers.setContentType(MediaType.parseMediaType("application/zip"));
-
-        return new HttpEntity<>(body, headers);
-    }
-
-    private static HttpEntity<List<org.cloudfoundry.client.v2.applications.Resource>> getResourcesPart(UploadApplicationRequest request) {
-        List<org.cloudfoundry.client.v2.applications.Resource> body = request.getResources();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentDispositionFormData("resources", null);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        return new HttpEntity<>(body, headers);
+        return put(request, UploadApplicationResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "bits"),
+            outbound -> outbound
+                .addPart(part -> part.setContentDispositionFormData("resources")
+                    .addHeader(CONTENT_TYPE, APPLICATION_JSON)
+                    .send(request.getResources()))
+                .addPart(part -> part.setContentDispositionFormData("application", "application.zip")
+                    .addHeader(CONTENT_TYPE, APPLICATION_ZIP)
+                    .sendInputStream(request.getApplication()))
+                .done());
     }
 
 }

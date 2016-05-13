@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client.v2.applications;
+package org.cloudfoundry.reactor.client.v2.applications;
 
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
@@ -66,39 +66,50 @@ import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstance;
-import org.cloudfoundry.spring.AbstractApiTest;
+import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.TestRequest;
+import org.cloudfoundry.reactor.TestResponse;
+import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.cloudfoundry.util.StringMap;
 import org.cloudfoundry.util.test.TestSubscriber;
+import org.reactivestreams.Publisher;
 import org.springframework.core.io.ClassPathResource;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.nio.charset.Charset;
 import java.util.Collections;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.Service;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.builder;
-import static org.hamcrest.core.StringStartsWith.startsWith;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
-public final class SpringApplicationsV2Test {
+public final class ReactorApplicationsV2Test {
 
-    public static final class AssociateRoute extends AbstractApiTest<AssociateApplicationRouteRequest, AssociateApplicationRouteResponse> {
+    public static final class AssociateRoute extends AbstractClientApiTest<AssociateApplicationRouteRequest, AssociateApplicationRouteResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/apps/test-application-id/routes/test-route-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/apps/PUT_{id}_routes_{route-id}_response.json");
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/apps/test-application-id/routes/test-route-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/apps/PUT_{id}_routes_{route-id}_response.json")
+                    .build())
+                .build();
         }
 
         @Override
@@ -153,17 +164,22 @@ public final class SpringApplicationsV2Test {
 
     }
 
-    public static final class Copy extends AbstractApiTest<CopyApplicationRequest, CopyApplicationResponse> {
+    public static final class Copy extends AbstractClientApiTest<CopyApplicationRequest, CopyApplicationResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v2/apps/test-application-id/copy_bits")
-                .requestPayload("fixtures/client/v2/apps/POST_{id}_copy_bits_request.json")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/apps/POST_{id}_copy_bits_response.json");
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v2/apps/test-application-id/copy_bits")
+                    .payload("fixtures/client/v2/apps/POST_{id}_copy_bits_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/apps/POST_{id}_copy_bits_response.json")
+                    .build())
+                .build();
         }
 
         @Override
@@ -195,17 +211,22 @@ public final class SpringApplicationsV2Test {
         }
     }
 
-    public static final class Create extends AbstractApiTest<CreateApplicationRequest, CreateApplicationResponse> {
+    public static final class Create extends AbstractClientApiTest<CreateApplicationRequest, CreateApplicationResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v2/apps")
-                .requestPayload("fixtures/client/v2/apps/POST_request.json")
-                .status(CREATED)
-                .responsePayload("fixtures/client/v2/apps/POST_response.json");
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v2/apps")
+                    .payload("fixtures/client/v2/apps/POST_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v2/apps/POST_response.json")
+                    .build())
+                .build();
         }
 
         @Override
@@ -261,15 +282,20 @@ public final class SpringApplicationsV2Test {
         }
     }
 
-    public static final class Delete extends AbstractApiTest<DeleteApplicationRequest, Void> {
+    public static final class Delete extends AbstractClientApiTest<DeleteApplicationRequest, Void> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/apps/test-application-id")
-                .status(NO_CONTENT);
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/apps/test-application-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
         }
 
         @Override
@@ -291,27 +317,32 @@ public final class SpringApplicationsV2Test {
 
     }
 
-    public static final class Download extends AbstractApiTest<DownloadApplicationRequest, byte[]> {
+    public static final class Download extends AbstractClientApiTest<DownloadApplicationRequest, byte[]> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
-        protected void assertions(TestSubscriber<byte[]> testSubscriber, byte[] expected) {
-            testSubscriber
-                .assertThat(arrayEqualsExpectation(expected));
+        protected void assertions(TestSubscriber<byte[]> testSubscriber, Publisher<byte[]> expected) {
+            Flux.from(expected)
+                .subscribe(e -> testSubscriber.assertThat(a -> assertArrayEquals(e, a)));
         }
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/apps/test-application-id/download")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/apps/GET_{id}_download_response.bin");
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/apps/test-application-id/download")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/apps/GET_{id}_download_response.bin")
+                    .build())
+                .build();
         }
 
         @Override
         protected byte[] getResponse() {
-            return getContents(new ClassPathResource("fixtures/client/v2/apps/GET_{id}_download_response.bin"));
+            return getBytes("fixtures/client/v2/apps/GET_{id}_download_response.bin");
         }
 
         @Override
@@ -323,32 +354,38 @@ public final class SpringApplicationsV2Test {
 
         @Override
         protected Mono<byte[]> invoke(DownloadApplicationRequest request) {
-            return getContents(this.applications.download(request));
+            return this.applications.download(request)
+                .as(AbstractClientApiTest::collectByteArray);
         }
 
     }
 
-    public static final class DownloadDroplet extends AbstractApiTest<DownloadApplicationDropletRequest, byte[]> {
+    public static final class DownloadDroplet extends AbstractClientApiTest<DownloadApplicationDropletRequest, byte[]> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
-        protected void assertions(TestSubscriber<byte[]> testSubscriber, byte[] expected) {
-            testSubscriber
-                .assertThat(arrayEqualsExpectation(expected));
+        protected void assertions(TestSubscriber<byte[]> testSubscriber, Publisher<byte[]> expected) {
+            Flux.from(expected)
+                .subscribe(e -> testSubscriber.assertThat(a -> assertArrayEquals(e, a)));
         }
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/apps/test-application-id/droplet/download")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/apps/GET_{id}_download_response.bin");
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/apps/test-application-id/droplet/download")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/apps/GET_{id}_download_response.bin")
+                    .build())
+                .build();
         }
 
         @Override
         protected byte[] getResponse() {
-            return getContents(new ClassPathResource("fixtures/client/v2/apps/GET_{id}_download_response.bin"));
+            return getBytes("fixtures/client/v2/apps/GET_{id}_download_response.bin");
         }
 
         @Override
@@ -360,20 +397,27 @@ public final class SpringApplicationsV2Test {
 
         @Override
         protected Mono<byte[]> invoke(DownloadApplicationDropletRequest request) {
-            return getContents(this.applications.downloadDroplet(request));
+            return this.applications.downloadDroplet(request)
+                .as(AbstractClientApiTest::collectByteArray);
         }
+
     }
 
-    public static final class Environment extends AbstractApiTest<ApplicationEnvironmentRequest, ApplicationEnvironmentResponse> {
+    public static final class Environment extends AbstractClientApiTest<ApplicationEnvironmentRequest, ApplicationEnvironmentResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/apps/test-application-id/env")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/apps/GET_{id}_env_response.json");
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/apps/test-application-id/env")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/apps/GET_{id}_env_response.json")
+                    .build())
+                .build();
         }
 
         @Override
@@ -417,16 +461,21 @@ public final class SpringApplicationsV2Test {
 
     }
 
-    public static final class Get extends AbstractApiTest<GetApplicationRequest, GetApplicationResponse> {
+    public static final class Get extends AbstractClientApiTest<GetApplicationRequest, GetApplicationResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/apps/test-application-id")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/apps/GET_{id}_response.json");
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/apps/test-application-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/apps/GET_{id}_response.json")
+                    .build())
+                .build();
         }
 
         @Override
@@ -480,16 +529,21 @@ public final class SpringApplicationsV2Test {
 
     }
 
-    public static final class Instances extends AbstractApiTest<ApplicationInstancesRequest, ApplicationInstancesResponse> {
+    public static final class Instances extends AbstractClientApiTest<ApplicationInstancesRequest, ApplicationInstancesResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/apps/test-application-id/instances")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/apps/GET_{id}_instances_response.json");
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/apps/test-application-id/instances")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/apps/GET_{id}_instances_response.json")
+                    .build())
+                .build();
         }
 
         @Override
@@ -516,16 +570,21 @@ public final class SpringApplicationsV2Test {
 
     }
 
-    public static final class List extends AbstractApiTest<ListApplicationsRequest, ListApplicationsResponse> {
+    public static final class List extends AbstractClientApiTest<ListApplicationsRequest, ListApplicationsResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/apps?q=name%20IN%20test-name&page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/apps/GET_apps_response.json");
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/apps?q=name%20IN%20test-name&page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/apps/GET_apps_response.json")
+                    .build())
+                .build();
         }
 
         @Override
@@ -653,16 +712,21 @@ public final class SpringApplicationsV2Test {
 
     }
 
-    public static final class ListRoutes extends AbstractApiTest<ListApplicationRoutesRequest, ListApplicationRoutesResponse> {
+    public static final class ListRoutes extends AbstractClientApiTest<ListApplicationRoutesRequest, ListApplicationRoutesResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/apps/test-application-id/routes?page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/apps/GET_{id}_routes_response.json");
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/apps/test-application-id/routes?page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/apps/GET_{id}_routes_response.json")
+                    .build())
+                .build();
         }
 
         @Override
@@ -706,17 +770,21 @@ public final class SpringApplicationsV2Test {
 
     }
 
-    public static final class ListServiceBindings extends AbstractApiTest<ListApplicationServiceBindingsRequest, ListApplicationServiceBindingsResponse> {
+    public static final class ListServiceBindings extends AbstractClientApiTest<ListApplicationServiceBindingsRequest, ListApplicationServiceBindingsResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET)
-                .path("v2/apps/test-application-id/service_bindings?q=service_instance_guid%20IN%20test-instance-id&page=-1")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/apps/GET_{id}_service_bindings_response.json");
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/apps/test-application-id/service_bindings?q=service_instance_guid%20IN%20test-instance-id&page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/apps/GET_{id}_service_bindings_response.json")
+                    .build())
+                .build();
         }
 
         @Override
@@ -758,15 +826,20 @@ public final class SpringApplicationsV2Test {
 
     }
 
-    public static final class RemoveRoute extends AbstractApiTest<RemoveApplicationRouteRequest, Void> {
+    public static final class RemoveRoute extends AbstractClientApiTest<RemoveApplicationRouteRequest, Void> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/apps/test-application-id/routes/test-route-id")
-                .status(NO_CONTENT);
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/apps/test-application-id/routes/test-route-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
         }
 
         @Override
@@ -789,15 +862,20 @@ public final class SpringApplicationsV2Test {
 
     }
 
-    public static final class RemoveServiceBinding extends AbstractApiTest<RemoveApplicationServiceBindingRequest, Void> {
+    public static final class RemoveServiceBinding extends AbstractClientApiTest<RemoveApplicationServiceBindingRequest, Void> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/apps/test-application-id/service_bindings/test-service-binding-id")
-                .status(NO_CONTENT);
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/apps/test-application-id/service_bindings/test-service-binding-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
         }
 
         @Override
@@ -819,16 +897,21 @@ public final class SpringApplicationsV2Test {
         }
     }
 
-    public static final class Restage extends AbstractApiTest<RestageApplicationRequest, RestageApplicationResponse> {
+    public static final class Restage extends AbstractClientApiTest<RestageApplicationRequest, RestageApplicationResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(POST).path("/v2/apps/test-application-id/restage")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/apps/POST_{id}_restage_response.json");
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v2/apps/test-application-id/restage")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/apps/POST_{id}_restage_response.json")
+                    .build())
+                .build();
         }
 
         @Override
@@ -876,16 +959,21 @@ public final class SpringApplicationsV2Test {
 
     }
 
-    public static final class Statistics extends AbstractApiTest<ApplicationStatisticsRequest, ApplicationStatisticsResponse> {
+    public static final class Statistics extends AbstractClientApiTest<ApplicationStatisticsRequest, ApplicationStatisticsResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/apps/test-application-id/stats")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/apps/GET_{id}_stats_response.json");
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/apps/test-application-id/stats")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/apps/GET_{id}_stats_response.json")
+                    .build())
+                .build();
         }
 
         @Override
@@ -927,16 +1015,21 @@ public final class SpringApplicationsV2Test {
 
     }
 
-    public static final class Summary extends AbstractApiTest<SummaryApplicationRequest, SummaryApplicationResponse> {
+    public static final class Summary extends AbstractClientApiTest<SummaryApplicationRequest, SummaryApplicationResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v2/apps/test-application-id/summary")
-                .status(OK)
-                .responsePayload("fixtures/client/v2/apps/GET_{id}_summary_response.json");
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/apps/test-application-id/summary")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/apps/GET_{id}_summary_response.json")
+                    .build())
+                .build();
         }
 
         @Override
@@ -1013,15 +1106,20 @@ public final class SpringApplicationsV2Test {
 
     }
 
-    public static final class TerminateInstance extends AbstractApiTest<TerminateApplicationInstanceRequest, Void> {
+    public static final class TerminateInstance extends AbstractClientApiTest<TerminateApplicationInstanceRequest, Void> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v2/apps/test-application-id/instances/0")
-                .status(NO_CONTENT);
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/apps/test-application-id/instances/0")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
         }
 
         @Override
@@ -1044,17 +1142,22 @@ public final class SpringApplicationsV2Test {
 
     }
 
-    public static final class Update extends AbstractApiTest<UpdateApplicationRequest, UpdateApplicationResponse> {
+    public static final class Update extends AbstractClientApiTest<UpdateApplicationRequest, UpdateApplicationResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/apps/test-application-id")
-                .requestPayload("fixtures/client/v2/apps/PUT_{id}_request.json")
-                .status(CREATED)
-                .responsePayload("fixtures/client/v2/apps/PUT_{id}_response.json");
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/apps/test-application-id")
+                    .payload("fixtures/client/v2/apps/PUT_{id}_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v2/apps/PUT_{id}_response.json")
+                    .build())
+                .build();
         }
 
         @Override
@@ -1109,19 +1212,38 @@ public final class SpringApplicationsV2Test {
 
     }
 
-    public static final class Upload extends AbstractApiTest<UploadApplicationRequest, UploadApplicationResponse> {
+    public static final class Upload extends AbstractClientApiTest<UploadApplicationRequest, UploadApplicationResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
-        @SuppressWarnings("unchecked")
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v2/apps/test-application-id/bits")
-                .requestMatcher(header("Content-Type", startsWith(MULTIPART_FORM_DATA_VALUE)))
-                .anyRequestPayload()
-                .status(CREATED)
-                .responsePayload("fixtures/client/v2/apps/PUT_{id}_bits_response.json");
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/apps/test-application-id/bits")
+                    .contents(consumer((headers, body) -> {
+                        String boundary = extractBoundary(headers);
+
+                        assertEquals("--" + boundary + "\r\n" +
+                            "Content-Disposition: form-data; name=\"resources\"\r\n" +
+                            "Content-Type: application/json\r\n" +
+                            "\r\n" +
+                            "[{\"sha1\":\"b907173290db6a155949ab4dc9b2d019dea0c901\",\"fn\":\"path/to/content.txt\",\"size\":123}," +
+                            "{\"sha1\":\"ff84f89760317996b9dd180ab996b079f418396f\",\"fn\":\"path/to/code.jar\",\"size\":123}]" +
+                            "\r\n" + "--" + boundary + "\r\n" +
+                            "Content-Disposition: form-data; name=\"application\"; filename=\"application.zip\"\r\n" +
+                            "Content-Type: application/zip\r\n" +
+                            "\r\n" +
+                            "test-content\n" +
+                            "\r\n" +
+                            "--" + boundary + "--", body.readString(Charset.defaultCharset()));
+                    }))
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v2/apps/PUT_{id}_bits_response.json")
+                    .build())
+                .build();
         }
 
         @Override
@@ -1142,7 +1264,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected UploadApplicationRequest getValidRequest() throws Exception {
             return UploadApplicationRequest.builder()
-                .application(new ClassPathResource("fixtures/client/v2/apps/application.zip").getInputStream())
+                .application(new ClassPathResource("fixtures/client/v2/apps/test-application.zip").getInputStream())
                 .applicationId("test-application-id")
                 .resource(Resource.builder()
                     .hash("b907173290db6a155949ab4dc9b2d019dea0c901")
