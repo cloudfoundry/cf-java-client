@@ -23,6 +23,8 @@ import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
 import org.cloudfoundry.uaa.tokens.AbstractTokenKey.KeyType;
 import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeResponse;
+import org.cloudfoundry.uaa.tokens.GetTokenByClientCredentialsRequest;
+import org.cloudfoundry.uaa.tokens.GetTokenByClientCredentialsResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyResponse;
 import org.cloudfoundry.uaa.tokens.ListTokenKeysRequest;
@@ -144,6 +146,55 @@ public final class ReactorTokensTest {
         @Override
         protected Mono<GetTokenByAuthorizationCodeResponse> invoke(GetTokenByAuthorizationCodeRequest request) {
             return this.tokens.getByAuthorizationCode(request);
+        }
+
+    }
+
+    public static final class GetTokenByClientCredentials extends AbstractUaaApiTest<GetTokenByClientCredentialsRequest, GetTokenByClientCredentialsResponse> {
+
+        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/oauth/token?client_id=login&client_secret=loginsecret&token_format=opaque&grant_type=client_credentials&response_type=token")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/tokens/GET_response_CC.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected GetTokenByClientCredentialsRequest getInvalidRequest() {
+            return GetTokenByClientCredentialsRequest.builder().build();
+        }
+
+        @Override
+        protected GetTokenByClientCredentialsResponse getResponse() {
+            return GetTokenByClientCredentialsResponse.builder()
+                .accessToken("f87f93a2666d4e6eaa54e34df86d160c")
+                .tokenType("bearer")
+                .expiresInSeconds(43199)
+                .scopes("clients.read emails.write scim.userids password.write idps.write notifications.write oauth.login scim.write critical_notifications.write")
+                .tokenId("f87f93a2666d4e6eaa54e34df86d160c")
+                .build();
+        }
+
+        @Override
+        protected GetTokenByClientCredentialsRequest getValidRequest() {
+            return GetTokenByClientCredentialsRequest.builder()
+                .clientId("login")
+                .clientSecret("loginsecret")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
+        }
+
+        @Override
+        protected Mono<GetTokenByClientCredentialsResponse> invoke(GetTokenByClientCredentialsRequest request) {
+            return this.tokens.getByClientCredentials(request);
         }
 
     }
