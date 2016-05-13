@@ -1,0 +1,8 @@
+{
+  "access_token" : "cd37a35114084fafb83d21c6f2af0e84",
+  "token_type" : "bearer",
+  "refresh_token" : "cd37a35114084fafb83d21c6f2af0e84-r",
+  "expires_in" : 43199,
+  "scope" : "scim.userids openid cloud_controller.read password.write cloud_controller.write",
+  "jti" : "cd37a35114084fafb83d21c6f2af0e84"
+}
