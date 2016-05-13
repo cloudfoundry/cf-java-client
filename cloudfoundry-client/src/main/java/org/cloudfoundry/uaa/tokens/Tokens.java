@@ -24,6 +24,14 @@ import reactor.core.publisher.Mono;
 public interface Tokens {
 
     /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#authorization-code-grant12">Authorization Code Grant</a> request
+     *
+     * @param request the Authorization Code request
+     * @return the response from the Authorization Code request
+     */
+    Mono<GetTokenByAuthorizationCodeResponse> getByAuthorizationCode(GetTokenByAuthorizationCodeRequest request);
+
+    /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#token-key">Token Key</a> request
      *
      * @param request the Token Key request
