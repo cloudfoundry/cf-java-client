@@ -28,6 +28,7 @@ import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomains;
 import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingsV2;
+import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokers;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
 import org.cloudfoundry.client.v2.servicekeys.ServiceKeys;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlans;
@@ -40,6 +41,7 @@ import org.cloudfoundry.client.v2.stacks.Stacks;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstances;
 import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.doppler.DopplerClient;
+import org.cloudfoundry.operations.serviceadmin.ServiceBroker;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.tokens.Tokens;
 import org.junit.Before;
@@ -97,6 +99,8 @@ public abstract class AbstractOperationsTest {
 
     protected final ServiceBindingsV2 serviceBindingsV2 = mock(ServiceBindingsV2.class, RETURNS_SMART_NULLS);
 
+    protected final ServiceBrokers serviceBrokers = mock(ServiceBrokers.class, RETURNS_SMART_NULLS);
+
     protected final ServiceInstances serviceInstances = mock(ServiceInstances.class, RETURNS_SMART_NULLS);
 
     protected final ServiceKeys serviceKeys = mock(ServiceKeys.class, RETURNS_SMART_NULLS);
@@ -134,6 +138,7 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.privateDomains()).thenReturn(this.privateDomains);
         when(this.cloudFoundryClient.routes()).thenReturn(this.routes);
         when(this.cloudFoundryClient.serviceBindingsV2()).thenReturn(this.serviceBindingsV2);
+        when(this.cloudFoundryClient.serviceBrokers()).thenReturn(this.serviceBrokers);
         when(this.cloudFoundryClient.serviceInstances()).thenReturn(this.serviceInstances);
         when(this.cloudFoundryClient.serviceKeys()).thenReturn(this.serviceKeys);
         when(this.cloudFoundryClient.servicePlans()).thenReturn(this.servicePlans);
