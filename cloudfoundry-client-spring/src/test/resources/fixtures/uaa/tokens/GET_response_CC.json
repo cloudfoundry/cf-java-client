@@ -1,0 +1,7 @@
+{
+  "access_token" : "f87f93a2666d4e6eaa54e34df86d160c",
+  "token_type" : "bearer",
+  "expires_in" : 43199,
+  "scope" : "clients.read emails.write scim.userids password.write idps.write notifications.write oauth.login scim.write critical_notifications.write",
+  "jti" : "f87f93a2666d4e6eaa54e34df86d160c"
+}
