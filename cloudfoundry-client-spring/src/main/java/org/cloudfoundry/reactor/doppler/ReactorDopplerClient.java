@@ -94,8 +94,8 @@ public final class ReactorDopplerClient extends AbstractDopplerOperations implem
     }
 
     private static Envelope toEnvelope(InputStream inputStream) {
-        try {
-            return Envelope.ADAPTER.decode(inputStream);
+        try (InputStream in = inputStream) {
+            return Envelope.ADAPTER.decode(in);
         } catch (IOException e) {
             throw Exceptions.propagate(e);
         }

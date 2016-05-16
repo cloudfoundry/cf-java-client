@@ -38,17 +38,11 @@ final class JsonCodec {
     private static final AsciiString CONTENT_TYPE = new AsciiString("Content-Type");
 
     static <T> Function<InputStream, T> decode(ObjectMapper objectMapper, Class<T> type) {
-        return in -> {
-            try {
+        return inputStream -> {
+            try(InputStream in = inputStream) {
                 return objectMapper.readValue(in, type);
             } catch (IOException e) {
                 throw Exceptions.propagate(e);
-            } finally {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    LOGGER.error("Unable to close input stream", e);
-                }
             }
         };
     }
