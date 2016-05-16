@@ -40,10 +40,8 @@ public final class DefaultServiceAdminTest {
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListServiceBrokersResponse.builder())
-                    .resource(fill(ServiceBrokerResource.builder(), "service-broker")
-                        .entity(ServiceBrokerEntity.builder()
-                            .name("test-service-broker1")
-                            .brokerUrl("https://ruby-service-broker.cfapps.io")
+                    .resource(fill(ServiceBrokerResource.builder(), "service-broker-")
+                        .entity(fill(ServiceBrokerEntity.builder(), "service-broker-resource-")
                             .build())
                         .build())
                     .build()));
@@ -72,8 +70,9 @@ public final class DefaultServiceAdminTest {
         protected void assertions(TestSubscriber<ServiceBroker> testSubscriber) {
             testSubscriber
                 .assertEquals(ServiceBroker.builder()
-                    .name("test-service-broker1")
-                    .url("https://ruby-service-broker.cfapps.io")
+                    .id("test-service-broker-id")
+                    .name("test-service-broker-resource-name")
+                    .url("test-service-broker-resource-brokerUrl")
                     .build());
         }
 
@@ -106,4 +105,5 @@ public final class DefaultServiceAdminTest {
         }
 
     }
+
 }

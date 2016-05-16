@@ -30,6 +30,8 @@ import org.cloudfoundry.operations.organizations.DefaultOrganizations;
 import org.cloudfoundry.operations.organizations.Organizations;
 import org.cloudfoundry.operations.routes.DefaultRoutes;
 import org.cloudfoundry.operations.routes.Routes;
+import org.cloudfoundry.operations.serviceadmin.DefaultServiceAdmin;
+import org.cloudfoundry.operations.serviceadmin.ServiceAdmin;
 import org.cloudfoundry.operations.services.DefaultServices;
 import org.cloudfoundry.operations.services.Services;
 import org.cloudfoundry.operations.spaceadmin.DefaultSpaceAdmin;
@@ -54,6 +56,8 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
 
     private final Routes routes;
 
+    private final ServiceAdmin serviceAdmin;
+
     private final Services services;
 
     private final SpaceAdmin spaceAdmin;
@@ -69,6 +73,7 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
         this.organizationAdmin = new DefaultOrganizationAdmin(cloudFoundryClient);
         this.organizations = new DefaultOrganizations(cloudFoundryClient, username);
         this.routes = new DefaultRoutes(cloudFoundryClient, organizationId, spaceId);
+        this.serviceAdmin = new DefaultServiceAdmin(cloudFoundryClient);
         this.services = new DefaultServices(cloudFoundryClient, spaceId, organizationId);
         this.spaceAdmin = new DefaultSpaceAdmin(cloudFoundryClient, organizationId);
         this.spaces = new DefaultSpaces(cloudFoundryClient, organizationId, username);
@@ -103,6 +108,11 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
     @Override
     public Routes routes() {
         return this.routes;
+    }
+
+    @Override
+    public ServiceAdmin serviceAdmin() {
+        return this.serviceAdmin;
     }
 
     @Override

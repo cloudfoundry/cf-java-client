@@ -26,6 +26,14 @@ import lombok.Data;
 public final class ServiceBroker {
 
     /**
+     * The id
+     *
+     * @param id the id
+     * @return the id
+     */
+    private final String id;
+
+    /**
      * The name of the service broker
      *
      * @param name the name
@@ -42,7 +50,8 @@ public final class ServiceBroker {
     private final String url;
 
     @Builder
-    ServiceBroker(String name, String url) {
+    ServiceBroker(String id, String name, String url) {
+        this.id = id;
         this.name = name;
         this.url = url;
     }

@@ -40,15 +40,17 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
 
     private static Flux<ServiceBrokerResource> requestServiceBrokers(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.serviceBrokers().list(
-                ListServiceBrokersRequest.builder()
+            .requestResources(page -> cloudFoundryClient.serviceBrokers()
+                .list(ListServiceBrokersRequest.builder()
                     .page(page)
                     .build()));
     }
 
-    private ServiceBroker toServiceBroker(ServiceBrokerResource serviceBrokerResource) {
-        ServiceBrokerEntity entity = ResourceUtils.getEntity(serviceBrokerResource);
+    private ServiceBroker toServiceBroker(ServiceBrokerResource resource) {
+        ServiceBrokerEntity entity = ResourceUtils.getEntity(resource);
+
         return ServiceBroker.builder()
+            .id(ResourceUtils.getId(resource))
             .name(entity.getName())
             .url(entity.getBrokerUrl())
             .build();
