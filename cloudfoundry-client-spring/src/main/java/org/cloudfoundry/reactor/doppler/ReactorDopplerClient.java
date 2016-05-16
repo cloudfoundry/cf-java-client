@@ -105,37 +105,21 @@ public final class ReactorDopplerClient extends AbstractDopplerOperations implem
     private static <T extends Event> T toEvent(Envelope envelope) {
         switch (envelope.eventType) {
             case HttpStart:
-                return (T) HttpStart.builder()
-                    .dropsonde(envelope.httpStart)
-                    .build();
+                return (T) HttpStart.from(envelope.httpStart);
             case HttpStop:
-                return (T) HttpStop.builder()
-                    .dropsonde(envelope.httpStop)
-                    .build();
+                return (T) HttpStop.from(envelope.httpStop);
             case HttpStartStop:
-                return (T) HttpStartStop.builder()
-                    .dropsonde(envelope.httpStartStop)
-                    .build();
+                return (T) HttpStartStop.from(envelope.httpStartStop);
             case LogMessage:
-                return (T) LogMessage.builder()
-                    .dropsonde(envelope.logMessage)
-                    .build();
+                return (T) LogMessage.from(envelope.logMessage);
             case ValueMetric:
-                return (T) ValueMetric.builder()
-                    .dropsonde(envelope.valueMetric)
-                    .build();
+                return (T) ValueMetric.from(envelope.valueMetric);
             case CounterEvent:
-                return (T) CounterEvent.builder()
-                    .dropsonde(envelope.counterEvent)
-                    .build();
+                return (T) CounterEvent.from(envelope.counterEvent);
             case Error:
-                return (T) Error.builder()
-                    .dropsonde(envelope.error)
-                    .build();
+                return (T) Error.from(envelope.error);
             case ContainerMetric:
-                return (T) ContainerMetric.builder()
-                    .dropsonde(envelope.containerMetric)
-                    .build();
+                return (T) ContainerMetric.from(envelope.containerMetric);
             default:
                 throw new IllegalStateException(String.format("Envelope event type %s is unsupported", envelope.eventType));
         }

@@ -16,21 +16,32 @@
 
 package org.cloudfoundry.doppler;
 
-import org.junit.Test;
+import java.util.Objects;
 
-public final class ContainerMetricsRequestTest {
+/**
+ * The destination of the message
+ */
+public enum MessageType {
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        ContainerMetricsRequest.builder()
-            .build();
-    }
+    /**
+     * {@code STDERR}
+     */
+    ERR,
 
-    @Test
-    public void valid() {
-        ContainerMetricsRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+    /**
+     * {@code STDOUT}
+     */
+    OUT;
+
+    static MessageType from(org.cloudfoundry.dropsonde.events.LogMessage.MessageType dropsonde) {
+        switch (Objects.requireNonNull(dropsonde, "dropsonde")) {
+            case ERR:
+                return ERR;
+            case OUT:
+                return OUT;
+            default:
+                throw new IllegalArgumentException("Unknown message type");
+        }
     }
 
 }

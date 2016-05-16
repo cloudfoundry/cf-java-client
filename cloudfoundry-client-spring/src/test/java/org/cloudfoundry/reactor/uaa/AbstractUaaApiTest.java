@@ -17,7 +17,27 @@
 package org.cloudfoundry.reactor.uaa;
 
 import org.cloudfoundry.reactor.AbstractApiTest;
+import org.cloudfoundry.util.RequestValidationException;
+import org.junit.Test;
+
+import java.time.Duration;
 
 public abstract class AbstractUaaApiTest<REQ, RSP> extends AbstractApiTest<REQ, RSP> {
+
+    @Test
+    public final void invalidRequest() throws Exception {
+        REQ request = getInvalidRequest();
+        if (request == null) {
+            return;
+        }
+
+        this.testSubscriber.assertError(RequestValidationException.class, null); // ignore message
+        invoke(request).subscribe(this.testSubscriber);
+
+        this.testSubscriber.verify(Duration.ofSeconds(5));
+        verify();
+    }
+
+    protected abstract REQ getInvalidRequest();
 
 }

@@ -16,21 +16,18 @@
 
 package org.cloudfoundry.doppler;
 
-import org.junit.Test;
+import java.util.Optional;
+import java.util.UUID;
 
-public final class ContainerMetricsRequestTest {
+final class UuidUtils {
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        ContainerMetricsRequest.builder()
-            .build();
+    private UuidUtils() {
     }
 
-    @Test
-    public void valid() {
-        ContainerMetricsRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+    static UUID from(org.cloudfoundry.dropsonde.events.UUID dropsonde) {
+        return Optional.ofNullable(dropsonde)
+            .map(d -> new UUID(d.high, d.low))
+            .orElse(null);
     }
 
 }

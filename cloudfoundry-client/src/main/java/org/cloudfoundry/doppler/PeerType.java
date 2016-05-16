@@ -16,21 +16,32 @@
 
 package org.cloudfoundry.doppler;
 
-import org.junit.Test;
+import java.util.Objects;
 
-public final class ContainerMetricsRequestTest {
+/**
+ * The type of peer handling request
+ */
+public enum PeerType {
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        ContainerMetricsRequest.builder()
-            .build();
-    }
+    /**
+     * The request is made by this process
+     */
+    CLIENT,
 
-    @Test
-    public void valid() {
-        ContainerMetricsRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+    /**
+     * The request is received by this process
+     */
+    SERVER;
+
+    static PeerType from(org.cloudfoundry.dropsonde.events.PeerType dropsonde) {
+        switch (Objects.requireNonNull(dropsonde, "dropsonde")) {
+            case Client:
+                return CLIENT;
+            case Server:
+                return SERVER;
+            default:
+                throw new IllegalArgumentException("Unknown Peer Type");
+        }
     }
 
 }

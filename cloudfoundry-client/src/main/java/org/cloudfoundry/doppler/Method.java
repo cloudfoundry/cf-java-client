@@ -16,12 +16,11 @@
 
 package org.cloudfoundry.doppler;
 
-import lombok.ToString;
+import java.util.Objects;
 
 /**
  * HTTP Methods
  */
-@ToString
 public enum Method {
 
     ACL,
@@ -112,8 +111,8 @@ public enum Method {
 
     VERSION_CONTROL;
 
-    static Method dropsonde(org.cloudfoundry.dropsonde.events.Method dropsonde) {
-        switch (dropsonde) {
+    static Method from(org.cloudfoundry.dropsonde.events.Method dropsonde) {
+        switch (Objects.requireNonNull(dropsonde, "dropsonde")) {
             case ACL:
                 return ACL;
             case BASELINE_CONTROL:

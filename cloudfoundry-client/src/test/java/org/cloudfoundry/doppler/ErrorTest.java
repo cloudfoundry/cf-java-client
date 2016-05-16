@@ -16,61 +16,50 @@
 
 package org.cloudfoundry.doppler;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class ErrorTest {
 
     @Test
-    public void isValid() {
-        ValidationResult result = Error.builder()
+    public void dropsonde() {
+        Error.from(new org.cloudfoundry.dropsonde.events.Error.Builder()
             .code(0)
             .message("test-message")
             .source("test-source")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build());
     }
 
-    @Test
-    public void isValidNoCode() {
-        ValidationResult result = Error.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noCode() {
+        Error.builder()
             .message("test-message")
             .source("test-source")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("code must be specified", result.getMessages().get(0));
+            .build();
     }
 
-    @Test
-    public void isValidNoMessage() {
-        ValidationResult result = Error.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noMessage() {
+        Error.builder()
             .code(0)
             .source("test-source")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("message must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noSource() {
+        Error.builder()
+            .code(0)
+            .message("test-message")
+            .build();
     }
 
     @Test
-    public void isValidNoSource() {
-        ValidationResult result = Error.builder()
+    public void valid() {
+        Error.builder()
             .code(0)
             .message("test-message")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("source must be specified", result.getMessages().get(0));
+            .source("test-source")
+            .build();
     }
 
 }

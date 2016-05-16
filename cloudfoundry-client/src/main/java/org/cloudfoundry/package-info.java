@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.doppler;
+@Value.Style(
+    defaults = @Value.Immutable(copy = false),
+    strictBuilder = true,
+    typeImmutable = "*",
+    visibility = ImplementationVisibility.PUBLIC
+)
+package org.cloudfoundry;
 
-import java.util.UUID;
-
-final class DropsondeUtils {
-
-    private DropsondeUtils() {
-    }
-
-    static UUID uuid(org.cloudfoundry.dropsonde.events.UUID dropsonde) {
-        return new UUID(dropsonde.high, dropsonde.low);
-    }
-
-}
+import org.immutables.value.Value;
+import org.immutables.value.Value.Style.ImplementationVisibility;

@@ -16,61 +16,50 @@
 
 package org.cloudfoundry.doppler;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class ValueMetricTest {
 
     @Test
-    public void isValid() {
-        ValidationResult result = ValueMetric.builder()
+    public void dropsonde() {
+        ValueMetric.from(new org.cloudfoundry.dropsonde.events.ValueMetric.Builder()
             .name("test-name")
             .unit("test-unit")
             .value(0.0)
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build());
     }
 
-    @Test
-    public void isValidNoName() {
-        ValidationResult result = ValueMetric.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        ValueMetric.builder()
             .unit("test-unit")
             .value(0.0)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+            .build();
     }
 
-    @Test
-    public void isValidNoUnit() {
-        ValidationResult result = ValueMetric.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noUnit() {
+        ValueMetric.builder()
             .name("test-name")
             .value(0.0)
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("unit must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noValue() {
+        ValueMetric.builder()
+            .name("test-name")
+            .unit("test-unit")
+            .build();
     }
 
     @Test
-    public void isValidNoValue() {
-        ValidationResult result = ValueMetric.builder()
+    public void valid() {
+        ValueMetric.builder()
             .name("test-name")
             .unit("test-unit")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("value must be specified", result.getMessages().get(0));
+            .value(0.0)
+            .build();
     }
 
 }
