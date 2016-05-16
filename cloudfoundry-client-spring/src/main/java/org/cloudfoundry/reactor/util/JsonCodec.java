@@ -20,8 +20,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.ByteBuf;
 import io.netty.util.AsciiString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import reactor.core.util.Exceptions;
 import reactor.io.netty.http.HttpOutbound;
 
@@ -31,15 +29,13 @@ import java.util.function.Function;
 
 final class JsonCodec {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JsonCodec.class);
-
     private static final AsciiString APPLICATION_JSON = new AsciiString("application/json; charset=utf-8");
 
     private static final AsciiString CONTENT_TYPE = new AsciiString("Content-Type");
 
     static <T> Function<InputStream, T> decode(ObjectMapper objectMapper, Class<T> type) {
         return inputStream -> {
-            try(InputStream in = inputStream) {
+            try (InputStream in = inputStream) {
                 return objectMapper.readValue(in, type);
             } catch (IOException e) {
                 throw Exceptions.propagate(e);
