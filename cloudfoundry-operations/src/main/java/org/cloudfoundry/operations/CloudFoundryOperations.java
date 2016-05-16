@@ -19,9 +19,10 @@ package org.cloudfoundry.operations;
 import org.cloudfoundry.operations.applications.Applications;
 import org.cloudfoundry.operations.buildpacks.Buildpacks;
 import org.cloudfoundry.operations.domains.Domains;
-import org.cloudfoundry.operations.organizations.Organizations;
 import org.cloudfoundry.operations.organizationadmin.OrganizationAdmin;
+import org.cloudfoundry.operations.organizations.Organizations;
 import org.cloudfoundry.operations.routes.Routes;
+import org.cloudfoundry.operations.serviceadmin.ServiceAdmin;
 import org.cloudfoundry.operations.services.Services;
 import org.cloudfoundry.operations.spaceadmin.SpaceAdmin;
 import org.cloudfoundry.operations.spaces.Spaces;
@@ -78,6 +79,13 @@ public interface CloudFoundryOperations {
      * @return the Cloud Foundry Routes Operations API
      */
     Routes routes();
+
+    /**
+     * Main entry point to the Cloud Foundry Service Admin Operations API
+     *
+     * @return the Cloud Foundry Service Admin Operations API
+     */
+    ServiceAdmin serviceAdmin();
 
     /**
      * Main entry point to the Cloud Foundry Services Operations API

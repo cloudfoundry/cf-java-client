@@ -57,6 +57,11 @@ public final class DefaultCloudFoundryOperationsTest extends AbstractOperationsT
     }
 
     @Test
+    public void serviceAdmin() {
+        assertNotNull(this.operations.serviceAdmin());
+    }
+
+    @Test
     public void services() {
         assertNotNull(this.operations.services());
     }
