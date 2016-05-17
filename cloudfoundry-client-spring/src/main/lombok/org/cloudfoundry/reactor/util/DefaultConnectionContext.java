@@ -39,6 +39,10 @@ public final class DefaultConnectionContext implements ConnectionContext {
 
     private final AuthorizationProvider authorizationProvider;
 
+    private final String clientId;
+
+    private final String clientSecret;
+
     private final HttpClient httpClient;
 
     private final Mono<Map<String, String>> info;
@@ -50,8 +54,8 @@ public final class DefaultConnectionContext implements ConnectionContext {
     private final Optional<SslCertificateTruster> sslCertificateTruster;
 
     @Builder
-    DefaultConnectionContext(@NonNull AuthorizationProvider authorizationProvider, @NonNull String host, ObjectMapper objectMapper, Integer port, String proxyHost, String proxyPassword,
-                             Integer proxyPort, String proxyUsername, Boolean trustCertificates) {
+    DefaultConnectionContext(@NonNull AuthorizationProvider authorizationProvider, String clientId, String clientSecret, @NonNull String host, ObjectMapper objectMapper, Integer port,
+                             String proxyHost, String proxyPassword, Integer proxyPort, String proxyUsername, Boolean trustCertificates) {
 
         ProxyContext proxyContext = ProxyContext.builder()
             .host(proxyHost)
@@ -64,6 +68,8 @@ public final class DefaultConnectionContext implements ConnectionContext {
         this.httpClient = createHttpClient(proxyContext, this.sslCertificateTruster);
 
         this.authorizationProvider = authorizationProvider;
+        this.clientId = Optional.ofNullable(clientId).orElse("cf");
+        this.clientSecret = Optional.ofNullable(clientSecret).orElse("");
         this.root = getRoot(host, port, this.sslCertificateTruster);
         this.objectMapper = getObjectMapper(objectMapper);
         this.info = getInfo(this.httpClient, this.objectMapper, this.root);
@@ -72,6 +78,16 @@ public final class DefaultConnectionContext implements ConnectionContext {
     @Override
     public AuthorizationProvider getAuthorizationProvider() {
         return this.authorizationProvider;
+    }
+
+    @Override
+    public String getClientId() {
+        return this.clientId;
+    }
+
+    @Override
+    public String getClientSecret() {
+        return this.clientSecret;
     }
 
     @Override

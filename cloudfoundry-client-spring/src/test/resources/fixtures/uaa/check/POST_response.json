@@ -1,0 +1,21 @@
+{
+  "user_id" : "ae77988e-1b25-4e02-87f2-81f98293a356",
+  "user_name" : "marissa",
+  "email" : "marissa@test.org",
+  "client_id" : "app",
+  "exp" : 1462015244,
+  "scope" : [ "scim.userids", "openid", "cloud_controller.read", "password.write", "cloud_controller.write" ],
+  "jti" : "f9f2f98d88e04ff7bb1f69041d3c0346",
+  "aud" : [ "app", "scim", "openid", "cloud_controller", "password" ],
+  "sub" : "ae77988e-1b25-4e02-87f2-81f98293a356",
+  "iss" : "http://localhost:8080/uaa/oauth/token",
+  "iat" : 1461972044,
+  "cid" : "app",
+  "grant_type" : "password",
+  "azp" : "app",
+  "auth_time" : 1461972044,
+  "zid" : "uaa",
+  "rev_sig" : "4e89e4da",
+  "origin" : "uaa",
+  "revocable" : true
+}

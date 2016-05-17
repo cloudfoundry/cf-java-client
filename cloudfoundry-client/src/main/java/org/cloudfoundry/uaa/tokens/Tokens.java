@@ -48,6 +48,14 @@ public interface Tokens {
     Mono<GetTokenByPasswordResponse> getByPassword(GetTokenByPasswordRequest request);
 
     /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#check-token">Check Token</a> request
+     *
+     * @param request the Check Token request
+     * @return the Check Token response
+     */
+    Mono<CheckTokenResponse> check(CheckTokenRequest request);
+
+    /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#token-key">Token Key</a> request
      *
      * @param request the Token Key request

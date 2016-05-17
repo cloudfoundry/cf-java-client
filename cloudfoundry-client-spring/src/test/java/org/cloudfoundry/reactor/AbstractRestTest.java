@@ -35,6 +35,10 @@ public abstract class AbstractRestTest {
 
     protected static final AuthorizationProvider AUTHORIZATION_PROVIDER = outbound -> Mono.just(outbound.addHeader("Authorization", "test-authorization"));
 
+    protected static final String CLIENT_ID = "test-client-id";
+
+    protected static final String CLIENT_SECRET = "test-client-secret";
+
     protected static final HttpClient HTTP_CLIENT = HttpClient.create();
 
     protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()

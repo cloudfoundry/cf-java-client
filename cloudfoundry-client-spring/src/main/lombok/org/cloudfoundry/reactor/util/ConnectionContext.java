@@ -24,6 +24,10 @@ public interface ConnectionContext {
 
     AuthorizationProvider getAuthorizationProvider();
 
+    String getClientId();
+
+    String getClientSecret();
+
     HttpClient getHttpClient();
 
     ObjectMapper getObjectMapper();
