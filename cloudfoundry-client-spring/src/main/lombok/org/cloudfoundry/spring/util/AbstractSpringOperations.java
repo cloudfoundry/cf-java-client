@@ -17,7 +17,6 @@
 package org.cloudfoundry.spring.util;
 
 import lombok.ToString;
-import org.cloudfoundry.Validatable;
 import org.cloudfoundry.reactor.client.CloudFoundryExceptionBuilder;
 import org.cloudfoundry.util.ValidationUtils;
 import org.springframework.http.HttpMethod;
@@ -58,7 +57,7 @@ public abstract class AbstractSpringOperations {
         this.schedulerGroup = schedulerGroup;
     }
 
-    protected final <T> Mono<T> delete(Validatable request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
+    protected final <T> Mono<T> delete(Object request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, (Function<FluxEmitter<T>, T>) emitter -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
             builderCallback.accept(builder);
@@ -69,7 +68,71 @@ public abstract class AbstractSpringOperations {
             .next();
     }
 
-    final <T, V extends Validatable> Flux<T> exchange(V request, Function<FluxEmitter<T>, T> exchange) {
+    protected final <T> Mono<T> get(Object request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(request, (Function<FluxEmitter<T>, T>) emitter -> {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
+            builderCallback.accept(builder);
+            URI uri = builder.build().encode().toUri();
+
+            return this.restOperations.getForObject(uri, responseType);
+        })
+            .next();
+    }
+
+    protected final Flux<byte[]> getStream(Object request, Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(request, emitter -> {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
+            builderCallback.accept(builder);
+            URI uri = builder.build().encode().toUri();
+
+            return this.restOperations.execute(uri, HttpMethod.GET, null, response -> {
+                try (InputStream in = response.getBody()) {
+                    int len;
+                    byte[] buffer = new byte[BYTE_ARRAY_BUFFER_LENGTH];
+
+                    while ((len = in.read(buffer)) != -1) {
+                        emitter.next(Arrays.copyOf(buffer, len));
+                    }
+
+                    return (byte[]) null;
+                } catch (Exceptions.CancelException e) {
+                    return null;
+                }
+            });
+        });
+    }
+
+    protected final <T> Mono<T> post(Object request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
+        return postWithBody(request, () -> request, responseType, builderCallback);
+    }
+
+    protected final <T, B> Mono<T> postWithBody(Object request, Supplier<B> bodySupplier, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(request, (Function<FluxEmitter<T>, T>) emitter -> {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
+            builderCallback.accept(builder);
+            URI uri = builder.build().encode().toUri();
+
+            return this.restOperations.postForObject(uri, bodySupplier.get(), responseType);
+        })
+            .next();
+    }
+
+    protected final <T> Mono<T> put(Object request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
+        return putWithBody(request, () -> request, responseType, builderCallback);
+    }
+
+    protected final <T, B> Mono<T> putWithBody(Object request, Supplier<B> bodySupplier, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(request, (Function<FluxEmitter<T>, T>) emitter -> {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
+            builderCallback.accept(builder);
+            URI uri = builder.build().encode().toUri();
+
+            return this.restOperations.exchange(new RequestEntity<>(bodySupplier.get(), null, PUT, uri), responseType).getBody();
+        })
+            .next();
+    }
+
+    final <T, V> Flux<T> exchange(V request, Function<FluxEmitter<T>, T> exchange) {
         return ValidationUtils
             .validate(request)
             .flatMap(validRequest -> Flux
@@ -90,70 +153,6 @@ public abstract class AbstractSpringOperations {
                     }
                 }))
             .subscribeOn(this.schedulerGroup);
-    }
-
-    protected final <T> Mono<T> get(Validatable request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, (Function<FluxEmitter<T>, T>) emitter -> {
-            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
-            builderCallback.accept(builder);
-            URI uri = builder.build().encode().toUri();
-
-            return this.restOperations.getForObject(uri, responseType);
-        })
-            .next();
-    }
-
-    protected final Flux<byte[]> getStream(Validatable request, Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, emitter -> {
-            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
-            builderCallback.accept(builder);
-            URI uri = builder.build().encode().toUri();
-
-            return this.restOperations.execute(uri, HttpMethod.GET, null, response -> {
-                try (InputStream in = response.getBody()) {
-                    int len;
-                    byte[] buffer = new byte[BYTE_ARRAY_BUFFER_LENGTH];
-
-                    while ((len = in.read(buffer)) != -1) {
-                        emitter.next(Arrays.copyOf(buffer, len));
-                    }
-
-                    return (byte[]) null;
-                } catch(Exceptions.CancelException e) {
-                    return null;
-                }
-            });
-        });
-    }
-
-    protected final <T> Mono<T> post(Validatable request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
-        return postWithBody(request, () -> request, responseType, builderCallback);
-    }
-
-    protected final <T, B> Mono<T> postWithBody(Validatable request, Supplier<B> bodySupplier, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, (Function<FluxEmitter<T>, T>) emitter -> {
-            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
-            builderCallback.accept(builder);
-            URI uri = builder.build().encode().toUri();
-
-            return this.restOperations.postForObject(uri, bodySupplier.get(), responseType);
-        })
-            .next();
-    }
-
-    protected final <T> Mono<T> put(Validatable request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
-        return putWithBody(request, () -> request, responseType, builderCallback);
-    }
-
-    protected final <T, B> Mono<T> putWithBody(Validatable request, Supplier<B> bodySupplier, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, (Function<FluxEmitter<T>, T>) emitter -> {
-            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
-            builderCallback.accept(builder);
-            URI uri = builder.build().encode().toUri();
-
-            return this.restOperations.exchange(new RequestEntity<>(bodySupplier.get(), null, PUT, uri), responseType).getBody();
-        })
-            .next();
     }
 
 }
