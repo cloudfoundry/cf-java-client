@@ -25,13 +25,17 @@ public final class ValidationUtils {
     private ValidationUtils() {
     }
 
-    public static <T extends Validatable> Mono<T> validate(T request) {
-        ValidationResult validationResult = request.isValid();
-        if (validationResult.getStatus() == ValidationResult.Status.INVALID) {
-            return Mono.error(new RequestValidationException(validationResult));
-        } else {
-            return Mono.just(request);
+    public static <T> Mono<T> validate(T request) {
+        if (request instanceof Validatable) {
+            Validatable validatable = (Validatable) request;
+            ValidationResult validationResult = validatable.isValid();
+
+            if (validationResult.getStatus() == ValidationResult.Status.INVALID) {
+                return Mono.error(new RequestValidationException(validationResult));
+            }
         }
+
+        return Mono.just(request);
     }
 
 }

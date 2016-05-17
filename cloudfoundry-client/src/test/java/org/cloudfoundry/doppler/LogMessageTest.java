@@ -16,61 +16,51 @@
 
 package org.cloudfoundry.doppler;
 
-import org.cloudfoundry.ValidationResult;
+import okio.ByteString;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class LogMessageTest {
 
     @Test
-    public void isValid() {
-        ValidationResult result = LogMessage.builder()
-            .message("test-message")
-            .messageType(LogMessage.MessageType.ERR)
+    public void dropsonde() {
+        LogMessage.from(new org.cloudfoundry.dropsonde.events.LogMessage.Builder()
+            .message(ByteString.encodeUtf8("test-message"))
+            .message_type(org.cloudfoundry.dropsonde.events.LogMessage.MessageType.ERR)
             .timestamp(0L)
-            .build()
-            .isValid();
+            .build());
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noMessage() {
+        LogMessage.builder()
+            .messageType(MessageType.ERR)
+            .timestamp(0L)
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noMessageType() {
+        LogMessage.builder()
+            .message("test-message")
+            .timestamp(0L)
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noTimestamp() {
+        LogMessage.builder()
+            .message("test-message")
+            .messageType(MessageType.ERR)
+            .build();
     }
 
     @Test
-    public void isValidNoMessage() {
-        ValidationResult result = LogMessage.builder()
-            .messageType(LogMessage.MessageType.ERR)
-            .timestamp(0L)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("message must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoMessageType() {
-        ValidationResult result = LogMessage.builder()
+    public void valid() {
+        LogMessage.builder()
             .message("test-message")
+            .messageType(MessageType.ERR)
             .timestamp(0L)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("message type must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoTimestamp() {
-        ValidationResult result = LogMessage.builder()
-            .message("test-message")
-            .messageType(LogMessage.MessageType.ERR)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("timestamp must be specified", result.getMessages().get(0));
+            .build();
     }
 
 }

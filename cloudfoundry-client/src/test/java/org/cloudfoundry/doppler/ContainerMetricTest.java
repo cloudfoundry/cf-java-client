@@ -16,97 +16,80 @@
 
 package org.cloudfoundry.doppler;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class ContainerMetricTest {
 
     @Test
-    public void isValid() {
-        ValidationResult result = ContainerMetric.builder()
+    public void dropsonde() {
+        ContainerMetric.from(new org.cloudfoundry.dropsonde.events.ContainerMetric.Builder()
             .applicationId("test-application-id")
             .cpuPercentage(0.0)
             .diskBytes(0L)
             .instanceIndex(0)
             .memoryBytes(0L)
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build());
     }
 
-    @Test
-    public void isValidNoApplicationId() {
-        ValidationResult result = ContainerMetric.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noApplicationId() {
+        ContainerMetric.builder()
             .cpuPercentage(0.0)
             .diskBytes(0L)
             .instanceIndex(0)
             .memoryBytes(0L)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application id must be specified", result.getMessages().get(0));
+            .build();
     }
 
-    @Test
-    public void isValidNoCpuPercentage() {
-        ValidationResult result = ContainerMetric.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noCpuPercentage() {
+        ContainerMetric.builder()
             .applicationId("test-application-id")
             .diskBytes(0L)
             .instanceIndex(0)
             .memoryBytes(0L)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("cpu percentage must be specified", result.getMessages().get(0));
+            .build();
     }
 
-    @Test
-    public void isValidNoDiskBytes() {
-        ValidationResult result = ContainerMetric.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noDiskBytes() {
+        ContainerMetric.builder()
             .applicationId("test-application-id")
             .cpuPercentage(0.0)
             .instanceIndex(0)
             .memoryBytes(0L)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("disk bytes must be specified", result.getMessages().get(0));
+            .build();
     }
 
-    @Test
-    public void isValidNoInstanceIndex() {
-        ValidationResult result = ContainerMetric.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noInstanceIndex() {
+        ContainerMetric.builder()
             .applicationId("test-application-id")
             .cpuPercentage(0.0)
             .diskBytes(0L)
             .memoryBytes(0L)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("instance index must be specified", result.getMessages().get(0));
+            .build();
     }
 
-    @Test
-    public void isValidNoMemoryBytes() {
-        ValidationResult result = ContainerMetric.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noMemoryBytes() {
+        ContainerMetric.builder()
             .applicationId("test-application-id")
             .cpuPercentage(0.0)
             .diskBytes(0L)
             .instanceIndex(0)
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("memory bytes must be specified", result.getMessages().get(0));
+    @Test
+    public void valid() {
+        ContainerMetric.builder()
+            .applicationId("test-application-id")
+            .cpuPercentage(0.0)
+            .diskBytes(0L)
+            .instanceIndex(0)
+            .memoryBytes(0L)
+            .build();
     }
 
 }

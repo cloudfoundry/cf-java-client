@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.reactor;
 
-import org.cloudfoundry.util.RequestValidationException;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Test;
 import org.reactivestreams.Publisher;
@@ -29,20 +28,6 @@ import java.util.Optional;
 public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
 
     protected final TestSubscriber<RSP> testSubscriber = new TestSubscriber<>();
-
-    @Test
-    public final void invalidRequest() throws Exception {
-        REQ request = getInvalidRequest();
-        if (request == null) {
-            return;
-        }
-
-        this.testSubscriber.assertError(RequestValidationException.class, null); // ignore message
-        invoke(request).subscribe(this.testSubscriber);
-
-        this.testSubscriber.verify(Duration.ofSeconds(5));
-        verify();
-    }
 
     @Test
     public final void success() throws Exception {
@@ -64,8 +49,6 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
     }
 
     protected abstract InteractionContext getInteractionContext();
-
-    protected abstract REQ getInvalidRequest();
 
     protected abstract RSP getResponse();
 

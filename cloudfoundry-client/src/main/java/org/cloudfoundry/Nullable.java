@@ -14,35 +14,15 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.doppler;
+package org.cloudfoundry;
 
-import lombok.ToString;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-/**
- * The type of peer handling request
- */
-@ToString
-public enum PeerType {
-
-    /**
-     * The request is made by this process
-     */
-    CLIENT,
-
-    /**
-     * The request is received by this process
-     */
-    SERVER;
-
-    static PeerType dropsonde(org.cloudfoundry.dropsonde.events.PeerType dropsonde) {
-        switch (dropsonde) {
-            case Client:
-                return CLIENT;
-            case Server:
-                return SERVER;
-            default:
-                throw new IllegalArgumentException("Unknown Peer Type");
-        }
-    }
+@Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
+@Retention(RetentionPolicy.SOURCE)
+public @interface Nullable {
 
 }

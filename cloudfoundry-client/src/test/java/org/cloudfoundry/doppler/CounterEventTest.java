@@ -16,46 +16,38 @@
 
 package org.cloudfoundry.doppler;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class CounterEventTest {
 
     @Test
-    public void isValid() {
-        ValidationResult result = CounterEvent.builder()
+    public void dropsonde() {
+        CounterEvent.from(new org.cloudfoundry.dropsonde.events.CounterEvent.Builder()
             .delta(0L)
             .name("test-name")
-            .build()
-            .isValid();
+            .build());
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noDelta() {
+        CounterEvent.builder()
+            .name("test-name")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        CounterEvent.builder()
+            .delta(0L)
+            .build();
     }
 
     @Test
-    public void isValidNoDelta() {
-        ValidationResult result = CounterEvent.builder()
-            .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("delta must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoName() {
-        ValidationResult result = CounterEvent.builder()
+    public void valid() {
+        CounterEvent.builder()
             .delta(0L)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+            .name("test-name")
+            .build();
     }
 
 }

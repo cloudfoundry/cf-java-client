@@ -158,6 +158,8 @@ public abstract class TestObjects {
             return null;
         } else if (!hasGetterOnBuiltType) {
             return null;
+        } else if (Enum.class.isAssignableFrom(clazz)) {
+            return (O) ((Class<Enum>) clazz).getEnumConstants()[0];
         } else if (clazz == Boolean.class) {
             return (O) Boolean.valueOf(true);
         } else if (clazz == Integer.class) {
@@ -184,10 +186,10 @@ public abstract class TestObjects {
     private static <T> void callSetters(T builder, String modifier, Class<?> builderClass, Class<?> builtType, boolean isPaginated) {
         for (Method m : builderClass.getDeclaredMethods()) {
             if (isPublic(m.getModifiers())) {
-                Class<?>[] parmTypes = m.getParameterTypes();
+                Class<?>[] paramTypes = m.getParameterTypes();
                 Class<?> returnType = m.getReturnType();
-                if (parmTypes.length == 1 && returnType == builderClass) { // single-value, chainable, setter
-                    Object parmValue = buildTestValue(m, parmTypes[0], modifier, isPaginated, hasGetterFor(m.getName(), builtType));
+                if (paramTypes.length == 1 && returnType == builderClass) { // single-value, chainable, setter
+                    Object parmValue = buildTestValue(m, paramTypes[0], modifier, isPaginated, hasGetterFor(m.getName(), builtType));
                     if (parmValue != null) {
                         invokeSetter(builder, m, parmValue);
                     }

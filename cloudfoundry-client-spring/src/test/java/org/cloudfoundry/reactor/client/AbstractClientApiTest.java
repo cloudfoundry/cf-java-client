@@ -19,6 +19,7 @@ package org.cloudfoundry.reactor.client;
 import okhttp3.Headers;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.reactor.AbstractApiTest;
+import org.cloudfoundry.util.RequestValidationException;
 import org.junit.Test;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -50,6 +51,20 @@ public abstract class AbstractClientApiTest<REQ, RSP> extends AbstractApiTest<RE
         verify();
     }
 
+    @Test
+    public final void invalidRequest() throws Exception {
+        REQ request = getInvalidRequest();
+        if (request == null) {
+            return;
+        }
+
+        this.testSubscriber.assertError(RequestValidationException.class, null); // ignore message
+        invoke(request).subscribe(this.testSubscriber);
+
+        this.testSubscriber.verify(Duration.ofSeconds(5));
+        verify();
+    }
+
     protected static Mono<byte[]> collectByteArray(Flux<byte[]> bytes) {
         return bytes
             .reduceWith(ByteArrayOutputStream::new, (prev, next) -> {
@@ -72,7 +87,6 @@ public abstract class AbstractClientApiTest<REQ, RSP> extends AbstractApiTest<RE
         return matcher.group(1);
     }
 
-
     protected static byte[] getBytes(String path) {
         try (InputStream in = new FileInputStream(new File("src/test/resources", path)); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             byte[] buffer = new byte[8192];
@@ -87,5 +101,7 @@ public abstract class AbstractClientApiTest<REQ, RSP> extends AbstractApiTest<RE
             throw new RuntimeException(e);
         }
     }
+
+    protected abstract REQ getInvalidRequest();
 
 }

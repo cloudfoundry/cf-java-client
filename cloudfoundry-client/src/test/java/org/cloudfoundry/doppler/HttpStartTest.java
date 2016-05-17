@@ -16,97 +16,123 @@
 
 package org.cloudfoundry.doppler;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
 
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
+import java.util.UUID;
 
 public final class HttpStartTest {
 
     @Test
-    public void isValid() {
-        ValidationResult result = ContainerMetric.builder()
-            .applicationId("test-application-id")
-            .cpuPercentage(0.0)
-            .diskBytes(0L)
-            .instanceIndex(0)
-            .memoryBytes(0L)
-            .build()
-            .isValid();
+    public void dropsonde() {
+        HttpStart.from(new org.cloudfoundry.dropsonde.events.HttpStart.Builder()
+            .method(org.cloudfoundry.dropsonde.events.Method.GET)
+            .peerType(org.cloudfoundry.dropsonde.events.PeerType.Client)
+            .remoteAddress("test-remote-address")
+            .requestId(new org.cloudfoundry.dropsonde.events.UUID.Builder()
+                .high(0L)
+                .low(0L)
+                .build())
+            .timestamp(0L)
+            .uri("test-uri")
+            .userAgent("test-user-agent")
+            .build());
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noMethod() {
+        HttpStart.builder()
+            .peerType(PeerType.CLIENT)
+            .remoteAddress("test-remote-address")
+            .requestId(UUID.randomUUID())
+            .timestamp(0L)
+            .uri("test-uri")
+            .userAgent("test-user-agent")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noPeerType() {
+        HttpStart.builder()
+            .method(Method.GET)
+            .remoteAddress("test-remote-address")
+            .requestId(UUID.randomUUID())
+            .timestamp(0L)
+            .uri("test-uri")
+            .userAgent("test-user-agent")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noRemoteAddress() {
+        HttpStart.builder()
+            .method(Method.GET)
+            .peerType(PeerType.CLIENT)
+            .requestId(UUID.randomUUID())
+            .timestamp(0L)
+            .uri("test-uri")
+            .userAgent("test-user-agent")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noRequestId() {
+        HttpStart.builder()
+            .method(Method.GET)
+            .peerType(PeerType.CLIENT)
+            .remoteAddress("test-remote-address")
+            .timestamp(0L)
+            .uri("test-uri")
+            .userAgent("test-user-agent")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noTimestamp() {
+        HttpStart.builder()
+            .method(Method.GET)
+            .peerType(PeerType.CLIENT)
+            .remoteAddress("test-remote-address")
+            .requestId(UUID.randomUUID())
+            .uri("test-uri")
+            .userAgent("test-user-agent")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noUri() {
+        HttpStart.builder()
+            .method(Method.GET)
+            .peerType(PeerType.CLIENT)
+            .remoteAddress("test-remote-address")
+            .requestId(UUID.randomUUID())
+            .timestamp(0L)
+            .userAgent("test-user-agent")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noUserAgent() {
+        HttpStart.builder()
+            .method(Method.GET)
+            .peerType(PeerType.CLIENT)
+            .remoteAddress("test-remote-address")
+            .requestId(UUID.randomUUID())
+            .timestamp(0L)
+            .uri("test-uri")
+            .build();
     }
 
     @Test
-    public void isValidNoApplicationId() {
-        ValidationResult result = ContainerMetric.builder()
-            .cpuPercentage(0.0)
-            .diskBytes(0L)
-            .instanceIndex(0)
-            .memoryBytes(0L)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoCpuPercentage() {
-        ValidationResult result = ContainerMetric.builder()
-            .applicationId("test-application-id")
-            .diskBytes(0L)
-            .instanceIndex(0)
-            .memoryBytes(0L)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("cpu percentage must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoDiskBytes() {
-        ValidationResult result = ContainerMetric.builder()
-            .applicationId("test-application-id")
-            .cpuPercentage(0.0)
-            .instanceIndex(0)
-            .memoryBytes(0L)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("disk bytes must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoInstanceIndex() {
-        ValidationResult result = ContainerMetric.builder()
-            .applicationId("test-application-id")
-            .cpuPercentage(0.0)
-            .diskBytes(0L)
-            .memoryBytes(0L)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("instance index must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoMemoryBytes() {
-        ValidationResult result = ContainerMetric.builder()
-            .applicationId("test-application-id")
-            .cpuPercentage(0.0)
-            .diskBytes(0L)
-            .instanceIndex(0)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("memory bytes must be specified", result.getMessages().get(0));
+    public void valid() {
+        HttpStart.builder()
+            .method(Method.GET)
+            .peerType(PeerType.CLIENT)
+            .remoteAddress("test-remote-address")
+            .requestId(UUID.randomUUID())
+            .timestamp(0L)
+            .uri("test-uri")
+            .userAgent("test-user-agent")
+            .build();
     }
 
 }

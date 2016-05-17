@@ -17,7 +17,6 @@
 package org.cloudfoundry.reactor.doppler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.cloudfoundry.Validatable;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -36,27 +35,27 @@ abstract class AbstractDopplerOperations extends AbstractReactorOperations {
         super(authorizationProvider, httpClient, objectMapper, root);
     }
 
-    final <REQ extends Validatable, RSP> Mono<RSP> delete(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
+    final <REQ, RSP> Mono<RSP> delete(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
         return doDelete(request, responseType, uriTransformer, function((outbound, validRequest) -> outbound));
     }
 
-    final <REQ extends Validatable, RSP> Mono<RSP> get(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
+    final <REQ, RSP> Mono<RSP> get(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
         return doGet(request, responseType, uriTransformer, function((outbound, validRequest) -> outbound));
     }
 
-    final <REQ extends Validatable> Mono<HttpInbound> get(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
+    final <REQ> Mono<HttpInbound> get(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
         return doGet(request, uriTransformer, function((outbound, validRequest) -> outbound));
     }
 
-    final <REQ extends Validatable, RSP> Mono<RSP> post(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
+    final <REQ, RSP> Mono<RSP> post(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
         return doPost(request, responseType, uriTransformer, function((outbound, validRequest) -> outbound));
     }
 
-    final <REQ extends Validatable, RSP> Mono<RSP> put(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
+    final <REQ, RSP> Mono<RSP> put(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
         return doPut(request, responseType, uriTransformer, function((outbound, validRequest) -> outbound));
     }
 
-    final <REQ extends Validatable> Mono<HttpInbound> ws(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
+    final <REQ> Mono<HttpInbound> ws(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
         return doWs(request, uriTransformer, function((outbound, validRequest) -> outbound));
     }
 

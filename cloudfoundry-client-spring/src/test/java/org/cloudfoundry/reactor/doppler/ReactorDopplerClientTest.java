@@ -19,7 +19,7 @@ package org.cloudfoundry.reactor.doppler;
 import org.cloudfoundry.doppler.ContainerMetric;
 import org.cloudfoundry.doppler.ContainerMetricsRequest;
 import org.cloudfoundry.doppler.LogMessage;
-import org.cloudfoundry.doppler.LogMessage.MessageType;
+import org.cloudfoundry.doppler.MessageType;
 import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
@@ -47,12 +47,6 @@ public final class ReactorDopplerClientTest {
                     .contentType("multipart/x-protobuf; boundary=30662872b152b6fbeb87658af504679def2b6680145265ad354761ea7acf")
                     .payload("fixtures/doppler/apps/GET_{id}_containermetrics_response.bin")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected ContainerMetricsRequest getInvalidRequest() {
-            return ContainerMetricsRequest.builder()
                 .build();
         }
 
@@ -109,12 +103,6 @@ public final class ReactorDopplerClientTest {
                     .contentType("multipart/x-protobuf; boundary=92d42123ec83c0af6a27ba0de34528b702a53e2e67ba99636286b6a4cafb")
                     .payload("fixtures/doppler/apps/GET_{id}_recentlogs_response.bin")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected RecentLogsRequest getInvalidRequest() {
-            return RecentLogsRequest.builder()
                 .build();
         }
 

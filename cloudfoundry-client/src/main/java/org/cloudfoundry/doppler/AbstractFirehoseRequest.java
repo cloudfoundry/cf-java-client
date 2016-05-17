@@ -17,41 +17,18 @@
 package org.cloudfoundry.doppler;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
  * The request payload for the Firehose endpoint
  */
-@Data
-public final class FirehoseRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractFirehoseRequest {
 
     /**
      * The subscription id
-     *
-     * @param subscriptionId the subscription id
-     * @return the subscription id
      */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String subscriptionId;
-
-    @Builder
-    FirehoseRequest(String subscriptionId) {
-        this.subscriptionId = subscriptionId;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.subscriptionId == null) {
-            builder.message("subscription id must be specified");
-        }
-
-        return builder.build();
-    }
+    @JsonIgnore
+    abstract String getSubscriptionId();
 
 }
