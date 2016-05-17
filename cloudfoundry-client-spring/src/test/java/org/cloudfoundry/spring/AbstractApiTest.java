@@ -106,7 +106,9 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
         }
     }
 
-    protected abstract REQ getInvalidRequest();
+    protected REQ getInvalidRequest() {
+        return null;
+    }
 
     protected abstract RequestContext getRequestContext();
 

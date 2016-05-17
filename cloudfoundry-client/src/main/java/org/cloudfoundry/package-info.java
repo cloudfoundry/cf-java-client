@@ -15,8 +15,10 @@
  */
 
 @Value.Style(
+    add = "*",
     defaults = @Value.Immutable(copy = false),
-    strictBuilder = true,
+    depluralize = true,
+    put = "*",
     typeImmutable = "*",
     visibility = ImplementationVisibility.PUBLIC
 )

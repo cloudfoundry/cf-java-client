@@ -1155,12 +1155,6 @@ public final class SpringApplicationsV2Test {
         private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
-        protected UpdateApplicationRequest getInvalidRequest() {
-            return UpdateApplicationRequest.builder()
-                .build();
-        }
-
-        @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PUT).path("/v2/apps/test-application-id")

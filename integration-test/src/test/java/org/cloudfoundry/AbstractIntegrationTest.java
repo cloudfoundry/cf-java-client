@@ -99,6 +99,14 @@ public abstract class AbstractIntegrationTest {
         return this.nameFactory.getName("test-space-");
     }
 
+    protected final String getVariableName() {
+        return this.nameFactory.getName("test-variable-name-");
+    }
+
+    protected final String getVariableValue() {
+        return this.nameFactory.getName("test-variable-value-");
+    }
+
     @SuppressWarnings("unchecked")
     protected final <T> TestSubscriber<T> testSubscriber() {
         return (TestSubscriber<T>) this.testSubscriber;
