@@ -17,25 +17,57 @@
 package org.cloudfoundry.operations.serviceadmin;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerResponse;
 import org.cloudfoundry.client.v2.servicebrokers.ListServiceBrokersRequest;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokerEntity;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokerResource;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
+import org.cloudfoundry.util.ValidationUtils;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.util.Optional;
+
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class DefaultServiceAdmin implements ServiceAdmin {
 
     private final CloudFoundryClient cloudFoundryClient;
 
-    public DefaultServiceAdmin(CloudFoundryClient cloudFoundryClient) {
+    private final Mono<String> spaceId;
+
+    public DefaultServiceAdmin(CloudFoundryClient cloudFoundryClient, Mono<String> spaceId) {
         this.cloudFoundryClient = cloudFoundryClient;
+        this.spaceId = spaceId;
+    }
+
+    @Override
+    public Mono<Void> create(CreateServiceBrokerRequest request) {
+        return ValidationUtils
+            .validate(request)
+            .and(this.spaceId)
+            .then(function((validRequest, spaceId) -> requestCreateServiceBroker(this.cloudFoundryClient, validRequest.getName(), validRequest.getUrl(), validRequest.getUsername(),
+                validRequest.getPassword(), Optional.ofNullable(validRequest.getIsSpaceScoped()).orElse(false), spaceId)))
+            .then();
     }
 
     @Override
     public Flux<ServiceBroker> listServiceBrokers() {
         return requestServiceBrokers(this.cloudFoundryClient)
             .map(this::toServiceBroker);
+    }
+
+    private static Mono<CreateServiceBrokerResponse> requestCreateServiceBroker(CloudFoundryClient cloudFoundryClient, String name, String url, String username, String password,
+                                                                                Boolean isSpaceScoped, String spaceId) {
+        return cloudFoundryClient.serviceBrokers()
+            .create(org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerRequest.builder()
+                .name(name)
+                .brokerUrl(url)
+                .authenticationUsername(username)
+                .authenticationPassword(password)
+                .spaceId(isSpaceScoped ? spaceId : null)
+                .build());
     }
 
     private static Flux<ServiceBrokerResource> requestServiceBrokers(CloudFoundryClient cloudFoundryClient) {
