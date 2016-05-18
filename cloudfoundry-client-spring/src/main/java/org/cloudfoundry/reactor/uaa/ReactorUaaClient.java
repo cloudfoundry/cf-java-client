@@ -18,8 +18,8 @@ package org.cloudfoundry.reactor.uaa;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
-import org.cloudfoundry.reactor.uaa.accesstokenadministration.ReactorTokens;
-import org.cloudfoundry.reactor.uaa.identityzonemanagement.ReactorIdentityZones;
+import org.cloudfoundry.reactor.uaa.identityzones.ReactorIdentityZones;
+import org.cloudfoundry.reactor.uaa.tokens.ReactorTokens;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.reactor.util.ConnectionContextSupplier;
 import org.cloudfoundry.uaa.UaaClient;
