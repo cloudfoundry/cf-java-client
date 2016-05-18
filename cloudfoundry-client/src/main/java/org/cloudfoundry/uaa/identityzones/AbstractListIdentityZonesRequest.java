@@ -16,24 +16,12 @@
 
 package org.cloudfoundry.uaa.identityzones;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
- * The request payload for the lis identity zones operation
+ * The request payload for the list identity zones operation
  */
-@Data
-public final class ListIdentityZoneRequest implements Validatable {
-
-    @Builder
-    ListIdentityZoneRequest() {
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        return ValidationResult.builder().build();
-    }
+@Value.Immutable
+abstract class AbstractListIdentityZonesRequest {
 
 }

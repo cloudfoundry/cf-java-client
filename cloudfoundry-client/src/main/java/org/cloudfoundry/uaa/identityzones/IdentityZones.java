@@ -53,7 +53,7 @@ public interface IdentityZones {
      * @param request the List Identity Zones request
      * @return the response from the List Identity Zones request
      */
-    Mono<ListIdentityZoneResponse> list(ListIdentityZoneRequest request);
+    Mono<ListIdentityZonesResponse> list(ListIdentityZonesRequest request);
 
     /**
      * Makes the <a href="https://github.com/cloudfoundry/uaa/blob/master/docs/UAA-APIs.rst#create-or-update-identity-zones-post-or-put-identity-zones">Update Identity Zone</a> request

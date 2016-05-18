@@ -16,78 +16,54 @@
 
 package org.cloudfoundry.uaa.identityzones;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public class UpdateIdentityZoneRequestTest {
 
-    @Test
-    public void isNotValidNoDescription() {
-        ValidationResult result = UpdateIdentityZoneRequest.builder()
-            .description("test-description")
+    @Test(expected = IllegalStateException.class)
+    public void noDescription() {
+        UpdateIdentityZoneRequest.builder()
             .identityZoneId("test-id")
             .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("sub domain must be specified", result.getMessages().get(0));
+            .subdomain("test-sub-domain")
+            .build();
     }
 
-    @Test
-    public void isNotValidNoId() {
-        ValidationResult result = UpdateIdentityZoneRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noIdentityZoneId() {
+        UpdateIdentityZoneRequest.builder()
             .description("test-description")
             .name("test-name")
             .subdomain("test-sub-domain")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("identity zone id must be specified", result.getMessages().get(0));
+            .build();
     }
 
-    @Test
-    public void isNotValidNoName() {
-        ValidationResult result = UpdateIdentityZoneRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        UpdateIdentityZoneRequest.builder()
             .description("test-description")
             .identityZoneId("test-id")
             .subdomain("test-sub-domain")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+            .build();
     }
 
-    @Test
-    public void isNotValidNoSubdomain() {
-        ValidationResult result = UpdateIdentityZoneRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noSubdomain() {
+        UpdateIdentityZoneRequest.builder()
             .description("test-description")
             .identityZoneId("test-id")
             .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("sub domain must be specified", result.getMessages().get(0));
+            .build();
     }
 
     @Test
-    public void isValid() {
-        ValidationResult result = UpdateIdentityZoneRequest.builder()
+    public void valid() {
+        UpdateIdentityZoneRequest.builder()
             .description("test-description")
             .identityZoneId("test-id")
             .name("test-name")
             .subdomain("test-sub-domain")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

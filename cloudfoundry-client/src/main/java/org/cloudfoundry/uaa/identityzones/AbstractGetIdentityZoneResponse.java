@@ -16,21 +16,14 @@
 
 package org.cloudfoundry.uaa.identityzones;
 
-import org.cloudfoundry.ValidationResult;
-import org.junit.Test;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
-
-public final class ListIdentityZoneRequestTest {
-
-    @Test
-    public void isValid() {
-        ValidationResult result = ListIdentityZoneRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
+/**
+ * The resource response payload for the Get Identity Zone Response
+ */
+@JsonDeserialize(as = GetIdentityZoneResponse.class)
+@Value.Immutable
+abstract class AbstractGetIdentityZoneResponse extends AbstractIdentityZone {
 
 }

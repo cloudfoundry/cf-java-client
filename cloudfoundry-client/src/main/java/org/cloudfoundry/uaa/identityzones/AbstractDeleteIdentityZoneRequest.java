@@ -18,41 +18,18 @@ package org.cloudfoundry.uaa.identityzones;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
  * The request payload for the Delete Identity Zone operation
  */
-@Data
-public final class DeleteIdentityZoneRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractDeleteIdentityZoneRequest {
 
     /**
      * The identity zone id
-     *
-     * @param identityZoneId the identity zone id
-     * @return the identity zone id
      */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String identityZoneId;
-
-    @Builder
-    DeleteIdentityZoneRequest(String identityZoneId) {
-        this.identityZoneId = identityZoneId;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.identityZoneId == null) {
-            builder.message("identity zone id must be specified");
-        }
-
-        return builder.build();
-    }
+    @JsonIgnore
+    abstract String getIdentityZoneId();
 
 }

@@ -38,7 +38,6 @@ abstract class AbstractListTokenKeysResponse {
     /**
      * The token key
      */
-    @JsonDeserialize(as = TokenKey.class)
     @Value.Immutable
     static abstract class AbstractTokenKey extends org.cloudfoundry.uaa.tokens.AbstractTokenKey {
 

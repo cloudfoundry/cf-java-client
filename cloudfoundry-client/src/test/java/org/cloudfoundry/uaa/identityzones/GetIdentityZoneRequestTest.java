@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.uaa.identityzones;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class GetIdentityZoneRequestTest {
 
-    @Test
-    public void isNotValidNoId() {
-        ValidationResult result = GetIdentityZoneRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("identity zone id must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noIdentityZoneId() {
+        GetIdentityZoneRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValid() {
-        ValidationResult result = GetIdentityZoneRequest.builder()
+    public void valid() {
+        GetIdentityZoneRequest.builder()
             .identityZoneId("test-identity-zone-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

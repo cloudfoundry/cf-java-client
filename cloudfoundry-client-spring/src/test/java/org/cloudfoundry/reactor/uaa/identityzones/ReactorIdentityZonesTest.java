@@ -27,8 +27,8 @@ import org.cloudfoundry.uaa.identityzones.DeleteIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzones.GetIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzones.GetIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzones.IdentityZone;
-import org.cloudfoundry.uaa.identityzones.ListIdentityZoneRequest;
-import org.cloudfoundry.uaa.identityzones.ListIdentityZoneResponse;
+import org.cloudfoundry.uaa.identityzones.ListIdentityZonesRequest;
+import org.cloudfoundry.uaa.identityzones.ListIdentityZonesResponse;
 import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneResponse;
 import reactor.core.publisher.Mono;
@@ -61,16 +61,12 @@ public final class ReactorIdentityZonesTest {
         }
 
         @Override
-        protected CreateIdentityZoneRequest getInvalidRequest() {
-            return CreateIdentityZoneRequest.builder().build();
-        }
-
-        @Override
         protected CreateIdentityZoneResponse getResponse() {
             return CreateIdentityZoneResponse.builder()
                 .createdAt(1426258488910L)
                 .description("Like the Twilight Zone but tastier[testzone1].")
-                .identityZoneId("testzone1")
+                .id("testzone1")
+                .lastModified(1461972047048L)
                 .name("The Twiglet Zone[testzone1]")
                 .subdomain("testzone1")
                 .version(0)
@@ -111,19 +107,14 @@ public final class ReactorIdentityZonesTest {
         }
 
         @Override
-        protected DeleteIdentityZoneRequest getInvalidRequest() {
-            return DeleteIdentityZoneRequest.builder().build();
-        }
-
-        @Override
         protected DeleteIdentityZoneResponse getResponse() {
             return DeleteIdentityZoneResponse.builder()
                 .createdAt(946710000000L)
                 .description("The test zone")
-                .identityZoneId("identity-zone-id")
+                .id("identity-zone-id")
+                .lastModified(946710000000L)
                 .name("test")
                 .subdomain("test")
-                .updatedAt(946710000000L)
                 .version(0)
                 .build();
         }
@@ -159,19 +150,14 @@ public final class ReactorIdentityZonesTest {
         }
 
         @Override
-        protected GetIdentityZoneRequest getInvalidRequest() {
-            return GetIdentityZoneRequest.builder().build();
-        }
-
-        @Override
         protected GetIdentityZoneResponse getResponse() {
             return GetIdentityZoneResponse.builder()
                 .createdAt(946710000000L)
                 .description("The test zone")
-                .identityZoneId("identity-zone-id")
+                .id("identity-zone-id")
+                .lastModified(946710000000L)
                 .name("test")
                 .subdomain("test")
-                .updatedAt(946710000000L)
                 .version(0)
                 .build();
         }
@@ -189,7 +175,7 @@ public final class ReactorIdentityZonesTest {
         }
     }
 
-    public static final class List extends AbstractUaaApiTest<ListIdentityZoneRequest, ListIdentityZoneResponse> {
+    public static final class List extends AbstractUaaApiTest<ListIdentityZonesRequest, ListIdentityZonesResponse> {
 
         private final ReactorIdentityZones identityZoneManagement = new ReactorIdentityZones(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
@@ -207,41 +193,36 @@ public final class ReactorIdentityZonesTest {
         }
 
         @Override
-        protected ListIdentityZoneRequest getInvalidRequest() {
-            return null;
-        }
-
-        @Override
-        protected ListIdentityZoneResponse getResponse() {
-            return ListIdentityZoneResponse.builder()
+        protected ListIdentityZonesResponse getResponse() {
+            return ListIdentityZonesResponse.builder()
                 .identityZone(IdentityZone.builder()
                     .createdAt(946710000000L)
                     .description("The system zone for backwards compatibility")
-                    .identityZoneId("uaa")
+                    .id("uaa")
+                    .lastModified(946710000000L)
                     .name("uaa")
                     .subdomain("")
-                    .updatedAt(946710000000L)
                     .version(0)
                     .build())
                 .identityZone(IdentityZone.builder()
                     .createdAt(1426260091139L)
                     .description("Like the Twilight Zone but tastier[testzone1].")
-                    .identityZoneId("testzone1")
+                    .id("testzone1")
+                    .lastModified(1426260091139L)
                     .name("The Twiglet Zone[testzone1]")
                     .subdomain("testzone1")
-                    .updatedAt(1426260091139L)
                     .version(0)
                     .build())
                 .build();
         }
 
         @Override
-        protected ListIdentityZoneRequest getValidRequest() throws Exception {
-            return ListIdentityZoneRequest.builder().build();
+        protected ListIdentityZonesRequest getValidRequest() throws Exception {
+            return ListIdentityZonesRequest.builder().build();
         }
 
         @Override
-        protected Mono<ListIdentityZoneResponse> invoke(ListIdentityZoneRequest request) {
+        protected Mono<ListIdentityZonesResponse> invoke(ListIdentityZonesRequest request) {
             return this.identityZoneManagement.list(request);
         }
     }
@@ -265,16 +246,12 @@ public final class ReactorIdentityZonesTest {
         }
 
         @Override
-        protected UpdateIdentityZoneRequest getInvalidRequest() {
-            return UpdateIdentityZoneRequest.builder().build();
-        }
-
-        @Override
         protected UpdateIdentityZoneResponse getResponse() {
             return UpdateIdentityZoneResponse.builder()
                 .createdAt(1426258488910L)
                 .description("Like the Twilight Zone but tastier[testzone1].")
-                .identityZoneId("testzone1")
+                .id("testzone1")
+                .lastModified(1461972046650L)
                 .name("The Twiglet Zone[testzone1]")
                 .subdomain("testzone1")
                 .version(0)

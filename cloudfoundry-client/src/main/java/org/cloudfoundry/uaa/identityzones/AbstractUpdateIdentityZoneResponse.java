@@ -16,30 +16,14 @@
 
 package org.cloudfoundry.uaa.identityzones;
 
-import org.junit.Test;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
-public final class CreateIdentityZoneRequestTest {
-
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        CreateIdentityZoneRequest.builder()
-            .subdomain("test-sub-domain")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noSubdomain() {
-        CreateIdentityZoneRequest.builder()
-            .name("test-name")
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        CreateIdentityZoneRequest.builder()
-            .name("test-name")
-            .subdomain("test-sub-domain")
-            .build();
-    }
+/**
+ * The response from the update identity zone request
+ */
+@JsonDeserialize(as = UpdateIdentityZoneResponse.class)
+@Value.Immutable
+abstract class AbstractUpdateIdentityZoneResponse extends AbstractIdentityZone {
 
 }

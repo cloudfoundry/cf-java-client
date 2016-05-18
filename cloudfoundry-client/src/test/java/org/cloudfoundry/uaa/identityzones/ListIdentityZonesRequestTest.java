@@ -18,27 +18,11 @@ package org.cloudfoundry.uaa.identityzones;
 
 import org.junit.Test;
 
-public final class CreateIdentityZoneRequestTest {
-
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        CreateIdentityZoneRequest.builder()
-            .subdomain("test-sub-domain")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noSubdomain() {
-        CreateIdentityZoneRequest.builder()
-            .name("test-name")
-            .build();
-    }
+public final class ListIdentityZonesRequestTest {
 
     @Test
     public void valid() {
-        CreateIdentityZoneRequest.builder()
-            .name("test-name")
-            .subdomain("test-sub-domain")
+        ListIdentityZonesRequest.builder()
             .build();
     }
 

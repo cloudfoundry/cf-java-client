@@ -17,30 +17,19 @@
 package org.cloudfoundry.uaa.identityzones;
 
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Singular;
-import lombok.ToString;
-
-import java.util.ArrayList;
-import java.util.Collection;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.immutables.value.Value;
 
 /**
- * The response from the list identity zones request
+ * The request payload for the Get Identity Zone operation
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public final class ListIdentityZoneResponse extends ArrayList<IdentityZone> {
+@Value.Immutable
+abstract class AbstractGetIdentityZoneRequest {
 
-    private static final long serialVersionUID = -510382178369314818L;
-
-    @Builder
-    @JsonCreator
-    ListIdentityZoneResponse(@Singular Collection<IdentityZone> identityZones) {
-        super(identityZones);
-    }
+    /**
+     * The identity zone id
+     */
+    @JsonIgnore
+    abstract String getIdentityZoneId();
 
 }

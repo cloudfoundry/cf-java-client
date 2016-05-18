@@ -26,8 +26,8 @@ import org.cloudfoundry.uaa.identityzones.DeleteIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzones.GetIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzones.GetIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzones.IdentityZones;
-import org.cloudfoundry.uaa.identityzones.ListIdentityZoneRequest;
-import org.cloudfoundry.uaa.identityzones.ListIdentityZoneResponse;
+import org.cloudfoundry.uaa.identityzones.ListIdentityZonesRequest;
+import org.cloudfoundry.uaa.identityzones.ListIdentityZonesResponse;
 import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneResponse;
 import reactor.core.publisher.Mono;
@@ -68,8 +68,8 @@ public final class ReactorIdentityZones extends AbstractUaaOperations implements
     }
 
     @Override
-    public Mono<ListIdentityZoneResponse> list(ListIdentityZoneRequest request) {
-        return get(request, ListIdentityZoneResponse.class, function((builder, validRequest) -> builder.pathSegment("identity-zones")));
+    public Mono<ListIdentityZonesResponse> list(ListIdentityZonesRequest request) {
+        return get(request, ListIdentityZonesResponse.class, function((builder, validRequest) -> builder.pathSegment("identity-zones")));
     }
 
     @Override
