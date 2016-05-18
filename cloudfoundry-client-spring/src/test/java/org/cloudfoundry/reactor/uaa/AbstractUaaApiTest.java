@@ -38,6 +38,8 @@ public abstract class AbstractUaaApiTest<REQ, RSP> extends AbstractApiTest<REQ, 
         verify();
     }
 
-    protected abstract REQ getInvalidRequest();
+    protected REQ getInvalidRequest() {
+        return null;
+    }
 
 }

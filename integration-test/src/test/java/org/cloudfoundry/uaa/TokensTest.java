@@ -42,8 +42,7 @@ public final class TokensTest extends AbstractIntegrationTest {
             .then(token -> this.uaaClient.tokens()
                 .check(CheckTokenRequest.builder()
                     .token(token)
-                    .scope("password.write")
-                    .scope("scim.userids")
+                    .scopes("password.write,scim.userids")
                     .build()))
             .subscribe(this.testSubscriber()
             .assertError(HttpException.class, "HTTP request failed with code: 403"));

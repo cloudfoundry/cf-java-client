@@ -16,14 +16,33 @@
 
 package org.cloudfoundry.uaa.tokens;
 
-import org.junit.Test;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.QueryParameter;
+import org.immutables.value.Value;
 
-public final class GetTokenKeyRequestTest {
+/**
+ * The request payload for the get token by client credentials operation
+ */
+@Value.Immutable
+abstract class AbstractGetTokenByClientCredentialsRequest {
 
-    @Test
-    public void valid() {
-        GetTokenKeyRequest.builder()
-            .build();
-    }
+    /**
+     * The client identifier
+     */
+    @QueryParameter("client_id")
+    abstract String getClientId();
+
+    /**
+     * The client's secret passphrase
+     */
+    @QueryParameter("client_secret")
+    abstract String getClientSecret();
+
+    /**
+     * The token format
+     */
+    @Nullable
+    @QueryParameter("token_format")
+    abstract TokenFormat getTokenFormat();
 
 }

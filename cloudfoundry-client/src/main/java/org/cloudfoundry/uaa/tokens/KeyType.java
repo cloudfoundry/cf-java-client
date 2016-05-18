@@ -16,14 +16,19 @@
 
 package org.cloudfoundry.uaa.tokens;
 
-import org.junit.Test;
+/**
+ * The key type
+ */
+public enum KeyType {
 
-public final class GetTokenKeyRequestTest {
+    /**
+     * The MAC key type
+     */
+    MAC,
 
-    @Test
-    public void valid() {
-        GetTokenKeyRequest.builder()
-            .build();
-    }
+    /**
+     * The RSA key type
+     */
+    RSA
 
 }

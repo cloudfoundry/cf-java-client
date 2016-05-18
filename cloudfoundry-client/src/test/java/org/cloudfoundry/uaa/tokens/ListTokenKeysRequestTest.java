@@ -16,21 +16,14 @@
 
 package org.cloudfoundry.uaa.tokens;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class ListTokenKeysRequestTest {
 
     @Test
-    public void isValid() {
-        ValidationResult result = ListTokenKeysRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    public void valid() {
+        ListTokenKeysRequest.builder()
+            .build();
     }
 
 }
