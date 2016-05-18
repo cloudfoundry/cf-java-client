@@ -20,21 +20,21 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
-import org.cloudfoundry.uaa.tokens.AbstractTokenKey.KeyType;
+import org.cloudfoundry.uaa.tokens.CheckTokenRequest;
+import org.cloudfoundry.uaa.tokens.CheckTokenResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenByClientCredentialsRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenByClientCredentialsResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenByPasswordRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenByPasswordResponse;
-import org.cloudfoundry.uaa.tokens.CheckTokenRequest;
-import org.cloudfoundry.uaa.tokens.CheckTokenResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyResponse;
+import org.cloudfoundry.uaa.tokens.KeyType;
 import org.cloudfoundry.uaa.tokens.ListTokenKeysRequest;
 import org.cloudfoundry.uaa.tokens.ListTokenKeysResponse;
-import org.cloudfoundry.uaa.tokens.ListTokenKeysResponse.TokenKey;
 import org.cloudfoundry.uaa.tokens.TokenFormat;
+import org.cloudfoundry.uaa.tokens.TokenKey;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
@@ -63,11 +63,6 @@ public final class ReactorTokensTest {
         }
 
         @Override
-        protected CheckTokenRequest getInvalidRequest() {
-            return null;
-        }
-
-        @Override
         protected CheckTokenResponse getResponse() {
             return CheckTokenResponse.builder()
                 .userId("ae77988e-1b25-4e02-87f2-81f98293a356")
@@ -84,7 +79,7 @@ public final class ReactorTokensTest {
                 .cid("app")
                 .grantType("password")
                 .authorizedParty("app")
-                .authTime(1461972044L)
+                .authorizationTime(1461972044L)
                 .zoneId("uaa")
                 .revocationSignature("4e89e4da")
                 .origin("uaa")
@@ -96,8 +91,7 @@ public final class ReactorTokensTest {
         protected CheckTokenRequest getValidRequest() {
             return CheckTokenRequest.builder()
                 .token("f9f2f98d88e04ff7bb1f69041d3c0346")
-                .scope("password.write")
-                .scope("scim.userids")
+                .scopes("password.write,scim.userids")
                 .build();
         }
 
@@ -123,11 +117,6 @@ public final class ReactorTokensTest {
                     .payload("fixtures/uaa/token_key/GET_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected GetTokenKeyRequest getInvalidRequest() {
-            return null;
         }
 
         @Override
@@ -185,11 +174,6 @@ public final class ReactorTokensTest {
         }
 
         @Override
-        protected GetTokenByAuthorizationCodeRequest getInvalidRequest() {
-            return GetTokenByAuthorizationCodeRequest.builder().build();
-        }
-
-        @Override
         protected GetTokenByAuthorizationCodeResponse getResponse() {
             return GetTokenByAuthorizationCodeResponse.builder()
                 .accessToken("555e2047bbc849628ff8cbfa7b342274")
@@ -234,11 +218,6 @@ public final class ReactorTokensTest {
                     .payload("fixtures/uaa/tokens/GET_response_CC.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected GetTokenByClientCredentialsRequest getInvalidRequest() {
-            return GetTokenByClientCredentialsRequest.builder().build();
         }
 
         @Override
@@ -287,11 +266,6 @@ public final class ReactorTokensTest {
         }
 
         @Override
-        protected GetTokenByPasswordRequest getInvalidRequest() {
-            return GetTokenByPasswordRequest.builder().build();
-        }
-
-        @Override
         protected GetTokenByPasswordResponse getResponse() {
             return GetTokenByPasswordResponse.builder()
                 .accessToken("cd37a35114084fafb83d21c6f2af0e84")
@@ -336,11 +310,6 @@ public final class ReactorTokensTest {
                     .payload("fixtures/uaa/token_keys/GET_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected ListTokenKeysRequest getInvalidRequest() {
-            return null;
         }
 
         @Override

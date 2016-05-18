@@ -16,24 +16,27 @@
 
 package org.cloudfoundry.uaa.tokens;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.QueryParameter;
+import org.immutables.value.Value;
 
 /**
  * The request payload for the token key operation
  */
-@Data
-public final class ListTokenKeysRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractCheckTokenRequest {
 
-    @Builder
-    ListTokenKeysRequest() {
-    }
+    /**
+     * The scopes authorized by the user for this client
+     */
+    @QueryParameter("scopes")
+    @Nullable
+    abstract String getScopes();
 
-    @Override
-    public ValidationResult isValid() {
-        return ValidationResult.builder().build();
-    }
+    /**
+     * The token
+     */
+    @QueryParameter("token")
+    abstract String getToken();
 
 }

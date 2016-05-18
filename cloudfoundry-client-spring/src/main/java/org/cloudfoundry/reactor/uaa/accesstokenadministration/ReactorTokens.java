@@ -19,14 +19,14 @@ package org.cloudfoundry.reactor.uaa.accesstokenadministration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
+import org.cloudfoundry.uaa.tokens.CheckTokenRequest;
+import org.cloudfoundry.uaa.tokens.CheckTokenResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenByClientCredentialsRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenByClientCredentialsResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenByPasswordRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenByPasswordResponse;
-import org.cloudfoundry.uaa.tokens.CheckTokenRequest;
-import org.cloudfoundry.uaa.tokens.CheckTokenResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyResponse;
 import org.cloudfoundry.uaa.tokens.ListTokenKeysRequest;
@@ -61,6 +61,12 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
     }
 
     @Override
+    public Mono<CheckTokenResponse> check(CheckTokenRequest request) {
+        return post(request, CheckTokenResponse.class, function((builder, validRequest) -> builder.pathSegment("check_token")),
+            function((outbound, validRequest) -> basicAuth(outbound, this.clientId, this.clientSecret)));
+    }
+
+    @Override
     public Mono<GetTokenByAuthorizationCodeResponse> getByAuthorizationCode(GetTokenByAuthorizationCodeRequest request) {
         return post(request, GetTokenByAuthorizationCodeResponse.class,
             function((builder, validRequest) -> builder
@@ -85,12 +91,6 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
                 .pathSegment("oauth", "token")
                 .queryParam("grant_type", "password")
                 .queryParam("response_type", "token")));
-    }
-
-    @Override
-    public Mono<CheckTokenResponse> check(CheckTokenRequest request) {
-        return post(request, CheckTokenResponse.class, function((builder, validRequest) -> builder.pathSegment("check_token")),
-            function((outbound, validRequest) -> basicAuth(outbound, this.clientId, this.clientSecret)));
     }
 
     @Override

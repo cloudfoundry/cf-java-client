@@ -16,81 +16,41 @@
 
 package org.cloudfoundry.uaa.tokens;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class GetTokenByAuthorizationCodeRequestTest {
 
-    @Test
-    public void isNotValidNoAuthorizationCode() {
-        ValidationResult result = GetTokenByAuthorizationCodeRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noAuthorizationCode() {
+        GetTokenByAuthorizationCodeRequest.builder()
             .clientId("test-client-id")
             .clientSecret("test-client-secret")
-            .redirectUri("test-redirect-uri")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("authorization code must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noClientId() {
+        GetTokenByAuthorizationCodeRequest.builder()
+            .authorizationCode("test-authorization-code")
+            .clientSecret("test-client-secret")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noClientSecret() {
+        GetTokenByAuthorizationCodeRequest.builder()
+            .authorizationCode("test-authorization-code")
+            .clientId("test-client-id")
+            .build();
     }
 
     @Test
-    public void isNotValidNoClientId() {
-        ValidationResult result = GetTokenByAuthorizationCodeRequest.builder()
-            .authorizationCode("test-authorization-code")
-            .clientSecret("test-client-secret")
-            .redirectUri("test-redirect-uri")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("client id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isNotValidNoClientSecret() {
-        ValidationResult result = GetTokenByAuthorizationCodeRequest.builder()
-            .authorizationCode("test-authorization-code")
-            .clientId("test-client-id")
-            .redirectUri("test-redirect-uri")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("client secret must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidMax() {
-        ValidationResult result = GetTokenByAuthorizationCodeRequest.builder()
+    public void valid() {
+        GetTokenByAuthorizationCodeRequest.builder()
             .authorizationCode("test-authorization-code")
             .clientId("test-client-id")
             .clientSecret("test-client-secret")
-            .redirectUri("test-redirect-uri")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidMin() {
-        ValidationResult result = GetTokenByAuthorizationCodeRequest.builder()
-            .authorizationCode("test-authorization-code")
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

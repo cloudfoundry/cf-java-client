@@ -16,14 +16,14 @@
 
 package org.cloudfoundry.uaa.tokens;
 
-import org.junit.Test;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
-public final class GetTokenKeyRequestTest {
-
-    @Test
-    public void valid() {
-        GetTokenKeyRequest.builder()
-            .build();
-    }
+/**
+ * The response from the token key request
+ */
+@JsonDeserialize(as = GetTokenKeyResponse.class)
+@Value.Immutable
+abstract class AbstractGetTokenKeyResponse extends AbstractTokenKey {
 
 }

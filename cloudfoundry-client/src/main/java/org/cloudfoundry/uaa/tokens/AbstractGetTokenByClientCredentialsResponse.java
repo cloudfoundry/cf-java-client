@@ -16,20 +16,14 @@
 
 package org.cloudfoundry.uaa.tokens;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
+
 /**
- * The format of tokens requested.
+ * The response from the get token by client credentials operation
  */
-public enum TokenFormat {
-    OPAQUE("opaque");
+@JsonDeserialize(as = GetTokenByClientCredentialsResponse.class)
+@Value.Immutable
+abstract class AbstractGetTokenByClientCredentialsResponse extends AbstractToken {
 
-    private final String representation;
-
-    TokenFormat(String representation) {
-        this.representation = representation;
-    }
-
-    @Override
-    public String toString() {
-        return this.representation;
-    }
 }

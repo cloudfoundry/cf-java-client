@@ -17,29 +17,31 @@
 package org.cloudfoundry.uaa.tokens;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
+
+import java.util.List;
 
 /**
  * The response from the token key request
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public final class GetTokenKeyResponse extends AbstractTokenKey {
+@JsonDeserialize(as = ListTokenKeysResponse.class)
+@Value.Immutable
+abstract class AbstractListTokenKeysResponse {
 
-    @Builder
-    GetTokenKeyResponse(@JsonProperty("alg") String algorithm,
-                        @JsonProperty("e") String e,
-                        @JsonProperty("kid") String id,
-                        @JsonProperty("kty") KeyType keyType,
-                        @JsonProperty("n") String n,
-                        @JsonProperty("use") String use,
-                        @JsonProperty("value") String value) {
+    /**
+     * The token keys
+     */
+    @JsonProperty("keys")
+    abstract List<TokenKey> getKeys();
 
-        super(algorithm, e, id, keyType, n, use, value);
+    /**
+     * The token key
+     */
+    @JsonDeserialize(as = TokenKey.class)
+    @Value.Immutable
+    static abstract class AbstractTokenKey extends org.cloudfoundry.uaa.tokens.AbstractTokenKey {
+
     }
 
 }

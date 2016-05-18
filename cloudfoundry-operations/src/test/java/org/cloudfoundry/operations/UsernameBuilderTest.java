@@ -31,6 +31,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
+import static org.cloudfoundry.util.test.TestObjects.fill;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -83,7 +84,7 @@ public final class UsernameBuilderTest extends AbstractOperationsTest {
             .getKey(GetTokenKeyRequest.builder()
                 .build()))
             .thenReturn(Mono
-                .just(GetTokenKeyResponse.builder()
+                .just(fill(GetTokenKeyResponse.builder())
                     .value(key)
                     .build()));
     }

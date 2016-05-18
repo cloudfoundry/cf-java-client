@@ -16,60 +16,30 @@
 
 package org.cloudfoundry.uaa.tokens;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class GetTokenByClientCredentialsRequestTest {
 
-    @Test
-    public void isNotValidNoClientId() {
-        ValidationResult result = GetTokenByClientCredentialsRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noClientId() {
+        GetTokenByClientCredentialsRequest.builder()
             .clientSecret("test-client-secret")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("client id must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noClientSecret() {
+        GetTokenByClientCredentialsRequest.builder()
+            .clientId("test-client-id")
+            .build();
     }
 
     @Test
-    public void isNotValidNoClientSecret() {
-        ValidationResult result = GetTokenByClientCredentialsRequest.builder()
-            .clientId("test-client-id")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("client secret must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidMax() {
-        ValidationResult result = GetTokenByClientCredentialsRequest.builder()
+    public void valid() {
+        GetTokenByClientCredentialsRequest.builder()
             .clientId("test-client-id")
             .clientSecret("test-client-secret")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidMin() {
-        ValidationResult result = GetTokenByClientCredentialsRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

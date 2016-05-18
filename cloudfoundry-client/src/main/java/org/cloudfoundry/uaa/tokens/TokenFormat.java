@@ -16,14 +16,19 @@
 
 package org.cloudfoundry.uaa.tokens;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-public final class GetTokenKeyRequestTest {
+/**
+ * The format of tokens requested.
+ */
+public enum TokenFormat {
 
-    @Test
-    public void valid() {
-        GetTokenKeyRequest.builder()
-            .build();
+    OPAQUE;
+
+    @JsonValue
+    @Override
+    public String toString() {
+        return name().toLowerCase();
     }
 
 }

@@ -16,14 +16,21 @@
 
 package org.cloudfoundry.uaa.tokens;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
-public final class GetTokenKeyRequestTest {
+/**
+ * The response from the get token by password operation
+ */
+@JsonDeserialize(as = GetTokenByPasswordResponse.class)
+@Value.Immutable
+abstract class AbstractGetTokenByPasswordResponse extends AbstractToken {
 
-    @Test
-    public void valid() {
-        GetTokenKeyRequest.builder()
-            .build();
-    }
+    /**
+     * The refresh token
+     */
+    @JsonProperty("refresh_token")
+    abstract String getRefreshToken();
 
 }

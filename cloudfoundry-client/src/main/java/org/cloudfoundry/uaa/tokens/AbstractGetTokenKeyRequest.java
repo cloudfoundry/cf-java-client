@@ -16,14 +16,12 @@
 
 package org.cloudfoundry.uaa.tokens;
 
-import org.junit.Test;
+import org.immutables.value.Value;
 
-public final class GetTokenKeyRequestTest {
-
-    @Test
-    public void valid() {
-        GetTokenKeyRequest.builder()
-            .build();
-    }
+/**
+ * The request payload for the token key operation
+ */
+@Value.Immutable
+abstract class AbstractGetTokenKeyRequest {
 
 }
