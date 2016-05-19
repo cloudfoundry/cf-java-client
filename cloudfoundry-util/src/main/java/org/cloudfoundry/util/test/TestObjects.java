@@ -36,7 +36,7 @@ import static org.junit.Assert.fail;
  * <i>modifier</i> which is used to augment the {@code String} values set. {@code fill(b)} is equivalent to {@code fill(b,"")} and {@code fillPage(b)} is equivalent to {@code fillPage(b,"")}.</p>
  *
  * <p>{@code TestObjects} is designed to populate builder objects with test values. Object setters are called with standard values based upon the parameter type and the name of the setter method.
- * Setters which take collections or {@link lombok.Singular} generated setters are ignored.</p>
+ * Setters which take collections are ignored.</p>
  *
  * <ul>
  *

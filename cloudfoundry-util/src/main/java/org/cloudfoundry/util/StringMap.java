@@ -16,21 +16,36 @@
 
 package org.cloudfoundry.util;
 
-import lombok.Builder;
-import lombok.Singular;
-
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Utility for building maps for Json responses
  */
-public final class StringMap extends HashMap<String, Object> {
+public final class StringMap {
 
-    private static final long serialVersionUID = -2835780629130145581L;
-
-    @Builder
-    StringMap(@Singular Map<String, Object> entries) {
-        super(entries);
+    public static Builder builder() {
+        return new Builder();
     }
+
+    public static final class Builder {
+
+        private final Map<String, Object> entries = new HashMap<>();
+
+        public Map<String, Object> build() {
+            return this.entries;
+        }
+
+        public Builder entries(Map<String, Object> entries) {
+            this.entries.putAll(entries);
+            return this;
+        }
+
+        public Builder entry(String key, Object value) {
+            this.entries.put(key, value);
+            return this;
+        }
+
+    }
+
 }

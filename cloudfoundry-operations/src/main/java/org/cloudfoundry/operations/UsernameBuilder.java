@@ -20,9 +20,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.impl.Base64Codec;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyRequest;
@@ -36,9 +33,6 @@ import java.security.spec.X509EncodedKeySpec;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
-@Accessors(chain = true, fluent = true)
-@Setter
-@ToString
 final class UsernameBuilder {
 
     private static final Base64Codec BASE64 = new Base64Codec();
@@ -58,6 +52,16 @@ final class UsernameBuilder {
                 this.cloudFoundryClient.getAccessToken()
             )
             .map(function(UsernameBuilder::getUsername));
+    }
+
+    UsernameBuilder cloudFoundryClient(CloudFoundryClient cloudFoundryClient) {
+        this.cloudFoundryClient = cloudFoundryClient;
+        return this;
+    }
+
+    UsernameBuilder uaaClient(UaaClient uaaClient) {
+        this.uaaClient = uaaClient;
+        return this;
     }
 
     private static PublicKey generateKey(String pem) {
