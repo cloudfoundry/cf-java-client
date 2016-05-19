@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class RestartApplicationInstanceRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = RestartApplicationInstanceRequest.builder()
-            .instanceIndex(0)
+    @Test(expected = IllegalStateException.class)
+    public void noInstanceIndex() {
+        RestartApplicationInstanceRequest.builder()
             .name("test-name")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        RestartApplicationInstanceRequest.builder()
+            .instanceIndex(0)
+            .build();
     }
 
     @Test
-    public void isValidNoInstanceIndex() {
-        ValidationResult result = RestartApplicationInstanceRequest.builder()
-            .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("instance index must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoName() {
-        ValidationResult result = RestartApplicationInstanceRequest.builder()
+    public void valid() {
+        RestartApplicationInstanceRequest.builder()
             .instanceIndex(0)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+            .name("test-name")
+            .build();
     }
 
 }

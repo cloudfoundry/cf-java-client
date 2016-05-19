@@ -16,33 +16,24 @@
 
 package org.cloudfoundry.operations.applications;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
 /**
- * The request options for the check application ssh enabled operation
+ * The request options for the application logs operation
  */
-@Data
-public final class ApplicationSshEnabledRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractLogsRequest {
 
-    private final String name;
+    /**
+     * The name of the application
+     */
+    abstract String getName();
 
-    @Builder
-    ApplicationSshEnabledRequest(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.name == null) {
-            builder.message("name must be specified");
-        }
-
-        return builder.build();
-    }
+    /**
+     * Whether only recent logs should be retrieved
+     */
+    @Nullable
+    abstract Boolean getRecent();
 
 }

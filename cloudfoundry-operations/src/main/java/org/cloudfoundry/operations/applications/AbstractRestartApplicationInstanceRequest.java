@@ -16,33 +16,22 @@
 
 package org.cloudfoundry.operations.applications;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
- * The request options for the stop application operation
+ * The request options for the restart application instance operation
  */
-@Data
-public final class StopApplicationRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractRestartApplicationInstanceRequest {
 
-    private final String name;
+    /**
+     * The index of the instance
+     */
+    abstract Integer getInstanceIndex();
 
-    @Builder
-    StopApplicationRequest(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.name == null) {
-            builder.message("name must be specified");
-        }
-
-        return builder.build();
-    }
+    /**
+     * The name of the application
+     */
+    abstract String getName();
 
 }

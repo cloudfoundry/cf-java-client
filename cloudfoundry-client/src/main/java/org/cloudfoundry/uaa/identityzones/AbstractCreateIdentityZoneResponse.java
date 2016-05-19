@@ -24,6 +24,6 @@ import org.immutables.value.Value;
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class AbstractCreateIdentityZoneResponse extends AbstractIdentityZone {
+abstract class AbstractCreateIdentityZoneResponse extends AbstractAbstractIdentityZone {
 
 }

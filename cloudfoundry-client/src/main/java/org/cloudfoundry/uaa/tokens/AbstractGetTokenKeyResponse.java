@@ -24,6 +24,6 @@ import org.immutables.value.Value;
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class AbstractGetTokenKeyResponse extends AbstractTokenKey {
+abstract class AbstractGetTokenKeyResponse extends AbstractAbstractTokenKey {
 
 }

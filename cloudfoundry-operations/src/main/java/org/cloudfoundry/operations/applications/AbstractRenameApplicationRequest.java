@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.identityzones;
+package org.cloudfoundry.operations.applications;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 /**
- * The resource response payload for the Get Identity Zone Response
+ * The request options for the rename application operation
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class AbstractGetIdentityZoneResponse extends AbstractAbstractIdentityZone {
+abstract class AbstractRenameApplicationRequest {
+
+    /**
+     * The name of the application
+     */
+    abstract String getName();
+
+    /**
+     * The new name of the application
+     */
+    abstract String getNewName();
 
 }

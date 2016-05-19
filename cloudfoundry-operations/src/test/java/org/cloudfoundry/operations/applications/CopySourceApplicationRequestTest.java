@@ -16,80 +16,39 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class CopySourceApplicationRequestTest {
 
-    @Test
-    public void isValidAll() {
-        ValidationResult result = CopySourceApplicationRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        CopySourceApplicationRequest.builder()
+            .targetName("test-target-name")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noTargetName() {
+        CopySourceApplicationRequest.builder()
+            .name("test-name")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void organizationNoSpace() {
+        CopySourceApplicationRequest.builder()
             .name("test-name")
             .targetName("test-target-name")
             .targetOrganization("test-target-organization")
-            .targetSpace("test-target-space")
-            .restart(true)
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
     @Test
-    public void isValidMinimum() {
-        ValidationResult result = CopySourceApplicationRequest.builder()
+    public void valid() {
+        CopySourceApplicationRequest.builder()
             .name("test-name")
             .targetName("test-target-name")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidNoName() {
-        ValidationResult result = CopySourceApplicationRequest.builder()
-            .targetName("test-target-name")
-            .targetOrganization("test-target-organization")
-            .targetSpace("test-target-space")
-            .restart(true)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoSpace() {
-        ValidationResult result = CopySourceApplicationRequest.builder()
-            .name("test-name")
-            .targetName("test-target-name")
-            .targetOrganization("test-target-organization")
-            .restart(true)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("target space must be specified with target organization", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoTargetName() {
-        ValidationResult result = CopySourceApplicationRequest.builder()
-            .name("test-name")
-            .targetOrganization("test-target-organization")
-            .targetSpace("test-target-space")
-            .restart(true)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("target application name must be specified", result.getMessages().get(0));
+            .build();
     }
 
 }

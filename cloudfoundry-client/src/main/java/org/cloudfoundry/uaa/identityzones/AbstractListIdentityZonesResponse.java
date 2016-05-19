@@ -39,12 +39,6 @@ abstract class AbstractListIdentityZonesResponse {
      */
     abstract List<IdentityZone> getIdentityZones();
 
-    @JsonDeserialize
-    @Value.Immutable
-    static abstract class AbstractIdentityZone extends org.cloudfoundry.uaa.identityzones.AbstractIdentityZone {
-
-    }
-
     static final class ListIdentityZonesResponseDeserializer extends StdDeserializer<ListIdentityZonesResponse> {
 
         private static final long serialVersionUID = 3381296378901733925L;

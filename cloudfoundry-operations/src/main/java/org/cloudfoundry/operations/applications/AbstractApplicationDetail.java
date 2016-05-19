@@ -14,25 +14,39 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.tokens;
+package org.cloudfoundry.operations.applications;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.util.Date;
 import java.util.List;
 
 /**
- * The response from the list token keys request
+ * A Cloud Foundry Application as returned by get
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class AbstractListTokenKeysResponse {
+abstract class AbstractApplicationDetail extends AbstractAbstractApplicationSummary {
 
     /**
-     * The token keys
+     * The buildpack, if any, used to stage this application
      */
-    @JsonProperty("keys")
-    abstract List<TokenKey> getKeys();
+    @Nullable
+    abstract String getBuildpack();
+
+    /**
+     * The list of instances
+     */
+    abstract List<InstanceDetail> getInstanceDetails();
+
+    /**
+     * The time the application was last updated
+     */
+    abstract Date getLastUploaded();
+
+    /**
+     * The name of the stack running the application
+     */
+    abstract String getStack();
 
 }

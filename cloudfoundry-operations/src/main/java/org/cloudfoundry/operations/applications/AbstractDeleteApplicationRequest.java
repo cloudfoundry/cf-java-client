@@ -16,36 +16,24 @@
 
 package org.cloudfoundry.operations.applications;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
 /**
  * The request options for the delete application operation
  */
-@Data
-public final class DeleteApplicationRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractDeleteApplicationRequest {
 
-    private final Boolean deleteRoutes;
+    /**
+     * Whether to delete mapped routes
+     */
+    @Nullable
+    abstract Boolean getDeleteRoutes();
 
-    private final String name;
-
-    @Builder
-    DeleteApplicationRequest(String name, Boolean deleteRoutes) {
-        this.name = name;
-        this.deleteRoutes = deleteRoutes;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.name == null) {
-            builder.message("name must be specified");
-        }
-
-        return builder.build();
-    }
+    /**
+     * The application name
+     */
+    abstract String getName();
 
 }

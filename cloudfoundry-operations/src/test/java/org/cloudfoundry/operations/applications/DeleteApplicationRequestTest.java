@@ -16,44 +16,22 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class DeleteApplicationRequestTest {
 
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        DeleteApplicationRequest.builder()
+            .build();
+    }
+
     @Test
-    public void isValid() {
-        ValidationResult result = DeleteApplicationRequest.builder()
+    public void valid() {
+        DeleteApplicationRequest.builder()
             .name("test-name")
             .deleteRoutes(true)
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidNoDeleteRoutes() {
-        ValidationResult result = DeleteApplicationRequest.builder()
-            .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidNoName() {
-        ValidationResult result = DeleteApplicationRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+            .build();
     }
 
 }

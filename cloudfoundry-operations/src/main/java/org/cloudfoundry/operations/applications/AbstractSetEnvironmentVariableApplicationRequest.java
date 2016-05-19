@@ -16,33 +16,27 @@
 
 package org.cloudfoundry.operations.applications;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
- * The request options for the get application operation
+ * The request options for the set environment variable of an application operation
  */
-@Data
-public final class GetApplicationRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractSetEnvironmentVariableApplicationRequest {
 
-    private final String name;
+    /**
+     * The application name
+     */
+    abstract String getName();
 
-    @Builder
-    GetApplicationRequest(String name) {
-        this.name = name;
-    }
+    /**
+     * The variable name
+     */
+    abstract String getVariableName();
 
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.name == null) {
-            builder.message("name must be specified");
-        }
-
-        return builder.build();
-    }
+    /**
+     * The variable value
+     */
+    abstract String getVariableValue();
 
 }

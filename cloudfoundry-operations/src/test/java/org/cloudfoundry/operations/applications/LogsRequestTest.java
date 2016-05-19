@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class LogsRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = LogsRequest.builder()
-            .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        LogsRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValidNoName() {
-        ValidationResult result = LogsRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+    public void valid() {
+        LogsRequest.builder()
+            .name("test-name")
+            .build();
     }
 
 }

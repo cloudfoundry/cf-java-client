@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class SetApplicationHealthCheckRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = SetApplicationHealthCheckRequest.builder()
-            .name("test-name")
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        SetApplicationHealthCheckRequest.builder()
             .type(ApplicationHealthCheck.NONE)
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noType() {
+        SetApplicationHealthCheckRequest.builder()
+            .name("test-name")
+            .build();
     }
 
     @Test
-    public void isValidNoName() {
-        ValidationResult result = SetApplicationHealthCheckRequest.builder()
-            .type(ApplicationHealthCheck.NONE)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoType() {
-        ValidationResult result = SetApplicationHealthCheckRequest.builder()
+    public void valid() {
+        SetApplicationHealthCheckRequest.builder()
             .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("type must be specified", result.getMessages().get(0));
+            .type(ApplicationHealthCheck.NONE)
+            .build();
     }
 
 }

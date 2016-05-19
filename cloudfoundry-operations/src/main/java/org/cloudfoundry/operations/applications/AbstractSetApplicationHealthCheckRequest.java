@@ -16,38 +16,22 @@
 
 package org.cloudfoundry.operations.applications;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
  * The request options for the get health check operation
  */
-@Data
-public final class GetApplicationHealthCheckRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractSetApplicationHealthCheckRequest {
 
     /**
      * The name of the application
-     *
-     * @param name the name of the application
-     * @return the name of the application
      */
-    private final String name;
+    abstract String getName();
 
-    @Builder
-    GetApplicationHealthCheckRequest(String name) {
-        this.name = name;
-    }
+    /**
+     * The health check type
+     */
+    abstract ApplicationHealthCheck getType();
 
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.name == null) {
-            builder.message("name must be specified");
-        }
-
-        return builder.build();
-    }
 }

@@ -14,16 +14,34 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.identityzones;
+package org.cloudfoundry.operations.applications;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.time.Duration;
+
 /**
- * The resource response payload for the Get Identity Zone Response
+ * The request options for the restage application operation
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class AbstractGetIdentityZoneResponse extends AbstractAbstractIdentityZone {
+abstract class AbstractRestageApplicationRequest {
+
+    /**
+     * The name of the application
+     */
+    abstract String getName();
+
+    /**
+     * How long to wait for staging
+     */
+    @Nullable
+    abstract Duration getStagingTimeout();
+
+    /**
+     * How long to wait for startup
+     */
+    @Nullable
+    abstract Duration getStartupTimeout();
 
 }

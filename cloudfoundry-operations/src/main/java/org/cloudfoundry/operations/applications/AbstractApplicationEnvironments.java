@@ -14,16 +14,36 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.identityzones;
+package org.cloudfoundry.operations.applications;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
+import java.util.Map;
+
 /**
- * The resource response payload for the Get Identity Zone Response
+ * An environment of an application
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class AbstractGetIdentityZoneResponse extends AbstractAbstractIdentityZone {
+abstract class AbstractApplicationEnvironments {
+
+    /**
+     * The running environment variables
+     */
+    abstract Map<String, Object> getRunning();
+
+    /**
+     * The staging environment variables
+     */
+    abstract Map<String, Object> getStaging();
+
+    /**
+     * The system provided environment variables
+     */
+    abstract Map<String, Object> getSystemProvided();
+
+    /**
+     * The user defined environment variables
+     */
+    abstract Map<String, Object> getUserProvided();
 
 }

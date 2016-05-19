@@ -594,7 +594,7 @@ public final class DefaultApplications implements Applications {
             .otherwise(ExceptionUtils.replace(CF_APP_STOPPED_STATS_ERROR, () -> Mono.just(ApplicationStatisticsResponse.builder().build())));
     }
 
-    private static Mono<Tuple6<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse, List<ApplicationDetail.InstanceDetail>, List<String>>>
+    private static Mono<Tuple6<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse, List<InstanceDetail>, List<String>>>
     getAuxiliaryContent(CloudFoundryClient cloudFoundryClient, AbstractApplicationResource applicationResource) {
 
         String applicationId = ResourceUtils.getId(applicationResource);
@@ -1195,7 +1195,7 @@ public final class DefaultApplications implements Applications {
 
     private static ApplicationDetail toApplicationDetail(ApplicationStatisticsResponse applicationStatisticsResponse, SummaryApplicationResponse summaryApplicationResponse,
                                                          GetStackResponse getStackResponse, ApplicationInstancesResponse applicationInstancesResponse,
-                                                         List<ApplicationDetail.InstanceDetail> instanceDetails, List<String> urls) {
+                                                         List<InstanceDetail> instanceDetails, List<String> urls) {
         return ApplicationDetail.builder()
             .buildpack(getBuildpack(summaryApplicationResponse))
             .diskQuota(summaryApplicationResponse.getDiskQuota())
@@ -1222,7 +1222,7 @@ public final class DefaultApplications implements Applications {
     }
 
     private static Mono<ApplicationManifest> toApplicationManifest(SummaryApplicationResponse response, String stackName) {
-        ApplicationManifest.ApplicationManifestBuilder manifestBuilder = ApplicationManifest.builder()
+        ApplicationManifest.Builder manifestBuilder = ApplicationManifest.builder()
             .buildpack(response.getBuildpack())
             .command(response.getCommand())
             .disk(response.getDiskQuota())
@@ -1282,12 +1282,12 @@ public final class DefaultApplications implements Applications {
         }
     }
 
-    private static ApplicationDetail.InstanceDetail toInstanceDetail(Map.Entry<String, ApplicationInstanceInfo> entry, ApplicationStatisticsResponse statisticsResponse) {
+    private static InstanceDetail toInstanceDetail(Map.Entry<String, ApplicationInstanceInfo> entry, ApplicationStatisticsResponse statisticsResponse) {
         ApplicationStatisticsResponse.InstanceStats instanceStats = Optional.ofNullable(statisticsResponse.get(entry.getKey())).orElse(emptyInstanceStats());
         ApplicationStatisticsResponse.InstanceStats.Statistics stats = Optional.ofNullable(instanceStats.getStatistics()).orElse(emptyApplicationStatistics());
         ApplicationStatisticsResponse.InstanceStats.Statistics.Usage usage = Optional.ofNullable(stats.getUsage()).orElse(emptyApplicationUsage());
 
-        return ApplicationDetail.InstanceDetail.builder()
+        return InstanceDetail.builder()
             .state(entry.getValue().getState())
             .since(toDate(entry.getValue().getSince()))
             .cpu(usage.getCpu())
@@ -1298,7 +1298,7 @@ public final class DefaultApplications implements Applications {
             .build();
     }
 
-    private static Mono<List<ApplicationDetail.InstanceDetail>> toInstanceDetailList(ApplicationInstancesResponse instancesResponse, ApplicationStatisticsResponse statisticsResponse) {
+    private static Mono<List<InstanceDetail>> toInstanceDetailList(ApplicationInstancesResponse instancesResponse, ApplicationStatisticsResponse statisticsResponse) {
         return Flux
             .fromIterable(instancesResponse.entrySet())
             .map(entry -> toInstanceDetail(entry, statisticsResponse))

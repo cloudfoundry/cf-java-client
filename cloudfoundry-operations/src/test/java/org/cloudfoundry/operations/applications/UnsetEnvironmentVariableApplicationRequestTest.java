@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class UnsetEnvironmentVariableApplicationRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = UnsetEnvironmentVariableApplicationRequest.builder()
-            .name("test-name")
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        UnsetEnvironmentVariableApplicationRequest.builder()
             .variableName("test-variable-name")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noVariableName() {
+        UnsetEnvironmentVariableApplicationRequest.builder()
+            .name("test-name")
+            .build();
     }
 
     @Test
-    public void isValidNoName() {
-        ValidationResult result = UnsetEnvironmentVariableApplicationRequest.builder()
-            .variableName("test-variable-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoVariableName() {
-        ValidationResult result = UnsetEnvironmentVariableApplicationRequest.builder()
+    public void valid() {
+        UnsetEnvironmentVariableApplicationRequest.builder()
             .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("variable name must be specified", result.getMessages().get(0));
+            .variableName("test-variable-name")
+            .build();
     }
 
 }

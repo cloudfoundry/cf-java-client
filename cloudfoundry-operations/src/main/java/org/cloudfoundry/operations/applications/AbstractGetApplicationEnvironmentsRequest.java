@@ -16,33 +16,17 @@
 
 package org.cloudfoundry.operations.applications;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
- * The request options for the get application manifest operation
+ * The request options for the get application environments operation
  */
-@Data
-public final class GetApplicationManifestRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractGetApplicationEnvironmentsRequest {
 
-    private final String name;
-
-    @Builder
-    GetApplicationManifestRequest(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.name == null) {
-            builder.message("name must be specified");
-        }
-
-        return builder.build();
-    }
+    /**
+     * The application name
+     */
+    abstract String getName();
 
 }

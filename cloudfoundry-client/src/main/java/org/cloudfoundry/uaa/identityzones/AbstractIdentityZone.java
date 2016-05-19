@@ -16,53 +16,11 @@
 
 package org.cloudfoundry.uaa.identityzones;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
-/**
- * The entity response payload for Identity Zone
- */
-abstract class AbstractIdentityZone {
-
-    /**
-     * The creation date of the identity zone
-     */
-    @JsonProperty("created")
-    abstract Long getCreatedAt();
-
-    /**
-     * The description of the identity zone
-     */
-    @JsonProperty("description")
-    abstract String getDescription();
-
-    /**
-     * The id of the identity zone
-     */
-    @JsonProperty("id")
-    abstract String getId();
-
-    /**
-     * The last modification date of the identity zone
-     */
-    @JsonProperty("last_modified")
-    abstract Long getLastModified();
-
-    /**
-     * The name of the identity zone
-     */
-    @JsonProperty("name")
-    abstract String getName();
-
-    /**
-     * The unique sub domain. It will be converted into lowercase upon creation.
-     */
-    @JsonProperty("subdomain")
-    abstract String getSubdomain();
-
-    /**
-     * The version of the identity zone.
-     */
-    @JsonProperty("version")
-    abstract Integer getVersion();
+@JsonDeserialize
+@Value.Immutable
+abstract class AbstractIdentityZone extends AbstractAbstractIdentityZone {
 
 }

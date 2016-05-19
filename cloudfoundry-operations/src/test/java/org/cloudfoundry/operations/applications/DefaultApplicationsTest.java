@@ -96,7 +96,6 @@ import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
 import org.cloudfoundry.util.DateUtils;
-import org.cloudfoundry.util.RequestValidationException;
 import org.cloudfoundry.util.StringMap;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
@@ -108,6 +107,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Map;
@@ -1127,26 +1127,6 @@ public final class DefaultApplicationsTest {
                     .build()));
     }
 
-    public static final class CopySourceInvalid extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .assertError(RequestValidationException.class, "Request is invalid: target application name must be specified");
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .copySource(CopySourceApplicationRequest.builder()
-                    .name("test-application-name")
-                    .build());
-        }
-
-    }
-
     public static final class CopySourceNoRestartOrgSpace extends AbstractOperationsApiTest<Void> {
 
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
@@ -1589,7 +1569,7 @@ public final class DefaultApplicationsTest {
                 .assertEquals(fill(ApplicationDetail.builder())
                     .buildpack("test-application-summary-buildpack")
                     .id("test-application-summary-id")
-                    .instanceDetail(fill(ApplicationDetail.InstanceDetail.builder())
+                    .instanceDetail(fill(InstanceDetail.builder())
                         .since(new Date(1000))
                         .state("test-application-instance-info-state")
                         .build())
@@ -1629,6 +1609,7 @@ public final class DefaultApplicationsTest {
                 .command("test-application-summary-command")
                 .disk(1)
                 .domain("test-domain-name")
+                .environmentVariables(Collections.emptyMap())
                 .host("test-route-host")
                 .instances(1)
                 .memory(1)
@@ -1644,25 +1625,6 @@ public final class DefaultApplicationsTest {
             return this.applications
                 .getApplicationManifest(GetApplicationManifestRequest.builder()
                     .name("test-app")
-                    .build());
-        }
-
-    }
-
-    public static final class GetApplicationManifestInvalidRequest extends AbstractOperationsApiTest<ApplicationManifest> {
-
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Override
-        protected void assertions(TestSubscriber<ApplicationManifest> testSubscriber) {
-            testSubscriber.
-                assertError(RequestValidationException.class, "Request is invalid: name must be specified");
-        }
-
-        @Override
-        protected Mono<ApplicationManifest> invoke() {
-            return this.applications
-                .getApplicationManifest(GetApplicationManifestRequest.builder()
                     .build());
         }
 
@@ -1685,6 +1647,7 @@ public final class DefaultApplicationsTest {
                 .buildpack("test-application-summary-buildpack")
                 .command("test-application-summary-command")
                 .disk(1)
+                .environmentVariables(Collections.emptyMap())
                 .instances(1)
                 .memory(1)
                 .name("test-application-summary-name")
@@ -1722,7 +1685,7 @@ public final class DefaultApplicationsTest {
                 .assertEquals(fill(ApplicationDetail.builder())
                     .buildpack("test-application-summary-detectedBuildpack")
                     .id("test-application-summary-id")
-                    .instanceDetail(fill(ApplicationDetail.InstanceDetail.builder())
+                    .instanceDetail(fill(InstanceDetail.builder())
                         .since(new Date(1000))
                         .state("test-application-instance-info-state")
                         .build())
@@ -2029,25 +1992,6 @@ public final class DefaultApplicationsTest {
 
     }
 
-    public static final class GetHealthCheckInvalidRequest extends AbstractOperationsApiTest<ApplicationHealthCheck> {
-
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Override
-        protected void assertions(TestSubscriber<ApplicationHealthCheck> testSubscriber) {
-            testSubscriber.
-                assertError(RequestValidationException.class, "Request is invalid: name must be specified");
-        }
-
-        @Override
-        protected Mono<ApplicationHealthCheck> invoke() {
-            return this.applications
-                .getHealthCheck(GetApplicationHealthCheckRequest.builder()
-                    .build());
-        }
-
-    }
-
     public static final class GetInstancesError extends AbstractOperationsApiTest<ApplicationDetail> {
 
         private static final int CF_INSTANCES_ERROR = 220001;
@@ -2106,7 +2050,7 @@ public final class DefaultApplicationsTest {
                 .assertEquals(fill(ApplicationDetail.builder())
                     .buildpack(null)
                     .id("test-application-summary-id")
-                    .instanceDetail(fill(ApplicationDetail.InstanceDetail.builder())
+                    .instanceDetail(fill(InstanceDetail.builder())
                         .since(new Date(1000))
                         .state("test-application-instance-info-state")
                         .build())
@@ -2188,7 +2132,7 @@ public final class DefaultApplicationsTest {
                 .assertEquals(fill(ApplicationDetail.builder())
                     .buildpack("test-application-summary-buildpack")
                     .id("test-application-summary-id")
-                    .instanceDetail(ApplicationDetail.InstanceDetail.builder()
+                    .instanceDetail(InstanceDetail.builder()
                         .since(new Date(1000))
                         .state("test-application-instance-info-state")
                         .build())
@@ -2229,7 +2173,7 @@ public final class DefaultApplicationsTest {
                 .assertEquals(fill(ApplicationDetail.builder())
                     .buildpack("test-application-summary-buildpack")
                     .id("test-application-summary-id")
-                    .instanceDetail(fill(ApplicationDetail.InstanceDetail.builder())
+                    .instanceDetail(fill(InstanceDetail.builder())
                         .state(null)
                         .build())
                     .lastUploaded(new Date(0))
@@ -2269,7 +2213,7 @@ public final class DefaultApplicationsTest {
                 .assertEquals(fill(ApplicationDetail.builder())
                     .buildpack("test-application-summary-buildpack")
                     .id("test-application-summary-id")
-                    .instanceDetail(ApplicationDetail.InstanceDetail.builder()
+                    .instanceDetail(InstanceDetail.builder()
                         .since(new Date(1000))
                         .state("test-application-instance-info-state")
                         .build())
@@ -2347,7 +2291,7 @@ public final class DefaultApplicationsTest {
                 .assertEquals(fill(ApplicationDetail.builder())
                     .buildpack("test-application-summary-buildpack")
                     .id("test-application-summary-id")
-                    .instanceDetail(ApplicationDetail.InstanceDetail.builder()
+                    .instanceDetail(InstanceDetail.builder()
                         .since(new Date(1000))
                         .state("test-application-instance-info-state")
                         .build())
@@ -2388,7 +2332,7 @@ public final class DefaultApplicationsTest {
                 .assertEquals(fill(ApplicationDetail.builder())
                     .buildpack("test-application-summary-buildpack")
                     .id("test-application-summary-id")
-                    .instanceDetail(ApplicationDetail.InstanceDetail.builder()
+                    .instanceDetail(InstanceDetail.builder()
                         .diskQuota(1L)
                         .memoryQuota(1L)
                         .since(new Date(1000))
@@ -2704,25 +2648,6 @@ public final class DefaultApplicationsTest {
         protected Mono<Void> invoke() {
             return this.applications
                 .push(this.pushApplicationRequest);
-        }
-
-    }
-
-    public static final class PushInvalid extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .assertError(RequestValidationException.class, "Request is invalid: name must be specified, application bits must be specified");
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .push(PushApplicationRequest.builder()
-                    .build());
         }
 
     }
@@ -3709,7 +3634,7 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STOPPED");
-            requestUpdateApplicationScale(this.cloudFoundryClient, "test-application-id", 2, 2, null);
+            requestUpdateApplicationScale(this.cloudFoundryClient, "test-application-id", 2048, 2, null);
         }
 
         @Override
@@ -3723,7 +3648,7 @@ public final class DefaultApplicationsTest {
                 .scale(ScaleApplicationRequest.builder()
                     .name("test-app-name")
                     .instances(2)
-                    .diskLimit("2m")
+                    .diskLimit(2048)
                     .build());
         }
 
@@ -3736,7 +3661,7 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STARTED");
-            requestUpdateApplicationScale(this.cloudFoundryClient, "test-application-id", 2, 2, null);
+            requestUpdateApplicationScale(this.cloudFoundryClient, "test-application-id", 2048, 2, null);
             requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
             requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         }
@@ -3752,7 +3677,7 @@ public final class DefaultApplicationsTest {
                 .scale(ScaleApplicationRequest.builder()
                     .name("test-app-name")
                     .instances(2)
-                    .diskLimit("2m")
+                    .diskLimit(2048)
                     .build());
         }
 
@@ -3919,26 +3844,6 @@ public final class DefaultApplicationsTest {
                 .setHealthCheck(SetApplicationHealthCheckRequest.builder()
                     .name("test-application-name")
                     .type(ApplicationHealthCheck.PORT)
-                    .build());
-        }
-
-    }
-
-    public static final class SetHealthCheckInvalidRequest extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber.
-                assertError(RequestValidationException.class, "Request is invalid: type must be specified");
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .setHealthCheck(SetApplicationHealthCheckRequest.builder()
-                    .name("test-application-name")
                     .build());
         }
 

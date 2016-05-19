@@ -16,33 +16,41 @@
 
 package org.cloudfoundry.operations.applications;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
+
+import java.util.Date;
 
 /**
- * The request options for the get application environments operation
+ * An event of an application
  */
-@Data
-public final class GetApplicationEnvironmentsRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractApplicationEvent {
 
-    private final String name;
+    /**
+     * The actor
+     */
+    abstract String getActor();
 
-    @Builder
-    GetApplicationEnvironmentsRequest(String name) {
-        this.name = name;
-    }
+    /**
+     * The description
+     */
+    abstract String getDescription();
 
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
+    /**
+     * The event
+     */
+    abstract String getEvent();
 
-        if (this.name == null) {
-            builder.message("name must be specified");
-        }
+    /**
+     * The id
+     */
+    abstract String getId();
 
-        return builder.build();
-    }
+    /**
+     * The time
+     */
+    @Nullable
+    abstract Date getTime();
 
 }

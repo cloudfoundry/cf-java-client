@@ -16,51 +16,35 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
-
 public final class PushApplicationRequestTest {
 
     private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-    @Test
-    public void isValid() {
-        ValidationResult result = PushApplicationRequest.builder()
-            .application(this.applicationBits)
+    @Test(expected = IllegalStateException.class)
+    public void noApplication() {
+        PushApplicationRequest.builder()
             .name("test-name")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        PushApplicationRequest.builder()
+            .application(this.applicationBits)
+            .build();
     }
 
     @Test
-    public void isValidNoApplicationBits() {
-        ValidationResult result = PushApplicationRequest.builder()
-            .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application bits must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoName() {
-        ValidationResult result = PushApplicationRequest.builder()
+    public void valid() {
+        PushApplicationRequest.builder()
             .application(this.applicationBits)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+            .name("test-name")
+            .build();
     }
 
 }

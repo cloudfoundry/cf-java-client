@@ -16,33 +16,17 @@
 
 package org.cloudfoundry.operations.applications;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
- * The request options for the enable application ssh operation
+ * The request options for the disable application ssh operation
  */
-@Data
-public final class EnableApplicationSshRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractDisableApplicationSshRequest {
 
-    private final String name;
-
-    @Builder
-    EnableApplicationSshRequest(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.name == null) {
-            builder.message("name must be specified");
-        }
-
-        return builder.build();
-    }
+    /**
+     * The application name
+     */
+    abstract String getName();
 
 }

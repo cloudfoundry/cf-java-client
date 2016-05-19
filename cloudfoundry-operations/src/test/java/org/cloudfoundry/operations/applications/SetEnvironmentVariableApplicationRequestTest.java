@@ -16,61 +16,41 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class SetEnvironmentVariableApplicationRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = SetEnvironmentVariableApplicationRequest.builder()
-            .name("test-name")
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        SetEnvironmentVariableApplicationRequest.builder()
             .variableName("test-variable-name")
             .variableValue("test-variable-value")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noVariableName() {
+        SetEnvironmentVariableApplicationRequest.builder()
+            .name("test-name")
+            .variableValue("test-variable-value")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noVariableValue() {
+        SetEnvironmentVariableApplicationRequest.builder()
+            .name("test-name")
+            .variableName("test-variable-name")
+            .build();
     }
 
     @Test
-    public void isValidNoName() {
-        ValidationResult result = SetEnvironmentVariableApplicationRequest.builder()
-            .variableName("test-variable-name")
-            .variableValue("test-variable-value")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoVariableName() {
-        ValidationResult result = SetEnvironmentVariableApplicationRequest.builder()
-            .name("test-name")
-            .variableValue("test-variable-value")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("variable name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoVariableValue() {
-        ValidationResult result = SetEnvironmentVariableApplicationRequest.builder()
+    public void valid() {
+        SetEnvironmentVariableApplicationRequest.builder()
             .name("test-name")
             .variableName("test-variable-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("variable value must be specified", result.getMessages().get(0));
+            .variableValue("test-variable-value")
+            .build();
     }
 
 }

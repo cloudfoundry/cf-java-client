@@ -16,8 +16,6 @@
 
 package org.cloudfoundry.operations.applications;
 
-import lombok.ToString;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,7 +25,6 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@ToString
 final class WordListRandomWords implements RandomWords {
 
     private final List<String> adjectives;
