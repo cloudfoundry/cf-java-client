@@ -16,80 +16,56 @@
 
 package org.cloudfoundry.operations.buildpacks;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
-
 public class CreateBuildpackRequestTest {
 
-    @Test
-    public void isNotValidNoBuildpack() {
-        ValidationResult result = CreateBuildpackRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noBuildpack() {
+        CreateBuildpackRequest.builder()
             .fileName("test-file-name")
             .name("test-name")
             .position(0)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("buildpack must be specified", result.getMessages().get(0));
+            .build();
     }
 
-    @Test
-    public void isNotValidNoFilename() {
-        ValidationResult result = CreateBuildpackRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noFilename() {
+        CreateBuildpackRequest.builder()
             .buildpack(new ByteArrayInputStream(new byte[0]))
             .name("test-name")
             .position(0)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("file name must be specified", result.getMessages().get(0));
+            .build();
     }
 
-    @Test
-    public void isNotValidNoName() {
-        ValidationResult result = CreateBuildpackRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        CreateBuildpackRequest.builder()
             .buildpack(new ByteArrayInputStream(new byte[0]))
             .fileName("test-file-name")
             .position(0)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+            .build();
     }
 
-    @Test
-    public void isNotValidNoPosition() {
-        ValidationResult result = CreateBuildpackRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noPosition() {
+        CreateBuildpackRequest.builder()
             .buildpack(new ByteArrayInputStream(new byte[0]))
             .fileName("test-file-name")
             .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("position must be specified", result.getMessages().get(0));
+            .build();
     }
 
     @Test
-    public void isValid() {
-        ValidationResult result = CreateBuildpackRequest.builder()
+    public void valid() {
+        CreateBuildpackRequest.builder()
             .buildpack(new ByteArrayInputStream(new byte[0]))
             .fileName("test-file-name")
             .name("test-name")
             .position(0)
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

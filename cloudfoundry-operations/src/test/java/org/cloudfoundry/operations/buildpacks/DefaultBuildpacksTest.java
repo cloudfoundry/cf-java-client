@@ -23,7 +23,6 @@ import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksResponse;
 import org.cloudfoundry.client.v2.buildpacks.UploadBuildpackResponse;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.cloudfoundry.util.RequestValidationException;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
@@ -109,28 +108,6 @@ public final class DefaultBuildpacksTest {
                     .name(BUILDPACK_NAME)
                     .enable(ENABLE)
                     .position(POSITION)
-                    .build());
-        }
-
-    }
-
-    public static final class CreateInvalid extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultBuildpacks buildpacks = new DefaultBuildpacks(this.cloudFoundryClient);
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .assertError(RequestValidationException.class, "Request is invalid: buildpack must be specified");
-        }
-
-        @Override
-        protected Publisher<Void> invoke() {
-            return this.buildpacks
-                .create(CreateBuildpackRequest.builder()
-                    .fileName("test-file-name")
-                    .name("test-name")
-                    .position(0)
                     .build());
         }
 
