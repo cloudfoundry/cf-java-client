@@ -24,6 +24,7 @@ import lombok.Getter;
 import lombok.ToString;
 import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
+import org.cloudfoundry.client.v2.OrderDirection;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 
 /**

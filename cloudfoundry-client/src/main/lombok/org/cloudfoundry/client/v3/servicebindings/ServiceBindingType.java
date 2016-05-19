@@ -14,16 +14,34 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.tokens;
+package org.cloudfoundry.client.v3.servicebindings;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.immutables.value.Value;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * The response from the get token by client credentials operation
+ * The service binding type of the {@link CreateServiceBindingRequest}
  */
-@JsonDeserialize
-@Value.Immutable
-abstract class AbstractGetTokenByClientCredentialsResponse extends AbstractToken {
+public enum ServiceBindingType {
+
+    /**
+     * Indicates that the service binding is to an application
+     */
+    APPLICATION("app");
+
+    private final String value;
+
+    ServiceBindingType(String value) {
+        this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+        return this.value;
+    }
+
+    @Override
+    public String toString() {
+        return getValue();
+    }
 
 }

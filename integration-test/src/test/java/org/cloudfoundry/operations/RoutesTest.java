@@ -30,8 +30,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 
-import static org.cloudfoundry.operations.routes.ListRoutesRequest.Level.ORGANIZATION;
-import static org.cloudfoundry.operations.routes.ListRoutesRequest.Level.SPACE;
+import static org.cloudfoundry.operations.routes.Level.ORGANIZATION;
+import static org.cloudfoundry.operations.routes.Level.SPACE;
 
 public final class RoutesTest extends AbstractIntegrationTest {
 

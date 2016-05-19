@@ -22,7 +22,7 @@ import org.immutables.value.Value;
 /**
  * The resource response payload for the Delete Identity Zone Response
  */
-@JsonDeserialize(as = DeleteIdentityZoneResponse.class)
+@JsonDeserialize
 @Value.Immutable
 abstract class AbstractDeleteIdentityZoneResponse extends AbstractIdentityZone {
 

@@ -31,7 +31,6 @@ import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainEntity;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
-import org.cloudfoundry.operations.domains.Domain.Status;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;

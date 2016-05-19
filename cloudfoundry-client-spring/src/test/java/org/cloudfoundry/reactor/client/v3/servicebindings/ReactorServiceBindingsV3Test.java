@@ -41,7 +41,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.client.v3.PaginatedResponse.Pagination;
-import static org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingRequest.ServiceBindingType.APP;
+import static org.cloudfoundry.client.v3.servicebindings.ServiceBindingType.APPLICATION;
 
 public final class ReactorServiceBindingsV3Test {
 
@@ -103,7 +103,7 @@ public final class ReactorServiceBindingsV3Test {
                         .id("8bfe4c1b-9e18-45b1-83be-124163f31f9e")
                         .build())
                     .build())
-                .type(APP)
+                .type(APPLICATION)
                 .build();
         }
 

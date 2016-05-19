@@ -960,7 +960,7 @@ public final class DefaultRoutesTest {
         protected Publisher<Route> invoke() {
             return this.routes
                 .list(ListRoutesRequest.builder()
-                    .level(ListRoutesRequest.Level.ORGANIZATION)
+                    .level(Level.ORGANIZATION)
                     .build());
         }
     }
@@ -979,7 +979,7 @@ public final class DefaultRoutesTest {
         protected Publisher<Route> invoke() {
             return this.routes
                 .list(ListRoutesRequest.builder()
-                    .level(ListRoutesRequest.Level.ORGANIZATION)
+                    .level(Level.ORGANIZATION)
                     .build());
         }
     }
@@ -1013,7 +1013,7 @@ public final class DefaultRoutesTest {
         protected Publisher<Route> invoke() {
             return this.routes
                 .list(ListRoutesRequest.builder()
-                    .level(ListRoutesRequest.Level.ORGANIZATION)
+                    .level(Level.ORGANIZATION)
                     .build());
         }
     }
@@ -1039,7 +1039,7 @@ public final class DefaultRoutesTest {
         protected Publisher<Route> invoke() {
             return this.routes
                 .list(ListRoutesRequest.builder()
-                    .level(ListRoutesRequest.Level.ORGANIZATION)
+                    .level(Level.ORGANIZATION)
                     .build());
         }
     }
@@ -1074,7 +1074,7 @@ public final class DefaultRoutesTest {
         protected Publisher<Route> invoke() {
             return this.routes
                 .list(ListRoutesRequest.builder()
-                    .level(ListRoutesRequest.Level.SPACE)
+                    .level(Level.SPACE)
                     .build());
         }
     }
@@ -1109,7 +1109,7 @@ public final class DefaultRoutesTest {
         protected Publisher<Route> invoke() {
             return this.routes
                 .list(ListRoutesRequest.builder()
-                    .level(ListRoutesRequest.Level.SPACE)
+                    .level(Level.SPACE)
                     .build());
         }
     }
@@ -1128,7 +1128,7 @@ public final class DefaultRoutesTest {
         protected Publisher<Route> invoke() {
             return this.routes
                 .list(ListRoutesRequest.builder()
-                    .level(ListRoutesRequest.Level.SPACE)
+                    .level(Level.SPACE)
                     .build());
         }
     }
@@ -1147,7 +1147,7 @@ public final class DefaultRoutesTest {
         protected Publisher<Route> invoke() {
             return this.routes
                 .list(ListRoutesRequest.builder()
-                    .level(ListRoutesRequest.Level.SPACE)
+                    .level(Level.SPACE)
                     .build());
         }
     }

@@ -23,7 +23,7 @@ import org.immutables.value.Value;
 /**
  * The response from the get token by authorization code request
  */
-@JsonDeserialize(as = GetTokenByAuthorizationCodeResponse.class)
+@JsonDeserialize
 @Value.Immutable
 abstract class AbstractGetTokenByAuthorizationCodeResponse extends AbstractToken {
 

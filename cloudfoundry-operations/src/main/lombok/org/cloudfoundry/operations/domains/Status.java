@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.tokens;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.immutables.value.Value;
+package org.cloudfoundry.operations.domains;
 
 /**
- * The response from the get token by client credentials operation
+ * The statuses of domains
  */
-@JsonDeserialize
-@Value.Immutable
-abstract class AbstractGetTokenByClientCredentialsResponse extends AbstractToken {
+public enum Status {
+
+    /**
+     * Domain is privately owned
+     */
+    OWNED,
+
+    /**
+     * Domain is shared
+     */
+    SHARED
 
 }

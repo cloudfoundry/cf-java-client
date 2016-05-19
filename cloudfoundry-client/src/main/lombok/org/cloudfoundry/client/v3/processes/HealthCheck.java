@@ -16,9 +16,7 @@
 
 package org.cloudfoundry.client.v3.processes;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -53,40 +51,6 @@ public final class HealthCheck {
 
         this.datas = datas;
         this.type = type;
-    }
-
-    /**
-     * The type of a {@link HealthCheck}
-     */
-    public enum Type {
-
-        /**
-         * A port health check
-         */
-        PORT,
-
-        /**
-         * A process health check
-         */
-        PROCESS;
-
-        @JsonValue
-        @Override
-        public String toString() {
-            return name().toLowerCase();
-        }
-
-        @JsonCreator
-        static Type fromString(String s) {
-            if (PORT.toString().equals(s)) {
-                return PORT;
-            } else if (PROCESS.toString().equals(s)) {
-                return PROCESS;
-            } else {
-                throw new IllegalArgumentException(String.format("Type %s is not a valid type", s));
-            }
-        }
-
     }
 
 }

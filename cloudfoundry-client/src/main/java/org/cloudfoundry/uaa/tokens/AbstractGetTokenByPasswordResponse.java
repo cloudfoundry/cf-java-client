@@ -23,7 +23,7 @@ import org.immutables.value.Value;
 /**
  * The response from the get token by password operation
  */
-@JsonDeserialize(as = GetTokenByPasswordResponse.class)
+@JsonDeserialize
 @Value.Immutable
 abstract class AbstractGetTokenByPasswordResponse extends AbstractToken {
 

@@ -33,7 +33,6 @@ import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.cloudfoundry.operations.domains.Domain.Status;
 import org.cloudfoundry.util.RequestValidationException;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;

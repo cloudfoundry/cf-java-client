@@ -23,6 +23,7 @@ import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.Package;
+import org.cloudfoundry.client.v3.packages.PackageType;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +59,7 @@ public final class PackagesTest extends AbstractIntegrationTest {
             .then(applicationId -> this.cloudFoundryClient.packages()
                 .create(CreatePackageRequest.builder()
                     .applicationId(applicationId)
-                    .type(CreatePackageRequest.PackageType.BITS)
+                    .type(PackageType.BITS)
                     .build()))
             .map(Package::getId)
             .then(packageId -> {

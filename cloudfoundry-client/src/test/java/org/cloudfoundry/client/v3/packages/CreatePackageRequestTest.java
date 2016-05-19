@@ -21,7 +21,7 @@ import org.junit.Test;
 
 import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.cloudfoundry.client.v3.packages.CreatePackageRequest.PackageType.BITS;
+import static org.cloudfoundry.client.v3.packages.PackageType.BITS;
 import static org.junit.Assert.assertEquals;
 
 public final class CreatePackageRequestTest {

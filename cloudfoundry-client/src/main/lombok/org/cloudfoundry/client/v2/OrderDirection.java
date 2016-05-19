@@ -14,16 +14,39 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.tokens;
+package org.cloudfoundry.client.v2;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.immutables.value.Value;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * The response from the get token by client credentials operation
+ * The order direction of the {@link PaginatedRequest}
  */
-@JsonDeserialize
-@Value.Immutable
-abstract class AbstractGetTokenByClientCredentialsResponse extends AbstractToken {
+public enum OrderDirection {
+
+    /**
+     * Indicates that order should be ascending
+     */
+    ASCENDING("asc"),
+
+    /**
+     * Indicates that order should be descending
+     */
+    DESCENDING("desc");
+
+    private final String value;
+
+    OrderDirection(String value) {
+        this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+        return this.value;
+    }
+
+    @Override
+    public String toString() {
+        return getValue();
+    }
 
 }

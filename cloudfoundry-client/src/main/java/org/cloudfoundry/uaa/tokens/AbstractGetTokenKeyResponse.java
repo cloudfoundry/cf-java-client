@@ -22,7 +22,7 @@ import org.immutables.value.Value;
 /**
  * The response from the token key request
  */
-@JsonDeserialize(as = GetTokenKeyResponse.class)
+@JsonDeserialize
 @Value.Immutable
 abstract class AbstractGetTokenKeyResponse extends AbstractTokenKey {
 

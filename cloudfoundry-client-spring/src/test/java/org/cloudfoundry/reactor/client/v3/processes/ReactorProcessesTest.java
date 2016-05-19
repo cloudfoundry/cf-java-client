@@ -23,7 +23,7 @@ import org.cloudfoundry.client.v3.processes.GetProcessStatisticsResponse;
 import org.cloudfoundry.client.v3.processes.GetProcessRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessResponse;
 import org.cloudfoundry.client.v3.processes.HealthCheck;
-import org.cloudfoundry.client.v3.processes.HealthCheck.Type;
+import org.cloudfoundry.client.v3.processes.Type;
 import org.cloudfoundry.client.v3.processes.ListProcessesRequest;
 import org.cloudfoundry.client.v3.processes.ListProcessesResponse;
 import org.cloudfoundry.client.v3.processes.ProcessUsage;

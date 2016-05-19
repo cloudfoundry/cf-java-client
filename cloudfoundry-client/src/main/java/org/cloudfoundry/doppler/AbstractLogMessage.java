@@ -63,7 +63,7 @@ abstract class AbstractLogMessage implements Event {
     abstract String getSourceInstance();
 
     /**
-     * The source of the message. For Cloud Foundry, this can be {@code APP}, {@code RTR}, {@code DEA}, {@code STG}, etc.
+     * The source of the message. For Cloud Foundry, this can be {@code APPLICATION}, {@code RTR}, {@code DEA}, {@code STG}, etc.
      */
     @Nullable
     abstract String getSourceType();

@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.reactor.client.v3.packages;
 
-import okhttp3.Headers;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.PaginatedResponse.Pagination;
@@ -47,15 +46,13 @@ import reactor.core.publisher.Mono;
 
 import java.nio.charset.Charset;
 import java.util.Collections;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.cloudfoundry.client.v3.packages.CreatePackageRequest.PackageType.DOCKER;
+import static org.cloudfoundry.client.v3.packages.PackageType.DOCKER;
 import static org.cloudfoundry.client.v3.packages.ListPackagesResponse.Resource;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.junit.Assert.assertArrayEquals;

@@ -18,7 +18,6 @@ package org.cloudfoundry.client.v3.servicebindings;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Builder;
 import lombok.Getter;
 import org.cloudfoundry.Validatable;
@@ -88,24 +87,6 @@ public final class CreateServiceBindingRequest implements Validatable {
         }
 
         return builder.build();
-    }
-
-    /**
-     * The service binding type of the {@link CreateServiceBindingRequest}
-     */
-    public enum ServiceBindingType {
-
-        /**
-         * Indicates that the service binding is to an application
-         */
-        APP;
-
-        @JsonValue
-        @Override
-        public String toString() {
-            return name().toLowerCase();
-        }
-
     }
 
     @lombok.Data

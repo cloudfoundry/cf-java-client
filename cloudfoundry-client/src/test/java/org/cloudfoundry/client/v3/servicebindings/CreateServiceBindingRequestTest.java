@@ -21,7 +21,6 @@ import org.cloudfoundry.ValidationResult;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingRequest.Data;
 import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingRequest.Relationships;
-import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingRequest.ServiceBindingType;
 import org.junit.Test;
 
 import static org.cloudfoundry.ValidationResult.Status.INVALID;
@@ -83,7 +82,7 @@ public final class CreateServiceBindingRequestTest {
     @Test
     public void requestIsNotValidNoRelationships() {
         ValidationResult result = CreateServiceBindingRequest.builder()
-            .type(ServiceBindingType.APP)
+            .type(ServiceBindingType.APPLICATION)
             .build()
             .isValid();
 
@@ -120,7 +119,7 @@ public final class CreateServiceBindingRequestTest {
                     .id("test-service-instance-id")
                     .build())
                 .build())
-            .type(ServiceBindingType.APP)
+            .type(ServiceBindingType.APPLICATION)
             .build()
             .isValid();
 

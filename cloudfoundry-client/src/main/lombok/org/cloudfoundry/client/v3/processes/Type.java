@@ -14,30 +14,33 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations.applications;
+package org.cloudfoundry.client.v3.processes;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * The health check type of an application
+ * The type of a {@link HealthCheck}
  */
-
-public enum ApplicationHealthCheck {
-
-    /**
-     * No health check
-     */
-    NONE("none"),
+public enum Type {
 
     /**
-     * Port health check
+     * A port health check
      */
-    PORT("port");
+    PORT("port"),
+
+    /**
+     * A process health check
+     */
+    PROCESS("process");
 
     private final String value;
 
-    ApplicationHealthCheck(String value) {
+    Type(String value) {
         this.value = value;
     }
 
+    @JsonValue
     public String getValue() {
         return this.value;
     }
@@ -45,6 +48,18 @@ public enum ApplicationHealthCheck {
     @Override
     public String toString() {
         return getValue();
+    }
+
+    @JsonCreator
+    static Type from(String s) {
+        switch (s.toLowerCase()) {
+            case "port":
+                return PORT;
+            case "process":
+                return PROCESS;
+            default:
+                throw new IllegalArgumentException(String.format("Unknown type: %s", s));
+        }
     }
 
 }

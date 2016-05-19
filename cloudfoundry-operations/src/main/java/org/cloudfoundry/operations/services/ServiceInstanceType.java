@@ -20,17 +20,20 @@ package org.cloudfoundry.operations.services;
  * The type of a service instance
  */
 public enum ServiceInstanceType {
-    
-    MANAGED("managed_service_instance"),
-    USER_PROVIDED("user_provided_service_instance");
 
-    private String text;
+    MANAGED,
 
-    ServiceInstanceType(String text) {
-        this.text = text;
+    USER_PROVIDED;
+
+    static ServiceInstanceType from(String s) {
+        switch (s.toLowerCase()) {
+            case "managed_service_instance":
+                return MANAGED;
+            case "user_provided_service_instance":
+                return USER_PROVIDED;
+            default:
+                throw new IllegalArgumentException(String.format("Unknown service instance type: %s", s));
+        }
     }
 
-    public String getText() {
-        return this.text;
-    }
 }

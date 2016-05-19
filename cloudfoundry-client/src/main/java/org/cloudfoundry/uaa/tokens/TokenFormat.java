@@ -23,12 +23,22 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum TokenFormat {
 
-    OPAQUE;
+    OPAQUE("opaque");
+
+    private final String value;
+
+    TokenFormat(String value) {
+        this.value = value;
+    }
 
     @JsonValue
+    public String getValue() {
+        return this.value;
+    }
+
     @Override
     public String toString() {
-        return name().toLowerCase();
+        return getValue();
     }
 
 }

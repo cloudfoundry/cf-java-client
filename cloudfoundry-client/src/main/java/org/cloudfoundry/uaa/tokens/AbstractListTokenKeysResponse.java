@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * The response from the token key request
  */
-@JsonDeserialize(as = ListTokenKeysResponse.class)
+@JsonDeserialize
 @Value.Immutable
 abstract class AbstractListTokenKeysResponse {
 

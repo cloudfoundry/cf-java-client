@@ -18,7 +18,7 @@ package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.CloudFoundryException;
-import org.cloudfoundry.client.v2.PaginatedRequest;
+import org.cloudfoundry.client.v2.OrderDirection;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
@@ -406,7 +406,7 @@ public final class DefaultApplicationsTest {
                             .build())
                         .entity(fill(ApplicationEntity.builder(), "application-")
                             .environmentJsons(envResponse)
-                            .healthCheckType(ApplicationHealthCheck.PORT.getText())
+                            .healthCheckType(ApplicationHealthCheck.PORT.getValue())
                             .build())
                         .build())
                     .totalPages(1)
@@ -493,7 +493,7 @@ public final class DefaultApplicationsTest {
                 .diskQuota(request.getDiskQuota())
                 .dockerImage(request.getDockerImage())
                 .healthCheckTimeout(request.getTimeout())
-                .healthCheckType(Optional.ofNullable(request.getHealthCheckType()).map(ApplicationHealthCheck::getText).orElse(null))
+                .healthCheckType(Optional.ofNullable(request.getHealthCheckType()).map(ApplicationHealthCheck::getValue).orElse(null))
                 .instances(request.getInstances())
                 .memory(request.getMemory())
                 .name(request.getName())
@@ -559,7 +559,7 @@ public final class DefaultApplicationsTest {
         when(cloudFoundryClient.events()
             .list(ListEventsRequest.builder()
                 .actee(applicationId)
-                .orderDirection(PaginatedRequest.OrderDirection.DESC)
+                .orderDirection(OrderDirection.DESCENDING)
                 .resultsPerPage(50)
                 .page(1)
                 .build()))
@@ -1012,7 +1012,7 @@ public final class DefaultApplicationsTest {
                 .diskQuota(request.getDiskQuota())
                 .dockerImage(request.getDockerImage())
                 .healthCheckTimeout(request.getTimeout())
-                .healthCheckType(Optional.ofNullable(request.getHealthCheckType()).map(ApplicationHealthCheck::getText).orElse(null))
+                .healthCheckType(Optional.ofNullable(request.getHealthCheckType()).map(ApplicationHealthCheck::getValue).orElse(null))
                 .instances(request.getInstances())
                 .memory(request.getMemory())
                 .name(request.getName())
@@ -1043,7 +1043,7 @@ public final class DefaultApplicationsTest {
         when(cloudFoundryClient.applicationsV2()
             .update(UpdateApplicationRequest.builder()
                 .applicationId(applicationId)
-                .healthCheckType(type.getText())
+                .healthCheckType(type.getValue())
                 .build()))
             .thenReturn(Mono
                 .just(fill(UpdateApplicationResponse.builder())

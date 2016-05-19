@@ -45,18 +45,4 @@ public final class ListRoutesRequest implements Validatable {
         return ValidationResult.builder().build();
     }
 
-    public enum Level {
-
-        /**
-         * List routes for all the spaces in the current organisation
-         */
-        ORGANIZATION,
-
-        /**
-         * List routes for the current space in the current organisation
-         */
-        SPACE
-
-    }
-
 }

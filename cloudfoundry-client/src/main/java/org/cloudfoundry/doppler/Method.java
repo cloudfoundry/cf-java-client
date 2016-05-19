@@ -202,7 +202,7 @@ public enum Method {
             case VERSION_CONTROL:
                 return VERSION_CONTROL;
             default:
-                throw new IllegalArgumentException("Unknown method");
+                throw new IllegalArgumentException(String.format("Unknown method: %s", dropsonde));
         }
     }
 

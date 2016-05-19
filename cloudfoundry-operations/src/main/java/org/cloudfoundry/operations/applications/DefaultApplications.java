@@ -17,7 +17,7 @@
 package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.PaginatedRequest;
+import org.cloudfoundry.client.v2.OrderDirection;
 import org.cloudfoundry.client.v2.applications.AbstractApplicationResource;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentResponse;
@@ -886,7 +886,7 @@ public final class DefaultApplications implements Applications {
                 .diskQuota(request.getDiskQuota())
                 .dockerImage(request.getDockerImage())
                 .healthCheckTimeout(request.getTimeout())
-                .healthCheckType(Optional.ofNullable(request.getHealthCheckType()).map(ApplicationHealthCheck::getText).orElse(null))
+                .healthCheckType(Optional.ofNullable(request.getHealthCheckType()).map(ApplicationHealthCheck::getValue).orElse(null))
                 .instances(request.getInstances())
                 .memory(request.getMemory())
                 .name(request.getName())
@@ -925,7 +925,7 @@ public final class DefaultApplications implements Applications {
             .requestResources(page -> cloudFoundryClient.events()
                 .list(ListEventsRequest.builder()
                     .actee(applicationId)
-                    .orderDirection(PaginatedRequest.OrderDirection.DESC)
+                    .orderDirection(OrderDirection.DESCENDING)
                     .resultsPerPage(50)
                     .page(page)
                     .build()));
@@ -1102,7 +1102,7 @@ public final class DefaultApplications implements Applications {
                 .diskQuota(request.getDiskQuota())
                 .dockerImage(request.getDockerImage())
                 .healthCheckTimeout(request.getTimeout())
-                .healthCheckType(Optional.ofNullable(request.getHealthCheckType()).map(ApplicationHealthCheck::getText).orElse(null))
+                .healthCheckType(Optional.ofNullable(request.getHealthCheckType()).map(ApplicationHealthCheck::getValue).orElse(null))
                 .instances(request.getInstances())
                 .memory(request.getMemory())
                 .name(request.getName())
@@ -1273,9 +1273,9 @@ public final class DefaultApplications implements Applications {
     private static ApplicationHealthCheck toHealthCheck(AbstractApplicationResource resource) {
         String type = resource.getEntity().getHealthCheckType();
 
-        if (ApplicationHealthCheck.NONE.getText().equals(type)) {
+        if (ApplicationHealthCheck.NONE.getValue().equals(type)) {
             return ApplicationHealthCheck.NONE;
-        } else if (ApplicationHealthCheck.PORT.getText().equals(type)) {
+        } else if (ApplicationHealthCheck.PORT.getValue().equals(type)) {
             return ApplicationHealthCheck.PORT;
         } else {
             return null;
@@ -1323,7 +1323,7 @@ public final class DefaultApplications implements Applications {
         return cloudFoundryClient.applicationsV2()
             .update(UpdateApplicationRequest.builder()
                 .applicationId(applicationId)
-                .healthCheckType(type.getText())
+                .healthCheckType(type.getValue())
                 .build());
     }
 

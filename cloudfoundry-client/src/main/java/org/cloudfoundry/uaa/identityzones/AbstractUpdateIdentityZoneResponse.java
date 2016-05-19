@@ -22,7 +22,7 @@ import org.immutables.value.Value;
 /**
  * The response from the update identity zone request
  */
-@JsonDeserialize(as = UpdateIdentityZoneResponse.class)
+@JsonDeserialize
 @Value.Immutable
 abstract class AbstractUpdateIdentityZoneResponse extends AbstractIdentityZone {
 

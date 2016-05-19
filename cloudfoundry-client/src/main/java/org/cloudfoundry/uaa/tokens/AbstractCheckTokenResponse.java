@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * The response from the token key request
  */
-@JsonDeserialize(as = CheckTokenResponse.class)
+@JsonDeserialize
 @Value.Immutable
 abstract class AbstractCheckTokenResponse {
 

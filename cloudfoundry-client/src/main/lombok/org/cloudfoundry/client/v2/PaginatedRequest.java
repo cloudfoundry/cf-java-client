@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.client.v2;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Data;
 import lombok.Getter;
 import org.cloudfoundry.QueryParameter;
@@ -58,29 +57,6 @@ public abstract class PaginatedRequest {
         this.orderDirection = orderDirection;
         this.page = page;
         this.resultsPerPage = resultsPerPage;
-    }
-
-    /**
-     * The order direction of the {@link PaginatedRequest}
-     */
-    public enum OrderDirection {
-
-        /**
-         * Indicates that order should be ascending
-         */
-        ASC,
-
-        /**
-         * Indicates that order should be descending
-         */
-        DESC;
-
-        @JsonValue
-        @Override
-        public String toString() {
-            return name().toLowerCase();
-        }
-
     }
 
 }

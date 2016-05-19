@@ -27,6 +27,7 @@ import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 import org.cloudfoundry.client.v2.InFilterParameter;
 import org.cloudfoundry.client.v2.IsFilterParameter;
+import org.cloudfoundry.client.v2.OrderDirection;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 
 import java.util.List;

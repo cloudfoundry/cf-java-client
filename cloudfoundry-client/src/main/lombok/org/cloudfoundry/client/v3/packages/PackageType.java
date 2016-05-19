@@ -14,16 +14,39 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.tokens;
+package org.cloudfoundry.client.v3.packages;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.immutables.value.Value;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * The response from the get token by client credentials operation
+ * The package type of the {@link CreatePackageRequest}
  */
-@JsonDeserialize
-@Value.Immutable
-abstract class AbstractGetTokenByClientCredentialsResponse extends AbstractToken {
+public enum PackageType {
+
+    /**
+     * Indicates that package type should be bits
+     */
+    BITS("bits"),
+
+    /**
+     * Indicates that package type should be docker
+     */
+    DOCKER("docker");
+
+    private final String value;
+
+    PackageType(String value) {
+        this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+        return this.value;
+    }
+
+    @Override
+    public String toString() {
+        return getValue();
+    }
 
 }

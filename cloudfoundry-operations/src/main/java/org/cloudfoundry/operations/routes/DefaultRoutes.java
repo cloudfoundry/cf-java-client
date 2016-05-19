@@ -40,7 +40,6 @@ import org.cloudfoundry.client.v2.spaces.GetSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
-import org.cloudfoundry.operations.routes.ListRoutesRequest.Level;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.OperationUtils;

@@ -18,16 +18,16 @@ package org.cloudfoundry.client.v2;
 
 import org.junit.Test;
 
-import static org.cloudfoundry.client.v2.PaginatedRequest.OrderDirection.ASC;
-import static org.cloudfoundry.client.v2.PaginatedRequest.OrderDirection.DESC;
+import static org.cloudfoundry.client.v2.OrderDirection.ASCENDING;
+import static org.cloudfoundry.client.v2.OrderDirection.DESCENDING;
 import static org.junit.Assert.assertEquals;
 
 public final class PaginatedRequestTest {
 
     @Test
     public void orderedBy() {
-        assertEquals("asc", ASC.toString());
-        assertEquals("desc", DESC.toString());
+        assertEquals("asc", ASCENDING.getValue());
+        assertEquals("desc", DESCENDING.getValue());
     }
 
 }

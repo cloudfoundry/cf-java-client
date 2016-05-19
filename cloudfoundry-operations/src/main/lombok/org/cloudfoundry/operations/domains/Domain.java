@@ -56,26 +56,4 @@ public final class Domain {
         this.status = status;
     }
 
-    /**
-     * The statuses of domains
-     */
-    public enum Status {
-
-        /**
-         * Domain is privately owned
-         */
-        OWNED,
-
-        /**
-         * Domain is shared
-         */
-        SHARED;
-
-        @Override
-        public String toString() {
-            return name().toLowerCase();
-        }
-
-    }
-
 }

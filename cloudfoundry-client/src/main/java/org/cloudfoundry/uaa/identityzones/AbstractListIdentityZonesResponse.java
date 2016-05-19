@@ -39,7 +39,7 @@ abstract class AbstractListIdentityZonesResponse {
      */
     abstract List<IdentityZone> getIdentityZones();
 
-    @JsonDeserialize(as = IdentityZone.class)
+    @JsonDeserialize
     @Value.Immutable
     static abstract class AbstractIdentityZone extends org.cloudfoundry.uaa.identityzones.AbstractIdentityZone {
 
@@ -56,7 +56,7 @@ abstract class AbstractListIdentityZonesResponse {
         @Override
         public ListIdentityZonesResponse deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
             return ListIdentityZonesResponse.builder()
-                .identityZones(p.<List<IdentityZone>>readValueAs(new TypeReference<List<IdentityZone>>() {
+                .identityZones(p.readValueAs(new TypeReference<List<IdentityZone>>() {
 
                 }))
                 .build();

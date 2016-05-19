@@ -18,7 +18,6 @@ package org.cloudfoundry.client.v3.packages;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -81,29 +80,6 @@ public final class CreatePackageRequest implements Validatable {
         }
 
         return builder.build();
-    }
-
-    /**
-     * The package type of the {@link CreatePackageRequest}
-     */
-    public enum PackageType {
-
-        /**
-         * Indicates that package type should be bits
-         */
-        BITS,
-
-        /**
-         * Indicates that package type should be docker
-         */
-        DOCKER;
-
-        @JsonValue
-        @Override
-        public String toString() {
-            return name().toLowerCase();
-        }
-
     }
 
 }

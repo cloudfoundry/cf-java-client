@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.tokens;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.immutables.value.Value;
+package org.cloudfoundry.operations.routes;
 
 /**
- * The response from the get token by client credentials operation
+ * What level to query for routes at
  */
-@JsonDeserialize
-@Value.Immutable
-abstract class AbstractGetTokenByClientCredentialsResponse extends AbstractToken {
+public enum Level {
+
+    /**
+     * List routes for all the spaces in the current organisation
+     */
+    ORGANIZATION,
+
+    /**
+     * List routes for the current space in the current organisation
+     */
+    SPACE
 
 }

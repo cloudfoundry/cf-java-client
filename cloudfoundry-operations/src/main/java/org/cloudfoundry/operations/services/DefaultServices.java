@@ -321,16 +321,6 @@ public final class DefaultServices implements Services {
             .then(Mono.just(servicePlanId));
     }
 
-    private static ServiceInstanceType convertToInstanceType(String type) {
-        if (ServiceInstanceType.USER_PROVIDED.getText().equals(type)) {
-            return ServiceInstanceType.USER_PROVIDED;
-        } else if (ServiceInstanceType.MANAGED.getText().equals(type)) {
-            return ServiceInstanceType.MANAGED;
-        } else {
-            return null;
-        }
-    }
-
     private static Mono<CreateServiceBindingResponse> createServiceBinding(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId,
                                                                            Map<String, Object> parameters) {
         return requestCreateServiceBinding(cloudFoundryClient, applicationId, serviceInstanceId, parameters)
@@ -738,7 +728,7 @@ public final class DefaultServices implements Services {
             .startedAt(lastOperation.getCreatedAt())
             .status(lastOperation.getState())
             .tags(serviceInstanceEntity.getTags())
-            .type(convertToInstanceType(serviceInstanceEntity.getType()))
+            .type(ServiceInstanceType.from(serviceInstanceEntity.getType()))
             .updatedAt(lastOperation.getUpdatedAt())
             .build();
     }
