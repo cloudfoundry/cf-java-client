@@ -16,75 +16,41 @@
 
 package org.cloudfoundry.operations.services;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class CreateServiceInstanceRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = CreateServiceInstanceRequest.builder()
-            .planName("test-plan-name")
+    @Test(expected = IllegalStateException.class)
+    public void noPlan() {
+        CreateServiceInstanceRequest.builder()
             .serviceName("test-service-name")
             .serviceInstanceName("test-service-instance-name")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noServiceInstanceName() {
+        CreateServiceInstanceRequest.builder()
+            .planName("test-plan-name")
+            .serviceName("test-service-name")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noServiceName() {
+        CreateServiceInstanceRequest.builder()
+            .planName("test-plan-name")
+            .serviceInstanceName("test-service-instance-name")
+            .build();
     }
 
     @Test
-    public void isValidAll() {
-        ValidationResult result = CreateServiceInstanceRequest.builder()
+    public void valid() {
+        CreateServiceInstanceRequest.builder()
             .planName("test-plan-name")
             .serviceName("test-service-name")
             .serviceInstanceName("test-service-instance-name")
-            .parameter("test-parameter", "test-parameter-value")
-            .tag("test-tag")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidNoPlan() {
-        ValidationResult result = CreateServiceInstanceRequest.builder()
-            .serviceName("test-service-name")
-            .serviceInstanceName("test-service-instance-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service plan name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoService() {
-        ValidationResult result = CreateServiceInstanceRequest.builder()
-            .planName("test-plan-name")
-            .serviceInstanceName("test-service-instance-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoServiceInstance() {
-        ValidationResult result = CreateServiceInstanceRequest.builder()
-            .planName("test-plan-name")
-            .serviceName("test-service-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service instance name must be specified", result.getMessages().get(0));
+            .build();
     }
 
 }

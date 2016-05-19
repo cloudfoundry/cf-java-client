@@ -16,51 +16,43 @@
 
 package org.cloudfoundry.operations.services;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.Singular;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
+import java.util.List;
 import java.util.Map;
 
 /**
- * A service key
+ * The request options for the create service instance operation
  */
-@Data
-public final class ServiceKey {
+@Value.Immutable
+abstract class AbstractCreateServiceInstanceRequest {
 
     /**
-     * The credentials
-     *
-     * @param credentials the credentials
-     * @return the credentials
+     * The parameters of the service instance
      */
-    private final Map<String, Object> credentials;
-
+    @Nullable
+    abstract Map<String, Object> getParameters();
 
     /**
-     * The service key id
-     *
-     * @param id the service key id
-     * @return the service key id
+     * The name of the service plan to use
      */
-    private final String id;
+    abstract String getPlanName();
 
     /**
-     * Service key name
-     *
-     * @param name The service key name
-     * @return the names
+     * The name of the service instance to create
      */
-    private final String name;
+    abstract String getServiceInstanceName();
 
+    /**
+     * The name of the service
+     */
+    abstract String getServiceName();
 
-    @Builder
-    ServiceKey(@Singular Map<String, Object> credentials,
-               String id,
-               String name) {
-        this.credentials = credentials;
-        this.id = id;
-        this.name = name;
-    }
+    /**
+     * The tags
+     */
+    @Nullable
+    abstract List<String> getTags();
 
 }

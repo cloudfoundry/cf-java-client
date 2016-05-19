@@ -68,11 +68,6 @@ public final class ReactorUserProvidedServiceInstancesTest {
         }
 
         @Override
-        protected CreateUserProvidedServiceInstanceRequest getInvalidRequest() {
-            return CreateUserProvidedServiceInstanceRequest.builder().build();
-        }
-
-        @Override
         protected CreateUserProvidedServiceInstanceResponse getResponse() {
             return CreateUserProvidedServiceInstanceResponse.builder()
                 .metadata(Resource.Metadata.builder()

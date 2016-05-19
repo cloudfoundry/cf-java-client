@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v2.userprovidedserviceinstances;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class CreateUserProvidedServiceInstanceRequestTest {
 
-    @Test
-    public void isNotValidNoName() {
-        ValidationResult result = CreateUserProvidedServiceInstanceRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        CreateUserProvidedServiceInstanceRequest.builder()
             .spaceId("space-id")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noSpaceId() {
+        CreateUserProvidedServiceInstanceRequest.builder()
+            .name("name")
+            .build();
     }
 
     @Test
-    public void isNotValidNoSpaceId() {
-        ValidationResult result = CreateUserProvidedServiceInstanceRequest.builder()
-            .name("name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("space id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValid() {
-        ValidationResult result = CreateUserProvidedServiceInstanceRequest.builder()
+    public void valid() {
+        CreateUserProvidedServiceInstanceRequest.builder()
             .name("name")
             .spaceId("space-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

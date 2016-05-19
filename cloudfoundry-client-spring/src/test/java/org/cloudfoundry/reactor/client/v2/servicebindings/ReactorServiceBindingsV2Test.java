@@ -66,12 +66,6 @@ public final class ReactorServiceBindingsV2Test {
         }
 
         @Override
-        protected CreateServiceBindingRequest getInvalidRequest() {
-            return CreateServiceBindingRequest.builder()
-                .build();
-        }
-
-        @Override
         protected CreateServiceBindingResponse getResponse() {
             return CreateServiceBindingResponse.builder()
                 .metadata(Resource.Metadata.builder()

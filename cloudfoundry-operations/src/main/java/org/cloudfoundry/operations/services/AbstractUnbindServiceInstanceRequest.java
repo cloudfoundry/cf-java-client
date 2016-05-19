@@ -16,30 +16,22 @@
 
 package org.cloudfoundry.operations.services;
 
-import org.junit.Test;
+import org.immutables.value.Value;
 
-public final class RenameServiceInstanceRequestTest {
+/**
+ * The request options for the unbind service instance operation
+ */
+@Value.Immutable
+abstract class AbstractUnbindServiceInstanceRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        RenameServiceInstanceRequest.builder()
-            .newName("test-service-new-name")
-            .build();
-    }
+    /**
+     * The name of the application to unbind
+     */
+    abstract String getApplicationName();
 
-    @Test(expected = IllegalStateException.class)
-    public void noNewName() {
-        RenameServiceInstanceRequest.builder()
-            .name("test-service-name")
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        RenameServiceInstanceRequest.builder()
-            .name("test-service-name")
-            .newName("test-service-new-name")
-            .build();
-    }
+    /**
+     * The name of the service instance to unbind
+     */
+    abstract String getServiceInstanceName();
 
 }

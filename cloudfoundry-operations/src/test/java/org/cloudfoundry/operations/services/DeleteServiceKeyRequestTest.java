@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.operations.services;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class DeleteServiceKeyRequestTest {
 
-    @Test
-    public void isInvalidNoServiceInstance() {
-        ValidationResult result = DeleteServiceKeyRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noServiceInstanceName() {
+        DeleteServiceKeyRequest.builder()
             .serviceKeyName("test-service-key-name")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service instance must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noServiceKeyName() {
+        DeleteServiceKeyRequest.builder()
+            .serviceInstanceName("test-service-instance-name")
+            .build();
     }
 
     @Test
-    public void isInvalidNoServiceKey() {
-        ValidationResult result = DeleteServiceKeyRequest.builder()
-            .serviceInstanceName("test-service-instance-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service key must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValid() {
-        ValidationResult result = DeleteServiceKeyRequest.builder()
+    public void valid() {
+        DeleteServiceKeyRequest.builder()
             .serviceInstanceName("test-service-instance-name")
             .serviceKeyName("test-service-key-name")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

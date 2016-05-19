@@ -75,20 +75,20 @@ public final class OrganizationDetail {
      * @param spaceQuota the space quota
      * @return the space quota
      */
-    private final List<SpaceQuota> spacesQuotas;
+    private final List<SpaceQuota> spaceQuotas;
 
     @Builder
     OrganizationDetail(@Singular List<String> domains,
                        String id,
                        String name,
                        OrganizationQuota quota,
-                       @Singular List<SpaceQuota> spacesQuotas,
+                       @Singular List<SpaceQuota> spaceQuotas,
                        @Singular List<String> spaces) {
         this.domains = domains;
         this.id = id;
         this.name = name;
         this.quota = quota;
-        this.spacesQuotas = spacesQuotas;
+        this.spaceQuotas = spaceQuotas;
         this.spaces = spaces;
     }
 

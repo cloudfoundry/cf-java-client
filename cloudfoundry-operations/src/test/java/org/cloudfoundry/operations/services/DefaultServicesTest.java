@@ -72,7 +72,6 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvide
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceEntity;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.cloudfoundry.util.RequestValidationException;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
@@ -433,7 +432,7 @@ public final class DefaultServicesTest {
             .thenReturn(Mono
                 .just(fillPage(ListServiceInstanceServiceKeysResponse.builder())
                     .resource(fill(ServiceKeyResource.builder(), "service-key-")
-                        .entity(ServiceKeyEntity.builder()
+                        .entity(fill(ServiceKeyEntity.builder(), "service-key-entity-")
                             .credential(credentialKey, credentialValue)
                             .build())
                         .build())
@@ -877,8 +876,7 @@ public final class DefaultServicesTest {
         public void setUp() throws Exception {
             requestListServices(this.cloudFoundryClient, TEST_SPACE_ID, "test-service");
             requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
-            requestCreateServiceInstance(this.cloudFoundryClient, TEST_SPACE_ID, "test-plan-id", "test-service-instance", Collections.emptyMap(), Collections.emptyList(),
-                "test-service-instance-id", "in progress");
+            requestCreateServiceInstance(this.cloudFoundryClient, TEST_SPACE_ID, "test-plan-id", "test-service-instance", null, null, "test-service-instance-id", "in progress");
             requestGetServiceInstance(this.cloudFoundryClient, "test-service-instance-id", "successful");
         }
 
@@ -924,29 +922,6 @@ public final class DefaultServicesTest {
                 .createInstance(CreateServiceInstanceRequest.builder()
                     .serviceInstanceName("test-service-instance")
                     .serviceName("test-service")
-                    .planName("test-plan")
-                    .parameter("test-parameter-key", "test-parameter-value")
-                    .tag("test-tag")
-                    .build());
-        }
-
-    }
-
-    public static final class CreateServiceInstanceNoService extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, MISSING_SPACE_ID, Mono.just(TEST_ORGANIZATION_ID));
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .assertError(RequestValidationException.class, "Request is invalid: service name must be specified");
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .createInstance(CreateServiceInstanceRequest.builder()
-                    .serviceInstanceName("test-service-instance")
                     .planName("test-plan")
                     .parameter("test-parameter-key", "test-parameter-value")
                     .tag("test-tag")
@@ -1493,6 +1468,7 @@ public final class DefaultServicesTest {
                 .assertEquals(ServiceKey.builder()
                     .credential("key", "val")
                     .id("test-service-key-id")
+                    .name("test-service-key-entity-name")
                     .build());
         }
 
@@ -1717,26 +1693,6 @@ public final class DefaultServicesTest {
             return this.services
                 .unbind(UnbindServiceInstanceRequest.builder()
                     .applicationName("test-application-name")
-                    .serviceInstanceName("test-service-instance-name")
-                    .build());
-        }
-
-    }
-
-    public static final class UnbindServiceInstanceInvalidRequest extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .assertError(RequestValidationException.class, "Request is invalid: application name must be specified");
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .unbind(UnbindServiceInstanceRequest.builder()
                     .serviceInstanceName("test-service-instance-name")
                     .build());
         }

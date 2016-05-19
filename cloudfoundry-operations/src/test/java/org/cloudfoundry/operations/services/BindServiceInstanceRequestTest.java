@@ -16,47 +16,30 @@
 
 package org.cloudfoundry.operations.services;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class BindServiceInstanceRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = BindServiceInstanceRequest.builder()
-            .applicationName("test-application-name")
+    @Test(expected = IllegalStateException.class)
+    public void noApplicationName() {
+        BindServiceInstanceRequest.builder()
             .serviceInstanceName("test-service-instance-name")
-            .parameter("foo", "bar")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noServiceInstanceName() {
+        BindServiceInstanceRequest.builder()
+            .applicationName("test-application-name")
+            .build();
     }
 
     @Test
-    public void isValidNoApplicationName() {
-        ValidationResult result = BindServiceInstanceRequest.builder()
-            .serviceInstanceName("test-service-instance-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoServiceInstanceName() {
-        ValidationResult result = BindServiceInstanceRequest.builder()
+    public void valid() {
+        BindServiceInstanceRequest.builder()
             .applicationName("test-application-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service instance name must be specified", result.getMessages().get(0));
+            .serviceInstanceName("test-service-instance-name")
+            .build();
     }
 
 }

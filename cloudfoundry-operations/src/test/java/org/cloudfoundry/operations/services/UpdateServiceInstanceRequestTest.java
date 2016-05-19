@@ -16,46 +16,21 @@
 
 package org.cloudfoundry.operations.services;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class UpdateServiceInstanceRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = UpdateServiceInstanceRequest.builder()
-            .serviceInstanceName("test-service-instance-name")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noServiceInstanceName() {
+        CreateServiceInstanceRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValidAll() {
-        ValidationResult result = UpdateServiceInstanceRequest.builder()
-            .planName("test-plan-name")
+    public void valid() {
+        UpdateServiceInstanceRequest.builder()
             .serviceInstanceName("test-service-instance-name")
-            .parameter("test-parameter", "test-parameter-value")
-            .tag("test-tag")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isNotValid() {
-        ValidationResult result = CreateServiceInstanceRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service plan name must be specified", result.getMessages().get(0));
+            .build();
     }
 
 }

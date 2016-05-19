@@ -102,6 +102,8 @@ public abstract class AbstractClientApiTest<REQ, RSP> extends AbstractApiTest<RE
         }
     }
 
-    protected abstract REQ getInvalidRequest();
+    protected REQ getInvalidRequest() {
+        return null;
+    }
 
 }

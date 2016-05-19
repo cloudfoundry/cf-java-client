@@ -143,12 +143,6 @@ public final class ReactorServiceInstancesTest {
         }
 
         @Override
-        protected CreateServiceInstanceRequest getInvalidRequest() {
-            return CreateServiceInstanceRequest.builder()
-                .build();
-        }
-
-        @Override
         protected CreateServiceInstanceResponse getResponse() {
             return CreateServiceInstanceResponse.builder()
                 .metadata(Resource.Metadata.builder()

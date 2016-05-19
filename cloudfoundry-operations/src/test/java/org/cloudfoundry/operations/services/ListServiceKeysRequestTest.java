@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.operations.services;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public class ListServiceKeysRequestTest {
 
-    @Test
-    public void isInValid() {
-        ValidationResult result = ListServiceKeysRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service instance name must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noServiceInstanceName() {
+        ListServiceKeysRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValid() {
-        ValidationResult result = ListServiceKeysRequest.builder()
+    public void valid() {
+        ListServiceKeysRequest.builder()
             .serviceInstanceName("service-instance")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

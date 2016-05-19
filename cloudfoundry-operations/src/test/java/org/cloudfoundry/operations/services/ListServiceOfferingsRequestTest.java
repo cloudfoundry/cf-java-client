@@ -16,21 +16,14 @@
 
 package org.cloudfoundry.operations.services;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class ListServiceOfferingsRequestTest {
 
     @Test
-    public void isValidAll() {
-        ValidationResult result = ListServiceOfferingsRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    public void valid() {
+        ListServiceOfferingsRequest.builder()
+            .build();
     }
 
 }

@@ -16,56 +16,30 @@
 
 package org.cloudfoundry.client.v2.servicebindings;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class CreateServiceBindingRequestTest {
 
-    @Test
-    public void isNotValidNoApplicationId() {
-        ValidationResult result = CreateServiceBindingRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noApplicationId() {
+        CreateServiceBindingRequest.builder()
             .serviceInstanceId("test-service-instance-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application id must be specified", result.getMessages().get(0));
+            .build();
     }
 
-    @Test
-    public void isNotValidNoApplicationIdNorServiceInstanceId() {
-        ValidationResult result = CreateServiceBindingRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isNotValidNoServiceInstanceId() {
-        ValidationResult result = CreateServiceBindingRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noServiceInstanceId() {
+        CreateServiceBindingRequest.builder()
             .applicationId("app-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service instance id must be specified", result.getMessages().get(0));
+            .build();
     }
 
     @Test
-    public void isValid() {
-        ValidationResult result = CreateServiceBindingRequest.builder()
+    public void valid() {
+        CreateServiceBindingRequest.builder()
             .applicationId("app-id")
             .serviceInstanceId("test-service-instance-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

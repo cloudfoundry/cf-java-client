@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.operations.services;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class UnbindServiceInstanceRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = UnbindServiceInstanceRequest.builder()
-            .applicationName("test-application-name")
+    @Test(expected = IllegalStateException.class)
+    public void noApplicationName() {
+        UnbindServiceInstanceRequest.builder()
             .serviceInstanceName("test-service-instance-name")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noServiceInstanceName() {
+        UnbindServiceInstanceRequest.builder()
+            .applicationName("test-application-name")
+            .build();
     }
 
     @Test
-    public void isValidNoApplicationName() {
-        ValidationResult result = UnbindServiceInstanceRequest.builder()
-            .serviceInstanceName("test-service-instance-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoServiceInstanceName() {
-        ValidationResult result = UnbindServiceInstanceRequest.builder()
+    public void valid() {
+        UnbindServiceInstanceRequest.builder()
             .applicationName("test-application-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service instance name must be specified", result.getMessages().get(0));
+            .serviceInstanceName("test-service-instance-name")
+            .build();
     }
 
 }

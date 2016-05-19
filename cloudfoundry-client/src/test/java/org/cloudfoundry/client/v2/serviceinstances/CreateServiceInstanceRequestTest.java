@@ -17,61 +17,41 @@
 package org.cloudfoundry.client.v2.serviceinstances;
 
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class CreateServiceInstanceRequestTest {
 
-    @Test
-    public void isNotValidNoName() {
-        ValidationResult result = CreateServiceInstanceRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        CreateServiceInstanceRequest.builder()
             .servicePlanId("service-plan-id")
             .spaceId("space-id")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noServicePlanId() {
+        CreateServiceInstanceRequest.builder()
+            .name("name")
+            .spaceId("space-id")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noSpaceId() {
+        CreateServiceInstanceRequest.builder()
+            .name("name")
+            .servicePlanId("service-plan-id")
+            .build();
     }
 
     @Test
-    public void isNotValidNoServicePlanId() {
-        ValidationResult result = CreateServiceInstanceRequest.builder()
-            .name("name")
-            .spaceId("space-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service plan id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isNotValidNoSpaceId() {
-        ValidationResult result = CreateServiceInstanceRequest.builder()
-            .name("name")
-            .servicePlanId("service-plan-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("space id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValid() {
-        ValidationResult result = CreateServiceInstanceRequest.builder()
+    public void valid() {
+        CreateServiceInstanceRequest.builder()
             .name("name")
             .servicePlanId("service-plan-id")
             .spaceId("space-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

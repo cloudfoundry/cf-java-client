@@ -16,30 +16,17 @@
 
 package org.cloudfoundry.operations.services;
 
-import org.junit.Test;
+import org.immutables.value.Value;
 
-public final class RenameServiceInstanceRequestTest {
+/**
+ * The request options for the list service keys operation
+ */
+@Value.Immutable
+abstract class AbstractListServiceKeysRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        RenameServiceInstanceRequest.builder()
-            .newName("test-service-new-name")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noNewName() {
-        RenameServiceInstanceRequest.builder()
-            .name("test-service-name")
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        RenameServiceInstanceRequest.builder()
-            .name("test-service-name")
-            .newName("test-service-new-name")
-            .build();
-    }
+    /**
+     * The name of the service instance for which the keys will be listed
+     */
+    abstract String getServiceInstanceName();
 
 }

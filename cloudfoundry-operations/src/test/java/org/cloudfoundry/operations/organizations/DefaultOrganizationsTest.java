@@ -470,7 +470,7 @@ public final class DefaultOrganizationsTest {
                         .organizationId("test-organization-id")
                         .build())
                     .space("test-name")
-                    .spacesQuota(fill(SpaceQuota.builder())
+                    .spaceQuota(fill(SpaceQuota.builder())
                         .build())
                     .build());
         }

@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.operations.services;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class GetServiceKeyRequestTest {
 
-    @Test
-    public void isNotValidNoInstanceName() {
-        ValidationResult result = GetServiceKeyRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noServiceInstanceName() {
+        GetServiceKeyRequest.builder()
             .serviceKeyName("test-service-key-name")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service instance name must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noServiceKeyName() {
+        GetServiceKeyRequest.builder()
+            .serviceInstanceName("test-service-instance-name")
+            .build();
     }
 
     @Test
-    public void isNotValidNoKeyName() {
-        ValidationResult result = GetServiceKeyRequest.builder()
-            .serviceInstanceName("test-service-instance-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service key name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValid() {
-        ValidationResult result = GetServiceKeyRequest.builder()
+    public void valid() {
+        GetServiceKeyRequest.builder()
             .serviceKeyName("test-service-key-name")
             .serviceInstanceName("test-service-instance-name")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

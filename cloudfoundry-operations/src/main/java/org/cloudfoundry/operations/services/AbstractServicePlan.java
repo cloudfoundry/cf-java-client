@@ -16,53 +16,32 @@
 
 package org.cloudfoundry.operations.services;
 
-import lombok.Builder;
-import lombok.Data;
+import org.immutables.value.Value;
 
 /**
  * A Cloud Foundry Service Plan
  */
-@Data
-public final class ServicePlan {
+@Value.Immutable
+abstract class AbstractServicePlan {
 
     /**
      * The description
-     *
-     * @param description the description
-     * @return the description
      */
-    private final String description;
+    abstract String getDescription();
 
     /**
      * Whether the plan is free
-     *
-     * @param paid whether the plan is free
-     * @return whether the plan is free
      */
-    private final Boolean free;
+    abstract Boolean getFree();
 
     /**
      * The id
-     *
-     * @param id the id
-     * @return the id
      */
-    private final String id;
+    abstract String getId();
 
     /**
      * The name
-     *
-     * @param name the name
-     * @return the name
      */
-    private final String name;
-
-    @Builder
-    ServicePlan(String description, Boolean free, String id, String name) {
-        this.description = description;
-        this.free = free;
-        this.id = id;
-        this.name = name;
-    }
+    abstract String getName();
 
 }

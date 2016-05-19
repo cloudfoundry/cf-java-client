@@ -16,60 +16,34 @@
 
 package org.cloudfoundry.operations.services;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.Singular;
+import org.immutables.value.Value;
 
 import java.util.List;
 
 /**
  * A Cloud Foundry Service Offering
  */
-@Data
-public final class ServiceOffering {
+@Value.Immutable
+abstract class AbstractServiceOffering {
 
     /**
      * The description
-     *
-     * @param description the description
-     * @return the description
      */
-    private final String description;
+    abstract String getDescription();
 
     /**
      * The id
-     *
-     * @param id the id
-     * @return the id
      */
-    private final String id;
+    abstract String getId();
 
     /**
      * The label
-     *
-     * @param name the label
-     * @return the label
      */
-    private final String label;
+    abstract String getLabel();
 
     /**
      * The service plans
-     *
-     * @param servicePlans the service plans
-     * @return the service plans
      */
-    private final List<ServicePlan> servicePlans;
-
-    @Builder
-    ServiceOffering(String description,
-                    String id,
-                    String label,
-                    @Singular List<ServicePlan> servicePlans) {
-
-        this.description = description;
-        this.id = id;
-        this.label = label;
-        this.servicePlans = servicePlans;
-    }
+    abstract List<ServicePlan> getServicePlans();
 
 }

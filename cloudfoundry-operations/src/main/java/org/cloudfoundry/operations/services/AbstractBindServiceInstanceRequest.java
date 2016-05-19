@@ -16,30 +16,31 @@
 
 package org.cloudfoundry.operations.services;
 
-import org.junit.Test;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
-public final class RenameServiceInstanceRequestTest {
+import java.util.Map;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        RenameServiceInstanceRequest.builder()
-            .newName("test-service-new-name")
-            .build();
-    }
+/**
+ * The request options for the bind service instance operation
+ */
+@Value.Immutable
+abstract class AbstractBindServiceInstanceRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noNewName() {
-        RenameServiceInstanceRequest.builder()
-            .name("test-service-name")
-            .build();
-    }
+    /**
+     * The name of the application to bind
+     */
+    abstract String getApplicationName();
 
-    @Test
-    public void valid() {
-        RenameServiceInstanceRequest.builder()
-            .name("test-service-name")
-            .newName("test-service-new-name")
-            .build();
-    }
+    /**
+     * The parameters for the service binding
+     */
+    @Nullable
+    abstract Map<String, Object> getParameters();
+
+    /**
+     * The name of the service instance to bind
+     */
+    abstract String getServiceInstanceName();
 
 }

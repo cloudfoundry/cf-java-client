@@ -16,39 +16,17 @@
 
 package org.cloudfoundry.operations.services;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
  * The request options for the delete service instance operation
  */
-@Data
-public final class DeleteServiceInstanceRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractDeleteServiceInstanceRequest {
 
     /**
      * The name of the service instance
-     *
-     * @param name the name of the service instance
-     * @return the name of the service instance
      */
-    private final String name;
-
-    @Builder
-    DeleteServiceInstanceRequest(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.name == null) {
-            builder.message("service instance name must be specified");
-        }
-
-        return builder.build();
-    }
+    abstract String getName();
 
 }

@@ -780,11 +780,11 @@ public final class DefaultServices implements Services {
             builder.servicePlanId(servicePlanId);
         }
 
-        if (!request.getParameters().isEmpty()) {
+        if (request.getParameters() != null && !request.getParameters().isEmpty()) {
             builder.parameters(request.getParameters());
         }
 
-        if (!request.getTags().isEmpty()) {
+        if (request.getTags() != null && !request.getTags().isEmpty()) {
             builder.tags(request.getTags());
         }
 

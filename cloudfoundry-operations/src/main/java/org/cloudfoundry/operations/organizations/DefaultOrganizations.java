@@ -322,7 +322,7 @@ public final class DefaultOrganizations implements Organizations {
             .id(ResourceUtils.getId(organizationResource))
             .name(organizationInfoRequest.getName())
             .quota(organizationQuota)
-            .spacesQuotas(spacesQuotas)
+            .spaceQuotas(spacesQuotas)
             .spaces(spaces)
             .build();
     }

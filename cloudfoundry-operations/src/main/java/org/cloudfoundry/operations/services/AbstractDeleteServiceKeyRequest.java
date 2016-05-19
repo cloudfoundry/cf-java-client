@@ -16,34 +16,22 @@
 
 package org.cloudfoundry.operations.services;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
- * The request options for the marketplace operation
+ * The request options for the deleting the service key
  */
-@Data
-public final class ListServiceOfferingsRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractDeleteServiceKeyRequest {
 
     /**
-     * The name of the service
-     *
-     * @param serviceName the name of the service
-     * @return the name of the service
+     * The name of the service instance
      */
-    private final String serviceName;
+    abstract String getServiceInstanceName();
 
-    @Builder
-    ListServiceOfferingsRequest(String serviceName) {
-        this.serviceName = serviceName;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        return ValidationResult.builder().build();
-    }
+    /**
+     * The name of the service key to delete
+     */
+    abstract String getServiceKeyName();
 
 }
-

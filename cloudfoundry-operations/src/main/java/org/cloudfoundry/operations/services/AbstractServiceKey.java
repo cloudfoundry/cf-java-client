@@ -16,30 +16,29 @@
 
 package org.cloudfoundry.operations.services;
 
-import org.junit.Test;
+import org.immutables.value.Value;
 
-public final class RenameServiceInstanceRequestTest {
+import java.util.Map;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        RenameServiceInstanceRequest.builder()
-            .newName("test-service-new-name")
-            .build();
-    }
+/**
+ * A service key
+ */
+@Value.Immutable
+abstract class AbstractServiceKey {
 
-    @Test(expected = IllegalStateException.class)
-    public void noNewName() {
-        RenameServiceInstanceRequest.builder()
-            .name("test-service-name")
-            .build();
-    }
+    /**
+     * The credentials
+     */
+    abstract Map<String, Object> getCredentials();
 
-    @Test
-    public void valid() {
-        RenameServiceInstanceRequest.builder()
-            .name("test-service-name")
-            .newName("test-service-new-name")
-            .build();
-    }
+    /**
+     * The service key id
+     */
+    abstract String getId();
+
+    /**
+     * Service key name
+     */
+    abstract String getName();
 
 }
