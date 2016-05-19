@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.operations.organizationadmin;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class GetQuotaRequestTest {
 
-    @Test
-    public void isNotValidNoName() {
-        ValidationResult result = GetQuotaRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        GetQuotaRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValid() {
-        ValidationResult result = GetQuotaRequest.builder()
+    public void valid() {
+        GetQuotaRequest.builder()
             .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

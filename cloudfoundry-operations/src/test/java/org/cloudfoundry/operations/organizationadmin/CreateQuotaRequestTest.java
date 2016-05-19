@@ -16,54 +16,23 @@
 
 package org.cloudfoundry.operations.organizationadmin;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
 
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.cloudfoundry.util.test.TestObjects.fill;
-import static org.junit.Assert.assertEquals;
 
 public final class CreateQuotaRequestTest {
 
-    @Test
-    public void isNotValidNoName() {
-        ValidationResult result = CreateQuotaRequest.builder()
-            .memoryLimit(-1)
-            .instanceMemoryLimit(-1)
-            .totalServices(-1)
-            .allowPaidServicePlans(true)
-            .totalRoutes(-1)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        CreateQuotaRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValidMin() {
-        ValidationResult result = fill(CreateQuotaRequest.builder())
+    public void valid() {
+        fill(CreateQuotaRequest.builder())
             .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
-    
-    @Test
-    public void isValidMax() {
-        ValidationResult result = fill(CreateQuotaRequest.builder())
-            .name("test-name")
-            .memoryLimit(-1)
-            .instanceMemoryLimit(-1)
-            .totalServices(-1)
-            .allowPaidServicePlans(true)
-            .totalRoutes(-1)
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

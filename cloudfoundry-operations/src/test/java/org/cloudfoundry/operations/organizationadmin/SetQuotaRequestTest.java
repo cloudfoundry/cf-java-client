@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.operations.organizationadmin;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class SetQuotaRequestTest {
 
-    @Test
-    public void isNotValidNoOrganizationName() {
-        ValidationResult result = SetQuotaRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noOrganizationName() {
+        SetQuotaRequest.builder()
             .quotaName("test-quota")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("organization name must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noQuotaName() {
+        SetQuotaRequest.builder()
+            .organizationName("test-organization")
+            .build();
     }
 
     @Test
-    public void isNotValidNoQuotaName() {
-        ValidationResult result = SetQuotaRequest.builder()
-            .organizationName("test-organization")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("quota name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValid() {
-        ValidationResult result = SetQuotaRequest.builder()
+    public void valid() {
+        SetQuotaRequest.builder()
             .organizationName("test-organization")
             .quotaName("test-quota")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

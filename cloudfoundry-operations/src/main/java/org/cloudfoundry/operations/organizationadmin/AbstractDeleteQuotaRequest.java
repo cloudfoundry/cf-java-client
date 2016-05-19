@@ -16,39 +16,17 @@
 
 package org.cloudfoundry.operations.organizationadmin;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
- * The request options for the get quota operation
+ * The request options for the delete quota operation
  */
-@Data
-public final class GetQuotaRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractDeleteQuotaRequest {
 
     /**
      * The name of the quota
-     *
-     * @param name the name of the quota
-     * @return the name of the quota
      */
-    private final String name;
-
-    @Builder
-    GetQuotaRequest(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.name == null) {
-            builder.message("name must be specified");
-        }
-
-        return builder.build();
-    }
+    abstract String getName();
 
 }

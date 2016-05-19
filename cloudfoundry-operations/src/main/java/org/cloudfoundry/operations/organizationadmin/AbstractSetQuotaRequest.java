@@ -16,21 +16,22 @@
 
 package org.cloudfoundry.operations.organizationadmin;
 
-import org.junit.Test;
+import org.immutables.value.Value;
 
-public final class DeleteQuotaRequestTest {
+/**
+ * The request options for the set quota operation
+ */
+@Value.Immutable
+abstract class AbstractSetQuotaRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        DeleteQuotaRequest.builder()
-            .build();
-    }
+    /**
+     * The name of the organization on which the quota must be set
+     */
+    abstract String getOrganizationName();
 
-    @Test
-    public void valid() {
-        DeleteQuotaRequest.builder()
-            .name("test-quota")
-            .build();
-    }
+    /**
+     * The name of the quota that will be set
+     */
+    abstract String getQuotaName();
 
 }
