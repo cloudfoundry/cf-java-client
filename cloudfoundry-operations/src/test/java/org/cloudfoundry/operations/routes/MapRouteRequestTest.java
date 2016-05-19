@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.operations.routes;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class MapRouteRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = MapRouteRequest.builder()
-            .applicationName("test-applicationName")
+    @Test(expected = IllegalStateException.class)
+    public void noApplicationName() {
+        MapRouteRequest.builder()
             .domain("test-domain")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noDomain() {
+        MapRouteRequest.builder()
+            .applicationName("test-applicationName")
+            .build();
     }
 
     @Test
-    public void isValidNoApplicationName() {
-        ValidationResult result = MapRouteRequest.builder()
-            .domain("test-domain")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoDomain() {
-        ValidationResult result = MapRouteRequest.builder()
+    public void valid() {
+        MapRouteRequest.builder()
             .applicationName("test-applicationName")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("domain must be specified", result.getMessages().get(0));
+            .domain("test-domain")
+            .build();
     }
 
 }

@@ -16,62 +16,31 @@
 
 package org.cloudfoundry.operations.routes;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class CreateRouteRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = CreateRouteRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noDomain() {
+        CreateRouteRequest.builder()
+            .space("test-space")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noSpace() {
+        CreateRouteRequest.builder()
             .domain("test-domain")
             .host("test-hostname")
-            .space("test-space")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
     @Test
-    public void isValidNoDomain() {
-        ValidationResult result = CreateRouteRequest.builder()
-            .host("test-hostname")
-            .space("test-space")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("domain must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoSpace() {
-        ValidationResult result = CreateRouteRequest.builder()
+    public void valid() {
+        CreateRouteRequest.builder()
             .domain("test-domain")
-            .host("test-hostname")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("space must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidWithPath() {
-        ValidationResult result = CreateRouteRequest.builder()
-            .domain("test-domain")
-            .host("test-hostname")
-            .path("test-path")
             .space("test-space")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

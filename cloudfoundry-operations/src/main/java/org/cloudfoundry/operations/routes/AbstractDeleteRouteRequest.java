@@ -16,30 +16,32 @@
 
 package org.cloudfoundry.operations.routes;
 
-import org.junit.Test;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
-public final class UnmapRouteRequestTest {
+/**
+ * The request options for the map route operation
+ */
+@Value.Immutable
+abstract class AbstractDeleteRouteRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationName() {
-        UnmapRouteRequest.builder()
-            .domain("test-domain")
-            .build();
-    }
+    /**
+     * The domain of the route
+     */
+    abstract String getDomain();
 
-    @Test(expected = IllegalStateException.class)
-    public void noDomain() {
-        UnmapRouteRequest.builder()
-            .applicationName("test-applicationName")
-            .build();
-    }
+    /**
+     * The host of the route
+     */
+    @Nullable
+    abstract String getHost();
 
-    @Test
-    public void valid() {
-        UnmapRouteRequest.builder()
-            .applicationName("test-applicationName")
-            .domain("test-domain")
-            .build();
-    }
+    /**
+     * The path of the route.
+     * <p>
+     * Note: the path is specified without a leading "/"
+     */
+    @Nullable
+    abstract String getPath();
 
 }

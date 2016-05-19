@@ -53,7 +53,6 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.cloudfoundry.util.RequestValidationException;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
@@ -720,25 +719,6 @@ public final class DefaultRoutesTest {
 
     }
 
-    public static final class DeleteInvalidRequest extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .assertError(RequestValidationException.class, "Request is invalid: domain must be specified");
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.routes
-                .delete(DeleteRouteRequest.builder()
-                    .build());
-        }
-
-    }
-
     public static final class DeleteInvalidRoute extends AbstractOperationsApiTest<Void> {
 
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
@@ -1003,8 +983,8 @@ public final class DefaultRoutesTest {
                     .application("test-application-name")
                     .domain("test-domain-name")
                     .host("test-route-entity-host")
+                    .id("test-id")
                     .path("test-route-entity-path")
-                    .routeId("test-id")
                     .space("test-space-entity-name")
                     .build());
         }
@@ -1065,7 +1045,6 @@ public final class DefaultRoutesTest {
                     .host("test-route-host")
                     .id("test-route-id")
                     .path("test-route-path")
-                    .routeId("test-route-id")
                     .space("test-space-entity-name")
                     .build());
         }
@@ -1100,7 +1079,6 @@ public final class DefaultRoutesTest {
                     .host("test-route-host")
                     .id("test-route-id")
                     .path("test-route-path")
-                    .routeId("test-route-id")
                     .space("test-space-entity-name")
                     .build());
         }

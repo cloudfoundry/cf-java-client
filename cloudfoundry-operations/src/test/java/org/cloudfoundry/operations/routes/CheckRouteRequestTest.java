@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.operations.routes;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class CheckRouteRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = CheckRouteRequest.builder()
-            .domain("test-domain")
+    @Test(expected = IllegalStateException.class)
+    public void noDomain() {
+        CheckRouteRequest.builder()
             .host("test-host")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noHost() {
+        CheckRouteRequest.builder()
+            .domain("test-domain")
+            .build();
     }
 
     @Test
-    public void isValidNoDomain() {
-        ValidationResult result = CheckRouteRequest.builder()
-            .host("test-host")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("domain must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoHost() {
-        ValidationResult result = CheckRouteRequest.builder()
+    public void valid() {
+        CheckRouteRequest.builder()
             .domain("test-domain")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("host must be specified", result.getMessages().get(0));
+            .host("test-host")
+            .build();
     }
 
 }

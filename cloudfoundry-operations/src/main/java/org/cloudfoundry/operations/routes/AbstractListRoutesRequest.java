@@ -16,30 +16,19 @@
 
 package org.cloudfoundry.operations.routes;
 
-import org.junit.Test;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
-public final class UnmapRouteRequestTest {
+/**
+ * The request options for the list routes operation
+ */
+@Value.Immutable
+abstract class AbstractListRoutesRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationName() {
-        UnmapRouteRequest.builder()
-            .domain("test-domain")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noDomain() {
-        UnmapRouteRequest.builder()
-            .applicationName("test-applicationName")
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        UnmapRouteRequest.builder()
-            .applicationName("test-applicationName")
-            .domain("test-domain")
-            .build();
-    }
+    /**
+     * A level to indicate which routes to list
+     */
+    @Nullable
+    abstract Level getLevel();
 
 }

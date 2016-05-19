@@ -16,33 +16,43 @@
 
 package org.cloudfoundry.operations.routes;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
+
+import java.util.List;
 
 /**
- * The request options for the list routes operation
+ * A route and the applications which are bound to the route.
  */
-@Data
-public final class ListRoutesRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractRoute {
 
     /**
-     * A level to indicate which routes to list
-     *
-     * @param level the level to list
-     * @return the level to list
+     * The applications bound to this route.
      */
-    private final Level level;
+    abstract List<String> getApplications();
 
-    @Builder
-    ListRoutesRequest(Level level) {
-        this.level = level;
-    }
+    /**
+     * The domain of this route
+     */
+    abstract String getDomain();
 
-    @Override
-    public ValidationResult isValid() {
-        return ValidationResult.builder().build();
-    }
+    /**
+     * The host of this route
+     */
+    abstract String getHost();
 
+    /**
+     * The id
+     */
+    abstract String getId();
+
+    /**
+     * The path of this route
+     */
+    abstract String getPath();
+
+    /**
+     * The name of the space of this route
+     */
+    abstract String getSpace();
 }
