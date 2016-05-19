@@ -31,7 +31,6 @@ import java.util.List;
  * The response from the list identity zones request
  */
 @JsonDeserialize(using = AbstractListIdentityZonesResponse.ListIdentityZonesResponseDeserializer.class)
-@SuppressWarnings("immutables")
 @Value.Immutable
 abstract class AbstractListIdentityZonesResponse {
 

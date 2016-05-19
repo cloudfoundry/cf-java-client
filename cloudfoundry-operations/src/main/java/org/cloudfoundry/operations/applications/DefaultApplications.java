@@ -316,7 +316,7 @@ public final class DefaultApplications implements Applications {
             .when(ValidationUtils.validate(request), this.spaceId)
             .then(function((validRequest, spaceId) -> getApplication(this.cloudFoundryClient, validRequest.getName(), spaceId)
                 .and(Mono.just(validRequest))))
-            .then(function((resource, validRequest) -> stopApplicationIfNotStopped(cloudFoundryClient, resource)
+            .then(function((resource, validRequest) -> stopApplicationIfNotStopped(this.cloudFoundryClient, resource)
                 .then(stoppedApplication -> startApplicationAndWait(this.cloudFoundryClient, validRequest.getName(), ResourceUtils.getId(stoppedApplication), validRequest.getStagingTimeout(),
                     validRequest.getStartupTimeout()))));
     }

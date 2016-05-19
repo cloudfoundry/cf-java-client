@@ -69,28 +69,19 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
     @Override
     public Mono<GetTokenByAuthorizationCodeResponse> getByAuthorizationCode(GetTokenByAuthorizationCodeRequest request) {
         return post(request, GetTokenByAuthorizationCodeResponse.class,
-            function((builder, validRequest) -> builder
-                .pathSegment("oauth", "token")
-                .queryParam("grant_type", "authorization_code")
-                .queryParam("response_type", "token")));
+            function((builder, validRequest) -> builder.pathSegment("oauth", "token").queryParam("grant_type", "authorization_code").queryParam("response_type", "token")));
     }
 
     @Override
     public Mono<GetTokenByClientCredentialsResponse> getByClientCredentials(GetTokenByClientCredentialsRequest request) {
         return post(request, GetTokenByClientCredentialsResponse.class,
-            function((builder, validRequest) -> builder
-                .pathSegment("oauth", "token")
-                .queryParam("grant_type", "client_credentials")
-                .queryParam("response_type", "token")));
+            function((builder, validRequest) -> builder.pathSegment("oauth", "token").queryParam("grant_type", "client_credentials").queryParam("response_type", "token")));
     }
 
     @Override
     public Mono<GetTokenByPasswordResponse> getByPassword(GetTokenByPasswordRequest request) {
         return post(request, GetTokenByPasswordResponse.class,
-            function((builder, validRequest) -> builder
-                .pathSegment("oauth", "token")
-                .queryParam("grant_type", "password")
-                .queryParam("response_type", "token")));
+            function((builder, validRequest) -> builder.pathSegment("oauth", "token").queryParam("grant_type", "password").queryParam("response_type", "token")));
     }
 
     @Override

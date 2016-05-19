@@ -391,7 +391,7 @@ public final class DefaultApplicationsTest {
         requestApplications(cloudFoundryClient, application, spaceId, applicationId, StringMap.builder().entry("test-var", "test-value").build());
     }
 
-    private static void requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId, String applicationId, StringMap envResponse) {
+    private static void requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId, String applicationId, Map<String, Object> envResponse) {
         when(cloudFoundryClient.spaces()
             .listApplications(ListSpaceApplicationsRequest.builder()
                 .name(application)
