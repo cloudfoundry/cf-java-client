@@ -16,31 +16,39 @@
 
 package org.cloudfoundry.uaa.tokens;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.QueryParameter;
 import org.immutables.value.Value;
 
-import java.util.List;
-
 /**
- * The response from the list token keys request
+ * The request payload for the refresh token operation
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class AbstractListTokenKeysResponse {
+abstract class AbstractRefreshTokenRequest {
 
     /**
-     * The token keys
+     * The client identifier
      */
-    @JsonProperty("keys")
-    abstract List<TokenKey> getKeys();
+    @QueryParameter("client_id")
+    abstract String getClientId();
 
     /**
-     * The token key
+     * The client's secret passphrase
      */
-    @Value.Immutable
-    static abstract class AbstractTokenKey extends org.cloudfoundry.uaa.tokens.AbstractTokenKey {
+    @QueryParameter("client_secret")
+    abstract String getClientSecret();
 
-    }
+    /**
+     * The password
+     */
+    @QueryParameter("refresh_token")
+    abstract String getRefreshToken();
+
+    /**
+     * The token format
+     */
+    @Nullable
+    @QueryParameter("token_format")
+    abstract TokenFormat getTokenFormat();
 
 }

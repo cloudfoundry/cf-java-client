@@ -19,7 +19,7 @@ package org.cloudfoundry.uaa.tokens;
 import org.immutables.value.Value;
 
 /**
- * The request payload for the token key operation
+ * The request payload for the list token keys operation
  */
 @Value.Immutable
 abstract class AbstractListTokenKeysRequest {
