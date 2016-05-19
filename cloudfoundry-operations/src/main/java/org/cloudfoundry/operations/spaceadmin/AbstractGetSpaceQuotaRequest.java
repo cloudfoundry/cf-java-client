@@ -16,39 +16,17 @@
 
 package org.cloudfoundry.operations.spaceadmin;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
  * The request options for the list routes operation
  */
-@Data
-public final class GetSpaceQuotaRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractGetSpaceQuotaRequest {
 
     /**
      * The name of the space quota to get
-     *
-     * @param name the name
-     * @return the name
      */
-    private final String name;
-
-    @Builder
-    GetSpaceQuotaRequest(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.name == null) {
-            builder.message("space quota name must be specified");
-        }
-
-        return builder.build();
-    }
+    abstract String getName();
 
 }
