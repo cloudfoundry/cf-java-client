@@ -16,44 +16,27 @@
 
 package org.cloudfoundry.operations.domains;
 
-import lombok.Builder;
-import lombok.Data;
+import org.immutables.value.Value;
 
 /**
  * Domain object representation
  */
-@Data
-public final class Domain {
+@Value.Immutable
+abstract class AbstractDomain {
 
     /**
      * The id of the domain
-     *
-     * @param id the id of the domain
-     * @return the id of the domain
      */
-    private final String id;
+    abstract String getId();
 
     /**
      * The name of the domain
-     *
-     * @param name the name
-     * @return the name of the domain
      */
-    private final String name;
+    abstract String getName();
 
     /**
      * The status of the domain indicating shared or private domain
-     *
-     * @param status indicating the domain is shared or private
-     * @return the status of the domain
      */
-    private final Status status;
-
-    @Builder
-    Domain(String id, String name, Status status) {
-        this.id = id;
-        this.name = name;
-        this.status = status;
-    }
+    abstract Status getStatus();
 
 }

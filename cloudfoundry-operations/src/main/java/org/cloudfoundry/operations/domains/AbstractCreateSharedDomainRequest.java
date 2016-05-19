@@ -16,39 +16,17 @@
 
 package org.cloudfoundry.operations.domains;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
  * The request options for the create shared domain operation
  */
-@Data
-public final class CreateSharedDomainRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractCreateSharedDomainRequest {
 
     /**
      * The domain name
-     *
-     * @param domain the domain name
-     * @return the domain name
      */
-    private final String domain;
-
-    @Builder
-    CreateSharedDomainRequest(String domain) {
-        this.domain = domain;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.domain == null) {
-            builder.message("domain must be specified");
-        }
-
-        return builder.build();
-    }
+    abstract String getDomain();
 
 }

@@ -33,7 +33,6 @@ import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.cloudfoundry.util.RequestValidationException;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
@@ -250,25 +249,6 @@ public final class DefaultDomainsTest {
 
     }
 
-    public static final class CreateSharedDomainInvalidRequest extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultDomains domains = new DefaultDomains(this.cloudFoundryClient);
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .assertError(RequestValidationException.class, "Request is invalid: domain must be specified");
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.domains
-                .createShared(CreateSharedDomainRequest.builder()
-                    .build());
-        }
-
-    }
-
     public static final class ListDomains extends AbstractOperationsApiTest<Domain> {
 
         private final DefaultDomains domains = new DefaultDomains(this.cloudFoundryClient);
@@ -386,30 +366,6 @@ public final class DefaultDomainsTest {
 
     }
 
-    public static final class ShareDomainInvalidRequest extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultDomains domains = new DefaultDomains(this.cloudFoundryClient);
-
-        @Before
-        public void setUp() throws Exception {
-        }
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .assertError(RequestValidationException.class, "Request is invalid: organization must be specified");
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.domains
-                .share(ShareDomainRequest.builder()
-                    .domain("test-domain")
-                    .build());
-        }
-
-    }
-
     public static final class ShareDomainSharedDomain extends AbstractOperationsApiTest<Void> {
 
         private final DefaultDomains domains = new DefaultDomains(this.cloudFoundryClient);
@@ -459,30 +415,6 @@ public final class DefaultDomainsTest {
                 .unshare(UnshareDomainRequest.builder()
                     .domain("test-domain")
                     .organization("test-organization")
-                    .build());
-        }
-
-    }
-
-    public static final class UnshareDomainInvalidRequest extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultDomains domains = new DefaultDomains(this.cloudFoundryClient);
-
-        @Before
-        public void setUp() throws Exception {
-        }
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .assertError(RequestValidationException.class, "Request is invalid: organization must be specified");
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.domains
-                .unshare(UnshareDomainRequest.builder()
-                    .domain("test-domain")
                     .build());
         }
 

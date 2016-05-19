@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.operations.domains;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class UnshareDomainRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = UnshareDomainRequest.builder()
-            .domain("test-domain")
+    @Test(expected = IllegalStateException.class)
+    public void noDomain() {
+        UnshareDomainRequest.builder()
             .organization("test-organization")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noOrganization() {
+        UnshareDomainRequest.builder()
+            .domain("test-domain")
+            .build();
     }
 
     @Test
-    public void isValidNoDomain() {
-        ValidationResult result = UnshareDomainRequest.builder()
-            .organization("test-organization")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("domain must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoOrganization() {
-        ValidationResult result = UnshareDomainRequest.builder()
+    public void valid() {
+        UnshareDomainRequest.builder()
             .domain("test-domain")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("organization must be specified", result.getMessages().get(0));
+            .organization("test-organization")
+            .build();
     }
 
 }

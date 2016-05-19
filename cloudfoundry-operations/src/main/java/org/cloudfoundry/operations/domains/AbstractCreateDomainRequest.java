@@ -16,30 +16,22 @@
 
 package org.cloudfoundry.operations.domains;
 
-import org.junit.Test;
+import org.immutables.value.Value;
 
-public final class CreateDomainRequestTest {
+/**
+ * The request options for the create domain operation
+ */
+@Value.Immutable
+abstract class AbstractCreateDomainRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noDomain() {
-        CreateDomainRequest.builder()
-            .organization("test-organization")
-            .build();
-    }
+    /**
+     * The domain name
+     */
+    abstract String getDomain();
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganization() {
-        CreateDomainRequest.builder()
-            .domain("test-domain")
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        CreateDomainRequest.builder()
-            .domain("test-domain")
-            .organization("test-organization")
-            .build();
-    }
+    /**
+     * The organization name of the domain
+     */
+    abstract String getOrganization();
 
 }
