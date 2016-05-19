@@ -16,39 +16,22 @@
 
 package org.cloudfoundry.operations.organizations;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
- * The request options for the Delete Organization Operation
+ * The request options for the rename organization operation
  */
-@Data
-public final class DeleteOrganizationRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractRenameOrganizationRequest {
 
     /**
      * The name of the organization
-     *
-     * @param name the name
-     * @return the name
      */
-    private final String name;
+    abstract String getName();
 
-    @Builder
-    DeleteOrganizationRequest(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.name == null) {
-            builder.message("name must be specified");
-        }
-
-        return builder.build();
-    }
+    /**
+     * The new name of the organization
+     */
+    abstract String getNewName();
 
 }

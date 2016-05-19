@@ -16,39 +16,17 @@
 
 package org.cloudfoundry.operations.organizations;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
  * The request options for the Organization Information Operation
  */
-@Data
-public final class OrganizationInfoRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractOrganizationInfoRequest {
 
     /**
      * The name of the organization to get information about
-     *
-     * @param name the name
-     * @return the name
      */
-    private final String name;
-
-    @Builder
-    OrganizationInfoRequest(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.name == null) {
-            builder.message("name must be specified");
-        }
-
-        return builder.build();
-    }
+    abstract String getName();
 
 }

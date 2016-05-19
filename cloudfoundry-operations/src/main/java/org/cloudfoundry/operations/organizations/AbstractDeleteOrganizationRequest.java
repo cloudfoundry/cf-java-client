@@ -16,35 +16,16 @@
 
 package org.cloudfoundry.operations.organizations;
 
-import lombok.Builder;
-import lombok.Data;
+import org.immutables.value.Value;
 
 /**
- * A Cloud Foundry Organization
+ * The request options for the Delete Organization Operation
  */
-@Data
-public final class OrganizationSummary {
+@Value.Immutable
+abstract class AbstractDeleteOrganizationRequest {
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
+     * The name of the organization
      */
-    private final String id;
-
-    /**
-     * The name
-     *
-     * @param name the name
-     * @return the name
-     */
-    private final String name;
-
-    @Builder
-    OrganizationSummary(String id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
+    abstract String getName();
 }

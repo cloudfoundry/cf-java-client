@@ -52,7 +52,6 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionReso
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
 import org.cloudfoundry.operations.spaceadmin.SpaceQuota;
-import org.cloudfoundry.util.RequestValidationException;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
@@ -321,25 +320,6 @@ public final class DefaultOrganizationsTest {
 
     }
 
-    public static final class CreateInvalid extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .assertError(RequestValidationException.class, "Request is invalid: organization name must be specified");
-        }
-
-        @Override
-        protected Publisher<Void> invoke() {
-            return this.organizations.
-                create(CreateOrganizationRequest.builder()
-                    .build());
-        }
-
-    }
-
     public static final class CreateSetRolesByUsernameDisabled extends AbstractOperationsApiTest<Void> {
 
         private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
@@ -530,25 +510,6 @@ public final class DefaultOrganizationsTest {
                 .rename(RenameOrganizationRequest.builder()
                     .name("test-organization-name")
                     .newName("test-new-organization-name")
-                    .build());
-        }
-
-    }
-
-    public static final class RenameInvalid extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .assertError(RequestValidationException.class, "Request is invalid: name must be specified, new name must be specified");
-        }
-
-        @Override
-        protected Publisher<Void> invoke() {
-            return this.organizations
-                .rename(RenameOrganizationRequest.builder()
                     .build());
         }
 

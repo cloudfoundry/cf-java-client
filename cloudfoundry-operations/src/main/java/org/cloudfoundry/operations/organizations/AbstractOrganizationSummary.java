@@ -16,21 +16,22 @@
 
 package org.cloudfoundry.operations.organizations;
 
-import org.junit.Test;
+import org.immutables.value.Value;
 
-public final class OrganizationSummaryDetailRequestTest {
+/**
+ * A Cloud Foundry Organization
+ */
+@Value.Immutable
+abstract class AbstractOrganizationSummary {
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        OrganizationInfoRequest.builder()
-            .build();
-    }
+    /**
+     * The id
+     */
+    abstract String getId();
 
-    @Test
-    public void valid() {
-        OrganizationInfoRequest.builder()
-            .name("test-organization-name")
-            .build();
-    }
+    /**
+     * The name
+     */
+    abstract String getName();
 
 }

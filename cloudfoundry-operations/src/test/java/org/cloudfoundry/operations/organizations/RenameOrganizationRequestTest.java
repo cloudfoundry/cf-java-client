@@ -16,45 +16,30 @@
 
 package org.cloudfoundry.operations.organizations;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.cloudfoundry.util.test.TestObjects.fill;
-import static org.junit.Assert.assertEquals;
 
 public final class RenameOrganizationRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = fill(RenameOrganizationRequest.builder())
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidNoName() {
-        ValidationResult result = RenameOrganizationRequest.builder()
-            .newName("new-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void isValidNoNewName() {
-        ValidationResult result = RenameOrganizationRequest.builder()
+        RenameOrganizationRequest.builder()
             .name("name")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("new name must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        RenameOrganizationRequest.builder()
+            .newName("new-name")
+            .build();
+    }
+
+    @Test
+    public void valid() {
+        RenameOrganizationRequest.builder()
+            .name("test-name")
+            .newName("test-new-name")
+            .build();
     }
 
 }

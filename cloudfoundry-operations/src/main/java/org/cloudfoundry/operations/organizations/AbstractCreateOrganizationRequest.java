@@ -16,21 +16,24 @@
 
 package org.cloudfoundry.operations.organizations;
 
-import org.junit.Test;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
-public final class OrganizationSummaryDetailRequestTest {
+/**
+ * The request options for the create org operation
+ */
+@Value.Immutable
+abstract class AbstractCreateOrganizationRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        OrganizationInfoRequest.builder()
-            .build();
-    }
+    /**
+     * The organization name
+     */
+    abstract String getOrganizationName();
 
-    @Test
-    public void valid() {
-        OrganizationInfoRequest.builder()
-            .name("test-organization-name")
-            .build();
-    }
+    /**
+     * The quota definition name
+     */
+    @Nullable
+    abstract String getQuotaDefinitionName();
 
 }
