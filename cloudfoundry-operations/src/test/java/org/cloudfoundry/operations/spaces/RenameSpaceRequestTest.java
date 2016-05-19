@@ -16,45 +16,30 @@
 
 package org.cloudfoundry.operations.spaces;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.cloudfoundry.util.test.TestObjects.fill;
-import static org.junit.Assert.assertEquals;
 
 public final class RenameSpaceRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = fill(RenameSpaceRequest.builder())
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidNoName() {
-        ValidationResult result = RenameSpaceRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        RenameSpaceRequest.builder()
             .newName("new-name")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noNewName() {
+        RenameSpaceRequest.builder()
+            .name("name")
+            .build();
     }
 
     @Test
-    public void isValidNoNewName() {
-        ValidationResult result = RenameSpaceRequest.builder()
-            .name("name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("new name must be specified", result.getMessages().get(0));
+    public void valid() {
+        RenameSpaceRequest.builder()
+            .name("test-name")
+            .newName("test-new-name")
+            .build();
     }
 
 }

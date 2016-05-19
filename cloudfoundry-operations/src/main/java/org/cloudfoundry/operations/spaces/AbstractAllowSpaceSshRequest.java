@@ -16,33 +16,17 @@
 
 package org.cloudfoundry.operations.spaces;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
- * The request options for the disallow space ssh operation
+ * The request options for the allow space ssh operation
  */
-@Data
-public final class DisallowSpaceSshRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractAllowSpaceSshRequest {
 
-    private final String name;
-
-    @Builder
-    DisallowSpaceSshRequest(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.name == null) {
-            builder.message("name must be specified");
-        }
-
-        return builder.build();
-    }
+    /**
+     * The space name
+     */
+    abstract String getName();
 
 }

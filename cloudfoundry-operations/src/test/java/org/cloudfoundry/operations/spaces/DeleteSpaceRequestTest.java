@@ -16,32 +16,21 @@
 
 package org.cloudfoundry.operations.spaces;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class DeleteSpaceRequestTest {
 
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        DeleteSpaceRequest.builder()
+            .build();
+    }
+
     @Test
-    public void isValid() {
-        ValidationResult result = DeleteSpaceRequest.builder()
+    public void valid() {
+        DeleteSpaceRequest.builder()
             .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
-    @Test
-    public void isValidNoName() {
-        ValidationResult result = DeleteSpaceRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
-    }
 }

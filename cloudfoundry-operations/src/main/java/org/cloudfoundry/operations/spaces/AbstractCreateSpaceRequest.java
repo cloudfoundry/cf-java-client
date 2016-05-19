@@ -16,33 +16,30 @@
 
 package org.cloudfoundry.operations.spaces;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
 /**
- * The request options for the check space ssh enabled operation
+ * The request options for the delete space operation
  */
-@Data
-public final class SpaceSshAllowedRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractCreateSpaceRequest {
 
-    private final String name;
+    /**
+     * The name of the new space
+     */
+    abstract String getName();
 
-    @Builder
-    SpaceSshAllowedRequest(String name) {
-        this.name = name;
-    }
+    /**
+     * The organization of the new space
+     */
+    @Nullable
+    abstract String getOrganization();
 
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.name == null) {
-            builder.message("name must be specified");
-        }
-
-        return builder.build();
-    }
+    /**
+     * The space quota definition of the new space
+     */
+    @Nullable
+    abstract String getSpaceQuota();
 
 }

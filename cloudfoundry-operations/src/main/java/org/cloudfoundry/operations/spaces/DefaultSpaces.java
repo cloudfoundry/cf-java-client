@@ -467,9 +467,9 @@ public final class DefaultSpaces implements Spaces {
             .build();
     }
 
-    private static List<SpaceDetail.SecurityGroup.Rule> toSpaceDetailSecurityGroupRules(List<SecurityGroupEntity.RuleEntity> rules) {
+    private static List<Rule> toSpaceDetailSecurityGroupRules(List<SecurityGroupEntity.RuleEntity> rules) {
         return rules.stream()
-            .map(ruleEntity -> SpaceDetail.SecurityGroup.Rule.builder()
+            .map(ruleEntity -> Rule.builder()
                 .destination(ruleEntity.getDestination())
                 .ports(ruleEntity.getPorts())
                 .protocol(ruleEntity.getProtocol())
@@ -477,9 +477,9 @@ public final class DefaultSpaces implements Spaces {
             .collect(Collectors.toList());
     }
 
-    private static List<SpaceDetail.SecurityGroup> toSpaceDetailSecurityGroups(List<SecurityGroupEntity> securityGroups) {
+    private static List<SecurityGroup> toSpaceDetailSecurityGroups(List<SecurityGroupEntity> securityGroups) {
         return securityGroups.stream()
-            .map(entity -> SpaceDetail.SecurityGroup.builder()
+            .map(entity -> SecurityGroup.builder()
                 .name(entity.getName())
                 .rules(toSpaceDetailSecurityGroupRules(entity.getRules()))
                 .build())

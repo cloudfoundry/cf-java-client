@@ -16,21 +16,22 @@
 
 package org.cloudfoundry.operations.spaces;
 
-import org.junit.Test;
+import org.immutables.value.Value;
 
-public final class SpaceSshAllowedRequestTest {
+/**
+ * The request options for the rename space operation
+ */
+@Value.Immutable
+abstract class AbstractRenameSpaceRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        SpaceSshAllowedRequest.builder()
-            .build();
-    }
+    /**
+     * The name of the space
+     */
+    abstract String getName();
 
-    @Test
-    public void valid() {
-        SpaceSshAllowedRequest.builder()
-            .name("test-name")
-            .build();
-    }
+    /**
+     * The new name of the space
+     */
+    abstract String getNewName();
 
 }

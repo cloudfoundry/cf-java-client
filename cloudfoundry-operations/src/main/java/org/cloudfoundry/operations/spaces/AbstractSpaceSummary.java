@@ -16,21 +16,22 @@
 
 package org.cloudfoundry.operations.spaces;
 
-import org.junit.Test;
+import org.immutables.value.Value;
 
-public final class SpaceSshAllowedRequestTest {
+/**
+ * A Cloud Foundry Space Summary
+ */
+@Value.Immutable
+abstract class AbstractSpaceSummary {
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        SpaceSshAllowedRequest.builder()
-            .build();
-    }
+    /**
+     * The id
+     */
+    abstract String getId();
 
-    @Test
-    public void valid() {
-        SpaceSshAllowedRequest.builder()
-            .name("test-name")
-            .build();
-    }
+    /**
+     * The name
+     */
+    abstract String getName();
 
 }

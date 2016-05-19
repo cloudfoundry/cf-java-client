@@ -16,39 +16,24 @@
 
 package org.cloudfoundry.operations.spaces;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
 /**
- * The request options for the delete space operation
+ * The request options for the get space operation
  */
-@Data
-public final class DeleteSpaceRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractGetSpaceRequest {
 
     /**
      * The name of the space
-     *
-     * @param name the name
-     * @return the name
      */
-    private final String name;
+    abstract String getName();
 
-    @Builder
-    DeleteSpaceRequest(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.name == null) {
-            builder.message("name must be specified");
-        }
-
-        return builder.build();
-    }
+    /**
+     * Include Security Group Rules information
+     */
+    @Nullable
+    abstract Boolean getSecurityGroupRules();
 
 }

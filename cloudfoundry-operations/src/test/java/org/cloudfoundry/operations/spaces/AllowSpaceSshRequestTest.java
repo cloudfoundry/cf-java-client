@@ -16,32 +16,21 @@
 
 package org.cloudfoundry.operations.spaces;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class AllowSpaceSshRequestTest {
 
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        AllowSpaceSshRequest.builder()
+            .build();
+    }
+
     @Test
-    public void isValid() {
-        ValidationResult result = AllowSpaceSshRequest.builder()
+    public void valid() {
+        AllowSpaceSshRequest.builder()
             .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
-    @Test
-    public void isValidNoName() {
-        ValidationResult result = AllowSpaceSshRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
-    }
 }

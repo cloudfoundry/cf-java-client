@@ -16,21 +16,23 @@
 
 package org.cloudfoundry.operations.spaces;
 
-import org.junit.Test;
+import org.immutables.value.Value;
 
-public final class SpaceSshAllowedRequestTest {
+import java.util.List;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        SpaceSshAllowedRequest.builder()
-            .build();
-    }
+@Value.Immutable
+abstract class AbstractSecurityGroup {
 
-    @Test
-    public void valid() {
-        SpaceSshAllowedRequest.builder()
-            .name("test-name")
-            .build();
-    }
+    /**
+     * The name
+     */
+    abstract String getName();
+
+    /**
+     * The rules
+     *
+     * @return
+     */
+    abstract List<Rule> getRules();
 
 }

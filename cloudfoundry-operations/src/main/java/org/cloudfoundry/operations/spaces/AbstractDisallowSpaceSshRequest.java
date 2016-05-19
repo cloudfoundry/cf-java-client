@@ -16,35 +16,17 @@
 
 package org.cloudfoundry.operations.spaces;
 
-import lombok.Builder;
-import lombok.Data;
+import org.immutables.value.Value;
 
 /**
- * A Cloud Foundry Space Summary
+ * The request options for the disallow space ssh operation
  */
-@Data
-public final class SpaceSummary {
+@Value.Immutable
+abstract class AbstractDisallowSpaceSshRequest {
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
+     * The space name
      */
-    private final String id;
-
-    /**
-     * The name
-     *
-     * @param name the name
-     * @return the name
-     */
-    private final String name;
-
-    @Builder
-    SpaceSummary(String id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+    abstract String getName();
 
 }

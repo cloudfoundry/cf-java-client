@@ -64,7 +64,6 @@ import org.cloudfoundry.client.v2.spaces.UpdateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceResponse;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
 import org.cloudfoundry.operations.spaceadmin.SpaceQuota;
-import org.cloudfoundry.util.RequestValidationException;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
@@ -471,27 +470,6 @@ public final class DefaultSpacesTest {
 
     }
 
-    public static final class CreateInvalid extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_USERNAME);
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .assertError(RequestValidationException.class, "Request is invalid: name must be specified");
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.spaces
-                .create(CreateSpaceRequest.builder()
-                    .organization("test-organization")
-                    .spaceQuota("test-space-quota")
-                    .build());
-        }
-
-    }
-
     public static final class CreateNoOrgNoQuota extends AbstractOperationsApiTest<Void> {
 
         private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_USERNAME));
@@ -684,25 +662,6 @@ public final class DefaultSpacesTest {
 
     }
 
-    public static final class DeleteInvalidRequest extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_USERNAME);
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .assertError(RequestValidationException.class, "Request is invalid: name must be specified");
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.spaces
-                .delete(DeleteSpaceRequest.builder()
-                    .build());
-        }
-
-    }
-
     public static final class DeleteInvalidSpace extends AbstractOperationsApiTest<Void> {
 
         private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
@@ -846,9 +805,9 @@ public final class DefaultSpacesTest {
                     .id(TEST_SPACE_ID)
                     .name(TEST_SPACE_NAME)
                     .organization("test-organization-name")
-                    .securityGroup(SpaceDetail.SecurityGroup.builder()
+                    .securityGroup(SecurityGroup.builder()
                         .name("test-security-group-name")
-                        .rule(fill(SpaceDetail.SecurityGroup.Rule.builder(), "security-group-")
+                        .rule(fill(Rule.builder(), "security-group-")
                             .build())
                         .build())
                     .service("test-service-label")
@@ -912,7 +871,7 @@ public final class DefaultSpacesTest {
                     .id(TEST_SPACE_ID)
                     .name(TEST_SPACE_NAME)
                     .organization("test-organization-name")
-                    .securityGroup(SpaceDetail.SecurityGroup.builder()
+                    .securityGroup(SecurityGroup.builder()
                         .name("test-security-group-name")
                         .build())
                     .service("test-service-label")
@@ -954,7 +913,7 @@ public final class DefaultSpacesTest {
                     .id(TEST_SPACE_ID)
                     .name(TEST_SPACE_NAME)
                     .organization("test-organization-name")
-                    .securityGroup(SpaceDetail.SecurityGroup.builder()
+                    .securityGroup(SecurityGroup.builder()
                         .name("test-security-group-name")
                         .build())
                     .service("test-service-label")
@@ -978,7 +937,7 @@ public final class DefaultSpacesTest {
 
         @Before
         public void setUp() throws Exception {
-            requestSpaces(cloudFoundryClient, TEST_ORGANIZATION_ID);
+            requestSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         }
 
         @Override
@@ -1035,25 +994,6 @@ public final class DefaultSpacesTest {
                 .rename(RenameSpaceRequest.builder()
                     .name("test-space-name")
                     .newName("test-new-space-name")
-                    .build());
-        }
-
-    }
-
-    public static final class RenameInvalid extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .assertError(RequestValidationException.class, "Request is invalid: name must be specified, new name must be specified");
-        }
-
-        @Override
-        protected Publisher<Void> invoke() {
-            return this.spaces
-                .rename(RenameSpaceRequest.builder()
                     .build());
         }
 

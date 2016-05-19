@@ -16,21 +16,17 @@
 
 package org.cloudfoundry.operations.spaces;
 
-import org.junit.Test;
+import org.immutables.value.Value;
 
-public final class SpaceSshAllowedRequestTest {
+/**
+ * The request options for the delete space operation
+ */
+@Value.Immutable
+abstract class AbstractDeleteSpaceRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        SpaceSshAllowedRequest.builder()
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        SpaceSshAllowedRequest.builder()
-            .name("test-name")
-            .build();
-    }
+    /**
+     * The name of the space
+     */
+    abstract String getName();
 
 }

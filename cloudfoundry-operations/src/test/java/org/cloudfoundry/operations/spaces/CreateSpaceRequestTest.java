@@ -16,36 +16,21 @@
 
 package org.cloudfoundry.operations.spaces;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class CreateSpaceRequestTest {
 
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        CreateSpaceRequest.builder()
+            .build();
+    }
+
     @Test
-    public void isValid() {
-        ValidationResult result = CreateSpaceRequest.builder()
+    public void valid() {
+        CreateSpaceRequest.builder()
             .name("test-name")
-            .organization("test-organization")
-            .spaceQuota("test-space-quota")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
-    @Test
-    public void isValidNoName() {
-        ValidationResult result = CreateSpaceRequest.builder()
-            .organization("test-organization")
-            .spaceQuota("test-space-quota")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
-    }
 }
