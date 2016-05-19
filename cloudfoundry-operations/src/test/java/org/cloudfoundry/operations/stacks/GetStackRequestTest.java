@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.operations.stacks;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class GetStackRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = GetStackRequest.builder()
-            .name("test-stack-name")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        GetStackRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValidNoDomain() {
-        ValidationResult result = GetStackRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+    public void valid() {
+        GetStackRequest.builder()
+            .name("test-stack-name")
+            .build();
     }
 
 }

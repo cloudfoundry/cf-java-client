@@ -16,44 +16,27 @@
 
 package org.cloudfoundry.operations.stacks;
 
-import lombok.Builder;
-import lombok.Data;
+import org.immutables.value.Value;
 
 /**
- * A Stack.
+ * A Stack
  */
-@Data
-public final class Stack {
+@Value.Immutable
+abstract class AbstractStack {
 
     /**
      * The description of this stack
-     *
-     * @param description the description
-     * @return the description
      */
-    private final String description;
+    abstract String getDescription();
 
     /**
      * The id
-     *
-     * @param id the id
-     * @return the id
      */
-    private final String id;
+    abstract String getId();
 
     /**
      * The name of this stack
-     *
-     * @param name the name
-     * @return the name
      */
-    private final String name;
-
-    @Builder
-    Stack(String description, String id, String name) {
-        this.description = description;
-        this.id = id;
-        this.name = name;
-    }
+    abstract String getName();
 
 }
