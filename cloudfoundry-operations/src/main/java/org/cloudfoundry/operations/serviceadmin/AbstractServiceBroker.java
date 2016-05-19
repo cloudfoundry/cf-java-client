@@ -16,44 +16,27 @@
 
 package org.cloudfoundry.operations.serviceadmin;
 
-import lombok.Builder;
-import lombok.Data;
+import org.immutables.value.Value;
 
 /**
  * A Service Broker
  */
-@Data
-public final class ServiceBroker {
+@Value.Immutable
+abstract class AbstractServiceBroker {
 
     /**
      * The id
-     *
-     * @param id the id
-     * @return the id
      */
-    private final String id;
+    abstract String getId();
 
     /**
      * The name of the service broker
-     *
-     * @param name the name
-     * @return the name
      */
-    private final String name;
+    abstract String getName();
 
     /**
      * The url of the service broker
-     *
-     * @param url the url
-     * @return the url
      */
-    private final String url;
-
-    @Builder
-    ServiceBroker(String id, String name, String url) {
-        this.id = id;
-        this.name = name;
-        this.url = url;
-    }
+    abstract String getUrl();
 
 }
