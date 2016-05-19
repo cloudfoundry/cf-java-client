@@ -23,7 +23,7 @@ import org.immutables.value.Value;
 import java.util.List;
 
 /**
- * The response from the token key request
+ * The response from the check token request
  */
 @JsonDeserialize
 @Value.Immutable
@@ -36,16 +36,16 @@ abstract class AbstractCheckTokenResponse {
     abstract List<String> getAudiences();
 
     /**
-     * The auth time
-     */
-    @JsonProperty("auth_time")
-    abstract Long getAuthorizationTime();
-
-    /**
      * The authorities
      */
     @JsonProperty("authorities")
     abstract List<String> getAuthorities();
+
+    /**
+     * The auth time
+     */
+    @JsonProperty("auth_time")
+    abstract Long getAuthorizationTime();
 
     /**
      * The authorized party

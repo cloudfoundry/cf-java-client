@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 /**
- * The response from the token key request
+ * The response from the get token key request
  */
 @JsonDeserialize
 @Value.Immutable

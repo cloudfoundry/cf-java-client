@@ -21,7 +21,7 @@ import org.cloudfoundry.QueryParameter;
 import org.immutables.value.Value;
 
 /**
- * The request payload for the token key operation
+ * The request payload for the check token operation
  */
 @Value.Immutable
 abstract class AbstractCheckTokenRequest {

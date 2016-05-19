@@ -71,4 +71,12 @@ public interface Tokens {
      */
     Mono<ListTokenKeysResponse> listKeys(ListTokenKeysRequest request);
 
+    /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#refresh-token">Refresh Token</a> request
+     *
+     * @param request the refresh token request
+     * @return the response from the refresh token request
+     */
+    Mono<RefreshTokenResponse> refresh(RefreshTokenRequest request);
+
 }

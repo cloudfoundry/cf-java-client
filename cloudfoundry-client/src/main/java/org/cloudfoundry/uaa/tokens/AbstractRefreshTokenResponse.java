@@ -20,27 +20,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
-import java.util.List;
-
 /**
- * The response from the list token keys request
+ * The response from the refresh token operation
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class AbstractListTokenKeysResponse {
+abstract class AbstractRefreshTokenResponse extends AbstractToken {
 
     /**
-     * The token keys
+     * The refresh token
      */
-    @JsonProperty("keys")
-    abstract List<TokenKey> getKeys();
-
-    /**
-     * The token key
-     */
-    @Value.Immutable
-    static abstract class AbstractTokenKey extends org.cloudfoundry.uaa.tokens.AbstractTokenKey {
-
-    }
+    @JsonProperty("refresh_token")
+    abstract String getRefreshToken();
 
 }

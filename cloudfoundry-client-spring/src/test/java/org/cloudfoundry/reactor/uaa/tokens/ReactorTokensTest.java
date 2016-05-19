@@ -33,6 +33,8 @@ import org.cloudfoundry.uaa.tokens.GetTokenKeyResponse;
 import org.cloudfoundry.uaa.tokens.KeyType;
 import org.cloudfoundry.uaa.tokens.ListTokenKeysRequest;
 import org.cloudfoundry.uaa.tokens.ListTokenKeysResponse;
+import org.cloudfoundry.uaa.tokens.RefreshTokenRequest;
+import org.cloudfoundry.uaa.tokens.RefreshTokenResponse;
 import org.cloudfoundry.uaa.tokens.TokenFormat;
 import org.cloudfoundry.uaa.tokens.TokenKey;
 import reactor.core.publisher.Mono;
@@ -347,6 +349,52 @@ public final class ReactorTokensTest {
         protected Mono<ListTokenKeysResponse> invoke(ListTokenKeysRequest request) {
             return this.tokens.listKeys(request);
         }
+    }
+
+    public static final class RefreshToken extends AbstractUaaApiTest<RefreshTokenRequest, RefreshTokenResponse> {
+
+        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, CLIENT_ID, CLIENT_SECRET, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/oauth/token?client_id=app&client_secret=appclientsecret&refresh_token=6af5fc07a8b74c2eafb0079ff477bb11-r&token_format=opaque&grant_type=refresh_token")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/tokens/GET_refresh_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected RefreshTokenResponse getResponse() {
+            return RefreshTokenResponse.builder()
+                .accessToken("eyJhbGciOiJIUzI1NiIsImtpZCI6Imx")
+                .tokenType("bearer")
+                .refreshToken("eyJhbGciOiJIUzI1NiIsImtpZCI6Imx_E")
+                .expiresInSeconds(43199)
+                .scopes("scim.userids cloud_controller.read password.write cloud_controller.write openid")
+                .tokenId("6af5fc07a8b74c2eafb0079ff477bb11")
+                .build();
+        }
+
+        @Override
+        protected RefreshTokenRequest getValidRequest() {
+            return RefreshTokenRequest.builder()
+                .clientId("app")
+                .clientSecret("appclientsecret")
+                .refreshToken("6af5fc07a8b74c2eafb0079ff477bb11-r")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
+        }
+
+        @Override
+        protected Mono<RefreshTokenResponse> invoke(RefreshTokenRequest request) {
+            return this.tokens.refresh(request);
+        }
+
     }
 
 }

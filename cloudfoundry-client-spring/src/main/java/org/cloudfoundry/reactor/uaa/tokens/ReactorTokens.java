@@ -31,6 +31,8 @@ import org.cloudfoundry.uaa.tokens.GetTokenKeyRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyResponse;
 import org.cloudfoundry.uaa.tokens.ListTokenKeysRequest;
 import org.cloudfoundry.uaa.tokens.ListTokenKeysResponse;
+import org.cloudfoundry.uaa.tokens.RefreshTokenRequest;
+import org.cloudfoundry.uaa.tokens.RefreshTokenResponse;
 import org.cloudfoundry.uaa.tokens.Tokens;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
@@ -92,6 +94,12 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
     @Override
     public Mono<ListTokenKeysResponse> listKeys(ListTokenKeysRequest request) {
         return get(request, ListTokenKeysResponse.class, function((builder, validRequest) -> builder.pathSegment("token_keys")));
+    }
+
+    @Override
+    public Mono<RefreshTokenResponse> refresh(RefreshTokenRequest request) {
+        return post(request, RefreshTokenResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("oauth", "token").queryParam("grant_type", "refresh_token")));
     }
 
 }
