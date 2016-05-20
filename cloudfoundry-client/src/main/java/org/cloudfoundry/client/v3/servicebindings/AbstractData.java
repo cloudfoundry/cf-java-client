@@ -14,39 +14,22 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3;
+package org.cloudfoundry.client.v3.servicebindings;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
-/**
- * A hash payload
- */
-@Data
-public final class Hash {
+import java.util.Map;
 
-    /**
-     * The type
-     *
-     * @param type the type
-     * @return the type
-     */
-    private final String type;
+@Value.Immutable
+abstract class AbstractData {
 
     /**
-     * The value
-     *
-     * @param value the value
-     * @return the value
+     * The parameters
      */
-    private final String value;
-
-    @Builder
-    Hash(@JsonProperty("type") String type,
-         @JsonProperty("value") String value) {
-        this.type = type;
-        this.value = value;
-    }
+    @JsonProperty("parameters")
+    @Nullable
+    abstract Map<String, Object> getParameters();
 
 }

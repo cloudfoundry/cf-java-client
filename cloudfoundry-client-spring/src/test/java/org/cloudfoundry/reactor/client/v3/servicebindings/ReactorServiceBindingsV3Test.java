@@ -19,13 +19,14 @@ package org.cloudfoundry.reactor.client.v3.servicebindings;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingRequest;
-import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingRequest.Relationships;
 import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingResponse;
+import org.cloudfoundry.client.v3.servicebindings.Data;
 import org.cloudfoundry.client.v3.servicebindings.DeleteServiceBindingRequest;
 import org.cloudfoundry.client.v3.servicebindings.GetServiceBindingRequest;
 import org.cloudfoundry.client.v3.servicebindings.GetServiceBindingResponse;
 import org.cloudfoundry.client.v3.servicebindings.ListServiceBindingsRequest;
 import org.cloudfoundry.client.v3.servicebindings.ListServiceBindingsResponse;
+import org.cloudfoundry.client.v3.servicebindings.Relationships;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -64,12 +65,6 @@ public final class ReactorServiceBindingsV3Test {
         }
 
         @Override
-        protected CreateServiceBindingRequest getInvalidRequest() {
-            return CreateServiceBindingRequest.builder()
-                .build();
-        }
-
-        @Override
         protected CreateServiceBindingResponse getResponse() {
             return CreateServiceBindingResponse.builder()
                 .id("dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
@@ -92,7 +87,7 @@ public final class ReactorServiceBindingsV3Test {
         @Override
         protected CreateServiceBindingRequest getValidRequest() throws Exception {
             return CreateServiceBindingRequest.builder()
-                .data(CreateServiceBindingRequest.Data.builder()
+                .data(Data.builder()
                     .parameters(Collections.singletonMap("some_object_id", "for_the_service_broker"))
                     .build())
                 .relationships(Relationships.builder()

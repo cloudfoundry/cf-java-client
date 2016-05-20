@@ -16,49 +16,39 @@
 
 package org.cloudfoundry.client.v3.applications;
 
-import org.cloudfoundry.ValidationResult;
 import org.cloudfoundry.client.v3.Relationship;
 import org.junit.Test;
 
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
-
 public final class CreateApplicationRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = CreateApplicationRequest.builder()
-            .name("test-name")
-            .relationship("space", Relationship.builder()
-                .id("test-id")
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        CreateApplicationRequest.builder()
+            .relationships(Relationships.builder()
+                .space(Relationship.builder()
+                    .id("test-id")
+                    .build())
                 .build())
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
-    @Test
-    public void isValidNoName() {
-        ValidationResult result = CreateApplicationRequest.builder()
-            .relationship("test-relationship", Relationship.builder()
-                .id("test-id")
-                .build())
-            .build()
-            .isValid();
-
-        assertEquals(ValidationResult.Status.INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoSpaceRelationship() {
-        ValidationResult result = CreateApplicationRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noRelationships() {
+        CreateApplicationRequest.builder()
             .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(ValidationResult.Status.INVALID, result.getStatus());
-        assertEquals("space relationship must be specified", result.getMessages().get(0));
+            .build();
     }
+
+    @Test
+    public void valid() {
+        CreateApplicationRequest.builder()
+            .name("test-name")
+            .relationships(Relationships.builder()
+                .space(Relationship.builder()
+                    .id("test-id")
+                    .build())
+                .build())
+            .build();
+    }
+
 }

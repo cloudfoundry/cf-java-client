@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3;
+package org.cloudfoundry.client.v3.servicebindings;
 
 import org.junit.Test;
 
-public final class RelationshipTest {
-
-    @Test(expected = IllegalStateException.class)
-    public void noId() {
-        Relationship.builder()
-            .build();
-    }
+public final class DataTest {
 
     @Test
     public void valid() {
-        Relationship.builder()
-            .id("test-id")
+        Data.builder()
             .build();
     }
 

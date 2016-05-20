@@ -17,42 +17,25 @@
 package org.cloudfoundry.client.v3;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Singular;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
-import java.util.Map;
-
-/**
- * Represents the lifecycle of an application
- */
-@Data
-public final class Lifecycle {
+@JsonDeserialize
+@Value.Immutable
+abstract class AbstractBuildpackData implements Data {
 
     /**
-     * The datas
-     *
-     * @param datas the datas
-     * @return the datas
+     * The buildpack
      */
-    @Getter(onMethod = @__(@JsonProperty("data")))
-    private final Map<String, String> datas;
+    @JsonProperty("buildpack")
+    @Nullable
+    abstract String getBuildpack();
 
     /**
-     * The type
-     *
-     * @param type the type
-     * @return the type
+     * The stack
      */
-    @Getter(onMethod = @__(@JsonProperty("type")))
-    private final String type;
-
-    @Builder
-    Lifecycle(@JsonProperty("data") @Singular Map<String, String> datas,
-              @JsonProperty("type") String type) {
-        this.datas = datas;
-        this.type = type;
-    }
+    @JsonProperty("stack")
+    abstract String getStack();
 
 }

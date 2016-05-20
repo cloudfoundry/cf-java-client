@@ -20,6 +20,7 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.applications.Application;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
+import org.cloudfoundry.client.v3.applications.Relationships;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.Package;
@@ -51,8 +52,10 @@ public final class PackagesTest extends AbstractIntegrationTest {
             .then(spaceId -> this.cloudFoundryClient.applicationsV3()
                 .create(CreateApplicationRequest.builder()
                     .name(applicationName)
-                    .relationship("space", Relationship.builder()
-                        .id(spaceId)
+                    .relationships(Relationships.builder()
+                        .space(Relationship.builder()
+                            .id(spaceId)
+                            .build())
                         .build())
                     .build()))
             .map(Application::getId)

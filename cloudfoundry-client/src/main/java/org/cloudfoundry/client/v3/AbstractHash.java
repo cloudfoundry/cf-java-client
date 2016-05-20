@@ -16,21 +16,24 @@
 
 package org.cloudfoundry.client.v3;
 
-import org.junit.Test;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
-public final class RelationshipTest {
+/**
+ * A hash payload
+ */
+@JsonDeserialize
+@Value.Immutable
+abstract class AbstractHash {
 
-    @Test(expected = IllegalStateException.class)
-    public void noId() {
-        Relationship.builder()
-            .build();
-    }
+    /**
+     * The type
+     */
+    abstract String getType();
 
-    @Test
-    public void valid() {
-        Relationship.builder()
-            .id("test-id")
-            .build();
-    }
+    /**
+     * The value
+     */
+    abstract String getValue();
 
 }

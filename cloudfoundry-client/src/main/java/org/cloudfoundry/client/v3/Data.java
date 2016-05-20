@@ -16,21 +16,9 @@
 
 package org.cloudfoundry.client.v3;
 
-import org.junit.Test;
-
-public final class RelationshipTest {
-
-    @Test(expected = IllegalStateException.class)
-    public void noId() {
-        Relationship.builder()
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        Relationship.builder()
-            .id("test-id")
-            .build();
-    }
+/**
+ * Data for an {@link Lifecycle}
+ */
+public interface Data {
 
 }

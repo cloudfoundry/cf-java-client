@@ -18,18 +18,18 @@ package org.cloudfoundry.client.v3;
 
 import org.junit.Test;
 
-public final class RelationshipTest {
+public final class BuildpackDataTest {
 
     @Test(expected = IllegalStateException.class)
-    public void noId() {
-        Relationship.builder()
+    public void noStack() {
+        BuildpackData.builder()
             .build();
     }
 
     @Test
     public void valid() {
-        Relationship.builder()
-            .id("test-id")
+        BuildpackData.builder()
+            .stack("test-stack")
             .build();
     }
 

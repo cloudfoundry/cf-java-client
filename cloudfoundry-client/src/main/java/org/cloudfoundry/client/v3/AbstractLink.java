@@ -16,21 +16,29 @@
 
 package org.cloudfoundry.client.v3;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
-public final class RelationshipTest {
+/**
+ * A link payload. By default it uses {@code GET} for the {@code method}
+ */
+@JsonDeserialize
+@Value.Immutable
+abstract class AbstractLink {
 
-    @Test(expected = IllegalStateException.class)
-    public void noId() {
-        Relationship.builder()
-            .build();
-    }
+    /**
+     * The href
+     */
+    @JsonProperty("href")
+    abstract String getHref();
 
-    @Test
-    public void valid() {
-        Relationship.builder()
-            .id("test-id")
-            .build();
-    }
+    /**
+     * The method
+     */
+    @JsonProperty("method")
+    @Nullable
+    abstract String getMethod();
 
 }

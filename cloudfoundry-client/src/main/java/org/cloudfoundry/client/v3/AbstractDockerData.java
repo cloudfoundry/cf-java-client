@@ -16,21 +16,14 @@
 
 package org.cloudfoundry.client.v3;
 
-import org.junit.Test;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
-public final class RelationshipTest {
-
-    @Test(expected = IllegalStateException.class)
-    public void noId() {
-        Relationship.builder()
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        Relationship.builder()
-            .id("test-id")
-            .build();
-    }
+/**
+ * The data for a docker lifecycle
+ */
+@JsonDeserialize
+@Value.Immutable
+abstract class AbstractDockerData implements Data {
 
 }

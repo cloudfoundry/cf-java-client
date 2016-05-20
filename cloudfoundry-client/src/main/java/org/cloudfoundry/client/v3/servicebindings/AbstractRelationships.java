@@ -14,39 +14,28 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3;
+package org.cloudfoundry.client.v3.servicebindings;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
+import org.cloudfoundry.client.v3.Relationship;
+import org.immutables.value.Value;
 
 /**
- * A link payload. By default it uses {@code GET} for the {@code method}
+ * The relationships for the Create Service Binding request
  */
-@Data
-public final class Link {
+@Value.Immutable
+abstract class AbstractRelationships {
 
     /**
-     * The href
-     *
-     * @param href the href
-     * @return the href
+     * The application relationship
      */
-    private final String href;
+    @JsonProperty("app")
+    abstract Relationship getApplication();
 
     /**
-     * The method
-     *
-     * @param method the method
-     * @return the method
+     * The service instance relationship
      */
-    private final String method;
-
-    @Builder
-    Link(@JsonProperty("href") String href,
-         @JsonProperty("method") String method) {
-        this.href = href;
-        this.method = method;
-    }
+    @JsonProperty("service_instance")
+    abstract Relationship getServiceInstance();
 
 }

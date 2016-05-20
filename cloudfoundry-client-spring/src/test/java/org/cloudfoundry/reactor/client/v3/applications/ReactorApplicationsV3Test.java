@@ -47,6 +47,7 @@ import org.cloudfoundry.client.v3.applications.ListApplicationTasksRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationTasksResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
+import org.cloudfoundry.client.v3.applications.Relationships;
 import org.cloudfoundry.client.v3.applications.ScaleApplicationRequest;
 import org.cloudfoundry.client.v3.applications.ScaleApplicationResponse;
 import org.cloudfoundry.client.v3.applications.StartApplicationRequest;
@@ -58,8 +59,8 @@ import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v3.processes.AbstractProcessStatistics.PortMapping;
 import org.cloudfoundry.client.v3.processes.HealthCheck;
-import org.cloudfoundry.client.v3.processes.Type;
 import org.cloudfoundry.client.v3.processes.ProcessUsage;
+import org.cloudfoundry.client.v3.processes.Type;
 import org.cloudfoundry.client.v3.tasks.Task;
 import org.cloudfoundry.client.v3.tasks.TaskResource;
 import org.cloudfoundry.reactor.InteractionContext;
@@ -252,12 +253,6 @@ public final class ReactorApplicationsV3Test {
         }
 
         @Override
-        protected CreateApplicationRequest getInvalidRequest() {
-            return CreateApplicationRequest
-                .builder().build();
-        }
-
-        @Override
         protected CreateApplicationResponse getResponse() {
             return CreateApplicationResponse.builder()
                 .id("a1aef47a-600b-4b2b-a2f6-f5dc5344f886")
@@ -313,8 +308,10 @@ public final class ReactorApplicationsV3Test {
                     .type("buildpack")
                     .data("buildpack", "name-2443")
                     .build())
-                .relationship("space", Relationship.builder()
-                    .id("48989e6d-bb23-480d-94da-dae7c20e7af3")
+                .relationships(Relationships.builder()
+                    .space(Relationship.builder()
+                        .id("48989e6d-bb23-480d-94da-dae7c20e7af3")
+                        .build())
                     .build())
                 .build();
         }

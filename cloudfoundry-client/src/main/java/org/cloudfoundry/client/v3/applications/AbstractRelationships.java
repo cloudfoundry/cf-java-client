@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3;
+package org.cloudfoundry.client.v3.applications;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.client.v3.Relationship;
+import org.immutables.value.Value;
 
-public final class RelationshipTest {
+/**
+ * The relationships for the Create Application request
+ */
+@Value.Immutable
+abstract class AbstractRelationships {
 
-    @Test(expected = IllegalStateException.class)
-    public void noId() {
-        Relationship.builder()
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        Relationship.builder()
-            .id("test-id")
-            .build();
-    }
+    /**
+     * The space relationship
+     */
+    @JsonProperty("space")
+    abstract Relationship getSpace();
 
 }
