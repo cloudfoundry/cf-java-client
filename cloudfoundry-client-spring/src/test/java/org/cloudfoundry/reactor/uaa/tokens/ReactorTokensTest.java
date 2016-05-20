@@ -26,6 +26,8 @@ import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenByClientCredentialsRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenByClientCredentialsResponse;
+import org.cloudfoundry.uaa.tokens.GetTokenByOpenIdRequest;
+import org.cloudfoundry.uaa.tokens.GetTokenByOpenIdResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenByPasswordRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenByPasswordResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyRequest;
@@ -245,6 +247,55 @@ public final class ReactorTokensTest {
         @Override
         protected Mono<GetTokenByClientCredentialsResponse> invoke(GetTokenByClientCredentialsRequest request) {
             return this.tokens.getByClientCredentials(request);
+        }
+
+    }
+
+    public static final class GetTokenByOpenId extends AbstractUaaApiTest<GetTokenByOpenIdRequest, GetTokenByOpenIdResponse> {
+
+        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, CLIENT_ID, CLIENT_SECRET, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/oauth/token?code=NAlA1d&client_id=app&client_secret=appclientsecret&redirect_uri=https://uaa.cloudfoundry.com/redirect/cf&token_format=opaque" +
+                        "&grant_type=authorization_code&response_type=id_token")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/tokens/GET_response_OI.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected GetTokenByOpenIdResponse getResponse() {
+            return GetTokenByOpenIdResponse.builder()
+                .accessToken("53a58e6581ee49d08f9e572f673bc8db")
+                .tokenType("bearer")
+                .openIdToken("eyJhbGciOiJIUzI1NiIsImtpZCI6ImxlZ2FjeS10b2tlbi1rZXkiLC")
+                .refreshToken("53a58e6581ee49d08f9e572f673bc8db-r")
+                .expiresInSeconds(43199)
+                .scopes("openid oauth.approvals")
+                .tokenId("53a58e6581ee49d08f9e572f673bc8db")
+                .build();
+        }
+
+        @Override
+        protected GetTokenByOpenIdRequest getValidRequest() {
+            return GetTokenByOpenIdRequest.builder()
+                .clientId("app")
+                .clientSecret("appclientsecret")
+                .authorizationCode("NAlA1d")
+                .redirectUri("https://uaa.cloudfoundry.com/redirect/cf")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
+        }
+
+        @Override
+        protected Mono<GetTokenByOpenIdResponse> invoke(GetTokenByOpenIdRequest request) {
+            return this.tokens.getByOpenId(request);
         }
 
     }
