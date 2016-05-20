@@ -23,13 +23,10 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionReso
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.cloudfoundry.util.ValidationUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.NoSuchElementException;
-
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class DefaultSpaceAdmin implements SpaceAdmin {
 
@@ -44,10 +41,8 @@ public final class DefaultSpaceAdmin implements SpaceAdmin {
 
     @Override
     public Mono<SpaceQuota> get(GetSpaceQuotaRequest request) {
-        return ValidationUtils
-            .validate(request)
-            .and(this.organizationId)
-            .then(function((validRequest, organizationId) -> getSpaceQuotaDefinition(this.cloudFoundryClient, organizationId, validRequest.getName())))
+        return this.organizationId
+            .then(organizationId -> getSpaceQuotaDefinition(this.cloudFoundryClient, organizationId, request.getName()))
             .map(DefaultSpaceAdmin::toSpaceQuota);
     }
 

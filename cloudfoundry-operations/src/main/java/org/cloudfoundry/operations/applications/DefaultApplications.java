@@ -86,7 +86,6 @@ import org.cloudfoundry.util.OperationUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.StringMap;
-import org.cloudfoundry.util.ValidationUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple2;
@@ -107,7 +106,6 @@ import java.util.function.Predicate;
 import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
-import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
 
 public final class DefaultApplications implements Applications {
 
@@ -144,30 +142,21 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> copySource(CopySourceApplicationRequest request) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((validRequest, spaceId) -> Mono
-                .when(
-                    Mono.just(validRequest),
-                    getApplicationId(this.cloudFoundryClient, validRequest.getName(), spaceId),
-                    getApplicationIdFromOrgSpace(this.cloudFoundryClient, validRequest.getTargetName(), spaceId, validRequest.getTargetOrganization(), validRequest.getTargetSpace())
-                )))
-            .then(function((validRequest, sourceApplicationId, targetApplicationId) -> Mono
-                .when(
-                    Mono.just(validRequest),
-                    copyBits(this.cloudFoundryClient, sourceApplicationId, targetApplicationId)
-                        .then(Mono.just(targetApplicationId))
-                )))
-            .where(predicate((validRequest, targetApplicationId) -> Optional.ofNullable(validRequest.getRestart()).orElse(false)))
-            .then(function((validRequest, targetApplicationId) ->
-                restartApplication(this.cloudFoundryClient, validRequest.getTargetName(), targetApplicationId, validRequest.getStagingTimeout(), validRequest.getStartupTimeout())));
+        return this.spaceId
+            .then(spaceId -> Mono.when(
+                getApplicationId(this.cloudFoundryClient, request.getName(), spaceId),
+                getApplicationIdFromOrgSpace(this.cloudFoundryClient, request.getTargetName(), spaceId, request.getTargetOrganization(), request.getTargetSpace())
+            ))
+            .then(function((sourceApplicationId, targetApplicationId) -> copyBits(this.cloudFoundryClient, sourceApplicationId, targetApplicationId)
+                .then(Mono.just(targetApplicationId))))
+            .where(targetApplicationId -> Optional.ofNullable(request.getRestart()).orElse(false))
+            .then(targetApplicationId -> restartApplication(this.cloudFoundryClient, request.getTargetName(), targetApplicationId, request.getStagingTimeout(), request.getStartupTimeout()));
     }
 
     @Override
     public Mono<Void> delete(DeleteApplicationRequest request) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((validRequest, spaceId) -> getRoutesAndApplicationId(this.cloudFoundryClient, validRequest, spaceId, Optional.ofNullable(request.getDeleteRoutes()).orElse(false))))
+        return this.spaceId
+            .then(spaceId -> getRoutesAndApplicationId(this.cloudFoundryClient, request, spaceId, Optional.ofNullable(request.getDeleteRoutes()).orElse(false)))
             .then(function((routes, applicationId) -> deleteRoutes(this.cloudFoundryClient, routes)
                 .then(Mono.just(applicationId))))
             .as(thenKeep(applicationId -> removeServiceBindings(this.cloudFoundryClient, applicationId)))
@@ -176,71 +165,61 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> disableSsh(DisableApplicationSshRequest request) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((validRequest, spaceId) -> getApplicationIdWhere(this.cloudFoundryClient, validRequest.getName(), spaceId, sshEnabled(true))))
+        return this.spaceId
+            .then(spaceId -> getApplicationIdWhere(this.cloudFoundryClient, request.getName(), spaceId, sshEnabled(true)))
             .then(applicationId -> requestUpdateApplicationSsh(this.cloudFoundryClient, applicationId, false))
             .then();
     }
 
     @Override
     public Mono<Void> enableSsh(EnableApplicationSshRequest request) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((validRequest, spaceId) -> getApplicationIdWhere(this.cloudFoundryClient, validRequest.getName(), spaceId, sshEnabled(false))))
+        return this.spaceId
+            .then(spaceId -> getApplicationIdWhere(this.cloudFoundryClient, request.getName(), spaceId, sshEnabled(false)))
             .then(applicationId -> requestUpdateApplicationSsh(this.cloudFoundryClient, applicationId, true))
             .then();
     }
 
     @Override
     public Mono<ApplicationDetail> get(GetApplicationRequest request) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((validRequest, spaceId) -> getApplication(this.cloudFoundryClient, validRequest.getName(), spaceId)))
+        return this.spaceId
+            .then(spaceId -> getApplication(this.cloudFoundryClient, request.getName(), spaceId))
             .then(applicationResource -> getAuxiliaryContent(this.cloudFoundryClient, applicationResource))
             .map(function(DefaultApplications::toApplicationDetail));
     }
 
     @Override
     public Mono<ApplicationManifest> getApplicationManifest(GetApplicationManifestRequest request) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((validRequest, spaceId) -> getApplicationId(this.cloudFoundryClient, validRequest.getName(), spaceId)))
+        return this.spaceId
+            .then(spaceId -> getApplicationId(this.cloudFoundryClient, request.getName(), spaceId))
             .then(applicationId -> requestApplicationSummary(this.cloudFoundryClient, applicationId))
-            .then(response -> Mono
-                .just(response)
-                .and(getStackName(this.cloudFoundryClient, response.getStackId())))
+            .then(response -> Mono.when(
+                Mono.just(response),
+                getStackName(this.cloudFoundryClient, response.getStackId())
+            ))
             .then(function(DefaultApplications::toApplicationManifest));
     }
 
     @Override
     public Mono<ApplicationEnvironments> getEnvironments(GetApplicationEnvironmentsRequest request) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((validRequest, spaceId) -> getApplicationId(this.cloudFoundryClient, validRequest.getName(), spaceId)))
+        return this.spaceId
+            .then(spaceId -> getApplicationId(this.cloudFoundryClient, request.getName(), spaceId))
             .then(applicationId -> requestApplicationEnvironment(this.cloudFoundryClient, applicationId))
             .map(DefaultApplications::toApplicationEnvironments);
     }
 
     @Override
     public Flux<ApplicationEvent> getEvents(GetApplicationEventsRequest request) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((validRequest, spaceId) -> Mono
-                .when(
-                    Mono.just(validRequest),
-                    getApplicationId(this.cloudFoundryClient, validRequest.getName(), spaceId)
-                )))
-            .flatMap(function((validRequest, applicationId) -> requestEvents(applicationId, this.cloudFoundryClient)
-                .take(Optional.ofNullable(validRequest.getMaxNumberOfEvents()).orElse(MAX_NUMBER_OF_RECENT_EVENTS))))
+        return this.spaceId
+            .then(spaceId -> getApplicationId(this.cloudFoundryClient, request.getName(), spaceId))
+            .flatMap(applicationId -> requestEvents(applicationId, this.cloudFoundryClient)
+                .take(Optional.ofNullable(request.getMaxNumberOfEvents()).orElse(MAX_NUMBER_OF_RECENT_EVENTS)))
             .map(DefaultApplications::convertToApplicationEvent);
     }
 
     @Override
-    public Mono<ApplicationHealthCheck> getHealthCheck(GetApplicationHealthCheckRequest getApplicationHealthCheckRequest) {
-        return Mono
-            .when(ValidationUtils.validate(getApplicationHealthCheckRequest), this.spaceId)
-            .then(function((request, spaceId) -> getApplication(this.cloudFoundryClient, request.getName(), spaceId)))
+    public Mono<ApplicationHealthCheck> getHealthCheck(GetApplicationHealthCheckRequest request) {
+        return this.spaceId
+            .then(spaceId -> getApplication(this.cloudFoundryClient, request.getName(), spaceId))
             .map(DefaultApplications::toHealthCheck);
     }
 
@@ -254,182 +233,115 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Flux<LogMessage> logs(LogsRequest request) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((validRequest, spaceId) -> getApplicationId(this.cloudFoundryClient, validRequest.getName(), spaceId)
-                .and(Mono.just(validRequest))))
-            .flatMap(function((applicationId, logsRequest) -> getLogs(this.dopplerClient, applicationId, logsRequest.getRecent())));
+        return this.spaceId
+            .then(spaceId -> getApplicationId(this.cloudFoundryClient, request.getName(), spaceId))
+            .flatMap(applicationId -> getLogs(this.dopplerClient, applicationId, request.getRecent()));
     }
 
     @Override
     public Mono<Void> push(PushApplicationRequest request) {
-        return ValidationUtils
-            .validate(request)
-            .then(validRequest -> Mono
-                .when(
-                    Mono.just(validRequest),
-                    DefaultApplications.this.spaceId,
-                    getOptionalStackId(this.cloudFoundryClient, validRequest.getStack())
-                ))
-            .then(function((validRequest, spaceId, stackId) -> Mono
-                .when(
-                    getApplicationId(this.cloudFoundryClient, validRequest, spaceId, stackId.orElse(null)),
-                    Mono.just(validRequest),
-                    Mono.just(spaceId)
-                )))
-            .as(thenKeep(function((applicationId, validRequest, spaceId) -> prepareDomainsAndRoutes(this.cloudFoundryClient, validRequest, applicationId, spaceId, this.randomWords))))
-            .map(function((applicationId, validRequest, spaceId) -> Tuple2.of(applicationId, validRequest)))
-            .as(thenKeep(function((applicationId, validRequest) -> uploadApplicationAndWait(this.cloudFoundryClient, applicationId, validRequest.getApplication()))))
-            .as(thenKeep(function((applicationId, validRequest) -> stopApplication(this.cloudFoundryClient, applicationId))))
-            .where(predicate((applicationId, validRequest) -> !Optional.ofNullable(validRequest.getNoStart()).orElse(false)))
-            .then(function((applicationId, validRequest) -> startApplicationAndWait(this.cloudFoundryClient, validRequest.getName(), applicationId, validRequest.getStagingTimeout(),
-                validRequest.getStartupTimeout())));
+        return Mono
+            .when(
+                this.spaceId,
+                getOptionalStackId(this.cloudFoundryClient, request.getStack())
+            )
+            .then(function((spaceId, stackId) -> Mono.when(
+                getApplicationId(this.cloudFoundryClient, request, spaceId, stackId.orElse(null)),
+                Mono.just(spaceId)
+            )))
+            .as(thenKeep(function((applicationId, spaceId) -> prepareDomainsAndRoutes(this.cloudFoundryClient, request, applicationId, spaceId, this.randomWords))))
+            .map(function((applicationId, spaceId) -> applicationId))
+            .as(thenKeep(applicationId -> uploadApplicationAndWait(this.cloudFoundryClient, applicationId, request.getApplication())))
+            .as(thenKeep(applicationId -> stopApplication(this.cloudFoundryClient, applicationId)))
+            .where(applicationId -> !Optional.ofNullable(request.getNoStart()).orElse(false))
+            .then(applicationId -> startApplicationAndWait(this.cloudFoundryClient, request.getName(), applicationId, request.getStagingTimeout(), request.getStartupTimeout()));
     }
 
     @Override
     public Mono<Void> rename(RenameApplicationRequest request) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((validRequest, spaceId) -> Mono
-                .when(
-                    getApplicationId(this.cloudFoundryClient, validRequest.getName(), spaceId),
-                    Mono.just(validRequest.getNewName())
-                )))
-            .then(function((applicationId, newName) -> requestUpdateApplicationRename(this.cloudFoundryClient, applicationId, newName)))
+        return this.spaceId
+            .then(spaceId -> getApplicationId(this.cloudFoundryClient, request.getName(), spaceId))
+            .then(applicationId -> requestUpdateApplicationRename(this.cloudFoundryClient, applicationId, request.getNewName()))
             .then();
     }
 
     @Override
     public Mono<Void> restage(RestageApplicationRequest request) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((validRequest, spaceId) -> Mono
-                .just(validRequest)
-                .and(getApplicationId(this.cloudFoundryClient, validRequest.getName(), spaceId))))
-            .then(function((validRequest, applicationId) -> restageApplication(this.cloudFoundryClient, validRequest.getName(), applicationId, validRequest.getStagingTimeout(),
-                validRequest.getStartupTimeout())));
+        return this.spaceId
+            .then(spaceId -> getApplicationId(this.cloudFoundryClient, request.getName(), spaceId))
+            .then(applicationId -> restageApplication(this.cloudFoundryClient, request.getName(), applicationId, request.getStagingTimeout(), request.getStartupTimeout()));
     }
 
     @Override
     public Mono<Void> restart(RestartApplicationRequest request) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((validRequest, spaceId) -> getApplication(this.cloudFoundryClient, validRequest.getName(), spaceId)
-                .and(Mono.just(validRequest))))
-            .then(function((resource, validRequest) -> stopApplicationIfNotStopped(this.cloudFoundryClient, resource)
-                .then(stoppedApplication -> startApplicationAndWait(this.cloudFoundryClient, validRequest.getName(), ResourceUtils.getId(stoppedApplication), validRequest.getStagingTimeout(),
-                    validRequest.getStartupTimeout()))));
+        return this.spaceId
+            .then(spaceId -> getApplication(this.cloudFoundryClient, request.getName(), spaceId))
+            .then(resource -> stopApplicationIfNotStopped(this.cloudFoundryClient, resource))
+            .then(stoppedApplication -> startApplicationAndWait(this.cloudFoundryClient, request.getName(), ResourceUtils.getId(stoppedApplication), request.getStagingTimeout(),
+                request.getStartupTimeout()));
     }
 
     @Override
     public Mono<Void> restartInstance(RestartApplicationInstanceRequest request) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((validRequest, spaceId) -> Mono
-                .when(
-                    getApplicationId(this.cloudFoundryClient, validRequest.getName(), spaceId),
-                    Mono.just(String.valueOf(validRequest.getInstanceIndex()))
-                )))
-            .then(function((applicationId, instanceIndex) -> requestTerminateApplicationInstance(this.cloudFoundryClient, applicationId, instanceIndex)));
+        return this.spaceId
+            .then(spaceId -> getApplicationId(this.cloudFoundryClient, request.getName(), spaceId))
+            .then(applicationId -> requestTerminateApplicationInstance(this.cloudFoundryClient, applicationId, String.valueOf(request.getInstanceIndex())));
     }
 
     @Override
     public Mono<Void> scale(ScaleApplicationRequest request) {
-        return Mono
-            .when(
-                ValidationUtils
-                    .validate(request)
-                    .where(DefaultApplications::areModifiersPresent),
-                this.spaceId
-            )
-            .then(function((validRequest, spaceId) -> Mono
-                .when(
-                    Mono.just(validRequest),
-                    getApplicationId(this.cloudFoundryClient, validRequest.getName(), spaceId)
-                )))
-            .then(function((validRequest, applicationId) -> Mono
-                .when(
-                    Mono.just(validRequest),
-                    requestUpdateApplicationScale(this.cloudFoundryClient, applicationId, validRequest.getDiskLimit(), validRequest.getInstances(), validRequest.getMemoryLimit())
-                )))
-            .where(predicate(DefaultApplications::isRestartRequired))
-            .then(function((validRequest, resource) ->
-                restartApplication(this.cloudFoundryClient, validRequest.getName(), ResourceUtils.getId(resource), validRequest.getStagingTimeout(), validRequest.getStartupTimeout())));
+        return this.spaceId
+            .where(spaceId -> areModifiersPresent(request))
+            .then(spaceId -> getApplicationId(this.cloudFoundryClient, request.getName(), spaceId))
+            .then(applicationId -> requestUpdateApplicationScale(this.cloudFoundryClient, applicationId, request.getDiskLimit(), request.getInstances(), request.getMemoryLimit()))
+            .where(resource -> isRestartRequired(request, resource))
+            .then(resource -> restartApplication(this.cloudFoundryClient, request.getName(), ResourceUtils.getId(resource), request.getStagingTimeout(), request.getStartupTimeout()));
     }
 
     @Override
     public Mono<Void> setEnvironmentVariable(SetEnvironmentVariableApplicationRequest request) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((validRequest, spaceId) -> Mono
-                .when(
-                    Mono.just(validRequest),
-                    getApplication(this.cloudFoundryClient, validRequest.getName(), spaceId)
-                )))
-            .then(function((validRequest, resource) ->
-                requestUpdateApplicationEnvironment(
-                    this.cloudFoundryClient,
-                    ResourceUtils.getId(resource),
-                    addToEnvironment(getEnvironment(resource), validRequest.getVariableName(), validRequest.getVariableValue())
-                )))
+        return this.spaceId
+            .then(spaceId -> getApplication(this.cloudFoundryClient, request.getName(), spaceId))
+            .then(resource -> requestUpdateApplicationEnvironment(this.cloudFoundryClient, ResourceUtils.getId(resource), addToEnvironment(getEnvironment(resource), request.getVariableName(),
+                request.getVariableValue())))
             .then();
     }
 
     @Override
-    public Mono<Void> setHealthCheck(SetApplicationHealthCheckRequest setApplicationHealthCheckRequest) {
-        return Mono
-            .when(ValidationUtils.validate(setApplicationHealthCheckRequest), this.spaceId)
-            .then(function((request, spaceId) -> Mono
-                .when(
-                    getApplicationId(this.cloudFoundryClient, request.getName(), spaceId),
-                    Mono.just(request.getType())
-                )))
-            .then(function((applicationId, type) -> updateHealthCheck(this.cloudFoundryClient, applicationId, type)))
+    public Mono<Void> setHealthCheck(SetApplicationHealthCheckRequest request) {
+        return this.spaceId
+            .then(spaceId -> getApplicationId(this.cloudFoundryClient, request.getName(), spaceId))
+            .then(applicationId -> updateHealthCheck(this.cloudFoundryClient, applicationId, request.getType()))
             .then();
     }
 
     @Override
     public Mono<Boolean> sshEnabled(ApplicationSshEnabledRequest request) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((validRequest, spaceId) -> getApplication(this.cloudFoundryClient, validRequest.getName(), spaceId)))
+        return this.spaceId
+            .then(spaceId -> getApplication(this.cloudFoundryClient, request.getName(), spaceId))
             .map(applicationResource -> ResourceUtils.getEntity(applicationResource).getEnableSsh());
     }
 
     @Override
     public Mono<Void> start(StartApplicationRequest request) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((validRequest, spaceId) -> getApplicationIdWhere(this.cloudFoundryClient, validRequest.getName(), spaceId, isNotIn(STARTED_STATE))
-                .and(Mono.just(validRequest))))
-            .then(function((applicationId, validRequest) ->
-                startApplicationAndWait(this.cloudFoundryClient, validRequest.getName(), applicationId, validRequest.getStagingTimeout(), validRequest.getStartupTimeout())));
+        return this.spaceId
+            .then(spaceId -> getApplicationIdWhere(this.cloudFoundryClient, request.getName(), spaceId, isNotIn(STARTED_STATE)))
+            .then(applicationId -> startApplicationAndWait(this.cloudFoundryClient, request.getName(), applicationId, request.getStagingTimeout(), request.getStartupTimeout()));
     }
 
     @Override
     public Mono<Void> stop(StopApplicationRequest request) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((validRequest, spaceId) -> getApplicationIdWhere(this.cloudFoundryClient, validRequest.getName(), spaceId, isNotIn(STOPPED_STATE))))
+        return this.spaceId
+            .then(spaceId -> getApplicationIdWhere(this.cloudFoundryClient, request.getName(), spaceId, isNotIn(STOPPED_STATE)))
             .then(applicationId -> stopApplication(this.cloudFoundryClient, applicationId))
             .then();
     }
 
     @Override
     public Mono<Void> unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest request) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.spaceId)
-            .then(function((validRequest, spaceId) -> Mono
-                .when(
-                    Mono.just(validRequest),
-                    getApplication(this.cloudFoundryClient, validRequest.getName(), spaceId)
-                )))
-            .then(function((validRequest, resource) ->
-                requestUpdateApplicationEnvironment(
-                    this.cloudFoundryClient,
-                    ResourceUtils.getId(resource),
-                    removeFromEnvironment(getEnvironment(resource), validRequest.getVariableName())
-                )))
+        return this.spaceId
+            .then(spaceId -> getApplication(this.cloudFoundryClient, request.getName(), spaceId))
+            .then(resource -> requestUpdateApplicationEnvironment(this.cloudFoundryClient, ResourceUtils.getId(resource), removeFromEnvironment(getEnvironment(resource), request.getVariableName())))
             .then();
     }
 
@@ -606,15 +518,14 @@ public final class DefaultApplications implements Applications {
                 requestApplicationSummary(cloudFoundryClient, applicationId),
                 getApplicationInstances(cloudFoundryClient, applicationId)
             )
-            .then(function((applicationStatisticsResponse, summaryApplicationResponse, applicationInstancesResponse) -> Mono
-                .when(
-                    Mono.just(applicationStatisticsResponse),
-                    Mono.just(summaryApplicationResponse),
-                    requestStack(cloudFoundryClient, stackId),
-                    Mono.just(applicationInstancesResponse),
-                    toInstanceDetailList(applicationInstancesResponse, applicationStatisticsResponse),
-                    toUrls(summaryApplicationResponse.getRoutes())
-                )));
+            .then(function((applicationStatisticsResponse, summaryApplicationResponse, applicationInstancesResponse) -> Mono.when(
+                Mono.just(applicationStatisticsResponse),
+                Mono.just(summaryApplicationResponse),
+                requestStack(cloudFoundryClient, stackId),
+                Mono.just(applicationInstancesResponse),
+                toInstanceDetailList(applicationInstancesResponse, applicationStatisticsResponse),
+                toUrls(summaryApplicationResponse.getRoutes())
+            )));
     }
 
     private static String getBuildpack(SummaryApplicationResponse response) {

@@ -34,7 +34,6 @@ import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.cloudfoundry.util.ValidationUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -51,19 +50,14 @@ public final class DefaultDomains implements Domains {
     }
 
     public Mono<Void> create(CreateDomainRequest request) {
-        return ValidationUtils
-            .validate(request)
-            .then(validRequest -> getOrganizationId(this.cloudFoundryClient, validRequest.getOrganization())
-                .and(Mono.just(validRequest)))
-            .then(function((domainId, validRequest) -> requestCreateDomain(this.cloudFoundryClient, validRequest.getDomain(), domainId)))
+        return getOrganizationId(this.cloudFoundryClient, request.getOrganization())
+            .then(domainId -> requestCreateDomain(this.cloudFoundryClient, request.getDomain(), domainId))
             .then();
     }
 
     @Override
     public Mono<Void> createShared(CreateSharedDomainRequest request) {
-        return ValidationUtils
-            .validate(request)
-            .then(validRequest -> requestCreateSharedDomain(this.cloudFoundryClient, validRequest.getDomain()))
+        return requestCreateSharedDomain(this.cloudFoundryClient, request.getDomain())
             .then();
     }
 
@@ -78,26 +72,22 @@ public final class DefaultDomains implements Domains {
 
     @Override
     public Mono<Void> share(ShareDomainRequest request) {
-        return ValidationUtils
-            .validate(request)
-            .then(validRequest -> Mono
-                .when(
-                    getPrivateDomainId(this.cloudFoundryClient, validRequest.getDomain()),
-                    getOrganizationId(this.cloudFoundryClient, validRequest.getOrganization())
-                ))
+        return Mono
+            .when(
+                getPrivateDomainId(this.cloudFoundryClient, request.getDomain()),
+                getOrganizationId(this.cloudFoundryClient, request.getOrganization())
+            )
             .then(function((domainId, organizationId) -> requestAssociateOrganizationPrivateDomainRequest(this.cloudFoundryClient, domainId, organizationId)))
             .then();
     }
 
     @Override
     public Mono<Void> unshare(UnshareDomainRequest request) {
-        return ValidationUtils
-            .validate(request)
-            .then(validRequest -> Mono
-                .when(
-                    getPrivateDomainId(this.cloudFoundryClient, validRequest.getDomain()),
-                    getOrganizationId(this.cloudFoundryClient, validRequest.getOrganization())
-                ))
+        return Mono
+            .when(
+                getPrivateDomainId(this.cloudFoundryClient, request.getDomain()),
+                getOrganizationId(this.cloudFoundryClient, request.getOrganization())
+            )
             .then(function((domainId, organizationId) -> requestRemoveOrganizationPrivateDomainRequest(this.cloudFoundryClient, domainId, organizationId)));
     }
 

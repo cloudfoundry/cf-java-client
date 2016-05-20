@@ -22,7 +22,6 @@ import org.cloudfoundry.client.v2.stacks.StackResource;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.cloudfoundry.util.ValidationUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -38,9 +37,7 @@ public final class DefaultStacks implements Stacks {
 
     @Override
     public Mono<Stack> get(GetStackRequest request) {
-        return ValidationUtils
-            .validate(request)
-            .then(getStackRequest -> getStack(this.cloudFoundryClient, getStackRequest.getName()))
+        return getStack(this.cloudFoundryClient, request.getName())
             .map(this::toStack);
     }
 
