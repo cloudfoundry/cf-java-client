@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v3.droplets;
 
+import org.cloudfoundry.client.v3.BuildpackData;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.droplets.DeleteDropletRequest;
@@ -111,8 +112,10 @@ public final class ReactorDropletsTest {
                 .error("example error")
                 .lifecycle(Lifecycle.builder()
                     .type("buildpack")
-                    .data("buildpack", "name-2466")
-                    .data("stack", "name-2467")
+                    .data(BuildpackData.builder()
+                        .buildpack("name-2466")
+                        .stack("name-2467")
+                        .build())
                     .build())
                 .result("execution_metadata", null)
                 .result("process_types", null)
@@ -196,8 +199,10 @@ public final class ReactorDropletsTest {
                     .state("STAGED")
                     .lifecycle(Lifecycle.builder()
                         .type("buildpack")
-                        .data("buildpack", "name-2488")
-                        .data("stack", "name-2489")
+                        .data(BuildpackData.builder()
+                            .buildpack("name-2488")
+                            .stack("name-2489")
+                            .build())
                         .build())
                     .memoryLimit(123)
                     .diskLimit(456)
@@ -232,8 +237,10 @@ public final class ReactorDropletsTest {
                     .state("STAGING")
                     .lifecycle(Lifecycle.builder()
                         .type("buildpack")
-                        .data("buildpack", "name-2490")
-                        .data("stack", "name-2491")
+                        .data(BuildpackData.builder()
+                            .buildpack("name-2490")
+                            .stack("name-2491")
+                            .build())
                         .build())
                     .environmentVariable("yuu", "huuu")
                     .createdAt("1970-01-01T00:00:01Z")

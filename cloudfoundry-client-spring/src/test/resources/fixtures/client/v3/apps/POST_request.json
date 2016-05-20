@@ -6,7 +6,8 @@
   "lifecycle": {
     "type": "buildpack",
     "data": {
-      "buildpack": "name-2443"
+      "buildpack": "name-2443",
+      "stack": "name-2444"
     }
   },
   "relationships": {

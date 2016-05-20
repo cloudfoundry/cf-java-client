@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v3.packages;
 
+import org.cloudfoundry.client.v3.BuildpackData;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.PaginatedResponse.Pagination;
@@ -52,13 +53,11 @@ import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.cloudfoundry.client.v3.packages.PackageType.DOCKER;
 import static org.cloudfoundry.client.v3.packages.ListPackagesResponse.Resource;
+import static org.cloudfoundry.client.v3.packages.PackageType.DOCKER;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public final class ReactorPackagesTest {
 
@@ -474,8 +473,10 @@ public final class ReactorPackagesTest {
                 .state("PENDING")
                 .lifecycle(Lifecycle.builder()
                     .type("buildpack")
-                    .data("buildpack", "http://github.com/myorg/awesome-buildpack")
-                    .data("stack", "cflinuxfs2")
+                    .data(BuildpackData.builder()
+                        .buildpack("http://github.com/myorg/awesome-buildpack")
+                        .stack("cflinuxfs2")
+                        .build())
                     .build())
                 .memoryLimit(1_024)
                 .diskLimit(4_096)
@@ -524,8 +525,10 @@ public final class ReactorPackagesTest {
                 .environmentVariable("CUSTOM_ENV_VAR", "hello")
                 .lifecycle(Lifecycle.builder()
                     .type("buildpack")
-                    .data("buildpack", "http://github.com/myorg/awesome-buildpack")
-                    .data("stack", "cflinuxfs2")
+                    .data(BuildpackData.builder()
+                        .buildpack("http://github.com/myorg/awesome-buildpack")
+                        .stack("cflinuxfs2")
+                        .build())
                     .build())
                 .build();
         }
