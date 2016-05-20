@@ -789,12 +789,6 @@ public final class ReactorOrganizationsTest {
         }
 
         @Override
-        protected DeleteOrganizationRequest getInvalidRequest() {
-            return DeleteOrganizationRequest.builder()
-                .build();
-        }
-
-        @Override
         protected DeleteOrganizationResponse getResponse() {
             return null;
         }
@@ -827,12 +821,6 @@ public final class ReactorOrganizationsTest {
                     .status(ACCEPTED)
                     .payload("fixtures/client/v2/organizations/DELETE_{id}_async_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected DeleteOrganizationRequest getInvalidRequest() {
-            return DeleteOrganizationRequest.builder()
                 .build();
         }
 
