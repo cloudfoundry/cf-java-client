@@ -50,11 +50,10 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvide
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceResource;
 import org.cloudfoundry.client.v3.applications.Application;
-import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v3.packages.DeletePackageRequest;
 import org.cloudfoundry.client.v3.packages.ListPackagesRequest;
-import org.cloudfoundry.client.v3.packages.ListPackagesResponse;
 import org.cloudfoundry.client.v3.packages.Package;
+import org.cloudfoundry.client.v3.packages.PackageResource;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
@@ -123,11 +122,11 @@ final class CloudFoundryCleaner {
                     .map(id -> (Predicate<ApplicationResource>) r -> !protectedSpaceIds.contains(ResourceUtils.getEntity(r).getSpaceId()))
                     .orElse(r -> true);
 
-                Predicate<ListApplicationsResponse.Resource> applicationsV3Predicate = r -> true;  // TODO: Filter out interesting organizations
+                Predicate<org.cloudfoundry.client.v3.applications.ApplicationResource> applicationsV3Predicate = r -> true;  // TODO: Filter out interesting organizations
 
                 Predicate<BuildpackResource> buildpackPredicate = r -> !protectedBuildpackIds.contains(ResourceUtils.getId(r));
 
-                Predicate<ListPackagesResponse.Resource> packagePredicate = r -> true;  // TODO: Filter out interesting organizations
+                Predicate<PackageResource> packagePredicate = r -> true;  // TODO: Filter out interesting organizations
 
                 Predicate<ServiceInstanceResource> serviceInstancePredicate = r -> !protectedSpaceIds.contains(ResourceUtils.getEntity(r).getSpaceId());
 
@@ -189,7 +188,7 @@ final class CloudFoundryCleaner {
                     .build()));
     }
 
-    private static Flux<Void> cleanApplicationsV3(CloudFoundryClient cloudFoundryClient, Predicate<ListApplicationsResponse.Resource> predicate) {
+    private static Flux<Void> cleanApplicationsV3(CloudFoundryClient cloudFoundryClient, Predicate<org.cloudfoundry.client.v3.applications.ApplicationResource> predicate) {
         return cloudFoundryClient.applicationsV3()  // TODO: Handle pagination properly
             .list(org.cloudfoundry.client.v3.applications.ListApplicationsRequest.builder()
                 .page(1)
@@ -272,7 +271,7 @@ final class CloudFoundryCleaner {
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
-    private static Flux<Void> cleanPackages(CloudFoundryClient cloudFoundryClient, Predicate<ListPackagesResponse.Resource> predicate) {
+    private static Flux<Void> cleanPackages(CloudFoundryClient cloudFoundryClient, Predicate<PackageResource> predicate) {
         return cloudFoundryClient.packages()  // TODO: Handle pagination properly
             .list(ListPackagesRequest.builder()
                 .page(1)

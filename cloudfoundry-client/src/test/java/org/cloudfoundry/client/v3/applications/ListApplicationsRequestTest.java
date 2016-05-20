@@ -16,31 +16,14 @@
 
 package org.cloudfoundry.client.v3.applications;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public final class ListApplicationsRequestTest {
 
     @Test
-    public void isValid() {
-        ValidationResult result = ListApplicationsRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(ValidationResult.Status.VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidInvalidPaginatedRequest() {
-        ValidationResult result = ListApplicationsRequest.builder()
-            .page(0)
-            .build()
-            .isValid();
-
-        assertEquals(ValidationResult.Status.INVALID, result.getStatus());
-        assertEquals("page must be greater than or equal to 1", result.getMessages().get(0));
+    public void valid() {
+        ListApplicationsRequest.builder()
+            .build();
     }
 
 }

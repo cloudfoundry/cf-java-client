@@ -17,19 +17,23 @@
 package org.cloudfoundry.reactor.client.v3.processes;
 
 import org.cloudfoundry.client.v3.Link;
-import org.cloudfoundry.client.v3.processes.AbstractProcessStatistics.PortMapping;
-import org.cloudfoundry.client.v3.processes.GetProcessStatisticsRequest;
-import org.cloudfoundry.client.v3.processes.GetProcessStatisticsResponse;
+import org.cloudfoundry.client.v3.Pagination;
+import org.cloudfoundry.client.v3.processes.Data;
 import org.cloudfoundry.client.v3.processes.GetProcessRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessResponse;
+import org.cloudfoundry.client.v3.processes.GetProcessStatisticsRequest;
+import org.cloudfoundry.client.v3.processes.GetProcessStatisticsResponse;
 import org.cloudfoundry.client.v3.processes.HealthCheck;
-import org.cloudfoundry.client.v3.processes.Type;
 import org.cloudfoundry.client.v3.processes.ListProcessesRequest;
 import org.cloudfoundry.client.v3.processes.ListProcessesResponse;
+import org.cloudfoundry.client.v3.processes.PortMapping;
+import org.cloudfoundry.client.v3.processes.ProcessResource;
+import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
 import org.cloudfoundry.client.v3.processes.ProcessUsage;
 import org.cloudfoundry.client.v3.processes.ScaleProcessRequest;
 import org.cloudfoundry.client.v3.processes.ScaleProcessResponse;
 import org.cloudfoundry.client.v3.processes.TerminateProcessInstanceRequest;
+import org.cloudfoundry.client.v3.processes.Type;
 import org.cloudfoundry.client.v3.processes.UpdateProcessRequest;
 import org.cloudfoundry.client.v3.processes.UpdateProcessResponse;
 import org.cloudfoundry.reactor.InteractionContext;
@@ -44,8 +48,6 @@ import static io.netty.handler.codec.http.HttpMethod.PATCH;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.cloudfoundry.client.v3.PaginatedResponse.Pagination;
-import static org.cloudfoundry.client.v3.processes.ListProcessesResponse.Resource;
 
 public final class ReactorProcessesTest {
 
@@ -114,7 +116,8 @@ public final class ReactorProcessesTest {
                 .port(8080)
                 .healthCheck(HealthCheck.builder()
                     .type(Type.PORT)
-                    .data("timeout", null)
+                    .data(Data.builder()
+                        .build())
                     .build())
                 .createdAt("2016-03-23T18:48:22Z")
                 .updatedAt("2016-03-23T18:48:42Z")
@@ -168,7 +171,7 @@ public final class ReactorProcessesTest {
         @Override
         protected GetProcessStatisticsResponse getResponse() {
             return GetProcessStatisticsResponse.builder()
-                .resource(GetProcessStatisticsResponse.Resource.builder()
+                .resource(ProcessStatisticsResource.builder()
                     .type("web")
                     .index(0)
                     .state("RUNNING")
@@ -186,7 +189,7 @@ public final class ReactorProcessesTest {
                     .uptime(9042L)
                     .memoryQuota(268435456L)
                     .diskQuota(1073741824L)
-                    .fdsQuota(16384)
+                    .fdsQuota(16384L)
                     .build())
                 .build();
         }
@@ -237,7 +240,7 @@ public final class ReactorProcessesTest {
                         .href("/v3/processes?page=2&per_page=2")
                         .build())
                     .build())
-                .resource(Resource.builder()
+                .resource(ProcessResource.builder()
                     .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
                     .type("web")
                     .command("rackup")
@@ -247,7 +250,8 @@ public final class ReactorProcessesTest {
                     .port(8080)
                     .healthCheck(HealthCheck.builder()
                         .type(Type.PORT)
-                        .data("timeout", null)
+                        .data(Data.builder()
+                            .build())
                         .build())
                     .createdAt("2016-03-23T18:48:22Z")
                     .updatedAt("2016-03-23T18:48:42Z")
@@ -265,7 +269,7 @@ public final class ReactorProcessesTest {
                         .href("/v2/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
                         .build())
                     .build())
-                .resource(Resource.builder()
+                .resource(ProcessResource.builder()
                     .id("3fccacd9-4b02-4b96-8d02-8e865865e9eb")
                     .type("worker")
                     .command("bundle exec rake worker")
@@ -274,7 +278,8 @@ public final class ReactorProcessesTest {
                     .diskInMb(1_024)
                     .healthCheck(HealthCheck.builder()
                         .type(Type.PROCESS)
-                        .data("timeout", null)
+                        .data(Data.builder()
+                            .build())
                         .build())
                     .createdAt("2016-03-23T18:48:22Z")
                     .updatedAt("2016-03-23T18:48:42Z")
@@ -340,7 +345,8 @@ public final class ReactorProcessesTest {
                 .port(8080)
                 .healthCheck(HealthCheck.builder()
                     .type(Type.PORT)
-                    .data("timeout", null)
+                    .data(Data.builder()
+                        .build())
                     .build())
                 .createdAt("2016-03-23T18:48:22Z")
                 .updatedAt("2016-03-23T18:48:42Z")
@@ -406,7 +412,8 @@ public final class ReactorProcessesTest {
                 .port(8080)
                 .healthCheck(HealthCheck.builder()
                     .type(Type.PORT)
-                    .data("timeout", null)
+                    .data(Data.builder()
+                        .build())
                     .build())
                 .createdAt("2016-03-23T18:48:22Z")
                 .updatedAt("2016-03-23T18:48:42Z")

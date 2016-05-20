@@ -34,6 +34,8 @@ import reactor.core.util.Exceptions;
 
 import java.io.IOException;
 
+import static org.cloudfoundry.client.v3.packages.State.PROCESSING_UPLOAD;
+import static org.cloudfoundry.client.v3.packages.State.READY;
 import static org.junit.Assert.assertTrue;
 
 public final class PackagesTest extends AbstractIntegrationTest {
@@ -83,7 +85,7 @@ public final class PackagesTest extends AbstractIntegrationTest {
                     .build()))
             .map(Package::getState)
             .subscribe(testSubscriber()
-                .assertThat(state -> assertTrue(state.equals("PROCESSING_UPLOAD") || state.equals("READY"))));
+                .assertThat(state -> assertTrue(state == PROCESSING_UPLOAD || state == READY)));
     }
 
 }

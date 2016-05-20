@@ -17,6 +17,7 @@
 package org.cloudfoundry.reactor.client.v3.servicebindings;
 
 import org.cloudfoundry.client.v3.Link;
+import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingResponse;
@@ -27,6 +28,8 @@ import org.cloudfoundry.client.v3.servicebindings.GetServiceBindingResponse;
 import org.cloudfoundry.client.v3.servicebindings.ListServiceBindingsRequest;
 import org.cloudfoundry.client.v3.servicebindings.ListServiceBindingsResponse;
 import org.cloudfoundry.client.v3.servicebindings.Relationships;
+import org.cloudfoundry.client.v3.servicebindings.ServiceBindingResource;
+import org.cloudfoundry.client.v3.servicebindings.ServiceBindingType;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -41,8 +44,6 @@ import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.cloudfoundry.client.v3.PaginatedResponse.Pagination;
-import static org.cloudfoundry.client.v3.servicebindings.ServiceBindingType.APPLICATION;
 
 public final class ReactorServiceBindingsV3Test {
 
@@ -98,7 +99,7 @@ public final class ReactorServiceBindingsV3Test {
                         .id("8bfe4c1b-9e18-45b1-83be-124163f31f9e")
                         .build())
                     .build())
-                .type(APPLICATION)
+                .type(ServiceBindingType.APPLICATION)
                 .build();
         }
 
@@ -227,7 +228,7 @@ public final class ReactorServiceBindingsV3Test {
                         .href("/v3/service_bindings?page=2&per_page=2")
                         .build())
                     .build())
-                .resource(ListServiceBindingsResponse.Resource.builder()
+                .resource(ServiceBindingResource.builder()
                     .id("dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
                     .type("app")
                     .data("credentials", Collections.singletonMap("super-secret", "password"))
@@ -243,7 +244,7 @@ public final class ReactorServiceBindingsV3Test {
                         .href("/v3/apps/74f7c078-0934-470f-9883-4fddss5b8f13")
                         .build())
                     .build())
-                .resource(ListServiceBindingsResponse.Resource.builder()
+                .resource(ServiceBindingResource.builder()
                     .id("7aa37bad-6ccb-4ef9-ba48-9ce3a91b2b62")
                     .type("app")
                     .data("credentials", Collections.singletonMap("super-secret", "password"))

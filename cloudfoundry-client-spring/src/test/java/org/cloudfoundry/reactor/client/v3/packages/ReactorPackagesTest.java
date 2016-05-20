@@ -17,21 +17,28 @@
 package org.cloudfoundry.reactor.client.v3.packages;
 
 import org.cloudfoundry.client.v3.BuildpackData;
+import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
-import org.cloudfoundry.client.v3.PaginatedResponse.Pagination;
+import org.cloudfoundry.client.v3.Pagination;
+import org.cloudfoundry.client.v3.Type;
+import org.cloudfoundry.client.v3.packages.BitsData;
 import org.cloudfoundry.client.v3.packages.CopyPackageRequest;
 import org.cloudfoundry.client.v3.packages.CopyPackageResponse;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.CreatePackageResponse;
 import org.cloudfoundry.client.v3.packages.DeletePackageRequest;
+import org.cloudfoundry.client.v3.packages.DockerData;
 import org.cloudfoundry.client.v3.packages.DownloadPackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageResponse;
 import org.cloudfoundry.client.v3.packages.ListPackagesRequest;
 import org.cloudfoundry.client.v3.packages.ListPackagesResponse;
+import org.cloudfoundry.client.v3.packages.PackageResource;
+import org.cloudfoundry.client.v3.packages.PackageType;
 import org.cloudfoundry.client.v3.packages.StagePackageRequest;
 import org.cloudfoundry.client.v3.packages.StagePackageResponse;
+import org.cloudfoundry.client.v3.packages.State;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
 import org.cloudfoundry.reactor.InteractionContext;
@@ -53,8 +60,6 @@ import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.cloudfoundry.client.v3.packages.ListPackagesResponse.Resource;
-import static org.cloudfoundry.client.v3.packages.PackageType.DOCKER;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -82,9 +87,11 @@ public final class ReactorPackagesTest {
         protected CopyPackageResponse getResponse() {
             return CopyPackageResponse.builder()
                 .id("041af871-9d09-45de-ad2d-df8c4771a1ee")
-                .type("docker")
-                .data("image", "http://awesome-sauce.com")
-                .state("READY")
+                .type(PackageType.DOCKER)
+                .data(DockerData.builder()
+                    .image("http://awesome-sauce.com")
+                    .build())
+                .state(State.READY)
                 .createdAt("2016-01-26T22:20:12Z")
                 .link("self", Link.builder()
                     .href("/v3/packages/041af871-9d09-45de-ad2d-df8c4771a1ee")
@@ -136,9 +143,11 @@ public final class ReactorPackagesTest {
         protected CreatePackageResponse getResponse() {
             return CreatePackageResponse.builder()
                 .id("909affe0-4aa1-42f4-b399-1a67cb5a90fa")
-                .type("docker")
-                .data("image", "registry/image:latest")
-                .state("READY")
+                .type(PackageType.DOCKER)
+                .data(DockerData.builder()
+                    .image("registry/image:latest")
+                    .build())
+                .state(State.READY)
                 .createdAt("2016-01-26T22:20:12Z")
                 .link("self", Link.builder()
                     .href("/v3/packages/909affe0-4aa1-42f4-b399-1a67cb5a90fa")
@@ -157,8 +166,10 @@ public final class ReactorPackagesTest {
         protected CreatePackageRequest getValidRequest() {
             return CreatePackageRequest.builder()
                 .applicationId("test-application-id")
-                .type(DOCKER)
-                .data("image", "registry/image:latest")
+                .type(PackageType.DOCKER)
+                .data(org.cloudfoundry.client.v3.DockerData.builder()
+                    .image("registry/image:latest")
+                    .build())
                 .build();
         }
 
@@ -268,13 +279,13 @@ public final class ReactorPackagesTest {
         protected GetPackageResponse getResponse() {
             return GetPackageResponse.builder()
                 .id("guid-ebaae129-a8ee-43cf-a0a6-734c7ed0d1b4")
-                .type("bits")
-                .data("error", null)
-                .data("hash", StringMap.builder()
-                    .entry("type", "sha1")
-                    .entry("value", null)
+                .type(PackageType.BITS)
+                .data(BitsData.builder()
+                    .hash(Hash.builder()
+                        .type("sha1")
+                        .build())
                     .build())
-                .state("AWAITING_UPLOAD")
+                .state(State.AWAITING_UPLOAD)
                 .createdAt("2016-01-26T22:20:12Z")
                 .link("self", Link.builder()
                     .href("/v3/packages/guid-ebaae129-a8ee-43cf-a0a6-734c7ed0d1b4")
@@ -343,15 +354,15 @@ public final class ReactorPackagesTest {
                         .href("/v3/packages?page=2&per_page=2")
                         .build())
                     .build())
-                .resource(Resource.builder()
+                .resource(PackageResource.builder()
                     .id("guid-2731172f-0714-430e-81e7-d662509d555b")
-                    .type("bits")
-                    .data("error", null)
-                    .data("hash", StringMap.builder()
-                        .entry("type", "sha1")
-                        .entry("value", null)
+                    .type(PackageType.BITS)
+                    .data(BitsData.builder()
+                        .hash(Hash.builder()
+                            .type("sha1")
+                            .build())
                         .build())
-                    .state("AWAITING_UPLOAD")
+                    .state(State.AWAITING_UPLOAD)
                     .createdAt("2016-01-26T22:20:12Z")
                     .link("self", Link.builder()
                         .href("/v3/packages/guid-2731172f-0714-430e-81e7-d662509d555b")
@@ -372,11 +383,13 @@ public final class ReactorPackagesTest {
                         .href("/v3/apps/guid-f4384453-4610-4075-b2c3-c2290401dbb9")
                         .build())
                     .build())
-                .resource(Resource.builder()
+                .resource(PackageResource.builder()
                     .id("guid-10217847-a68c-4c08-89d6-b247d8afe647")
-                    .type("docker")
-                    .data("image", "http://location-of-image.com")
-                    .state("READY")
+                    .type(PackageType.DOCKER)
+                    .data(DockerData.builder()
+                        .image("http://location-of-image.com")
+                        .build())
+                    .state(State.READY)
                     .createdAt("2016-01-26T22:20:12Z")
                     .link("self", Link.builder()
                         .href("/v3/packages/guid-10217847-a68c-4c08-89d6-b247d8afe647")
@@ -427,49 +440,49 @@ public final class ReactorPackagesTest {
         protected StagePackageResponse getResponse() {
             return StagePackageResponse.builder()
                 .id("whatuuid")
-                .state("PENDING")
+                .state(org.cloudfoundry.client.v3.droplets.State.PENDING)
                 .lifecycle(Lifecycle.builder()
-                    .type("buildpack")
+                    .type(Type.BUILDPACK)
                     .data(BuildpackData.builder()
                         .buildpack("http://github.com/myorg/awesome-buildpack")
                         .stack("cflinuxfs2")
                         .build())
                     .build())
-                .memoryLimit(1_024)
-                .diskLimit(4_096)
+                .stagingMemoryInMb(1024)
+                .stagingDiskInMb(4096)
                 .environmentVariable("CUSTOM_ENV_VAR", "hello")
-                .environmentVariable("CF_STACK", "cflinuxfs2")
                 .environmentVariable("VCAP_APPLICATION", StringMap.builder()
                     .entry("limits", StringMap.builder()
                         .entry("mem", 1_024)
                         .entry("disk", 4_096)
                         .entry("fds", 16_384)
                         .build())
-                    .entry("application_id", "guid-81b0a3b1-19e5-4e93-b9c4-1730cdd99695")
+                    .entry("application_id", "f82a88a2-2197-45b2-8b6d-84d1be8e2d0e")
                     .entry("application_version", "whatuuid")
-                    .entry("application_name", "name-487")
+                    .entry("application_name", "name-673")
                     .entry("application_uris", Collections.emptyList())
                     .entry("version", "whatuuid")
-                    .entry("name", "name-487")
-                    .entry("space_name", "name-484")
-                    .entry("space_id", "78a77c68-55cc-45e2-ac82-01df0290fca9")
+                    .entry("name", "name-673")
+                    .entry("space_name", "name-670")
+                    .entry("space_id", "8543c9f2-0ec4-4bd2-adb4-eee7b2cd6c9d")
                     .entry("uris", Collections.emptyList())
                     .entry("users", null)
                     .build())
+                .environmentVariable("CF_STACK", "cflinuxfs2")
                 .environmentVariable("MEMORY_LIMIT", 1_024)
                 .environmentVariable("VCAP_SERVICES", Collections.emptyMap())
-                .createdAt("2016-01-26T22:20:12Z")
+                .createdAt("2015-11-03T00:53:54Z")
                 .link("self", Link.builder()
                     .href("/v3/droplets/whatuuid")
                     .build())
                 .link("package", Link.builder()
-                    .href("/v3/packages/guid-c613ad85-308b-4ba6-9097-8b21f60eef95")
+                    .href("/v3/packages/aee22e31-6476-435e-a8c9-8961c6ead83e")
                     .build())
                 .link("app", Link.builder()
-                    .href("/v3/apps/guid-81b0a3b1-19e5-4e93-b9c4-1730cdd99695")
+                    .href("/v3/apps/f82a88a2-2197-45b2-8b6d-84d1be8e2d0e")
                     .build())
                 .link("assign_current_droplet", Link.builder()
-                    .href("/v3/apps/guid-81b0a3b1-19e5-4e93-b9c4-1730cdd99695/current_droplet")
+                    .href("/v3/apps/f82a88a2-2197-45b2-8b6d-84d1be8e2d0e/droplets/current")
                     .method("PUT")
                     .build())
                 .build();
@@ -481,7 +494,7 @@ public final class ReactorPackagesTest {
                 .packageId("test-package-id")
                 .environmentVariable("CUSTOM_ENV_VAR", "hello")
                 .lifecycle(Lifecycle.builder()
-                    .type("buildpack")
+                    .type(Type.BUILDPACK)
                     .data(BuildpackData.builder()
                         .buildpack("http://github.com/myorg/awesome-buildpack")
                         .stack("cflinuxfs2")
@@ -528,13 +541,13 @@ public final class ReactorPackagesTest {
         protected UploadPackageResponse getResponse() {
             return UploadPackageResponse.builder()
                 .id("guid-f582d3d1-320c-4524-9c4f-480252ab5bff")
-                .type("bits")
-                .data("error", null)
-                .data("hash", StringMap.builder()
-                    .entry("type", "sha1")
-                    .entry("value", null)
+                .type(PackageType.BITS)
+                .data(BitsData.builder()
+                    .hash(Hash.builder()
+                        .type("sha1")
+                        .build())
                     .build())
-                .state("PROCESSING_UPLOAD")
+                .state(State.PROCESSING_UPLOAD)
                 .createdAt("2016-01-26T22:20:12Z")
                 .updatedAt("2016-01-26T22:20:12Z")
                 .link("self", Link.builder()

@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v3.packages;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class CopyPackageRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = CopyPackageRequest.builder()
-            .applicationId("test-application-id")
+    @Test(expected = IllegalStateException.class)
+    public void noApplicationId() {
+        CopyPackageRequest.builder()
             .sourcePackageId("test-source-package-id")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noSourcePackageId() {
+        CopyPackageRequest.builder()
+            .applicationId("test-application-id")
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = CopyPackageRequest.builder()
-            .sourcePackageId("test-source-package-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoSourceId() {
-        ValidationResult result = CopyPackageRequest.builder()
+    public void valid() {
+        CopyPackageRequest.builder()
             .applicationId("test-application-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("source package id must be specified", result.getMessages().get(0));
+            .sourcePackageId("test-source-package-id")
+            .build();
     }
 
 }

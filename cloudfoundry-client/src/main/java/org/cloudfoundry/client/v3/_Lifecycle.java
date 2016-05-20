@@ -43,7 +43,7 @@ abstract class _Lifecycle {
      * The type
      */
     @JsonProperty("type")
-    abstract String getType();
+    abstract Type getType();
 
     static final class DataDeserializer extends StdDeserializer<Data> {
 
@@ -58,13 +58,13 @@ abstract class _Lifecycle {
         public Data deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
             Lifecycle.Json lifecycle = (Lifecycle.Json) p.getParsingContext().getParent().getCurrentValue();
 
-            switch (lifecycle.type.toLowerCase()) {
-                case "buildpack":
+            switch (lifecycle.type) {
+                case BUILDPACK:
                     return p.readValueAs(BuildpackData.class);
-                case "docker":
+                case DOCKER:
                     return p.readValueAs(DockerData.class);
                 default:
-                    throw new IllegalArgumentException(String.format("Unknown lifecycle type: %s", lifecycle.type));
+                    throw new IllegalArgumentException(String.format("Unknown lifecycle type: %s", lifecycle.getType()));
             }
         }
     }

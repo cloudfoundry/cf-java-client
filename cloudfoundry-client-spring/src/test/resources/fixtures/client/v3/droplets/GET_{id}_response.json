@@ -1,43 +1,69 @@
 {
-  "guid": "guid-92bd22f3-7e80-4be8-b603-ce7e97ab68b2",
+  "guid": "585bc3c1-3743-497d-88b0-403ad6b56d16",
   "state": "STAGED",
-  "error": "example error",
+  "error": null,
   "lifecycle": {
     "type": "buildpack",
     "data": {
-      "buildpack": "name-2466",
-      "stack": "name-2467"
+      "buildpack": null,
+      "stack": null
     }
   },
-  "memory_limit": null,
-  "disk_limit": null,
+  "staging_memory_in_mb": 1024,
+  "staging_disk_in_mb": 4096,
   "result": {
-    "execution_metadata": null,
-    "process_types": null,
+    "execution_metadata": "",
+    "process_types": {
+      "rake": "bundle exec rake",
+      "web": "bundle exec rackup config.ru -p $PORT"
+    },
     "hash": {
       "type": "sha1",
-      "value": null
+      "value": "0cd90dd63dd9f42db25340445d203fba25c69cf6"
     },
-    "buildpack": "http://buildpack.git.url.com",
-    "stack": null
+    "buildpack": "ruby 1.6.14",
+    "stack": "cflinuxfs2"
   },
   "environment_variables": {
-    "cloud": "foundry"
+    "CF_STACK": "cflinuxfs2",
+    "VCAP_APPLICATION": {
+      "limits": {
+        "mem": 1024,
+        "disk": 4096,
+        "fds": 16384
+      },
+      "application_id": "7b34f1cf-7e73-428a-bb5a-8a17a8058396",
+      "application_version": "d5985d64-c455-44d0-99a5-285b6521f84c",
+      "application_name": "my_app",
+      "application_uris": [
+        "my_app.example.com"
+      ],
+      "version": "d5985d64-c455-44d0-99a5-285b6521f84c",
+      "name": "my_app",
+      "space_name": "my_space",
+      "space_id": "2f35885d-0c9d-4423-83ad-fd05066f8576",
+      "uris": [
+        "my_app.example.com"
+      ],
+      "users": null
+    },
+    "MEMORY_LIMIT": "1024m",
+    "VCAP_SERVICES": {}
   },
-  "created_at": "2016-01-26T22:20:36Z",
-  "updated_at": "2016-01-26T22:20:36Z",
+  "created_at": "2016-03-28T23:39:34Z",
+  "updated_at": "2016-03-28T23:39:47Z",
   "links": {
     "self": {
-      "href": "/v3/droplets/guid-92bd22f3-7e80-4be8-b603-ce7e97ab68b2"
+      "href": "/v3/droplets/585bc3c1-3743-497d-88b0-403ad6b56d16"
     },
     "package": {
-      "href": "/v3/packages/guid-f5dfcb97-6e61-4b69-8198-0c115498b70b"
+      "href": "/v3/packages/8222f76a-9e09-4360-b3aa-1ed329945e92"
     },
     "app": {
-      "href": "/v3/apps/guid-efbab1ea-3e76-45ca-baa3-98bc95f881de"
+      "href": "/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396"
     },
     "assign_current_droplet": {
-      "href": "/v3/apps/guid-efbab1ea-3e76-45ca-baa3-98bc95f881de/current_droplet",
+      "href": "/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396/droplets/current",
       "method": "PUT"
     }
   }

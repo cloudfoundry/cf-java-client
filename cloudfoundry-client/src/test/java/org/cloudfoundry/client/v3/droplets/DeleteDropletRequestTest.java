@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.client.v3.droplets;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class DeleteDropletRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = DeleteDropletRequest.builder()
-            .dropletId("test-droplet-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noDropletId() {
+        DeleteDropletRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = DeleteDropletRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("droplet id must be specified", result.getMessages().get(0));
+    public void valid() {
+        DeleteDropletRequest.builder()
+            .dropletId("test-droplet-id")
+            .build();
     }
 
 }

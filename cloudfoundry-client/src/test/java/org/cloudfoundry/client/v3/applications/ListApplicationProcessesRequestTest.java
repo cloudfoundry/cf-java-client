@@ -16,44 +16,21 @@
 
 package org.cloudfoundry.client.v3.applications;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class ListApplicationProcessesRequestTest {
 
+    @Test(expected = IllegalStateException.class)
+    public void noApplicationId() {
+        ListApplicationProcessesRequest.builder()
+            .build();
+    }
+
     @Test
-    public void isValid() {
-        ValidationResult result = ListApplicationProcessesRequest.builder()
+    public void valid() {
+        ListApplicationProcessesRequest.builder()
             .applicationId("test-application-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidInvalidPaginatedRequest() {
-        ValidationResult result = ListApplicationProcessesRequest.builder()
-            .page(0)
-            .build()
-            .isValid();
-
-        assertEquals(ValidationResult.Status.INVALID, result.getStatus());
-        assertEquals("page must be greater than or equal to 1", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoId() {
-        ValidationResult result = ListApplicationProcessesRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application id must be specified", result.getMessages().get(0));
+            .build();
     }
 
 }

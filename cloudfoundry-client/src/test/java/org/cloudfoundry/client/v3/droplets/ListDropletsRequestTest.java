@@ -16,32 +16,14 @@
 
 package org.cloudfoundry.client.v3.droplets;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class ListDropletsRequestTest {
 
     @Test
-    public void isValid() {
-        ValidationResult result = ListDropletsRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidInvalidPaginatedRequest() {
-        ValidationResult result = ListDropletsRequest.builder()
-            .page(0)
-            .build()
-            .isValid();
-
-        assertEquals(ValidationResult.Status.INVALID, result.getStatus());
-        assertEquals("page must be greater than or equal to 1", result.getMessages().get(0));
+    public void valid() {
+        ListDropletsRequest.builder()
+            .build();
     }
 
 }

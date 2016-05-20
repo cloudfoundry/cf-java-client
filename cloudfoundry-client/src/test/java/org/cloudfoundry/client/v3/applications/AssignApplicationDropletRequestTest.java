@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v3.applications;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class AssignApplicationDropletRequestTest {
 
-    @Test
-    public void isValidId() {
-        ValidationResult result = AssignApplicationDropletRequest.builder()
-            .applicationId("test-application-id")
+    @Test(expected = IllegalStateException.class)
+    public void noApplicationId() {
+        AssignApplicationDropletRequest.builder()
             .dropletId("test-droplet-id")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noDropletId() {
+        AssignApplicationDropletRequest.builder()
+            .applicationId("test-application-id")
+            .build();
     }
 
     @Test
-    public void isValidNoDropletId() {
-        ValidationResult result = AssignApplicationDropletRequest.builder()
+    public void valid() {
+        AssignApplicationDropletRequest.builder()
             .applicationId("test-application-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("droplet id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoId() {
-        ValidationResult result = AssignApplicationDropletRequest.builder()
             .dropletId("test-droplet-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application id must be specified", result.getMessages().get(0));
+            .build();
     }
 
 }

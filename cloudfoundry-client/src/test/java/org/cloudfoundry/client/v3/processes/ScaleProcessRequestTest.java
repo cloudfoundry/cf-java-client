@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.client.v3.processes;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class ScaleProcessRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = ScaleProcessRequest.builder()
-            .processId("test-process-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noProcessId() {
+        ScaleProcessRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = ScaleProcessRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("process id must be specified", result.getMessages().get(0));
+    public void valid() {
+        ScaleProcessRequest.builder()
+            .processId("test-process-id")
+            .build();
     }
 
 }

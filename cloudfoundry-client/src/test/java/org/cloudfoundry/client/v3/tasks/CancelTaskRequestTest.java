@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.client.v3.tasks;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class CancelTaskRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = CancelTaskRequest.builder()
-            .taskId("test-task-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noTaskId() {
+        CancelTaskRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValidNoTaskId() {
-        ValidationResult result = CancelTaskRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("task id must be specified", result.getMessages().get(0));
+    public void valid() {
+        CancelTaskRequest.builder()
+            .taskId("test-task-id")
+            .build();
     }
 
 }

@@ -17,7 +17,7 @@
 package org.cloudfoundry.reactor.client.v3.tasks;
 
 import org.cloudfoundry.client.v3.Link;
-import org.cloudfoundry.client.v3.PaginatedResponse;
+import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.tasks.CancelTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CancelTaskResponse;
 import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
@@ -26,15 +26,14 @@ import org.cloudfoundry.client.v3.tasks.GetTaskRequest;
 import org.cloudfoundry.client.v3.tasks.GetTaskResponse;
 import org.cloudfoundry.client.v3.tasks.ListTasksRequest;
 import org.cloudfoundry.client.v3.tasks.ListTasksResponse;
-import org.cloudfoundry.client.v3.tasks.Task;
+import org.cloudfoundry.client.v3.tasks.Result;
+import org.cloudfoundry.client.v3.tasks.State;
 import org.cloudfoundry.client.v3.tasks.TaskResource;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
-
-import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
@@ -67,9 +66,10 @@ public final class ReactorTasksTest {
                 .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
                 .name("migrate")
                 .command("rake db:migrate")
-                .state(Task.CANCELING_STATE)
+                .state(State.CANCELING_STATE)
                 .memoryInMb(512)
-                .results(Collections.singletonMap("failure_reason", null))
+                .result(Result.builder()
+                    .build())
                 .link("self", Link.builder()
                     .href("/v3/tasks/d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
                     .build())
@@ -120,9 +120,10 @@ public final class ReactorTasksTest {
                 .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
                 .name("migrate")
                 .command("rake db:migrate")
-                .state(Task.RUNNING_STATE)
+                .state(State.RUNNING_STATE)
                 .memoryInMb(256)
-                .results(Collections.singletonMap("failure_reason", null))
+                .result(Result.builder()
+                    .build())
                 .link("self", Link.builder()
                     .href("/v3/tasks/d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
                     .build())
@@ -175,9 +176,10 @@ public final class ReactorTasksTest {
                 .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
                 .name("migrate")
                 .command("rake db:migrate")
-                .state(Task.RUNNING_STATE)
+                .state(State.RUNNING_STATE)
                 .memoryInMb(256)
-                .results(Collections.singletonMap("failure_reason", null))
+                .result(Result.builder()
+                    .build())
                 .link("self", Link.builder()
                     .href("/v3/tasks/d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
                     .build())
@@ -224,7 +226,7 @@ public final class ReactorTasksTest {
         @Override
         protected ListTasksResponse getResponse() {
             return ListTasksResponse.builder()
-                .pagination(PaginatedResponse.Pagination.builder()
+                .pagination(Pagination.builder()
                     .totalResults(3)
                     .first(Link.builder()
                         .href("/v3/tasks?page=1&per_page=2")
@@ -240,9 +242,10 @@ public final class ReactorTasksTest {
                     .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
                     .name("hello")
                     .command("echo \"hello world\"")
-                    .state(Task.SUCCEEDED_STATE)
+                    .state(State.SUCCEEDED_STATE)
                     .memoryInMb(256)
-                    .results(Collections.singletonMap("failure_reason", null))
+                    .result(Result.builder()
+                        .build())
                     .link("self", Link.builder()
                         .href("/v3/tasks/d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
                         .build())
@@ -257,9 +260,11 @@ public final class ReactorTasksTest {
                     .id("63b4cd89-fd8b-4bf1-a311-7174fcc907d6")
                     .name("migrate")
                     .command("rake db:migrate")
-                    .state(Task.FAILED_STATE)
+                    .state(State.FAILED_STATE)
                     .memoryInMb(256)
-                    .results(Collections.singletonMap("failure_reason", "Exited with status 1"))
+                    .result(Result.builder()
+                        .failureReason("Exited with status 1")
+                        .build())
                     .link("self", Link.builder()
                         .href("/v3/tasks/63b4cd89-fd8b-4bf1-a311-7174fcc907d6")
                         .build())
