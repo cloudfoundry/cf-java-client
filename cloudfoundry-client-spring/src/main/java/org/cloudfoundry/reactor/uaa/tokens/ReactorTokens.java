@@ -25,6 +25,8 @@ import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenByClientCredentialsRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenByClientCredentialsResponse;
+import org.cloudfoundry.uaa.tokens.GetTokenByOneTimePasscodeRequest;
+import org.cloudfoundry.uaa.tokens.GetTokenByOneTimePasscodeResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenByOpenIdRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenByOpenIdResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenByPasswordRequest;
@@ -80,6 +82,13 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
     public Mono<GetTokenByClientCredentialsResponse> getByClientCredentials(GetTokenByClientCredentialsRequest request) {
         return post(request, GetTokenByClientCredentialsResponse.class,
             function((builder, validRequest) -> builder.pathSegment("oauth", "token").queryParam("grant_type", "client_credentials").queryParam("response_type", "token")));
+    }
+
+    @Override
+    public Mono<GetTokenByOneTimePasscodeResponse> getByOneTimePasscode(GetTokenByOneTimePasscodeRequest request) {
+        return post(request, GetTokenByOneTimePasscodeResponse.class,
+            function((builder, validRequest) -> builder.pathSegment("oauth", "token").queryParam("grant_type", "password").queryParam("response_type", "token")),
+            function((outbound, validRequest) -> basicAuth(outbound, validRequest.getClientId(), validRequest.getClientSecret())));
     }
 
     @Override

@@ -26,6 +26,8 @@ import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenByClientCredentialsRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenByClientCredentialsResponse;
+import org.cloudfoundry.uaa.tokens.GetTokenByOneTimePasscodeRequest;
+import org.cloudfoundry.uaa.tokens.GetTokenByOneTimePasscodeResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenByOpenIdRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenByOpenIdResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenByPasswordRequest;
@@ -247,6 +249,52 @@ public final class ReactorTokensTest {
         @Override
         protected Mono<GetTokenByClientCredentialsResponse> invoke(GetTokenByClientCredentialsRequest request) {
             return this.tokens.getByClientCredentials(request);
+        }
+
+    }
+
+    public static final class GetTokenByOneTimePasscode extends AbstractUaaApiTest<GetTokenByOneTimePasscodeRequest, GetTokenByOneTimePasscodeResponse> {
+
+        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, CLIENT_ID, CLIENT_SECRET, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/oauth/token?passcode=qcZNkd&token_format=opaque&grant_type=password&response_type=token")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/tokens/GET_response_OT.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected GetTokenByOneTimePasscodeResponse getResponse() {
+            return GetTokenByOneTimePasscodeResponse.builder()
+                .accessToken("0ddcada64ef742a28badaf4750ef435f")
+                .tokenType("bearer")
+                .refreshToken("0ddcada64ef742a28badaf4750ef435f-r")
+                .expiresInSeconds(43199)
+                .scopes("scim.userids openid cloud_controller.read password.write cloud_controller.write")
+                .tokenId("0ddcada64ef742a28badaf4750ef435f")
+                .build();
+        }
+
+        @Override
+        protected GetTokenByOneTimePasscodeRequest getValidRequest() {
+            return GetTokenByOneTimePasscodeRequest.builder()
+                .clientId("app")
+                .clientSecret("appclientsecret")
+                .passcode("qcZNkd")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
+        }
+
+        @Override
+        protected Mono<GetTokenByOneTimePasscodeResponse> invoke(GetTokenByOneTimePasscodeRequest request) {
+            return this.tokens.getByOneTimePasscode(request);
         }
 
     }
