@@ -23,6 +23,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * A builder for Cloud Foundry queries
@@ -52,7 +54,14 @@ public final class QueryBuilder {
             Object value = ReflectionUtils.invokeMethod(method, instance);
 
             if (value != null) {
-                builder.queryParam(queryParameter.value(), value);
+
+                if (value instanceof Collection) {
+                    builder.queryParam(queryParameter.value(), ((Collection<?>) value).stream()
+                        .map(Object::toString)
+                        .collect(Collectors.joining(",")));
+                } else {
+                    builder.queryParam(queryParameter.value(), value);
+                }
             }
         }
     }

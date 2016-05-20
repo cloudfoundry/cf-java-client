@@ -97,7 +97,8 @@ public final class ReactorTokensTest {
         protected CheckTokenRequest getValidRequest() {
             return CheckTokenRequest.builder()
                 .token("f9f2f98d88e04ff7bb1f69041d3c0346")
-                .scopes("password.write,scim.userids")
+                .scope("password.write")
+                .scope("scim.userids")
                 .build();
         }
 

@@ -20,6 +20,8 @@ import org.cloudfoundry.Nullable;
 import org.cloudfoundry.QueryParameter;
 import org.immutables.value.Value;
 
+import java.util.List;
+
 /**
  * The request payload for the check token operation
  */
@@ -31,7 +33,7 @@ abstract class AbstractCheckTokenRequest {
      */
     @QueryParameter("scopes")
     @Nullable
-    abstract String getScopes();
+    abstract List<String> getScopes();
 
     /**
      * The token
