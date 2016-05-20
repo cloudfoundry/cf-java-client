@@ -1,0 +1,9 @@
+{
+  "access_token": "53a58e6581ee49d08f9e572f673bc8db",
+  "token_type": "bearer",
+  "id_token": "eyJhbGciOiJIUzI1NiIsImtpZCI6ImxlZ2FjeS10b2tlbi1rZXkiLC",
+  "refresh_token": "53a58e6581ee49d08f9e572f673bc8db-r",
+  "expires_in": 43199,
+  "scope": "openid oauth.approvals",
+  "jti": "53a58e6581ee49d08f9e572f673bc8db"
+}
