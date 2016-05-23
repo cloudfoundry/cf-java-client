@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.reactor.client.v2.shareddomains;
 
-import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest;
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
@@ -32,7 +31,8 @@ import reactor.core.publisher.Mono;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.cloudfoundry.client.v2.Resource.Metadata;
+
+import org.cloudfoundry.client.v2.Metadata;
 
 public final class ReactorSharedDomainsTest {
 
@@ -63,7 +63,7 @@ public final class ReactorSharedDomainsTest {
         @Override
         protected CreateSharedDomainResponse getResponse() {
             return CreateSharedDomainResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .id("d6c7d452-70bb-4edd-bbf1-a925dd51732c")
                     .url("/v2/shared_domains/d6c7d452-70bb-4edd-bbf1-a925dd51732c")
                     .createdAt("2016-04-22T19:33:17Z")

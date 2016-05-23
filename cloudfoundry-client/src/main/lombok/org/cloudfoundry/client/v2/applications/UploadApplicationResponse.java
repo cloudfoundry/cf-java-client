@@ -21,6 +21,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
 
@@ -34,7 +35,7 @@ public final class UploadApplicationResponse extends Resource<JobEntity> {
 
     @Builder
     UploadApplicationResponse(@JsonProperty("entity") JobEntity entity,
-                              @JsonProperty("metadata") Resource.Metadata metadata) {
+                              @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 

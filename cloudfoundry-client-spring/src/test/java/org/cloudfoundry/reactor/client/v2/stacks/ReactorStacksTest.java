@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.stacks;
 
-import org.cloudfoundry.client.v2.Resource.Metadata;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;

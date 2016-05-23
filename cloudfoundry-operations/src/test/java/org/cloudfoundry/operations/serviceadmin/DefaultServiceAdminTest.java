@@ -28,7 +28,6 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.util.test.TestObjects.fill;
-import static org.cloudfoundry.util.test.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultServiceAdminTest {
@@ -39,7 +38,7 @@ public final class DefaultServiceAdminTest {
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListServiceBrokersResponse.builder())
+                .just(fill(ListServiceBrokersResponse.builder())
                     .resource(fill(ServiceBrokerResource.builder(), "service-broker-")
                         .entity(fill(ServiceBrokerEntity.builder(), "service-broker-resource-")
                             .build())
@@ -53,7 +52,7 @@ public final class DefaultServiceAdminTest {
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListServiceBrokersResponse.builder())
+                .just(fill(ListServiceBrokersResponse.builder())
                     .build()));
     }
 

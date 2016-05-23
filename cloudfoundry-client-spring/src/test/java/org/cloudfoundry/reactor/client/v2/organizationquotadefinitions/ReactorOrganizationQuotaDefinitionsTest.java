@@ -42,7 +42,8 @@ import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.cloudfoundry.client.v2.Resource.Metadata;
+
+import org.cloudfoundry.client.v2.Metadata;
 
 public final class ReactorOrganizationQuotaDefinitionsTest {
 

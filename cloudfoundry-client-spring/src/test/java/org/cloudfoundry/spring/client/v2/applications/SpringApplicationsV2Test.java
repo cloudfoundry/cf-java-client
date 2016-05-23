@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.spring.client.v2.applications;
 
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentResponse;
@@ -107,7 +107,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected AssociateApplicationRouteResponse getResponse() {
             return AssociateApplicationRouteResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2015-07-27T22:43:19Z")
                     .id("638e90b6-502f-47a8-a3bf-b18fdf3fb70a")
                     .url("/v2/apps/638e90b6-502f-47a8-a3bf-b18fdf3fb70a")
@@ -182,7 +182,7 @@ public final class SpringApplicationsV2Test {
                     .id("c900719e-c70a-4c75-9e6a-9535f118acc3")
                     .status("queued")
                     .build())
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2015-07-27T22:43:34Z")
                     .id("c900719e-c70a-4c75-9e6a-9535f118acc3")
                     .url("/v2/jobs/c900719e-c70a-4c75-9e6a-9535f118acc3")
@@ -209,12 +209,6 @@ public final class SpringApplicationsV2Test {
         private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
-        protected CreateApplicationRequest getInvalidRequest() {
-            return CreateApplicationRequest.builder()
-                .build();
-        }
-
-        @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(POST).path("/v2/apps")
@@ -226,7 +220,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected CreateApplicationResponse getResponse() {
             return CreateApplicationResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2015-07-27T22:43:20Z")
                     .id("78d1a119-2ded-405f-8675-421d8dade602")
                     .url("/v2/apps/78d1a119-2ded-405f-8675-421d8dade602")
@@ -477,7 +471,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected GetApplicationResponse getResponse() {
             return GetApplicationResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2015-07-27T22:43:20Z")
                     .id("03f286bb-f17c-42b4-8dcd-b818b0b798af")
                     .updatedAt("2015-07-27T22:43:20Z")
@@ -591,7 +585,7 @@ public final class SpringApplicationsV2Test {
                 .totalResults(3)
                 .totalPages(1)
                 .resource(ApplicationResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .id("3d294ed0-105c-4ccd-8f79-5605d6b7198c")
                         .url("/v2/apps/3d294ed0-105c-4ccd-8f79-5605d6b7198c")
                         .createdAt("2015-07-27T22:43:20Z")
@@ -625,7 +619,7 @@ public final class SpringApplicationsV2Test {
                         .build())
                     .build())
                 .resource(ApplicationResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .id("522c5382-29e9-48aa-9db0-9f6cfa643ec1")
                         .url("/v2/apps/522c5382-29e9-48aa-9db0-9f6cfa643ec1")
                         .createdAt("2015-07-27T22:43:20Z")
@@ -659,7 +653,7 @@ public final class SpringApplicationsV2Test {
                         .build())
                     .build())
                 .resource(ApplicationResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .id("ec31bfbd-ab5c-490d-8e83-3c1ea5d1bedf")
                         .url("/v2/apps/ec31bfbd-ab5c-490d-8e83-3c1ea5d1bedf")
                         .createdAt("2015-07-27T22:43:20Z")
@@ -734,7 +728,7 @@ public final class SpringApplicationsV2Test {
                 .totalResults(1)
                 .totalPages(1)
                 .resource(RouteResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .id("893e7d4e-2038-4253-8dd6-1e056d5b24b3")
                         .url("/v2/routes/893e7d4e-2038-4253-8dd6-1e056d5b24b3")
                         .createdAt("2016-03-17T21:41:11Z")
@@ -794,7 +788,7 @@ public final class SpringApplicationsV2Test {
                 .totalResults(1)
                 .totalPages(1)
                 .resource(ServiceBindingResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:20Z")
                         .id("42eda707-fe4d-4eed-9b39-7cb5e665c226")
                         .url("/v2/service_bindings/42eda707-fe4d-4eed-9b39-7cb5e665c226")
@@ -921,7 +915,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected RestageApplicationResponse getResponse() {
             return RestageApplicationResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2015-07-27T22:43:33Z")
                     .id("2c6b3d3c-47bb-4060-be49-a56496ab57d4")
                     .url("/v2/apps/2c6b3d3c-47bb-4060-be49-a56496ab57d4")
@@ -1191,7 +1185,7 @@ public final class SpringApplicationsV2Test {
                     .routesUrl("/v2/apps/0c71909b-3d44-49c3-b65d-13894d70972c/routes")
                     .routeMappingsUrl("/v2/apps/0c71909b-3d44-49c3-b65d-13894d70972c/route_mappings")
                     .build())
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .updatedAt("2015-07-27T22:43:21Z")
                     .createdAt("2015-07-27T22:43:21Z")
                     .id("0c71909b-3d44-49c3-b65d-13894d70972c")
@@ -1243,7 +1237,7 @@ public final class SpringApplicationsV2Test {
                     .id("eff6a47e-67a1-4e3b-99a5-4f9bcab7620a")
                     .status("queued")
                     .build())
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2015-07-27T22:43:33Z")
                     .id("eff6a47e-67a1-4e3b-99a5-4f9bcab7620a")
                     .url("/v2/jobs/eff6a47e-67a1-4e3b-99a5-4f9bcab7620a")

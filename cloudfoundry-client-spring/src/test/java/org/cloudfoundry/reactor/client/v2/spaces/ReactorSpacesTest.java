@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.reactor.client.v2.spaces;
 
-import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.domains.Domain;
@@ -114,7 +113,8 @@ import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.cloudfoundry.client.v2.Resource.Metadata;
+
+import org.cloudfoundry.client.v2.Metadata;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.Service;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.builder;
@@ -712,7 +712,7 @@ public final class ReactorSpacesTest {
         @Override
         protected DeleteSpaceResponse getResponse() {
             return DeleteSpaceResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
                     .createdAt("2016-02-02T17:16:31Z")
                     .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
@@ -1409,7 +1409,7 @@ public final class ReactorSpacesTest {
                 .totalResults(1)
                 .totalPages(1)
                 .resource(RouteResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .id("f975dbb5-f6d2-4cac-8014-49994ce01853")
                         .url("/v2/routes/f975dbb5-f6d2-4cac-8014-49994ce01853")
                         .createdAt("2016-03-17T21:41:14Z")

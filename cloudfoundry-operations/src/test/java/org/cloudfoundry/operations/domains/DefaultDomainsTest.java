@@ -17,7 +17,7 @@
 package org.cloudfoundry.operations.domains;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationPrivateDomainRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
@@ -39,7 +39,6 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.util.test.TestObjects.fill;
-import static org.cloudfoundry.util.test.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultDomainsTest {
@@ -81,9 +80,9 @@ public final class DefaultDomainsTest {
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListPrivateDomainsResponse.builder())
+                .just(fill(ListPrivateDomainsResponse.builder())
                     .resource(PrivateDomainResource.builder()
-                        .metadata(fill(Resource.Metadata.builder(), "private-domain-")
+                        .metadata(fill(Metadata.builder(), "private-domain-")
                             .id(domainId)
                             .build())
                         .build())
@@ -98,17 +97,17 @@ public final class DefaultDomainsTest {
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListPrivateDomainsResponse.builder())
+                .just(fill(ListPrivateDomainsResponse.builder())
                     .build()));
     }
 
     private static void requestOrganizations(CloudFoundryClient cloudFoundryClient, String organization) {
         when(cloudFoundryClient.organizations()
-            .list(fillPage(ListOrganizationsRequest.builder())
+            .list(fill(ListOrganizationsRequest.builder())
                 .name(organization)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationsResponse.builder())
+                .just(fill(ListOrganizationsResponse.builder())
                     .resource(fill(OrganizationResource.builder(), "organization-")
                         .build())
                     .build()));
@@ -116,20 +115,20 @@ public final class DefaultDomainsTest {
 
     private static void requestOrganizationsEmpty(CloudFoundryClient cloudFoundryClient, String organization) {
         when(cloudFoundryClient.organizations()
-            .list(fillPage(ListOrganizationsRequest.builder())
+            .list(fill(ListOrganizationsRequest.builder())
                 .name(organization)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationsResponse.builder(), "organization-")
+                .just(fill(ListOrganizationsResponse.builder(), "organization-")
                     .build()));
     }
 
     private static void requestPrivateDomains(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.privateDomains()
-            .list(fillPage(ListPrivateDomainsRequest.builder())
+            .list(fill(ListPrivateDomainsRequest.builder())
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListPrivateDomainsResponse.builder())
+                .just(fill(ListPrivateDomainsResponse.builder())
                     .resource(fill(PrivateDomainResource.builder(), "private-domain-")
                         .build())
                     .build()));
@@ -137,10 +136,10 @@ public final class DefaultDomainsTest {
 
     private static void requestPrivateDomainsEmpty(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.privateDomains()
-            .list(fillPage(ListPrivateDomainsRequest.builder())
+            .list(fill(ListPrivateDomainsRequest.builder())
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListPrivateDomainsResponse.builder())
+                .just(fill(ListPrivateDomainsResponse.builder())
                     .build()));
     }
 
@@ -155,10 +154,10 @@ public final class DefaultDomainsTest {
 
     private static void requestSharedDomains(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.sharedDomains()
-            .list(fillPage(ListSharedDomainsRequest.builder())
+            .list(fill(ListSharedDomainsRequest.builder())
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSharedDomainsResponse.builder())
+                .just(fill(ListSharedDomainsResponse.builder())
                     .resource(fill(SharedDomainResource.builder(), "shared-domain-")
                         .build())
                     .build()));
@@ -166,10 +165,10 @@ public final class DefaultDomainsTest {
 
     private static void requestSharedDomainsEmpty(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.sharedDomains()
-            .list(fillPage(ListSharedDomainsRequest.builder())
+            .list(fill(ListSharedDomainsRequest.builder())
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSharedDomainsResponse.builder())
+                .just(fill(ListSharedDomainsResponse.builder())
                     .build()));
     }
 

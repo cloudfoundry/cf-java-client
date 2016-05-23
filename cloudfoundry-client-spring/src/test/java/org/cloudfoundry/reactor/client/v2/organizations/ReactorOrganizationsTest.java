@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.reactor.client.v2.organizations;
 
-import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.domains.DomainEntity;
 import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
@@ -112,7 +111,8 @@ import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.cloudfoundry.client.v2.Resource.Metadata;
+
+import org.cloudfoundry.client.v2.Metadata;
 
 public final class ReactorOrganizationsTest {
 
@@ -827,7 +827,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected DeleteOrganizationResponse getResponse() {
             return DeleteOrganizationResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
                     .createdAt("2016-02-02T17:16:31Z")
                     .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")

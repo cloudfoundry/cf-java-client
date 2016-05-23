@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.operations;
 
-import org.cloudfoundry.client.v2.Resource.Metadata;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
@@ -28,6 +28,7 @@ import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
 
+import static org.cloudfoundry.util.test.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
 public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsTest {
@@ -57,7 +58,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
 
         ListOrganizationsResponse response = ListOrganizationsResponse.builder()
             .resource(OrganizationResource.builder()
-                .metadata(Metadata.builder()
+                .metadata(fill(Metadata.builder())
                     .id("test-organization-id")
                     .build())
                 .entity(OrganizationEntity.builder()
@@ -86,7 +87,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
 
         ListOrganizationsResponse orgResponse = ListOrganizationsResponse.builder()
             .resource(OrganizationResource.builder()
-                .metadata(Metadata.builder()
+                .metadata(fill(Metadata.builder())
                     .id("test-organization-id")
                     .build())
                 .entity(OrganizationEntity.builder()
@@ -106,7 +107,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
 
         ListSpacesResponse spaceResponse = ListSpacesResponse.builder()
             .resource(SpaceResource.builder()
-                .metadata(Metadata.builder()
+                .metadata(fill(Metadata.builder())
                     .id("test-space-id")
                     .build())
                 .entity(SpaceEntity.builder()

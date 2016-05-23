@@ -19,6 +19,7 @@ package org.cloudfoundry.client.v2.serviceplans;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
+import org.cloudfoundry.client.v2.Metadata;
 
 public final class UpdateServicePlanResponse extends AbstractServicePlanResource {
 

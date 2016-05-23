@@ -16,7 +16,8 @@
 
 package org.cloudfoundry.util.test;
 
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
+import org.cloudfoundry.client.v2.OrderDirection;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
@@ -24,15 +25,16 @@ import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsResponse;
 import org.junit.Test;
 
+import java.util.Collections;
+
 import static org.cloudfoundry.util.test.TestObjects.fill;
-import static org.cloudfoundry.util.test.TestObjects.fillPage;
 import static org.junit.Assert.assertEquals;
 
 public final class TestObjectsTest {
 
+    @SuppressWarnings("deprecation")
     @Test
     public void fillCreate() {
-
         CreateApplicationRequest actual = fill(CreateApplicationRequest.builder()).build();
         CreateApplicationRequest expected = CreateApplicationRequest.builder()
             .buildpack("test-buildpack")
@@ -40,20 +42,21 @@ public final class TestObjectsTest {
             .console(true)
             .debug(true)
             .detectedStartCommand("test-detectedStartCommand")
+            .dockerCredentialsJsons(Collections.emptyMap())
             .diego(true)
             .diskQuota(1)
             .dockerImage("test-dockerImage")
             .enableSsh(true)
+            .environmentJsons(Collections.emptyMap())
             .healthCheckTimeout(1)
             .healthCheckType("test-healthCheckType")
             .instances(1)
             .memory(1)
             .name("test-name")
+            .ports(Collections.emptyList())
             .production(true)
             .spaceId("test-spaceId")
             .stackId("test-stackId")
-            .stagingFailedDescription("test-stagingFailedDescription")
-            .stagingFailedReason("test-stagingFailedReason")
             .state("test-state")
             .build();
 
@@ -102,21 +105,11 @@ public final class TestObjectsTest {
         assertEquals(expected, actual);
     }
 
-    @Test(expected = AssertionError.class)
-    public void fillOfPaginated() {
-        fill(ListApplicationsResponse.builder());
-    }
-
-    @Test(expected = AssertionError.class)
-    public void fillPageOfNonPaginated() {
-        fillPage(ApplicationEntity.builder());
-    }
-
-    @Test
     public void fillRequestPage() {
 
-        ListApplicationsRequest actual = fillPage(ListApplicationsRequest.builder()).build();
+        ListApplicationsRequest actual = fill(ListApplicationsRequest.builder()).build();
         ListApplicationsRequest expected = ListApplicationsRequest.builder()
+            .orderDirection(OrderDirection.ASCENDING)
             .page(1)
             .diego(true)
             .build();
@@ -130,7 +123,7 @@ public final class TestObjectsTest {
         ApplicationResource actual = fill(ApplicationResource.builder()).build();
         ApplicationResource expected = ApplicationResource.builder()
             .entity(fill(ApplicationEntity.builder()).build())
-            .metadata(fill(Resource.Metadata.builder()).build())
+            .metadata(fill(Metadata.builder()).build())
             .build();
 
         assertEquals(expected, actual);
@@ -139,7 +132,7 @@ public final class TestObjectsTest {
     @Test
     public void fillResponsePage() {
 
-        ListApplicationsResponse actual = fillPage(ListApplicationsResponse.builder()).build();
+        ListApplicationsResponse actual = fill(ListApplicationsResponse.builder()).build();
         ListApplicationsResponse expected = ListApplicationsResponse.builder()
             .nextUrl("test-nextUrl")
             .previousUrl("test-previousUrl")

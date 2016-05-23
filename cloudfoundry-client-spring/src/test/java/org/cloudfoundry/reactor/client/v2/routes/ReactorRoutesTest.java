@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.routes;
 
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
@@ -81,7 +81,7 @@ public final class ReactorRoutesTest {
         @Override
         protected AssociateRouteApplicationResponse getResponse() {
             return AssociateRouteApplicationResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .id("a05c94a3-e4b3-456e-b044-475270919ea7")
                     .url("/v2/routes/a05c94a3-e4b3-456e-b044-475270919ea7")
                     .createdAt("2016-03-17T21:41:19Z")
@@ -142,7 +142,7 @@ public final class ReactorRoutesTest {
         @Override
         protected CreateRouteResponse getResponse() {
             return CreateRouteResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .id("ad307f5b-efec-4034-8cf1-1f86515ee093")
                     .url("/v2/routes/ad307f5b-efec-4034-8cf1-1f86515ee093")
                     .createdAt("2016-03-17T21:41:19Z")
@@ -244,7 +244,7 @@ public final class ReactorRoutesTest {
         @Override
         protected DeleteRouteResponse getResponse() {
             return DeleteRouteResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
                     .createdAt("2016-02-02T17:16:31Z")
                     .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
@@ -339,7 +339,7 @@ public final class ReactorRoutesTest {
         @Override
         protected GetRouteResponse getResponse() {
             return GetRouteResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .id("e6c3ae35-9083-4816-9432-ee8ad700fd03")
                     .url("/v2/routes/e6c3ae35-9083-4816-9432-ee8ad700fd03")
                     .createdAt("2016-03-17T21:41:19Z")
@@ -402,7 +402,7 @@ public final class ReactorRoutesTest {
                 .totalResults(1)
                 .totalPages(1)
                 .resource(RouteResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .id("8fd7433e-e9c7-4897-809f-9a9696f72986")
                         .url("/v2/routes/8fd7433e-e9c7-4897-809f-9a9696f72986")
                         .createdAt("2016-03-17T21:41:19Z")
@@ -467,7 +467,7 @@ public final class ReactorRoutesTest {
                 .totalResults(1)
                 .totalPages(1)
                 .resource(ApplicationResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .id("f1243da8-e613-490a-8a0e-21ef1bcce952")
                         .url("/v2/apps/f1243da8-e613-490a-8a0e-21ef1bcce952")
                         .createdAt("2015-11-30T23:38:56Z")
@@ -586,7 +586,7 @@ public final class ReactorRoutesTest {
         @Override
         protected UpdateRouteResponse getResponse() {
             return UpdateRouteResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .id("fc72a0ae-374b-4f06-b96d-38a3864ee91b")
                     .url("/v2/routes/fc72a0ae-374b-4f06-b96d-38a3864ee91b")
                     .createdAt("2016-03-17T21:41:19Z")

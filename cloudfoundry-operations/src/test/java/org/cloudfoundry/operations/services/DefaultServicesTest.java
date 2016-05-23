@@ -18,7 +18,7 @@ package org.cloudfoundry.operations.services;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.CloudFoundryException;
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
@@ -86,20 +86,19 @@ import java.util.Queue;
 import java.util.function.Supplier;
 
 import static org.cloudfoundry.util.test.TestObjects.fill;
-import static org.cloudfoundry.util.test.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultServicesTest {
 
     private static void requestApplications(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
         when(cloudFoundryClient.spaces()
-            .listApplications(fillPage(ListSpaceApplicationsRequest.builder())
+            .listApplications(fill(ListSpaceApplicationsRequest.builder())
                 .diego(null)
                 .name(applicationName)
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceApplicationsResponse.builder())
+                .just(fill(ListSpaceApplicationsResponse.builder())
                     .resource(fill(ApplicationResource.builder(), "application-")
                         .build())
                     .build()));
@@ -107,13 +106,13 @@ public final class DefaultServicesTest {
 
     private static void requestApplicationsEmpty(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
         when(cloudFoundryClient.spaces()
-            .listApplications(fillPage(ListSpaceApplicationsRequest.builder())
+            .listApplications(fill(ListSpaceApplicationsRequest.builder())
                 .diego(null)
                 .name(applicationName)
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceApplicationsResponse.builder())
+                .just(fill(ListSpaceApplicationsResponse.builder())
                     .build()));
     }
 
@@ -125,7 +124,7 @@ public final class DefaultServicesTest {
                 .serviceInstanceId(serviceInstanceId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListApplicationServiceBindingsResponse.builder())
+                .just(fill(ListApplicationServiceBindingsResponse.builder())
                     .resource(fill(ServiceBindingResource.builder(), "service-binding-")
                         .entity(ServiceBindingEntity.builder()
                             .applicationId(applicationId)
@@ -170,7 +169,7 @@ public final class DefaultServicesTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(CreateServiceInstanceResponse.builder())
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(fill(Metadata.builder())
                         .id(serviceInstanceId)
                         .build())
                     .entity(fill(ServiceInstanceEntity.builder())
@@ -206,7 +205,7 @@ public final class DefaultServicesTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(CreateUserProvidedServiceInstanceResponse.builder())
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(fill(Metadata.builder())
                         .id(userProvidedServiceInstanceId)
                         .build())
                     .entity(fill(UserProvidedServiceInstanceEntity.builder())
@@ -250,7 +249,9 @@ public final class DefaultServicesTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(GetApplicationResponse.builder())
-                    .metadata(Resource.Metadata.builder().id(applicationId).build())
+                    .metadata(fill(Metadata.builder())
+                        .id(applicationId)
+                        .build())
                     .entity(ApplicationEntity.builder()
                         .name(application)
                         .build())
@@ -265,7 +266,7 @@ public final class DefaultServicesTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(GetServiceResponse.builder())
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(fill(Metadata.builder())
                         .id(serviceId)
                         .build())
                     .entity(fill(ServiceEntity.builder())
@@ -282,7 +283,7 @@ public final class DefaultServicesTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(GetServiceInstanceResponse.builder())
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(fill(Metadata.builder())
                         .id(serviceInstanceId)
                         .build())
                     .entity(fill(ServiceInstanceEntity.builder())
@@ -385,7 +386,7 @@ public final class DefaultServicesTest {
                 .serviceInstanceId(serviceInstanceId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListServiceBindingsResponse.builder())
+                .just(fill(ListServiceBindingsResponse.builder())
                     .resource(fill(ServiceBindingResource.builder(), "service-binding")
                         .entity(ServiceBindingEntity.builder()
                             .applicationId(applicationId)
@@ -401,7 +402,7 @@ public final class DefaultServicesTest {
                 .serviceInstanceId(serviceInstanceId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListServiceBindingsResponse.builder())
+                .just(fill(ListServiceBindingsResponse.builder())
                     .build()));
     }
 
@@ -413,7 +414,7 @@ public final class DefaultServicesTest {
                 .name(serviceKey)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListServiceInstanceServiceKeysResponse.builder())
+                .just(fill(ListServiceInstanceServiceKeysResponse.builder())
                     .resource(fill(ServiceKeyResource.builder(), "service-key-")
                         .entity(ServiceKeyEntity.builder()
                             .name(serviceKey)
@@ -430,7 +431,7 @@ public final class DefaultServicesTest {
                 .serviceInstanceId(serviceInstanceId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListServiceInstanceServiceKeysResponse.builder())
+                .just(fill(ListServiceInstanceServiceKeysResponse.builder())
                     .resource(fill(ServiceKeyResource.builder(), "service-key-")
                         .entity(fill(ServiceKeyEntity.builder(), "service-key-entity-")
                             .credential(credentialKey, credentialValue)
@@ -447,7 +448,7 @@ public final class DefaultServicesTest {
                 .name(serviceKey)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListServiceInstanceServiceKeysResponse.builder())
+                .just(fill(ListServiceInstanceServiceKeysResponse.builder())
                     .build()));
     }
 
@@ -458,7 +459,7 @@ public final class DefaultServicesTest {
                 .serviceInstanceId(serviceInstanceId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListServiceInstanceServiceKeysResponse.builder())
+                .just(fill(ListServiceInstanceServiceKeysResponse.builder())
                     .build()));
     }
 
@@ -471,7 +472,7 @@ public final class DefaultServicesTest {
                 .name(serviceName)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceServiceInstancesResponse.builder())
+                .just(fill(ListSpaceServiceInstancesResponse.builder())
                     .resource(fill(UnionServiceInstanceResource.builder(), "service-instance-")
                         .build())
                     .build()));
@@ -486,7 +487,7 @@ public final class DefaultServicesTest {
                 .name(serviceName)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceServiceInstancesResponse.builder())
+                .just(fill(ListSpaceServiceInstancesResponse.builder())
                     .resource(fill(UnionServiceInstanceResource.builder(), "service-instance-")
                         .entity(fill(UnionServiceInstanceEntity.builder())
                             .servicePlanId(servicePlanId)
@@ -503,7 +504,7 @@ public final class DefaultServicesTest {
                 .returnUserProvidedServiceInstances(true)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceServiceInstancesResponse.builder())
+                .just(fill(ListSpaceServiceInstancesResponse.builder())
                     .build()));
     }
 
@@ -516,7 +517,7 @@ public final class DefaultServicesTest {
                 .name(serviceName)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceServiceInstancesResponse.builder())
+                .just(fill(ListSpaceServiceInstancesResponse.builder())
                     .build()));
     }
 
@@ -529,9 +530,11 @@ public final class DefaultServicesTest {
                 .name(serviceName)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceServiceInstancesResponse.builder())
+                .just(fill(ListSpaceServiceInstancesResponse.builder())
                     .resource(UnionServiceInstanceResource.builder()
-                        .metadata(Resource.Metadata.builder().id("test-service-instance-id").build())
+                        .metadata(fill(Metadata.builder())
+                            .id("test-service-instance-id")
+                            .build())
                         .entity(fill(UnionServiceInstanceEntity.builder())
                             .name(serviceName)
                             .servicePlanId("test-service-plan-id")
@@ -557,9 +560,11 @@ public final class DefaultServicesTest {
                 .returnUserProvidedServiceInstances(true)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceServiceInstancesResponse.builder())
+                .just(fill(ListSpaceServiceInstancesResponse.builder())
                     .resource(UnionServiceInstanceResource.builder()
-                        .metadata(Resource.Metadata.builder().id(instanceName1 + "-id").build())
+                        .metadata(fill(Metadata.builder())
+                            .id(instanceName1 + "-id")
+                            .build())
                         .entity(fill(UnionServiceInstanceEntity.builder())
                             .type("user_provided_service_instance")
                             .dashboardUrl(null)
@@ -569,7 +574,9 @@ public final class DefaultServicesTest {
                             .build())
                         .build())
                     .resource(UnionServiceInstanceResource.builder()
-                        .metadata(Resource.Metadata.builder().id(instanceName2 + "-id").build())
+                        .metadata(fill(Metadata.builder())
+                            .id(instanceName2 + "-id")
+                            .build())
                         .entity(fill(UnionServiceInstanceEntity.builder())
                             .type("managed_service_instance")
                             .name(instanceName2)
@@ -596,9 +603,9 @@ public final class DefaultServicesTest {
                 .name(serviceName)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceServiceInstancesResponse.builder())
+                .just(fill(ListSpaceServiceInstancesResponse.builder())
                     .resource(UnionServiceInstanceResource.builder()
-                        .metadata(Resource.Metadata.builder()
+                        .metadata(fill(Metadata.builder())
                             .id("test-service-instance-id")
                             .build())
                         .entity(UnionServiceInstanceEntity.builder()
@@ -617,7 +624,7 @@ public final class DefaultServicesTest {
                 .servicePlanId(servicePlanId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListServicePlanVisibilitiesResponse.builder())
+                .just(fill(ListServicePlanVisibilitiesResponse.builder())
                     .resource(ServicePlanVisibilityResource.builder()
                         .entity(ServicePlanVisibilityEntity.builder()
                             .organizationId(organizationId)
@@ -635,7 +642,7 @@ public final class DefaultServicesTest {
                 .servicePlanId(servicePlanId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListServicePlanVisibilitiesResponse.builder())
+                .just(fill(ListServicePlanVisibilitiesResponse.builder())
                     .build()));
     }
 
@@ -646,9 +653,9 @@ public final class DefaultServicesTest {
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListServicePlansResponse.builder())
+                .just(fill(ListServicePlansResponse.builder())
                     .resource(ServicePlanResource.builder()
-                        .metadata(Resource.Metadata.builder()
+                        .metadata(fill(Metadata.builder())
                             .id(planId)
                             .build())
                         .entity(fill(ServicePlanEntity.builder())
@@ -667,9 +674,9 @@ public final class DefaultServicesTest {
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListServicePlansResponse.builder())
+                .just(fill(ListServicePlansResponse.builder())
                     .resource(ServicePlanResource.builder()
-                        .metadata(Resource.Metadata.builder()
+                        .metadata(fill(Metadata.builder())
                             .id(planId)
                             .build())
                         .entity(fill(ServicePlanEntity.builder())
@@ -690,9 +697,9 @@ public final class DefaultServicesTest {
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceServicesResponse.builder())
+                .just(fill(ListSpaceServicesResponse.builder())
                     .resource(ServiceResource.builder()
-                        .metadata(Resource.Metadata.builder()
+                        .metadata(fill(Metadata.builder())
                             .id(serviceLabel + "-id")
                             .build())
                         .entity(fill(ServiceEntity.builder())
@@ -710,16 +717,20 @@ public final class DefaultServicesTest {
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceServicesResponse.builder())
+                .just(fill(ListSpaceServicesResponse.builder())
                     .resource(ServiceResource.builder()
-                        .metadata(Resource.Metadata.builder().id(serviceLabel1 + "-id").build())
+                        .metadata(fill(Metadata.builder())
+                            .id(serviceLabel1 + "-id")
+                            .build())
                         .entity(fill(ServiceEntity.builder())
                             .description(serviceLabel1 + "-description")
                             .label(serviceLabel1)
                             .build())
                         .build())
                     .resource(ServiceResource.builder()
-                        .metadata(Resource.Metadata.builder().id(serviceLabel2 + "-id").build())
+                        .metadata(fill(Metadata.builder())
+                            .id(serviceLabel2 + "-id")
+                            .build())
                         .entity(fill(ServiceEntity.builder())
                             .description(serviceLabel2 + "-description")
                             .label(serviceLabel2)

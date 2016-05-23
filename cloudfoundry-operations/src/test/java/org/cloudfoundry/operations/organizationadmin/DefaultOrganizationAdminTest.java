@@ -18,7 +18,7 @@ package org.cloudfoundry.operations.organizationadmin;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.CloudFoundryException;
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
@@ -39,7 +39,6 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.util.test.TestObjects.fill;
-import static org.cloudfoundry.util.test.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultOrganizationAdminTest {
@@ -57,7 +56,7 @@ public final class DefaultOrganizationAdminTest {
                 .build()))
             .thenReturn(Mono
                 .just(CreateOrganizationQuotaDefinitionResponse.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(fill(Metadata.builder())
                         .id(quotaDefinitionId)
                         .build())
                     .entity(OrganizationQuotaDefinitionEntity.builder()
@@ -90,19 +89,19 @@ public final class DefaultOrganizationAdminTest {
 
     private static void requestListOrganizationEmpty(CloudFoundryClient cloudFoundryClient, String name) {
         when(cloudFoundryClient.organizations()
-            .list(fillPage(ListOrganizationsRequest.builder().name(name))
+            .list(fill(ListOrganizationsRequest.builder().name(name))
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationsResponse.builder())
+                .just(fill(ListOrganizationsResponse.builder())
                     .build()));
     }
 
     private static void requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.organizationQuotaDefinitions()
-            .list(fillPage(ListOrganizationQuotaDefinitionsRequest.builder())
+            .list(fill(ListOrganizationQuotaDefinitionsRequest.builder())
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationQuotaDefinitionsResponse.builder())
+                .just(fill(ListOrganizationQuotaDefinitionsResponse.builder())
                     .resource(fill(OrganizationQuotaDefinitionResource.builder(), "quota-")
                         .build())
                     .build()));
@@ -110,10 +109,10 @@ public final class DefaultOrganizationAdminTest {
 
     private static void requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient, String name) {
         when(cloudFoundryClient.organizationQuotaDefinitions()
-            .list(fillPage(ListOrganizationQuotaDefinitionsRequest.builder().name(name))
+            .list(fill(ListOrganizationQuotaDefinitionsRequest.builder().name(name))
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationQuotaDefinitionsResponse.builder())
+                .just(fill(ListOrganizationQuotaDefinitionsResponse.builder())
                     .resource(fill(OrganizationQuotaDefinitionResource.builder(), "quota-")
                         .build())
                     .build()));
@@ -121,19 +120,19 @@ public final class DefaultOrganizationAdminTest {
 
     private static void requestListOrganizationQuotasEmpty(CloudFoundryClient cloudFoundryClient, String name) {
         when(cloudFoundryClient.organizationQuotaDefinitions()
-            .list(fillPage(ListOrganizationQuotaDefinitionsRequest.builder().name(name))
+            .list(fill(ListOrganizationQuotaDefinitionsRequest.builder().name(name))
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationQuotaDefinitionsResponse.builder())
+                .just(fill(ListOrganizationQuotaDefinitionsResponse.builder())
                     .build()));
     }
 
     private static void requestListOrganizations(CloudFoundryClient cloudFoundryClient, String name) {
         when(cloudFoundryClient.organizations()
-            .list(fillPage(ListOrganizationsRequest.builder().name(name))
+            .list(fill(ListOrganizationsRequest.builder().name(name))
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationsResponse.builder())
+                .just(fill(ListOrganizationsResponse.builder())
                     .resource(fill(OrganizationResource.builder(), "organization-")
                         .build())
                     .build()));
@@ -163,7 +162,7 @@ public final class DefaultOrganizationAdminTest {
                 .build()))
             .thenReturn(Mono
                 .just(UpdateOrganizationQuotaDefinitionResponse.builder()
-                    .metadata(fill(Resource.Metadata.builder()).id(organizationQuotaDefinitionId).build())
+                    .metadata(fill(Metadata.builder()).id(organizationQuotaDefinitionId).build())
                     .entity(OrganizationQuotaDefinitionEntity.builder()
                         .applicationInstanceLimit(-1)
                         .applicationTaskLimit(-1)

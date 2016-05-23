@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.serviceplans;
 
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
@@ -114,7 +114,7 @@ public final class ReactorServicePlansTest {
         @Override
         protected DeleteServicePlanResponse getResponse() {
             return DeleteServicePlanResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
                     .createdAt("2016-02-02T17:16:31Z")
                     .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
@@ -166,7 +166,7 @@ public final class ReactorServicePlansTest {
         @Override
         protected GetServicePlanResponse getResponse() {
             return GetServicePlanResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2015-07-27T22:43:16Z")
                     .id("f6ceb8a2-e6fc-43d5-a11b-7ced9e1b47c7")
                     .url("/v2/service_plans/f6ceb8a2-e6fc-43d5-a11b-7ced9e1b47c7")
@@ -226,7 +226,7 @@ public final class ReactorServicePlansTest {
                 .totalResults(1)
                 .totalPages(1)
                 .resource(ServicePlanResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:16Z")
                         .id("956cb355-3acc-4ced-8161-a57b9b5c7943")
                         .url("/v2/service_plans/956cb355-3acc-4ced-8161-a57b9b5c7943")
@@ -289,7 +289,7 @@ public final class ReactorServicePlansTest {
                 .totalResults(1)
                 .totalPages(1)
                 .resource(ServiceInstanceResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:16Z")
                         .id("b95c56b9-f81b-4d34-9a00-a1a1ddba5f2f")
                         .url("/v2/service_instances/b95c56b9-f81b-4d34-9a00-a1a1ddba5f2f")
@@ -352,7 +352,7 @@ public final class ReactorServicePlansTest {
         @Override
         protected UpdateServicePlanResponse getResponse() {
             return UpdateServicePlanResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .id("195f6bd5-0aa4-4a97-9c8d-5410e5e6d4b6")
                     .url("/v2/service_plans/195f6bd5-0aa4-4a97-9c8d-5410e5e6d4b6")
                     .createdAt("2016-02-19T02:04:09Z")

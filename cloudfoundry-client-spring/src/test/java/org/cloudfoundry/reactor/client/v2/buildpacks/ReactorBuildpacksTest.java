@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.buildpacks;
 
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.buildpacks.BuildpackEntity;
 import org.cloudfoundry.client.v2.buildpacks.BuildpackResource;
 import org.cloudfoundry.client.v2.buildpacks.CreateBuildpackRequest;
@@ -78,7 +78,7 @@ public final class ReactorBuildpacksTest {
         @Override
         protected CreateBuildpackResponse getResponse() {
             return CreateBuildpackResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2016-03-17T21:41:28Z")
                     .id("9c38753c-960c-44aa-ac46-37ad61b87e35")
                     .url("/v2/buildpacks/9c38753c-960c-44aa-ac46-37ad61b87e35")
@@ -132,7 +132,7 @@ public final class ReactorBuildpacksTest {
         @Override
         protected DeleteBuildpackResponse getResponse() {
             return DeleteBuildpackResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2015-07-27T22:43:34Z")
                     .id("c900719e-c70a-4c75-9e6a-9535f118acc3")
                     .url("/v2/jobs/c900719e-c70a-4c75-9e6a-9535f118acc3")
@@ -184,7 +184,7 @@ public final class ReactorBuildpacksTest {
         @Override
         protected GetBuildpackResponse getResponse() {
             return GetBuildpackResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2016-03-17T21:41:28Z")
                     .id("35d3fa06-08db-4b9e-b2a7-58724a179687")
                     .url("/v2/buildpacks/35d3fa06-08db-4b9e-b2a7-58724a179687")
@@ -241,7 +241,7 @@ public final class ReactorBuildpacksTest {
                 .totalResults(3)
                 .totalPages(1)
                 .resource(BuildpackResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .id("45203d32-475b-4d55-9d34-3ffc935edd49")
                         .url("/v2/buildpacks/45203d32-475b-4d55-9d34-3ffc935edd49")
                         .createdAt("2016-03-17T21:41:28Z")
@@ -255,7 +255,7 @@ public final class ReactorBuildpacksTest {
                         .build())
                     .build())
                 .resource(BuildpackResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .id("1aeb95ef-7058-495c-b260-dea2e8efb976")
                         .url("/v2/buildpacks/1aeb95ef-7058-495c-b260-dea2e8efb976")
                         .createdAt("2016-03-17T21:41:28Z")
@@ -269,7 +269,7 @@ public final class ReactorBuildpacksTest {
                         .build())
                     .build())
                 .resource(BuildpackResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .id("4dd0046a-7a54-4f57-a31f-06d7e57eb463")
                         .url("/v2/buildpacks/4dd0046a-7a54-4f57-a31f-06d7e57eb463")
                         .createdAt("2016-03-17T21:41:28Z")
@@ -326,7 +326,7 @@ public final class ReactorBuildpacksTest {
         @Override
         protected UpdateBuildpackResponse getResponse() {
             return UpdateBuildpackResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2016-03-17T21:41:28Z")
                     .id("edd64481-e13c-4193-b6cc-2a727a62e817")
                     .updatedAt("2016-03-17T21:41:28Z")
@@ -392,7 +392,7 @@ public final class ReactorBuildpacksTest {
         @Override
         protected UploadBuildpackResponse getResponse() {
             return UploadBuildpackResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2016-04-21T08:51:39Z")
                     .id("353360ea-59bb-414b-a90e-100c37317a02")
                     .updatedAt("2016-04-21T09:38:16Z")

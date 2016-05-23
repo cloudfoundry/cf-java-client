@@ -32,17 +32,16 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import static org.cloudfoundry.util.test.TestObjects.fill;
-import static org.cloudfoundry.util.test.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultBuildpacksTest {
 
     private static void requestBuildpacks(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.buildpacks()
-            .list(fillPage(ListBuildpacksRequest.builder())
+            .list(fill(ListBuildpacksRequest.builder())
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListBuildpacksResponse.builder())
+                .just(fill(ListBuildpacksResponse.builder())
                     .resource(fill(BuildpackResource.builder(), "buildpack-")
                         .build())
                     .build()));

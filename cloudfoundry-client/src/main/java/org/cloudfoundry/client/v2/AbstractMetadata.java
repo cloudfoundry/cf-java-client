@@ -17,24 +17,40 @@
 package org.cloudfoundry.client.v2;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
 /**
- * The resource payload for a paginated response
- *
- * @param <T> the type of entity contained within the resource
+ * The metadata payload for a resource
  */
-@Data
-public abstract class Resource<T> {
+@JsonDeserialize
+@Value.Immutable
+abstract class AbstractMetadata {
 
-    private final T entity;
+    /**
+     * When the resource was created
+     */
+    @JsonProperty("created_at")
+    abstract String getCreatedAt();
 
-    private final Metadata metadata;
+    /**
+     * The resource's id
+     */
+    @JsonProperty("guid")
+    abstract String getId();
 
-    protected Resource(@JsonProperty("entity") T entity,
-                       @JsonProperty("metadata") Metadata metadata) {
-        this.entity = entity;
-        this.metadata = metadata;
-    }
+    /**
+     * When the resource was last updated
+     */
+    @JsonProperty("updated_at")
+    @Nullable
+    abstract String getUpdatedAt();
+
+    /**
+     * The resource's URL
+     */
+    @JsonProperty("url")
+    abstract String getUrl();
 
 }

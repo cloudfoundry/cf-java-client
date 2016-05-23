@@ -27,18 +27,17 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.util.test.TestObjects.fill;
-import static org.cloudfoundry.util.test.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultSpaceAdminTest {
 
     private static void requestSpaceQuotaDefinitions(CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient.organizations()
-            .listSpaceQuotaDefinitions(fillPage(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
+            .listSpaceQuotaDefinitions(fill(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
                 .organizationId(organizationId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
+                .just(fill(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
                     .resource(fill(SpaceQuotaDefinitionResource.builder(), "space-quota-definition-")
                         .build())
                     .build()));
@@ -46,11 +45,11 @@ public final class DefaultSpaceAdminTest {
 
     private static void requestSpaceQuotaDefinitionsEmpty(CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient.organizations()
-            .listSpaceQuotaDefinitions(fillPage(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
+            .listSpaceQuotaDefinitions(fill(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
                 .organizationId(organizationId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
+                .just(fill(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
                     .build()));
     }
 

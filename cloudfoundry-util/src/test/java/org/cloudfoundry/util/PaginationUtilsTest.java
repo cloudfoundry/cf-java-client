@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.util;
 
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
@@ -26,6 +27,7 @@ import reactor.core.publisher.Mono;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.cloudfoundry.util.test.TestObjects.fill;
 import static org.junit.Assert.assertEquals;
 
 public final class PaginationUtilsTest {
@@ -77,10 +79,10 @@ public final class PaginationUtilsTest {
 
     private static SpaceResource testSpaceResource(int i) {
         return SpaceResource.builder()
-            .metadata(SpaceResource.Metadata.builder()
+            .metadata(fill(Metadata.builder())
                 .id("test-id-" + i)
                 .build())
-            .entity(SpaceEntity.builder()
+            .entity(fill(SpaceEntity.builder())
                 .name("name-" + i)
                 .build())
             .build();

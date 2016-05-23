@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.serviceplanvisibilities;
 
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.CreateServicePlanVisibilityRequest;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.CreateServicePlanVisibilityResponse;
@@ -75,7 +75,7 @@ public final class ReactorServicePlanVisibilitiesTest {
         @Override
         protected CreateServicePlanVisibilityResponse getResponse() {
             return CreateServicePlanVisibilityResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2015-07-27T22:43:28Z")
                     .id("28a22749-25f4-44bd-a371-c37e2ee53175")
                     .url("/v2/service_plan_visibilities/28a22749-25f4-44bd-a371-c37e2ee53175")
@@ -167,7 +167,7 @@ public final class ReactorServicePlanVisibilitiesTest {
         @Override
         protected DeleteServicePlanVisibilityResponse getResponse() {
             return DeleteServicePlanVisibilityResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
                     .createdAt("2016-02-02T17:16:31Z")
                     .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
@@ -218,7 +218,7 @@ public final class ReactorServicePlanVisibilitiesTest {
         @Override
         protected GetServicePlanVisibilityResponse getResponse() {
             return GetServicePlanVisibilityResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2015-07-27T22:43:28Z")
                     .id("18365c25-898b-4365-911d-6f6a09154297")
                     .url("/v2/service_plan_visibilities/18365c25-898b-4365-911d-6f6a09154297")
@@ -273,7 +273,7 @@ public final class ReactorServicePlanVisibilitiesTest {
                 .totalPages(1)
                 .totalResults(1)
                 .resource(ServicePlanVisibilityResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .id("3d5c0584-fbf0-4d75-b68e-226e77496f69")
                         .url("/v2/service_plan_visibilities/3d5c0584-fbf0-4d75-b68e-226e77496f69")
                         .createdAt("2015-07-27T22:43:28Z")
@@ -328,7 +328,7 @@ public final class ReactorServicePlanVisibilitiesTest {
         @Override
         protected UpdateServicePlanVisibilityResponse getResponse() {
             return UpdateServicePlanVisibilityResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2015-07-27T22:43:28Z")
                     .id("5f1514f9-66ee-4799-9de2-69f2ec3cb5f1")
                     .updatedAt("2015-07-27T22:43:28Z")

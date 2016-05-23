@@ -21,7 +21,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
 
 /**
  * The response payload for the Associate Route with the Application operation
@@ -33,7 +33,7 @@ public final class AssociateApplicationRouteResponse extends AbstractApplication
 
     @Builder
     AssociateApplicationRouteResponse(@JsonProperty("entity") ApplicationEntity entity,
-                                      @JsonProperty("metadata") Resource.Metadata metadata) {
+                                      @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 

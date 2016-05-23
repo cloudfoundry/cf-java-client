@@ -19,6 +19,7 @@ package org.cloudfoundry.client.v2.serviceinstances;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
+import org.cloudfoundry.client.v2.Metadata;
 
 /**
  * The response payload for the the Update Service Instance request.

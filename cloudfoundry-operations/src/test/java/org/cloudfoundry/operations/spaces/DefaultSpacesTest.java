@@ -18,7 +18,7 @@ package org.cloudfoundry.operations.spaces;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.CloudFoundryException;
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.jobs.GetJobRequest;
@@ -76,7 +76,6 @@ import java.util.Queue;
 import java.util.function.Supplier;
 
 import static org.cloudfoundry.util.test.TestObjects.fill;
-import static org.cloudfoundry.util.test.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultSpacesTest {
@@ -123,7 +122,7 @@ public final class DefaultSpacesTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(CreateSpaceResponse.builder())
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(fill(Metadata.builder())
                         .id(spaceId)
                         .build())
                     .build()));
@@ -214,12 +213,12 @@ public final class DefaultSpacesTest {
 
     private static void requestOrganizationSpaceQuotas(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceQuota, String spaceQuotaId) {
         ListOrganizationSpaceQuotaDefinitionsResponse.ListOrganizationSpaceQuotaDefinitionsResponseBuilder responseBuilder =
-            fillPage(ListOrganizationSpaceQuotaDefinitionsResponse.builder());
+            fill(ListOrganizationSpaceQuotaDefinitionsResponse.builder());
 
         if (spaceQuotaId != null) {
             responseBuilder
                 .resource(SpaceQuotaDefinitionResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(fill(Metadata.builder())
                         .id(spaceQuotaId)
                         .build())
                     .entity(SpaceQuotaDefinitionEntity.builder()
@@ -229,7 +228,7 @@ public final class DefaultSpacesTest {
         }
 
         when(cloudFoundryClient.organizations()
-            .listSpaceQuotaDefinitions(fillPage(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
+            .listSpaceQuotaDefinitions(fill(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
                 .organizationId(organizationId)
                 .build()))
             .thenReturn(Mono
@@ -238,12 +237,12 @@ public final class DefaultSpacesTest {
 
     private static void requestOrganizationSpaces(CloudFoundryClient cloudFoundryClient, String organizationId, String space, String spaceQuotaDefinitionId) {
         when(cloudFoundryClient.organizations()
-            .listSpaces(fillPage(ListOrganizationSpacesRequest.builder())
+            .listSpaces(fill(ListOrganizationSpacesRequest.builder())
                 .name(space)
                 .organizationId(organizationId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationSpacesResponse.builder())
+                .just(fill(ListOrganizationSpacesResponse.builder())
                     .resource(fill(SpaceResource.builder(), "space-")
                         .entity(fill(SpaceEntity.builder(), "space-")
                             .spaceQuotaDefinitionId(spaceQuotaDefinitionId)
@@ -254,23 +253,23 @@ public final class DefaultSpacesTest {
 
     private static void requestOrganizationSpacesEmpty(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         when(cloudFoundryClient.organizations()
-            .listSpaces(fillPage(ListOrganizationSpacesRequest.builder())
+            .listSpaces(fill(ListOrganizationSpacesRequest.builder())
                 .name(space)
                 .organizationId(organizationId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationSpacesResponse.builder())
+                .just(fill(ListOrganizationSpacesResponse.builder())
                     .build()));
     }
 
     private static void requestOrganizationSpacesWithSsh(CloudFoundryClient cloudFoundryClient, String organizationId, String space, Boolean allowSsh) {
         when(cloudFoundryClient.organizations()
-            .listSpaces(fillPage(ListOrganizationSpacesRequest.builder())
+            .listSpaces(fill(ListOrganizationSpacesRequest.builder())
                 .name(space)
                 .organizationId(organizationId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationSpacesResponse.builder())
+                .just(fill(ListOrganizationSpacesResponse.builder())
                     .resource(fill(SpaceResource.builder(), "space-")
                         .entity(fill(SpaceEntity.builder(), "space-entity-")
                             .allowSsh(allowSsh)
@@ -280,19 +279,19 @@ public final class DefaultSpacesTest {
     }
 
     private static void requestOrganizations(CloudFoundryClient cloudFoundryClient, String organization, String organizationId) {
-        ListOrganizationsResponse.ListOrganizationsResponseBuilder responseBuilder = fillPage(ListOrganizationsResponse.builder(), "organization-");
+        ListOrganizationsResponse.ListOrganizationsResponseBuilder responseBuilder = fill(ListOrganizationsResponse.builder(), "organization-");
 
         if (organizationId != null) {
             responseBuilder
                 .resource(OrganizationResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(fill(Metadata.builder())
                         .id(organizationId)
                         .build())
                     .build());
         }
 
         when(cloudFoundryClient.organizations()
-            .list(fillPage(ListOrganizationsRequest.builder())
+            .list(fill(ListOrganizationsRequest.builder())
                 .name(organization)
                 .build()))
             .thenReturn(Mono
@@ -302,12 +301,12 @@ public final class DefaultSpacesTest {
 
     private static void requestSpaceApplications(CloudFoundryClient cloudFoundryClient, String spaceId) {
         when(cloudFoundryClient.spaces()
-            .listApplications(fillPage(ListSpaceApplicationsRequest.builder(), "application-")
+            .listApplications(fill(ListSpaceApplicationsRequest.builder(), "application-")
                 .diego(null)
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceApplicationsResponse.builder())
+                .just(fill(ListSpaceApplicationsResponse.builder())
                     .resource(fill(ApplicationResource.builder(), "application-")
                         .build())
                     .build()));
@@ -315,11 +314,11 @@ public final class DefaultSpacesTest {
 
     private static void requestSpaceDomains(CloudFoundryClient cloudFoundryClient, String spaceId) {
         when(cloudFoundryClient.spaces()
-            .listDomains(fillPage(ListSpaceDomainsRequest.builder())
+            .listDomains(fill(ListSpaceDomainsRequest.builder())
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceDomainsResponse.builder())
+                .just(fill(ListSpaceDomainsResponse.builder())
                     .resource(fill(DomainResource.builder(), "domain-")
                         .build())
                     .build()));
@@ -338,13 +337,15 @@ public final class DefaultSpacesTest {
 
     private static void requestSpaceSecurityGroups(CloudFoundryClient cloudFoundryClient, String spaceId) {
         when(cloudFoundryClient.spaces()
-            .listSecurityGroups(fillPage(ListSpaceSecurityGroupsRequest.builder())
+            .listSecurityGroups(fill(ListSpaceSecurityGroupsRequest.builder())
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceSecurityGroupsResponse.builder())
+                .just(fill(ListSpaceSecurityGroupsResponse.builder())
                     .resource(fill(SecurityGroupResource.builder(), "security-group-")
                         .entity(fill(SecurityGroupEntity.builder(), "security-group-")
+                            .rule(fill(SecurityGroupEntity.RuleEntity.builder(), "security-group-")
+                                .build())
                             .build())
                         .build())
                     .build()));
@@ -352,11 +353,11 @@ public final class DefaultSpacesTest {
 
     private static void requestSpaceServices(CloudFoundryClient cloudFoundryClient, String spaceId) {
         when(cloudFoundryClient.spaces()
-            .listServices(fillPage(ListSpaceServicesRequest.builder())
+            .listServices(fill(ListSpaceServicesRequest.builder())
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceServicesResponse.builder())
+                .just(fill(ListSpaceServicesResponse.builder())
                     .resource(fill(ServiceResource.builder(), "service-")
                         .build())
                     .build()));
@@ -364,11 +365,11 @@ public final class DefaultSpacesTest {
 
     private static void requestSpaces(CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient.spaces()
-            .list(fillPage(ListSpacesRequest.builder())
+            .list(fill(ListSpacesRequest.builder())
                 .organizationId(organizationId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpacesResponse.builder())
+                .just(fill(ListSpacesResponse.builder())
                     .resource(fill(SpaceResource.builder(), "space-")
                         .build())
                     .build()));

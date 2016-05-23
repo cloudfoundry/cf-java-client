@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.reactor.client.v2.serviceinstances;
 
-import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
@@ -57,7 +56,8 @@ import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.cloudfoundry.client.v2.Resource.Metadata;
+
+import org.cloudfoundry.client.v2.Metadata;
 
 public final class ReactorServiceInstancesTest {
 
@@ -88,7 +88,7 @@ public final class ReactorServiceInstancesTest {
         @Override
         protected BindServiceInstanceToRouteResponse getResponse() {
             return BindServiceInstanceToRouteResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2015-12-22T18:27:58Z")
                     .id("e7e5b08e-c530-4c1c-b420-fa0b09b3770d")
                     .url("/v2/service_instances/e7e5b08e-c530-4c1c-b420-fa0b09b3770d")
@@ -145,7 +145,7 @@ public final class ReactorServiceInstancesTest {
         @Override
         protected CreateServiceInstanceResponse getResponse() {
             return CreateServiceInstanceResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2015-07-27T22:43:08Z")
                     .id("8b2b3c5e-c1ba-41d0-ac87-08c776cfc25a")
                     .url("/v2/service_instances/8b2b3c5e-c1ba-41d0-ac87-08c776cfc25a")
@@ -262,7 +262,7 @@ public final class ReactorServiceInstancesTest {
         @Override
         protected DeleteServiceInstanceResponse getResponse() {
             return DeleteServiceInstanceResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
                     .createdAt("2016-02-02T17:16:31Z")
                     .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
@@ -507,7 +507,7 @@ public final class ReactorServiceInstancesTest {
                 .totalResults(1)
                 .totalPages(1)
                 .resource(ServiceBindingResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:09Z")
                         .id("05f3ec3c-8d97-4bd8-bf86-e44cc835a154")
                         .url("/v2/service_bindings/05f3ec3c-8d97-4bd8-bf86-e44cc835a154")
@@ -569,7 +569,7 @@ public final class ReactorServiceInstancesTest {
                 .totalResults(1)
                 .totalPages(1)
                 .resource(ServiceKeyResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .id("03ddc0ba-f792-4762-b4e4-dc08b307dc4f")
                         .url("/v2/service_keys/03ddc0ba-f792-4762-b4e4-dc08b307dc4f")
                         .createdAt("2016-05-04T04:49:09Z")
@@ -626,7 +626,7 @@ public final class ReactorServiceInstancesTest {
         @Override
         protected UpdateServiceInstanceResponse getResponse() {
             return UpdateServiceInstanceResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2015-07-27T22:43:08Z")
                     .id("2a80a0f7-cb9c-414a-8a6b-7cc3f811ad41")
                     .url("/v2/service_instances/2a80a0f7-cb9c-414a-8a6b-7cc3f811ad41")
