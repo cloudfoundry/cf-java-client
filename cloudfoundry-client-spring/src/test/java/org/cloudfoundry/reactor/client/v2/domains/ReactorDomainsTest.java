@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.domains;
 
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v2.domains.CreateDomainResponse;
 import org.cloudfoundry.client.v2.domains.DeleteDomainRequest;
@@ -46,8 +47,6 @@ import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-import org.cloudfoundry.client.v2.Metadata;
-
 public final class ReactorDomainsTest {
 
     public static final class Create extends AbstractClientApiTest<CreateDomainRequest, CreateDomainResponse> {
@@ -65,12 +64,6 @@ public final class ReactorDomainsTest {
                     .status(OK)
                     .payload("fixtures/client/v2/domains/POST_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected CreateDomainRequest getInvalidRequest() {
-            return CreateDomainRequest.builder()
                 .build();
         }
 
@@ -124,12 +117,6 @@ public final class ReactorDomainsTest {
         }
 
         @Override
-        protected DeleteDomainRequest getInvalidRequest() {
-            return DeleteDomainRequest.builder()
-                .build();
-        }
-
-        @Override
         protected DeleteDomainResponse getResponse() {
             return null;
         }
@@ -161,12 +148,6 @@ public final class ReactorDomainsTest {
                     .status(ACCEPTED)
                     .payload("fixtures/client/v2/domains/DELETE_{id}_async_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected DeleteDomainRequest getInvalidRequest() {
-            return DeleteDomainRequest.builder()
                 .build();
         }
 
@@ -213,12 +194,6 @@ public final class ReactorDomainsTest {
                     .status(OK)
                     .payload("fixtures/client/v2/domains/GET_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected GetDomainRequest getInvalidRequest() {
-            return GetDomainRequest.builder()
                 .build();
         }
 

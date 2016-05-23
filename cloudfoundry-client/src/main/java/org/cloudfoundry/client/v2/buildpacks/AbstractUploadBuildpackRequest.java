@@ -14,16 +14,36 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.environmentvariablegroups;
+package org.cloudfoundry.client.v2.buildpacks;
 
-import org.junit.Test;
 
-public final class GetStagingEnvironmentVariablesRequestTest {
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.immutables.value.Value;
 
-    @Test
-    public void valid() {
-        GetStagingEnvironmentVariablesRequest.builder()
-            .build();
-    }
+import java.io.InputStream;
+
+/**
+ * The request payload to Upload a Buildpack
+ */
+@Value.Immutable
+abstract class AbstractUploadBuildpackRequest {
+
+    /**
+     * A binary zip file containing the buildpack bits.
+     */
+    @JsonIgnore
+    abstract InputStream getBuildpack();
+
+    /**
+     * The buildpack id
+     */
+    @JsonIgnore
+    abstract String getBuildpackId();
+
+    /**
+     * The filename
+     */
+    @JsonIgnore
+    abstract String getFilename();
 
 }

@@ -71,11 +71,6 @@ public final class ReactorBuildpacksTest {
         }
 
         @Override
-        protected CreateBuildpackRequest getInvalidRequest() {
-            return CreateBuildpackRequest.builder().build();
-        }
-
-        @Override
         protected CreateBuildpackResponse getResponse() {
             return CreateBuildpackResponse.builder()
                 .metadata(Metadata.builder()
@@ -125,11 +120,6 @@ public final class ReactorBuildpacksTest {
         }
 
         @Override
-        protected DeleteBuildpackRequest getInvalidRequest() {
-            return DeleteBuildpackRequest.builder().build();
-        }
-
-        @Override
         protected DeleteBuildpackResponse getResponse() {
             return DeleteBuildpackResponse.builder()
                 .metadata(Metadata.builder()
@@ -174,11 +164,6 @@ public final class ReactorBuildpacksTest {
                     .payload("fixtures/client/v2/buildpacks/GET_{id}_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected GetBuildpackRequest getInvalidRequest() {
-            return GetBuildpackRequest.builder().build();
         }
 
         @Override
@@ -319,11 +304,6 @@ public final class ReactorBuildpacksTest {
         }
 
         @Override
-        protected UpdateBuildpackRequest getInvalidRequest() {
-            return UpdateBuildpackRequest.builder().build();
-        }
-
-        @Override
         protected UpdateBuildpackResponse getResponse() {
             return UpdateBuildpackResponse.builder()
                 .metadata(Metadata.builder()
@@ -382,11 +362,6 @@ public final class ReactorBuildpacksTest {
                     .payload("fixtures/client/v2/buildpacks/PUT_{id}_bits_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected UploadBuildpackRequest getInvalidRequest() {
-            return UploadBuildpackRequest.builder().build();
         }
 
         @Override

@@ -14,26 +14,19 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.environmentvariablegroups;
+package org.cloudfoundry.client.v2.domains;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
- * The request payload for the get running environment variable group
+ * The request payload for the Get Domain operation
  */
-@Data
-public final class GetRunningEnvironmentVariablesRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractGetDomainRequest {
 
-    @Builder
-    GetRunningEnvironmentVariablesRequest() {
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        return ValidationResult.builder().build();
-    }
+    /**
+     * The domain id
+     */
+    abstract String getDomainId();
 
 }

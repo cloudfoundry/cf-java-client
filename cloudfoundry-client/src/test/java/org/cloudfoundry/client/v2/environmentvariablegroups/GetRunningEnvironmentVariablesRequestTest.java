@@ -16,17 +16,14 @@
 
 package org.cloudfoundry.client.v2.environmentvariablegroups;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public final class GetRunningEnvironmentVariablesRequestTest {
 
     @Test
-    public void isValid() {
-        assertEquals(ValidationResult.Status.VALID,
-            GetRunningEnvironmentVariablesRequest.builder().build().isValid().getStatus());
+    public void valid() {
+        GetRunningEnvironmentVariablesRequest.builder()
+            .build();
     }
 
 }

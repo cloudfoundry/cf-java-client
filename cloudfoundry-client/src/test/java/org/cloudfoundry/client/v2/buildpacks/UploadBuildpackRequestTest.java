@@ -16,65 +16,45 @@
 
 package org.cloudfoundry.client.v2.buildpacks;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class UploadBuildpackRequestTest {
 
     private static final ByteArrayInputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[0]);
 
-    @Test
-    public void isNotValidNoBuildpack() {
-        ValidationResult result = UploadBuildpackRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noBuildpack() {
+        UploadBuildpackRequest.builder()
             .buildpackId("test-buildpack-id")
             .filename("test-filename")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("buildpack must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noBuildpackId() {
+        UploadBuildpackRequest.builder()
+            .buildpack(EMPTY_STREAM)
+            .filename("test-filename")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noFilename() {
+        UploadBuildpackRequest.builder()
+            .buildpack(EMPTY_STREAM)
+            .buildpackId("test-buildpack-id")
+            .build();
     }
 
     @Test
-    public void isNotValidNoFilename() {
-        ValidationResult result = UploadBuildpackRequest.builder()
-            .buildpack(EMPTY_STREAM)
-            .buildpackId("test-buildpack-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("filename must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isNotValidNoId() {
-        ValidationResult result = UploadBuildpackRequest.builder()
-            .buildpack(EMPTY_STREAM)
-            .filename("test-filename")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("buildpack id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValid() {
-        ValidationResult result = UploadBuildpackRequest.builder()
+    public void valid() {
+        UploadBuildpackRequest.builder()
             .buildpack(EMPTY_STREAM)
             .buildpackId("test-buildpack-id")
             .filename("test-filename")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

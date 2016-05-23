@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.client.v2.buildpacks;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class GetBuildpackRequestTest {
 
-    @Test
-    public void isNotValidNoId() {
-        ValidationResult result = GetBuildpackRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("buildpack id must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noBuildpackId() {
+        GetBuildpackRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValid() {
-        ValidationResult result = GetBuildpackRequest.builder()
+    public void valid() {
+        GetBuildpackRequest.builder()
             .buildpackId("test-buildpack-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

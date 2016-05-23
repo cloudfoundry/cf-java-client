@@ -16,31 +16,33 @@
 
 package org.cloudfoundry.client.v2.domains;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
-public final class CreateDomainRequestTest {
+/**
+ * The request payload for the deprecated Create a Domain operation
+ */
+@Value.Immutable
+abstract class AbstractCreateDomainRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        CreateDomainRequest.builder()
-            .wildcard(true)
-            .build();
-    }
+    /**
+     * The name
+     */
+    @JsonProperty("name")
+    abstract String getName();
 
-    @Test(expected = IllegalStateException.class)
-    public void noWildcard() {
-        CreateDomainRequest.builder()
-            .name("test-name")
-            .owningOrganizationId("test-owning-organization-id")
-            .build();
-    }
+    /**
+     * The owning organization id
+     */
+    @JsonProperty("owning_organization_guid")
+    @Nullable
+    abstract String getOwningOrganizationId();
 
-    @Test
-    public void valid() {
-        CreateDomainRequest.builder()
-            .name("test-name")
-            .wildcard(true)
-            .build();
-    }
+    /**
+     * The wildcard
+     */
+    @JsonProperty("wildcard")
+    abstract Boolean getWildcard();
 
 }

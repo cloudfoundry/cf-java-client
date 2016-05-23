@@ -14,16 +14,31 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.environmentvariablegroups;
+package org.cloudfoundry.client.v2.buildpacks;
 
-import org.junit.Test;
 
-public final class GetStagingEnvironmentVariablesRequestTest {
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.QueryParameter;
+import org.immutables.value.Value;
 
-    @Test
-    public void valid() {
-        GetStagingEnvironmentVariablesRequest.builder()
-            .build();
-    }
+/**
+ * The request payload for the Delete Buildpack operation.
+ */
+@Value.Immutable
+abstract class AbstractDeleteBuildpackRequest {
+
+    /**
+     * The async flag
+     */
+    @QueryParameter("async")
+    @Nullable
+    abstract Boolean getAsync();
+
+    /**
+     * The buildpack id
+     */
+    @JsonIgnore
+    abstract String getBuildpackId();
 
 }

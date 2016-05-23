@@ -14,26 +14,30 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.environmentvariablegroups;
+package org.cloudfoundry.client.v2.domains;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.QueryParameter;
+import org.immutables.value.Value;
 
 /**
- * The request payload for the get staging environment variable group
+ * The request payload for the deprecated Delete a Particular Domain operation
  */
-@Data
-public final class GetStagingEnvironmentVariablesRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractDeleteDomainRequest {
 
-    @Builder
-    GetStagingEnvironmentVariablesRequest() {
-    }
+    /**
+     * Whether to delete asynchronously
+     */
+    @Nullable
+    @QueryParameter("async")
+    abstract Boolean getAsync();
 
-    @Override
-    public ValidationResult isValid() {
-        return ValidationResult.builder().build();
-    }
+    /**
+     * The domain id
+     */
+    @JsonIgnore
+    abstract String getDomainId();
 
 }

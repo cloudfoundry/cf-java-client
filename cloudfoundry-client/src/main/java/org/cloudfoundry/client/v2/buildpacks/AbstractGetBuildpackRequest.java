@@ -18,41 +18,18 @@ package org.cloudfoundry.client.v2.buildpacks;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
  * The request payload for the Get Buildpack
  */
-@Data
-public final class GetBuildpackRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractGetBuildpackRequest {
 
     /**
      * The buildpack id
-     *
-     * @param buildpackId the buildpack id
-     * @return the buildpack id
      */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String buildpackId;
-
-    @Builder
-    GetBuildpackRequest(String buildpackId) {
-        this.buildpackId = buildpackId;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.buildpackId == null) {
-            builder.message("buildpack id must be specified");
-        }
-
-        return builder.build();
-    }
+    @JsonIgnore
+    abstract String getBuildpackId();
 
 }

@@ -16,14 +16,12 @@
 
 package org.cloudfoundry.client.v2.environmentvariablegroups;
 
-import org.junit.Test;
+import org.immutables.value.Value;
 
-public final class GetStagingEnvironmentVariablesRequestTest {
-
-    @Test
-    public void valid() {
-        GetStagingEnvironmentVariablesRequest.builder()
-            .build();
-    }
+/**
+ * The request payload for the get staging environment variable group
+ */
+@Value.Immutable
+abstract class AbstractGetStagingEnvironmentVariablesRequest {
 
 }
