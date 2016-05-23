@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.client.v2.applications;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,7 +23,6 @@ import lombok.Singular;
 import lombok.ToString;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,7 +31,7 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ApplicationStatisticsResponse extends HashMap<String, ApplicationStatisticsResponse.InstanceStats> {
+public final class ApplicationStatisticsResponse extends HashMap<String, InstanceStatistics> {
 
     private static final long serialVersionUID = 5833542672981662359L;
 
@@ -42,91 +40,8 @@ public final class ApplicationStatisticsResponse extends HashMap<String, Applica
     }
 
     @Builder
-    ApplicationStatisticsResponse(@Singular Map<String, InstanceStats> instances) {
+    ApplicationStatisticsResponse(@Singular Map<String, InstanceStatistics> instances) {
         super(instances);
-    }
-
-    @Data
-    public static final class InstanceStats {
-
-        private final String state;
-
-        private final Statistics statistics;
-
-        @Builder
-        InstanceStats(@JsonProperty("state") String state,
-                      @JsonProperty("stats") Statistics statistics) {
-            this.state = state;
-            this.statistics = statistics;
-        }
-
-        @Data
-        public static final class Statistics {
-
-            private final Long diskQuota;
-
-            private final Integer fdsQuota;
-
-            private final String host;
-
-            private final Long memoryQuota;
-
-            private final String name;
-
-            private final Integer port;
-
-            private final Long uptime;
-
-            private final List<String> uris;
-
-            private final Usage usage;
-
-            @Builder
-            Statistics(@JsonProperty("disk_quota") Long diskQuota,
-                       @JsonProperty("fds_quota") Integer fdsQuota,
-                       @JsonProperty("host") String host,
-                       @JsonProperty("mem_quota") Long memoryQuota,
-                       @JsonProperty("name") String name,
-                       @JsonProperty("port") Integer port,
-                       @JsonProperty("uptime") Long uptime,
-                       @JsonProperty("uris") @Singular("uri") List<String> uris,
-                       @JsonProperty("usage") Usage usage) {
-                this.diskQuota = diskQuota;
-                this.fdsQuota = fdsQuota;
-                this.host = host;
-                this.memoryQuota = memoryQuota;
-                this.name = name;
-                this.port = port;
-                this.uptime = uptime;
-                this.uris = uris;
-                this.usage = usage;
-            }
-
-            @Data
-            public static final class Usage {
-
-                private final Double cpu;
-
-                private final Long disk;
-
-                private final Long memory;
-
-                private final String time;
-
-                @Builder
-                Usage(@JsonProperty("cpu") Double cpu,
-                      @JsonProperty("disk") Long disk,
-                      @JsonProperty("mem") Long memory,
-                      @JsonProperty("time") String time) {
-                    this.cpu = cpu;
-                    this.disk = disk;
-                    this.memory = memory;
-                    this.time = time;
-                }
-            }
-
-        }
-
     }
 
 }

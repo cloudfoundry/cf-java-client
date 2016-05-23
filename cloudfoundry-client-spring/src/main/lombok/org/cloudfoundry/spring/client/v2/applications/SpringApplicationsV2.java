@@ -217,8 +217,8 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
         return new HttpEntity<>(body, headers);
     }
 
-    private static HttpEntity<List<UploadApplicationRequest.Resource>> getResourcesPart(UploadApplicationRequest request) {
-        List<UploadApplicationRequest.Resource> body = request.getResources();
+    private static HttpEntity<List<org.cloudfoundry.client.v2.applications.Resource>> getResourcesPart(UploadApplicationRequest request) {
+        List<org.cloudfoundry.client.v2.applications.Resource> body = request.getResources();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentDispositionFormData("resources", null);

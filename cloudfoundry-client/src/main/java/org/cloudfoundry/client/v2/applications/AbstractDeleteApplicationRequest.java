@@ -17,41 +17,18 @@
 package org.cloudfoundry.client.v2.applications;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
  * The request payload for the Delete Application operation.
  */
-@Data
-public final class DeleteApplicationRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractDeleteApplicationRequest {
 
     /**
      * The application id
-     *
-     * @param applicationId the application id
-     * @return the application id
      */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String applicationId;
-
-    @Builder
-    DeleteApplicationRequest(String applicationId) {
-        this.applicationId = applicationId;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.applicationId == null) {
-            builder.message("application id must be specified");
-        }
-
-        return builder.build();
-    }
+    @JsonIgnore
+    abstract String getApplicationId();
 
 }

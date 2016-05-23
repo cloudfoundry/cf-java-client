@@ -16,21 +16,24 @@
 
 package org.cloudfoundry.client.v2.applications;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
-public final class ApplicationStatisticsRequestTest {
+@JsonDeserialize
+@Value.Immutable
+abstract class AbstractInstanceStatistics {
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        ApplicationStatisticsRequest.builder()
-            .build();
-    }
+    /**
+     * The instance state
+     */
+    @JsonProperty("state")
+    abstract String getState();
 
-    @Test
-    public void valid() {
-        ApplicationStatisticsRequest.builder()
-            .applicationId("test-application-id")
-            .build();
-    }
+    /**
+     * The instance statistics
+     */
+    @JsonProperty("stats")
+    abstract Statistics getStatistics();
 
 }

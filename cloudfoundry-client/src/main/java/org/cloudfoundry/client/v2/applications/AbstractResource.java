@@ -16,21 +16,31 @@
 
 package org.cloudfoundry.client.v2.applications;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.immutables.value.Value;
 
-public final class ApplicationStatisticsRequestTest {
+/**
+ * The request payload for the resources
+ */
+@Value.Immutable
+abstract class AbstractResource {
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        ApplicationStatisticsRequest.builder()
-            .build();
-    }
+    /**
+     * The hash
+     */
+    @JsonProperty("sha1")
+    abstract String getHash();
 
-    @Test
-    public void valid() {
-        ApplicationStatisticsRequest.builder()
-            .applicationId("test-application-id")
-            .build();
-    }
+    /**
+     * The path
+     */
+    @JsonProperty("fn")
+    abstract String getPath();
+
+    /**
+     * The size
+     */
+    @JsonProperty("size")
+    abstract Integer getSize();
 
 }

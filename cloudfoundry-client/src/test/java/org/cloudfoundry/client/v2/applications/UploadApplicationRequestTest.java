@@ -16,124 +16,34 @@
 
 package org.cloudfoundry.client.v2.applications;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class UploadApplicationRequestTest {
 
     private static final ByteArrayInputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[0]);
 
-    @Test
-    public void isValid() {
-        ValidationResult result = UploadApplicationRequest.builder()
-            .application(EMPTY_STREAM)
+    @Test(expected = IllegalStateException.class)
+    public void noApplication() {
+        UploadApplicationRequest.builder()
             .applicationId("test-application-id")
-            .resource(UploadApplicationRequest.Resource.builder()
-                .hash("test-hash")
-                .path("test-path")
-                .size(-1)
-                .build())
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noApplicationId() {
+        UploadApplicationRequest.builder()
+            .application(EMPTY_STREAM)
+            .build();
     }
 
     @Test
-    public void isValidNoApplication() {
-        ValidationResult result = UploadApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .resource(UploadApplicationRequest.Resource.builder()
-                .hash("test-hash")
-                .path("test-path")
-                .size(-1)
-                .build())
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoId() {
-        ValidationResult result = UploadApplicationRequest.builder()
-            .application(EMPTY_STREAM)
-            .resource(UploadApplicationRequest.Resource.builder()
-                .hash("test-hash")
-                .path("test-path")
-                .size(-1)
-                .build())
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoResourceHash() {
-        ValidationResult result = UploadApplicationRequest.builder()
+    public void valid() {
+        UploadApplicationRequest.builder()
             .application(EMPTY_STREAM)
             .applicationId("test-application-id")
-            .resource(UploadApplicationRequest.Resource.builder()
-                .path("test-path")
-                .size(-1)
-                .build())
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("resource hash must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoResourcePath() {
-        ValidationResult result = UploadApplicationRequest.builder()
-            .application(EMPTY_STREAM)
-            .applicationId("test-application-id")
-            .resource(UploadApplicationRequest.Resource.builder()
-                .hash("test-hash")
-                .size(-1)
-                .build())
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("resource path must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoResourceSize() {
-        ValidationResult result = UploadApplicationRequest.builder()
-            .application(EMPTY_STREAM)
-            .applicationId("test-application-id")
-            .resource(UploadApplicationRequest.Resource.builder()
-                .hash("test-hash")
-                .path("test-path")
-                .build())
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("resource size must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoResources() {
-        ValidationResult result = UploadApplicationRequest.builder()
-            .application(EMPTY_STREAM)
-            .applicationId("test-application-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

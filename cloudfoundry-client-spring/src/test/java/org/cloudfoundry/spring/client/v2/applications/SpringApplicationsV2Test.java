@@ -37,6 +37,7 @@ import org.cloudfoundry.client.v2.applications.DownloadApplicationDropletRequest
 import org.cloudfoundry.client.v2.applications.DownloadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
+import org.cloudfoundry.client.v2.applications.InstanceStatistics;
 import org.cloudfoundry.client.v2.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationRoutesResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
@@ -45,6 +46,7 @@ import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteRequest;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingRequest;
+import org.cloudfoundry.client.v2.applications.Resource;
 import org.cloudfoundry.client.v2.applications.RestageApplicationEntity;
 import org.cloudfoundry.client.v2.applications.RestageApplicationRequest;
 import org.cloudfoundry.client.v2.applications.RestageApplicationResponse;
@@ -55,6 +57,7 @@ import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
+import org.cloudfoundry.client.v2.applications.Usage;
 import org.cloudfoundry.client.v2.domains.Domain;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.routes.Route;
@@ -89,12 +92,6 @@ public final class SpringApplicationsV2Test {
     public static final class AssociateRoute extends AbstractApiTest<AssociateApplicationRouteRequest, AssociateApplicationRouteResponse> {
 
         private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
-
-        @Override
-        protected AssociateApplicationRouteRequest getInvalidRequest() {
-            return AssociateApplicationRouteRequest.builder()
-                .build();
-        }
 
         @Override
         protected RequestContext getRequestContext() {
@@ -159,12 +156,6 @@ public final class SpringApplicationsV2Test {
     public static final class Copy extends AbstractApiTest<CopyApplicationRequest, CopyApplicationResponse> {
 
         private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
-
-        @Override
-        protected CopyApplicationRequest getInvalidRequest() {
-            return CopyApplicationRequest.builder()
-                .build();
-        }
 
         @Override
         protected RequestContext getRequestContext() {
@@ -275,12 +266,6 @@ public final class SpringApplicationsV2Test {
         private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
-        protected DeleteApplicationRequest getInvalidRequest() {
-            return DeleteApplicationRequest.builder()
-                .build();
-        }
-
-        @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(DELETE).path("/v2/apps/test-application-id")
@@ -314,12 +299,6 @@ public final class SpringApplicationsV2Test {
         protected void assertions(TestSubscriber<byte[]> testSubscriber, byte[] expected) {
             testSubscriber
                 .assertThat(arrayEqualsExpectation(expected));
-        }
-
-        @Override
-        protected DownloadApplicationRequest getInvalidRequest() {
-            return DownloadApplicationRequest.builder()
-                .build();
         }
 
         @Override
@@ -360,12 +339,6 @@ public final class SpringApplicationsV2Test {
         }
 
         @Override
-        protected DownloadApplicationDropletRequest getInvalidRequest() {
-            return DownloadApplicationDropletRequest.builder()
-                .build();
-        }
-
-        @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(GET).path("/v2/apps/test-application-id/droplet/download")
@@ -394,12 +367,6 @@ public final class SpringApplicationsV2Test {
     public static final class Environment extends AbstractApiTest<ApplicationEnvironmentRequest, ApplicationEnvironmentResponse> {
 
         private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
-
-        @Override
-        protected ApplicationEnvironmentRequest getInvalidRequest() {
-            return ApplicationEnvironmentRequest.builder()
-                .build();
-        }
 
         @Override
         protected RequestContext getRequestContext() {
@@ -453,12 +420,6 @@ public final class SpringApplicationsV2Test {
     public static final class Get extends AbstractApiTest<GetApplicationRequest, GetApplicationResponse> {
 
         private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
-
-        @Override
-        protected GetApplicationRequest getInvalidRequest() {
-            return GetApplicationRequest.builder()
-                .build();
-        }
 
         @Override
         protected RequestContext getRequestContext() {
@@ -522,12 +483,6 @@ public final class SpringApplicationsV2Test {
     public static final class Instances extends AbstractApiTest<ApplicationInstancesRequest, ApplicationInstancesResponse> {
 
         private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
-
-        @Override
-        protected ApplicationInstancesRequest getInvalidRequest() {
-            return ApplicationInstancesRequest.builder()
-                .build();
-        }
 
         @Override
         protected RequestContext getRequestContext() {
@@ -826,12 +781,6 @@ public final class SpringApplicationsV2Test {
         private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
-        protected RemoveApplicationRouteRequest getInvalidRequest() {
-            return RemoveApplicationRouteRequest.builder()
-                .build();
-        }
-
-        @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(DELETE).path("/v2/apps/test-application-id/routes/test-route-id")
@@ -863,12 +812,6 @@ public final class SpringApplicationsV2Test {
         private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
-        protected RemoveApplicationServiceBindingRequest getInvalidRequest() {
-            return RemoveApplicationServiceBindingRequest.builder()
-                .build();
-        }
-
-        @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(DELETE).path("/v2/apps/test-application-id/service_bindings/test-service-binding-id")
@@ -897,12 +840,6 @@ public final class SpringApplicationsV2Test {
     public static final class Restage extends AbstractApiTest<RestageApplicationRequest, RestageApplicationResponse> {
 
         private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
-
-        @Override
-        protected RestageApplicationRequest getInvalidRequest() {
-            return RestageApplicationRequest.builder()
-                .build();
-        }
 
         @Override
         protected RequestContext getRequestContext() {
@@ -962,12 +899,6 @@ public final class SpringApplicationsV2Test {
         private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
-        protected ApplicationStatisticsRequest getInvalidRequest() {
-            return ApplicationStatisticsRequest.builder()
-                .build();
-        }
-
-        @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(GET).path("/v2/apps/test-application-id/stats")
@@ -978,10 +909,10 @@ public final class SpringApplicationsV2Test {
         @Override
         protected ApplicationStatisticsResponse getResponse() {
             return ApplicationStatisticsResponse.builder()
-                .instance("0", ApplicationStatisticsResponse.InstanceStats.builder()
+                .instance("0", InstanceStatistics.builder()
                     .state("RUNNING")
-                    .statistics(ApplicationStatisticsResponse.InstanceStats.Statistics.builder()
-                        .usage(ApplicationStatisticsResponse.InstanceStats.Statistics.Usage.builder()
+                    .statistics(org.cloudfoundry.client.v2.applications.Statistics.builder()
+                        .usage(Usage.builder()
                             .disk(66392064L)
                             .memory(29880320L)
                             .cpu(0.13511219703079957d)
@@ -1017,12 +948,6 @@ public final class SpringApplicationsV2Test {
     public static final class Summary extends AbstractApiTest<SummaryApplicationRequest, SummaryApplicationResponse> {
 
         private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
-
-        @Override
-        protected SummaryApplicationRequest getInvalidRequest() {
-            return SummaryApplicationRequest.builder()
-                .build();
-        }
 
         @Override
         protected RequestContext getRequestContext() {
@@ -1109,13 +1034,6 @@ public final class SpringApplicationsV2Test {
     public static final class TerminateInstance extends AbstractApiTest<TerminateApplicationInstanceRequest, Void> {
 
         private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
-
-
-        @Override
-        protected TerminateApplicationInstanceRequest getInvalidRequest() {
-            return TerminateApplicationInstanceRequest.builder()
-                .build();
-        }
 
         @Override
         protected RequestContext getRequestContext() {
@@ -1214,12 +1132,6 @@ public final class SpringApplicationsV2Test {
         private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
-        protected UploadApplicationRequest getInvalidRequest() {
-            return UploadApplicationRequest.builder()
-                .build();
-        }
-
-        @Override
         @SuppressWarnings("unchecked")
         protected RequestContext getRequestContext() {
             return new RequestContext()
@@ -1250,12 +1162,12 @@ public final class SpringApplicationsV2Test {
             return UploadApplicationRequest.builder()
                 .application(new ClassPathResource("fixtures/client/v2/apps/application.zip").getInputStream())
                 .applicationId("test-application-id")
-                .resource(UploadApplicationRequest.Resource.builder()
+                .resource(Resource.builder()
                     .hash("b907173290db6a155949ab4dc9b2d019dea0c901")
                     .path("path/to/content.txt")
                     .size(123)
                     .build())
-                .resource(UploadApplicationRequest.Resource.builder()
+                .resource(Resource.builder()
                     .hash("ff84f89760317996b9dd180ab996b079f418396f")
                     .path("path/to/code.jar")
                     .size(123)

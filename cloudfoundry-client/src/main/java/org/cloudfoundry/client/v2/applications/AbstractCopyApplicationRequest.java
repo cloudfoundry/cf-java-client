@@ -16,21 +16,26 @@
 
 package org.cloudfoundry.client.v2.applications;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.immutables.value.Value;
 
-public final class ApplicationStatisticsRequestTest {
+/**
+ * The request payload for the Copy the Application operation
+ */
+@Value.Immutable
+abstract class AbstractCopyApplicationRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        ApplicationStatisticsRequest.builder()
-            .build();
-    }
+    /**
+     * The application id
+     */
+    @JsonIgnore
+    abstract String getApplicationId();
 
-    @Test
-    public void valid() {
-        ApplicationStatisticsRequest.builder()
-            .applicationId("test-application-id")
-            .build();
-    }
+    /**
+     * The source application id
+     */
+    @JsonProperty("source_app_guid")
+    abstract String getSourceApplicationId();
 
 }

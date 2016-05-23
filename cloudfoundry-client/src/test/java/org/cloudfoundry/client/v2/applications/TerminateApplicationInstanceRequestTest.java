@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v2.applications;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class TerminateApplicationInstanceRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = TerminateApplicationInstanceRequest.builder()
-            .applicationId("test-application-id")
+    @Test(expected = IllegalStateException.class)
+    public void noApplicationId() {
+        TerminateApplicationInstanceRequest.builder()
             .index("0")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noIndex() {
+        TerminateApplicationInstanceRequest.builder()
+            .applicationId("test-application-id")
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = TerminateApplicationInstanceRequest.builder()
-            .index("0")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoIndex() {
-        ValidationResult result = TerminateApplicationInstanceRequest.builder()
+    public void valid() {
+        TerminateApplicationInstanceRequest.builder()
             .applicationId("test-application-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("index must be specified", result.getMessages().get(0));
+            .index("0")
+            .build();
     }
 
 }

@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v2.applications;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class RemoveApplicationServiceBindingRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = RemoveApplicationServiceBindingRequest.builder()
-            .applicationId("test-application-id")
+    @Test(expected = IllegalStateException.class)
+    public void noApplicationId() {
+        RemoveApplicationServiceBindingRequest.builder()
             .serviceBindingId("test-service-binding-id")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noServiceBindingId() {
+        RemoveApplicationServiceBindingRequest.builder()
+            .applicationId("test-application-id")
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = RemoveApplicationServiceBindingRequest.builder()
-            .serviceBindingId("test-service-binding-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoServiceBindingId() {
-        ValidationResult result = RemoveApplicationServiceBindingRequest.builder()
+    public void valid() {
+        RemoveApplicationServiceBindingRequest.builder()
             .applicationId("test-application-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service binding id must be specified", result.getMessages().get(0));
+            .serviceBindingId("test-service-binding-id")
+            .build();
     }
 
 }

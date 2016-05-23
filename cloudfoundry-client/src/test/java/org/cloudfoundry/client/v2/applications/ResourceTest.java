@@ -18,18 +18,38 @@ package org.cloudfoundry.client.v2.applications;
 
 import org.junit.Test;
 
-public final class ApplicationStatisticsRequestTest {
+public final class ResourceTest {
 
     @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        ApplicationStatisticsRequest.builder()
+    public void noHash() {
+        Resource.builder()
+            .path("test-path")
+            .size(-1)
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noPath() {
+        Resource.builder()
+            .hash("test-hash")
+            .size(-1)
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noSize() {
+        Resource.builder()
+            .hash("test-hash")
+            .path("test-path")
             .build();
     }
 
     @Test
     public void valid() {
-        ApplicationStatisticsRequest.builder()
-            .applicationId("test-application-id")
+        Resource.builder()
+            .hash("test-hash")
+            .path("test-path")
+            .size(-1)
             .build();
     }
 

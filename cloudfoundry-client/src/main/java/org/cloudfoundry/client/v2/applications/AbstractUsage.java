@@ -16,21 +16,39 @@
 
 package org.cloudfoundry.client.v2.applications;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
-public final class ApplicationStatisticsRequestTest {
+/**
+ * Application instance usage info
+ */
+@JsonDeserialize
+@Value.Immutable
+abstract class AbstractUsage {
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        ApplicationStatisticsRequest.builder()
-            .build();
-    }
+    /**
+     * The CPU usage
+     */
+    @JsonProperty("cpu")
+    abstract Double getCpu();
 
-    @Test
-    public void valid() {
-        ApplicationStatisticsRequest.builder()
-            .applicationId("test-application-id")
-            .build();
-    }
+    /**
+     * The disk usage
+     */
+    @JsonProperty("disk")
+    abstract Long getDisk();
+
+    /**
+     * The memory usage
+     */
+    @JsonProperty("mem")
+    abstract Long getMemory();
+
+    /**
+     * The time since start
+     */
+    @JsonProperty("time")
+    abstract String getTime();
 
 }

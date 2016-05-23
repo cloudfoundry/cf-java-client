@@ -34,9 +34,11 @@ import org.cloudfoundry.client.v2.applications.CopyApplicationResponse;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
+import org.cloudfoundry.client.v2.applications.InstanceStatistics;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingRequest;
 import org.cloudfoundry.client.v2.applications.RestageApplicationResponse;
+import org.cloudfoundry.client.v2.applications.Statistics;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest;
@@ -44,6 +46,7 @@ import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
+import org.cloudfoundry.client.v2.applications.Usage;
 import org.cloudfoundry.client.v2.events.EventEntity;
 import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
@@ -418,19 +421,19 @@ public final class DefaultApplications implements Applications {
         }
     }
 
-    private static ApplicationStatisticsResponse.InstanceStats.Statistics emptyApplicationStatistics() {
-        return ApplicationStatisticsResponse.InstanceStats.Statistics.builder()
+    private static Statistics emptyApplicationStatistics() {
+        return Statistics.builder()
             .usage(emptyApplicationUsage())
             .build();
     }
 
-    private static ApplicationStatisticsResponse.InstanceStats.Statistics.Usage emptyApplicationUsage() {
-        return ApplicationStatisticsResponse.InstanceStats.Statistics.Usage.builder()
+    private static Usage emptyApplicationUsage() {
+        return Usage.builder()
             .build();
     }
 
-    private static ApplicationStatisticsResponse.InstanceStats emptyInstanceStats() {
-        return ApplicationStatisticsResponse.InstanceStats.builder()
+    private static InstanceStatistics emptyInstanceStats() {
+        return InstanceStatistics.builder()
             .statistics(emptyApplicationStatistics())
             .build();
     }
@@ -1194,9 +1197,9 @@ public final class DefaultApplications implements Applications {
     }
 
     private static InstanceDetail toInstanceDetail(Map.Entry<String, ApplicationInstanceInfo> entry, ApplicationStatisticsResponse statisticsResponse) {
-        ApplicationStatisticsResponse.InstanceStats instanceStats = Optional.ofNullable(statisticsResponse.get(entry.getKey())).orElse(emptyInstanceStats());
-        ApplicationStatisticsResponse.InstanceStats.Statistics stats = Optional.ofNullable(instanceStats.getStatistics()).orElse(emptyApplicationStatistics());
-        ApplicationStatisticsResponse.InstanceStats.Statistics.Usage usage = Optional.ofNullable(stats.getUsage()).orElse(emptyApplicationUsage());
+        InstanceStatistics instanceStatistics = Optional.ofNullable(statisticsResponse.get(entry.getKey())).orElse(emptyInstanceStats());
+        Statistics stats = Optional.ofNullable(instanceStatistics.getStatistics()).orElse(emptyApplicationStatistics());
+        Usage usage = Optional.ofNullable(stats.getUsage()).orElse(emptyApplicationUsage());
 
         return InstanceDetail.builder()
             .state(entry.getValue().getState())

@@ -16,21 +16,25 @@
 
 package org.cloudfoundry.client.v2.applications;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.immutables.value.Value;
 
-public final class ApplicationStatisticsRequestTest {
+/**
+ * The request payload for the Remove a Service Binding from an Application operation
+ */
+@Value.Immutable
+abstract class AbstractRemoveApplicationServiceBindingRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        ApplicationStatisticsRequest.builder()
-            .build();
-    }
+    /**
+     * The application id
+     */
+    @JsonIgnore
+    abstract String getApplicationId();
 
-    @Test
-    public void valid() {
-        ApplicationStatisticsRequest.builder()
-            .applicationId("test-application-id")
-            .build();
-    }
+    /**
+     * The service binding id
+     */
+    @JsonIgnore
+    abstract String getServiceBindingId();
 
 }

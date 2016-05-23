@@ -16,21 +16,17 @@
 
 package org.cloudfoundry.client.v2.applications;
 
-import org.junit.Test;
+import org.immutables.value.Value;
 
-public final class ApplicationStatisticsRequestTest {
+/**
+ * The request payload for the Get Application Statistics operation.
+ */
+@Value.Immutable
+abstract class AbstractApplicationStatisticsRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        ApplicationStatisticsRequest.builder()
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        ApplicationStatisticsRequest.builder()
-            .applicationId("test-application-id")
-            .build();
-    }
+    /**
+     * The application id
+     */
+    abstract String getApplicationId();
 
 }

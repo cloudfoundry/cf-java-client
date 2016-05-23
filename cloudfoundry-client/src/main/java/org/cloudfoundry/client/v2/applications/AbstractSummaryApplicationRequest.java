@@ -17,41 +17,18 @@
 package org.cloudfoundry.client.v2.applications;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
  * The request payload for the Get Application Summary operation
  */
-@Data
-public final class SummaryApplicationRequest implements Validatable {
+@Value.Immutable
+abstract class AbstractSummaryApplicationRequest {
 
     /**
      * The application id
-     *
-     * @param applicationId the application id
-     * @return the application id
      */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String applicationId;
-
-    @Builder
-    SummaryApplicationRequest(String applicationId) {
-        this.applicationId = applicationId;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.applicationId == null) {
-            builder.message("application id must be specified");
-        }
-
-        return builder.build();
-    }
+    @JsonIgnore
+    abstract String getApplicationId();
 
 }

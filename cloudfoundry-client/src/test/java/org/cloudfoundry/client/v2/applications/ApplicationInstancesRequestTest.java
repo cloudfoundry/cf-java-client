@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.client.v2.applications;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class ApplicationInstancesRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = ApplicationInstancesRequest.builder()
-            .applicationId("test-application-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noApplicationId() {
+        ApplicationInstancesRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = ApplicationInstancesRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application id must be specified", result.getMessages().get(0));
+    public void valid() {
+        ApplicationInstancesRequest.builder()
+            .applicationId("test-application-id")
+            .build();
     }
 
 }

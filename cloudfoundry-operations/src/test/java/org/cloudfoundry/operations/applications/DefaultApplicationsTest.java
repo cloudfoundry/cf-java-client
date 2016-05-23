@@ -35,10 +35,12 @@ import org.cloudfoundry.client.v2.applications.CopyApplicationResponse;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
+import org.cloudfoundry.client.v2.applications.InstanceStatistics;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsResponse;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingRequest;
 import org.cloudfoundry.client.v2.applications.RestageApplicationResponse;
+import org.cloudfoundry.client.v2.applications.Statistics;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest;
@@ -46,6 +48,7 @@ import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
+import org.cloudfoundry.client.v2.applications.Usage;
 import org.cloudfoundry.client.v2.events.EventEntity;
 import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
@@ -256,7 +259,7 @@ public final class DefaultApplicationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(ApplicationStatisticsResponse.builder()
-                    .instance("instance-0", fill(ApplicationStatisticsResponse.InstanceStats.builder(), "instance-statistics-")
+                    .instance("instance-0", fill(InstanceStatistics.builder(), "instance-statistics-")
                         .statistics(null)
                         .build())
                     .build()));
@@ -269,8 +272,8 @@ public final class DefaultApplicationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(ApplicationStatisticsResponse.builder()
-                    .instance("instance-0", fill(ApplicationStatisticsResponse.InstanceStats.builder(), "instance-statistics-")
-                        .statistics(fill(ApplicationStatisticsResponse.InstanceStats.Statistics.builder(), "statistics-")
+                    .instance("instance-0", fill(InstanceStatistics.builder(), "instance-statistics-")
+                        .statistics(fill(Statistics.builder(), "statistics-")
                             .usage(null)
                             .build())
                         .build())
@@ -310,9 +313,9 @@ public final class DefaultApplicationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(ApplicationStatisticsResponse.builder()
-                    .instance("instance-0", fill(ApplicationStatisticsResponse.InstanceStats.builder(), "instance-statistics-")
-                        .statistics(fill(ApplicationStatisticsResponse.InstanceStats.Statistics.builder(), "statistics-")
-                            .usage(fill(ApplicationStatisticsResponse.InstanceStats.Statistics.Usage.builder(), "usage-")
+                    .instance("instance-0", fill(InstanceStatistics.builder(), "instance-statistics-")
+                        .statistics(fill(Statistics.builder(), "statistics-")
+                            .usage(fill(Usage.builder(), "usage-")
                                 .build())
                             .build())
                         .build())
