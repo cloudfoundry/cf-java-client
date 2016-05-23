@@ -17,53 +17,45 @@
 package org.cloudfoundry.uaa.identityzones;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.util.List;
+
 /**
- * The request payload for the create identity zone operation
+ * The request payload for the identity zone logout link
  */
+@JsonDeserialize
 @Value.Immutable
-abstract class _CreateIdentityZoneRequest {
+abstract class _LogoutLink {
 
     /**
-     * The configuration
+     * Whether or not to allow the redirect parameter on logout.
      */
-    @JsonProperty("config")
+    @JsonProperty("disableRedirectParameter")
     @Nullable
-    abstract IdentityZoneConfiguration getConfiguration();
+    abstract Boolean getDisableRedirectParameter();
 
     /**
-     * The description of the identity zone
+     * Changes the name of the redirect parameter.
      */
-    @JsonProperty("description")
+    @JsonProperty("redirectParameterName")
     @Nullable
-    abstract String getDescription();
+    abstract String getRedirectParameterName();
 
     /**
-     * The id of the identity zone. When not provided, an identifier will be generated
+     * Logout redirect url.
      */
-    @JsonProperty("id")
+    @JsonProperty("redirectUrl")
     @Nullable
-    abstract String getIdentityZoneId();
+    abstract String getRedirectUrl();
 
     /**
-     * The name of the identity zone
+     * List of allowed whitelist redirects.
      */
-    @JsonProperty("name")
-    abstract String getName();
-
-    /**
-     * The unique subdomain. It will be converted into lowercase upon creation.
-     */
-    @JsonProperty("subdomain")
-    abstract String getSubdomain();
-
-    /**
-     * The version of the identity zone
-     */
-    @JsonProperty("version")
+    @JsonProperty("whitelist")
     @Nullable
-    abstract Integer getVersion();
+    abstract List<String> getWhitelist();
 
 }

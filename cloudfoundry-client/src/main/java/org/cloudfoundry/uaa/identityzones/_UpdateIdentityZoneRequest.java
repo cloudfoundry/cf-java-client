@@ -28,6 +28,13 @@ import org.immutables.value.Value;
 abstract class _UpdateIdentityZoneRequest {
 
     /**
+     * The configuration
+     */
+    @JsonProperty("config")
+    @Nullable
+    abstract Integer getConfiguration();
+
+    /**
      * The description of the identity zone
      */
     @JsonProperty("description")

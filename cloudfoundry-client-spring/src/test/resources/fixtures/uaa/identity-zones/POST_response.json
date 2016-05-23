@@ -1,9 +1,58 @@
 {
-  "created": 1426258488910,
-  "description": "Like the Twilight Zone but tastier[testzone1].",
-  "id": "testzone1",
-  "last_modified": 1461972047048,
-  "name": "The Twiglet Zone[testzone1]",
-  "subdomain": "testzone1",
-  "version": 0
+  "id" : "twiglet-create",
+  "subdomain" : "twiglet-create",
+  "config" : {
+    "tokenPolicy" : {
+      "accessTokenValidity" : -1,
+      "jwtRevocable" : false,
+      "keys" : {
+        "exampleKeyId" : {
+          "signingKey" : "s1gNiNg.K3y/t3XT"
+        }
+      },
+      "refreshTokenValidity" : -1
+    },
+    "samlConfig" : {
+      "assertionSigned" : true,
+      "requestSigned" : true,
+      "wantAssertionSigned" : false,
+      "wantAuthnRequestSigned" : false,
+      "assertionTimeToLiveSeconds" : 600,
+      "certificate" : null,
+      "privateKey" : null,
+      "privateKeyPassword" : null
+    },
+    "links" : {
+      "logout" : {
+        "redirectUrl" : "/login",
+        "redirectParameterName" : "redirect",
+        "disableRedirectParameter" : true,
+        "whitelist" : null
+      },
+      "selfService" : {
+        "selfServiceLinksEnabled" : true,
+        "signup" : "/create_account",
+        "passwd" : "/forgot_password"
+      }
+    },
+    "prompts" : [ {
+      "name" : "username",
+      "type" : "text",
+      "text" : "Email"
+    }, {
+      "name" : "password",
+      "type" : "password",
+      "text" : "Password"
+    }, {
+      "name" : "passcode",
+      "type" : "password",
+      "text" : "One Time Code (Get on at /passcode)"
+    } ],
+    "idpDiscoveryEnabled" : false
+  },
+  "name" : "The Twiglet Zone",
+  "version" : 0,
+  "description" : "Like the Twilight Zone but tastier.",
+  "created" : 1463595920184,
+  "last_modified" : 1463595920184
 }
