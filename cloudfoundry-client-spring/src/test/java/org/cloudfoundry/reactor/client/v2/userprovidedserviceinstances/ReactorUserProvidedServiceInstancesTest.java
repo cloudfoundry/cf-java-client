@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.userprovidedserviceinstances;
 
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
@@ -70,7 +70,7 @@ public final class ReactorUserProvidedServiceInstancesTest {
         @Override
         protected CreateUserProvidedServiceInstanceResponse getResponse() {
             return CreateUserProvidedServiceInstanceResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2015-07-27T22:43:35Z")
                     .id("34d5500e-712d-49ef-8bbe-c9ac349532da")
                     .url("/v2/user_provided_service_instances/34d5500e-712d-49ef-8bbe-c9ac349532da")
@@ -170,7 +170,7 @@ public final class ReactorUserProvidedServiceInstancesTest {
         @Override
         protected GetUserProvidedServiceInstanceResponse getResponse() {
             return GetUserProvidedServiceInstanceResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2015-07-27T22:43:34Z")
                     .id("8c12fd06-6639-4844-b5e7-a6831cadbbcc")
                     .url("/v2/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc")
@@ -229,7 +229,7 @@ public final class ReactorUserProvidedServiceInstancesTest {
                 .totalPages(1)
                 .totalResults(1)
                 .resource(UserProvidedServiceInstanceResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:34Z")
                         .id("8db6d37b-1ca8-4d0a-b1d3-2a6aaceae866")
                         .url("/v2/user_provided_service_instances/8db6d37b-1ca8-4d0a-b1d3-2a6aaceae866")
@@ -289,7 +289,7 @@ public final class ReactorUserProvidedServiceInstancesTest {
                 .totalPages(1)
                 .totalResults(1)
                 .resource(ServiceBindingResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .createdAt("2016-01-26T22:20:16Z")
                         .id("e6b8d548-e009-47d4-ab79-675e3da6bb52")
                         .url("/v2/service_bindings/e6b8d548-e009-47d4-ab79-675e3da6bb52")
@@ -347,7 +347,7 @@ public final class ReactorUserProvidedServiceInstancesTest {
         @Override
         protected UpdateUserProvidedServiceInstanceResponse getResponse() {
             return UpdateUserProvidedServiceInstanceResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2016-02-19T02:04:06Z")
                     .id("e2c198b1-fa15-414e-a9a4-31537996b39d")
                     .updatedAt("2016-02-19T02:04:06Z")

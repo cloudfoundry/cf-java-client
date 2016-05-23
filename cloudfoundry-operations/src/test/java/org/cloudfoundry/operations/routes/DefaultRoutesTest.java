@@ -18,7 +18,7 @@ package org.cloudfoundry.operations.routes;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.CloudFoundryException;
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteRequest;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteResponse;
@@ -64,19 +64,18 @@ import java.util.Queue;
 import java.util.function.Supplier;
 
 import static org.cloudfoundry.util.test.TestObjects.fill;
-import static org.cloudfoundry.util.test.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultRoutesTest {
 
     private static void requestApplications(CloudFoundryClient cloudFoundryClient, String routeId) {
         when(cloudFoundryClient.routes()
-            .listApplications(fillPage(ListRouteApplicationsRequest.builder())
+            .listApplications(fill(ListRouteApplicationsRequest.builder())
                 .diego(null)
                 .routeId(routeId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListRouteApplicationsResponse.builder())
+                .just(fill(ListRouteApplicationsResponse.builder())
                     .resource(fill(ApplicationResource.builder(), "application-")
                         .build())
                     .build()));
@@ -84,13 +83,13 @@ public final class DefaultRoutesTest {
 
     private static void requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         when(cloudFoundryClient.spaces()
-            .listApplications(fillPage(ListSpaceApplicationsRequest.builder())
+            .listApplications(fill(ListSpaceApplicationsRequest.builder())
                 .diego(null)
                 .name(application)
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceApplicationsResponse.builder())
+                .just(fill(ListSpaceApplicationsResponse.builder())
                     .resource(fill(ApplicationResource.builder(), "application-")
                         .build())
                     .build()));
@@ -98,24 +97,24 @@ public final class DefaultRoutesTest {
 
     private static void requestApplicationsEmpty(CloudFoundryClient cloudFoundryClient, String routeId) {
         when(cloudFoundryClient.routes()
-            .listApplications(fillPage(ListRouteApplicationsRequest.builder())
+            .listApplications(fill(ListRouteApplicationsRequest.builder())
                 .diego(null)
                 .routeId(routeId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListRouteApplicationsResponse.builder())
+                .just(fill(ListRouteApplicationsResponse.builder())
                     .build()));
     }
 
     private static void requestApplicationsEmpty(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         when(cloudFoundryClient.spaces()
-            .listApplications(fillPage(ListSpaceApplicationsRequest.builder())
+            .listApplications(fill(ListSpaceApplicationsRequest.builder())
                 .diego(null)
                 .name(application)
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceApplicationsResponse.builder())
+                .just(fill(ListSpaceApplicationsResponse.builder())
                     .build()));
     }
 
@@ -228,11 +227,11 @@ public final class DefaultRoutesTest {
 
     private static void requestOrganizationsRoutes(CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient.routes()
-            .list(fillPage(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder())
+            .list(fill(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder())
                 .organizationId(organizationId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListRoutesResponse.builder())
+                .just(fill(ListRoutesResponse.builder())
                     .resource(fill(RouteResource.builder())
                         .entity(fill(RouteEntity.builder(), "route-entity-").build())
                         .build())
@@ -241,24 +240,24 @@ public final class DefaultRoutesTest {
 
     private static void requestOrganizationsRoutesEmpty(CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient.routes()
-            .list(fillPage(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder())
+            .list(fill(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder())
                 .organizationId(organizationId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListRoutesResponse.builder())
+                .just(fill(ListRoutesResponse.builder())
                     .build()));
     }
 
     private static void requestPrivateDomains(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
         when(cloudFoundryClient.organizations()
-            .listPrivateDomains(fillPage(ListOrganizationPrivateDomainsRequest.builder())
+            .listPrivateDomains(fill(ListOrganizationPrivateDomainsRequest.builder())
                 .organizationId(organizationId)
                 .name(domain)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationPrivateDomainsResponse.builder())
+                .just(fill(ListOrganizationPrivateDomainsResponse.builder())
                     .resource(fill(PrivateDomainResource.builder(), "private-domain-")
-                        .metadata(fill(Resource.Metadata.builder(), "private-domain-metadata-")
+                        .metadata(fill(Metadata.builder(), "private-domain-metadata-")
                             .build())
                         .build())
                     .build()));
@@ -266,13 +265,13 @@ public final class DefaultRoutesTest {
 
     private static void requestPrivateDomainsEmpty(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
         when(cloudFoundryClient.organizations()
-            .listPrivateDomains(fillPage(ListOrganizationPrivateDomainsRequest.builder())
+            .listPrivateDomains(fill(ListOrganizationPrivateDomainsRequest.builder())
                 .organizationId(organizationId)
                 .name(domain)
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationPrivateDomainsResponse.builder())
+                .just(fill(ListOrganizationPrivateDomainsResponse.builder())
                     .build()));
     }
 
@@ -309,14 +308,14 @@ public final class DefaultRoutesTest {
 
     private static void requestRoutes(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
         when(cloudFoundryClient.routes()
-            .list(fillPage(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder())
+            .list(fill(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder())
                 .domainId(domainId)
                 .host(host)
                 .organizationId(null)
                 .path(path)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListRoutesResponse.builder())
+                .just(fill(ListRoutesResponse.builder())
                     .resource(fill(RouteResource.builder(), "route-")
                         .build())
                     .build()));
@@ -324,26 +323,26 @@ public final class DefaultRoutesTest {
 
     private static void requestRoutesEmpty(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
         when(cloudFoundryClient.routes()
-            .list(fillPage(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder())
+            .list(fill(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder())
                 .domainId(domainId)
                 .host(host)
                 .organizationId(null)
                 .path(path)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListRoutesResponse.builder())
+                .just(fill(ListRoutesResponse.builder())
                     .build()));
     }
 
     private static void requestSharedDomains(CloudFoundryClient cloudFoundryClient, String domain) {
         when(cloudFoundryClient.sharedDomains()
-            .list(fillPage(ListSharedDomainsRequest.builder())
+            .list(fill(ListSharedDomainsRequest.builder())
                 .name(domain)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSharedDomainsResponse.builder())
+                .just(fill(ListSharedDomainsResponse.builder())
                     .resource(fill(SharedDomainResource.builder(), "shared-domain-")
-                        .metadata(fill(Resource.Metadata.builder(), "shared-domain-metadata-")
+                        .metadata(fill(Metadata.builder(), "shared-domain-metadata-")
                             .build())
                         .build())
                     .build()));
@@ -352,11 +351,11 @@ public final class DefaultRoutesTest {
 
     private static void requestSharedDomainsEmpty(CloudFoundryClient cloudFoundryClient, String domain) {
         when(cloudFoundryClient.sharedDomains()
-            .list(fillPage(ListSharedDomainsRequest.builder())
+            .list(fill(ListSharedDomainsRequest.builder())
                 .name(domain)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSharedDomainsResponse.builder())
+                .just(fill(ListSharedDomainsResponse.builder())
                     .build()));
     }
 
@@ -374,45 +373,45 @@ public final class DefaultRoutesTest {
 
     private static void requestSpaceRoutes(CloudFoundryClient cloudFoundryClient, String spaceId) {
         when(cloudFoundryClient.spaces()
-            .listRoutes(fillPage(ListSpaceRoutesRequest.builder())
+            .listRoutes(fill(ListSpaceRoutesRequest.builder())
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceRoutesResponse.builder())
+                .just(fill(ListSpaceRoutesResponse.builder())
                     .resource(fill(RouteResource.builder(), "route-").build())
                     .build()));
     }
 
     private static void requestSpaceRoutesEmpty(CloudFoundryClient cloudFoundryClient, String spaceId) {
         when(cloudFoundryClient.spaces()
-            .listRoutes(fillPage(ListSpaceRoutesRequest.builder())
+            .listRoutes(fill(ListSpaceRoutesRequest.builder())
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceRoutesResponse.builder())
+                .just(fill(ListSpaceRoutesResponse.builder())
                     .build()));
     }
 
     private static void requestSpaces(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         when(cloudFoundryClient.organizations()
-            .listSpaces(fillPage(ListOrganizationSpacesRequest.builder())
+            .listSpaces(fill(ListOrganizationSpacesRequest.builder())
                 .organizationId(organizationId)
                 .name(space)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationSpacesResponse.builder())
+                .just(fill(ListOrganizationSpacesResponse.builder())
                     .resource(fill(SpaceResource.builder(), "space-").build())
                     .build()));
     }
 
     private static void requestSpacesEmpty(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         when(cloudFoundryClient.organizations()
-            .listSpaces(fillPage(ListOrganizationSpacesRequest.builder())
+            .listSpaces(fill(ListOrganizationSpacesRequest.builder())
                 .organizationId(organizationId)
                 .name(space)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationSpacesResponse.builder())
+                .just(fill(ListOrganizationSpacesResponse.builder())
                     .build()));
     }
 

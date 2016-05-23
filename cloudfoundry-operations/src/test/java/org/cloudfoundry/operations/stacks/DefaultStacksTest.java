@@ -27,17 +27,16 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.util.test.TestObjects.fill;
-import static org.cloudfoundry.util.test.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultStacksTest {
 
     private static void requestStacks(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.stacks()
-            .list(fillPage(ListStacksRequest.builder())
+            .list(fill(ListStacksRequest.builder())
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListStacksResponse.builder())
+                .just(fill(ListStacksResponse.builder())
                     .resource(fill(StackResource.builder(), "stack-")
                         .build())
                     .build()));
@@ -45,11 +44,11 @@ public final class DefaultStacksTest {
 
     private static void requestStacks(CloudFoundryClient cloudFoundryClient, String name) {
         when(cloudFoundryClient.stacks()
-            .list(fillPage(ListStacksRequest.builder())
+            .list(fill(ListStacksRequest.builder())
                 .name(name)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListStacksResponse.builder())
+                .just(fill(ListStacksResponse.builder())
                     .resource(fill(StackResource.builder(), "stack-")
                         .build())
                     .build()));

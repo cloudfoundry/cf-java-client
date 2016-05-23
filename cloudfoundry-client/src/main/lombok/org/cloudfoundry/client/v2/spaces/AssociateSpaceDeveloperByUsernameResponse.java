@@ -21,6 +21,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.Resource;
 
 /**
@@ -33,7 +34,7 @@ public final class AssociateSpaceDeveloperByUsernameResponse extends Resource<Sp
 
     @Builder
     AssociateSpaceDeveloperByUsernameResponse(@JsonProperty("entity") SpaceEntity entity,
-                                              @JsonProperty("metadata") Resource.Metadata metadata) {
+                                              @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 

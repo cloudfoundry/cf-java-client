@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.jobs;
 
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.jobs.GetJobRequest;
 import org.cloudfoundry.client.v2.jobs.GetJobResponse;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
@@ -57,7 +57,7 @@ public final class ReactorJobsTest {
         @Override
         protected GetJobResponse getResponse() {
             return GetJobResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .id("e86ffe00-a243-48f7-be05-8f1f41bee864")
                     .createdAt("2015-11-30T23:38:44Z")
                     .url("/v2/jobs/e86ffe00-a243-48f7-be05-8f1f41bee864")

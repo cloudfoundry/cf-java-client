@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.serviceusageevents;
 
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventRequest;
 import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventResponse;
 import org.cloudfoundry.client.v2.serviceusageevents.ListServiceUsageEventsRequest;
@@ -62,7 +62,7 @@ public final class ReactorServiceUsageEventsTest {
         @Override
         protected GetServiceUsageEventResponse getResponse() {
             return GetServiceUsageEventResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2015-07-27T22:43:30Z")
                     .id("9470627d-0488-4d9a-8564-f97571487893")
                     .url("/v2/service_usage_events/9470627d-0488-4d9a-8564-f97571487893")
@@ -124,7 +124,7 @@ public final class ReactorServiceUsageEventsTest {
                 .totalPages(1)
                 .totalResults(1)
                 .resource(ServiceUsageEventResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:30Z")
                         .id("0c9c59b8-3462-4acf-be39-aa987f087146")
                         .url("/v2/service_usage_events/0c9c59b8-3462-4acf-be39-aa987f087146")

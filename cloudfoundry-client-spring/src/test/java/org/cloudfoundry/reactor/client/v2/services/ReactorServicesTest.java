@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.services;
 
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlanEntity;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlanResource;
@@ -111,7 +111,7 @@ public final class ReactorServicesTest {
         @Override
         protected DeleteServiceResponse getResponse() {
             return DeleteServiceResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
                     .createdAt("2016-02-02T17:16:31Z")
                     .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
@@ -164,7 +164,7 @@ public final class ReactorServicesTest {
         @Override
         protected GetServiceResponse getResponse() {
             return GetServiceResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .id("58eb36ad-0636-428b-b4ed-afc14e48d926")
                     .url("/v2/services/58eb36ad-0636-428b-b4ed-afc14e48d926")
                     .createdAt("2015-07-27T22:43:35Z")
@@ -224,7 +224,7 @@ public final class ReactorServicesTest {
                 .totalResults(1)
                 .totalPages(1)
                 .resource(ServiceResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .id("69b84c38-e786-4270-9cca-59d02a700798")
                         .url("/v2/services/69b84c38-e786-4270-9cca-59d02a700798")
                         .createdAt("2015-07-27T22:43:35Z")
@@ -286,7 +286,7 @@ public final class ReactorServicesTest {
                 .totalResults(1)
                 .totalPages(1)
                 .resource(ServicePlanResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:35Z")
                         .id("51067400-d79f-4ca5-9400-1f36f5dd09e7")
                         .url("/v2/service_plans/51067400-d79f-4ca5-9400-1f36f5dd09e7")

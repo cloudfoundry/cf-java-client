@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.Resource;
 
 /**
@@ -29,7 +30,7 @@ import org.cloudfoundry.client.v2.Resource;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public abstract class AbstractServiceBindingResource extends Resource<ServiceBindingEntity> {
-    
+
     AbstractServiceBindingResource(@JsonProperty("entity") ServiceBindingEntity entity,
                                    @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);

@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.securitygroups;
 
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRunningDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupStagingDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsRequest;
@@ -151,7 +151,7 @@ public final class ReactorSecurityGroupsTest {
                 .totalPages(1)
                 .totalResults(1)
                 .resource(SecurityGroupResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .createdAt("2016-04-06T00:17:17Z")
                         .id("1f2f24f8-f68c-4a3b-b51a-8134fe2626d8")
                         .url("/v2/config/running_security_groups/1f2f24f8-f68c-4a3b-b51a-8134fe2626d8")
@@ -210,7 +210,7 @@ public final class ReactorSecurityGroupsTest {
                 .totalPages(1)
                 .totalResults(1)
                 .resource(SecurityGroupResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .createdAt("2016-04-16T01:23:52Z")
                         .id("c0bb3afb-ae01-4af0-96cf-a5b0d2dca894")
                         .url("/v2/config/staging_security_groups/c0bb3afb-ae01-4af0-96cf-a5b0d2dca894")
@@ -266,7 +266,7 @@ public final class ReactorSecurityGroupsTest {
         @Override
         protected SetSecurityGroupRunningDefaultResponse getResponse() {
             return SetSecurityGroupRunningDefaultResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2016-04-06T00:17:17Z")
                     .id("9aa7ab9c-997f-4f87-be50-87105521881a")
                     .url("/v2/config/running_security_groups/9aa7ab9c-997f-4f87-be50-87105521881a")
@@ -324,7 +324,7 @@ public final class ReactorSecurityGroupsTest {
         @Override
         protected SetSecurityGroupStagingDefaultResponse getResponse() {
             return SetSecurityGroupStagingDefaultResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2016-04-16T01:23:52Z")
                     .id("50165fce-6c41-4c35-a4d8-3858ee217d36")
                     .url("/v2/config/staging_security_groups/50165fce-6c41-4c35-a4d8-3858ee217d36")

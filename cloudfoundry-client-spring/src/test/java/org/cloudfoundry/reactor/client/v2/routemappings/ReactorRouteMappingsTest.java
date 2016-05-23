@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.routemappings;
 
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.routemappings.CreateRouteMappingRequest;
 import org.cloudfoundry.client.v2.routemappings.CreateRouteMappingResponse;
@@ -71,7 +71,7 @@ public final class ReactorRouteMappingsTest {
         @Override
         protected CreateRouteMappingResponse getResponse() {
             return CreateRouteMappingResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2016-01-19T19:40:59Z")
                     .id("ca9cdd28-53c4-4b8e-a7e0-1838f69b8f91")
                     .url("/v2/route_mappings/ca9cdd28-53c4-4b8e-a7e0-1838f69b8f91")
@@ -166,7 +166,7 @@ public final class ReactorRouteMappingsTest {
         @Override
         protected DeleteRouteMappingResponse getResponse() {
             return DeleteRouteMappingResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
                     .createdAt("2016-02-02T17:16:31Z")
                     .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
@@ -218,7 +218,7 @@ public final class ReactorRouteMappingsTest {
         @Override
         protected GetRouteMappingResponse getResponse() {
             return GetRouteMappingResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .id("304bead7-ad5a-4f6e-a093-f2a85d30c54a")
                     .createdAt("2016-04-06T00:17:40Z")
                     .url("/v2/route_mappings/304bead7-ad5a-4f6e-a093-f2a85d30c54a")
@@ -274,7 +274,7 @@ public final class ReactorRouteMappingsTest {
                 .totalPages(1)
                 .totalResults(1)
                 .resource(RouteMappingResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .createdAt("2016-04-06T00:17:40Z")
                         .id("50dedf28-08db-4cdd-9903-0d74f3b8708d")
                         .url("/v2/route_mappings/50dedf28-08db-4cdd-9903-0d74f3b8708d")

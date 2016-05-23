@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.users;
 
-import org.cloudfoundry.client.v2.Resource.Metadata;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.ListUsersResponse;
 import org.cloudfoundry.client.v2.users.UserEntity;

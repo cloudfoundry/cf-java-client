@@ -18,8 +18,8 @@ package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.OrderDirection;
-import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentResponse;
@@ -116,7 +116,6 @@ import java.util.Queue;
 import java.util.function.Supplier;
 
 import static org.cloudfoundry.util.test.TestObjects.fill;
-import static org.cloudfoundry.util.test.TestObjects.fillPage;
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -135,7 +134,8 @@ public final class DefaultApplicationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(ApplicationInstancesResponse.builder()
-                    .instance("instance-0", ApplicationInstanceInfo.builder().build())
+                    .instance("instance-0", ApplicationInstanceInfo.builder()
+                        .build())
                     .build()));
     }
 
@@ -284,9 +284,9 @@ public final class DefaultApplicationsTest {
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListApplicationServiceBindingsResponse.builder(), "test-service-binding-")
+                .just(fill(ListApplicationServiceBindingsResponse.builder(), "test-service-binding-")
                     .resource(ServiceBindingResource.builder()
-                        .metadata(Resource.Metadata.builder()
+                        .metadata(fill(Metadata.builder())
                             .id("test-service-binding-id")
                             .build())
                         .build())
@@ -399,9 +399,9 @@ public final class DefaultApplicationsTest {
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceApplicationsResponse.builder())
+                .just(fill(ListSpaceApplicationsResponse.builder())
                     .resource(ApplicationResource.builder()
-                        .metadata(Resource.Metadata.builder()
+                        .metadata(fill(Metadata.builder())
                             .id(applicationId)
                             .build())
                         .entity(fill(ApplicationEntity.builder(), "application-")
@@ -415,26 +415,26 @@ public final class DefaultApplicationsTest {
 
     private static void requestApplicationsEmpty(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         when(cloudFoundryClient.spaces()
-            .listApplications(fillPage(ListSpaceApplicationsRequest.builder())
-                .spaceId(spaceId)
+            .listApplications(fill(ListSpaceApplicationsRequest.builder())
                 .diego(null)
                 .name(application)
+                .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceApplicationsResponse.builder())
+                .just(fill(ListSpaceApplicationsResponse.builder())
                     .build()));
     }
 
     private static void requestApplicationsSpecificState(CloudFoundryClient cloudFoundryClient, String application, String spaceId, String stateReturned) {
         when(cloudFoundryClient.spaces()
-            .listApplications(fillPage(ListSpaceApplicationsRequest.builder())
+            .listApplications(fill(ListSpaceApplicationsRequest.builder())
                 .spaceId(spaceId)
                 .diego(null)
                 .name(application)
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceApplicationsResponse.builder())
+                .just(fill(ListSpaceApplicationsResponse.builder())
                     .resource(fill(ApplicationResource.builder(), "application-")
                         .entity(fill(ApplicationEntity.builder(), "application-entity-")
                             .state(stateReturned)
@@ -451,9 +451,9 @@ public final class DefaultApplicationsTest {
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceApplicationsResponse.builder())
+                .just(fill(ListSpaceApplicationsResponse.builder())
                     .resource(ApplicationResource.builder()
-                        .metadata(Resource.Metadata.builder()
+                        .metadata(fill(Metadata.builder())
                             .id("test-application-id")
                             .build())
                         .entity(fill(ApplicationEntity.builder(), "application-")
@@ -502,7 +502,7 @@ public final class DefaultApplicationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(CreateApplicationResponse.builder(), "create-")
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(fill(Metadata.builder())
                         .id(applicationId)
                         .build())
                     .build()));
@@ -519,7 +519,7 @@ public final class DefaultApplicationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(CreateRouteResponse.builder())
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(fill(Metadata.builder())
                         .id(routeId)
                         .build())
                     .build()));
@@ -547,11 +547,13 @@ public final class DefaultApplicationsTest {
     }
 
     private static void requestEvents(CloudFoundryClient cloudFoundryClient, String applicationId, EventEntity... entities) {
-        ListEventsResponse.ListEventsResponseBuilder responseBuilder = fillPage(ListEventsResponse.builder());
+        ListEventsResponse.ListEventsResponseBuilder responseBuilder = fill(ListEventsResponse.builder());
 
         for (EventEntity entity : entities) {
             responseBuilder.resource(EventResource.builder()
-                .metadata(Resource.Metadata.builder().id("test-event-id").build())
+                .metadata(fill(Metadata.builder())
+                    .id("test-event-id")
+                    .build())
                 .entity(entity)
                 .build());
         }
@@ -712,9 +714,9 @@ public final class DefaultApplicationsTest {
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationSpacesResponse.builder())
+                .just(fill(ListOrganizationSpacesResponse.builder())
                     .resource(SpaceResource.builder()
-                        .metadata(fill(Resource.Metadata.builder(), "space-resource-metadata-")
+                        .metadata(fill(Metadata.builder(), "space-resource-metadata-")
                             .build())
                         .entity(fill(SpaceEntity.builder())
                             .build())
@@ -731,7 +733,7 @@ public final class DefaultApplicationsTest {
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationSpacesResponse.builder())
+                .just(fill(ListOrganizationSpacesResponse.builder())
                     .totalPages(1)
                     .build()));
     }
@@ -743,9 +745,9 @@ public final class DefaultApplicationsTest {
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationsResponse.builder())
+                .just(fill(ListOrganizationsResponse.builder())
                     .resource(OrganizationResource.builder()
-                        .metadata(fill(Resource.Metadata.builder(), "organization-resource-metadata-")
+                        .metadata(fill(Metadata.builder(), "organization-resource-metadata-")
                             .build())
                         .entity(fill(OrganizationEntity.builder())
                             .build())
@@ -761,7 +763,7 @@ public final class DefaultApplicationsTest {
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationsResponse.builder())
+                .just(fill(ListOrganizationsResponse.builder())
                     .totalPages(1)
                     .build()));
     }
@@ -774,9 +776,9 @@ public final class DefaultApplicationsTest {
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationPrivateDomainsResponse.builder())
+                .just(fill(ListOrganizationPrivateDomainsResponse.builder())
                     .resource(PrivateDomainResource.builder()
-                        .metadata(Resource.Metadata.builder()
+                        .metadata(fill(Metadata.builder())
                             .id(domainId)
                             .build())
                         .build())
@@ -791,7 +793,7 @@ public final class DefaultApplicationsTest {
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationPrivateDomainsResponse.builder())
+                .just(fill(ListOrganizationPrivateDomainsResponse.builder())
                     .build()));
     }
 
@@ -802,9 +804,9 @@ public final class DefaultApplicationsTest {
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationPrivateDomainsResponse.builder())
+                .just(fill(ListOrganizationPrivateDomainsResponse.builder())
                     .resource(PrivateDomainResource.builder()
-                        .metadata(Resource.Metadata.builder()
+                        .metadata(fill(Metadata.builder())
                             .id(domainId)
                             .build())
                         .build())
@@ -818,7 +820,7 @@ public final class DefaultApplicationsTest {
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationPrivateDomainsResponse.builder())
+                .just(fill(ListOrganizationPrivateDomainsResponse.builder())
                     .build()));
     }
 
@@ -857,9 +859,9 @@ public final class DefaultApplicationsTest {
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListRoutesResponse.builder())
+                .just(fill(ListRoutesResponse.builder())
                     .resource(RouteResource.builder()
-                        .metadata(Resource.Metadata.builder()
+                        .metadata(fill(Metadata.builder())
                             .id(routeId)
                             .build())
                         .entity(RouteEntity.builder()
@@ -886,7 +888,7 @@ public final class DefaultApplicationsTest {
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListRoutesResponse.builder())
+                .just(fill(ListRoutesResponse.builder())
                     .build()));
     }
 
@@ -897,9 +899,9 @@ public final class DefaultApplicationsTest {
                 .name(domain)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSharedDomainsResponse.builder())
+                .just(fill(ListSharedDomainsResponse.builder())
                     .resource(SharedDomainResource.builder()
-                        .metadata(Resource.Metadata.builder()
+                        .metadata(fill(Metadata.builder())
                             .id(domainId)
                             .build())
                         .entity(SharedDomainEntity.builder()
@@ -915,7 +917,7 @@ public final class DefaultApplicationsTest {
                 .name(domain)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSharedDomainsResponse.builder())
+                .just(fill(ListSharedDomainsResponse.builder())
                     .build()));
     }
 
@@ -925,9 +927,9 @@ public final class DefaultApplicationsTest {
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSharedDomainsResponse.builder())
+                .just(fill(ListSharedDomainsResponse.builder())
                     .resource(SharedDomainResource.builder()
-                        .metadata(Resource.Metadata.builder()
+                        .metadata(fill(Metadata.builder())
                             .id(domainId)
                             .build())
                         .entity(SharedDomainEntity.builder()
@@ -942,7 +944,7 @@ public final class DefaultApplicationsTest {
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSharedDomainsResponse.builder())
+                .just(fill(ListSharedDomainsResponse.builder())
                     .build()));
     }
 
@@ -990,7 +992,7 @@ public final class DefaultApplicationsTest {
                 .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListStacksResponse.builder())
+                .just(fill(ListStacksResponse.builder())
                     .build()));
     }
 
@@ -1020,7 +1022,7 @@ public final class DefaultApplicationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(UpdateApplicationResponse.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(fill(Metadata.builder())
                         .id(applicationId)
                         .build())
                     .build()));
@@ -1101,7 +1103,7 @@ public final class DefaultApplicationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(UpdateApplicationResponse.builder()
-                    .metadata(fill(Resource.Metadata.builder())
+                    .metadata(fill(Metadata.builder())
                         .id(applicationId)
                         .build())
                     .entity(fill(ApplicationEntity.builder())
@@ -1119,7 +1121,7 @@ public final class DefaultApplicationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(UploadApplicationResponse.builder())
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(fill(Metadata.builder())
                         .id(jobId)
                         .build())
                     .entity(fill(JobEntity.builder(), "job-entity-")
@@ -2174,6 +2176,7 @@ public final class DefaultApplicationsTest {
                     .buildpack("test-application-summary-buildpack")
                     .id("test-application-summary-id")
                     .instanceDetail(fill(InstanceDetail.builder())
+                        .since(null)
                         .state(null)
                         .build())
                     .lastUploaded(new Date(0))

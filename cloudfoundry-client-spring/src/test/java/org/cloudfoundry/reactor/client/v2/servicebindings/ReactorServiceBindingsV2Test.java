@@ -17,7 +17,7 @@
 package org.cloudfoundry.reactor.client.v2.servicebindings;
 
 
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingResponse;
@@ -68,7 +68,7 @@ public final class ReactorServiceBindingsV2Test {
         @Override
         protected CreateServiceBindingResponse getResponse() {
             return CreateServiceBindingResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2015-07-27T22:43:20Z")
                     .id("42eda707-fe4d-4eed-9b39-7cb5e665c226")
                     .url("/v2/service_bindings/42eda707-fe4d-4eed-9b39-7cb5e665c226")
@@ -167,7 +167,7 @@ public final class ReactorServiceBindingsV2Test {
         @Override
         protected DeleteServiceBindingResponse getResponse() {
             return DeleteServiceBindingResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .id("c4faac01-5bbd-494f-8849-256a3bab06b8")
                     .createdAt("2016-03-14T22:30:51Z")
                     .url("/v2/jobs/c4faac01-5bbd-494f-8849-256a3bab06b8")
@@ -220,7 +220,7 @@ public final class ReactorServiceBindingsV2Test {
         @Override
         protected GetServiceBindingResponse getResponse() {
             return GetServiceBindingResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2015-11-03T00:53:50Z")
                     .id("925d8848-4808-47cf-a3e8-049aa0163328")
                     .updatedAt("2015-11-04T12:54:50Z")
@@ -279,7 +279,7 @@ public final class ReactorServiceBindingsV2Test {
                 .totalResults(3)
                 .totalPages(1)
                 .resource(ServiceBindingResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:06Z")
                         .id("d6d87c3d-a38f-4b31-9bbe-2432d2faaa1d")
                         .url("/v2/service_bindings/d6d87c3d-a38f-4b31-9bbe-2432d2faaa1d")
@@ -294,7 +294,7 @@ public final class ReactorServiceBindingsV2Test {
                         .build())
                     .build())
                 .resource(ServiceBindingResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .createdAt("2015-11-03T00:53:50Z")
                         .id("925d8848-4808-47cf-a3e8-049aa0163328")
                         .updatedAt("2015-11-04T12:54:50Z")
@@ -310,7 +310,7 @@ public final class ReactorServiceBindingsV2Test {
                         .build())
                     .build())
                 .resource(ServiceBindingResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:20Z")
                         .id("42eda707-fe4d-4eed-9b39-7cb5e665c226")
                         .url("/v2/service_bindings/42eda707-fe4d-4eed-9b39-7cb5e665c226")

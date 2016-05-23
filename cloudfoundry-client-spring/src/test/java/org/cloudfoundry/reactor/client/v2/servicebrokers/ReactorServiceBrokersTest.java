@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.servicebrokers;
 
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerRequest;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerResponse;
 import org.cloudfoundry.client.v2.servicebrokers.DeleteServiceBrokerRequest;
@@ -72,7 +72,7 @@ public final class ReactorServiceBrokersTest {
         @Override
         protected CreateServiceBrokerResponse getResponse() {
             return CreateServiceBrokerResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2015-07-27T22:43:23Z")
                     .id("1e86a649-e4a2-4bed-830d-b12435ed4cd9")
                     .url("/v2/service_brokers/1e86a649-e4a2-4bed-830d-b12435ed4cd9")
@@ -167,7 +167,7 @@ public final class ReactorServiceBrokersTest {
         @Override
         protected GetServiceBrokerResponse getResponse() {
             return GetServiceBrokerResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2015-07-27T22:43:23Z")
                     .id("1311f77f-cfb6-499e-bcba-82c7ef968ae6")
                     .updatedAt("2015-07-27T22:43:23Z")
@@ -223,7 +223,7 @@ public final class ReactorServiceBrokersTest {
                 .totalResults(3)
                 .totalPages(1)
                 .resource(ServiceBrokerResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:23Z")
                         .id("b52de6f1-15dd-4069-8b42-f052cc9333fc")
                         .updatedAt("2015-07-27T22:43:23Z")
@@ -237,7 +237,7 @@ public final class ReactorServiceBrokersTest {
                         .build())
                     .build())
                 .resource(ServiceBrokerResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:23Z")
                         .id("812e9e7f-b5b0-4587-ba3c-b4a7c574fb88")
                         .url("/v2/service_brokers/812e9e7f-b5b0-4587-ba3c-b4a7c574fb88")
@@ -249,7 +249,7 @@ public final class ReactorServiceBrokersTest {
                         .build())
                     .build())
                 .resource(ServiceBrokerResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:23Z")
                         .id("93e760c4-ff3d-447a-9cff-a17f4454eaee")
                         .url("/v2/service_brokers/93e760c4-ff3d-447a-9cff-a17f4454eaee")
@@ -303,7 +303,7 @@ public final class ReactorServiceBrokersTest {
         @Override
         protected UpdateServiceBrokerResponse getResponse() {
             return UpdateServiceBrokerResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .createdAt("2015-07-27T22:43:23Z")
                     .id("92b935f5-20e2-4377-a7e2-f15faa110eab")
                     .updatedAt("2015-07-27T22:43:23Z")

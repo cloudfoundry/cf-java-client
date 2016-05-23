@@ -21,7 +21,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
 
 /**
  * The resource response payload for Buildpacks
@@ -33,7 +33,7 @@ public final class BuildpackResource extends AbstractBuildpackResource {
 
     @Builder
     BuildpackResource(@JsonProperty("entity") BuildpackEntity entity,
-                      @JsonProperty("metadata") Resource.Metadata metadata) {
+                      @JsonProperty("metadata") Metadata metadata) {
 
         super(entity, metadata);
     }

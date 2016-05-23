@@ -18,7 +18,7 @@ package org.cloudfoundry.operations.organizations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.CloudFoundryException;
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagRequest;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagResponse;
@@ -63,7 +63,6 @@ import java.util.Queue;
 import java.util.function.Supplier;
 
 import static org.cloudfoundry.util.test.TestObjects.fill;
-import static org.cloudfoundry.util.test.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultOrganizationsTest {
@@ -114,11 +113,11 @@ public final class DefaultOrganizationsTest {
 
     private static void requestDomains(CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient.organizations()
-            .listDomains(fillPage(ListOrganizationDomainsRequest.builder())
+            .listDomains(fill(ListOrganizationDomainsRequest.builder())
                 .organizationId(organizationId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationDomainsResponse.builder())
+                .just(fill(ListOrganizationDomainsResponse.builder())
                     .resource(fill(DomainResource.builder())
                         .build())
                     .build()));
@@ -154,13 +153,13 @@ public final class DefaultOrganizationsTest {
 
                     private final Queue<GetJobResponse> responses = new LinkedList<>(Arrays.asList(
                         GetJobResponse.builder()
-                            .metadata(fill(Resource.Metadata.builder()).build())
+                            .metadata(fill(Metadata.builder()).build())
                             .entity(fill(JobEntity.builder())
                                 .status("running")
                                 .build())
                             .build(),
                         GetJobResponse.builder()
-                            .metadata(fill(Resource.Metadata.builder()).build())
+                            .metadata(fill(Metadata.builder()).build())
                             .entity(fill(JobEntity.builder())
                                 .errorDetails(fill(JobEntity.ErrorDetails.builder(), "error-details-")
                                     .build())
@@ -187,13 +186,13 @@ public final class DefaultOrganizationsTest {
 
                     private final Queue<GetJobResponse> responses = new LinkedList<>(Arrays.asList(
                         GetJobResponse.builder()
-                            .metadata(fill(Resource.Metadata.builder()).build())
+                            .metadata(fill(Metadata.builder()).build())
                             .entity(fill(JobEntity.builder())
                                 .status("running")
                                 .build())
                             .build(),
                         GetJobResponse.builder()
-                            .metadata(fill(Resource.Metadata.builder()).build())
+                            .metadata(fill(Metadata.builder()).build())
                             .entity(fill(JobEntity.builder())
                                 .status("finished")
                                 .build())
@@ -222,11 +221,11 @@ public final class DefaultOrganizationsTest {
 
     private static void requestOrganizationQuotaDefinitions(CloudFoundryClient cloudFoundryClient, String organizationQuotaDefinition) {
         when(cloudFoundryClient.organizationQuotaDefinitions()
-            .list(fillPage(ListOrganizationQuotaDefinitionsRequest.builder())
+            .list(fill(ListOrganizationQuotaDefinitionsRequest.builder())
                 .name(organizationQuotaDefinition)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationQuotaDefinitionsResponse.builder())
+                .just(fill(ListOrganizationQuotaDefinitionsResponse.builder())
                     .resource(fill(OrganizationQuotaDefinitionResource.builder(), "organization-quota-definition-")
                         .entity(fill(OrganizationQuotaDefinitionEntity.builder(), "organization-quota-definition-entity-")
                             .build())
@@ -236,11 +235,11 @@ public final class DefaultOrganizationsTest {
 
     private static void requestOrganizations(CloudFoundryClient cloudFoundryClient, String organizationName) {
         when(cloudFoundryClient.organizations()
-            .list(fillPage(ListOrganizationsRequest.builder())
+            .list(fill(ListOrganizationsRequest.builder())
                 .name(organizationName)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationsResponse.builder())
+                .just(fill(ListOrganizationsResponse.builder())
                     .resource(fill(OrganizationResource.builder(), "organization-")
                         .entity(fill(OrganizationEntity.builder(), "organization-entity-")
                             .build())
@@ -251,10 +250,10 @@ public final class DefaultOrganizationsTest {
 
     private static void requestOrganizations(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.organizations()
-            .list(fillPage(ListOrganizationsRequest.builder())
+            .list(fill(ListOrganizationsRequest.builder())
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationsResponse.builder())
+                .just(fill(ListOrganizationsResponse.builder())
                     .resource(fill(OrganizationResource.builder(), "organization-")
                         .build())
                     .build()));
@@ -262,11 +261,11 @@ public final class DefaultOrganizationsTest {
 
     private static void requestSpaceQuotaDefinitions(CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient.organizations()
-            .listSpaceQuotaDefinitions(fillPage(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
+            .listSpaceQuotaDefinitions(fill(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
                 .organizationId(organizationId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
+                .just(fill(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
                     .resource(fill(SpaceQuotaDefinitionResource.builder())
                         .build())
                     .build()));
@@ -274,11 +273,11 @@ public final class DefaultOrganizationsTest {
 
     private static void requestSpaces(CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient.organizations()
-            .listSpaces(fillPage(ListOrganizationSpacesRequest.builder())
+            .listSpaces(fill(ListOrganizationSpacesRequest.builder())
                 .organizationId(organizationId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationSpacesResponse.builder())
+                .just(fill(ListOrganizationSpacesResponse.builder())
                     .resource(fill(SpaceResource.builder())
                         .build())
                     .build()));

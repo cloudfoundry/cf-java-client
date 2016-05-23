@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.privatedomains;
 
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
@@ -69,7 +69,7 @@ public final class ReactorPrivateDomainsTest {
         @Override
         protected CreatePrivateDomainResponse getResponse() {
             return CreatePrivateDomainResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .id("4af3234e-813d-453f-b3ae-fcdecfd87a47")
                     .url("/v2/private_domains/4af3234e-813d-453f-b3ae-fcdecfd87a47")
                     .createdAt("2016-01-19T19:41:12Z")
@@ -162,7 +162,7 @@ public final class ReactorPrivateDomainsTest {
         @Override
         protected DeletePrivateDomainResponse getResponse() {
             return DeletePrivateDomainResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
                     .createdAt("2016-02-02T17:16:31Z")
                     .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
@@ -213,7 +213,7 @@ public final class ReactorPrivateDomainsTest {
         @Override
         protected GetPrivateDomainResponse getResponse() {
             return GetPrivateDomainResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                     .id("3de9db5f-8e3b-4d10-a8c9-8137caafe43d")
                     .url("/v2/private_domains/3de9db5f-8e3b-4d10-a8c9-8137caafe43d")
                     .createdAt("2016-02-19T02:04:00Z")
@@ -268,7 +268,7 @@ public final class ReactorPrivateDomainsTest {
                 .totalResults(1)
                 .totalPages(1)
                 .resource(PrivateDomainResource.builder()
-                    .metadata(Resource.Metadata.builder()
+                    .metadata(Metadata.builder()
                         .id("3de9db5f-8e3b-4d10-a8c9-8137caafe43d")
                         .url("/v2/private_domains/3de9db5f-8e3b-4d10-a8c9-8137caafe43d")
                         .createdAt("2016-02-19T02:04:00Z")
