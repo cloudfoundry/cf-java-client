@@ -16,14 +16,19 @@
 
 package org.cloudfoundry.client.v2.applicationusageevents;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.immutables.value.Value;
 
-public final class PurgeAndReseedApplicationUsageEventsRequestTest {
+/**
+ * The request payload for the Get Application Usage Events operation
+ */
+@Value.Immutable
+abstract class AbstractGetApplicationUsageEventRequest {
 
-    @Test
-    public void valid() {
-        PurgeAndReseedApplicationUsageEventsRequest.builder()
-            .build();
-    }
+    /**
+     * The service usage event id
+     */
+    @JsonIgnore
+    abstract String getApplicationUsageEventId();
 
 }

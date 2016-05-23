@@ -16,24 +16,12 @@
 
 package org.cloudfoundry.client.v2.applicationusageevents;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
  * The request payload for the Purge and Reseed Application Usage Events operation
  */
-@Data
-public final class PurgeAndReseedApplicationUsageEventsRequest implements Validatable {
-
-    @Builder
-    PurgeAndReseedApplicationUsageEventsRequest() {
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        return ValidationResult.builder().build();
-    }
+@Value.Immutable
+abstract class AbstractPurgeAndReseedApplicationUsageEventsRequest {
 
 }

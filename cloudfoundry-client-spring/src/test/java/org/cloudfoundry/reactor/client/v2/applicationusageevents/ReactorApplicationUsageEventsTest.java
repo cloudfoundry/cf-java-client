@@ -55,11 +55,6 @@ public final class ReactorApplicationUsageEventsTest {
         }
 
         @Override
-        protected GetApplicationUsageEventRequest getInvalidRequest() {
-            return GetApplicationUsageEventRequest.builder().build();
-        }
-
-        @Override
         protected GetApplicationUsageEventResponse getResponse() {
             return GetApplicationUsageEventResponse.builder()
                 .metadata(Metadata.builder()

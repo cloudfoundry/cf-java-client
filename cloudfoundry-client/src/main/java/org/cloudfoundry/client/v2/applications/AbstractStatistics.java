@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.applications;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -30,54 +31,63 @@ abstract class AbstractStatistics {
      * The application disk quota
      */
     @JsonProperty("disk_quota")
+    @Nullable
     abstract Long getDiskQuota();
 
     /**
      * The application file descriptor quota
      */
     @JsonProperty("fds_quota")
+    @Nullable
     abstract Integer getFdsQuota();
 
     /**
      * The application host
      */
     @JsonProperty("host")
+    @Nullable
     abstract String getHost();
 
     /**
      * The application memory quota
      */
     @JsonProperty("mem_quota")
+    @Nullable
     abstract Long getMemoryQuota();
 
     /**
      * The application name
      */
     @JsonProperty("name")
+    @Nullable
     abstract String getName();
 
     /**
      * The application port
      */
     @JsonProperty("port")
+    @Nullable
     abstract Integer getPort();
 
     /**
      * The application uptime
      */
     @JsonProperty("uptime")
+    @Nullable
     abstract Long getUptime();
 
     /**
      * The application uris
      */
     @JsonProperty("uris")
+    @Nullable
     abstract List<String> getUris();
 
     /**
      * The application usage
      */
     @JsonProperty("usage")
+    @Nullable
     abstract Usage getUsage();
 
 }

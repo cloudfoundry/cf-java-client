@@ -67,6 +67,7 @@ abstract class AbstractApplicationInstanceInfo {
      * The state
      */
     @JsonProperty("state")
+    @Nullable
     abstract String getState();
 
     /**

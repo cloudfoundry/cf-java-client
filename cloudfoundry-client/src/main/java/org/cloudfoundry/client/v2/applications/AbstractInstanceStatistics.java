@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.applications;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 @JsonDeserialize
@@ -28,12 +29,14 @@ abstract class AbstractInstanceStatistics {
      * The instance state
      */
     @JsonProperty("state")
+    @Nullable
     abstract String getState();
 
     /**
      * The instance statistics
      */
     @JsonProperty("stats")
+    @Nullable
     abstract Statistics getStatistics();
 
 }
