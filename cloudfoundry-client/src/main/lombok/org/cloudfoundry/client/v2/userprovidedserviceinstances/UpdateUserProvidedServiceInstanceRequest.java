@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Singular;
 import org.cloudfoundry.Validatable;
@@ -33,6 +34,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 /**
  * The request payload for the Update User Provided Service Instance
  */
+@Data
 public final class UpdateUserProvidedServiceInstanceRequest implements Validatable {
 
     /**

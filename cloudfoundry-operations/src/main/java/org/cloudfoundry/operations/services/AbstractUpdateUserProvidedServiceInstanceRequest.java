@@ -19,36 +19,29 @@ package org.cloudfoundry.operations.services;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
-import java.util.List;
 import java.util.Map;
 
 /**
- * The request options for the update service instance operation
+ * The request options for the update user provided service instance operation
  */
 @Value.Immutable
-abstract class AbstractUpdateServiceInstanceRequest {
+abstract class AbstractUpdateUserProvidedServiceInstanceRequest {
 
     /**
-     * The parameters of the service instance
+     * The credentials of the user provided service instance
      */
     @Nullable
-    abstract Map<String, Object> getParameters();
+    abstract Map<String, Object> getCredentials();
 
     /**
-     * The name of the required plan
+     * he url for the syslog_drain to direct to
      */
     @Nullable
-    abstract String getPlanName();
+    abstract String getSyslogDrainUrl();
 
     /**
-     * The name of the service instance
+     * The name of the user provided service instance
      */
-    abstract String getServiceInstanceName();
-
-    /**
-     * The tags
-     */
-    @Nullable
-    abstract List<String> getTags();
+    abstract String getUserProvidedServiceInstanceName();
 
 }

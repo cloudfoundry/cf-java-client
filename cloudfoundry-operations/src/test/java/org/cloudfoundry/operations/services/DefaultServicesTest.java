@@ -70,6 +70,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceServicesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServicesResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceEntity;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
 import org.cloudfoundry.util.test.TestSubscriber;
@@ -739,6 +740,24 @@ public final class DefaultServicesTest {
                     .build()));
     }
 
+    private static void requestListUserProvidedServiceInstances(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
+        when(cloudFoundryClient.spaces()
+            .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
+                .page(1)
+                .spaceId(spaceId)
+                .returnUserProvidedServiceInstances(true)
+                .name(serviceName)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListSpaceServiceInstancesResponse.builder())
+                    .resource(fill(UnionServiceInstanceResource.builder(), "user-provided-service-instance-")
+                        .entity(fill(UnionServiceInstanceEntity.builder())
+                            .type("user_provided_service_instance")
+                            .build())
+                        .build())
+                    .build()));
+    }
+
     private static void requestRenameServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String newName) {
         when(cloudFoundryClient.serviceInstances()
             .update(org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest.builder()
@@ -761,6 +780,18 @@ public final class DefaultServicesTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(UpdateServiceInstanceResponse.builder())
+                    .build()));
+    }
+
+    private static void requestUpdateUserProvidedServiceInstance(CloudFoundryClient cloudFoundryClient, Map<String, Object> credentials, String syslogDrainUrl, String userProvidedServiceInstanceId) {
+        when(cloudFoundryClient.userProvidedServiceInstances()
+            .update(org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceRequest.builder()
+                .credentials(credentials)
+                .syslogDrainUrl(syslogDrainUrl)
+                .userProvidedServiceInstanceId(userProvidedServiceInstanceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(UpdateUserProvidedServiceInstanceResponse.builder())
                     .build()));
     }
 
@@ -1753,7 +1784,7 @@ public final class DefaultServicesTest {
         @Override
         protected Mono<Void> invoke() {
             return this.services
-                .update(UpdateServiceInstanceRequest.builder()
+                .updateInstance(UpdateServiceInstanceRequest.builder()
                     .planName("test-plan")
                     .parameter("test-parameter-key", "test-parameter-value")
                     .serviceInstanceName("test-service")
@@ -1784,7 +1815,7 @@ public final class DefaultServicesTest {
         @Override
         protected Mono<Void> invoke() {
             return this.services
-                .update(UpdateServiceInstanceRequest.builder()
+                .updateInstance(UpdateServiceInstanceRequest.builder()
                     .planName("test-plan")
                     .serviceInstanceName("test-service")
                     .tag("test-tag")
@@ -1810,7 +1841,7 @@ public final class DefaultServicesTest {
         @Override
         protected Mono<Void> invoke() {
             return this.services
-                .update(UpdateServiceInstanceRequest.builder()
+                .updateInstance(UpdateServiceInstanceRequest.builder()
                     .parameter("test-parameter-key", "test-parameter-value")
                     .serviceInstanceName("test-service")
                     .tag("test-tag")
@@ -1841,7 +1872,7 @@ public final class DefaultServicesTest {
         @Override
         protected Mono<Void> invoke() {
             return this.services
-                .update(UpdateServiceInstanceRequest.builder()
+                .updateInstance(UpdateServiceInstanceRequest.builder()
                     .planName("test-plan")
                     .parameter("test-parameter-key", "test-parameter-value")
                     .serviceInstanceName("test-service")
@@ -1873,7 +1904,7 @@ public final class DefaultServicesTest {
         @Override
         protected Mono<Void> invoke() {
             return this.services
-                .update(UpdateServiceInstanceRequest.builder()
+                .updateInstance(UpdateServiceInstanceRequest.builder()
                     .planName("test-plan")
                     .parameter("test-parameter-key", "test-parameter-value")
                     .serviceInstanceName("test-service")
@@ -1905,7 +1936,7 @@ public final class DefaultServicesTest {
         @Override
         protected Mono<Void> invoke() {
             return this.services
-                .update(UpdateServiceInstanceRequest.builder()
+                .updateInstance(UpdateServiceInstanceRequest.builder()
                     .planName("test-plan")
                     .parameter("test-parameter-key", "test-parameter-value")
                     .serviceInstanceName("test-service")
@@ -1934,7 +1965,7 @@ public final class DefaultServicesTest {
         @Override
         protected Mono<Void> invoke() {
             return this.services
-                .update(UpdateServiceInstanceRequest.builder()
+                .updateInstance(UpdateServiceInstanceRequest.builder()
                     .planName("test-plan")
                     .parameter("test-parameter-key", "test-parameter-value")
                     .serviceInstanceName("test-service")
@@ -1962,10 +1993,63 @@ public final class DefaultServicesTest {
         @Override
         protected Mono<Void> invoke() {
             return this.services
-                .update(UpdateServiceInstanceRequest.builder()
+                .updateInstance(UpdateServiceInstanceRequest.builder()
                     .parameter("test-parameter-key", "test-parameter-value")
                     .serviceInstanceName("test-service")
                     .tag("test-tag")
+                    .build());
+        }
+
+    }
+
+    public static final class updateUserProvidedService extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestListUserProvidedServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID);
+            requestUpdateUserProvidedServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-credential-key", "test-credential-value"), "syslog-url",
+                "test-user-provided-service-instance-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.services
+                .updateUserProvidedInstance(UpdateUserProvidedServiceInstanceRequest.builder()
+                    .userProvidedServiceInstanceName("test-service")
+                    .credential("test-credential-key", "test-credential-value")
+                    .syslogDrainUrl("syslog-url")
+                    .build());
+        }
+
+    }
+
+    public static final class updateUserProvidedServiceNotUserProvided extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-service-plan-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            testSubscriber
+                .assertError(IllegalArgumentException.class, "User provided service instance test-service does not exist");
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.services
+                .updateUserProvidedInstance(UpdateUserProvidedServiceInstanceRequest.builder()
+                    .userProvidedServiceInstanceName("test-service")
                     .build());
         }
 
