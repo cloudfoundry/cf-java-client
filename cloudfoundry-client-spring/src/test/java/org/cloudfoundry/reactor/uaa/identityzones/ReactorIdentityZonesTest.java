@@ -27,8 +27,16 @@ import org.cloudfoundry.uaa.identityzones.DeleteIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzones.GetIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzones.GetIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzones.IdentityZone;
+import org.cloudfoundry.uaa.identityzones.IdentityZoneConfiguration;
+import org.cloudfoundry.uaa.identityzones.KeyInformation;
+import org.cloudfoundry.uaa.identityzones.Links;
 import org.cloudfoundry.uaa.identityzones.ListIdentityZonesRequest;
 import org.cloudfoundry.uaa.identityzones.ListIdentityZonesResponse;
+import org.cloudfoundry.uaa.identityzones.LogoutLink;
+import org.cloudfoundry.uaa.identityzones.Prompt;
+import org.cloudfoundry.uaa.identityzones.SamlConfiguration;
+import org.cloudfoundry.uaa.identityzones.SelfServiceLink;
+import org.cloudfoundry.uaa.identityzones.TokenPolicy;
 import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneResponse;
 import reactor.core.publisher.Mono;
@@ -63,23 +71,114 @@ public final class ReactorIdentityZonesTest {
         @Override
         protected CreateIdentityZoneResponse getResponse() {
             return CreateIdentityZoneResponse.builder()
-                .createdAt(1426258488910L)
-                .description("Like the Twilight Zone but tastier[testzone1].")
-                .id("testzone1")
-                .lastModified(1461972047048L)
-                .name("The Twiglet Zone[testzone1]")
-                .subdomain("testzone1")
+                .createdAt(1463595920184L)
+                .description("Like the Twilight Zone but tastier.")
+                .id("twiglet-create")
+                .lastModified(1463595920184L)
+                .name("The Twiglet Zone")
+                .subdomain("twiglet-create")
                 .version(0)
+                .configuration(IdentityZoneConfiguration.builder()
+                    .tokenPolicy(TokenPolicy.builder()
+                        .accessTokenValidity(-1)
+                        .jwtRevokable(false)
+                        .refreshTokenValidity(-1)
+                        .key("exampleKeyId", KeyInformation.builder()
+                            .signingKey("s1gNiNg.K3y/t3XT")
+                            .build())
+                        .build())
+                    .samlConfiguration(SamlConfiguration.builder()
+                        .assertionSigned(true)
+                        .requestSigned(true)
+                        .wantAssertionSigned(false)
+                        .wantPartnerAuthenticationRequestSigned(false)
+                        .assertionTimeToLive(600)
+                        .build())
+                    .links(Links.builder()
+                        .logout(LogoutLink.builder()
+                            .redirectUrl("/login")
+                            .redirectParameterName("redirect")
+                            .disableRedirectParameter(true)
+                            .build())
+                        .selfService(SelfServiceLink.builder()
+                            .selfServiceLinksEnabled(true)
+                            .signupLink("/create_account")
+                            .resetPasswordLink("/forgot_password")
+                            .build())
+                        .build())
+                    .prompt(Prompt.builder()
+                        .fieldName("username")
+                        .text("Email")
+                        .fieldType("text")
+                        .build())
+                    .prompt(Prompt.builder()
+                        .fieldName("password")
+                        .text("Password")
+                        .fieldType("password")
+                        .build())
+                    .prompt(Prompt.builder()
+                        .fieldName("passcode")
+                        .text("One Time Code (Get on at /passcode)")
+                        .fieldType("password")
+                        .build())
+                    .ldapDiscoveryEnabled(false)
+                    .build())
                 .build();
         }
 
         @Override
         protected CreateIdentityZoneRequest getValidRequest() throws Exception {
             return CreateIdentityZoneRequest.builder()
-                .description("Like the Twilight Zone but tastier[testzone1].")
-                .identityZoneId("testzone1")
-                .name("The Twiglet Zone[testzone1]")
-                .subdomain("testzone1")
+                .description("Like the Twilight Zone but tastier.")
+                .identityZoneId("twiglet-create-response")
+                .name("The Twiglet Zone")
+                .subdomain("twiglet-create-response")
+                .version(0)
+                .configuration(IdentityZoneConfiguration.builder()
+                    .tokenPolicy(TokenPolicy.builder()
+                        .accessTokenValidity(-1)
+                        .jwtRevokable(false)
+                        .refreshTokenValidity(-1)
+                        .key("exampleKeyId", KeyInformation.builder()
+                            .signingKey("s1gNiNg.K3y/t3XT")
+                            .build())
+                        .build())
+                    .samlConfiguration(SamlConfiguration.builder()
+                        .assertionSigned(true)
+                        .requestSigned(true)
+                        .wantAssertionSigned(false)
+                        .wantPartnerAuthenticationRequestSigned(false)
+                        .assertionTimeToLive(600)
+                        .build())
+                    .links(Links.builder()
+                        .logout(LogoutLink.builder()
+                            .redirectUrl("/login")
+                            .redirectParameterName("redirect")
+                            .disableRedirectParameter(true)
+                            .build())
+                        .selfService(SelfServiceLink.builder()
+                            .selfServiceLinksEnabled(true)
+                            .signupLink("/create_account")
+                            .resetPasswordLink("/forgot_password")
+                            .build())
+                        .build())
+                    .prompt(Prompt.builder()
+                        .fieldName("username")
+                        .fieldType("text")
+                        .text("Email")
+                        .build())
+                    .prompt(Prompt.builder()
+                        .fieldName("password")
+                        .fieldType("password")
+                        .text("Password")
+                        .build())
+                    .prompt(Prompt.builder()
+                        .fieldName("passcode")
+                        .fieldType("password")
+                        .text("One Time Code (Get on at /passcode)")
+                        .build())
+                    .ldapDiscoveryEnabled(false)
+                    .build())
                 .build();
         }
 

@@ -1,6 +1,52 @@
 {
-  "id": "testzone1",
-  "subdomain": "testzone1",
-  "name": "The Twiglet Zone[testzone1]",
-  "description": "Like the Twilight Zone but tastier[testzone1]."
+  "config" : {
+    "idpDiscoveryEnabled" : false,
+    "links" : {
+      "logout" : {
+        "disableRedirectParameter" : true,
+        "redirectParameterName" : "redirect",
+        "redirectUrl" : "/login"
+      },
+      "selfService" : {
+        "passwd" : "/forgot_password",
+        "selfServiceLinksEnabled" : true,
+        "signup" : "/create_account"
+      }
+    },
+    "prompts" : [ {
+      "name" : "username",
+      "type" : "text",
+      "text" : "Email"
+    }, {
+      "name" : "password",
+      "type" : "password",
+      "text" : "Password"
+    }, {
+      "name" : "passcode",
+      "type" : "password",
+      "text" : "One Time Code (Get on at /passcode)"
+    } ],
+    "samlConfig" : {
+      "assertionSigned" : true,
+      "assertionTimeToLiveSeconds" : 600,
+      "requestSigned" : true,
+      "wantAssertionSigned" : false,
+      "wantAuthnRequestSigned" : false
+    },
+    "tokenPolicy" : {
+      "accessTokenValidity" : -1,
+      "jwtRevocable" : false,
+      "keys" : {
+        "exampleKeyId" : {
+          "signingKey" : "s1gNiNg.K3y/t3XT"
+        }
+      },
+      "refreshTokenValidity" : -1
+    }
+  },
+  "description" : "Like the Twilight Zone but tastier.",
+  "id" : "twiglet-create-response",
+  "name" : "The Twiglet Zone",
+  "subdomain" : "twiglet-create-response",
+  "version" : 0
 }

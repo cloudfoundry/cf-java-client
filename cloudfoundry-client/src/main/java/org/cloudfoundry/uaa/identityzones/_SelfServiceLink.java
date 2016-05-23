@@ -17,53 +17,36 @@
 package org.cloudfoundry.uaa.identityzones;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * The request payload for the create identity zone operation
+ * The request payload for the identity zone self service link
  */
+@JsonDeserialize
 @Value.Immutable
-abstract class _CreateIdentityZoneRequest {
+abstract class _SelfServiceLink {
 
     /**
-     * The configuration
+     * Where users are directed upon clicking the password reset link.
      */
-    @JsonProperty("config")
+    @JsonProperty("passwd")
     @Nullable
-    abstract IdentityZoneConfiguration getConfiguration();
+    abstract String getResetPasswordLink();
 
     /**
-     * The description of the identity zone
+     * Whether or not users are allowed to sign up or reset their passwords via the UI.
      */
-    @JsonProperty("description")
+    @JsonProperty("selfServiceLinksEnabled")
     @Nullable
-    abstract String getDescription();
+    abstract Boolean getSelfServiceLinksEnabled();
 
     /**
-     * The id of the identity zone. When not provided, an identifier will be generated
+     * Where users are directed upon clicking the account creation link.
      */
-    @JsonProperty("id")
+    @JsonProperty("signup")
     @Nullable
-    abstract String getIdentityZoneId();
-
-    /**
-     * The name of the identity zone
-     */
-    @JsonProperty("name")
-    abstract String getName();
-
-    /**
-     * The unique subdomain. It will be converted into lowercase upon creation.
-     */
-    @JsonProperty("subdomain")
-    abstract String getSubdomain();
-
-    /**
-     * The version of the identity zone
-     */
-    @JsonProperty("version")
-    @Nullable
-    abstract Integer getVersion();
+    abstract String getSignupLink();
 
 }

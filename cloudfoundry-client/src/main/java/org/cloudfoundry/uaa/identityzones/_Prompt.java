@@ -17,53 +17,36 @@
 package org.cloudfoundry.uaa.identityzones;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * The request payload for the create identity zone operation
+ * The request payload for the identity zone saml configuration
  */
+@JsonDeserialize
 @Value.Immutable
-abstract class _CreateIdentityZoneRequest {
+abstract class _Prompt {
 
     /**
-     * The configuration
-     */
-    @JsonProperty("config")
-    @Nullable
-    abstract IdentityZoneConfiguration getConfiguration();
-
-    /**
-     * The description of the identity zone
-     */
-    @JsonProperty("description")
-    @Nullable
-    abstract String getDescription();
-
-    /**
-     * The id of the identity zone. When not provided, an identifier will be generated
-     */
-    @JsonProperty("id")
-    @Nullable
-    abstract String getIdentityZoneId();
-
-    /**
-     * The name of the identity zone
+     * Name of field.
      */
     @JsonProperty("name")
-    abstract String getName();
-
-    /**
-     * The unique subdomain. It will be converted into lowercase upon creation.
-     */
-    @JsonProperty("subdomain")
-    abstract String getSubdomain();
-
-    /**
-     * The version of the identity zone
-     */
-    @JsonProperty("version")
     @Nullable
-    abstract Integer getVersion();
+    abstract String getFieldName();
+
+    /**
+     * What kind of field this is (e.g. text or password)
+     */
+    @JsonProperty("type")
+    @Nullable
+    abstract String getFieldType();
+
+    /**
+     * Actual text displayed on prompt for field.
+     */
+    @JsonProperty("text")
+    @Nullable
+    abstract String getText();
 
 }
