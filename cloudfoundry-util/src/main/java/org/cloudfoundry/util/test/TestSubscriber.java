@@ -32,6 +32,7 @@ import java.time.Duration;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
@@ -48,6 +49,8 @@ public final class TestSubscriber<T> implements Subscriber<T> {
     private final Queue<Consumer<T>> expectations = new LinkedList<>();
 
     private final CountDownLatch latch = new CountDownLatch(1);
+
+    private final AtomicBoolean subscribed = new AtomicBoolean(false);
 
     private Integer countExpectation;
 
@@ -132,6 +135,7 @@ public final class TestSubscriber<T> implements Subscriber<T> {
 
     @Override
     public void onSubscribe(Subscription s) {
+        this.subscribed.set(true);
         this.subscription = s;
         this.startTime = System.currentTimeMillis();
 
@@ -169,6 +173,10 @@ public final class TestSubscriber<T> implements Subscriber<T> {
     }
 
     public void verify(Duration duration) throws InterruptedException {
+        if (!this.subscribed.get()) {
+            throw new IllegalStateException("Subscriber not initialized");
+        }
+
         if (!this.latch.await(duration.toMillis(), MILLISECONDS)) {
             throw new IllegalStateException("Subscriber timed out");
         }
