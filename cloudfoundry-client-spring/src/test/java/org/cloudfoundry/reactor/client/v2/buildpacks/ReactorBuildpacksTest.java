@@ -216,11 +216,6 @@ public final class ReactorBuildpacksTest {
         }
 
         @Override
-        protected ListBuildpacksRequest getInvalidRequest() {
-            return null;
-        }
-
-        @Override
         protected ListBuildpacksResponse getResponse() {
             return ListBuildpacksResponse.builder()
                 .totalResults(3)

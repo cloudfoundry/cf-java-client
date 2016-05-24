@@ -110,11 +110,6 @@ public final class ReactorApplicationUsageEventsTest {
         }
 
         @Override
-        protected ListApplicationUsageEventsRequest getInvalidRequest() {
-            return null;
-        }
-
-        @Override
         protected ListApplicationUsageEventsResponse getResponse() {
             return ListApplicationUsageEventsResponse.builder()
                 .nextUrl("/v2/app_usage_events?after_guid=f1d8ddec-d36a-4670-acb8-6082a1f1a95f&order-direction=asc&page=2&results-per-page=1")
@@ -172,11 +167,6 @@ public final class ReactorApplicationUsageEventsTest {
                     .status(NO_CONTENT)
                     .build())
                 .build();
-        }
-
-        @Override
-        protected PurgeAndReseedApplicationUsageEventsRequest getInvalidRequest() {
-            return null;
         }
 
         @Override

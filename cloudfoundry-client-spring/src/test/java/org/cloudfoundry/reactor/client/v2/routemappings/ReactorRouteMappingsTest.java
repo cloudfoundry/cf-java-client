@@ -64,11 +64,6 @@ public final class ReactorRouteMappingsTest {
         }
 
         @Override
-        protected CreateRouteMappingRequest getInvalidRequest() {
-            return CreateRouteMappingRequest.builder().build();
-        }
-
-        @Override
         protected CreateRouteMappingResponse getResponse() {
             return CreateRouteMappingResponse.builder()
                 .metadata(Metadata.builder()
@@ -118,11 +113,6 @@ public final class ReactorRouteMappingsTest {
         }
 
         @Override
-        protected DeleteRouteMappingRequest getInvalidRequest() {
-            return DeleteRouteMappingRequest.builder().build();
-        }
-
-        @Override
         protected DeleteRouteMappingResponse getResponse() {
             return null;
         }
@@ -154,12 +144,6 @@ public final class ReactorRouteMappingsTest {
                     .status(ACCEPTED)
                     .payload("fixtures/client/v2/route_mappings/DELETE_{id}_async_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected DeleteRouteMappingRequest getInvalidRequest() {
-            return DeleteRouteMappingRequest.builder()
                 .build();
         }
 
@@ -211,11 +195,6 @@ public final class ReactorRouteMappingsTest {
         }
 
         @Override
-        protected GetRouteMappingRequest getInvalidRequest() {
-            return GetRouteMappingRequest.builder().build();
-        }
-
-        @Override
         protected GetRouteMappingResponse getResponse() {
             return GetRouteMappingResponse.builder()
                 .metadata(Metadata.builder()
@@ -261,11 +240,6 @@ public final class ReactorRouteMappingsTest {
                     .payload("fixtures/client/v2/route_mappings/GET_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected ListRouteMappingsRequest getInvalidRequest() {
-            return null;
         }
 
         @Override

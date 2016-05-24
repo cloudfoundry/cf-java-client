@@ -139,12 +139,6 @@ public final class ReactorSpacesTest {
         }
 
         @Override
-        protected AssociateSpaceAuditorRequest getInvalidRequest() {
-            return AssociateSpaceAuditorRequest.builder()
-                .build();
-        }
-
-        @Override
         protected AssociateSpaceAuditorResponse getResponse() {
             return AssociateSpaceAuditorResponse.builder()
                 .metadata(Metadata.builder()
@@ -201,12 +195,6 @@ public final class ReactorSpacesTest {
                     .status(OK)
                     .payload("fixtures/client/v2/spaces/PUT_{id}_auditors_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected AssociateSpaceAuditorByUsernameRequest getInvalidRequest() {
-            return AssociateSpaceAuditorByUsernameRequest.builder()
                 .build();
         }
 
@@ -270,12 +258,6 @@ public final class ReactorSpacesTest {
         }
 
         @Override
-        protected AssociateSpaceDeveloperRequest getInvalidRequest() {
-            return AssociateSpaceDeveloperRequest.builder()
-                .build();
-        }
-
-        @Override
         protected AssociateSpaceDeveloperResponse getResponse() {
             return AssociateSpaceDeveloperResponse.builder()
                 .metadata(Metadata.builder()
@@ -335,12 +317,6 @@ public final class ReactorSpacesTest {
         }
 
         @Override
-        protected AssociateSpaceManagerRequest getInvalidRequest() {
-            return AssociateSpaceManagerRequest.builder()
-                .build();
-        }
-
-        @Override
         protected AssociateSpaceManagerResponse getResponse() {
             return AssociateSpaceManagerResponse.builder()
                 .metadata(Metadata.builder()
@@ -396,12 +372,6 @@ public final class ReactorSpacesTest {
                     .status(OK)
                     .payload("fixtures/client/v2/spaces/PUT_{id}_security_group_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected AssociateSpaceSecurityGroupRequest getInvalidRequest() {
-            return AssociateSpaceSecurityGroupRequest.builder()
                 .build();
         }
 
@@ -466,12 +436,6 @@ public final class ReactorSpacesTest {
         }
 
         @Override
-        protected AssociateSpaceDeveloperByUsernameRequest getInvalidRequest() {
-            return AssociateSpaceDeveloperByUsernameRequest.builder()
-                .build();
-        }
-
-        @Override
         protected AssociateSpaceDeveloperByUsernameResponse getResponse() {
             return AssociateSpaceDeveloperByUsernameResponse.builder()
                 .metadata(Metadata.builder()
@@ -528,12 +492,6 @@ public final class ReactorSpacesTest {
                     .status(OK)
                     .payload("fixtures/client/v2/spaces/PUT_{id}_managers_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected AssociateSpaceManagerByUsernameRequest getInvalidRequest() {
-            return AssociateSpaceManagerByUsernameRequest.builder()
                 .build();
         }
 
@@ -598,12 +556,6 @@ public final class ReactorSpacesTest {
         }
 
         @Override
-        protected CreateSpaceRequest getInvalidRequest() {
-            return CreateSpaceRequest.builder()
-                .build();
-        }
-
-        @Override
         protected CreateSpaceResponse getResponse() {
             return CreateSpaceResponse.builder()
                 .metadata(Metadata.builder()
@@ -662,12 +614,6 @@ public final class ReactorSpacesTest {
         }
 
         @Override
-        protected DeleteSpaceRequest getInvalidRequest() {
-            return DeleteSpaceRequest.builder()
-                .build();
-        }
-
-        @Override
         protected DeleteSpaceResponse getResponse() {
             return null;
         }
@@ -700,12 +646,6 @@ public final class ReactorSpacesTest {
                     .status(ACCEPTED)
                     .payload("fixtures/client/v2/spaces/DELETE_{id}_async_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected DeleteSpaceRequest getInvalidRequest() {
-            return DeleteSpaceRequest.builder()
                 .build();
         }
 
@@ -753,12 +693,6 @@ public final class ReactorSpacesTest {
                     .status(OK)
                     .payload("fixtures/client/v2/spaces/GET_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected GetSpaceRequest getInvalidRequest() {
-            return GetSpaceRequest.builder()
                 .build();
         }
 
@@ -817,12 +751,6 @@ public final class ReactorSpacesTest {
                     .status(OK)
                     .payload("fixtures/client/v2/spaces/GET_{id}_summary_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected GetSpaceSummaryRequest getInvalidRequest() {
-            return GetSpaceSummaryRequest.builder()
                 .build();
         }
 
@@ -919,11 +847,6 @@ public final class ReactorSpacesTest {
         }
 
         @Override
-        protected ListSpacesRequest getInvalidRequest() {
-            return null;
-        }
-
-        @Override
         protected ListSpacesResponse getResponse() {
             return ListSpacesResponse.builder()
                 .totalResults(1)
@@ -984,11 +907,6 @@ public final class ReactorSpacesTest {
                     .payload("fixtures/client/v2/spaces/GET_{id}_apps_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected ListSpaceApplicationsRequest getInvalidRequest() {
-            return null;
         }
 
         @Override
@@ -1066,12 +984,6 @@ public final class ReactorSpacesTest {
         }
 
         @Override
-        protected ListSpaceAuditorsRequest getInvalidRequest() {
-            return ListSpaceAuditorsRequest.builder()
-                .build();
-        }
-
-        @Override
         protected ListSpaceAuditorsResponse getResponse() {
             return ListSpaceAuditorsResponse.builder()
                 .totalResults(1)
@@ -1127,12 +1039,6 @@ public final class ReactorSpacesTest {
                     .status(OK)
                     .payload("fixtures/client/v2/spaces/GET_{id}_developers_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected ListSpaceDevelopersRequest getInvalidRequest() {
-            return ListSpaceDevelopersRequest.builder()
                 .build();
         }
 
@@ -1197,12 +1103,6 @@ public final class ReactorSpacesTest {
         }
 
         @Override
-        protected ListSpaceDomainsRequest getInvalidRequest() {
-            return ListSpaceDomainsRequest.builder()
-                .build();
-        }
-
-        @Override
         protected ListSpaceDomainsResponse getResponse() {
             return ListSpaceDomainsResponse.builder()
                 .totalResults(2)
@@ -1258,12 +1158,6 @@ public final class ReactorSpacesTest {
                     .status(OK)
                     .payload("fixtures/client/v2/spaces/GET_{id}_events_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected ListSpaceEventsRequest getInvalidRequest() {
-            return ListSpaceEventsRequest.builder()
                 .build();
         }
 
@@ -1332,12 +1226,6 @@ public final class ReactorSpacesTest {
         }
 
         @Override
-        protected ListSpaceManagersRequest getInvalidRequest() {
-            return ListSpaceManagersRequest.builder()
-                .build();
-        }
-
-        @Override
         protected ListSpaceManagersResponse getResponse() {
             return ListSpaceManagersResponse.builder()
                 .totalResults(1)
@@ -1394,12 +1282,6 @@ public final class ReactorSpacesTest {
                     .status(OK)
                     .payload("fixtures/client/v2/spaces/GET_{id}_routes_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected ListSpaceRoutesRequest getInvalidRequest() {
-            return ListSpaceRoutesRequest.builder()
                 .build();
         }
 
@@ -1462,12 +1344,6 @@ public final class ReactorSpacesTest {
         }
 
         @Override
-        protected ListSpaceSecurityGroupsRequest getInvalidRequest() {
-            return ListSpaceSecurityGroupsRequest.builder()
-                .build();
-        }
-
-        @Override
         protected ListSpaceSecurityGroupsResponse getResponse() {
             return ListSpaceSecurityGroupsResponse.builder()
                 .totalResults(1)
@@ -1522,12 +1398,6 @@ public final class ReactorSpacesTest {
                     .status(OK)
                     .payload("fixtures/client/v2/spaces/GET_{id}_service_instances_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected ListSpaceServiceInstancesRequest getInvalidRequest() {
-            return ListSpaceServiceInstancesRequest.builder()
                 .build();
         }
 
@@ -1593,12 +1463,6 @@ public final class ReactorSpacesTest {
         }
 
         @Override
-        protected ListSpaceServicesRequest getInvalidRequest() {
-            return ListSpaceServicesRequest.builder()
-                .build();
-        }
-
-        @Override
         protected ListSpaceServicesResponse getResponse() {
             return ListSpaceServicesResponse.builder()
                 .totalResults(1)
@@ -1652,13 +1516,6 @@ public final class ReactorSpacesTest {
                     .status(OK)
                     .payload("fixtures/client/v2/spaces/GET_{id}_user_roles_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected ListSpaceUserRolesRequest getInvalidRequest() {
-            return ListSpaceUserRolesRequest.builder()
-                .page(-1)
                 .build();
         }
 
@@ -1725,12 +1582,6 @@ public final class ReactorSpacesTest {
         }
 
         @Override
-        protected RemoveSpaceAuditorRequest getInvalidRequest() {
-            return RemoveSpaceAuditorRequest.builder()
-                .build();
-        }
-
-        @Override
         protected Void getResponse() {
             return null;
         }
@@ -1765,12 +1616,6 @@ public final class ReactorSpacesTest {
                     .status(OK)
                     .payload("fixtures/client/v2/spaces/DELETE_{id}_auditors_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected RemoveSpaceAuditorByUsernameRequest getInvalidRequest() {
-            return RemoveSpaceAuditorByUsernameRequest.builder()
                 .build();
         }
 
@@ -1833,12 +1678,6 @@ public final class ReactorSpacesTest {
         }
 
         @Override
-        protected RemoveSpaceDeveloperRequest getInvalidRequest() {
-            return RemoveSpaceDeveloperRequest.builder()
-                .build();
-        }
-
-        @Override
         protected Void getResponse() {
             return null;
         }
@@ -1872,12 +1711,6 @@ public final class ReactorSpacesTest {
                     .status(OK)
                     .payload("fixtures/client/v2/spaces/DELETE_{id}_developers_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected RemoveSpaceDeveloperByUsernameRequest getInvalidRequest() {
-            return RemoveSpaceDeveloperByUsernameRequest.builder()
                 .build();
         }
 
@@ -1940,12 +1773,6 @@ public final class ReactorSpacesTest {
         }
 
         @Override
-        protected RemoveSpaceManagerRequest getInvalidRequest() {
-            return RemoveSpaceManagerRequest.builder()
-                .build();
-        }
-
-        @Override
         protected Void getResponse() {
             return null;
         }
@@ -1980,12 +1807,6 @@ public final class ReactorSpacesTest {
                     .status(OK)
                     .payload("fixtures/client/v2/spaces/DELETE_{id}_managers_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected RemoveSpaceManagerByUsernameRequest getInvalidRequest() {
-            return RemoveSpaceManagerByUsernameRequest.builder()
                 .build();
         }
 
@@ -2048,12 +1869,6 @@ public final class ReactorSpacesTest {
         }
 
         @Override
-        protected RemoveSpaceSecurityGroupRequest getInvalidRequest() {
-            return RemoveSpaceSecurityGroupRequest.builder()
-                .build();
-        }
-
-        @Override
         protected Void getResponse() {
             return null;
         }
@@ -2088,12 +1903,6 @@ public final class ReactorSpacesTest {
                     .status(OK)
                     .payload("fixtures/client/v2/spaces/PUT_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected UpdateSpaceRequest getInvalidRequest() {
-            return UpdateSpaceRequest.builder()
                 .build();
         }
 

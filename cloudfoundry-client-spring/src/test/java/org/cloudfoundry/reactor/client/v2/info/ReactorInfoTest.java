@@ -48,11 +48,6 @@ public final class ReactorInfoTest {
         }
 
         @Override
-        protected GetInfoRequest getInvalidRequest() {
-            return null;
-        }
-
-        @Override
         protected GetInfoResponse getResponse() {
             return GetInfoResponse.builder()
                 .name("vcap")

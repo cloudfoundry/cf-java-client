@@ -54,12 +54,6 @@ public final class ReactorFeatureFlagsTest {
         }
 
         @Override
-        protected GetFeatureFlagRequest getInvalidRequest() {
-            return GetFeatureFlagRequest.builder()
-                .build();
-        }
-
-        @Override
         protected GetFeatureFlagResponse getResponse() {
             return GetFeatureFlagResponse.builder()
                 .name("app_scaling")
@@ -96,12 +90,6 @@ public final class ReactorFeatureFlagsTest {
                     .status(OK)
                     .payload("fixtures/client/v2/feature_flags/GET_set_user_roles_flag_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected GetFeatureFlagRequest getInvalidRequest() {
-            return GetFeatureFlagRequest.builder()
                 .build();
         }
 
@@ -143,11 +131,6 @@ public final class ReactorFeatureFlagsTest {
                     .payload("fixtures/client/v2/feature_flags/GET_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected ListFeatureFlagsRequest getInvalidRequest() {
-            return null;
         }
 
         @Override
@@ -256,12 +239,6 @@ public final class ReactorFeatureFlagsTest {
                     .status(OK)
                     .payload("fixtures/client/v2/feature_flags/PUT_user_org_creation_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected SetFeatureFlagRequest getInvalidRequest() {
-            return SetFeatureFlagRequest.builder()
                 .build();
         }
 

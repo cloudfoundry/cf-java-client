@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.servicekeys;
 
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyRequest;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyResponse;
 import org.cloudfoundry.client.v2.servicekeys.DeleteServiceKeyRequest;
@@ -38,8 +39,6 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-import org.cloudfoundry.client.v2.Metadata;
-
 public final class ReactorServiceKeysTest {
 
     public static final class Create extends AbstractClientApiTest<CreateServiceKeyRequest, CreateServiceKeyResponse> {
@@ -58,11 +57,6 @@ public final class ReactorServiceKeysTest {
                     .payload("fixtures/client/v2/service_keys/POST_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected CreateServiceKeyRequest getInvalidRequest() {
-            return CreateServiceKeyRequest.builder().build();
         }
 
         @Override
@@ -113,11 +107,6 @@ public final class ReactorServiceKeysTest {
         }
 
         @Override
-        protected DeleteServiceKeyRequest getInvalidRequest() {
-            return DeleteServiceKeyRequest.builder().build();
-        }
-
-        @Override
         protected Void getResponse() {
             return null;
         }
@@ -150,11 +139,6 @@ public final class ReactorServiceKeysTest {
                     .payload("fixtures/client/v2/service_keys/GET_{id}_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected GetServiceKeyRequest getInvalidRequest() {
-            return GetServiceKeyRequest.builder().build();
         }
 
         @Override
@@ -202,11 +186,6 @@ public final class ReactorServiceKeysTest {
                     .payload("fixtures/client/v2/service_keys/GET_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected ListServiceKeysRequest getInvalidRequest() {
-            return null;
         }
 
         @Override

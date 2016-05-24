@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.events;
 
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.events.EventEntity;
 import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.events.GetEventRequest;
@@ -33,8 +34,6 @@ import java.util.Collections;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-import org.cloudfoundry.client.v2.Metadata;
-
 public final class ReactorEventsTest {
 
     public static final class Get extends AbstractClientApiTest<GetEventRequest, GetEventResponse> {
@@ -51,12 +50,6 @@ public final class ReactorEventsTest {
                     .status(OK)
                     .payload("fixtures/client/v2/events/GET_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected GetEventRequest getInvalidRequest() {
-            return GetEventRequest.builder()
                 .build();
         }
 
@@ -113,11 +106,6 @@ public final class ReactorEventsTest {
                     .payload("fixtures/client/v2/events/GET_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected ListEventsRequest getInvalidRequest() {
-            return null;
         }
 
         @Override

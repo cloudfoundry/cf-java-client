@@ -106,12 +106,6 @@ public final class ReactorApplicationsV3Test {
         }
 
         @Override
-        protected AssignApplicationDropletRequest getInvalidRequest() {
-            return AssignApplicationDropletRequest.builder()
-                .build();
-        }
-
-        @Override
         protected AssignApplicationDropletResponse getResponse() {
             return AssignApplicationDropletResponse.builder()
                 .id("guid-a08fd981-137f-4a8f-9c32-6be10007edde")
@@ -192,12 +186,6 @@ public final class ReactorApplicationsV3Test {
                     .status(ACCEPTED)
                     .payload("fixtures/client/v3/apps/PUT_{id}_tasks_{id}_cancel_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected CancelApplicationTaskRequest getInvalidRequest() {
-            return CancelApplicationTaskRequest.builder()
                 .build();
         }
 
@@ -348,12 +336,6 @@ public final class ReactorApplicationsV3Test {
         }
 
         @Override
-        protected DeleteApplicationRequest getInvalidRequest() {
-            return DeleteApplicationRequest.builder()
-                .build();
-        }
-
-        @Override
         protected Void getResponse() {
             return null;
         }
@@ -385,12 +367,6 @@ public final class ReactorApplicationsV3Test {
                 .response(TestResponse.builder()
                     .status(NO_CONTENT)
                     .build())
-                .build();
-        }
-
-        @Override
-        protected TerminateApplicationInstanceRequest getInvalidRequest() {
-            return TerminateApplicationInstanceRequest.builder()
                 .build();
         }
 
@@ -429,12 +405,6 @@ public final class ReactorApplicationsV3Test {
                     .status(OK)
                     .payload("fixtures/client/v3/apps/GET_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected GetApplicationRequest getInvalidRequest() {
-            return GetApplicationRequest.builder()
                 .build();
         }
 
@@ -522,12 +492,6 @@ public final class ReactorApplicationsV3Test {
         }
 
         @Override
-        protected GetApplicationProcessStatisticsRequest getInvalidRequest() {
-            return GetApplicationProcessStatisticsRequest.builder()
-                .build();
-        }
-
-        @Override
         protected GetApplicationProcessStatisticsResponse getResponse() {
             return GetApplicationProcessStatisticsResponse.builder()
                 .resource(GetApplicationProcessStatisticsResponse.Resource.builder()
@@ -586,12 +550,6 @@ public final class ReactorApplicationsV3Test {
         }
 
         @Override
-        protected GetApplicationEnvironmentRequest getInvalidRequest() {
-            return GetApplicationEnvironmentRequest.builder()
-                .build();
-        }
-
-        @Override
         protected GetApplicationEnvironmentResponse getResponse() {
             return GetApplicationEnvironmentResponse.builder()
                 .environmentVariable("SOME_KEY", "some_val")
@@ -640,12 +598,6 @@ public final class ReactorApplicationsV3Test {
                     .status(OK)
                     .payload("fixtures/client/v3/apps/GET_{id}_processes_{type}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected GetApplicationProcessRequest getInvalidRequest() {
-            return GetApplicationProcessRequest.builder()
                 .build();
         }
 
@@ -714,12 +666,6 @@ public final class ReactorApplicationsV3Test {
         }
 
         @Override
-        protected GetApplicationTaskRequest getInvalidRequest() {
-            return GetApplicationTaskRequest.builder()
-                .build();
-        }
-
-        @Override
         protected GetApplicationTaskResponse getResponse() {
             return GetApplicationTaskResponse.builder()
                 .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
@@ -769,13 +715,6 @@ public final class ReactorApplicationsV3Test {
                     .status(OK)
                     .payload("fixtures/client/v3/apps/GET_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected ListApplicationsRequest getInvalidRequest() {
-            return ListApplicationsRequest.builder()
-                .page(-1)
                 .build();
         }
 
@@ -920,12 +859,6 @@ public final class ReactorApplicationsV3Test {
         }
 
         @Override
-        protected ListApplicationDropletsRequest getInvalidRequest() {
-            return ListApplicationDropletsRequest.builder()
-                .build();
-        }
-
-        @Override
         protected ListApplicationDropletsResponse getResponse() {
             return ListApplicationDropletsResponse.builder()
                 .pagination(Pagination.builder()
@@ -1040,12 +973,6 @@ public final class ReactorApplicationsV3Test {
         }
 
         @Override
-        protected ListApplicationPackagesRequest getInvalidRequest() {
-            return ListApplicationPackagesRequest.builder()
-                .build();
-        }
-
-        @Override
         protected ListApplicationPackagesResponse getResponse() {
             return ListApplicationPackagesResponse.builder()
                 .pagination(Pagination.builder()
@@ -1118,12 +1045,6 @@ public final class ReactorApplicationsV3Test {
                     .status(OK)
                     .payload("fixtures/client/v3/apps/GET_{id}_processes_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected ListApplicationProcessesRequest getInvalidRequest() {
-            return ListApplicationProcessesRequest.builder()
                 .build();
         }
 
@@ -1233,12 +1154,6 @@ public final class ReactorApplicationsV3Test {
         }
 
         @Override
-        protected ListApplicationTasksRequest getInvalidRequest() {
-            return ListApplicationTasksRequest.builder()
-                .build();
-        }
-
-        @Override
         protected ListApplicationTasksResponse getResponse() {
             return ListApplicationTasksResponse.builder()
                 .pagination(PaginatedResponse.Pagination.builder()
@@ -1324,12 +1239,6 @@ public final class ReactorApplicationsV3Test {
         }
 
         @Override
-        protected ScaleApplicationRequest getInvalidRequest() {
-            return ScaleApplicationRequest.builder()
-                .build();
-        }
-
-        @Override
         protected ScaleApplicationResponse getResponse() {
             return ScaleApplicationResponse.builder()
                 .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
@@ -1393,12 +1302,6 @@ public final class ReactorApplicationsV3Test {
                     .status(OK)
                     .payload("fixtures/client/v3/apps/PUT_{id}_start_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected StartApplicationRequest getInvalidRequest() {
-            return StartApplicationRequest.builder()
                 .build();
         }
 
@@ -1486,12 +1389,6 @@ public final class ReactorApplicationsV3Test {
         }
 
         @Override
-        protected StopApplicationRequest getInvalidRequest() {
-            return StopApplicationRequest.builder()
-                .build();
-        }
-
-        @Override
         protected StopApplicationResponse getResponse() {
             return StopApplicationResponse.builder()
                 .id("guid-11e8e36d-71f5-4be8-9487-c6d1a187e439")
@@ -1572,12 +1469,6 @@ public final class ReactorApplicationsV3Test {
                     .status(OK)
                     .payload("fixtures/client/v3/apps/PATCH_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected UpdateApplicationRequest getInvalidRequest() {
-            return UpdateApplicationRequest.builder()
                 .build();
         }
 

@@ -62,11 +62,6 @@ public final class ReactorServicesTest {
         }
 
         @Override
-        protected DeleteServiceRequest getInvalidRequest() {
-            return DeleteServiceRequest.builder().build();
-        }
-
-        @Override
         protected DeleteServiceResponse getResponse() {
             return null;
         }
@@ -101,11 +96,6 @@ public final class ReactorServicesTest {
                     .payload("fixtures/client/v2/services/DELETE_{id}_async_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected DeleteServiceRequest getInvalidRequest() {
-            return DeleteServiceRequest.builder().build();
         }
 
         @Override
@@ -152,12 +142,6 @@ public final class ReactorServicesTest {
                     .status(OK)
                     .payload("fixtures/client/v2/services/GET_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected GetServiceRequest getInvalidRequest() {
-            return GetServiceRequest.builder()
                 .build();
         }
 
@@ -211,11 +195,6 @@ public final class ReactorServicesTest {
                     .payload("fixtures/client/v2/services/GET_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected ListServicesRequest getInvalidRequest() {
-            return null;
         }
 
         @Override
@@ -273,11 +252,6 @@ public final class ReactorServicesTest {
                     .payload("fixtures/client/v2/services/GET_{id}_service_plans_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected ListServiceServicePlansRequest getInvalidRequest() {
-            return ListServiceServicePlansRequest.builder().build();
         }
 
         @Override

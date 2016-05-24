@@ -79,12 +79,6 @@ public final class ReactorPackagesTest {
         }
 
         @Override
-        protected CopyPackageRequest getInvalidRequest() {
-            return CopyPackageRequest.builder()
-                .build();
-        }
-
-        @Override
         protected CopyPackageResponse getResponse() {
             return CopyPackageResponse.builder()
                 .id("041af871-9d09-45de-ad2d-df8c4771a1ee")
@@ -135,12 +129,6 @@ public final class ReactorPackagesTest {
                     .status(CREATED)
                     .payload("fixtures/client/v3/apps/POST_{id}_packages_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected CreatePackageRequest getInvalidRequest() {
-            return CreatePackageRequest.builder()
                 .build();
         }
 
@@ -198,12 +186,6 @@ public final class ReactorPackagesTest {
         }
 
         @Override
-        protected DeletePackageRequest getInvalidRequest() {
-            return DeletePackageRequest.builder()
-                .build();
-        }
-
-        @Override
         protected Void getResponse() {
             return null;
         }
@@ -246,12 +228,6 @@ public final class ReactorPackagesTest {
         }
 
         @Override
-        protected DownloadPackageRequest getInvalidRequest() {
-            return DownloadPackageRequest.builder()
-                .build();
-        }
-
-        @Override
         protected byte[] getResponse() {
             return getBytes("fixtures/client/v3/packages/GET_{id}_download_response.bin");
         }
@@ -285,12 +261,6 @@ public final class ReactorPackagesTest {
                     .status(OK)
                     .payload("fixtures/client/v3/packages/GET_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected GetPackageRequest getInvalidRequest() {
-            return GetPackageRequest.builder()
                 .build();
         }
 
@@ -355,13 +325,6 @@ public final class ReactorPackagesTest {
                     .status(OK)
                     .payload("fixtures/client/v3/packages/GET_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected ListPackagesRequest getInvalidRequest() {
-            return ListPackagesRequest.builder()
-                .page(-1)
                 .build();
         }
 
@@ -457,12 +420,6 @@ public final class ReactorPackagesTest {
                     .status(CREATED)
                     .payload("fixtures/client/v3/packages/POST_{id}_droplets_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected StagePackageRequest getInvalidRequest() {
-            return StagePackageRequest.builder()
                 .build();
         }
 
@@ -564,12 +521,6 @@ public final class ReactorPackagesTest {
                     .status(CREATED)
                     .payload("fixtures/client/v3/packages/POST_{id}_upload_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected UploadPackageRequest getInvalidRequest() {
-            return UploadPackageRequest.builder()
                 .build();
         }
 

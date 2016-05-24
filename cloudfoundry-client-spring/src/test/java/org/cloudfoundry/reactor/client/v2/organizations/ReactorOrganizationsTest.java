@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.organizations;
 
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.domains.DomainEntity;
 import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
@@ -112,8 +113,6 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-import org.cloudfoundry.client.v2.Metadata;
-
 public final class ReactorOrganizationsTest {
 
     public static final class AssociateOrganizationAuditor extends AbstractClientApiTest<AssociateOrganizationAuditorRequest, AssociateOrganizationAuditorResponse> {
@@ -130,12 +129,6 @@ public final class ReactorOrganizationsTest {
                     .status(CREATED)
                     .payload("fixtures/client/v2/organizations/PUT_{id}_auditors_{auditor-id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected AssociateOrganizationAuditorRequest getInvalidRequest() {
-            return AssociateOrganizationAuditorRequest.builder()
                 .build();
         }
 
@@ -200,12 +193,6 @@ public final class ReactorOrganizationsTest {
         }
 
         @Override
-        protected AssociateOrganizationAuditorByUsernameRequest getInvalidRequest() {
-            return AssociateOrganizationAuditorByUsernameRequest.builder()
-                .build();
-        }
-
-        @Override
         protected AssociateOrganizationAuditorByUsernameResponse getResponse() {
             return AssociateOrganizationAuditorByUsernameResponse.builder()
                 .metadata(Metadata.builder()
@@ -261,12 +248,6 @@ public final class ReactorOrganizationsTest {
                     .status(OK)
                     .payload("fixtures/client/v2/organizations/PUT_{id}_billing_managers_{billing-manager-id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected AssociateOrganizationBillingManagerRequest getInvalidRequest() {
-            return AssociateOrganizationBillingManagerRequest.builder()
                 .build();
         }
 
@@ -332,12 +313,6 @@ public final class ReactorOrganizationsTest {
         }
 
         @Override
-        protected AssociateOrganizationBillingManagerByUsernameRequest getInvalidRequest() {
-            return AssociateOrganizationBillingManagerByUsernameRequest.builder()
-                .build();
-        }
-
-        @Override
         protected AssociateOrganizationBillingManagerByUsernameResponse getResponse() {
             return AssociateOrganizationBillingManagerByUsernameResponse.builder()
                 .metadata(Metadata.builder()
@@ -393,12 +368,6 @@ public final class ReactorOrganizationsTest {
                     .status(OK)
                     .payload("fixtures/client/v2/organizations/PUT_{id}_managers_{manager-id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected AssociateOrganizationManagerRequest getInvalidRequest() {
-            return AssociateOrganizationManagerRequest.builder()
                 .build();
         }
 
@@ -463,12 +432,6 @@ public final class ReactorOrganizationsTest {
         }
 
         @Override
-        protected AssociateOrganizationManagerByUsernameRequest getInvalidRequest() {
-            return AssociateOrganizationManagerByUsernameRequest.builder()
-                .build();
-        }
-
-        @Override
         protected AssociateOrganizationManagerByUsernameResponse getResponse() {
             return AssociateOrganizationManagerByUsernameResponse.builder()
                 .metadata(Metadata.builder()
@@ -524,12 +487,6 @@ public final class ReactorOrganizationsTest {
                     .status(OK)
                     .payload("fixtures/client/v2/organizations/PUT_{id}_users_{user-id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected AssociateOrganizationUserRequest getInvalidRequest() {
-            return AssociateOrganizationUserRequest.builder()
                 .build();
         }
 
@@ -594,12 +551,6 @@ public final class ReactorOrganizationsTest {
         }
 
         @Override
-        protected AssociateOrganizationUserByUsernameRequest getInvalidRequest() {
-            return AssociateOrganizationUserByUsernameRequest.builder()
-                .build();
-        }
-
-        @Override
         protected AssociateOrganizationUserByUsernameResponse getResponse() {
             return AssociateOrganizationUserByUsernameResponse.builder()
                 .metadata(Metadata.builder()
@@ -655,12 +606,6 @@ public final class ReactorOrganizationsTest {
                     .status(OK)
                     .payload("fixtures/client/v2/organizations/PUT_{id}_private_domains_{private-domain-id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected AssociateOrganizationPrivateDomainRequest getInvalidRequest() {
-            return AssociateOrganizationPrivateDomainRequest.builder()
                 .build();
         }
 
@@ -721,12 +666,6 @@ public final class ReactorOrganizationsTest {
                     .status(OK)
                     .payload("fixtures/client/v2/organizations/POST_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected CreateOrganizationRequest getInvalidRequest() {
-            return CreateOrganizationRequest.builder()
                 .build();
         }
 
@@ -872,12 +811,6 @@ public final class ReactorOrganizationsTest {
         }
 
         @Override
-        protected GetOrganizationRequest getInvalidRequest() {
-            return GetOrganizationRequest.builder()
-                .build();
-        }
-
-        @Override
         protected GetOrganizationResponse getResponse() {
             return GetOrganizationResponse.builder()
                 .metadata(Metadata.builder()
@@ -936,12 +869,6 @@ public final class ReactorOrganizationsTest {
         }
 
         @Override
-        protected GetOrganizationInstanceUsageRequest getInvalidRequest() {
-            return GetOrganizationInstanceUsageRequest.builder()
-                .build();
-        }
-
-        @Override
         protected GetOrganizationInstanceUsageResponse getResponse() {
             return GetOrganizationInstanceUsageResponse.builder()
                 .instanceUsage(3)
@@ -980,12 +907,6 @@ public final class ReactorOrganizationsTest {
         }
 
         @Override
-        protected GetOrganizationMemoryUsageRequest getInvalidRequest() {
-            return GetOrganizationMemoryUsageRequest.builder()
-                .build();
-        }
-
-        @Override
         protected GetOrganizationMemoryUsageResponse getResponse() {
             return GetOrganizationMemoryUsageResponse.builder()
                 .memoryUsageInMb(0)
@@ -1020,12 +941,6 @@ public final class ReactorOrganizationsTest {
                     .status(OK)
                     .payload("fixtures/client/v2/organizations/GET_{id}_user_roles_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected GetOrganizationUserRolesRequest getInvalidRequest() {
-            return GetOrganizationUserRolesRequest.builder()
                 .build();
         }
 
@@ -1095,11 +1010,6 @@ public final class ReactorOrganizationsTest {
         }
 
         @Override
-        protected ListOrganizationsRequest getInvalidRequest() {
-            return null;
-        }
-
-        @Override
         protected ListOrganizationsResponse getResponse() {
             return ListOrganizationsResponse.builder()
                 .totalResults(1)
@@ -1159,12 +1069,6 @@ public final class ReactorOrganizationsTest {
                     .status(OK)
                     .payload("fixtures/client/v2/organizations/GET_{id}_auditors_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected ListOrganizationAuditorsRequest getInvalidRequest() {
-            return ListOrganizationAuditorsRequest.builder()
                 .build();
         }
 
@@ -1229,12 +1133,6 @@ public final class ReactorOrganizationsTest {
         }
 
         @Override
-        protected ListOrganizationBillingManagersRequest getInvalidRequest() {
-            return ListOrganizationBillingManagersRequest.builder()
-                .build();
-        }
-
-        @Override
         protected ListOrganizationBillingManagersResponse getResponse() {
             return ListOrganizationBillingManagersResponse.builder()
                 .totalResults(1)
@@ -1295,12 +1193,6 @@ public final class ReactorOrganizationsTest {
         }
 
         @Override
-        protected ListOrganizationDomainsRequest getInvalidRequest() {
-            return ListOrganizationDomainsRequest.builder()
-                .build();
-        }
-
-        @Override
         protected ListOrganizationDomainsResponse getResponse() {
             return ListOrganizationDomainsResponse.builder()
                 .totalResults(2)
@@ -1357,12 +1249,6 @@ public final class ReactorOrganizationsTest {
                     .status(OK)
                     .payload("fixtures/client/v2/organizations/GET_{id}_managers_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected ListOrganizationManagersRequest getInvalidRequest() {
-            return ListOrganizationManagersRequest.builder()
                 .build();
         }
 
@@ -1446,12 +1332,6 @@ public final class ReactorOrganizationsTest {
         }
 
         @Override
-        protected ListOrganizationPrivateDomainsRequest getInvalidRequest() {
-            return ListOrganizationPrivateDomainsRequest.builder()
-                .build();
-        }
-
-        @Override
         protected ListOrganizationPrivateDomainsResponse getResponse() {
             return ListOrganizationPrivateDomainsResponse.builder()
                 .totalResults(1)
@@ -1502,12 +1382,6 @@ public final class ReactorOrganizationsTest {
                     .status(OK)
                     .payload("fixtures/client/v2/organizations/GET_{id}_services_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected ListOrganizationServicesRequest getInvalidRequest() {
-            return ListOrganizationServicesRequest.builder()
                 .build();
         }
 
@@ -1569,12 +1443,6 @@ public final class ReactorOrganizationsTest {
         }
 
         @Override
-        protected ListOrganizationSpaceQuotaDefinitionsRequest getInvalidRequest() {
-            return ListOrganizationSpaceQuotaDefinitionsRequest.builder()
-                .build();
-        }
-
-        @Override
         protected ListOrganizationSpaceQuotaDefinitionsResponse getResponse() {
             return ListOrganizationSpaceQuotaDefinitionsResponse.builder()
                 .totalResults(1)
@@ -1629,12 +1497,6 @@ public final class ReactorOrganizationsTest {
                     .status(OK)
                     .payload("fixtures/client/v2/organizations/GET_{id}_spaces_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected ListOrganizationSpacesRequest getInvalidRequest() {
-            return ListOrganizationSpacesRequest.builder()
                 .build();
         }
 
@@ -1703,12 +1565,6 @@ public final class ReactorOrganizationsTest {
         }
 
         @Override
-        protected ListOrganizationUsersRequest getInvalidRequest() {
-            return ListOrganizationUsersRequest.builder()
-                .build();
-        }
-
-        @Override
         protected ListOrganizationUsersResponse getResponse() {
             return ListOrganizationUsersResponse.builder()
                 .totalResults(1)
@@ -1768,12 +1624,6 @@ public final class ReactorOrganizationsTest {
         }
 
         @Override
-        protected RemoveOrganizationAuditorRequest getInvalidRequest() {
-            return RemoveOrganizationAuditorRequest.builder()
-                .build();
-        }
-
-        @Override
         protected Void getResponse() {
             return null;
         }
@@ -1807,12 +1657,6 @@ public final class ReactorOrganizationsTest {
                 .response(TestResponse.builder()
                     .status(NO_CONTENT)
                     .build())
-                .build();
-        }
-
-        @Override
-        protected RemoveOrganizationAuditorByUsernameRequest getInvalidRequest() {
-            return RemoveOrganizationAuditorByUsernameRequest.builder()
                 .build();
         }
 
@@ -1853,12 +1697,6 @@ public final class ReactorOrganizationsTest {
         }
 
         @Override
-        protected RemoveOrganizationBillingManagerRequest getInvalidRequest() {
-            return RemoveOrganizationBillingManagerRequest.builder()
-                .build();
-        }
-
-        @Override
         protected Void getResponse() {
             return null;
         }
@@ -1891,12 +1729,6 @@ public final class ReactorOrganizationsTest {
                 .response(TestResponse.builder()
                     .status(NO_CONTENT)
                     .build())
-                .build();
-        }
-
-        @Override
-        protected RemoveOrganizationManagerRequest getInvalidRequest() {
-            return RemoveOrganizationManagerRequest.builder()
                 .build();
         }
 
@@ -1938,12 +1770,6 @@ public final class ReactorOrganizationsTest {
         }
 
         @Override
-        protected RemoveOrganizationBillingManagerByUsernameRequest getInvalidRequest() {
-            return RemoveOrganizationBillingManagerByUsernameRequest.builder()
-                .build();
-        }
-
-        @Override
         protected Void getResponse() {
             return null;
         }
@@ -1977,12 +1803,6 @@ public final class ReactorOrganizationsTest {
                 .response(TestResponse.builder()
                     .status(NO_CONTENT)
                     .build())
-                .build();
-        }
-
-        @Override
-        protected RemoveOrganizationManagerByUsernameRequest getInvalidRequest() {
-            return RemoveOrganizationManagerByUsernameRequest.builder()
                 .build();
         }
 
@@ -2023,12 +1843,6 @@ public final class ReactorOrganizationsTest {
         }
 
         @Override
-        protected RemoveOrganizationPrivateDomainRequest getInvalidRequest() {
-            return RemoveOrganizationPrivateDomainRequest.builder()
-                .build();
-        }
-
-        @Override
         protected Void getResponse() {
             return null;
         }
@@ -2060,12 +1874,6 @@ public final class ReactorOrganizationsTest {
                 .response(TestResponse.builder()
                     .status(NO_CONTENT)
                     .build())
-                .build();
-        }
-
-        @Override
-        protected RemoveOrganizationUserRequest getInvalidRequest() {
-            return RemoveOrganizationUserRequest.builder()
                 .build();
         }
 
@@ -2106,12 +1914,6 @@ public final class ReactorOrganizationsTest {
         }
 
         @Override
-        protected RemoveOrganizationUserByUsernameRequest getInvalidRequest() {
-            return RemoveOrganizationUserByUsernameRequest.builder()
-                .build();
-        }
-
-        @Override
         protected Void getResponse() {
             return null;
         }
@@ -2145,12 +1947,6 @@ public final class ReactorOrganizationsTest {
                     .status(OK)
                     .payload("fixtures/client/v2/organizations/GET_{id}_summary_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected SummaryOrganizationRequest getInvalidRequest() {
-            return SummaryOrganizationRequest.builder()
                 .build();
         }
 
@@ -2200,12 +1996,6 @@ public final class ReactorOrganizationsTest {
                     .status(OK)
                     .payload("fixtures/client/v2/organizations/PUT_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected UpdateOrganizationRequest getInvalidRequest() {
-            return UpdateOrganizationRequest.builder()
                 .build();
         }
 

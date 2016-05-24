@@ -123,11 +123,6 @@ public final class ReactorUserProvidedServiceInstancesTest {
         }
 
         @Override
-        protected DeleteUserProvidedServiceInstanceRequest getInvalidRequest() {
-            return DeleteUserProvidedServiceInstanceRequest.builder().build();
-        }
-
-        @Override
         protected Void getResponse() {
             return null;
         }
@@ -160,11 +155,6 @@ public final class ReactorUserProvidedServiceInstancesTest {
                     .payload("fixtures/client/v2/user_provided_service_instances/GET_{id}_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected GetUserProvidedServiceInstanceRequest getInvalidRequest() {
-            return GetUserProvidedServiceInstanceRequest.builder().build();
         }
 
         @Override
@@ -216,11 +206,6 @@ public final class ReactorUserProvidedServiceInstancesTest {
                     .payload("fixtures/client/v2/user_provided_service_instances/GET_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected ListUserProvidedServiceInstancesRequest getInvalidRequest() {
-            return null;
         }
 
         @Override
@@ -279,11 +264,6 @@ public final class ReactorUserProvidedServiceInstancesTest {
         }
 
         @Override
-        protected ListUserProvidedServiceInstanceServiceBindingsRequest getInvalidRequest() {
-            return ListUserProvidedServiceInstanceServiceBindingsRequest.builder().build();
-        }
-
-        @Override
         protected ListUserProvidedServiceInstanceServiceBindingsResponse getResponse() {
             return ListUserProvidedServiceInstanceServiceBindingsResponse.builder()
                 .totalPages(1)
@@ -337,11 +317,6 @@ public final class ReactorUserProvidedServiceInstancesTest {
                     .payload("fixtures/client/v2/user_provided_service_instances/PUT_{id}_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected UpdateUserProvidedServiceInstanceRequest getInvalidRequest() {
-            return UpdateUserProvidedServiceInstanceRequest.builder().build();
         }
 
         @Override

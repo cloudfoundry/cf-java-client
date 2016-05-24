@@ -60,11 +60,6 @@ public final class ReactorPrivateDomainsTest {
                     .build())
                 .build();
         }
-        @Override
-        protected CreatePrivateDomainRequest getInvalidRequest() {
-            return CreatePrivateDomainRequest.builder()
-                .build();
-        }
 
         @Override
         protected CreatePrivateDomainResponse getResponse() {
@@ -112,11 +107,6 @@ public final class ReactorPrivateDomainsTest {
                     .build())
                 .build();
         }
-        @Override
-        protected DeletePrivateDomainRequest getInvalidRequest() {
-            return DeletePrivateDomainRequest.builder()
-                .build();
-        }
 
         @Override
         protected DeletePrivateDomainResponse getResponse() {
@@ -151,11 +141,6 @@ public final class ReactorPrivateDomainsTest {
                     .status(ACCEPTED)
                     .payload("fixtures/client/v2/private_domains/DELETE_{id}_async_response.json")
                     .build())
-                .build();
-        }
-        @Override
-        protected DeletePrivateDomainRequest getInvalidRequest() {
-            return DeletePrivateDomainRequest.builder()
                 .build();
         }
 
@@ -205,10 +190,6 @@ public final class ReactorPrivateDomainsTest {
                     .build())
                 .build();
         }
-        @Override
-        protected GetPrivateDomainRequest getInvalidRequest() {
-            return null;
-        }
 
         @Override
         protected GetPrivateDomainResponse getResponse() {
@@ -256,10 +237,6 @@ public final class ReactorPrivateDomainsTest {
                     .payload("fixtures/client/v2/private_domains/GET_response.json")
                     .build())
                 .build();
-        }
-        @Override
-        protected ListPrivateDomainsRequest getInvalidRequest() {
-            return null;
         }
 
         @Override

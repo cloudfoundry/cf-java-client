@@ -49,12 +49,6 @@ public final class ReactorJobsTest {
         }
 
         @Override
-        protected GetJobRequest getInvalidRequest() {
-            return GetJobRequest.builder()
-                .build();
-        }
-
-        @Override
         protected GetJobResponse getResponse() {
             return GetJobResponse.builder()
                 .metadata(Metadata.builder()

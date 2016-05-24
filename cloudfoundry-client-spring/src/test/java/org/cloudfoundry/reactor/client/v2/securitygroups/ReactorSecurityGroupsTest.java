@@ -60,11 +60,6 @@ public final class ReactorSecurityGroupsTest {
         }
 
         @Override
-        protected DeleteSecurityGroupRunningDefaultRequest getInvalidRequest() {
-            return DeleteSecurityGroupRunningDefaultRequest.builder().build();
-        }
-
-        @Override
         protected Void getResponse() {
             return null;
         }
@@ -97,11 +92,6 @@ public final class ReactorSecurityGroupsTest {
                     .status(NO_CONTENT)
                     .build())
                 .build();
-        }
-
-        @Override
-        protected DeleteSecurityGroupStagingDefaultRequest getInvalidRequest() {
-            return DeleteSecurityGroupStagingDefaultRequest.builder().build();
         }
 
         @Override
@@ -138,11 +128,6 @@ public final class ReactorSecurityGroupsTest {
                     .payload("fixtures/client/v2/config/GET_running_security_groups_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected ListSecurityGroupRunningDefaultsRequest getInvalidRequest() {
-            return null;
         }
 
         @Override
@@ -200,11 +185,6 @@ public final class ReactorSecurityGroupsTest {
         }
 
         @Override
-        protected ListSecurityGroupStagingDefaultsRequest getInvalidRequest() {
-            return null;
-        }
-
-        @Override
         protected ListSecurityGroupStagingDefaultsResponse getResponse() {
             return ListSecurityGroupStagingDefaultsResponse.builder()
                 .totalPages(1)
@@ -259,11 +239,6 @@ public final class ReactorSecurityGroupsTest {
         }
 
         @Override
-        protected SetSecurityGroupRunningDefaultRequest getInvalidRequest() {
-            return SetSecurityGroupRunningDefaultRequest.builder().build();
-        }
-
-        @Override
         protected SetSecurityGroupRunningDefaultResponse getResponse() {
             return SetSecurityGroupRunningDefaultResponse.builder()
                 .metadata(Metadata.builder()
@@ -314,11 +289,6 @@ public final class ReactorSecurityGroupsTest {
                     .payload("fixtures/client/v2/config/PUT_{id}_staging_security_groups_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected SetSecurityGroupStagingDefaultRequest getInvalidRequest() {
-            return SetSecurityGroupStagingDefaultRequest.builder().build();
         }
 
         @Override

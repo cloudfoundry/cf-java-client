@@ -243,11 +243,6 @@ public final class ReactorDomainsTest {
         }
 
         @Override
-        protected ListDomainsRequest getInvalidRequest() {
-            return null;
-        }
-
-        @Override
         protected ListDomainsResponse getResponse() {
             return ListDomainsResponse.builder()
                 .totalResults(4)
@@ -325,12 +320,6 @@ public final class ReactorDomainsTest {
                     .status(OK)
                     .payload("fixtures/client/v2/domains/GET_{id}_spaces_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected ListDomainSpacesRequest getInvalidRequest() {
-            return ListDomainSpacesRequest.builder()
                 .build();
         }
 

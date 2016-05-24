@@ -62,12 +62,6 @@ public final class ReactorTasksTest {
         }
 
         @Override
-        protected CancelTaskRequest getInvalidRequest() {
-            return CancelTaskRequest.builder()
-                .build();
-        }
-
-        @Override
         protected CancelTaskResponse getResponse() {
             return CancelTaskResponse.builder()
                 .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
@@ -117,12 +111,6 @@ public final class ReactorTasksTest {
                     .status(ACCEPTED)
                     .payload("fixtures/client/v3/tasks/POST_apps_{id}_tasks_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected CreateTaskRequest getInvalidRequest() {
-            return CreateTaskRequest.builder()
                 .build();
         }
 
@@ -182,12 +170,6 @@ public final class ReactorTasksTest {
         }
 
         @Override
-        protected GetTaskRequest getInvalidRequest() {
-            return GetTaskRequest.builder()
-                .build();
-        }
-
-        @Override
         protected GetTaskResponse getResponse() {
             return GetTaskResponse.builder()
                 .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
@@ -236,13 +218,6 @@ public final class ReactorTasksTest {
                     .status(OK)
                     .payload("fixtures/client/v3/tasks/GET_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected ListTasksRequest getInvalidRequest() {
-            return ListTasksRequest.builder()
-                .page(-1)
                 .build();
         }
 

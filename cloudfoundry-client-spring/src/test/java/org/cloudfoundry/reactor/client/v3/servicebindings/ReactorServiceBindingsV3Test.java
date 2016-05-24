@@ -126,12 +126,6 @@ public final class ReactorServiceBindingsV3Test {
         }
 
         @Override
-        protected DeleteServiceBindingRequest getInvalidRequest() {
-            return DeleteServiceBindingRequest.builder()
-                .build();
-        }
-
-        @Override
         protected Void getResponse() {
             return null;
         }
@@ -164,12 +158,6 @@ public final class ReactorServiceBindingsV3Test {
                     .status(OK)
                     .payload("fixtures/client/v3/servicebindings/GET_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected GetServiceBindingRequest getInvalidRequest() {
-            return GetServiceBindingRequest.builder()
                 .build();
         }
 
@@ -221,13 +209,6 @@ public final class ReactorServiceBindingsV3Test {
                     .status(OK)
                     .payload("fixtures/client/v3/servicebindings/GET_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected ListServiceBindingsRequest getInvalidRequest() {
-            return ListServiceBindingsRequest.builder()
-                .page(-1)
                 .build();
         }
 

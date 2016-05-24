@@ -68,11 +68,6 @@ public final class ReactorServicePlanVisibilitiesTest {
         }
 
         @Override
-        protected CreateServicePlanVisibilityRequest getInvalidRequest() {
-            return CreateServicePlanVisibilityRequest.builder().build();
-        }
-
-        @Override
         protected CreateServicePlanVisibilityResponse getResponse() {
             return CreateServicePlanVisibilityResponse.builder()
                 .metadata(Metadata.builder()
@@ -120,11 +115,6 @@ public final class ReactorServicePlanVisibilitiesTest {
         }
 
         @Override
-        protected DeleteServicePlanVisibilityRequest getInvalidRequest() {
-            return DeleteServicePlanVisibilityRequest.builder().build();
-        }
-
-        @Override
         protected DeleteServicePlanVisibilityResponse getResponse() {
             return null;
         }
@@ -157,11 +147,6 @@ public final class ReactorServicePlanVisibilitiesTest {
                     .payload("fixtures/client/v2/service_plan_visibilities/DELETE_{id}_async_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected DeleteServicePlanVisibilityRequest getInvalidRequest() {
-            return DeleteServicePlanVisibilityRequest.builder().build();
         }
 
         @Override
@@ -211,11 +196,6 @@ public final class ReactorServicePlanVisibilitiesTest {
         }
 
         @Override
-        protected GetServicePlanVisibilityRequest getInvalidRequest() {
-            return GetServicePlanVisibilityRequest.builder().build();
-        }
-
-        @Override
         protected GetServicePlanVisibilityResponse getResponse() {
             return GetServicePlanVisibilityResponse.builder()
                 .metadata(Metadata.builder()
@@ -260,11 +240,6 @@ public final class ReactorServicePlanVisibilitiesTest {
                     .payload("fixtures/client/v2/service_plan_visibilities/GET_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected ListServicePlanVisibilitiesRequest getInvalidRequest() {
-            return null;
         }
 
         @Override
@@ -318,11 +293,6 @@ public final class ReactorServicePlanVisibilitiesTest {
                     .payload("fixtures/client/v2/service_plan_visibilities/PUT_{id}_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected UpdateServicePlanVisibilityRequest getInvalidRequest() {
-            return UpdateServicePlanVisibilityRequest.builder().build();
         }
 
         @Override

@@ -117,12 +117,6 @@ public final class ReactorServiceBindingsV2Test {
         }
 
         @Override
-        protected DeleteServiceBindingRequest getInvalidRequest() {
-            return DeleteServiceBindingRequest.builder()
-                .build();
-        }
-
-        @Override
         protected DeleteServiceBindingResponse getResponse() {
             return null;
         }
@@ -155,12 +149,6 @@ public final class ReactorServiceBindingsV2Test {
                     .status(ACCEPTED)
                     .payload("fixtures/client/v2/service_bindings/DELETE_{id}_async_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected DeleteServiceBindingRequest getInvalidRequest() {
-            return DeleteServiceBindingRequest.builder()
                 .build();
         }
 
@@ -208,12 +196,6 @@ public final class ReactorServiceBindingsV2Test {
                     .status(OK)
                     .payload("fixtures/client/v2/service_bindings/GET_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected GetServiceBindingRequest getInvalidRequest() {
-            return GetServiceBindingRequest.builder()
                 .build();
         }
 
@@ -266,11 +248,6 @@ public final class ReactorServiceBindingsV2Test {
                     .payload("fixtures/client/v2/service_bindings/GET_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected ListServiceBindingsRequest getInvalidRequest() {
-            return null;
         }
 
         @Override

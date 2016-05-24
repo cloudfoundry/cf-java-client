@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.serviceinstances;
 
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
@@ -57,8 +58,6 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-import org.cloudfoundry.client.v2.Metadata;
-
 public final class ReactorServiceInstancesTest {
 
     public static final class BindToRoute extends AbstractClientApiTest<BindServiceInstanceToRouteRequest, BindServiceInstanceToRouteResponse> {
@@ -76,12 +75,6 @@ public final class ReactorServiceInstancesTest {
                     .status(CREATED)
                     .payload("fixtures/client/v2/service_instances/PUT_{id}_routes_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected BindServiceInstanceToRouteRequest getInvalidRequest() {
-            return BindServiceInstanceToRouteRequest.builder()
                 .build();
         }
 
@@ -210,12 +203,6 @@ public final class ReactorServiceInstancesTest {
         }
 
         @Override
-        protected DeleteServiceInstanceRequest getInvalidRequest() {
-            return DeleteServiceInstanceRequest.builder()
-                .build();
-        }
-
-        @Override
         protected DeleteServiceInstanceResponse getResponse() {
             return null;
         }
@@ -250,12 +237,6 @@ public final class ReactorServiceInstancesTest {
                     .status(ACCEPTED)
                     .payload("fixtures/client/v2/service_instances/DELETE_{id}_async_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected DeleteServiceInstanceRequest getInvalidRequest() {
-            return DeleteServiceInstanceRequest.builder()
                 .build();
         }
 
@@ -305,12 +286,6 @@ public final class ReactorServiceInstancesTest {
                     .status(OK)
                     .payload("fixtures/client/v2/service_instances/GET_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected GetServiceInstanceRequest getInvalidRequest() {
-            return GetServiceInstanceRequest.builder()
                 .build();
         }
 
@@ -379,11 +354,6 @@ public final class ReactorServiceInstancesTest {
         }
 
         @Override
-        protected GetServiceInstancePermissionsRequest getInvalidRequest() {
-            return GetServiceInstancePermissionsRequest.builder().build();
-        }
-
-        @Override
         protected GetServiceInstancePermissionsResponse getResponse() {
             return GetServiceInstancePermissionsResponse.builder()
                 .manage(true)
@@ -419,11 +389,6 @@ public final class ReactorServiceInstancesTest {
                     .payload("fixtures/client/v2/service_instances/GET_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected ListServiceInstancesRequest getInvalidRequest() {
-            return null;
         }
 
         @Override
@@ -496,12 +461,6 @@ public final class ReactorServiceInstancesTest {
         }
 
         @Override
-        protected ListServiceInstanceServiceBindingsRequest getInvalidRequest() {
-            return ListServiceInstanceServiceBindingsRequest.builder()
-                .build();
-        }
-
-        @Override
         protected ListServiceInstanceServiceBindingsResponse getResponse() {
             return ListServiceInstanceServiceBindingsResponse.builder()
                 .totalResults(1)
@@ -558,12 +517,6 @@ public final class ReactorServiceInstancesTest {
         }
 
         @Override
-        protected ListServiceInstanceServiceKeysRequest getInvalidRequest() {
-            return ListServiceInstanceServiceKeysRequest.builder()
-                .build();
-        }
-
-        @Override
         protected ListServiceInstanceServiceKeysResponse getResponse() {
             return ListServiceInstanceServiceKeysResponse.builder()
                 .totalResults(1)
@@ -614,12 +567,6 @@ public final class ReactorServiceInstancesTest {
                     .status(CREATED)
                     .payload("fixtures/client/v2/service_instances/PUT_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected UpdateServiceInstanceRequest getInvalidRequest() {
-            return UpdateServiceInstanceRequest.builder()
                 .build();
         }
 

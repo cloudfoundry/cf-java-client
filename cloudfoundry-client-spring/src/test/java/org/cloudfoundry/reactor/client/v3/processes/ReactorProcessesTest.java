@@ -66,12 +66,6 @@ public final class ReactorProcessesTest {
         }
 
         @Override
-        protected TerminateProcessInstanceRequest getInvalidRequest() {
-            return TerminateProcessInstanceRequest.builder()
-                .build();
-        }
-
-        @Override
         protected Void getResponse() {
             return null;
         }
@@ -105,12 +99,6 @@ public final class ReactorProcessesTest {
                     .status(OK)
                     .payload("fixtures/client/v3/processes/GET_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected GetProcessRequest getInvalidRequest() {
-            return GetProcessRequest.builder()
                 .build();
         }
 
@@ -178,12 +166,6 @@ public final class ReactorProcessesTest {
         }
 
         @Override
-        protected GetProcessStatisticsRequest getInvalidRequest() {
-            return GetProcessStatisticsRequest.builder()
-                .build();
-        }
-
-        @Override
         protected GetProcessStatisticsResponse getResponse() {
             return GetProcessStatisticsResponse.builder()
                 .resource(GetProcessStatisticsResponse.Resource.builder()
@@ -237,13 +219,6 @@ public final class ReactorProcessesTest {
                     .status(OK)
                     .payload("fixtures/client/v3/processes/GET_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected ListProcessesRequest getInvalidRequest() {
-            return ListProcessesRequest.builder()
-                .page(-1)
                 .build();
         }
 
@@ -354,12 +329,6 @@ public final class ReactorProcessesTest {
         }
 
         @Override
-        protected ScaleProcessRequest getInvalidRequest() {
-            return ScaleProcessRequest.builder()
-                .build();
-        }
-
-        @Override
         protected ScaleProcessResponse getResponse() {
             return ScaleProcessResponse.builder()
                 .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
@@ -422,12 +391,6 @@ public final class ReactorProcessesTest {
                     .status(OK)
                     .payload("fixtures/client/v3/processes/PATCH_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected UpdateProcessRequest getInvalidRequest() {
-            return UpdateProcessRequest.builder()
                 .build();
         }
 

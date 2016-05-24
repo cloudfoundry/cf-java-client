@@ -73,12 +73,6 @@ public final class ReactorRoutesTest {
         }
 
         @Override
-        protected AssociateRouteApplicationRequest getInvalidRequest() {
-            return AssociateRouteApplicationRequest.builder()
-                .build();
-        }
-
-        @Override
         protected AssociateRouteApplicationResponse getResponse() {
             return AssociateRouteApplicationResponse.builder()
                 .metadata(Metadata.builder()
@@ -130,12 +124,6 @@ public final class ReactorRoutesTest {
                     .status(OK)
                     .payload("fixtures/client/v2/routes/POST_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected CreateRouteRequest getInvalidRequest() {
-            return CreateRouteRequest.builder()
                 .build();
         }
 
@@ -194,12 +182,6 @@ public final class ReactorRoutesTest {
         }
 
         @Override
-        protected DeleteRouteRequest getInvalidRequest() {
-            return DeleteRouteRequest.builder()
-                .build();
-        }
-
-        @Override
         protected DeleteRouteResponse getResponse() {
             return null;
         }
@@ -232,12 +214,6 @@ public final class ReactorRoutesTest {
                     .status(ACCEPTED)
                     .payload("fixtures/client/v2/routes/DELETE_{id}_async_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected DeleteRouteRequest getInvalidRequest() {
-            return DeleteRouteRequest.builder()
                 .build();
         }
 
@@ -288,12 +264,6 @@ public final class ReactorRoutesTest {
         }
 
         @Override
-        protected RouteExistsRequest getInvalidRequest() {
-            return RouteExistsRequest.builder()
-                .build();
-        }
-
-        @Override
         protected Boolean getResponse() {
             return true;
         }
@@ -327,12 +297,6 @@ public final class ReactorRoutesTest {
                     .status(OK)
                     .payload("fixtures/client/v2/routes/GET_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected GetRouteRequest getInvalidRequest() {
-            return GetRouteRequest.builder()
                 .build();
         }
 
@@ -392,11 +356,6 @@ public final class ReactorRoutesTest {
         }
 
         @Override
-        protected ListRoutesRequest getInvalidRequest() {
-            return null;
-        }
-
-        @Override
         protected ListRoutesResponse getResponse() {
             return ListRoutesResponse.builder()
                 .totalResults(1)
@@ -452,12 +411,6 @@ public final class ReactorRoutesTest {
                     .status(OK)
                     .payload("fixtures/client/v2/routes/GET_{id}_apps_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected ListRouteApplicationsRequest getInvalidRequest() {
-            return ListRouteApplicationsRequest.builder()
                 .build();
         }
 
@@ -534,12 +487,6 @@ public final class ReactorRoutesTest {
         }
 
         @Override
-        protected RemoveRouteApplicationRequest getInvalidRequest() {
-            return RemoveRouteApplicationRequest.builder()
-                .build();
-        }
-
-        @Override
         protected Void getResponse() {
             return null;
         }
@@ -574,12 +521,6 @@ public final class ReactorRoutesTest {
                     .status(CREATED)
                     .payload("fixtures/client/v2/routes/PUT_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected UpdateRouteRequest getInvalidRequest() {
-            return UpdateRouteRequest.builder()
                 .build();
         }
 

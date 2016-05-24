@@ -57,12 +57,6 @@ public final class ReactorDropletsTest {
         }
 
         @Override
-        protected DeleteDropletRequest getInvalidRequest() {
-            return DeleteDropletRequest.builder()
-                .build();
-        }
-
-        @Override
         protected Void getResponse() {
             return null;
         }
@@ -95,12 +89,6 @@ public final class ReactorDropletsTest {
                     .status(OK)
                     .payload("fixtures/client/v3/droplets/GET_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected GetDropletRequest getInvalidRequest() {
-            return GetDropletRequest.builder()
                 .build();
         }
 
@@ -172,13 +160,6 @@ public final class ReactorDropletsTest {
                     .status(OK)
                     .payload("fixtures/client/v3/droplets/GET_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected ListDropletsRequest getInvalidRequest() {
-            return ListDropletsRequest.builder()
-                .page(0)
                 .build();
         }
 

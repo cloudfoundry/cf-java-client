@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.organizationquotadefinitions;
 
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.DeleteOrganizationQuotaDefinitionRequest;
@@ -43,8 +44,6 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-import org.cloudfoundry.client.v2.Metadata;
-
 public final class ReactorOrganizationQuotaDefinitionsTest {
 
     public static final class CreateQuotaDefinition extends AbstractClientApiTest<CreateOrganizationQuotaDefinitionRequest, CreateOrganizationQuotaDefinitionResponse> {
@@ -62,12 +61,6 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
                     .status(CREATED)
                     .payload("fixtures/client/v2/quota_definitions/POST_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected CreateOrganizationQuotaDefinitionRequest getInvalidRequest() {
-            return CreateOrganizationQuotaDefinitionRequest.builder()
                 .build();
         }
 
@@ -133,11 +126,6 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
         }
 
         @Override
-        protected DeleteOrganizationQuotaDefinitionRequest getInvalidRequest() {
-            return DeleteOrganizationQuotaDefinitionRequest.builder().build();
-        }
-
-        @Override
         protected DeleteOrganizationQuotaDefinitionResponse getResponse() {
             return null;
         }
@@ -170,12 +158,6 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
                     .status(OK)
                     .payload("fixtures/client/v2/quota_definitions/GET_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected GetOrganizationQuotaDefinitionRequest getInvalidRequest() {
-            return GetOrganizationQuotaDefinitionRequest.builder()
                 .build();
         }
 
@@ -235,11 +217,6 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
         }
 
         @Override
-        protected ListOrganizationQuotaDefinitionsRequest getInvalidRequest() {
-            return null;
-        }
-
-        @Override
         protected ListOrganizationQuotaDefinitionsResponse getResponse() {
             return ListOrganizationQuotaDefinitionsResponse.builder()
                 .totalPages(1)
@@ -296,12 +273,6 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
                     .status(CREATED)
                     .payload("fixtures/client/v2/quota_definitions/PUT_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected UpdateOrganizationQuotaDefinitionRequest getInvalidRequest() {
-            return UpdateOrganizationQuotaDefinitionRequest.builder()
                 .build();
         }
 

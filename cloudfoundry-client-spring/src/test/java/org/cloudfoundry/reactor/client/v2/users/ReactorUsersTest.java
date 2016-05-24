@@ -50,11 +50,6 @@ public final class ReactorUsersTest {
         }
 
         @Override
-        protected ListUsersRequest getInvalidRequest() {
-            return null;
-        }
-
-        @Override
         protected ListUsersResponse getResponse() {
             return ListUsersResponse.builder()
                 .totalResults(2)

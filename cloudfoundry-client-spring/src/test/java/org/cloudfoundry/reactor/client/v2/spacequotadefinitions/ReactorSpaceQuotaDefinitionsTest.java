@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.spacequotadefinitions;
 
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.spacequotadefinitions.AssociateSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.AssociateSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionRequest;
@@ -38,8 +39,6 @@ import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-import org.cloudfoundry.client.v2.Metadata;
-
 public final class ReactorSpaceQuotaDefinitionsTest {
 
     public static final class AssociateSpace extends AbstractClientApiTest<AssociateSpaceQuotaDefinitionRequest, AssociateSpaceQuotaDefinitionResponse> {
@@ -57,11 +56,6 @@ public final class ReactorSpaceQuotaDefinitionsTest {
                     .payload("fixtures/client/v2/space_quota_definitions/PUT_{id}_spaces_{id}_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected AssociateSpaceQuotaDefinitionRequest getInvalidRequest() {
-            return AssociateSpaceQuotaDefinitionRequest.builder().build();
         }
 
         @Override
@@ -115,12 +109,6 @@ public final class ReactorSpaceQuotaDefinitionsTest {
                     .status(OK)
                     .payload("fixtures/client/v2/space_quota_definitions/GET_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected GetSpaceQuotaDefinitionRequest getInvalidRequest() {
-            return GetSpaceQuotaDefinitionRequest.builder()
                 .build();
         }
 
@@ -179,11 +167,6 @@ public final class ReactorSpaceQuotaDefinitionsTest {
         }
 
         @Override
-        protected ListSpaceQuotaDefinitionsRequest getInvalidRequest() {
-            return null;
-        }
-
-        @Override
         protected ListSpaceQuotaDefinitionsResponse getResponse() {
             return ListSpaceQuotaDefinitionsResponse.builder()
                 .totalResults(1)
@@ -237,12 +220,6 @@ public final class ReactorSpaceQuotaDefinitionsTest {
                 .response(TestResponse.builder()
                     .status(NO_CONTENT)
                     .build())
-                .build();
-        }
-
-        @Override
-        protected RemoveSpaceQuotaDefinitionRequest getInvalidRequest() {
-            return RemoveSpaceQuotaDefinitionRequest.builder()
                 .build();
         }
 

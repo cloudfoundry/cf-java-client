@@ -66,11 +66,6 @@ public final class ReactorServicePlansTest {
         }
 
         @Override
-        protected DeleteServicePlanRequest getInvalidRequest() {
-            return DeleteServicePlanRequest.builder().build();
-        }
-
-        @Override
         protected DeleteServicePlanResponse getResponse() {
             return null;
         }
@@ -104,11 +99,6 @@ public final class ReactorServicePlansTest {
                     .payload("fixtures/client/v2/service_plans/DELETE_{id}_async_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected DeleteServicePlanRequest getInvalidRequest() {
-            return DeleteServicePlanRequest.builder().build();
         }
 
         @Override
@@ -156,11 +146,6 @@ public final class ReactorServicePlansTest {
                     .payload("fixtures/client/v2/service_plans/GET_{id}_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected GetServicePlanRequest getInvalidRequest() {
-            return GetServicePlanRequest.builder().build();
         }
 
         @Override
@@ -213,11 +198,6 @@ public final class ReactorServicePlansTest {
                     .payload("fixtures/client/v2/service_plans/GET_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected ListServicePlansRequest getInvalidRequest() {
-            return null;
         }
 
         @Override
@@ -278,12 +258,6 @@ public final class ReactorServicePlansTest {
         }
 
         @Override
-        protected ListServicePlanServiceInstancesRequest getInvalidRequest() {
-            return ListServicePlanServiceInstancesRequest.builder()
-                .build();
-        }
-
-        @Override
         protected ListServicePlanServiceInstancesResponse getResponse() {
             return ListServicePlanServiceInstancesResponse.builder()
                 .totalResults(1)
@@ -340,12 +314,6 @@ public final class ReactorServicePlansTest {
                     .status(CREATED)
                     .payload("fixtures/client/v2/service_plans/PUT_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected UpdateServicePlanRequest getInvalidRequest() {
-            return UpdateServicePlanRequest.builder()
                 .build();
         }
 

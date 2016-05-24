@@ -64,12 +64,6 @@ public final class ReactorServiceBrokersTest {
         }
 
         @Override
-        protected CreateServiceBrokerRequest getInvalidRequest() {
-            return CreateServiceBrokerRequest.builder()
-                .build();
-        }
-
-        @Override
         protected CreateServiceBrokerResponse getResponse() {
             return CreateServiceBrokerResponse.builder()
                 .metadata(Metadata.builder()
@@ -119,12 +113,6 @@ public final class ReactorServiceBrokersTest {
         }
 
         @Override
-        protected DeleteServiceBrokerRequest getInvalidRequest() {
-            return DeleteServiceBrokerRequest.builder()
-                .build();
-        }
-
-        @Override
         protected Void getResponse() {
             return null;
         }
@@ -157,11 +145,6 @@ public final class ReactorServiceBrokersTest {
                     .payload("fixtures/client/v2/service_brokers/GET_{id}_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected GetServiceBrokerRequest getInvalidRequest() {
-            return GetServiceBrokerRequest.builder().build();
         }
 
         @Override
@@ -210,11 +193,6 @@ public final class ReactorServiceBrokersTest {
                     .payload("fixtures/client/v2/service_brokers/GET_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected ListServiceBrokersRequest getInvalidRequest() {
-            return null;
         }
 
         @Override
@@ -293,11 +271,6 @@ public final class ReactorServiceBrokersTest {
                     .payload("fixtures/client/v2/service_brokers/PUT_{id}_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected UpdateServiceBrokerRequest getInvalidRequest() {
-            return UpdateServiceBrokerRequest.builder().build();
         }
 
         @Override

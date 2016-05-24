@@ -52,12 +52,6 @@ public final class ReactorStacksTest {
         }
 
         @Override
-        protected GetStackRequest getInvalidRequest() {
-            return GetStackRequest.builder()
-                .build();
-        }
-
-        @Override
         protected GetStackResponse getResponse() {
             return GetStackResponse.builder()
                 .metadata(Metadata.builder()
@@ -101,11 +95,6 @@ public final class ReactorStacksTest {
                     .payload("fixtures/client/v2/stacks/GET_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected ListStacksRequest getInvalidRequest() {
-            return null;
         }
 
         @Override

@@ -55,11 +55,6 @@ public final class ReactorServiceUsageEventsTest {
         }
 
         @Override
-        protected GetServiceUsageEventRequest getInvalidRequest() {
-            return GetServiceUsageEventRequest.builder().build();
-        }
-
-        @Override
         protected GetServiceUsageEventResponse getResponse() {
             return GetServiceUsageEventResponse.builder()
                 .metadata(Metadata.builder()
@@ -111,11 +106,6 @@ public final class ReactorServiceUsageEventsTest {
                     .payload("fixtures/client/v2/service_usage_events/GET_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected ListServiceUsageEventsRequest getInvalidRequest() {
-            return null;
         }
 
         @Override
@@ -175,11 +165,6 @@ public final class ReactorServiceUsageEventsTest {
                     .status(NO_CONTENT)
                     .build())
                 .build();
-        }
-
-        @Override
-        protected PurgeAndReseedServiceUsageEventsRequest getInvalidRequest() {
-            return null;
         }
 
         @Override

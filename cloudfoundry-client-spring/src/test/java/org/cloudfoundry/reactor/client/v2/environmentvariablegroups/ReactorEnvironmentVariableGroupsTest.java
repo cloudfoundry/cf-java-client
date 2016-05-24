@@ -55,11 +55,6 @@ public class ReactorEnvironmentVariableGroupsTest {
         }
 
         @Override
-        protected GetRunningEnvironmentVariablesRequest getInvalidRequest() {
-            return null;
-        }
-
-        @Override
         protected GetRunningEnvironmentVariablesResponse getResponse() {
             return GetRunningEnvironmentVariablesResponse.builder()
                 .environmentVariable("abc", 123)
@@ -94,11 +89,6 @@ public class ReactorEnvironmentVariableGroupsTest {
                     .payload("fixtures/client/v2/environment_variable_groups/GET_staging_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected GetStagingEnvironmentVariablesRequest getInvalidRequest() {
-            return null;
         }
 
         @Override
@@ -140,11 +130,6 @@ public class ReactorEnvironmentVariableGroupsTest {
         }
 
         @Override
-        protected UpdateRunningEnvironmentVariablesRequest getInvalidRequest() {
-            return null;
-        }
-
-        @Override
         protected UpdateRunningEnvironmentVariablesResponse getResponse() {
             return UpdateRunningEnvironmentVariablesResponse.builder()
                 .environmentVariable("abc", 123)
@@ -182,11 +167,6 @@ public class ReactorEnvironmentVariableGroupsTest {
                     .payload("fixtures/client/v2/environment_variable_groups/PUT_staging_response.json")
                     .build())
                 .build();
-        }
-
-        @Override
-        protected UpdateStagingEnvironmentVariablesRequest getInvalidRequest() {
-            return null;
         }
 
         @Override
