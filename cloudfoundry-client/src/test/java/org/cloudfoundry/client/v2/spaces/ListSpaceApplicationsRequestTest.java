@@ -16,30 +16,21 @@
 
 package org.cloudfoundry.client.v2.spaces;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public final class ListSpaceApplicationsRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = ListSpaceApplicationsRequest.builder()
-            .spaceId("test-space-id")
-            .build()
-            .isValid();
-
-        assertEquals(ValidationResult.Status.VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noSpaceId() {
+        ListSpaceApplicationsRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = ListSpaceApplicationsRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(ValidationResult.Status.INVALID, result.getStatus());
+    public void valid() {
+        ListSpaceApplicationsRequest.builder()
+            .spaceId("test-space-id")
+            .build();
     }
 
 }

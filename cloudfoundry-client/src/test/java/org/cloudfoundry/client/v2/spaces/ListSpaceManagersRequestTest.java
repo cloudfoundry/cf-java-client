@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.client.v2.spaces;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class ListSpaceManagersRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = ListSpaceManagersRequest.builder()
-            .spaceId("test-space-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noSpaceId() {
+        ListSpaceManagersRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = ListSpaceManagersRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("space id must be specified", result.getMessages().get(0));
+    public void valid() {
+        ListSpaceManagersRequest.builder()
+            .spaceId("test-space-id")
+            .build();
     }
 
 }

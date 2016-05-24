@@ -18,8 +18,6 @@ package org.cloudfoundry.operations.organizationadmin;
 
 import org.junit.Test;
 
-import static org.cloudfoundry.util.test.TestObjects.fill;
-
 public final class CreateQuotaRequestTest {
 
     @Test(expected = IllegalStateException.class)
@@ -30,7 +28,7 @@ public final class CreateQuotaRequestTest {
 
     @Test
     public void valid() {
-        fill(CreateQuotaRequest.builder())
+        CreateQuotaRequest.builder()
             .name("test-name")
             .build();
     }

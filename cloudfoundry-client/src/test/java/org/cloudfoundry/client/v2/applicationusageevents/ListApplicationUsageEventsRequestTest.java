@@ -16,17 +16,14 @@
 
 package org.cloudfoundry.client.v2.applicationusageevents;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public final class ListApplicationUsageEventsRequestTest {
 
     @Test
-    public void isValid() {
-        assertEquals(ValidationResult.Status.VALID,
-            ListApplicationUsageEventsRequest.builder().build().isValid().getStatus());
+    public void valid() {
+        ListApplicationUsageEventsRequest.builder()
+            .build();
     }
 
 }

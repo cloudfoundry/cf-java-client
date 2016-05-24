@@ -122,11 +122,10 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
         String instanceName = getServiceInstanceName();
 
         this.spaceId
-            .then(spaceId -> Mono
-                .when(
-                    getCreateApplicationId(this.cloudFoundryClient, applicationName, spaceId),
-                    getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId)
-                ))
+            .then(spaceId -> Mono.when(
+                getCreateApplicationId(this.cloudFoundryClient, applicationName, spaceId),
+                getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId)
+            ))
             .as(thenKeep(function((applicationId, instanceId) -> this.cloudFoundryClient.serviceBindingsV2()
                 .create(CreateServiceBindingRequest.builder()
                     .applicationId(applicationId)
@@ -175,18 +174,18 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getId);
     }
 
-    private static Mono<CreateUserProvidedServiceInstanceResponse> requestCreateUserProvidedServiceInstance(CloudFoundryClient cloudFoundryClient, String instanceName, String spaceId) {
-        return cloudFoundryClient.userProvidedServiceInstances()
-            .create(CreateUserProvidedServiceInstanceRequest.builder()
-                .name(instanceName)
-                .spaceId(spaceId)
-                .build());
-    }
-
     private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
         return cloudFoundryClient.applicationsV2()
             .create(CreateApplicationRequest.builder()
                 .name(applicationName)
+                .spaceId(spaceId)
+                .build());
+    }
+
+    private static Mono<CreateUserProvidedServiceInstanceResponse> requestCreateUserProvidedServiceInstance(CloudFoundryClient cloudFoundryClient, String instanceName, String spaceId) {
+        return cloudFoundryClient.userProvidedServiceInstances()
+            .create(CreateUserProvidedServiceInstanceRequest.builder()
+                .name(instanceName)
                 .spaceId(spaceId)
                 .build());
     }

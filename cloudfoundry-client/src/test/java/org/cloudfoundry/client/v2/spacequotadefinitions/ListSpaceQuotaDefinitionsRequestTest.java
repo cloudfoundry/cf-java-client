@@ -16,17 +16,14 @@
 
 package org.cloudfoundry.client.v2.spacequotadefinitions;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public final class ListSpaceQuotaDefinitionsRequestTest {
 
     @Test
-    public void isValid() {
-        assertEquals(ValidationResult.Status.VALID,
-            ListSpaceQuotaDefinitionsRequest.builder().build().isValid().getStatus());
+    public void valid() {
+        ListSpaceQuotaDefinitionsRequest.builder()
+            .build();
     }
 
 }

@@ -520,12 +520,6 @@ public final class SpringApplicationsV2Test {
 
         private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
 
-
-        @Override
-        protected ListApplicationsRequest getInvalidRequest() {
-            return null;
-        }
-
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
@@ -664,12 +658,6 @@ public final class SpringApplicationsV2Test {
         private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
-        protected ListApplicationRoutesRequest getInvalidRequest() {
-            return ListApplicationRoutesRequest.builder()
-                .build();
-        }
-
-        @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(GET).path("/v2/apps/test-application-id/routes?page=-1")
@@ -721,12 +709,6 @@ public final class SpringApplicationsV2Test {
     public static final class ListServiceBindings extends AbstractApiTest<ListApplicationServiceBindingsRequest, ListApplicationServiceBindingsResponse> {
 
         private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
-
-        @Override
-        protected ListApplicationServiceBindingsRequest getInvalidRequest() {
-            return ListApplicationServiceBindingsRequest.builder()
-                .build();
-        }
 
         @Override
         protected RequestContext getRequestContext() {

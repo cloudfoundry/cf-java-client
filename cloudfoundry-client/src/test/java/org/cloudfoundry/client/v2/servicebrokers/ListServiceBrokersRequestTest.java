@@ -18,15 +18,13 @@ package org.cloudfoundry.client.v2.servicebrokers;
 
 import org.junit.Test;
 
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
-
 
 public final class ListServiceBrokersRequestTest {
 
     @Test
-    public void isValid() {
-        assertEquals(VALID, ListServiceBrokersRequest.builder().build().isValid().getStatus());
+    public void valid() {
+        ListServiceBrokersRequest.builder()
+            .build();
     }
 
 }

@@ -16,22 +16,15 @@
 
 package org.cloudfoundry.client.v2.shareddomains;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class ListSharedDomainsRequestTest {
 
     @Test
-    public void isValid() {
-        ValidationResult result = ListSharedDomainsRequest.builder()
+    public void valid() {
+        ListSharedDomainsRequest.builder()
             .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

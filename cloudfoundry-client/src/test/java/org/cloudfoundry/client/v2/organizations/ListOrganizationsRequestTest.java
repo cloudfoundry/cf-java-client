@@ -16,16 +16,14 @@
 
 package org.cloudfoundry.client.v2.organizations;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public final class ListOrganizationsRequestTest {
 
     @Test
-    public void isValid() {
-        assertEquals(ValidationResult.Status.VALID, ListOrganizationsRequest.builder().build().isValid().getStatus());
+    public void valid() {
+        ListOrganizationsRequest.builder()
+            .build();
     }
 
 }

@@ -87,17 +87,16 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
 
         requestCreateSharedDomain(this.cloudFoundryClient, domainName)
             .map(ResourceUtils::getId)
-            .then(sharedDomainId -> Mono
-                .when(
-                    Mono.just(sharedDomainId),
-                    requestListSharedDomains(this.cloudFoundryClient, domainName)
-                        .single()
-                ))
+            .then(sharedDomainId -> Mono.when(
+                Mono.just(sharedDomainId),
+                requestListSharedDomains(this.cloudFoundryClient, domainName)
+                    .single()
+            ))
             .subscribe(this.<Tuple2<String, SharedDomainResource>>testSubscriber()
                 .assertThat(consumer((id, resource) -> assertEquals(id, ResourceUtils.getId(resource)))));
     }
 
-    // TODO: awaiting story https://www.pivotaltracker.com/story/show/101527362 to re-implement with get() 
+    // TODO: awaiting story https://www.pivotaltracker.com/story/show/101527362 to re-implement with get()
     private static Mono<SharedDomainResource> getSharedDomainResource(CloudFoundryClient cloudFoundryClient, String sharedDomainId) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.sharedDomains()
@@ -116,7 +115,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
     }
 
     private static Flux<SharedDomainResource> requestListSharedDomains(CloudFoundryClient cloudFoundryClient, String sharedDomainName) {
-        ListSharedDomainsRequest.ListSharedDomainsRequestBuilder requestBuilder = ListSharedDomainsRequest.builder();
+        ListSharedDomainsRequest.Builder requestBuilder = ListSharedDomainsRequest.builder();
         Optional.ofNullable(sharedDomainName).ifPresent(requestBuilder::name);
 
         return PaginationUtils.requestResources(page -> cloudFoundryClient.sharedDomains()

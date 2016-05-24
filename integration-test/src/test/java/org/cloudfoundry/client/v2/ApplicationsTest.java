@@ -113,18 +113,16 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         Mono
             .when(this.organizationId, this.spaceId)
-            .then(function((organizationId, spaceId) -> Mono
-                .when(
-                    createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
-                    createRouteWithDomain(cloudFoundryClient, organizationId, spaceId, domainName, "test-host", "/test/path")
-                        .map(ResourceUtils::getId)
-                )))
+            .then(function((organizationId, spaceId) -> Mono.when(
+                createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
+                createRouteWithDomain(this.cloudFoundryClient, organizationId, spaceId, domainName, "test-host", "/test/path")
+                    .map(ResourceUtils::getId)
+            )))
             .as(thenKeep(function((applicationId, routeId) -> requestAssociateRoute(this.cloudFoundryClient, applicationId, routeId))))
-            .then(function((applicationId, routeId) -> Mono
-                .when(
-                    getSingleRouteId(cloudFoundryClient, applicationId),
-                    Mono.just(routeId)
-                )))
+            .then(function((applicationId, routeId) -> Mono.when(
+                getSingleRouteId(this.cloudFoundryClient, applicationId),
+                Mono.just(routeId)
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -135,13 +133,12 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String copyApplicationName = getApplicationName();
 
         this.spaceId
-            .then(spaceId -> Mono
-                .when(
-                    createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
-                        .as(thenKeep(applicationId -> uploadApplication(this.cloudFoundryClient, applicationId))),
-                    requestCreateApplication(this.cloudFoundryClient, spaceId, copyApplicationName)
-                        .map(ResourceUtils::getId)
-                ))
+            .then(spaceId -> Mono.when(
+                createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
+                    .as(thenKeep(applicationId -> uploadApplication(this.cloudFoundryClient, applicationId))),
+                requestCreateApplication(this.cloudFoundryClient, spaceId, copyApplicationName)
+                    .map(ResourceUtils::getId)
+            ))
             .as(thenKeep(function((sourceId, targetId) -> this.cloudFoundryClient.applicationsV2()
                 .copy(CopyApplicationRequest.builder()
                     .applicationId(targetId)
@@ -149,11 +146,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build())
                 .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))
             )))
-            .then(function((sourceId, targetId) -> Mono
-                .when(
-                    downloadApplication(this.cloudFoundryClient, sourceId),
-                    downloadApplication(this.cloudFoundryClient, targetId)
-                )))
+            .then(function((sourceId, targetId) -> Mono.when(
+                downloadApplication(this.cloudFoundryClient, sourceId),
+                downloadApplication(this.cloudFoundryClient, targetId)
+            )))
             .subscribe(this.<Tuple2<byte[], byte[]>>testSubscriber()
                 .assertThat(consumer((Consumer2<byte[], byte[]>) Assert::assertArrayEquals)));
     }
@@ -163,12 +159,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = getApplicationName();
 
         this.spaceId
-            .then(spaceId -> Mono
-                .when(
-                    Mono.just(spaceId),
-                    requestCreateApplication(this.cloudFoundryClient, spaceId, applicationName)
-                        .map(ResourceUtils::getEntity)
-                ))
+            .then(spaceId -> Mono.when(
+                Mono.just(spaceId),
+                requestCreateApplication(this.cloudFoundryClient, spaceId, applicationName)
+                    .map(ResourceUtils::getEntity)
+            ))
             .subscribe(this.<Tuple2<String, ApplicationEntity>>testSubscriber()
                 .assertThat(consumer((spaceId, entity) -> {
                     assertEquals(spaceId, entity.getSpaceId());
@@ -214,14 +209,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .then(applicationId -> Mono
-                .when(
-                    Mono.just(applicationId),
-                    this.cloudFoundryClient.applicationsV2()
-                        .environment(ApplicationEnvironmentRequest.builder()
-                            .applicationId(applicationId)
-                            .build())
-                        .map(response -> getStringApplicationEnvValue(response.getApplicationEnvironmentJsons(), "VCAP_APPLICATION", "application_id")))
+            .then(applicationId -> Mono.when(
+                Mono.just(applicationId),
+                this.cloudFoundryClient.applicationsV2()
+                    .environment(ApplicationEnvironmentRequest.builder()
+                        .applicationId(applicationId)
+                        .build())
+                    .map(response -> getStringApplicationEnvValue(response.getApplicationEnvironmentJsons(), "VCAP_APPLICATION", "application_id")))
             )
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
@@ -233,11 +227,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .then(applicationId -> Mono
-                .when(
-                    Mono.just(applicationId),
-                    requestGetApplication(cloudFoundryClient, applicationId)
-                ))
+            .then(applicationId -> Mono.when(
+                Mono.just(applicationId),
+                requestGetApplication(this.cloudFoundryClient, applicationId)
+            ))
             .subscribe(this.<Tuple2<String, AbstractApplicationResource>>testSubscriber()
                 .assertThat(applicationIdAndResourceMatchesName(applicationName)));
     }
@@ -248,18 +241,17 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .then(applicationId -> Mono
-                .when(
-                    Mono.just(applicationId),
-                    PaginationUtils
-                        .requestResources(page -> this.cloudFoundryClient.applicationsV2()
-                            .list(ListApplicationsRequest.builder()
-                                .page(page)
-                                .build()))
-                        .filter(resource -> ResourceUtils.getId(resource).equals(applicationId))
-                        .single()
-                        .cast(AbstractApplicationResource.class)
-                ))
+            .then(applicationId -> Mono.when(
+                Mono.just(applicationId),
+                PaginationUtils
+                    .requestResources(page -> this.cloudFoundryClient.applicationsV2()
+                        .list(ListApplicationsRequest.builder()
+                            .page(page)
+                            .build()))
+                    .filter(resource -> ResourceUtils.getId(resource).equals(applicationId))
+                    .single()
+                    .cast(AbstractApplicationResource.class)
+            ))
             .subscribe(this.<Tuple2<String, AbstractApplicationResource>>testSubscriber()
                 .assertThat(applicationIdAndResourceMatchesName(applicationName)));
     }
@@ -270,19 +262,18 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .then(applicationId -> Mono
-                .when(
-                    Mono.just(applicationId),
-                    PaginationUtils
-                        .requestResources(page -> this.cloudFoundryClient.applicationsV2()
-                            .list(ListApplicationsRequest.builder()
-                                .diego(true)
-                                .page(page)
-                                .build()))
-                        .filter(resource -> ResourceUtils.getId(resource).equals(applicationId))
-                        .single()
-                        .cast(AbstractApplicationResource.class)
-                ))
+            .then(applicationId -> Mono.when(
+                Mono.just(applicationId),
+                PaginationUtils
+                    .requestResources(page -> this.cloudFoundryClient.applicationsV2()
+                        .list(ListApplicationsRequest.builder()
+                            .diego(true)
+                            .page(page)
+                            .build()))
+                    .filter(resource -> ResourceUtils.getId(resource).equals(applicationId))
+                    .single()
+                    .cast(AbstractApplicationResource.class)
+            ))
             .subscribe(this.<Tuple2<String, AbstractApplicationResource>>testSubscriber()
                 .assertThat(applicationIdAndResourceMatchesName(applicationName)));
     }
@@ -293,19 +284,18 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .then(applicationId -> Mono
-                .when(
-                    Mono.just(applicationId),
-                    PaginationUtils
-                        .requestResources(page -> this.cloudFoundryClient.applicationsV2()
-                            .list(ListApplicationsRequest.builder()
-                                .name(applicationName)
-                                .page(page)
-                                .build()))
-                        .filter(resource -> ResourceUtils.getId(resource).equals(applicationId))
-                        .single()
-                        .cast(AbstractApplicationResource.class)
-                ))
+            .then(applicationId -> Mono.when(
+                Mono.just(applicationId),
+                PaginationUtils
+                    .requestResources(page -> this.cloudFoundryClient.applicationsV2()
+                        .list(ListApplicationsRequest.builder()
+                            .name(applicationName)
+                            .page(page)
+                            .build()))
+                    .filter(resource -> ResourceUtils.getId(resource).equals(applicationId))
+                    .single()
+                    .cast(AbstractApplicationResource.class)
+            ))
             .subscribe(this.<Tuple2<String, AbstractApplicationResource>>testSubscriber()
                 .assertThat(applicationIdAndResourceMatchesName(applicationName)));
     }
@@ -320,19 +310,18 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 this.spaceId
                     .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
             )
-            .then(function((organizationId, applicationId) -> Mono
-                .when(
-                    Mono.just(applicationId),
-                    PaginationUtils
-                        .requestResources(page -> this.cloudFoundryClient.applicationsV2()
-                            .list(ListApplicationsRequest.builder()
-                                .organizationId(organizationId)
-                                .page(page)
-                                .build()))
-                        .filter(resource -> ResourceUtils.getId(resource).equals(applicationId))
-                        .single()
-                        .cast(AbstractApplicationResource.class)
-                )))
+            .then(function((organizationId, applicationId) -> Mono.when(
+                Mono.just(applicationId),
+                PaginationUtils
+                    .requestResources(page -> this.cloudFoundryClient.applicationsV2()
+                        .list(ListApplicationsRequest.builder()
+                            .organizationId(organizationId)
+                            .page(page)
+                            .build()))
+                    .filter(resource -> ResourceUtils.getId(resource).equals(applicationId))
+                    .single()
+                    .cast(AbstractApplicationResource.class)
+            )))
             .subscribe(this.<Tuple2<String, AbstractApplicationResource>>testSubscriber()
                 .assertThat(applicationIdAndResourceMatchesName(applicationName)));
     }
@@ -342,24 +331,22 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = getApplicationName();
 
         this.spaceId
-            .then(spaceId -> Mono
-                .when(
-                    Mono.just(spaceId),
-                    createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
-                ))
-            .then(function((spaceId, applicationId) -> Mono
-                .when(
-                    Mono.just(applicationId),
-                    PaginationUtils
-                        .requestResources(page -> this.cloudFoundryClient.applicationsV2()
-                            .list(ListApplicationsRequest.builder()
-                                .spaceId(spaceId)
-                                .page(page)
-                                .build()))
-                        .filter(resource -> ResourceUtils.getId(resource).equals(applicationId))
-                        .single()
-                        .cast(AbstractApplicationResource.class)
-                )))
+            .then(spaceId -> Mono.when(
+                Mono.just(spaceId),
+                createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
+            ))
+            .then(function((spaceId, applicationId) -> Mono.when(
+                Mono.just(applicationId),
+                PaginationUtils
+                    .requestResources(page -> this.cloudFoundryClient.applicationsV2()
+                        .list(ListApplicationsRequest.builder()
+                            .spaceId(spaceId)
+                            .page(page)
+                            .build()))
+                    .filter(resource -> ResourceUtils.getId(resource).equals(applicationId))
+                    .single()
+                    .cast(AbstractApplicationResource.class)
+            )))
             .subscribe(this.<Tuple2<String, AbstractApplicationResource>>testSubscriber()
                 .assertThat(applicationIdAndResourceMatchesName(applicationName)));
     }
@@ -374,19 +361,18 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 this.spaceId
                     .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
             )
-            .then(function((stackId, applicationId) -> Mono
-                .when(
-                    Mono.just(applicationId),
-                    PaginationUtils
-                        .requestResources(page -> this.cloudFoundryClient.applicationsV2()
-                            .list(ListApplicationsRequest.builder()
-                                .stackId(stackId)
-                                .page(page)
-                                .build()))
-                        .filter(resource -> ResourceUtils.getId(resource).equals(applicationId))
-                        .single()
-                        .cast(AbstractApplicationResource.class)
-                )))
+            .then(function((stackId, applicationId) -> Mono.when(
+                Mono.just(applicationId),
+                PaginationUtils
+                    .requestResources(page -> this.cloudFoundryClient.applicationsV2()
+                        .list(ListApplicationsRequest.builder()
+                            .stackId(stackId)
+                            .page(page)
+                            .build()))
+                    .filter(resource -> ResourceUtils.getId(resource).equals(applicationId))
+                    .single()
+                    .cast(AbstractApplicationResource.class)
+            )))
             .subscribe(this.<Tuple2<String, AbstractApplicationResource>>testSubscriber()
                 .assertThat(applicationIdAndResourceMatchesName(applicationName)));
     }
@@ -398,31 +384,26 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         Mono
             .when(this.organizationId, this.spaceId)
-            .then(function((organizationId, spaceId) -> {
-                return Mono
-                    .when(
-                        Mono.just(organizationId),
-                        Mono.just(spaceId),
-                        createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
-                    );
-            }))
-            .then(function((organizationId, spaceId, applicationId) -> Mono
-                .when(
-                    Mono.just(applicationId),
-                    createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
-                )))
-            .then(function((applicationId, routeResponse) -> Mono
-                .when(
-                    Mono.just(ResourceUtils.getId(routeResponse)),
-                    PaginationUtils
-                        .requestResources(page -> this.cloudFoundryClient.applicationsV2()
-                            .listRoutes(ListApplicationRoutesRequest.builder()
-                                .applicationId(applicationId)
-                                .page(page)
-                                .build()))
-                        .single()
-                        .map(ResourceUtils::getId)
-                )))
+            .then(function((organizationId, spaceId) -> Mono.when(
+                Mono.just(organizationId),
+                Mono.just(spaceId),
+                createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
+            )))
+            .then(function((organizationId, spaceId, applicationId) -> Mono.when(
+                Mono.just(applicationId),
+                createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
+            )))
+            .then(function((applicationId, routeResponse) -> Mono.when(
+                Mono.just(ResourceUtils.getId(routeResponse)),
+                PaginationUtils
+                    .requestResources(page -> this.cloudFoundryClient.applicationsV2()
+                        .listRoutes(ListApplicationRoutesRequest.builder()
+                            .applicationId(applicationId)
+                            .page(page)
+                            .build()))
+                    .single()
+                    .map(ResourceUtils::getId)
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -434,32 +415,27 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         Mono
             .when(this.organizationId, this.spaceId)
-            .then(function((organizationId, spaceId) -> {
-                return Mono
-                    .when(
-                        Mono.just(organizationId),
-                        Mono.just(spaceId),
-                        createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
-                    );
-            }))
-            .then(function((organizationId, spaceId, applicationId) -> Mono
-                .when(
-                    Mono.just(applicationId),
-                    createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
-                )))
-            .then(function((applicationId, routeResponse) -> Mono
-                .when(
-                    Mono.just(ResourceUtils.getId(routeResponse)),
-                    PaginationUtils
-                        .requestResources(page -> this.cloudFoundryClient.applicationsV2()
-                            .listRoutes(ListApplicationRoutesRequest.builder()
-                                .applicationId(applicationId)
-                                .domainId(ResourceUtils.getEntity(routeResponse).getDomainId())
-                                .page(page)
-                                .build()))
-                        .single()
-                        .map(ResourceUtils::getId)
-                )))
+            .then(function((organizationId, spaceId) -> Mono.when(
+                Mono.just(organizationId),
+                Mono.just(spaceId),
+                createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
+            )))
+            .then(function((organizationId, spaceId, applicationId) -> Mono.when(
+                Mono.just(applicationId),
+                createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
+            )))
+            .then(function((applicationId, routeResponse) -> Mono.when(
+                Mono.just(ResourceUtils.getId(routeResponse)),
+                PaginationUtils
+                    .requestResources(page -> this.cloudFoundryClient.applicationsV2()
+                        .listRoutes(ListApplicationRoutesRequest.builder()
+                            .applicationId(applicationId)
+                            .domainId(ResourceUtils.getEntity(routeResponse).getDomainId())
+                            .page(page)
+                            .build()))
+                    .single()
+                    .map(ResourceUtils::getId)
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -471,32 +447,27 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         Mono
             .when(this.organizationId, this.spaceId)
-            .then(function((organizationId, spaceId) -> {
-                return Mono
-                    .when(
-                        Mono.just(organizationId),
-                        Mono.just(spaceId),
-                        createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
-                    );
-            }))
-            .then(function((organizationId, spaceId, applicationId) -> Mono
-                .when(
-                    Mono.just(applicationId),
-                    createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
-                )))
-            .then(function((applicationId, routeResponse) -> Mono
-                .when(
-                    Mono.just(ResourceUtils.getId(routeResponse)),
-                    PaginationUtils
-                        .requestResources(page -> this.cloudFoundryClient.applicationsV2()
-                            .listRoutes(ListApplicationRoutesRequest.builder()
-                                .applicationId(applicationId)
-                                .host(ResourceUtils.getEntity(routeResponse).getHost())
-                                .page(page)
-                                .build()))
-                        .single()
-                        .map(ResourceUtils::getId)
-                )))
+            .then(function((organizationId, spaceId) -> Mono.when(
+                Mono.just(organizationId),
+                Mono.just(spaceId),
+                createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
+            )))
+            .then(function((organizationId, spaceId, applicationId) -> Mono.when(
+                Mono.just(applicationId),
+                createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
+            )))
+            .then(function((applicationId, routeResponse) -> Mono.when(
+                Mono.just(ResourceUtils.getId(routeResponse)),
+                PaginationUtils
+                    .requestResources(page -> this.cloudFoundryClient.applicationsV2()
+                        .listRoutes(ListApplicationRoutesRequest.builder()
+                            .applicationId(applicationId)
+                            .host(ResourceUtils.getEntity(routeResponse).getHost())
+                            .page(page)
+                            .build()))
+                    .single()
+                    .map(ResourceUtils::getId)
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -508,32 +479,27 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         Mono
             .when(this.organizationId, this.spaceId)
-            .then(function((organizationId, spaceId) -> {
-                return Mono
-                    .when(
-                        Mono.just(organizationId),
-                        Mono.just(spaceId),
-                        createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
-                    );
-            }))
-            .then(function((organizationId, spaceId, applicationId) -> Mono
-                .when(
-                    Mono.just(applicationId),
-                    createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
-                )))
-            .then(function((applicationId, routeResponse) -> Mono
-                .when(
-                    Mono.just(ResourceUtils.getId(routeResponse)),
-                    PaginationUtils
-                        .requestResources(page -> this.cloudFoundryClient.applicationsV2()
-                            .listRoutes(ListApplicationRoutesRequest.builder()
-                                .applicationId(applicationId)
-                                .path(ResourceUtils.getEntity(routeResponse).getPath())
-                                .page(page)
-                                .build()))
-                        .single()
-                        .map(ResourceUtils::getId)
-                )))
+            .then(function((organizationId, spaceId) -> Mono.when(
+                Mono.just(organizationId),
+                Mono.just(spaceId),
+                createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
+            )))
+            .then(function((organizationId, spaceId, applicationId) -> Mono.when(
+                Mono.just(applicationId),
+                createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
+            )))
+            .then(function((applicationId, routeResponse) -> Mono.when(
+                Mono.just(ResourceUtils.getId(routeResponse)),
+                PaginationUtils
+                    .requestResources(page -> this.cloudFoundryClient.applicationsV2()
+                        .listRoutes(ListApplicationRoutesRequest.builder()
+                            .applicationId(applicationId)
+                            .path(ResourceUtils.getEntity(routeResponse).getPath())
+                            .page(page)
+                            .build()))
+                    .single()
+                    .map(ResourceUtils::getId)
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -545,32 +511,32 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         Mono
             .when(this.organizationId, this.spaceId)
-            .then(function((organizationId, spaceId) -> {
-                return Mono
-                    .when(
-                        Mono.just(organizationId),
-                        Mono.just(spaceId),
-                        createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
-                    );
-            }))
-            .then(function((organizationId, spaceId, applicationId) -> Mono
-                .when(
-                    Mono.just(applicationId),
-                    createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
-                )))
-            .then(function((applicationId, routeResponse) -> Mono
-                .when(
-                    Mono.just(ResourceUtils.getId(routeResponse)),
-                    PaginationUtils
-                        .requestResources(page -> this.cloudFoundryClient.applicationsV2()
-                            .listRoutes(ListApplicationRoutesRequest.builder()
-                                .applicationId(applicationId)
-                                .port(ResourceUtils.getEntity(routeResponse).getPort())
-                                .page(page)
-                                .build()))
-                        .single()
-                        .map(ResourceUtils::getId)
-                )))
+            .then(function((organizationId, spaceId) -> Mono.when(
+                Mono.just(organizationId),
+                Mono.just(spaceId),
+                createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
+            )))
+            .then(function((organizationId, spaceId, applicationId) -> Mono.when(
+                Mono.just(applicationId),
+                createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
+            )))
+            .then(function((applicationId, routeResponse) -> Mono.when(
+                Mono.just(ResourceUtils.getId(routeResponse)),
+                PaginationUtils
+                    .requestResources(page -> {
+                        ListApplicationRoutesRequest.Builder builder = ListApplicationRoutesRequest.builder()
+                            .applicationId(applicationId)
+                            .page(page);
+
+                        Optional.ofNullable(ResourceUtils.getEntity(routeResponse).getPort()).ifPresent(builder::port);
+
+                        return this.cloudFoundryClient.applicationsV2()
+                            .listRoutes(builder
+                                .build());
+                    })
+                    .single()
+                    .map(ResourceUtils::getId)
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -581,17 +547,15 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String serviceInstanceName = getServiceInstanceName();
 
         this.spaceId
-            .then(spaceId -> Mono
-                .when(
-                    createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
-                    createUserServiceInstanceId(this.cloudFoundryClient, spaceId, serviceInstanceName)
-                ))
+            .then(spaceId -> Mono.when(
+                createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
+                createUserServiceInstanceId(this.cloudFoundryClient, spaceId, serviceInstanceName)
+            ))
             .as(thenKeep(function((applicationId, serviceInstanceId) -> createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId))))
-            .then(function((applicationId, serviceInstanceId) -> Mono
-                .when(
-                    Mono.just(serviceInstanceId),
-                    getSingleServiceBindingInstanceId(this.cloudFoundryClient, applicationId)
-                )))
+            .then(function((applicationId, serviceInstanceId) -> Mono.when(
+                Mono.just(serviceInstanceId),
+                getSingleServiceBindingInstanceId(this.cloudFoundryClient, applicationId)
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -602,30 +566,27 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String serviceInstanceName = getServiceInstanceName();
 
         this.spaceId
-            .then(spaceId -> Mono
-                .when(
-                    createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
-                    createUserServiceInstanceId(this.cloudFoundryClient, spaceId, serviceInstanceName)
-                ))
-            .then(function((applicationId, serviceInstanceId) -> Mono
-                .when(
-                    Mono.just(applicationId),
-                    Mono.just(serviceInstanceId),
-                    createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)
-                )))
-            .then(function((applicationId, serviceInstanceId, serviceBindingId) -> Mono
-                .when(
-                    Mono.just(serviceBindingId),
-                    PaginationUtils
-                        .requestResources(page -> this.cloudFoundryClient.applicationsV2()
-                            .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
-                                .applicationId(applicationId)
-                                .serviceInstanceId(serviceInstanceId)
-                                .page(page)
-                                .build()))
-                        .single()
-                        .map(ResourceUtils::getId)
-                )))
+            .then(spaceId -> Mono.when(
+                createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
+                createUserServiceInstanceId(this.cloudFoundryClient, spaceId, serviceInstanceName)
+            ))
+            .then(function((applicationId, serviceInstanceId) -> Mono.when(
+                Mono.just(applicationId),
+                Mono.just(serviceInstanceId),
+                createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)
+            )))
+            .then(function((applicationId, serviceInstanceId, serviceBindingId) -> Mono.when(
+                Mono.just(serviceBindingId),
+                PaginationUtils
+                    .requestResources(page -> this.cloudFoundryClient.applicationsV2()
+                        .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
+                            .applicationId(applicationId)
+                            .serviceInstanceId(serviceInstanceId)
+                            .page(page)
+                            .build()))
+                    .single()
+                    .map(ResourceUtils::getId)
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -637,19 +598,15 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         Mono
             .when(this.organizationId, this.spaceId)
-            .then(function((organizationId, spaceId) -> {
-                return Mono
-                    .when(
-                        Mono.just(organizationId),
-                        Mono.just(spaceId),
-                        createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
-                    );
-            }))
-            .then(function((organizationId, spaceId, applicationId) -> Mono
-                .when(
-                    Mono.just(applicationId),
-                    createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
-                )))
+            .then(function((organizationId, spaceId) -> Mono.when(
+                Mono.just(organizationId),
+                Mono.just(spaceId),
+                createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
+            )))
+            .then(function((organizationId, spaceId, applicationId) -> Mono.when(
+                Mono.just(applicationId),
+                createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
+            )))
             .as(thenKeep(function((applicationId, routeResponse) -> this.cloudFoundryClient.applicationsV2()
                 .removeRoute(RemoveApplicationRouteRequest.builder()
                     .applicationId(applicationId)
@@ -665,16 +622,14 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String serviceInstanceName = getServiceInstanceName();
 
         this.spaceId
-            .then(spaceId -> Mono
-                .when(
-                    createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
-                    createUserServiceInstanceId(cloudFoundryClient, spaceId, serviceInstanceName)
-                ))
-            .then(function((applicationId, serviceInstanceId) -> Mono
-                .when(
-                    Mono.just(applicationId),
-                    createServiceBindingId(cloudFoundryClient, applicationId, serviceInstanceId)
-                )))
+            .then(spaceId -> Mono.when(
+                createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
+                createUserServiceInstanceId(this.cloudFoundryClient, spaceId, serviceInstanceName)
+            ))
+            .then(function((applicationId, serviceInstanceId) -> Mono.when(
+                Mono.just(applicationId),
+                createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)
+            )))
             .as(thenKeep(function((applicationId, serviceBindingId) -> this.cloudFoundryClient.applicationsV2()
                 .removeServiceBinding(RemoveApplicationServiceBindingRequest.builder()
                     .applicationId(applicationId)
@@ -739,12 +694,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
             .as(thenKeep(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId)))
-            .then(applicationId -> Mono
-                .when(
-                    Mono.just(applicationId),
-                    getInstanceInfo(this.cloudFoundryClient, applicationId, "0")
-                        .map(info -> Optional.ofNullable(info.getSince()))
-                ))
+            .then(applicationId -> Mono.when(
+                Mono.just(applicationId),
+                getInstanceInfo(this.cloudFoundryClient, applicationId, "0")
+                    .map(info -> Optional.ofNullable(info.getSince()))
+            ))
             .as(thenKeep(function((applicationId, optionalSince) -> this.cloudFoundryClient.applicationsV2()
                 .terminateInstance(TerminateApplicationInstanceRequest.builder()
                     .applicationId(applicationId)
@@ -785,11 +739,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
             .as(thenKeep(applicationId -> uploadApplication(this.cloudFoundryClient, applicationId)))
-            .then(applicationId -> Mono
-                .when(
-                    downloadApplication(cloudFoundryClient, applicationId),
-                    getByteArrayFrom(testApplicationName, testApplication)
-                ))
+            .then(applicationId -> Mono.when(
+                downloadApplication(this.cloudFoundryClient, applicationId),
+                getByteArrayFrom(testApplicationName, testApplication)
+            ))
             .subscribe(this.<Tuple2<byte[], byte[]>>testSubscriber()
                 .assertThat(consumer((bytes1, bytes2) -> zipAssertEquivalent(new ByteArrayInputStream(bytes1), new ByteArrayInputStream(bytes2)))));
     }
@@ -804,11 +757,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
             .as(thenKeep(applicationId -> uploadApplicationAsyncFalse(this.cloudFoundryClient, applicationId)))
-            .then(applicationId -> Mono
-                .when(
-                    downloadApplication(cloudFoundryClient, applicationId),
-                    getByteArrayFrom(testApplicationName, testApplication)
-                ))
+            .then(applicationId -> Mono.when(
+                downloadApplication(this.cloudFoundryClient, applicationId),
+                getByteArrayFrom(testApplicationName, testApplication)
+            ))
             .subscribe(this.<Tuple2<byte[], byte[]>>testSubscriber()
                 .assertThat(consumer((bytes1, bytes2) -> zipAssertEquivalent(new ByteArrayInputStream(bytes1), new ByteArrayInputStream(bytes2)))));
     }

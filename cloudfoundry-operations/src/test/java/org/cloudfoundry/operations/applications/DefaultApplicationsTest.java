@@ -333,7 +333,7 @@ public final class DefaultApplicationsTest {
 
     private static void requestApplicationSummary(CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient.applicationsV2()
-            .summary(fill(SummaryApplicationRequest.builder())
+            .summary(SummaryApplicationRequest.builder()
                 .applicationId(applicationId)
                 .build()))
             .thenReturn(Mono
@@ -348,7 +348,7 @@ public final class DefaultApplicationsTest {
 
     private static void requestApplicationSummaryDetectedBuildpack(CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient.applicationsV2()
-            .summary(fill(SummaryApplicationRequest.builder())
+            .summary(SummaryApplicationRequest.builder()
                 .applicationId(applicationId)
                 .build()))
             .thenReturn(Mono
@@ -364,7 +364,7 @@ public final class DefaultApplicationsTest {
 
     private static void requestApplicationSummaryNoBuildpack(CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient.applicationsV2()
-            .summary(fill(SummaryApplicationRequest.builder())
+            .summary(SummaryApplicationRequest.builder()
                 .applicationId(applicationId)
                 .build()))
             .thenReturn(Mono
@@ -381,7 +381,7 @@ public final class DefaultApplicationsTest {
 
     private static void requestApplicationSummaryNoRoutes(CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient.applicationsV2()
-            .summary(fill(SummaryApplicationRequest.builder())
+            .summary(SummaryApplicationRequest.builder()
                 .applicationId(applicationId)
                 .build()))
             .thenReturn(Mono
@@ -398,8 +398,8 @@ public final class DefaultApplicationsTest {
         when(cloudFoundryClient.spaces()
             .listApplications(ListSpaceApplicationsRequest.builder()
                 .name(application)
-                .spaceId(spaceId)
                 .page(1)
+                .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListSpaceApplicationsResponse.builder())
@@ -418,9 +418,9 @@ public final class DefaultApplicationsTest {
 
     private static void requestApplicationsEmpty(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         when(cloudFoundryClient.spaces()
-            .listApplications(fill(ListSpaceApplicationsRequest.builder())
-                .diego(null)
+            .listApplications(ListSpaceApplicationsRequest.builder()
                 .name(application)
+                .page(1)
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
@@ -430,11 +430,10 @@ public final class DefaultApplicationsTest {
 
     private static void requestApplicationsSpecificState(CloudFoundryClient cloudFoundryClient, String application, String spaceId, String stateReturned) {
         when(cloudFoundryClient.spaces()
-            .listApplications(fill(ListSpaceApplicationsRequest.builder())
-                .spaceId(spaceId)
-                .diego(null)
+            .listApplications(ListSpaceApplicationsRequest.builder()
                 .name(application)
                 .page(1)
+                .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListSpaceApplicationsResponse.builder())
@@ -847,7 +846,7 @@ public final class DefaultApplicationsTest {
     }
 
     private static void requestRoutes(CloudFoundryClient cloudFoundryClient, String domainId, String host, String routePath, String routeId) {
-        ListRoutesRequest.ListRoutesRequestBuilder requestBuilder = ListRoutesRequest.builder();
+        ListRoutesRequest.Builder requestBuilder = ListRoutesRequest.builder();
         if (host != null) {
             requestBuilder.host(host);
         }
@@ -876,7 +875,7 @@ public final class DefaultApplicationsTest {
     }
 
     private static void requestRoutesEmpty(CloudFoundryClient cloudFoundryClient, String domainId, String host, String routePath) {
-        ListRoutesRequest.ListRoutesRequestBuilder requestBuilder = ListRoutesRequest.builder();
+        ListRoutesRequest.Builder requestBuilder = ListRoutesRequest.builder();
         if (host != null) {
             requestBuilder.host(host);
         }
@@ -3925,7 +3924,8 @@ public final class DefaultApplicationsTest {
         @Override
         protected Mono<Void> invoke() {
             return this.applications
-                .start(fill(StartApplicationRequest.builder(), "application-")
+                .start(StartApplicationRequest.builder()
+                    .name("test-application-name")
                     .build());
         }
 
@@ -3952,7 +3952,8 @@ public final class DefaultApplicationsTest {
         @Override
         protected Mono<Void> invoke() {
             return this.applications
-                .start(fill(StartApplicationRequest.builder(), "application-")
+                .start(StartApplicationRequest.builder()
+                    .name("test-application-name")
                     .build());
         }
 
@@ -3979,7 +3980,8 @@ public final class DefaultApplicationsTest {
         @Override
         protected Mono<Void> invoke() {
             return this.applications
-                .start(fill(StartApplicationRequest.builder(), "application-")
+                .start(StartApplicationRequest.builder()
+                    .name("test-application-name")
                     .startupTimeout(Duration.ofSeconds(1))
                     .build());
         }
@@ -4004,7 +4006,8 @@ public final class DefaultApplicationsTest {
         @Override
         protected Mono<Void> invoke() {
             return this.applications
-                .start(fill(StartApplicationRequest.builder(), "application-")
+                .start(StartApplicationRequest.builder()
+                    .name("test-application-name")
                     .build());
         }
 
@@ -4027,7 +4030,8 @@ public final class DefaultApplicationsTest {
         @Override
         protected Mono<Void> invoke() {
             return this.applications
-                .start(fill(StartApplicationRequest.builder(), "application-")
+                .start(StartApplicationRequest.builder()
+                    .name("test-application-name")
                     .build());
         }
 
@@ -4053,7 +4057,8 @@ public final class DefaultApplicationsTest {
         @Override
         protected Mono<Void> invoke() {
             return this.applications
-                .start(fill(StartApplicationRequest.builder(), "application-")
+                .start(StartApplicationRequest.builder()
+                    .name("test-application-name")
                     .build());
         }
 
@@ -4077,7 +4082,8 @@ public final class DefaultApplicationsTest {
         @Override
         protected Mono<Void> invoke() {
             return this.applications
-                .stop(fill(StopApplicationRequest.builder(), "application-")
+                .stop(StopApplicationRequest.builder()
+                    .name("test-application-name")
                     .build());
         }
 
@@ -4101,7 +4107,8 @@ public final class DefaultApplicationsTest {
         @Override
         protected Mono<Void> invoke() {
             return this.applications
-                .stop(fill(StopApplicationRequest.builder(), "application-")
+                .stop(StopApplicationRequest.builder()
+                    .name("test-application-name")
                     .build());
         }
 
@@ -4124,7 +4131,8 @@ public final class DefaultApplicationsTest {
         @Override
         protected Mono<Void> invoke() {
             return this.applications
-                .stop(fill(StopApplicationRequest.builder(), "application-")
+                .stop(StopApplicationRequest.builder()
+                    .name("test-application-name")
                     .build());
         }
 

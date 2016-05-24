@@ -66,10 +66,9 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
                 getSharedDomainId(this.cloudFoundryClient, domainName),
                 this.spaceId
             )
-            .then(function((domainId, spaceId) -> Mono
-                .when(
-                    getApplicationId(this.cloudFoundryClient, applicationName, spaceId),
-                    getRouteId(this.cloudFoundryClient, domainId, hostName, spaceId))
+            .then(function((domainId, spaceId) -> Mono.when(
+                getApplicationId(this.cloudFoundryClient, applicationName, spaceId),
+                getRouteId(this.cloudFoundryClient, domainId, hostName, spaceId))
             ))
             .then(function((applicationId, routeId) -> Mono
                 .when(
@@ -131,15 +130,14 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .then(spaceId -> getRouteMappingId(this.cloudFoundryClient, applicationName, domainName, hostName, spaceId))
-            .then(routeMappingId -> Mono
-                .when(
-                    Mono.just(routeMappingId),
-                    this.cloudFoundryClient.routeMappings()
-                        .get(GetRouteMappingRequest.builder()
-                            .routeMappingId(routeMappingId)
-                            .build())
-                        .map(ResourceUtils::getId)
-                ))
+            .then(routeMappingId -> Mono.when(
+                Mono.just(routeMappingId),
+                this.cloudFoundryClient.routeMappings()
+                    .get(GetRouteMappingRequest.builder()
+                        .routeMappingId(routeMappingId)
+                        .build())
+                    .map(ResourceUtils::getId)
+            ))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -151,17 +149,15 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
         String hostName = getHostName();
 
         this.spaceId
-            .then(spaceId -> Mono
-                .when(
-                    getSharedDomainId(cloudFoundryClient, domainName),
-                    Mono.just(spaceId)
-                ))
-            .then(function((domainId, spaceId) -> Mono
-                .when(
-                    getApplicationId(cloudFoundryClient, applicationName, spaceId),
-                    getRouteId(cloudFoundryClient, domainId, hostName, spaceId)
-                )))
-            .then(function((applicationId, routeId) -> requestCreateRouteMapping(cloudFoundryClient, applicationId, routeId)
+            .then(spaceId -> Mono.when(
+                getSharedDomainId(this.cloudFoundryClient, domainName),
+                Mono.just(spaceId)
+            ))
+            .then(function((domainId, spaceId) -> Mono.when(
+                getApplicationId(this.cloudFoundryClient, applicationName, spaceId),
+                getRouteId(this.cloudFoundryClient, domainId, hostName, spaceId)
+            )))
+            .then(function((applicationId, routeId) -> requestCreateRouteMapping(this.cloudFoundryClient, applicationId, routeId)
                 .then(Mono.just(applicationId))))
             .flatMap(applicationId -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.routeMappings()
@@ -182,17 +178,15 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
         String hostName = getHostName();
 
         this.spaceId
-            .then(spaceId -> Mono
-                .when(
-                    getSharedDomainId(cloudFoundryClient, domainName),
-                    Mono.just(spaceId)
-                ))
-            .then(function((domainId, spaceId) -> Mono
-                .when(
-                    getApplicationId(cloudFoundryClient, applicationName, spaceId),
-                    getRouteId(cloudFoundryClient, domainId, hostName, spaceId)
-                )))
-            .then(function((applicationId, routeId) -> requestCreateRouteMapping(cloudFoundryClient, applicationId, routeId)
+            .then(spaceId -> Mono.when(
+                getSharedDomainId(this.cloudFoundryClient, domainName),
+                Mono.just(spaceId)
+            ))
+            .then(function((domainId, spaceId) -> Mono.when(
+                getApplicationId(this.cloudFoundryClient, applicationName, spaceId),
+                getRouteId(this.cloudFoundryClient, domainId, hostName, spaceId)
+            )))
+            .then(function((applicationId, routeId) -> requestCreateRouteMapping(this.cloudFoundryClient, applicationId, routeId)
                 .then(Mono.just(routeId))))
             .flatMap(routeId -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.routeMappings()
@@ -223,11 +217,10 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
 
     private static Mono<String> getRouteMappingId(CloudFoundryClient cloudFoundryClient, String applicationName, String domainName, String hostName, String spaceId) {
         return getSharedDomainId(cloudFoundryClient, domainName)
-            .then(domainId -> Mono
-                .when(
-                    getApplicationId(cloudFoundryClient, applicationName, spaceId),
-                    getRouteId(cloudFoundryClient, domainId, hostName, spaceId)
-                ))
+            .then(domainId -> Mono.when(
+                getApplicationId(cloudFoundryClient, applicationName, spaceId),
+                getRouteId(cloudFoundryClient, domainId, hostName, spaceId)
+            ))
             .then(function((applicationId, routeId) -> createRouteMappingId(cloudFoundryClient, applicationId, routeId)
             ));
     }

@@ -16,30 +16,21 @@
 
 package org.cloudfoundry.client.v2.spaces;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public final class ListSpaceUserRolesRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = ListSpaceUserRolesRequest.builder()
-            .spaceId("test-space-id")
-            .build()
-            .isValid();
-
-        assertEquals(ValidationResult.Status.VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noSpaceId() {
+        ListSpaceUserRolesRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = ListSpaceUserRolesRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(ValidationResult.Status.INVALID, result.getStatus());
+    public void valid() {
+        ListSpaceUserRolesRequest.builder()
+            .spaceId("test-space-id")
+            .build();
     }
 
 }

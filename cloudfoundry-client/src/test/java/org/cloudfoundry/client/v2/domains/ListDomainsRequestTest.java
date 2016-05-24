@@ -16,21 +16,14 @@
 
 package org.cloudfoundry.client.v2.domains;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class ListDomainsRequestTest {
 
     @Test
-    public void isValid() {
-        ValidationResult result = ListDomainsRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    public void valid() {
+        ListDomainsRequest.builder()
+            .build();
     }
 
 }

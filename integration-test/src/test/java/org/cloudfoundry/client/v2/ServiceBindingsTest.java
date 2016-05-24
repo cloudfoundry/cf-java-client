@@ -77,7 +77,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
         String applicationName = getApplicationName();
         String serviceInstanceName = getServiceInstanceName();
 
-        createServiceInstanceAndApplicationIds(spaceId, cloudFoundryClient, serviceInstanceName, applicationName)
+        createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
             .then(function((serviceInstanceId, applicationId) -> Mono
                 .when(
                     Mono.just(serviceInstanceId),
@@ -95,7 +95,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
         String applicationName = getApplicationName();
         String serviceInstanceName = getServiceInstanceName();
 
-        createServiceInstanceAndApplicationIds(spaceId, cloudFoundryClient, serviceInstanceName, applicationName)
+        createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
             .then(function((serviceInstanceId, applicationId) -> Mono
                 .when(
                     Mono.just(serviceInstanceId),
@@ -117,7 +117,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
         String applicationName = getApplicationName();
         String serviceInstanceName = getServiceInstanceName();
 
-        createServiceInstanceAndApplicationIds(spaceId, cloudFoundryClient, serviceInstanceName, applicationName)
+        createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
             .then(function((serviceInstanceId, applicationId) -> Mono
                 .when(
                     Mono.just(serviceInstanceId),
@@ -141,7 +141,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
         String applicationName = getApplicationName();
         String serviceInstanceName = getServiceInstanceName();
 
-        createServiceInstanceAndApplicationIds(spaceId, cloudFoundryClient, serviceInstanceName, applicationName)
+        createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
             .then(function((serviceInstanceId, applicationId) -> Mono
                 .when(
                     Mono.just(serviceInstanceId),
@@ -165,7 +165,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
         String applicationName = getApplicationName();
         String serviceInstanceName = getServiceInstanceName();
 
-        createServiceInstanceAndApplicationIds(spaceId, cloudFoundryClient, serviceInstanceName, applicationName)
+        createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
             .then(function((serviceInstanceId, applicationId) -> Mono
                 .when(
                     Mono.just(serviceInstanceId),
@@ -196,11 +196,10 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
 
     private static Mono<Tuple2<String, String>> createServiceInstanceAndApplicationIds(Mono<String> spaceId, CloudFoundryClient cloudFoundryClient, String serviceInstance, String application) {
         return spaceId
-            .then(spaceId1 -> Mono
-                .when(
-                    createUserServiceInstanceId(cloudFoundryClient, spaceId1, serviceInstance),
-                    createApplicationId(cloudFoundryClient, spaceId1, application)
-                ));
+            .then(spaceId1 -> Mono.when(
+                createUserServiceInstanceId(cloudFoundryClient, spaceId1, serviceInstance),
+                createApplicationId(cloudFoundryClient, spaceId1, application)
+            ));
     }
 
     private static Mono<String> createUserServiceInstanceId(CloudFoundryClient cloudFoundryClient, String spaceId, String serviceInstanceName) {
@@ -257,7 +256,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
     }
 
     private static Flux<ServiceBindingResource> requestListServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId) {
-        ListServiceBindingsRequest.ListServiceBindingsRequestBuilder builder = ListServiceBindingsRequest.builder();
+        ListServiceBindingsRequest.Builder builder = ListServiceBindingsRequest.builder();
 
         Optional.ofNullable(applicationId).map(builder::applicationId);
         Optional.ofNullable(serviceInstanceId).map(builder::serviceInstanceId);

@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.client.v2.services;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class ListServiceServicePlansRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = ListServiceServicePlansRequest.builder()
-            .serviceId("test-service-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noServiceId() {
+        ListServiceServicePlansRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = ListServiceServicePlansRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service id must be specified", result.getMessages().get(0));
+    public void valid() {
+        ListServiceServicePlansRequest.builder()
+            .serviceId("test-service-id")
+            .build();
     }
 
 }

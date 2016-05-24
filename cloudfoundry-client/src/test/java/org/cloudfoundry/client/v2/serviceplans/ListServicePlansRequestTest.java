@@ -16,17 +16,14 @@
 
 package org.cloudfoundry.client.v2.serviceplans;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public final class ListServicePlansRequestTest {
 
     @Test
-    public void isValid() {
-        assertEquals(ValidationResult.Status.VALID,
-            ListServicePlansRequest.builder().build().isValid().getStatus());
+    public void valid() {
+        ListServicePlansRequest.builder()
+            .build();
     }
 
 }

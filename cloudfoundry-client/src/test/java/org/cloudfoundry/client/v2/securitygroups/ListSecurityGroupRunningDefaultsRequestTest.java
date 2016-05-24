@@ -16,16 +16,14 @@
 
 package org.cloudfoundry.client.v2.securitygroups;
 
-import org.cloudfoundry.ValidationResult;
-import org.junit.Assert;
 import org.junit.Test;
 
 public final class ListSecurityGroupRunningDefaultsRequestTest {
 
     @Test
-    public void isValid() {
-        Assert.assertEquals(ValidationResult.Status.VALID,
-            ListSecurityGroupRunningDefaultsRequest.builder().build().isValid().getStatus());
+    public void valid() {
+        ListSecurityGroupRunningDefaultsRequest.builder()
+            .build();
     }
 
 }

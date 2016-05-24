@@ -92,9 +92,9 @@ public final class DefaultServicesTest {
 
     private static void requestApplications(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
         when(cloudFoundryClient.spaces()
-            .listApplications(fill(ListSpaceApplicationsRequest.builder())
-                .diego(null)
+            .listApplications(ListSpaceApplicationsRequest.builder()
                 .name(applicationName)
+                .page(1)
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
@@ -106,9 +106,9 @@ public final class DefaultServicesTest {
 
     private static void requestApplicationsEmpty(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
         when(cloudFoundryClient.spaces()
-            .listApplications(fill(ListSpaceApplicationsRequest.builder())
-                .diego(null)
+            .listApplications(ListSpaceApplicationsRequest.builder()
                 .name(applicationName)
+                .page(1)
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono

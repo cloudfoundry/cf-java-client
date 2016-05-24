@@ -33,8 +33,9 @@ public final class DefaultSpaceAdminTest {
 
     private static void requestSpaceQuotaDefinitions(CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient.organizations()
-            .listSpaceQuotaDefinitions(fill(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
+            .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
                 .organizationId(organizationId)
+                .page(1)
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
@@ -45,8 +46,9 @@ public final class DefaultSpaceAdminTest {
 
     private static void requestSpaceQuotaDefinitionsEmpty(CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient.organizations()
-            .listSpaceQuotaDefinitions(fill(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
+            .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
                 .organizationId(organizationId)
+                .page(1)
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListOrganizationSpaceQuotaDefinitionsResponse.builder())

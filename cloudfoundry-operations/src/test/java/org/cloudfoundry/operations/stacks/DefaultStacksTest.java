@@ -33,7 +33,8 @@ public final class DefaultStacksTest {
 
     private static void requestStacks(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.stacks()
-            .list(fill(ListStacksRequest.builder())
+            .list(ListStacksRequest.builder()
+                .page(1)
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListStacksResponse.builder())
@@ -44,8 +45,9 @@ public final class DefaultStacksTest {
 
     private static void requestStacks(CloudFoundryClient cloudFoundryClient, String name) {
         when(cloudFoundryClient.stacks()
-            .list(fill(ListStacksRequest.builder())
+            .list(ListStacksRequest.builder()
                 .name(name)
+                .page(1)
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListStacksResponse.builder())

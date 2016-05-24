@@ -77,11 +77,10 @@ public final class DomainsTest extends AbstractIntegrationTest {
         String domainName = getDomainName();
 
         this.organizationId
-            .then(organizationId -> Mono
-                .when(
-                    createDomainEntity(this.cloudFoundryClient, organizationId, domainName),
-                    Mono.just(organizationId)
-                ))
+            .then(organizationId -> Mono.when(
+                createDomainEntity(this.cloudFoundryClient, organizationId, domainName),
+                Mono.just(organizationId)
+            ))
             .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
                 .assertThat(entityMatchesDomainNameAndOrganizationId(domainName)));
     }
@@ -116,16 +115,14 @@ public final class DomainsTest extends AbstractIntegrationTest {
         String domainName = getDomainName();
 
         this.organizationId
-            .then(organizationId -> Mono
-                .when(
-                    Mono.just(organizationId),
-                    createDomainId(this.cloudFoundryClient, domainName, organizationId)
-                ))
-            .then(function((organizationId, domainId) -> Mono
-                .when(
-                    getDomainEntity(this.cloudFoundryClient, domainId),
-                    Mono.just(organizationId)
-                )))
+            .then(organizationId -> Mono.when(
+                Mono.just(organizationId),
+                createDomainId(this.cloudFoundryClient, domainName, organizationId)
+            ))
+            .then(function((organizationId, domainId) -> Mono.when(
+                getDomainEntity(this.cloudFoundryClient, domainId),
+                Mono.just(organizationId)
+            )))
             .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
                 .assertThat(entityMatchesDomainNameAndOrganizationId(domainName)));
     }
@@ -135,19 +132,17 @@ public final class DomainsTest extends AbstractIntegrationTest {
         String domainName = getDomainName();
 
         this.organizationId
-            .then(organizationId -> Mono
-                .when(
-                    Mono.just(organizationId),
-                    createDomainId(this.cloudFoundryClient, domainName, organizationId)
-                ))
-            .then(function((organizationId, domainId) -> Mono
-                .when(
-                    requestListDomains(cloudFoundryClient)
-                        .filter(resource -> domainId.equals(ResourceUtils.getId(resource)))
-                        .single()
-                        .map(ResourceUtils::getEntity),
-                    Mono.just(organizationId)
-                )))
+            .then(organizationId -> Mono.when(
+                Mono.just(organizationId),
+                createDomainId(this.cloudFoundryClient, domainName, organizationId)
+            ))
+            .then(function((organizationId, domainId) -> Mono.when(
+                requestListDomains(this.cloudFoundryClient)
+                    .filter(resource -> domainId.equals(ResourceUtils.getId(resource)))
+                    .single()
+                    .map(ResourceUtils::getEntity),
+                Mono.just(organizationId)
+            )))
             .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
                 .assertThat(entityMatchesDomainNameAndOrganizationId(domainName)));
     }
@@ -158,19 +153,17 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
         Mono
             .when(this.organizationId, this.spaceId)
-            .then(function((organizationId, spaceId) -> Mono
-                .when(
-                    createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                    Mono.just(spaceId)
-                )))
-            .then(function((domainId, spaceId) -> Mono
-                .when(
-                    requestListDomainSpaces(cloudFoundryClient, domainId)
-                        .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
-                        .single()
-                        .map(ResourceUtils::getId),
-                    Mono.just(spaceId)
-                )))
+            .then(function((organizationId, spaceId) -> Mono.when(
+                createDomainId(this.cloudFoundryClient, domainName, organizationId),
+                Mono.just(spaceId)
+            )))
+            .then(function((domainId, spaceId) -> Mono.when(
+                requestListDomainSpaces(this.cloudFoundryClient, domainId)
+                    .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
+                    .single()
+                    .map(ResourceUtils::getId),
+                Mono.just(spaceId)
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -183,23 +176,21 @@ public final class DomainsTest extends AbstractIntegrationTest {
         this.organizationId
             .then(organizationId -> createDomainId(this.cloudFoundryClient, domainName, organizationId))
             .and(this.spaceId)
-            .then(function((domainId, spaceId) -> Mono
-                .when(
-                    Mono.just(domainId),
-                    Mono.just(spaceId),
-                    getApplicationId(cloudFoundryClient, applicationName, spaceId),
-                    getRouteId(cloudFoundryClient, domainId, spaceId)
-                )))
-            .as(thenKeep(function((domainId, spaceId, applicationId, routeId) -> requestAssociateRouteApplication(cloudFoundryClient, applicationId, routeId)
+            .then(function((domainId, spaceId) -> Mono.when(
+                Mono.just(domainId),
+                Mono.just(spaceId),
+                getApplicationId(this.cloudFoundryClient, applicationName, spaceId),
+                getRouteId(this.cloudFoundryClient, domainId, spaceId)
             )))
-            .then(function((domainId, spaceId, applicationId, routeId) -> Mono
-                .when(
-                    requestListDomainSpacesByApplicationId(cloudFoundryClient, applicationId, domainId)
-                        .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
-                        .single()
-                        .map(ResourceUtils::getId),
-                    Mono.just(spaceId)
-                )))
+            .as(thenKeep(function((domainId, spaceId, applicationId, routeId) -> requestAssociateRouteApplication(this.cloudFoundryClient, applicationId, routeId)
+            )))
+            .then(function((domainId, spaceId, applicationId, routeId) -> Mono.when(
+                requestListDomainSpacesByApplicationId(this.cloudFoundryClient, applicationId, domainId)
+                    .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
+                    .single()
+                    .map(ResourceUtils::getId),
+                Mono.just(spaceId)
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -210,15 +201,14 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
         Mono
             .when(this.spaceId, this.organizationId, this.userId)
-            .then(function((spaceId, organizationId, userId) -> Mono
-                .when(
-                    createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                    requestAssociateOrganizationUser(cloudFoundryClient, organizationId, userId),
-                    Mono.just(spaceId),
-                    Mono.just(userId)
-                )))
-            .as(thenKeep(function((domainId, response, spaceId, userId) -> requestAssociateSpaceDeveloper(cloudFoundryClient, spaceId, userId))))
-            .then(function((domainId, response, spaceId, userId) -> requestListSpaceDevelopers(cloudFoundryClient, domainId, userId)
+            .then(function((spaceId, organizationId, userId) -> Mono.when(
+                createDomainId(this.cloudFoundryClient, domainName, organizationId),
+                requestAssociateOrganizationUser(this.cloudFoundryClient, organizationId, userId),
+                Mono.just(spaceId),
+                Mono.just(userId)
+            )))
+            .as(thenKeep(function((domainId, response, spaceId, userId) -> requestAssociateSpaceDeveloper(this.cloudFoundryClient, spaceId, userId))))
+            .then(function((domainId, response, spaceId, userId) -> requestListSpaceDevelopers(this.cloudFoundryClient, domainId, userId)
                 .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
                 .single()
                 .map(ResourceUtils::getId)
@@ -240,14 +230,13 @@ public final class DomainsTest extends AbstractIntegrationTest {
                     getSpaceName(this.cloudFoundryClient, spaceId),
                     createDomainId(this.cloudFoundryClient, domainName, organizationId)
                 )))
-            .then(function((spaceId, spaceName, domainId) -> Mono
-                .when(
-                    requestListDomainSpacesBySpaceName(cloudFoundryClient, domainId, spaceName)
-                        .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
-                        .single()
-                        .map(ResourceUtils::getId),
-                    Mono.just(spaceId)
-                )))
+            .then(function((spaceId, spaceName, domainId) -> Mono.when(
+                requestListDomainSpacesBySpaceName(this.cloudFoundryClient, domainId, spaceName)
+                    .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
+                    .single()
+                    .map(ResourceUtils::getId),
+                Mono.just(spaceId)
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -258,20 +247,18 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
         Mono
             .when(this.organizationId, this.spaceId)
-            .then(function((organizationId, spaceId) -> Mono
-                .when(
-                    createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                    Mono.just(organizationId),
-                    Mono.just(spaceId)
-                )))
-            .then(function((domainId, organizationId, spaceId) -> Mono
-                .when(
-                    requestListDomainSpacesByOrganizationId(cloudFoundryClient, domainId, organizationId)
-                        .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
-                        .single()
-                        .map(ResourceUtils::getId),
-                    Mono.just(spaceId)
-                )))
+            .then(function((organizationId, spaceId) -> Mono.when(
+                createDomainId(this.cloudFoundryClient, domainName, organizationId),
+                Mono.just(organizationId),
+                Mono.just(spaceId)
+            )))
+            .then(function((domainId, organizationId, spaceId) -> Mono.when(
+                requestListDomainSpacesByOrganizationId(this.cloudFoundryClient, domainId, organizationId)
+                    .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
+                    .single()
+                    .map(ResourceUtils::getId),
+                Mono.just(spaceId)
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -281,19 +268,17 @@ public final class DomainsTest extends AbstractIntegrationTest {
         String domainName = getDomainName();
 
         this.organizationId
-            .then(organizationId -> Mono
-                .when(
-                    Mono.just(organizationId),
-                    createDomainId(this.cloudFoundryClient, domainName, organizationId)
-                ))
-            .then(function((organizationId, domainId) -> Mono
-                .when(
-                    requestListDomains(cloudFoundryClient, domainName)
-                        .filter(resource -> domainId.equals(ResourceUtils.getId(resource)))
-                        .single()
-                        .map(ResourceUtils::getEntity),
-                    Mono.just(organizationId)
-                )))
+            .then(organizationId -> Mono.when(
+                Mono.just(organizationId),
+                createDomainId(this.cloudFoundryClient, domainName, organizationId)
+            ))
+            .then(function((organizationId, domainId) -> Mono.when(
+                requestListDomains(this.cloudFoundryClient, domainName)
+                    .filter(resource -> domainId.equals(ResourceUtils.getId(resource)))
+                    .single()
+                    .map(ResourceUtils::getEntity),
+                Mono.just(organizationId)
+            )))
             .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
                 .assertThat(entityMatchesDomainNameAndOrganizationId(domainName)));
     }
@@ -303,19 +288,17 @@ public final class DomainsTest extends AbstractIntegrationTest {
         String domainName = getDomainName();
 
         this.organizationId
-            .then(organizationId -> Mono
-                .when(
-                    Mono.just(organizationId),
-                    createDomainId(this.cloudFoundryClient, domainName, organizationId)
-                ))
-            .then(function((organizationId, domainId) -> Mono
-                .when(
-                    requestListDomainsByOwningOrganization(cloudFoundryClient, organizationId)
-                        .filter(resource -> domainId.equals(ResourceUtils.getId(resource)))
-                        .single()
-                        .map(ResourceUtils::getEntity),
-                    Mono.just(organizationId)
-                )))
+            .then(organizationId -> Mono.when(
+                Mono.just(organizationId),
+                createDomainId(this.cloudFoundryClient, domainName, organizationId)
+            ))
+            .then(function((organizationId, domainId) -> Mono.when(
+                requestListDomainsByOwningOrganization(this.cloudFoundryClient, organizationId)
+                    .filter(resource -> domainId.equals(ResourceUtils.getId(resource)))
+                    .single()
+                    .map(ResourceUtils::getEntity),
+                Mono.just(organizationId)
+            )))
             .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
                 .assertThat(entityMatchesDomainNameAndOrganizationId(domainName)));
     }

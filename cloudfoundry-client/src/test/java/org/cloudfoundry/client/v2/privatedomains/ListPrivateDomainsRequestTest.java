@@ -16,32 +16,14 @@
 
 package org.cloudfoundry.client.v2.privatedomains;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class ListPrivateDomainsRequestTest {
 
     @Test
-    public void isValid() {
-        ValidationResult result = ListPrivateDomainsRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidWithNames() {
-        ValidationResult result = ListPrivateDomainsRequest.builder()
-            .name("fred")
-            .name("bill")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    public void valid() {
+        ListPrivateDomainsRequest.builder()
+            .build();
     }
 
 }

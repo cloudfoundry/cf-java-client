@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.util.test;
 
+import org.junit.Assert;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
@@ -76,8 +77,14 @@ public abstract class TestObjects {
         return fill(builder, Optional.of(modifier));
     }
 
+    private static boolean buildsRequestType(Class<?> builderType) {
+        return getBuiltType(builderType).getName().endsWith("Request");
+    }
+
     private static <T> T fill(T builder, Optional<String> modifier) {
         Class<?> builderType = builder.getClass();
+        Assert.assertFalse("Do not fill Request types", buildsRequestType(builderType));
+
         List<Method> builderMethods = getBuilderMethods(builderType);
         Set<String> builtGetters = getBuiltGetters(builderType);
 
@@ -99,11 +106,15 @@ public abstract class TestObjects {
     }
 
     private static Set<String> getBuiltGetters(Class<?> builderType) {
-        Class<?> builtType = getBuildMethod(builderType).getReturnType();
+        Class<?> builtType = getBuiltType(builderType);
         return Arrays.stream(ReflectionUtils.getUniqueDeclaredMethods(builtType))
             .map(Method::getName)
             .filter(s -> s.startsWith("get"))
             .collect(Collectors.toSet());
+    }
+
+    private static Class<?> getBuiltType(Class<?> builderType) {
+        return getBuildMethod(builderType).getReturnType();
     }
 
     private static List<Method> getConfigurationMethods(Class<?> builderType, List<Method> builderMethods, Set<String> builtGetters) {
@@ -112,7 +123,6 @@ public abstract class TestObjects {
             .filter(method -> returnsBuilder(method, builderType))
             .filter(TestObjects::hasSingleParameter)
             .filter(method -> hasMatchingGetter(method, builtGetters))
-            .filter(method -> !isPaginationParameter(method))
             .collect(Collectors.toList());
     }
 
@@ -181,11 +191,6 @@ public abstract class TestObjects {
 
     private static boolean hasSingleParameter(Method method) {
         return 1 == method.getParameterCount();
-    }
-
-    private static boolean isPaginationParameter(Method method) {
-        String name = method.getName();
-        return name.equals("orderDirection") || name.equals("resultsPerPage");
     }
 
     private static boolean isPublic(Method method) {

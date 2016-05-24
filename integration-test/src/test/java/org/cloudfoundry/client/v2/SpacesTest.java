@@ -95,7 +95,6 @@ import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static reactor.core.publisher.Mono.when;
 
 public final class SpacesTest extends AbstractIntegrationTest {
 
@@ -117,16 +116,15 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
-            .then(function((userId, spaceId) -> Mono
-                .when(
-                    Mono.just(spaceId),
-                    this.cloudFoundryClient.spaces()
-                        .associateAuditor(AssociateSpaceAuditorRequest.builder()
-                            .spaceId(spaceId)
-                            .auditorId(userId)
-                            .build())
-                        .map(ResourceUtils::getId)
-                )))
+            .then(function((userId, spaceId) -> Mono.when(
+                Mono.just(spaceId),
+                this.cloudFoundryClient.spaces()
+                    .associateAuditor(AssociateSpaceAuditorRequest.builder()
+                        .spaceId(spaceId)
+                        .auditorId(userId)
+                        .build())
+                    .map(ResourceUtils::getId)
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -160,16 +158,15 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
-            .then(function((userId, spaceId) -> Mono
-                .when(
-                    Mono.just(spaceId),
-                    this.cloudFoundryClient.spaces()
-                        .associateDeveloper(AssociateSpaceDeveloperRequest.builder()
-                            .spaceId(spaceId)
-                            .developerId(userId)
-                            .build())
-                        .map(ResourceUtils::getId)
-                )))
+            .then(function((userId, spaceId) -> Mono.when(
+                Mono.just(spaceId),
+                this.cloudFoundryClient.spaces()
+                    .associateDeveloper(AssociateSpaceDeveloperRequest.builder()
+                        .spaceId(spaceId)
+                        .developerId(userId)
+                        .build())
+                    .map(ResourceUtils::getId)
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -203,16 +200,15 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
-            .then(function((userId, spaceId) -> Mono
-                .when(
-                    Mono.just(spaceId),
-                    this.cloudFoundryClient.spaces()
-                        .associateManager(AssociateSpaceManagerRequest.builder()
-                            .spaceId(spaceId)
-                            .managerId(userId)
-                            .build())
-                        .map(ResourceUtils::getId)
-                )))
+            .then(function((userId, spaceId) -> Mono.when(
+                Mono.just(spaceId),
+                this.cloudFoundryClient.spaces()
+                    .associateManager(AssociateSpaceManagerRequest.builder()
+                        .spaceId(spaceId)
+                        .managerId(userId)
+                        .build())
+                    .map(ResourceUtils::getId)
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -330,14 +326,13 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = getSpaceName();
 
         createOrganizationIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName)
-            .then(function((organizationId, spaceId) -> Mono
-                .when(
-                    Mono.just(spaceId),
-                    requestListSpaces(this.cloudFoundryClient)
-                        .filter(hasOrganizationId(organizationId))
-                        .single()
-                        .map(ResourceUtils::getId)
-                )))
+            .then(function((organizationId, spaceId) -> Mono.when(
+                Mono.just(spaceId),
+                requestListSpaces(this.cloudFoundryClient)
+                    .filter(hasOrganizationId(organizationId))
+                    .single()
+                    .map(ResourceUtils::getId)
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -381,18 +376,16 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> Mono
-                .when(
-                    Mono.just(spaceId),
-                    createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
-                ))
-            .flatMap(function((spaceId, applicationId) ->
-                when(
-                    Mono.just(applicationId),
-                    requestListSpaceApplications(this.cloudFoundryClient, spaceId, builder -> builder.name(applicationName))
-                        .single()
-                        .map(ResourceUtils::getId)
-                )))
+            .then(spaceId -> Mono.when(
+                Mono.just(spaceId),
+                createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
+            ))
+            .flatMap(function((spaceId, applicationId) -> Mono.when(
+                Mono.just(applicationId),
+                requestListSpaceApplications(this.cloudFoundryClient, spaceId, builder -> builder.name(applicationName))
+                    .single()
+                    .map(ResourceUtils::getId)
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -403,11 +396,10 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = getSpaceName();
 
         this.organizationId
-            .then(organizationId -> Mono
-                .when(
-                    Mono.just(organizationId),
-                    createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
-                ))
+            .then(organizationId -> Mono.when(
+                Mono.just(organizationId),
+                createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
+            ))
             .as(thenKeep(function((organizationId, spaceId) -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))))
             .flatMap(function((organizationId, spaceId) -> requestListSpaceApplications(this.cloudFoundryClient, spaceId, builder -> builder.organizationId(organizationId))))
             .map(ResourceUtils::getEntity)
@@ -424,17 +416,17 @@ public final class SpacesTest extends AbstractIntegrationTest {
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
             .as(thenKeep(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName)))
-            .then(spaceId -> Mono
-                .when(
-                    Mono.just(spaceId),
-                    PaginationUtils
-                        .requestResources(page -> this.cloudFoundryClient.stacks()
-                            .list(ListStacksRequest.builder()
-                                .name(stackName)
-                                .page(page)
-                                .build()))
-                        .map(ResourceUtils::getId)
-                        .single()))
+            .then(spaceId -> Mono.when(
+                Mono.just(spaceId),
+                PaginationUtils
+                    .requestResources(page -> this.cloudFoundryClient.stacks()
+                        .list(ListStacksRequest.builder()
+                            .name(this.stackName)
+                            .page(page)
+                            .build()))
+                    .map(ResourceUtils::getId)
+                    .single()
+            ))
             .flatMap(function((spaceId, stackId) -> requestListSpaceApplications(this.cloudFoundryClient, spaceId, builder -> builder.stackId(stackId))))
             .map(ResourceUtils::getEntity)
             .map(ApplicationEntity::getName)
@@ -495,11 +487,10 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> createSpaceIdWithDomain(this.cloudFoundryClient, organizationId, spaceName, domainName))
-            .then(spaceId -> Mono
-                .when(
-                    Mono.just(spaceId),
-                    getSpaceDomainId(this.cloudFoundryClient, spaceId, domainName)
-                ))
+            .then(spaceId -> Mono.when(
+                Mono.just(spaceId),
+                getSpaceDomainId(this.cloudFoundryClient, spaceId, domainName)
+            ))
             .flatMap(function((spaceId, domainId) -> requestListSpaceDomains(this.cloudFoundryClient, spaceId)))
             .filter(domainResource -> domainName.equals(ResourceUtils.getEntity(domainResource).getName()))
             .subscribe(testSubscriber()
@@ -533,24 +524,23 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 createOrganizationId(this.cloudFoundryClient, spaceOrganizationName),
                 createOrganizationId(this.cloudFoundryClient, domainOrganizationName)
             )
-            .then(function((spaceOrganizationId, domainOrganizationId) -> Mono
-                .when(
-                    Mono.just(domainOrganizationId),
-                    this.cloudFoundryClient.domains()
-                        .create(CreateDomainRequest.builder()
-                            .name(domainName)
-                            .owningOrganizationId(domainOrganizationId)
-                            .wildcard(true)
-                            .build())
-                        .map(ResourceUtils::getId)
-                        .then(domainId -> this.cloudFoundryClient.spaces()
-                            .create(CreateSpaceRequest.builder()
-                                .domainId(domainId)
-                                .organizationId(spaceOrganizationId)
-                                .name(spaceName)
-                                .build()))
-                        .map(ResourceUtils::getId)
-                )))
+            .then(function((spaceOrganizationId, domainOrganizationId) -> Mono.when(
+                Mono.just(domainOrganizationId),
+                this.cloudFoundryClient.domains()
+                    .create(CreateDomainRequest.builder()
+                        .name(domainName)
+                        .owningOrganizationId(domainOrganizationId)
+                        .wildcard(true)
+                        .build())
+                    .map(ResourceUtils::getId)
+                    .then(domainId -> this.cloudFoundryClient.spaces()
+                        .create(CreateSpaceRequest.builder()
+                            .domainId(domainId)
+                            .organizationId(spaceOrganizationId)
+                            .name(spaceName)
+                            .build()))
+                    .map(ResourceUtils::getId)
+            )))
             .flatMap(function((domainOrganizationId, spaceId) -> requestListSpaceDomains(this.cloudFoundryClient, spaceId, builder -> builder.owningOrganizationId(domainOrganizationId))))
             .map(ResourceUtils::getEntity)
             .map(DomainEntity::getName)
@@ -564,7 +554,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> requestListSpaceEvents(cloudFoundryClient, spaceId))
+            .flatMap(spaceId -> requestListSpaceEvents(this.cloudFoundryClient, spaceId))
             .map(ResourceUtils::getEntity)
             .map(EventEntity::getType)
             .subscribe(this.<String>testSubscriber()
@@ -604,14 +594,13 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> Mono
-                .when(
-                    Mono.just(spaceId),
-                    requestListSpaceEvents(this.cloudFoundryClient, spaceId, builder -> builder.type("audit.space.create"))
-                        .single()
-                        .map(ResourceUtils::getEntity)
-                        .map(EventEntity::getSpaceId)
-                ))
+            .then(spaceId -> Mono.when(
+                Mono.just(spaceId),
+                requestListSpaceEvents(this.cloudFoundryClient, spaceId, builder -> builder.type("audit.space.create"))
+                    .single()
+                    .map(ResourceUtils::getEntity)
+                    .map(EventEntity::getSpaceId)
+            ))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -623,18 +612,16 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> Mono
-                .when(
-                    Mono.just(spaceId),
-                    createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
-                ))
-            .then(function((spaceId, applicationId) -> Mono
-                .when(
-                    Mono.just(spaceId),
-                    requestListSpaces(this.cloudFoundryClient, builder -> builder.applicationId(applicationId))
-                        .map(ResourceUtils::getId)
-                        .single()
-                )))
+            .then(spaceId -> Mono.when(
+                Mono.just(spaceId),
+                createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
+            ))
+            .then(function((spaceId, applicationId) -> Mono.when(
+                Mono.just(spaceId),
+                requestListSpaces(this.cloudFoundryClient, builder -> builder.applicationId(applicationId))
+                    .map(ResourceUtils::getId)
+                    .single()
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -651,13 +638,12 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> Mono
-                .when(
-                    Mono.just(spaceId),
-                    requestListSpaces(this.cloudFoundryClient, builder -> builder.name(spaceName))
-                        .map(ResourceUtils::getId)
-                        .single()
-                ))
+            .then(spaceId -> Mono.when(
+                Mono.just(spaceId),
+                requestListSpaces(this.cloudFoundryClient, builder -> builder.name(spaceName))
+                    .map(ResourceUtils::getId)
+                    .single()
+            ))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -668,13 +654,12 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = getSpaceName();
 
         createOrganizationIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName)
-            .then(function((organizationId, spaceId) -> Mono
-                .when(
-                    Mono.just(spaceId),
-                    requestListSpaces(this.cloudFoundryClient, builder -> builder.organizationId(organizationId))
-                        .single()
-                        .map(ResourceUtils::getId)
-                )))
+            .then(function((organizationId, spaceId) -> Mono.when(
+                Mono.just(spaceId),
+                requestListSpaces(this.cloudFoundryClient, builder -> builder.organizationId(organizationId))
+                    .single()
+                    .map(ResourceUtils::getId)
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -699,20 +684,18 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = getSpaceName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId ->
-                when(
-                    createUserId(this.cloudFoundryClient, organizationId, this.userName),
-                    createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
-                    Mono.just(organizationId)
-                ))
-            .as(thenKeep(function((userId, spaceId, organizationId) -> Mono
-                .when(
-                    requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId),
-                    this.cloudFoundryClient.organizations()
-                        .associateAuditor(AssociateOrganizationAuditorRequest.builder()
-                            .organizationId(organizationId)
-                            .auditorId(userId)
-                            .build())))))
+            .then(organizationId -> Mono.when(
+                createUserId(this.cloudFoundryClient, organizationId, this.userName),
+                createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
+                Mono.just(organizationId)
+            ))
+            .as(thenKeep(function((userId, spaceId, organizationId) -> Mono.when(
+                requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId),
+                this.cloudFoundryClient.organizations()
+                    .associateAuditor(AssociateOrganizationAuditorRequest.builder()
+                        .organizationId(organizationId)
+                        .auditorId(userId)
+                        .build())))))
             .flatMap(function((userId, spaceId, organizationId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId, builder -> builder.auditedOrganizationId(organizationId))
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
@@ -726,11 +709,10 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
-            .as(thenKeep(function((userId, spaceId) -> Mono
-                .when(
-                    requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId),
-                    requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId)
-                ))))
+            .as(thenKeep(function((userId, spaceId) -> Mono.when(
+                requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId),
+                requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId)
+            ))))
             .flatMap(function((userId, spaceId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId, builder -> builder.auditedSpaceId(spaceId))
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
@@ -744,28 +726,25 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = getSpaceName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId ->
-                when(
-                    createUserId(this.cloudFoundryClient, organizationId, this.userName),
-                    createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
-                    Mono.just(organizationId)
-                ))
-            .as(thenKeep(function((userId, spaceId, organizationId) -> Mono
-                .when(
-                    requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId),
-                    this.cloudFoundryClient.organizations()
-                        .associateBillingManager(AssociateOrganizationBillingManagerRequest.builder()
-                            .organizationId(organizationId)
-                            .billingManagerId(userId)
-                            .build())
-                ))))
-            .then(function((userId, spaceId, organizationId) -> Mono
-                .when(
-                    Mono.just(userId),
-                    requestListSpaceManagers(this.cloudFoundryClient, spaceId, builder -> builder.billingManagedOrganizationId(organizationId))
-                        .single()
-                        .map(ResourceUtils::getId)
-                )))
+            .then(organizationId -> Mono.when(
+                createUserId(this.cloudFoundryClient, organizationId, this.userName),
+                createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
+                Mono.just(organizationId)
+            ))
+            .as(thenKeep(function((userId, spaceId, organizationId) -> Mono.when(
+                requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId),
+                this.cloudFoundryClient.organizations()
+                    .associateBillingManager(AssociateOrganizationBillingManagerRequest.builder()
+                        .organizationId(organizationId)
+                        .billingManagerId(userId)
+                        .build())
+            ))))
+            .then(function((userId, spaceId, organizationId) -> Mono.when(
+                Mono.just(userId),
+                requestListSpaceManagers(this.cloudFoundryClient, spaceId, builder -> builder.billingManagedOrganizationId(organizationId))
+                    .single()
+                    .map(ResourceUtils::getId)
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -776,28 +755,25 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = getSpaceName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId ->
-                when(
-                    createUserId(this.cloudFoundryClient, organizationId, this.userName),
-                    createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
-                    Mono.just(organizationId)
-                ))
-            .as(thenKeep(function((userId, spaceId, organizationId) -> Mono
-                .when(
-                    requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId),
-                    this.cloudFoundryClient.organizations()
-                        .associateManager(AssociateOrganizationManagerRequest.builder()
-                            .organizationId(organizationId)
-                            .managerId(userId)
-                            .build())
-                ))))
-            .then(function((userId, spaceId, organizationId) -> Mono
-                .when(
-                    Mono.just(userId),
-                    requestListSpaceManagers(this.cloudFoundryClient, spaceId, builder -> builder.managedOrganizationId(organizationId))
-                        .single()
-                        .map(ResourceUtils::getId)
-                )))
+            .then(organizationId -> Mono.when(
+                createUserId(this.cloudFoundryClient, organizationId, this.userName),
+                createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
+                Mono.just(organizationId)
+            ))
+            .as(thenKeep(function((userId, spaceId, organizationId) -> Mono.when(
+                requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId),
+                this.cloudFoundryClient.organizations()
+                    .associateManager(AssociateOrganizationManagerRequest.builder()
+                        .organizationId(organizationId)
+                        .managerId(userId)
+                        .build())
+            ))))
+            .then(function((userId, spaceId, organizationId) -> Mono.when(
+                Mono.just(userId),
+                requestListSpaceManagers(this.cloudFoundryClient, spaceId, builder -> builder.managedOrganizationId(organizationId))
+                    .single()
+                    .map(ResourceUtils::getId)
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -822,20 +798,18 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = getSpaceName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId ->
-                when(
-                    createUserId(this.cloudFoundryClient, organizationId, this.userName),
-                    createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
-                    Mono.just(organizationId)
-                ))
+            .then(organizationId -> Mono.when(
+                createUserId(this.cloudFoundryClient, organizationId, this.userName),
+                createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
+                Mono.just(organizationId)
+            ))
             .as(thenKeep(function((userId, spaceId, organizationId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
-            .then(function((userId, spaceId, organizationId) -> Mono
-                .when(
-                    Mono.just(userId),
-                    requestListSpaceManagers(this.cloudFoundryClient, spaceId, builder -> builder.organizationId(organizationId))
-                        .single()
-                        .map(ResourceUtils::getId)
-                )))
+            .then(function((userId, spaceId, organizationId) -> Mono.when(
+                Mono.just(userId),
+                requestListSpaceManagers(this.cloudFoundryClient, spaceId, builder -> builder.organizationId(organizationId))
+                    .single()
+                    .map(ResourceUtils::getId)
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -848,18 +822,16 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> createSpaceIdWithDomain(this.cloudFoundryClient, organizationId, spaceName, domainName))
-            .then(spaceId -> Mono
-                .when(
-                    Mono.just(spaceId),
-                    createRouteId(this.cloudFoundryClient, spaceId, domainName, hostName, "/test-path")
-                ))
-            .flatMap(function((spaceId, routeId) -> Mono
-                .when(
-                    Mono.just(routeId),
-                    requestListSpaceRoutes(this.cloudFoundryClient, spaceId)
-                        .map(ResourceUtils::getId)
-                        .single()
-                )))
+            .then(spaceId -> Mono.when(
+                Mono.just(spaceId),
+                createRouteId(this.cloudFoundryClient, spaceId, domainName, hostName, "/test-path")
+            ))
+            .flatMap(function((spaceId, routeId) -> Mono.when(
+                Mono.just(routeId),
+                requestListSpaceRoutes(this.cloudFoundryClient, spaceId)
+                    .map(ResourceUtils::getId)
+                    .single()
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -872,19 +844,17 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> createSpaceIdWithDomain(this.cloudFoundryClient, organizationId, spaceName, domainName))
-            .then(spaceId ->
-                when(
-                    Mono.just(spaceId),
-                    getSpaceDomainId(this.cloudFoundryClient, spaceId, domainName),
-                    createRouteId(this.cloudFoundryClient, spaceId, domainName, hostName, "/test-path")
-                ))
-            .flatMap(function((spaceId, domainId, routeId) -> Mono
-                .when(
-                    Mono.just(routeId),
-                    requestListSpaceRoutes(this.cloudFoundryClient, spaceId, builder -> builder.domainId(domainId))
-                        .map(ResourceUtils::getId)
-                        .single()
-                )))
+            .then(spaceId -> Mono.when(
+                Mono.just(spaceId),
+                getSpaceDomainId(this.cloudFoundryClient, spaceId, domainName),
+                createRouteId(this.cloudFoundryClient, spaceId, domainName, hostName, "/test-path")
+            ))
+            .flatMap(function((spaceId, domainId, routeId) -> Mono.when(
+                Mono.just(routeId),
+                requestListSpaceRoutes(this.cloudFoundryClient, spaceId, builder -> builder.domainId(domainId))
+                    .map(ResourceUtils::getId)
+                    .single()
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -897,18 +867,16 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> createSpaceIdWithDomain(this.cloudFoundryClient, organizationId, spaceName, domainName))
-            .then(spaceId -> Mono
-                .when(
-                    Mono.just(spaceId),
-                    createRouteId(this.cloudFoundryClient, spaceId, domainName, hostName, "/test-path")
-                ))
-            .flatMap(function((spaceId, routeId) -> Mono
-                .when(
-                    Mono.just(routeId),
-                    requestListSpaceRoutes(this.cloudFoundryClient, spaceId, builder -> builder.host(hostName))
-                        .map(ResourceUtils::getId)
-                        .single()
-                )))
+            .then(spaceId -> Mono.when(
+                Mono.just(spaceId),
+                createRouteId(this.cloudFoundryClient, spaceId, domainName, hostName, "/test-path")
+            ))
+            .flatMap(function((spaceId, routeId) -> Mono.when(
+                Mono.just(routeId),
+                requestListSpaceRoutes(this.cloudFoundryClient, spaceId, builder -> builder.host(hostName))
+                    .map(ResourceUtils::getId)
+                    .single()
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -921,18 +889,16 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> createSpaceIdWithDomain(this.cloudFoundryClient, organizationId, spaceName, domainName))
-            .then(spaceId -> Mono
-                .when(
-                    Mono.just(spaceId),
-                    createRouteId(this.cloudFoundryClient, spaceId, domainName, hostName, "/test-path")
-                ))
-            .flatMap(function((spaceId, routeId) -> Mono
-                .when(
-                    Mono.just(routeId),
-                    requestListSpaceRoutes(this.cloudFoundryClient, spaceId, builder -> builder.path("/test-path"))
-                        .map(ResourceUtils::getId)
-                        .single()
-                )))
+            .then(spaceId -> Mono.when(
+                Mono.just(spaceId),
+                createRouteId(this.cloudFoundryClient, spaceId, domainName, hostName, "/test-path")
+            ))
+            .flatMap(function((spaceId, routeId) -> Mono.when(
+                Mono.just(routeId),
+                requestListSpaceRoutes(this.cloudFoundryClient, spaceId, builder -> builder.path("/test-path"))
+                    .map(ResourceUtils::getId)
+                    .single()
+            )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -1204,11 +1170,10 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     private static Mono<Tuple2<String, String>> createOrganizationIdAndSpaceId(CloudFoundryClient cloudFoundryClient, String organizationName, String spaceName) {
         return createOrganizationId(cloudFoundryClient, organizationName)
-            .then(organizationId -> Mono
-                .when(
-                    Mono.just(organizationId),
-                    createSpaceId(cloudFoundryClient, organizationId, spaceName)
-                ));
+            .then(organizationId -> Mono.when(
+                Mono.just(organizationId),
+                createSpaceId(cloudFoundryClient, organizationId, spaceName)
+            ));
     }
 
     private static Mono<String> createRouteId(CloudFoundryClient cloudFoundryClient, String spaceId, String domainName, String host, String path) {
@@ -1263,11 +1228,10 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     private static Mono<Tuple2<String, String>> createUserIdAndSpaceId(CloudFoundryClient cloudFoundryClient, String organizationName, String spaceName, String userName) {
         return createOrganizationId(cloudFoundryClient, organizationName)
-            .then(organizationId -> Mono
-                .when(
-                    createUserId(cloudFoundryClient, organizationId, userName),
-                    createSpaceId(cloudFoundryClient, organizationId, spaceName)
-                ));
+            .then(organizationId -> Mono.when(
+                createUserId(cloudFoundryClient, organizationId, userName),
+                createSpaceId(cloudFoundryClient, organizationId, spaceName)
+            ));
     }
 
     private static String getPastTimestamp() {
@@ -1331,8 +1295,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         return requestListSpaceApplications(cloudFoundryClient, spaceId, UnaryOperator.identity());
     }
 
-    private static Flux<ApplicationResource> requestListSpaceApplications(CloudFoundryClient cloudFoundryClient, String spaceId,
-                                                                          UnaryOperator<ListSpaceApplicationsRequest.ListSpaceApplicationsRequestBuilder> transformer) {
+    private static Flux<ApplicationResource> requestListSpaceApplications(CloudFoundryClient cloudFoundryClient, String spaceId, UnaryOperator<ListSpaceApplicationsRequest.Builder> transformer) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .listApplications(transformer.apply(ListSpaceApplicationsRequest.builder())
@@ -1345,8 +1308,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         return requestListSpaceDomains(cloudFoundryClient, spaceId, UnaryOperator.identity());
     }
 
-    private static Flux<DomainResource> requestListSpaceDomains(CloudFoundryClient cloudFoundryClient, String spaceId,
-                                                                UnaryOperator<ListSpaceDomainsRequest.ListSpaceDomainsRequestBuilder> transformer) {
+    private static Flux<DomainResource> requestListSpaceDomains(CloudFoundryClient cloudFoundryClient, String spaceId, UnaryOperator<ListSpaceDomainsRequest.Builder> transformer) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .listDomains(transformer.apply(ListSpaceDomainsRequest.builder())
@@ -1359,8 +1321,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         return requestListSpaceEvents(cloudFoundryClient, spaceId, UnaryOperator.identity());
     }
 
-    private static Flux<EventResource> requestListSpaceEvents(CloudFoundryClient cloudFoundryClient, String spaceId,
-                                                              UnaryOperator<ListSpaceEventsRequest.ListSpaceEventsRequestBuilder> transformer) {
+    private static Flux<EventResource> requestListSpaceEvents(CloudFoundryClient cloudFoundryClient, String spaceId, UnaryOperator<ListSpaceEventsRequest.Builder> transformer) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .listEvents(transformer.apply(ListSpaceEventsRequest.builder())
@@ -1373,9 +1334,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
         return requestListSpaceManagers(cloudFoundryClient, spaceId, Function.identity());
     }
 
-    private static Flux<UserResource> requestListSpaceManagers(CloudFoundryClient cloudFoundryClient, String spaceId,
-                                                               Function<ListSpaceManagersRequest.ListSpaceManagersRequestBuilder, ListSpaceManagersRequest.ListSpaceManagersRequestBuilder>
-                                                                   transformer) {
+    private static Flux<UserResource> requestListSpaceManagers(CloudFoundryClient cloudFoundryClient, String spaceId, Function<ListSpaceManagersRequest.Builder, ListSpaceManagersRequest.Builder>
+        transformer) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .listManagers(transformer.apply(ListSpaceManagersRequest.builder())
@@ -1388,8 +1348,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         return requestListSpaceRoutes(cloudFoundryClient, spaceId, UnaryOperator.identity());
     }
 
-    private static Flux<RouteResource> requestListSpaceRoutes(CloudFoundryClient cloudFoundryClient, String spaceId,
-                                                              UnaryOperator<ListSpaceRoutesRequest.ListSpaceRoutesRequestBuilder> transformer) {
+    private static Flux<RouteResource> requestListSpaceRoutes(CloudFoundryClient cloudFoundryClient, String spaceId, UnaryOperator<ListSpaceRoutesRequest.Builder> transformer) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .listRoutes(transformer.apply(ListSpaceRoutesRequest.builder())
@@ -1401,8 +1360,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         return requestListSpaces(cloudFoundryClient, UnaryOperator.identity());
     }
 
-    private static Flux<SpaceResource> requestListSpaces(CloudFoundryClient cloudFoundryClient,
-                                                         UnaryOperator<ListSpacesRequest.ListSpacesRequestBuilder> transformer) {
+    private static Flux<SpaceResource> requestListSpaces(CloudFoundryClient cloudFoundryClient, UnaryOperator<ListSpacesRequest.Builder> transformer) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .list(transformer.apply(ListSpacesRequest.builder())

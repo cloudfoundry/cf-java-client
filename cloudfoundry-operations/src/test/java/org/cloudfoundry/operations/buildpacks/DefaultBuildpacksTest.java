@@ -38,7 +38,8 @@ public final class DefaultBuildpacksTest {
 
     private static void requestBuildpacks(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.buildpacks()
-            .list(fill(ListBuildpacksRequest.builder())
+            .list(ListBuildpacksRequest.builder()
+                .page(1)
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListBuildpacksResponse.builder())

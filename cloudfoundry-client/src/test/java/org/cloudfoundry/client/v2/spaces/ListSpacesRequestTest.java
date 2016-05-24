@@ -16,16 +16,14 @@
 
 package org.cloudfoundry.client.v2.spaces;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public final class ListSpacesRequestTest {
 
     @Test
-    public void isValid() {
-        assertEquals(ValidationResult.Status.VALID, ListSpacesRequest.builder().build().isValid().getStatus());
+    public void valid() {
+        ListSpacesRequest.builder()
+            .build();
     }
 
 }

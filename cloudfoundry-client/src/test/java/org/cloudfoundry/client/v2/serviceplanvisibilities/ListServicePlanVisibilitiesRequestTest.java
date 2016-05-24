@@ -18,14 +18,12 @@ package org.cloudfoundry.client.v2.serviceplanvisibilities;
 
 import org.junit.Test;
 
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
-
 public final class ListServicePlanVisibilitiesRequestTest {
 
     @Test
-    public void isValid() {
-        assertEquals(VALID, ListServicePlanVisibilitiesRequest.builder().build().isValid().getStatus());
+    public void valid() {
+        ListServicePlanVisibilitiesRequest.builder()
+            .build();
     }
 
 }

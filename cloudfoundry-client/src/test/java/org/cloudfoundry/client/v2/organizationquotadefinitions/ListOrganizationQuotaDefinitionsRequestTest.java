@@ -16,21 +16,14 @@
 
 package org.cloudfoundry.client.v2.organizationquotadefinitions;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class ListOrganizationQuotaDefinitionsRequestTest {
 
     @Test
-    public void isValid() {
-        ValidationResult result = ListOrganizationQuotaDefinitionsRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    public void valid() {
+        ListOrganizationQuotaDefinitionsRequest.builder()
+            .build();
     }
 
 }

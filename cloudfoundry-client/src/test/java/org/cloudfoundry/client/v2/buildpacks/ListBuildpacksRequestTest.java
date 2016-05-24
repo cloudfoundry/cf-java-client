@@ -16,17 +16,14 @@
 
 package org.cloudfoundry.client.v2.buildpacks;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public final class ListBuildpacksRequestTest {
 
     @Test
-    public void isValid() {
-        assertEquals(ValidationResult.Status.VALID,
-            ListBuildpacksRequest.builder().build().isValid().getStatus());
+    public void valid() {
+        ListBuildpacksRequest.builder()
+            .build();
     }
 
 }

@@ -70,8 +70,8 @@ public final class DefaultRoutesTest {
 
     private static void requestApplications(CloudFoundryClient cloudFoundryClient, String routeId) {
         when(cloudFoundryClient.routes()
-            .listApplications(fill(ListRouteApplicationsRequest.builder())
-                .diego(null)
+            .listApplications(ListRouteApplicationsRequest.builder()
+                .page(1)
                 .routeId(routeId)
                 .build()))
             .thenReturn(Mono
@@ -83,9 +83,9 @@ public final class DefaultRoutesTest {
 
     private static void requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         when(cloudFoundryClient.spaces()
-            .listApplications(fill(ListSpaceApplicationsRequest.builder())
-                .diego(null)
+            .listApplications(ListSpaceApplicationsRequest.builder()
                 .name(application)
+                .page(1)
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
@@ -97,8 +97,8 @@ public final class DefaultRoutesTest {
 
     private static void requestApplicationsEmpty(CloudFoundryClient cloudFoundryClient, String routeId) {
         when(cloudFoundryClient.routes()
-            .listApplications(fill(ListRouteApplicationsRequest.builder())
-                .diego(null)
+            .listApplications(ListRouteApplicationsRequest.builder()
+                .page(1)
                 .routeId(routeId)
                 .build()))
             .thenReturn(Mono
@@ -108,9 +108,9 @@ public final class DefaultRoutesTest {
 
     private static void requestApplicationsEmpty(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         when(cloudFoundryClient.spaces()
-            .listApplications(fill(ListSpaceApplicationsRequest.builder())
-                .diego(null)
+            .listApplications(ListSpaceApplicationsRequest.builder()
                 .name(application)
+                .page(1)
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
@@ -227,8 +227,9 @@ public final class DefaultRoutesTest {
 
     private static void requestOrganizationsRoutes(CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient.routes()
-            .list(fill(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder())
+            .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
                 .organizationId(organizationId)
+                .page(1)
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListRoutesResponse.builder())
@@ -240,8 +241,9 @@ public final class DefaultRoutesTest {
 
     private static void requestOrganizationsRoutesEmpty(CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient.routes()
-            .list(fill(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder())
+            .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
                 .organizationId(organizationId)
+                .page(1)
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListRoutesResponse.builder())
@@ -250,9 +252,10 @@ public final class DefaultRoutesTest {
 
     private static void requestPrivateDomains(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
         when(cloudFoundryClient.organizations()
-            .listPrivateDomains(fill(ListOrganizationPrivateDomainsRequest.builder())
-                .organizationId(organizationId)
+            .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
                 .name(domain)
+                .organizationId(organizationId)
+                .page(1)
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListOrganizationPrivateDomainsResponse.builder())
@@ -265,9 +268,9 @@ public final class DefaultRoutesTest {
 
     private static void requestPrivateDomainsEmpty(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
         when(cloudFoundryClient.organizations()
-            .listPrivateDomains(fill(ListOrganizationPrivateDomainsRequest.builder())
-                .organizationId(organizationId)
+            .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
                 .name(domain)
+                .organizationId(organizationId)
                 .page(1)
                 .build()))
             .thenReturn(Mono
@@ -277,7 +280,7 @@ public final class DefaultRoutesTest {
 
     private static void requestRemoveApplication(CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
         when(cloudFoundryClient.routes()
-            .removeApplication(fill(RemoveRouteApplicationRequest.builder())
+            .removeApplication(RemoveRouteApplicationRequest.builder()
                 .applicationId(applicationId)
                 .routeId(routeId)
                 .build()))
@@ -308,10 +311,10 @@ public final class DefaultRoutesTest {
 
     private static void requestRoutes(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
         when(cloudFoundryClient.routes()
-            .list(fill(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder())
+            .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
                 .domainId(domainId)
                 .host(host)
-                .organizationId(null)
+                .page(1)
                 .path(path)
                 .build()))
             .thenReturn(Mono
@@ -323,10 +326,10 @@ public final class DefaultRoutesTest {
 
     private static void requestRoutesEmpty(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
         when(cloudFoundryClient.routes()
-            .list(fill(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder())
+            .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
                 .domainId(domainId)
                 .host(host)
-                .organizationId(null)
+                .page(1)
                 .path(path)
                 .build()))
             .thenReturn(Mono
@@ -336,8 +339,9 @@ public final class DefaultRoutesTest {
 
     private static void requestSharedDomains(CloudFoundryClient cloudFoundryClient, String domain) {
         when(cloudFoundryClient.sharedDomains()
-            .list(fill(ListSharedDomainsRequest.builder())
+            .list(ListSharedDomainsRequest.builder()
                 .name(domain)
+                .page(1)
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListSharedDomainsResponse.builder())
@@ -351,8 +355,9 @@ public final class DefaultRoutesTest {
 
     private static void requestSharedDomainsEmpty(CloudFoundryClient cloudFoundryClient, String domain) {
         when(cloudFoundryClient.sharedDomains()
-            .list(fill(ListSharedDomainsRequest.builder())
+            .list(ListSharedDomainsRequest.builder()
                 .name(domain)
+                .page(1)
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListSharedDomainsResponse.builder())
@@ -373,7 +378,8 @@ public final class DefaultRoutesTest {
 
     private static void requestSpaceRoutes(CloudFoundryClient cloudFoundryClient, String spaceId) {
         when(cloudFoundryClient.spaces()
-            .listRoutes(fill(ListSpaceRoutesRequest.builder())
+            .listRoutes(ListSpaceRoutesRequest.builder()
+                .page(1)
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
@@ -384,7 +390,8 @@ public final class DefaultRoutesTest {
 
     private static void requestSpaceRoutesEmpty(CloudFoundryClient cloudFoundryClient, String spaceId) {
         when(cloudFoundryClient.spaces()
-            .listRoutes(fill(ListSpaceRoutesRequest.builder())
+            .listRoutes(ListSpaceRoutesRequest.builder()
+                .page(1)
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
@@ -394,9 +401,10 @@ public final class DefaultRoutesTest {
 
     private static void requestSpaces(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         when(cloudFoundryClient.organizations()
-            .listSpaces(fill(ListOrganizationSpacesRequest.builder())
-                .organizationId(organizationId)
+            .listSpaces(ListOrganizationSpacesRequest.builder()
                 .name(space)
+                .organizationId(organizationId)
+                .page(1)
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListOrganizationSpacesResponse.builder())
@@ -406,9 +414,10 @@ public final class DefaultRoutesTest {
 
     private static void requestSpacesEmpty(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         when(cloudFoundryClient.organizations()
-            .listSpaces(fill(ListOrganizationSpacesRequest.builder())
-                .organizationId(organizationId)
+            .listSpaces(ListOrganizationSpacesRequest.builder()
                 .name(space)
+                .organizationId(organizationId)
+                .page(1)
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListOrganizationSpacesResponse.builder())

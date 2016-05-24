@@ -16,16 +16,14 @@
 
 package org.cloudfoundry.client.v2.events;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public final class ListEventsRequestTest {
 
     @Test
-    public void isValid() {
-        assertEquals(ValidationResult.Status.VALID, ListEventsRequest.builder().build().isValid().getStatus());
+    public void valid() {
+        ListEventsRequest.builder()
+            .build();
     }
 
 }

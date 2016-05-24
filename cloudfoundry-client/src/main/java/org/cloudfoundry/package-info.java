@@ -18,6 +18,7 @@
     add = "*",
     defaults = @Value.Immutable(copy = false),
     depluralize = true,
+    depluralizeDictionary = "status:statuses",
     put = "*",
     typeImmutable = "*",
     visibility = ImplementationVisibility.PUBLIC

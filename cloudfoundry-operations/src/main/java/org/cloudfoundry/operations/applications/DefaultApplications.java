@@ -932,7 +932,7 @@ public final class DefaultApplications implements Applications {
     }
 
     private static Flux<RouteResource> requestRoutes(CloudFoundryClient cloudFoundryClient, String domainId, String host, String routePath) {
-        ListRoutesRequest.ListRoutesRequestBuilder requestBuilder = ListRoutesRequest.builder()
+        ListRoutesRequest.Builder requestBuilder = ListRoutesRequest.builder()
             .domainId(domainId);
 
         if (host != null) {

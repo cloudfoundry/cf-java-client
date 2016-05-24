@@ -55,11 +55,10 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
         String privateDomainName = getDomainName();
 
         this.organizationId
-            .then(organizationId -> Mono
-                .when(
-                    requestCreatePrivateDomain(this.cloudFoundryClient, organizationId, privateDomainName),
-                    Mono.just(organizationId)
-                ))
+            .then(organizationId -> Mono.when(
+                requestCreatePrivateDomain(this.cloudFoundryClient, organizationId, privateDomainName),
+                Mono.just(organizationId)
+            ))
             .subscribe(this.<Tuple2<CreatePrivateDomainResponse, String>>testSubscriber()
                 .assertThat(resourceMatchesDomainNameAndOrganizationId(privateDomainName)));
     }
@@ -83,16 +82,14 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
         String privateDomainName = getDomainName();
 
         this.organizationId
-            .then(organizationId -> Mono
-                .when(
-                    Mono.just(organizationId),
-                    requestCreatePrivateDomain(this.cloudFoundryClient, organizationId, privateDomainName)
-                ))
-            .then(function((organizationId, privateDomainResource) -> Mono
-                .when(
-                    requestGetPrivateDomain(this.cloudFoundryClient, ResourceUtils.getId(privateDomainResource)),
-                    Mono.just(organizationId)
-                )))
+            .then(organizationId -> Mono.when(
+                Mono.just(organizationId),
+                requestCreatePrivateDomain(this.cloudFoundryClient, organizationId, privateDomainName)
+            ))
+            .then(function((organizationId, privateDomainResource) -> Mono.when(
+                requestGetPrivateDomain(this.cloudFoundryClient, ResourceUtils.getId(privateDomainResource)),
+                Mono.just(organizationId)
+            )))
             .subscribe(this.<Tuple2<GetPrivateDomainResponse, String>>testSubscriber()
                 .assertThat(resourceMatchesDomainNameAndOrganizationId(privateDomainName)));
     }
@@ -102,18 +99,16 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
         String privateDomainName = getDomainName();
 
         this.organizationId
-            .then(organizationId -> Mono
-                .when(
-                    Mono.just(organizationId),
-                    requestCreatePrivateDomain(this.cloudFoundryClient, organizationId, privateDomainName)
-                ))
-            .then(function((organizationId, privateDomainResource) -> Mono
-                .when(
-                    listPrivateDomains(this.cloudFoundryClient)
-                        .filter(resource -> ResourceUtils.getId(privateDomainResource).equals(ResourceUtils.getId(resource)))
-                        .single(),
-                    Mono.just(organizationId)
-                )))
+            .then(organizationId -> Mono.when(
+                Mono.just(organizationId),
+                requestCreatePrivateDomain(this.cloudFoundryClient, organizationId, privateDomainName)
+            ))
+            .then(function((organizationId, privateDomainResource) -> Mono.when(
+                listPrivateDomains(this.cloudFoundryClient)
+                    .filter(resource -> ResourceUtils.getId(privateDomainResource).equals(ResourceUtils.getId(resource)))
+                    .single(),
+                Mono.just(organizationId)
+            )))
             .subscribe(this.<Tuple2<PrivateDomainResource, String>>testSubscriber()
                 .assertThat(resourceMatchesDomainNameAndOrganizationId(privateDomainName)));
     }
@@ -123,18 +118,16 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
         String privateDomainName = getDomainName();
 
         this.organizationId
-            .then(organizationId -> Mono
-                .when(
-                    Mono.just(organizationId),
-                    requestCreatePrivateDomain(this.cloudFoundryClient, organizationId, privateDomainName)
-                ))
-            .then(function((organizationId, privateDomainResource) -> Mono
-                .when(
-                    listPrivateDomains(this.cloudFoundryClient, privateDomainName)
-                        .filter(resource -> ResourceUtils.getId(privateDomainResource).equals(ResourceUtils.getId(resource)))
-                        .single(),
-                    Mono.just(organizationId)
-                )))
+            .then(organizationId -> Mono.when(
+                Mono.just(organizationId),
+                requestCreatePrivateDomain(this.cloudFoundryClient, organizationId, privateDomainName)
+            ))
+            .then(function((organizationId, privateDomainResource) -> Mono.when(
+                listPrivateDomains(this.cloudFoundryClient, privateDomainName)
+                    .filter(resource -> ResourceUtils.getId(privateDomainResource).equals(ResourceUtils.getId(resource)))
+                    .single(),
+                Mono.just(organizationId)
+            )))
             .subscribe(this.<Tuple2<PrivateDomainResource, String>>testSubscriber()
                 .assertThat(resourceMatchesDomainNameAndOrganizationId(privateDomainName)));
     }

@@ -40,14 +40,13 @@ public final class EventsTest extends AbstractIntegrationTest {
     @Test
     public void get() {
         getFirstEvent(this.cloudFoundryClient)
-            .then(resource -> Mono
-                .when(
-                    Mono.just(resource),
-                    this.cloudFoundryClient.events()
-                        .get(GetEventRequest.builder()
-                            .eventId(ResourceUtils.getId(resource))
-                            .build())
-                ))
+            .then(resource -> Mono.when(
+                Mono.just(resource),
+                this.cloudFoundryClient.events()
+                    .get(GetEventRequest.builder()
+                        .eventId(ResourceUtils.getId(resource))
+                        .build())
+            ))
             .subscribe(this.<Tuple2<EventResource, GetEventResponse>>testSubscriber()
                 .assertThat(consumer((expected, actual) -> assertEquals(ResourceUtils.getId(expected), ResourceUtils.getId(actual)))));
     }
@@ -55,15 +54,14 @@ public final class EventsTest extends AbstractIntegrationTest {
     @Test
     public void list() {
         getFirstEvent(this.cloudFoundryClient)
-            .then(resource -> Mono
-                .when(
-                    Mono.just(resource),
-                    this.cloudFoundryClient.events()
-                        .list(ListEventsRequest.builder()
-                            .build())
-                        .flatMap(ResourceUtils::getResources)
-                        .next()
-                ))
+            .then(resource -> Mono.when(
+                Mono.just(resource),
+                this.cloudFoundryClient.events()
+                    .list(ListEventsRequest.builder()
+                        .build())
+                    .flatMap(ResourceUtils::getResources)
+                    .next()
+            ))
             .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -71,16 +69,15 @@ public final class EventsTest extends AbstractIntegrationTest {
     @Test
     public void listFilterByActee() {
         getFirstEvent(this.cloudFoundryClient)
-            .then(resource -> Mono
-                .when(
-                    Mono.just(resource),
-                    this.cloudFoundryClient.events()
-                        .list(ListEventsRequest.builder()
-                            .actee(ResourceUtils.getEntity(resource).getActee())
-                            .build())
-                        .flatMap(ResourceUtils::getResources)
-                        .next()
-                ))
+            .then(resource -> Mono.when(
+                Mono.just(resource),
+                this.cloudFoundryClient.events()
+                    .list(ListEventsRequest.builder()
+                        .actee(ResourceUtils.getEntity(resource).getActee())
+                        .build())
+                    .flatMap(ResourceUtils::getResources)
+                    .next()
+            ))
             .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -88,16 +85,15 @@ public final class EventsTest extends AbstractIntegrationTest {
     @Test
     public void listFilterByTimestamp() {
         getFirstEvent(this.cloudFoundryClient)
-            .then(resource -> Mono
-                .when(
-                    Mono.just(resource),
-                    this.cloudFoundryClient.events()
-                        .list(ListEventsRequest.builder()
-                            .timestamp(ResourceUtils.getEntity(resource).getTimestamp())
-                            .build())
-                        .flatMap(ResourceUtils::getResources)
-                        .next()
-                ))
+            .then(resource -> Mono.when(
+                Mono.just(resource),
+                this.cloudFoundryClient.events()
+                    .list(ListEventsRequest.builder()
+                        .timestamp(ResourceUtils.getEntity(resource).getTimestamp())
+                        .build())
+                    .flatMap(ResourceUtils::getResources)
+                    .next()
+            ))
             .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }
@@ -105,16 +101,15 @@ public final class EventsTest extends AbstractIntegrationTest {
     @Test
     public void listFilterByType() {
         getFirstEvent(this.cloudFoundryClient)
-            .then(resource -> Mono
-                .when(
-                    Mono.just(resource),
-                    this.cloudFoundryClient.events()
-                        .list(ListEventsRequest.builder()
-                            .type(ResourceUtils.getEntity(resource).getType())
-                            .build())
-                        .flatMap(ResourceUtils::getResources)
-                        .next()
-                ))
+            .then(resource -> Mono.when(
+                Mono.just(resource),
+                this.cloudFoundryClient.events()
+                    .list(ListEventsRequest.builder()
+                        .type(ResourceUtils.getEntity(resource).getType())
+                        .build())
+                    .flatMap(ResourceUtils::getResources)
+                    .next()
+            ))
             .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
     }

@@ -103,8 +103,9 @@ public final class DefaultDomainsTest {
 
     private static void requestOrganizations(CloudFoundryClient cloudFoundryClient, String organization) {
         when(cloudFoundryClient.organizations()
-            .list(fill(ListOrganizationsRequest.builder())
+            .list(ListOrganizationsRequest.builder()
                 .name(organization)
+                .page(1)
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListOrganizationsResponse.builder())
@@ -115,8 +116,9 @@ public final class DefaultDomainsTest {
 
     private static void requestOrganizationsEmpty(CloudFoundryClient cloudFoundryClient, String organization) {
         when(cloudFoundryClient.organizations()
-            .list(fill(ListOrganizationsRequest.builder())
+            .list(ListOrganizationsRequest.builder()
                 .name(organization)
+                .page(1)
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListOrganizationsResponse.builder(), "organization-")
@@ -125,7 +127,8 @@ public final class DefaultDomainsTest {
 
     private static void requestPrivateDomains(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.privateDomains()
-            .list(fill(ListPrivateDomainsRequest.builder())
+            .list(ListPrivateDomainsRequest.builder()
+                .page(1)
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListPrivateDomainsResponse.builder())
@@ -136,7 +139,8 @@ public final class DefaultDomainsTest {
 
     private static void requestPrivateDomainsEmpty(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.privateDomains()
-            .list(fill(ListPrivateDomainsRequest.builder())
+            .list(ListPrivateDomainsRequest.builder()
+                .page(1)
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListPrivateDomainsResponse.builder())
@@ -154,7 +158,8 @@ public final class DefaultDomainsTest {
 
     private static void requestSharedDomains(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.sharedDomains()
-            .list(fill(ListSharedDomainsRequest.builder())
+            .list(ListSharedDomainsRequest.builder()
+                .page(1)
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListSharedDomainsResponse.builder())
@@ -165,7 +170,8 @@ public final class DefaultDomainsTest {
 
     private static void requestSharedDomainsEmpty(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.sharedDomains()
-            .list(fill(ListSharedDomainsRequest.builder())
+            .list(ListSharedDomainsRequest.builder()
+                .page(1)
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListSharedDomainsResponse.builder())
