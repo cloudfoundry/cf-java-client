@@ -71,6 +71,7 @@ public final class PaginationUtilsTest {
     private static Mono<ListSpacesResponse> testPaginatedResponsePublisher(int i, int totalNumber) {
         ListSpacesResponse response = ListSpacesResponse.builder()
             .totalPages(totalNumber)
+            .totalResults(1)
             .resource(testSpaceResource(i))
             .build();
 

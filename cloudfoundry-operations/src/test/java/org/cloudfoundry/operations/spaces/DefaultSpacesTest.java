@@ -212,8 +212,7 @@ public final class DefaultSpacesTest {
     }
 
     private static void requestOrganizationSpaceQuotas(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceQuota, String spaceQuotaId) {
-        ListOrganizationSpaceQuotaDefinitionsResponse.ListOrganizationSpaceQuotaDefinitionsResponseBuilder responseBuilder =
-            fill(ListOrganizationSpaceQuotaDefinitionsResponse.builder());
+        ListOrganizationSpaceQuotaDefinitionsResponse.Builder responseBuilder = fill(ListOrganizationSpaceQuotaDefinitionsResponse.builder());
 
         if (spaceQuotaId != null) {
             responseBuilder
@@ -283,7 +282,7 @@ public final class DefaultSpacesTest {
     }
 
     private static void requestOrganizations(CloudFoundryClient cloudFoundryClient, String organization, String organizationId) {
-        ListOrganizationsResponse.ListOrganizationsResponseBuilder responseBuilder = fill(ListOrganizationsResponse.builder(), "organization-");
+        ListOrganizationsResponse.Builder responseBuilder = fill(ListOrganizationsResponse.builder(), "organization-");
 
         if (organizationId != null) {
             responseBuilder

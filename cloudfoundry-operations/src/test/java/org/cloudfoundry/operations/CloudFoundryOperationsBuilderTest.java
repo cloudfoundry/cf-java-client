@@ -56,7 +56,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
             .page(1)
             .build();
 
-        ListOrganizationsResponse response = ListOrganizationsResponse.builder()
+        ListOrganizationsResponse response = fill(ListOrganizationsResponse.builder())
             .resource(OrganizationResource.builder()
                 .metadata(fill(Metadata.builder())
                     .id("test-organization-id")
@@ -85,7 +85,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
             .page(1)
             .build();
 
-        ListOrganizationsResponse orgResponse = ListOrganizationsResponse.builder()
+        ListOrganizationsResponse orgResponse = fill(ListOrganizationsResponse.builder())
             .resource(OrganizationResource.builder()
                 .metadata(fill(Metadata.builder())
                     .id("test-organization-id")
@@ -105,7 +105,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
             .page(1)
             .build();
 
-        ListSpacesResponse spaceResponse = ListSpacesResponse.builder()
+        ListSpacesResponse spaceResponse = fill(ListSpacesResponse.builder())
             .resource(SpaceResource.builder()
                 .metadata(fill(Metadata.builder())
                     .id("test-space-id")
