@@ -52,12 +52,12 @@ public final class JobUtils {
         } else {
             job = requestJob(cloudFoundryClient, ResourceUtils.getId(resource))
                 .map(GetJobResponse::getEntity)
-                .where(JobUtils::isComplete)
+                .filter(JobUtils::isComplete)
                 .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
         }
 
         return job
-            .where(entity -> "failed".equals(entity.getStatus()))
+            .filter(entity -> "failed".equals(entity.getStatus()))
             .then(JobUtils::getError);
     }
 

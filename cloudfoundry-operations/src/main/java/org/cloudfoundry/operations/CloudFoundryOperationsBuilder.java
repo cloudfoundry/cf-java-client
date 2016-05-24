@@ -132,7 +132,7 @@ public final class CloudFoundryOperationsBuilder {
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
         return requestOrganizations(cloudFoundryClient, organization)
             .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Organization %s does not exist", organization)));
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Organization %s does not exist", organization));
     }
 
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
@@ -148,7 +148,7 @@ public final class CloudFoundryOperationsBuilder {
     private static Mono<SpaceResource> getSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         return requestSpaces(cloudFoundryClient, organizationId, space)
             .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Space %s does not exist", space)));
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Space %s does not exist", space));
     }
 
     private static Mono<String> getSpaceId(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, String space) {

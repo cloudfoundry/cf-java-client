@@ -50,7 +50,7 @@ public final class DefaultStacks implements Stacks {
     private static Mono<StackResource> getStack(CloudFoundryClient cloudFoundryClient, String stack) {
         return requestStack(cloudFoundryClient, stack)
             .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Stack %s does not exist", stack)));
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Stack %s does not exist", stack));
     }
 
     private static Flux<StackResource> requestStack(CloudFoundryClient cloudFoundryClient, String stack) {

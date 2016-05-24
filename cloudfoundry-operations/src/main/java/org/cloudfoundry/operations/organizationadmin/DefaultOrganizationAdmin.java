@@ -112,14 +112,14 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String name) {
         return requestListOrganizations(cloudFoundryClient, name)
             .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Organization %s does not exist", name)))
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Organization %s does not exist", name))
             .map(ResourceUtils::getId);
     }
 
     private static Mono<OrganizationQuotaDefinitionResource> getOrganizationQuota(CloudFoundryClient cloudFoundryClient, String name) {
         return requestListOrganizationQuotas(cloudFoundryClient, name)
             .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Quota %s does not exist", name)));
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Quota %s does not exist", name));
     }
 
     private static Mono<String> getOrganizationQuotaId(CloudFoundryClient cloudFoundryClient, String name) {

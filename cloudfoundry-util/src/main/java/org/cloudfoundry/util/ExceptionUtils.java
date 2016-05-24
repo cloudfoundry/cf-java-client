@@ -19,8 +19,7 @@ package org.cloudfoundry.util;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import reactor.core.publisher.Mono;
 
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.function.Predicate;
 
 /**
  * Utilities for dealing with {@link Exception}s
@@ -61,59 +60,13 @@ public final class ExceptionUtils {
     }
 
     /**
-     * Replaces {@link Throwable}s of a given type with an alternate value
+     * A predicate that return {@code true} if the exception is a {@link CloudFoundryException} and its code matches
      *
-     * @param exceptionType       the type of exception to convert
-     * @param replacementSupplier a supplier of a replacement
-     * @param <T>                 the type of the {@link Mono} being converted
-     * @return a function that converts errors
+     * @param code the code to match
+     * @return {@code true} if the exception is a {@link CloudFoundryException} and its code matches
      */
-    public static <T> Function<Throwable, Mono<T>> replace(Class<? extends Throwable> exceptionType, Supplier<Mono<T>> replacementSupplier) {
-        return throwable -> {
-            if (exceptionType.isAssignableFrom(throwable.getClass())) {
-                return replacementSupplier.get();
-            } else {
-                return Mono.error(throwable);
-            }
-        };
-    }
-
-    /**
-     * Replaces {@link Throwable}s of a given type with an alternate value
-     *
-     * @param exceptionType       the type of exception to convert
-     * @param replacementFunction a transforming function
-     * @param <T>                 the type of the {@link Mono} being converted
-     * @param <U>                 the type of {@link Throwable}
-     * @return a function that converts errors
-     */
-    @SuppressWarnings("unchecked")
-    public static <T, U extends Throwable> Function<Throwable, Mono<T>> replace(Class<U> exceptionType, Function<U, Mono<T>> replacementFunction) {
-        return throwable -> {
-            if (exceptionType.isAssignableFrom(throwable.getClass())) {
-                return replacementFunction.apply((U) throwable);
-            } else {
-                return Mono.error(throwable);
-            }
-        };
-    }
-
-    /**
-     * Replaces {@link CloudFoundryException}s with a given code with an alternate value
-     *
-     * @param code                the {@link CloudFoundryException} code
-     * @param replacementSupplier a supplier of a replacement
-     * @param <T>                 the type of the {@link Mono} being converted
-     * @return a function that converts errors
-     */
-    public static <T> Function<Throwable, Mono<T>> replace(int code, Supplier<Mono<T>> replacementSupplier) {
-        return throwable -> {
-            if (CloudFoundryException.class.isAssignableFrom(throwable.getClass()) && ((CloudFoundryException) throwable).getCode() == code) {
-                return replacementSupplier.get();
-            } else {
-                return Mono.error(throwable);
-            }
-        };
+    public static Predicate<? super Throwable> statusCode(int code) {
+        return t -> t instanceof CloudFoundryException && ((CloudFoundryException) t).getCode() == code;
     }
 
 }

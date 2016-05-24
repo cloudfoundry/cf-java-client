@@ -152,7 +152,7 @@ public final class DefaultApplications implements Applications {
             ))
             .then(function((sourceApplicationId, targetApplicationId) -> copyBits(this.cloudFoundryClient, sourceApplicationId, targetApplicationId)
                 .then(Mono.just(targetApplicationId))))
-            .where(targetApplicationId -> Optional.ofNullable(request.getRestart()).orElse(false))
+            .filter(targetApplicationId -> Optional.ofNullable(request.getRestart()).orElse(false))
             .then(targetApplicationId -> restartApplication(this.cloudFoundryClient, request.getTargetName(), targetApplicationId, request.getStagingTimeout(), request.getStartupTimeout()));
     }
 
@@ -256,7 +256,7 @@ public final class DefaultApplications implements Applications {
             .map(function((applicationId, spaceId) -> applicationId))
             .as(thenKeep(applicationId -> uploadApplicationAndWait(this.cloudFoundryClient, applicationId, request.getApplication())))
             .as(thenKeep(applicationId -> stopApplication(this.cloudFoundryClient, applicationId)))
-            .where(applicationId -> !Optional.ofNullable(request.getNoStart()).orElse(false))
+            .filter(applicationId -> !Optional.ofNullable(request.getNoStart()).orElse(false))
             .then(applicationId -> startApplicationAndWait(this.cloudFoundryClient, request.getName(), applicationId, request.getStagingTimeout(), request.getStartupTimeout()));
     }
 
@@ -294,10 +294,10 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<Void> scale(ScaleApplicationRequest request) {
         return this.spaceId
-            .where(spaceId -> areModifiersPresent(request))
+            .filter(spaceId -> areModifiersPresent(request))
             .then(spaceId -> getApplicationId(this.cloudFoundryClient, request.getName(), spaceId))
             .then(applicationId -> requestUpdateApplicationScale(this.cloudFoundryClient, applicationId, request.getDiskLimit(), request.getInstances(), request.getMemoryLimit()))
-            .where(resource -> isRestartRequired(request, resource))
+            .filter(resource -> isRestartRequired(request, resource))
             .then(resource -> restartApplication(this.cloudFoundryClient, request.getName(), ResourceUtils.getId(resource), request.getStagingTimeout(), request.getStartupTimeout()));
     }
 
@@ -465,7 +465,7 @@ public final class DefaultApplications implements Applications {
     private static Mono<AbstractApplicationResource> getApplication(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         return requestApplications(cloudFoundryClient, application, spaceId)
             .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Application %s does not exist", application)));
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Application %s does not exist", application));
     }
 
     private static Mono<String> getApplicationId(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
@@ -494,19 +494,19 @@ public final class DefaultApplications implements Applications {
 
     private static Mono<String> getApplicationIdWhere(CloudFoundryClient cloudFoundryClient, String application, String spaceId, Predicate<AbstractApplicationResource> predicate) {
         return getApplication(cloudFoundryClient, application, spaceId)
-            .where(predicate)
+            .filter(predicate)
             .map(ResourceUtils::getId);
     }
 
     private static Mono<ApplicationInstancesResponse> getApplicationInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestApplicationInstances(cloudFoundryClient, applicationId)
-            .otherwise(ExceptionUtils.replace(CF_INSTANCES_ERROR, () -> Mono.just(ApplicationInstancesResponse.builder().build())))
-            .otherwise(ExceptionUtils.replace(CF_STAGING_NOT_FINISHED, () -> Mono.just(ApplicationInstancesResponse.builder().build())));
+            .otherwise(ExceptionUtils.statusCode(CF_INSTANCES_ERROR), t -> Mono.just(ApplicationInstancesResponse.builder().build()))
+            .otherwise(ExceptionUtils.statusCode(CF_STAGING_NOT_FINISHED), t -> Mono.just(ApplicationInstancesResponse.builder().build()));
     }
 
     private static Mono<ApplicationStatisticsResponse> getApplicationStatistics(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestApplicationStatistics(cloudFoundryClient, applicationId)
-            .otherwise(ExceptionUtils.replace(CF_APP_STOPPED_STATS_ERROR, () -> Mono.just(ApplicationStatisticsResponse.builder().build())));
+            .otherwise(ExceptionUtils.statusCode(CF_APP_STOPPED_STATS_ERROR), t -> Mono.just(ApplicationStatisticsResponse.builder().build()));
     }
 
     private static Mono<Tuple6<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse, List<InstanceDetail>, List<String>>>
@@ -599,7 +599,7 @@ public final class DefaultApplications implements Applications {
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
         return requestOrganizations(cloudFoundryClient, organization)
             .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Organization %s not found", organization)));
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Organization %s not found", organization));
     }
 
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
@@ -610,7 +610,7 @@ public final class DefaultApplications implements Applications {
     private static Mono<SpaceResource> getOrganizationSpaceByName(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         return requestOrganizationSpacesByName(cloudFoundryClient, organizationId, space)
             .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Space %s not found", space)));
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Space %s not found", space));
     }
 
     private static Mono<String> getPrivateDomainId(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
@@ -996,7 +996,7 @@ public final class DefaultApplications implements Applications {
                     .name(stack)
                     .build()))
             .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Stack %s does not exist", stack)));
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Stack %s does not exist", stack));
     }
 
     private static Mono<Void> requestTerminateApplicationInstance(CloudFoundryClient cloudFoundryClient, String applicationId, String instanceIndex) {
@@ -1253,11 +1253,11 @@ public final class DefaultApplications implements Applications {
             .flatMap(response -> Flux.fromIterable(response.values()))
             .map(ApplicationInstanceInfo::getState)
             .reduce("UNKNOWN", collectStates())
-            .where(isInstanceComplete())
+            .filter(isInstanceComplete())
             .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), timeout))
-            .where(isRunning())
+            .filter(isRunning())
             .otherwiseIfEmpty(ExceptionUtils.illegalState("Application %s failed during start", application))
-            .otherwise(ExceptionUtils.replace(DelayTimeoutException.class, () -> ExceptionUtils.illegalState("Application %s timed out during start", application)))
+            .otherwise(DelayTimeoutException.class, t -> ExceptionUtils.illegalState("Application %s timed out during start", application))
             .then();
     }
 
@@ -1266,11 +1266,11 @@ public final class DefaultApplications implements Applications {
 
         return requestGetApplication(cloudFoundryClient, applicationId)
             .map(response -> ResourceUtils.getEntity(response).getPackageState())
-            .where(isStagingComplete())
+            .filter(isStagingComplete())
             .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), timeout))
-            .where(isStaged())
+            .filter(isStaged())
             .otherwiseIfEmpty(ExceptionUtils.illegalState("Application %s failed during staging", application))
-            .otherwise(ExceptionUtils.replace(DelayTimeoutException.class, () -> ExceptionUtils.illegalState("Application %s timed out during staging", application)))
+            .otherwise(DelayTimeoutException.class, t -> ExceptionUtils.illegalState("Application %s timed out during staging", application))
             .then();
     }
 

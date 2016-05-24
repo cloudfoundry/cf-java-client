@@ -196,7 +196,7 @@ public abstract class AbstractReactorOperations {
 
     private <REQ> Mono<ByteBuf> serializedRequest(HttpOutbound outbound, REQ validRequest) {
         return Mono.just(validRequest)
-            .where(req -> this.objectMapper.canSerialize(req.getClass()))
+            .filter(req -> this.objectMapper.canSerialize(req.getClass()))
             .map(JsonCodec.encode(this.objectMapper, outbound));
     }
 

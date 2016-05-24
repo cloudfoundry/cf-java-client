@@ -196,7 +196,7 @@ public final class DefaultSpaces implements Spaces {
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
         return requestOrganizations(cloudFoundryClient, organization)
             .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Organization %s does not exist", organization)));
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Organization %s does not exist", organization));
     }
 
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
@@ -220,7 +220,7 @@ public final class DefaultSpaces implements Spaces {
     private static Mono<SpaceResource> getOrganizationSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         return requestOrganizationSpaces(cloudFoundryClient, organizationId, space)
             .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Space %s does not exist", space)));
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Space %s does not exist", space));
     }
 
     private static Mono<String> getOrganizationSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
@@ -230,7 +230,7 @@ public final class DefaultSpaces implements Spaces {
 
     private static Mono<String> getOrganizationSpaceIdWhere(CloudFoundryClient cloudFoundryClient, String organizationId, String space, Predicate<SpaceResource> predicate) {
         return getOrganizationSpace(cloudFoundryClient, organizationId, space)
-            .where(predicate)
+            .filter(predicate)
             .map(ResourceUtils::getId);
     }
 
@@ -275,7 +275,7 @@ public final class DefaultSpaces implements Spaces {
     private static Mono<SpaceQuotaDefinitionResource> getSpaceQuota(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceQuota) {
         return requestOrganizationSpaceQuotas(cloudFoundryClient, organizationId, spaceQuota)
             .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Space quota definition %s does not exist", spaceQuota)));
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Space quota definition %s does not exist", spaceQuota));
     }
 
     private static Mono<AssociateOrganizationUserByUsernameResponse> requestAssociateOrganizationUserByUsername(CloudFoundryClient cloudFoundryClient, String organizationId, String username) {

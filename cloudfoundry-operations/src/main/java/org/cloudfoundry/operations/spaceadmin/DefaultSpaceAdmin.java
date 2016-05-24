@@ -57,7 +57,7 @@ public final class DefaultSpaceAdmin implements SpaceAdmin {
         return requestSpaceQuotaDefinitions(cloudFoundryClient, organizationId)
             .filter(resource -> name.equals(ResourceUtils.getEntity(resource).getName()))
             .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Space Quota %s does not exist", name)));
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Space Quota %s does not exist", name));
     }
 
     private static Flux<SpaceQuotaDefinitionResource> requestSpaceQuotaDefinitions(CloudFoundryClient cloudFoundryClient, String organizationId) {

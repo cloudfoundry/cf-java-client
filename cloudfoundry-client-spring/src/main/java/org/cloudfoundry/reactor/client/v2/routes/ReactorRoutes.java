@@ -81,7 +81,7 @@ public final class ReactorRoutes extends AbstractClientV2Operations implements R
     public Mono<Boolean> exists(RouteExistsRequest request) {
         return get(request, Boolean.class, function((builder, validRequest) -> builder.pathSegment("v2", "routes", "reserved", "domain", validRequest.getDomainId(), "host", validRequest.getHost())))
             .defaultIfEmpty(true)
-            .otherwise(ExceptionUtils.replace(CF_NOT_FOUND, () -> Mono.just(false)));
+            .otherwise(ExceptionUtils.statusCode(CF_NOT_FOUND), t -> Mono.just(false));
     }
 
     @Override

@@ -94,7 +94,7 @@ public final class DefaultDomains implements Domains {
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
         return requestOrganizations(cloudFoundryClient, organization)
             .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Organization %s does not exist", organization)));
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Organization %s does not exist", organization));
     }
 
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
@@ -105,7 +105,7 @@ public final class DefaultDomains implements Domains {
     private static Mono<PrivateDomainResource> getPrivateDomain(CloudFoundryClient cloudFoundryClient, String domain) {
         return requestListPrivateDomains(cloudFoundryClient, domain)
             .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Private domain %s does not exist", domain)));
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Private domain %s does not exist", domain));
     }
 
     private static Mono<String> getPrivateDomainId(CloudFoundryClient cloudFoundryClient, String domain) {

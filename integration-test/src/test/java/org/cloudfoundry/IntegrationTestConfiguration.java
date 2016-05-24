@@ -147,7 +147,7 @@ public class IntegrationTestConfiguration {
     Mono<Optional<String>> protectedDomainId(CloudFoundryClient cloudFoundryClient, @Value("${test.protected.domain:}") String protectedDomain) {
         return Mono
             .just(protectedDomain)
-            .where(StringUtils::hasText)
+            .filter(StringUtils::hasText)
             .flatMap(protectedDomain1 -> PaginationUtils
                 .requestResources(page -> cloudFoundryClient.domains()
                     .list(ListDomainsRequest.builder()
@@ -173,7 +173,7 @@ public class IntegrationTestConfiguration {
     Mono<Optional<String>> protectedOrganizationId(CloudFoundryClient cloudFoundryClient, @Value("${test.protected.organization:}") String protectedOrganization) {
         return Mono
             .just(protectedOrganization)
-            .where(StringUtils::hasText)
+            .filter(StringUtils::hasText)
             .flatMap(protectedOrganization1 -> PaginationUtils
                 .requestResources(page -> cloudFoundryClient.organizations()
                     .list(ListOrganizationsRequest.builder()

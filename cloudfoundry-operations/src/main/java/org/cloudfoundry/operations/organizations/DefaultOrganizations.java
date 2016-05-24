@@ -75,7 +75,7 @@ public final class DefaultOrganizations implements Organizations {
                 getFeatureFlagEnabled(this.cloudFoundryClient, SET_ROLES_BY_USERNAME_FEATURE_FLAG),
                 Mono.just(username)
             ))
-            .where(predicate((organizationId, setRolesByUsernameEnabled, username) -> setRolesByUsernameEnabled))
+            .filter(predicate((organizationId, setRolesByUsernameEnabled, username) -> setRolesByUsernameEnabled))
             .then(function((organizationId, setRolesByUsernameEnabled, username) -> setOrganizationManager(this.cloudFoundryClient, organizationId, username)));
     }
 
@@ -149,7 +149,7 @@ public final class DefaultOrganizations implements Organizations {
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
         return requestOrganizations(cloudFoundryClient, organization)
             .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Organization %s does not exist", organization)));
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Organization %s does not exist", organization));
     }
 
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
@@ -166,7 +166,7 @@ public final class DefaultOrganizations implements Organizations {
     private static Mono<OrganizationQuotaDefinitionResource> getOrganizationQuotaDefinition(CloudFoundryClient cloudFoundryClient, String quotaDefinitionName) {
         return requestOrganizationQuotaDefinitions(cloudFoundryClient, quotaDefinitionName)
             .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Organization quota %s does not exist", quotaDefinitionName)));
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Organization quota %s does not exist", quotaDefinitionName));
     }
 
     private static Mono<String> getOrganizationQuotaDefinitionId(CloudFoundryClient cloudFoundryClient, String quotaDefinitionName) {

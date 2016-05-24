@@ -22,7 +22,6 @@ import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.reactor.util.MultipartHttpOutbound;
-import org.cloudfoundry.util.ExceptionUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple;
@@ -43,22 +42,22 @@ public abstract class AbstractClientV2Operations extends AbstractReactorOperatio
 
     protected final <REQ, RSP> Mono<RSP> delete(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
         return doDelete(request, responseType, getUriAugmenter(uriTransformer), function((outbound, validRequest) -> outbound))
-            .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build));
+            .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
     }
 
     protected final <REQ, RSP> Mono<RSP> get(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
         return doGet(request, responseType, getUriAugmenter(uriTransformer), function((outbound, validRequest) -> outbound))
-            .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build));
+            .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
     }
 
     protected final <REQ> Mono<HttpInbound> get(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
         return doGet(request, getUriAugmenter(uriTransformer), function((outbound, validRequest) -> outbound))
-            .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build));
+            .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
     }
 
     protected final <REQ, RSP> Mono<RSP> post(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
         return doPost(request, responseType, getUriAugmenter(uriTransformer), function((outbound, validRequest) -> outbound))
-            .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build));
+            .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
     }
 
     protected final <REQ, RSP> Mono<RSP> post(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
@@ -66,12 +65,12 @@ public abstract class AbstractClientV2Operations extends AbstractReactorOperatio
 
         return doPostComplete(request, responseType, getUriAugmenter(uriTransformer),
             function((outbound, validRequest) -> requestTransformer.apply(Tuple.of(new MultipartHttpOutbound(outbound), validRequest))))
-            .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build));
+            .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
     }
 
     protected final <REQ, RSP> Mono<RSP> put(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
         return doPut(request, responseType, getUriAugmenter(uriTransformer), function((outbound, validRequest) -> outbound))
-            .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build));
+            .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
     }
 
     protected final <REQ, RSP> Mono<RSP> put(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
@@ -79,7 +78,7 @@ public abstract class AbstractClientV2Operations extends AbstractReactorOperatio
 
         return doPutComplete(request, responseType, getUriAugmenter(uriTransformer),
             function((outbound, validRequest) -> requestTransformer.apply(Tuple.of(new MultipartHttpOutbound(outbound), validRequest))))
-            .otherwise(ExceptionUtils.replace(HttpException.class, CloudFoundryExceptionBuilder::build));
+            .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
     }
 
     private static <REQ> Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> getUriAugmenter(

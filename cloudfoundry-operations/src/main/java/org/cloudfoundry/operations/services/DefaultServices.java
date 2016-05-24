@@ -250,8 +250,8 @@ public final class DefaultServices implements Services {
             )))
             .then(function((organizationId, serviceInstance) -> Mono.when(
                 Mono.just(serviceInstance.getMetadata().getId()),
-                    getValidatedServicePlanId(this.cloudFoundryClient, request.getPlanName(), serviceInstance, organizationId)
-                )))
+                getValidatedServicePlanId(this.cloudFoundryClient, request.getPlanName(), serviceInstance, organizationId)
+            )))
             .then(function((serviceInstanceId, servicePlanId) -> updateServiceInstance(this.cloudFoundryClient, request, serviceInstanceId, servicePlanId)))
             .then();
     }
@@ -269,10 +269,9 @@ public final class DefaultServices implements Services {
             .then(Mono.just(servicePlanId));
     }
 
-    private static Mono<CreateServiceBindingResponse> createServiceBinding(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId,
-                                                                           Map<String, Object> parameters) {
+    private static Mono<CreateServiceBindingResponse> createServiceBinding(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId, Map<String, Object> parameters) {
         return requestCreateServiceBinding(cloudFoundryClient, applicationId, serviceInstanceId, parameters)
-            .otherwise(ExceptionUtils.replace(CF_SERVICE_ALREADY_BOUND, Mono::empty));
+            .otherwise(ExceptionUtils.statusCode(CF_SERVICE_ALREADY_BOUND), t -> Mono.empty());
     }
 
     private static Mono<AbstractServiceInstanceResource> createServiceInstance(CloudFoundryClient cloudFoundryClient, String spaceId, String planId, CreateServiceInstanceRequest request) {
@@ -301,7 +300,7 @@ public final class DefaultServices implements Services {
     private static Mono<ApplicationResource> getApplication(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
         return requestListApplications(cloudFoundryClient, applicationName, spaceId)
             .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Application %s does not exist", applicationName)));
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Application %s does not exist", applicationName));
     }
 
     private static Mono<String> getApplicationId(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
@@ -359,7 +358,7 @@ public final class DefaultServices implements Services {
     private static Mono<ServiceKeyResource> getServiceKey(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKey) {
         return requestListServiceInstanceServiceKeys(cloudFoundryClient, serviceInstanceId, serviceKey)
             .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Service key %s does not exist", serviceKey)));
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Service key %s does not exist", serviceKey));
     }
 
     private static Mono<ServicePlanEntity> getServicePlanEntity(CloudFoundryClient cloudFoundryClient, String servicePlanId) {
@@ -375,19 +374,19 @@ public final class DefaultServices implements Services {
             .filter(resource -> plan.equals(ResourceUtils.getEntity(resource).getName()))
             .single()
             .map(ResourceUtils::getId)
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Service plan %s does not exist", plan)));
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Service plan %s does not exist", plan));
     }
 
     private static Mono<ServiceResource> getSpaceService(CloudFoundryClient cloudFoundryClient, String spaceId, String service) {
         return requestListServices(cloudFoundryClient, spaceId, service)
             .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Service %s does not exist", service)));
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Service %s does not exist", service));
     }
 
     private static Mono<UnionServiceInstanceResource> getSpaceServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
         return requestListServiceInstances(cloudFoundryClient, spaceId, serviceInstanceName)
             .single()
-            .otherwise(ExceptionUtils.replace(NoSuchElementException.class, () -> ExceptionUtils.illegalArgument("Service instance %s does not exist", serviceInstanceName)));
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Service instance %s does not exist", serviceInstanceName));
     }
 
     private static Mono<String> getSpaceServiceInstanceId(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
@@ -408,7 +407,7 @@ public final class DefaultServices implements Services {
 
         return getServiceId(cloudFoundryClient, serviceInstance.getEntity().getServicePlanId())
             .then(serviceId -> requestGetService(cloudFoundryClient, serviceId))
-            .where(DefaultServices::isUpdateable)
+            .filter(DefaultServices::isUpdateable)
             .otherwiseIfEmpty(ExceptionUtils.illegalArgument("Plan does not exist for the %s service", serviceInstance.getEntity().getName()))
             .flatMap(response -> requestListServicePlans(cloudFoundryClient, response.getMetadata().getId()))
             .filter(resource -> planName.equals(resource.getEntity().getName()))
@@ -762,7 +761,7 @@ public final class DefaultServices implements Services {
 
         return requestGetServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance))
             .map(DefaultServices::extractState)
-            .where(DefaultServices::isNotInProgress)
+            .filter(DefaultServices::isNotInProgress)
             .repeatWhenEmpty(DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
             .then();
     }

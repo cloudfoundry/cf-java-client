@@ -895,7 +895,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     private static Mono<ApplicationInstanceInfo> getInstanceInfo(CloudFoundryClient cloudFoundryClient, String applicationId, String instanceName) {
         return requestInstances(cloudFoundryClient, applicationId)
-            .where(response -> response.containsKey(instanceName))
+            .filter(response -> response.containsKey(instanceName))
             .map(response -> response.get(instanceName));
     }
 
@@ -1046,13 +1046,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     private static Mono<ApplicationInstanceInfo> waitForInstanceRestart(CloudFoundryClient cloudFoundryClient, String applicationId, String instanceName, Optional<Double> optionalSince) {
         return getInstanceInfo(cloudFoundryClient, applicationId, instanceName)
-            .where(info -> !isIdentical(info.getSince(), optionalSince.orElse(null)))
+            .filter(info -> !isIdentical(info.getSince(), optionalSince.orElse(null)))
             .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
     }
 
     private static Mono<AbstractApplicationResource> waitForStagingApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestGetApplication(cloudFoundryClient, applicationId)
-            .where(response -> "STAGED".equals(response.getEntity().getPackageState()))
+            .filter(response -> "STAGED".equals(response.getEntity().getPackageState()))
             .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
     }
 
