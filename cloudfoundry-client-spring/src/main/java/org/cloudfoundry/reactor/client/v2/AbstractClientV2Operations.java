@@ -60,14 +60,6 @@ public abstract class AbstractClientV2Operations extends AbstractReactorOperatio
             .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
     }
 
-    protected final <REQ, RSP> Mono<RSP> post(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
-                                              Function<Tuple2<MultipartHttpOutbound, REQ>, Mono<Void>> requestTransformer) {
-
-        return doPostComplete(request, responseType, getUriAugmenter(uriTransformer),
-            function((outbound, validRequest) -> requestTransformer.apply(Tuple.of(new MultipartHttpOutbound(outbound), validRequest))))
-            .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
-    }
-
     protected final <REQ, RSP> Mono<RSP> put(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
         return doPut(request, responseType, getUriAugmenter(uriTransformer), function((outbound, validRequest) -> outbound))
             .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);

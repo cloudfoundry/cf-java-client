@@ -94,7 +94,6 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
         return post(request, StagePackageResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "packages", validRequest.getPackageId(), "droplets")));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Mono<UploadPackageResponse> upload(UploadPackageRequest request) {
         return post(request, UploadPackageResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "packages", validRequest.getPackageId(), "upload")),
