@@ -32,7 +32,7 @@ import org.cloudfoundry.client.v3.packages.StagePackageRequest;
 import org.cloudfoundry.client.v3.packages.StagePackageResponse;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
-import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
+import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -44,7 +44,7 @@ import static org.cloudfoundry.util.tuple.TupleUtils.function;
 /**
  * The Reactor-based implementation of {@link Packages}
  */
-public final class ReactorPackages extends AbstractClientV2Operations implements Packages {
+public final class ReactorPackages extends AbstractClientV3Operations implements Packages {
 
     /**
      * Creates an instance

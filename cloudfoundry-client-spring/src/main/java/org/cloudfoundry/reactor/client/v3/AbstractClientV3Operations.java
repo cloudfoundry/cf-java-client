@@ -21,6 +21,7 @@ import org.cloudfoundry.reactor.client.CloudFoundryExceptionBuilder;
 import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
+import org.cloudfoundry.reactor.util.MultipartHttpOutbound;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple;
@@ -61,6 +62,14 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
 
     protected final <REQ, RSP> Mono<RSP> post(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
         return doPost(request, responseType, getUriAugmenter(uriTransformer), function((outbound, validRequest) -> outbound))
+            .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
+    }
+
+    protected final <REQ, RSP> Mono<RSP> post(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
+                                              Function<Tuple2<MultipartHttpOutbound, REQ>, Mono<Void>> requestTransformer) {
+
+        return doPostComplete(request, responseType, getUriAugmenter(uriTransformer),
+            function((outbound, validRequest) -> requestTransformer.apply(Tuple.of(new MultipartHttpOutbound(outbound), validRequest))))
             .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
     }
 
