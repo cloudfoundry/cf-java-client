@@ -288,7 +288,7 @@ public final class DefaultApplicationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListApplicationServiceBindingsResponse.builder(), "test-service-binding-")
-                    .resource(ServiceBindingResource.builder()
+                    .resource(fill(ServiceBindingResource.builder())
                         .metadata(fill(Metadata.builder())
                             .id("test-service-binding-id")
                             .build())
@@ -779,7 +779,7 @@ public final class DefaultApplicationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListOrganizationPrivateDomainsResponse.builder())
-                    .resource(PrivateDomainResource.builder()
+                    .resource(fill(PrivateDomainResource.builder())
                         .metadata(fill(Metadata.builder())
                             .id(domainId)
                             .build())
@@ -807,7 +807,7 @@ public final class DefaultApplicationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListOrganizationPrivateDomainsResponse.builder())
-                    .resource(PrivateDomainResource.builder()
+                    .resource(fill(PrivateDomainResource.builder())
                         .metadata(fill(Metadata.builder())
                             .id(domainId)
                             .build())
@@ -956,7 +956,7 @@ public final class DefaultApplicationsTest {
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
-                .just(GetSpaceResponse.builder()
+                .just(fill(GetSpaceResponse.builder())
                     .entity(SpaceEntity.builder()
                         .organizationId(organizationId)
                         .build())
@@ -1023,7 +1023,7 @@ public final class DefaultApplicationsTest {
                 .stackId(stackId)
                 .build()))
             .thenReturn(Mono
-                .just(UpdateApplicationResponse.builder()
+                .just(fill(UpdateApplicationResponse.builder())
                     .metadata(fill(Metadata.builder())
                         .id(applicationId)
                         .build())

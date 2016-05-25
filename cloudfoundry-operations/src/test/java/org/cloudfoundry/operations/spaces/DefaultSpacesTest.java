@@ -286,7 +286,7 @@ public final class DefaultSpacesTest {
 
         if (organizationId != null) {
             responseBuilder
-                .resource(OrganizationResource.builder()
+                .resource(fill(OrganizationResource.builder())
                     .metadata(fill(Metadata.builder())
                         .id(organizationId)
                         .build())
