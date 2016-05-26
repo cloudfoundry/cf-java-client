@@ -35,7 +35,11 @@ import java.util.function.Function;
 
 public abstract class AbstractReactorOperations {
 
+    protected static final AsciiString APPLICATION_X_WWW_FORM_URLENCODED = new AsciiString("application/x-www-form-urlencoded");
+
     protected static final AsciiString APPLICATION_ZIP = new AsciiString("application/zip");
+
+    protected static final AsciiString AUTHORIZATION = new AsciiString("Authorization");
 
     protected static final AsciiString CONTENT_TYPE = new AsciiString("Content-Type");
 

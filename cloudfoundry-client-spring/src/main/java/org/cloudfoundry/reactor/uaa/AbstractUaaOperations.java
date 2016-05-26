@@ -32,12 +32,17 @@ import java.util.function.Function;
 
 public abstract class AbstractUaaOperations extends AbstractReactorOperations {
 
-    private static final AsciiString AUTHORIZATION = new AsciiString("Authorization");
-
     private static final AsciiString BASIC_PREAMBLE = new AsciiString("Basic ");
 
     protected AbstractUaaOperations(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
         super(authorizationProvider, httpClient, objectMapper, root);
+    }
+
+    protected static Function<UriComponentsBuilder, UriComponentsBuilder> getUriAugmenter(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return builder -> {
+            QueryBuilder.augment(builder, request);
+            return uriTransformer.apply(builder);
+        };
     }
 
     protected final HttpOutbound basicAuth(HttpOutbound outbound, String clientId, String clientSecret) {
@@ -73,13 +78,6 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
 
     protected final <T> Mono<T> put(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doPut(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> IdentityZoneBuilder.augment(outbound, request));
-    }
-
-    private static Function<UriComponentsBuilder, UriComponentsBuilder> getUriAugmenter(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return builder -> {
-            QueryBuilder.augment(builder, request);
-            return uriTransformer.apply(builder);
-        };
     }
 
 }

@@ -20,6 +20,7 @@ import io.netty.handler.codec.http.HttpMethod;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
+import lombok.Singular;
 import okhttp3.Headers;
 import okhttp3.mockwebserver.RecordedRequest;
 import okio.Buffer;
@@ -45,6 +46,8 @@ public final class TestRequest {
 
     private final Optional<Consumer<Tuple2<Headers, Buffer>>> contents;
 
+    private final Map<String, String> headers;
+
     private final HttpMethod method;
 
     private final String path;
@@ -52,8 +55,9 @@ public final class TestRequest {
     private final Optional<Buffer> payload;
 
     @Builder
-    TestRequest(Consumer<Tuple2<Headers, Buffer>> contents, @NonNull HttpMethod method, @NonNull String path, String payload) {
+    TestRequest(Consumer<Tuple2<Headers, Buffer>> contents, @Singular Map<String, String> headers, @NonNull HttpMethod method, @NonNull String path, String payload) {
         this.contents = Optional.ofNullable(contents);
+        this.headers = headers;
         this.method = method;
         this.path = path;
         this.payload = Optional.ofNullable(payload).map(TestRequest::getBuffer);
@@ -62,6 +66,8 @@ public final class TestRequest {
     public void assertEquals(RecordedRequest request) {
         Assert.assertEquals(this.method.toString(), request.getMethod());
         Assert.assertEquals(this.path, extractPath(request));
+
+        this.headers.forEach((key, value) -> Assert.assertEquals(value, request.getHeader(key)));
 
         if (this.payload.isPresent()) {
             assertBodyEquals(this.payload.get(), request.getBody());
