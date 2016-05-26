@@ -18,7 +18,6 @@ package org.cloudfoundry.reactor.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.tuple.Tuple2;
 import reactor.io.netty.config.ClientOptions;
 import reactor.io.netty.tcp.TcpClient;
@@ -155,10 +154,6 @@ final class DefaultSslCertificateTruster implements SslCertificateTruster {
         } else {
             return chain;
         }
-    }
-
-    private static String getUri(String host, int port) {
-        return UriComponentsBuilder.newInstance().scheme("https").host(host).port(port).toUriString();
     }
 
 }
