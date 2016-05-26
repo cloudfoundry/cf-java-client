@@ -22,7 +22,7 @@ import lombok.NonNull;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.io.netty.config.ClientOptions;
+import reactor.io.netty.config.HttpClientOptions;
 import reactor.io.netty.http.HttpClient;
 
 import java.time.Duration;
@@ -115,7 +115,8 @@ public final class DefaultConnectionContext implements ConnectionContext {
     }
 
     private static HttpClient createHttpClient(ProxyContext proxyContext, Optional<SslCertificateTruster> sslCertificateTruster) {
-        return HttpClient.create(ClientOptions.create()
+        return HttpClient.create(HttpClientOptions.create()
+            .followRedirects(true)
             .sslSupport()
             .pipelineConfigurer(pipeline -> proxyContext.getHttpProxyHandler().ifPresent(handler -> pipeline.addBefore(SslHandler, null, handler)))
             .sslConfigurer(ssl -> sslCertificateTruster.ifPresent(trustManager -> ssl.trustManager(new StaticTrustManagerFactory(trustManager)))));

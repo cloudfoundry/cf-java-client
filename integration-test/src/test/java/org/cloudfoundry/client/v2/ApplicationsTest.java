@@ -67,20 +67,19 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple2;
 import reactor.core.util.Exceptions;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.zip.GZIPInputStream;
 
@@ -196,9 +195,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .flatMap(applicationId -> this.cloudFoundryClient.applicationsV2()
                 .downloadDroplet(DownloadApplicationDropletRequest.builder()
                     .applicationId(applicationId)
-                    .build()))
-            .reduceWith(ByteArrayOutputStream::new, ApplicationsTest::collectIntoByteArrayOutputStream)
-            .map(ByteArrayOutputStream::toByteArray)
+                    .build())
+                .as(AbstractIntegrationTest::collectByteArray))
             .subscribe(this.<byte[]>testSubscriber()
                 .assertThat(ApplicationsTest::assertIsTestApplicationDroplet));
     }
@@ -704,7 +702,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .applicationId(applicationId)
                     .index("0")
                     .build()))))
-            .then(function((applicationId, optionalSince) -> waitForInstanceRestart(cloudFoundryClient, applicationId, "0", optionalSince)))
+            .then(function((applicationId, optionalSince) -> waitForInstanceRestart(this.cloudFoundryClient, applicationId, "0", optionalSince)))
             .subscribe(this.testSubscriber()
                 .assertCount(1));
     }
@@ -733,15 +731,12 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void uploadAndDownload() {
         String applicationName = getApplicationName();
 
-        String testApplicationName = "test-application.zip";
-        Resource testApplication = new ClassPathResource(testApplicationName);
-
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
             .as(thenKeep(applicationId -> uploadApplication(this.cloudFoundryClient, applicationId)))
             .then(applicationId -> Mono.when(
                 downloadApplication(this.cloudFoundryClient, applicationId),
-                getByteArrayFrom(testApplicationName, testApplication)
+                getBytes("test-application.zip")
             ))
             .subscribe(this.<Tuple2<byte[], byte[]>>testSubscriber()
                 .assertThat(consumer((bytes1, bytes2) -> zipAssertEquivalent(new ByteArrayInputStream(bytes1), new ByteArrayInputStream(bytes2)))));
@@ -751,15 +746,12 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void uploadAndDownloadAsyncFalse() {
         String applicationName = getApplicationName();
 
-        String testApplicationName = "test-application.zip";
-        Resource testApplication = new ClassPathResource(testApplicationName);
-
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
             .as(thenKeep(applicationId -> uploadApplicationAsyncFalse(this.cloudFoundryClient, applicationId)))
             .then(applicationId -> Mono.when(
                 downloadApplication(this.cloudFoundryClient, applicationId),
-                getByteArrayFrom(testApplicationName, testApplication)
+                getBytes("test-application.zip")
             ))
             .subscribe(this.<Tuple2<byte[], byte[]>>testSubscriber()
                 .assertThat(consumer((bytes1, bytes2) -> zipAssertEquivalent(new ByteArrayInputStream(bytes1), new ByteArrayInputStream(bytes2)))));
@@ -772,33 +764,20 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         });
     }
 
-    private static void assertIsTestApplicationDroplet(byte[] byteArray) {
-        boolean staticFileFound = false;
-        boolean indexFileFound = false;
+    private static void assertIsTestApplicationDroplet(byte[] bytes) {
+        Set<String> names = new HashSet<>();
 
-        try {
-            TarArchiveInputStream tis = new TarArchiveInputStream(new GZIPInputStream(new ByteArrayInputStream(byteArray)));
-            for (TarArchiveEntry entry = tis.getNextTarEntry(); entry != null; entry = tis.getNextTarEntry()) {
-                if (entry.getName().endsWith("Staticfile")) {
-                    staticFileFound = true;
-                }
-                if (entry.getName().endsWith("index.html")) {
-                    indexFileFound = true;
-                }
+        try (TarArchiveInputStream in = new TarArchiveInputStream(new GZIPInputStream(new ByteArrayInputStream(bytes)))) {
+            TarArchiveEntry entry;
+            while ((entry = in.getNextTarEntry()) != null) {
+                names.add(entry.getName());
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Exceptions.propagate(e);
         }
-        assertTrue("Staticfile and index.html not both found in droplet", staticFileFound && indexFileFound);
-    }
 
-    private static ByteArrayOutputStream collectIntoByteArrayOutputStream(ByteArrayOutputStream out, byte[] bytes) {
-        try {
-            out.write(bytes);
-            return out;
-        } catch (IOException e) {
-            throw new Exceptions.UpstreamException(e);
-        }
+        assertTrue(names.contains("./app/Staticfile"));
+        assertTrue(names.contains("./app/public/index.html"));
     }
 
     private static Mono<String> createApplicationId(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
@@ -837,60 +816,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     private static Mono<String> createUserServiceInstanceId(CloudFoundryClient cloudFoundryClient, String spaceId, String serviceInstanceName) {
         return requestCreateUserServiceInstance(cloudFoundryClient, spaceId, serviceInstanceName)
             .map(ResourceUtils::getId);
-    }
-
-    private static Mono<byte[]> downloadApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient.applicationsV2()
-            .download(DownloadApplicationRequest.builder()
-                .applicationId(applicationId)
-                .build())
-            .reduceWith(ByteArrayOutputStream::new, ApplicationsTest::collectIntoByteArrayOutputStream)
-            .map(ByteArrayOutputStream::toByteArray);
-    }
-
-    private static Mono<byte[]> getByteArrayFrom(String resourceName, Resource resource) {
-        try {
-            final InputStream inputStream = resource.getInputStream();
-
-            return Flux
-                .fromIterable(() -> new Iterator<byte[]>() {
-
-                    @Override
-                    public boolean hasNext() {
-                        try {
-                            return inputStream.available() > 0;
-                        } catch (IOException e) {
-                            return false;
-                        }
-                    }
-
-                    @Override
-                    public byte[] next() {
-                        final int BUFSIZE = 1024;
-                        try {
-                            byte[] buffer = new byte[BUFSIZE];
-                            int numRead = inputStream.read(buffer, 0, BUFSIZE);
-                            if (numRead == BUFSIZE) {
-                                return buffer;
-                            } else if (numRead <= 0) {
-                                return new byte[0];
-                            } else {
-                                byte[] result = new byte[numRead];
-                                System.arraycopy(buffer, 0, result, 0, numRead);
-                                return result;
-                            }
-                        } catch (Exception e) {
-                            throw Exceptions.propagate(e);
-                        }
-                    }
-
-                })
-                .reduceWith(ByteArrayOutputStream::new, ApplicationsTest::collectIntoByteArrayOutputStream)
-                .map(ByteArrayOutputStream::toByteArray);
-
-        } catch (Exception e) {
-            return Mono.error(new AssertionError(String.format("Cannot get %s resource", resourceName), e));
-        }
     }
 
     private static Mono<ApplicationInstanceInfo> getInstanceInfo(CloudFoundryClient cloudFoundryClient, String applicationId, String instanceName) {
@@ -1065,6 +990,14 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .filter(applicationInstanceInfo -> "RUNNING".equals(applicationInstanceInfo.getState()))
             .next()
             .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
+    }
+
+    private Mono<byte[]> downloadApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient.applicationsV2()
+            .download(DownloadApplicationRequest.builder()
+                .applicationId(applicationId)
+                .build())
+            .as(AbstractIntegrationTest::collectByteArray);
     }
 
 }

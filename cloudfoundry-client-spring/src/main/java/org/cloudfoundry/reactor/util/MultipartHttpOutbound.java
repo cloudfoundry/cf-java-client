@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.CompositeByteBuf;
@@ -57,11 +58,14 @@ public final class MultipartHttpOutbound {
 
     private static final Random RND = new Random();
 
+    private final ObjectMapper objectMapper;
+
     private final HttpOutbound outbound;
 
     private final List<Consumer<PartHttpOutbound>> partConsumers = new ArrayList<>();
 
-    public MultipartHttpOutbound(HttpOutbound outbound) {
+    public MultipartHttpOutbound(ObjectMapper objectMapper, HttpOutbound outbound) {
+        this.objectMapper = objectMapper;
         this.outbound = outbound;
     }
 
@@ -75,7 +79,7 @@ public final class MultipartHttpOutbound {
         ByteBufAllocator allocator = this.outbound.delegate().alloc();
 
         CompositeByteBuf bodyBuf = allocator.compositeBuffer();
-        this.partConsumers.forEach(partConsumer -> bodyBuf.addComponent(getPart(allocator, boundary, partConsumer)));
+        this.partConsumers.forEach(partConsumer -> bodyBuf.addComponent(getPart(allocator, boundary, this.objectMapper, partConsumer)));
         bodyBuf.addComponent(getCloseDelimiter(allocator, boundary));
 
         return this.outbound
@@ -98,43 +102,19 @@ public final class MultipartHttpOutbound {
         return allocator.directBuffer(s.length()).writeBytes(s.toByteArray());
     }
 
-    private static ByteBuf getData(ByteBufAllocator allocator, InputStream inputStream) {
-        try (InputStream in = inputStream) {
-            ByteBuf dataBuf = allocator.directBuffer(CRLF.length() + inputStream.available() + CRLF.length());
-
-            dataBuf.writeBytes(CRLF.toByteArray());
-            dataBuf.writeBytes(in, in.available());
-            dataBuf.writeBytes(CRLF.toByteArray());
-
-            return dataBuf;
-        } catch (IOException e) {
-            throw Exceptions.propagate(e);
-        }
-    }
-
     private static ByteBuf getDelimiter(ByteBufAllocator allocator, AsciiString boundary) {
         AsciiString s = DOUBLE_DASH.concat(boundary).concat(CRLF);
         return allocator.directBuffer(s.length()).writeBytes(s.toByteArray());
     }
 
-    private static ByteBuf getHeaders(ByteBufAllocator allocator, HttpHeaders headers) {
-        AsciiString s = AsciiString.EMPTY_STRING;
-
-        for (Map.Entry<String, String> entry : headers) {
-            s = s.concat(new AsciiString(entry.getKey())).concat(HEADER_DELIMITER).concat(entry.getValue()).concat(CRLF);
-        }
-
-        return allocator.directBuffer(s.length()).writeBytes(s.toByteArray());
-    }
-
-    private static ByteBuf getPart(ByteBufAllocator allocator, AsciiString boundary, Consumer<PartHttpOutbound> partConsumer) {
-        PartHttpOutbound part = new PartHttpOutbound();
+    private static ByteBuf getPart(ByteBufAllocator allocator, AsciiString boundary, ObjectMapper objectMapper, Consumer<PartHttpOutbound> partConsumer) {
+        PartHttpOutbound part = new PartHttpOutbound(objectMapper);
         partConsumer.accept(part);
 
         CompositeByteBuf body = allocator.compositeBuffer();
         body.addComponent(getDelimiter(allocator, boundary));
-        body.addComponent(getHeaders(allocator, part.getHeaders()));
-        body.addComponent(getData(allocator, part.getInputStream()));
+        body.addComponent(part.getHeaders(allocator));
+        body.addComponent(part.getData(allocator));
 
         return body.writerIndex(body.capacity());
     }
@@ -143,15 +123,31 @@ public final class MultipartHttpOutbound {
 
         private final HttpHeaders headers = new DefaultHttpHeaders(true);
 
+        private final ObjectMapper objectMapper;
+
         private InputStream inputStream;
+
+        private Object source;
+
+        private PartHttpOutbound(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+        }
 
         public PartHttpOutbound addHeader(CharSequence name, CharSequence value) {
             this.headers.add(name, value);
             return this;
         }
 
+        public void send(Object source) {
+            this.source = source;
+        }
+
         public void sendInputStream(InputStream inputStream) {
             this.inputStream = inputStream;
+        }
+
+        public PartHttpOutbound setContentDispositionFormData(String name) {
+            return setContentDispositionFormData(name, null);
         }
 
         public PartHttpOutbound setContentDispositionFormData(String name, String filename) {
@@ -166,13 +162,46 @@ public final class MultipartHttpOutbound {
             return this;
         }
 
-        private HttpHeaders getHeaders() {
-            return this.headers;
+        private static ByteBuf getData(ByteBufAllocator allocator, InputStream inputStream) {
+            try (InputStream in = inputStream) {
+                ByteBuf byteBuf = allocator.directBuffer(in.available());
+                byteBuf.writeBytes(inputStream, inputStream.available());
+                return byteBuf;
+            } catch (IOException e) {
+                throw Exceptions.propagate(e);
+            }
         }
 
-        private InputStream getInputStream() {
-            return this.inputStream;
+        private static ByteBuf getData(ByteBufAllocator allocator, ObjectMapper objectMapper, Object source) {
+            return JsonCodec.encode(allocator, objectMapper, source);
         }
+
+        private ByteBuf getData(ByteBufAllocator allocator) {
+            CompositeByteBuf dataBuf = allocator.compositeBuffer();
+
+            dataBuf.addComponent(allocator.directBuffer(CRLF.length()).writeBytes(CRLF.toByteArray()));
+
+            if (this.inputStream != null) {
+                dataBuf.addComponent(getData(allocator, this.inputStream));
+            } else if (this.source != null) {
+                dataBuf.addComponent(getData(allocator, this.objectMapper, this.source));
+            }
+
+            dataBuf.addComponent(allocator.directBuffer(CRLF.length()).writeBytes(CRLF.toByteArray()));
+
+            return dataBuf.writerIndex(dataBuf.capacity());
+        }
+
+        private ByteBuf getHeaders(ByteBufAllocator allocator) {
+            AsciiString s = AsciiString.EMPTY_STRING;
+
+            for (Map.Entry<String, String> entry : this.headers) {
+                s = s.concat(new AsciiString(entry.getKey())).concat(HEADER_DELIMITER).concat(entry.getValue()).concat(CRLF);
+            }
+
+            return allocator.directBuffer(s.length()).writeBytes(s.toByteArray());
+        }
+
 
     }
 

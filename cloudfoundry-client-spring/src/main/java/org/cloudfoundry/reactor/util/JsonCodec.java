@@ -19,6 +19,7 @@ package org.cloudfoundry.reactor.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.util.AsciiString;
 import reactor.core.util.Exceptions;
 import reactor.io.netty.http.HttpOutbound;
@@ -45,15 +46,15 @@ final class JsonCodec {
 
     static <T> Function<T, ByteBuf> encode(ObjectMapper objectMapper, HttpOutbound httpOutbound) {
         httpOutbound.header(CONTENT_TYPE, APPLICATION_JSON);
+        return source -> encode(httpOutbound.delegate().alloc(), objectMapper, source);
+    }
 
-        return source -> {
-            try {
-                return httpOutbound.delegate().alloc().directBuffer()
-                    .writeBytes(objectMapper.writeValueAsBytes(source));
-            } catch (JsonProcessingException e) {
-                throw Exceptions.propagate(e);
-            }
-        };
+    static <T> ByteBuf encode(ByteBufAllocator allocator, ObjectMapper objectMapper, T source) {
+        try {
+            return allocator.directBuffer().writeBytes(objectMapper.writeValueAsBytes(source));
+        } catch (JsonProcessingException e) {
+            throw Exceptions.propagate(e);
+        }
     }
 
 }

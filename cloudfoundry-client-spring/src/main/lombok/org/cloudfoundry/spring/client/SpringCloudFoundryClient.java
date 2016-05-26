@@ -57,6 +57,7 @@ import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
 import org.cloudfoundry.client.v3.servicebindings.ServiceBindingsV3;
 import org.cloudfoundry.client.v3.tasks.Tasks;
+import org.cloudfoundry.reactor.client.v2.applications.ReactorApplicationsV2;
 import org.cloudfoundry.reactor.client.v2.applicationusageevents.ReactorApplicationUsageEvents;
 import org.cloudfoundry.reactor.client.v2.buildpacks.ReactorBuildpacks;
 import org.cloudfoundry.reactor.client.v2.domains.ReactorDomains;
@@ -94,30 +95,21 @@ import org.cloudfoundry.reactor.client.v3.tasks.ReactorTasks;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.reactor.util.ConnectionContextSupplier;
 import org.cloudfoundry.reactor.util.DefaultConnectionContext;
-import org.cloudfoundry.spring.client.v2.applications.SpringApplicationsV2;
 import org.cloudfoundry.spring.util.CloudFoundryClientCompatibilityChecker;
-import org.cloudfoundry.spring.util.SchedulerGroupBuilder;
 import org.cloudfoundry.spring.util.network.ConnectionContext;
 import org.cloudfoundry.spring.util.network.ConnectionContextFactory;
 import org.cloudfoundry.spring.util.network.FallbackHttpMessageConverter;
 import org.cloudfoundry.spring.util.network.OAuth2RestOperationsOAuth2TokenProvider;
 import org.cloudfoundry.spring.util.network.OAuth2RestTemplateBuilder;
 import org.cloudfoundry.spring.util.network.OAuth2TokenProvider;
-import org.cloudfoundry.spring.util.network.SslCertificateTruster;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
-import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
 import reactor.io.netty.http.HttpClient;
 
-import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * The Spring-based implementation of {@link CloudFoundryClient}
@@ -213,13 +205,12 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
                              @Singular List<DeserializationProblemHandler> problemHandlers) {
 
         this(getConnectionContext(host, port, skipSslValidation, clientId, clientSecret, username, password), host, port, proxyHost, proxyPassword, proxyPort, proxyUsername, skipSslValidation,
-            getSchedulerGroup(), problemHandlers, clientId, clientSecret);
+            problemHandlers, clientId, clientSecret);
         new CloudFoundryClientCompatibilityChecker(this.info).check();
     }
 
-    SpringCloudFoundryClient(String host, Integer port, String proxyHost, String proxyPassword, Integer proxyPort, String proxyUsername, Boolean skipSslValidation, RestOperations restOperations,
-                             URI root, Scheduler schedulerGroup, OAuth2TokenProvider tokenProvider, List<DeserializationProblemHandler> problemHandlers, String clientId, String clientSecret) {
-        this.applicationsV2 = new SpringApplicationsV2(restOperations, root, schedulerGroup);
+    SpringCloudFoundryClient(String host, Integer port, String proxyHost, String proxyPassword, Integer proxyPort, String proxyUsername, Boolean skipSslValidation,
+                             OAuth2TokenProvider tokenProvider, List<DeserializationProblemHandler> problemHandlers, String clientId, String clientSecret) {
 
         this.tokenProvider = tokenProvider;
 
@@ -248,6 +239,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         HttpClient httpClient = this.connectionContext.getHttpClient();
         Mono<String> root2 = this.connectionContext.getRoot();  // TODO: Change name once Spring is gone
 
+        this.applicationsV2 = new ReactorApplicationsV2(authorizationProvider, httpClient, objectMapper, root2);
         this.applicationsV3 = new ReactorApplicationsV3(authorizationProvider, httpClient, objectMapper, root2);
         this.applicationUsageEvents = new ReactorApplicationUsageEvents(authorizationProvider, httpClient, objectMapper, root2);
         this.buildpacks = new ReactorBuildpacks(authorizationProvider, httpClient, objectMapper, root2);
@@ -286,19 +278,14 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
 
     // Let's take a moment to reflect on the fact that this bridge constructor is needed to counter a useless compiler constraint
     private SpringCloudFoundryClient(ConnectionContext connectionContext, String host, Integer port, String proxyHost, String proxyPassword, Integer proxyPort, String proxyUsername,
-                                     Boolean skipSslValidation, Scheduler schedulerGroup, List<DeserializationProblemHandler> problemHandlers, String clientId, String clientSecret) {
-
-        this(host, port, proxyHost, proxyPassword, proxyPort, proxyUsername, skipSslValidation, getRestOperations(connectionContext, problemHandlers), getRoot(host, port,
-            connectionContext.getSslCertificateTruster()), schedulerGroup, problemHandlers, clientId, clientSecret);
+                                     Boolean skipSslValidation, List<DeserializationProblemHandler> problemHandlers, String clientId, String clientSecret) {
+        this(host, port, proxyHost, proxyPassword, proxyPort, proxyUsername, skipSslValidation, getRestOperations(connectionContext, problemHandlers), problemHandlers, clientId, clientSecret);
     }
 
     // Let's take a moment to reflect on the fact that this bridge constructor is needed to counter a useless compiler constraint
     private SpringCloudFoundryClient(String host, Integer port, String proxyHost, String proxyPassword, Integer proxyPort, String proxyUsername, Boolean skipSslValidation,
-                                     OAuth2RestOperations restOperations, URI root, Scheduler schedulerGroup, List<DeserializationProblemHandler> problemHandlers, String clientId,
-                                     String clientSecret) {
-
-        this(host, port, proxyHost, proxyPassword, proxyPort, proxyUsername, skipSslValidation, restOperations, root, schedulerGroup, new OAuth2RestOperationsOAuth2TokenProvider(restOperations),
-            problemHandlers, clientId, clientSecret);
+                                     OAuth2RestOperations restOperations, List<DeserializationProblemHandler> problemHandlers, String clientId, String clientSecret) {
+        this(host, port, proxyHost, proxyPassword, proxyPort, proxyUsername, skipSslValidation, new OAuth2RestOperationsOAuth2TokenProvider(restOperations), problemHandlers, clientId, clientSecret);
     }
 
     @Override
@@ -506,22 +493,6 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
             .sslContext(connectionContext.getSslContext())
             .messageConverter(new FallbackHttpMessageConverter())
             .problemHandlers(problemHandlers)
-            .build();
-    }
-
-    private static URI getRoot(String host, Integer port, SslCertificateTruster sslCertificateTruster) {
-        URI uri = UriComponentsBuilder.newInstance()
-            .scheme("https").host(host).port(Optional.ofNullable(port).orElse(443))
-            .build().toUri();
-
-        sslCertificateTruster.trust(uri.getHost(), uri.getPort(), 5, SECONDS);
-        return uri;
-    }
-
-    private static Scheduler getSchedulerGroup() {
-        return new SchedulerGroupBuilder()
-            .name("cloud-foundry")
-            .autoShutdown(false)
             .build();
     }
 
