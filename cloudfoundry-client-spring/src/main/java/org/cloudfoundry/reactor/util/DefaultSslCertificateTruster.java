@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.tuple.Tuple2;
-import reactor.io.netty.config.ClientOptions;
+import reactor.io.netty.config.HttpClientOptions;
 import reactor.io.netty.http.HttpClient;
 import reactor.io.netty.http.HttpException;
 
@@ -112,7 +112,8 @@ final class DefaultSslCertificateTruster implements SslCertificateTruster {
     }
 
     private static HttpClient getHttpClient(ProxyContext proxyContext, CertificateCollectingTrustManager collector) {
-        return HttpClient.create(ClientOptions.create()
+        return HttpClient.create(HttpClientOptions.create()
+            .followRedirects(false)
             .sslSupport()
             .pipelineConfigurer(pipeline -> proxyContext.getHttpProxyHandler().ifPresent(handler -> pipeline.addBefore(SslHandler, null, handler)))
             .sslConfigurer(ssl -> ssl.trustManager(new StaticTrustManagerFactory(collector))));
