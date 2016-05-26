@@ -31,8 +31,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link RouteMappings}
  */
@@ -52,22 +50,22 @@ public final class ReactorRouteMappings extends AbstractClientV2Operations imple
 
     @Override
     public Mono<CreateRouteMappingResponse> create(CreateRouteMappingRequest request) {
-        return post(request, CreateRouteMappingResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "route_mappings")));
+        return post(request, CreateRouteMappingResponse.class, builder -> builder.pathSegment("v2", "route_mappings"));
     }
 
     @Override
     public Mono<DeleteRouteMappingResponse> delete(DeleteRouteMappingRequest request) {
-        return delete(request, DeleteRouteMappingResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "route_mappings", validRequest.getRouteMappingId())));
+        return delete(request, DeleteRouteMappingResponse.class, builder -> builder.pathSegment("v2", "route_mappings", request.getRouteMappingId()));
     }
 
     @Override
     public Mono<GetRouteMappingResponse> get(GetRouteMappingRequest request) {
-        return get(request, GetRouteMappingResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "route_mappings", validRequest.getRouteMappingId())));
+        return get(request, GetRouteMappingResponse.class, builder -> builder.pathSegment("v2", "route_mappings", request.getRouteMappingId()));
     }
 
     @Override
     public Mono<ListRouteMappingsResponse> list(ListRouteMappingsRequest request) {
-        return get(request, ListRouteMappingsResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "route_mappings")));
+        return get(request, ListRouteMappingsResponse.class, builder -> builder.pathSegment("v2", "route_mappings"));
     }
 
 }

@@ -17,10 +17,10 @@
 package org.cloudfoundry.reactor.client.v3.processes;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.cloudfoundry.client.v3.processes.GetProcessStatisticsRequest;
-import org.cloudfoundry.client.v3.processes.GetProcessStatisticsResponse;
 import org.cloudfoundry.client.v3.processes.GetProcessRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessResponse;
+import org.cloudfoundry.client.v3.processes.GetProcessStatisticsRequest;
+import org.cloudfoundry.client.v3.processes.GetProcessStatisticsResponse;
 import org.cloudfoundry.client.v3.processes.ListProcessesRequest;
 import org.cloudfoundry.client.v3.processes.ListProcessesResponse;
 import org.cloudfoundry.client.v3.processes.Processes;
@@ -33,8 +33,6 @@ import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
-
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
  * The Reactor-based implementation of {@link Processes}
@@ -55,32 +53,32 @@ public final class ReactorProcesses extends AbstractClientV3Operations implement
 
     @Override
     public Mono<GetProcessResponse> get(GetProcessRequest request) {
-        return get(request, GetProcessResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "processes", validRequest.getProcessId())));
+        return get(request, GetProcessResponse.class, builder -> builder.pathSegment("v3", "processes", request.getProcessId()));
     }
 
     @Override
     public Mono<GetProcessStatisticsResponse> getStatistics(GetProcessStatisticsRequest request) {
-        return get(request, GetProcessStatisticsResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "processes", validRequest.getProcessId(), "stats")));
+        return get(request, GetProcessStatisticsResponse.class, builder -> builder.pathSegment("v3", "processes", request.getProcessId(), "stats"));
     }
 
     @Override
     public Mono<ListProcessesResponse> list(ListProcessesRequest request) {
-        return get(request, ListProcessesResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "processes")));
+        return get(request, ListProcessesResponse.class, builder -> builder.pathSegment("v3", "processes"));
     }
 
     @Override
     public Mono<ScaleProcessResponse> scale(ScaleProcessRequest request) {
-        return put(request, ScaleProcessResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "processes", validRequest.getProcessId(), "scale")));
+        return put(request, ScaleProcessResponse.class, builder -> builder.pathSegment("v3", "processes", request.getProcessId(), "scale"));
     }
 
     @Override
     public Mono<Void> terminateInstance(TerminateProcessInstanceRequest request) {
-        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v3", "processes", validRequest.getProcessId(), "instances", validRequest.getIndex())));
+        return delete(request, Void.class, builder -> builder.pathSegment("v3", "processes", request.getProcessId(), "instances", request.getIndex()));
     }
 
     @Override
     public Mono<UpdateProcessResponse> update(UpdateProcessRequest request) {
-        return patch(request, UpdateProcessResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "processes", validRequest.getProcessId())));
+        return patch(request, UpdateProcessResponse.class, builder -> builder.pathSegment("v3", "processes", request.getProcessId()));
     }
 
 }

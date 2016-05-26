@@ -28,8 +28,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link Droplets}
  */
@@ -49,17 +47,17 @@ public final class ReactorDroplets extends AbstractClientV3Operations implements
 
     @Override
     public Mono<Void> delete(DeleteDropletRequest request) {
-        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v3", "droplets", validRequest.getDropletId())));
+        return delete(request, Void.class, builder -> builder.pathSegment("v3", "droplets", request.getDropletId()));
     }
 
     @Override
     public Mono<GetDropletResponse> get(GetDropletRequest request) {
-        return get(request, GetDropletResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "droplets", validRequest.getDropletId())));
+        return get(request, GetDropletResponse.class, builder -> builder.pathSegment("v3", "droplets", request.getDropletId()));
     }
 
     @Override
     public Mono<ListDropletsResponse> list(ListDropletsRequest request) {
-        return get(request, ListDropletsResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "droplets")));
+        return get(request, ListDropletsResponse.class, builder -> builder.pathSegment("v3", "droplets"));
     }
 
 }

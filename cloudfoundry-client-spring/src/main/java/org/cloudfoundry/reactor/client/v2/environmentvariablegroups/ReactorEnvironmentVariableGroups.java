@@ -31,8 +31,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link EnvironmentVariableGroups}
  */
@@ -52,22 +50,22 @@ public final class ReactorEnvironmentVariableGroups extends AbstractClientV2Oper
 
     @Override
     public Mono<GetRunningEnvironmentVariablesResponse> getRunningEnvironmentVariables(GetRunningEnvironmentVariablesRequest request) {
-        return get(request, GetRunningEnvironmentVariablesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "config", "environment_variable_groups", "running")));
+        return get(request, GetRunningEnvironmentVariablesResponse.class, builder -> builder.pathSegment("v2", "config", "environment_variable_groups", "running"));
     }
 
     @Override
     public Mono<GetStagingEnvironmentVariablesResponse> getStagingEnvironmentVariables(GetStagingEnvironmentVariablesRequest request) {
-        return get(request, GetStagingEnvironmentVariablesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "config", "environment_variable_groups", "staging")));
+        return get(request, GetStagingEnvironmentVariablesResponse.class, builder -> builder.pathSegment("v2", "config", "environment_variable_groups", "staging"));
     }
 
     @Override
     public Mono<UpdateRunningEnvironmentVariablesResponse> updateRunningEnvironmentVariables(UpdateRunningEnvironmentVariablesRequest request) {
-        return put(request, UpdateRunningEnvironmentVariablesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "config", "environment_variable_groups", "running")));
+        return put(request, UpdateRunningEnvironmentVariablesResponse.class, builder -> builder.pathSegment("v2", "config", "environment_variable_groups", "running"));
     }
 
     @Override
     public Mono<UpdateStagingEnvironmentVariablesResponse> updateStagingEnvironmentVariables(UpdateStagingEnvironmentVariablesRequest request) {
-        return put(request, UpdateStagingEnvironmentVariablesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "config", "environment_variable_groups", "staging")));
+        return put(request, UpdateStagingEnvironmentVariablesResponse.class, builder -> builder.pathSegment("v2", "config", "environment_variable_groups", "staging"));
     }
 
 }

@@ -34,8 +34,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link ServicePlans}
  */
@@ -55,28 +53,28 @@ public final class ReactorServicePlans extends AbstractClientV2Operations implem
 
     @Override
     public Mono<DeleteServicePlanResponse> delete(DeleteServicePlanRequest request) {
-        return delete(request, DeleteServicePlanResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_plans", validRequest.getServicePlanId())));
+        return delete(request, DeleteServicePlanResponse.class, builder -> builder.pathSegment("v2", "service_plans", request.getServicePlanId()));
     }
 
     @Override
     public Mono<GetServicePlanResponse> get(GetServicePlanRequest request) {
-        return get(request, GetServicePlanResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_plans", validRequest.getServicePlanId())));
+        return get(request, GetServicePlanResponse.class, builder -> builder.pathSegment("v2", "service_plans", request.getServicePlanId()));
     }
 
     @Override
     public Mono<ListServicePlansResponse> list(ListServicePlansRequest request) {
-        return get(request, ListServicePlansResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_plans")));
+        return get(request, ListServicePlansResponse.class, builder -> builder.pathSegment("v2", "service_plans"));
     }
 
     @Override
     public Mono<ListServicePlanServiceInstancesResponse> listServiceInstances(ListServicePlanServiceInstancesRequest request) {
         return get(request, ListServicePlanServiceInstancesResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("v2", "service_plans", validRequest.getServicePlanId(), "service_instances")));
+            builder -> builder.pathSegment("v2", "service_plans", request.getServicePlanId(), "service_instances"));
     }
 
     @Override
     public Mono<UpdateServicePlanResponse> update(UpdateServicePlanRequest request) {
-        return put(request, UpdateServicePlanResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_plans", validRequest.getServicePlanId())));
+        return put(request, UpdateServicePlanResponse.class, builder -> builder.pathSegment("v2", "service_plans", request.getServicePlanId()));
     }
 
 }

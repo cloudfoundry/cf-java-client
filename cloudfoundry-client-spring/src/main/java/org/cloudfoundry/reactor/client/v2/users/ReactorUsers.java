@@ -25,8 +25,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link Users}
  */
@@ -46,7 +44,7 @@ public final class ReactorUsers extends AbstractClientV2Operations implements Us
 
     @Override
     public Mono<ListUsersResponse> list(ListUsersRequest request) {
-        return get(request, ListUsersResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "users")));
+        return get(request, ListUsersResponse.class, builder -> builder.pathSegment("v2", "users"));
     }
 
 }

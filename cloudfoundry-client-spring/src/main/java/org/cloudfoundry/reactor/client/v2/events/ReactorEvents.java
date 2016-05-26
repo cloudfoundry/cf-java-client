@@ -27,8 +27,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link Events}
  */
@@ -48,12 +46,12 @@ public final class ReactorEvents extends AbstractClientV2Operations implements E
 
     @Override
     public Mono<GetEventResponse> get(GetEventRequest request) {
-        return get(request, GetEventResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "events", validRequest.getEventId())));
+        return get(request, GetEventResponse.class, builder -> builder.pathSegment("v2", "events", request.getEventId()));
     }
 
     @Override
     public Mono<ListEventsResponse> list(ListEventsRequest request) {
-        return get(request, ListEventsResponse.class, function((builder, validaRequest) -> builder.pathSegment("v2", "events")));
+        return get(request, ListEventsResponse.class, builder -> builder.pathSegment("v2", "events"));
     }
 
 }

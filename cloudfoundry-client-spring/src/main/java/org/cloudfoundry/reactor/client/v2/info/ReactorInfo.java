@@ -26,8 +26,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link Info}
  */
@@ -47,7 +45,7 @@ public final class ReactorInfo extends AbstractClientV2Operations implements Inf
 
     @Override
     public Mono<GetInfoResponse> get(GetInfoRequest request) {
-        return get(request, GetInfoResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "info")));
+        return get(request, GetInfoResponse.class, builder -> builder.pathSegment("v2", "info"));
     }
 
 }

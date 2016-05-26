@@ -34,8 +34,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link UserProvidedServiceInstances}
  */
@@ -55,35 +53,33 @@ public final class ReactorUserProvidedServiceInstances extends AbstractClientV2O
 
     @Override
     public Mono<CreateUserProvidedServiceInstanceResponse> create(CreateUserProvidedServiceInstanceRequest request) {
-        return post(request, CreateUserProvidedServiceInstanceResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "user_provided_service_instances")));
+        return post(request, CreateUserProvidedServiceInstanceResponse.class, builder -> builder.pathSegment("v2", "user_provided_service_instances"));
     }
 
     @Override
     public Mono<Void> delete(DeleteUserProvidedServiceInstanceRequest request) {
-        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v2", "user_provided_service_instances", validRequest.getUserProvidedServiceInstanceId())));
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId()));
     }
 
     @Override
     public Mono<GetUserProvidedServiceInstanceResponse> get(GetUserProvidedServiceInstanceRequest request) {
-        return get(request, GetUserProvidedServiceInstanceResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("v2", "user_provided_service_instances", validRequest.getUserProvidedServiceInstanceId())));
+        return get(request, GetUserProvidedServiceInstanceResponse.class, builder -> builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId()));
     }
 
     @Override
     public Mono<ListUserProvidedServiceInstancesResponse> list(ListUserProvidedServiceInstancesRequest request) {
-        return get(request, ListUserProvidedServiceInstancesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "user_provided_service_instances")));
+        return get(request, ListUserProvidedServiceInstancesResponse.class, builder -> builder.pathSegment("v2", "user_provided_service_instances"));
     }
 
     @Override
     public Mono<ListUserProvidedServiceInstanceServiceBindingsResponse> listServiceBindings(ListUserProvidedServiceInstanceServiceBindingsRequest request) {
         return get(request, ListUserProvidedServiceInstanceServiceBindingsResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("v2", "user_provided_service_instances", validRequest.getUserProvidedServiceInstanceId(), "service_bindings")));
+            builder -> builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId(), "service_bindings"));
     }
 
     @Override
     public Mono<UpdateUserProvidedServiceInstanceResponse> update(UpdateUserProvidedServiceInstanceRequest request) {
-        return put(request, UpdateUserProvidedServiceInstanceResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("v2", "user_provided_service_instances", validRequest.getUserProvidedServiceInstanceId())));
+        return put(request, UpdateUserProvidedServiceInstanceResponse.class, builder -> builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId()));
     }
 
 }

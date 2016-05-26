@@ -31,8 +31,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link ServiceInstances}
  */
@@ -52,22 +50,22 @@ public final class ReactorServiceKeys extends AbstractClientV2Operations impleme
 
     @Override
     public Mono<CreateServiceKeyResponse> create(CreateServiceKeyRequest request) {
-        return post(request, CreateServiceKeyResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_keys")));
+        return post(request, CreateServiceKeyResponse.class, builder -> builder.pathSegment("v2", "service_keys"));
     }
 
     @Override
     public Mono<Void> delete(DeleteServiceKeyRequest request) {
-        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_keys", validRequest.getServiceKeyId())));
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "service_keys", request.getServiceKeyId()));
     }
 
     @Override
     public Mono<GetServiceKeyResponse> get(GetServiceKeyRequest request) {
-        return get(request, GetServiceKeyResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_keys", validRequest.getServiceKeyId())));
+        return get(request, GetServiceKeyResponse.class, builder -> builder.pathSegment("v2", "service_keys", request.getServiceKeyId()));
     }
 
     @Override
     public Mono<ListServiceKeysResponse> list(ListServiceKeysRequest request) {
-        return get(request, ListServiceKeysResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_keys")));
+        return get(request, ListServiceKeysResponse.class, builder -> builder.pathSegment("v2", "service_keys"));
     }
 
 }

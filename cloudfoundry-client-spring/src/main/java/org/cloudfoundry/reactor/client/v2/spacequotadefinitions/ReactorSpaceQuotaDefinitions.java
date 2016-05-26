@@ -30,8 +30,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link SpaceQuotaDefinitions}
  */
@@ -52,23 +50,22 @@ public final class ReactorSpaceQuotaDefinitions extends AbstractClientV2Operatio
     @Override
     public Mono<AssociateSpaceQuotaDefinitionResponse> associateSpace(AssociateSpaceQuotaDefinitionRequest request) {
         return put(request, AssociateSpaceQuotaDefinitionResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("v2", "space_quota_definitions", validRequest.getSpaceQuotaDefinitionId(), "spaces", validRequest.getSpaceId())));
+            builder -> builder.pathSegment("v2", "space_quota_definitions", request.getSpaceQuotaDefinitionId(), "spaces", request.getSpaceId()));
     }
 
     @Override
     public Mono<GetSpaceQuotaDefinitionResponse> get(GetSpaceQuotaDefinitionRequest request) {
-        return get(request, GetSpaceQuotaDefinitionResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "space_quota_definitions", validRequest.getSpaceQuotaDefinitionId())));
+        return get(request, GetSpaceQuotaDefinitionResponse.class, builder -> builder.pathSegment("v2", "space_quota_definitions", request.getSpaceQuotaDefinitionId()));
     }
 
     @Override
     public Mono<ListSpaceQuotaDefinitionsResponse> list(ListSpaceQuotaDefinitionsRequest request) {
-        return get(request, ListSpaceQuotaDefinitionsResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "space_quota_definitions")));
+        return get(request, ListSpaceQuotaDefinitionsResponse.class, builder -> builder.pathSegment("v2", "space_quota_definitions"));
     }
 
     @Override
     public Mono<Void> removeSpace(RemoveSpaceQuotaDefinitionRequest request) {
-        return delete(request, Void.class,
-            function((builder, validRequest) -> builder.pathSegment("v2", "space_quota_definitions", validRequest.getSpaceQuotaDefinitionId(), "spaces", validRequest.getSpaceId())));
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "space_quota_definitions", request.getSpaceQuotaDefinitionId(), "spaces", request.getSpaceId()));
     }
 
 }

@@ -24,15 +24,11 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.reactor.util.MultipartHttpOutbound;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.core.tuple.Tuple;
-import reactor.core.tuple.Tuple2;
 import reactor.io.netty.http.HttpClient;
 import reactor.io.netty.http.HttpException;
 import reactor.io.netty.http.HttpInbound;
 
 import java.util.function.Function;
-
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public abstract class AbstractClientV3Operations extends AbstractReactorOperations {
 
@@ -40,52 +36,50 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
         super(authorizationProvider, httpClient, objectMapper, root);
     }
 
-    protected final <REQ, RSP> Mono<RSP> delete(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
-        return doDelete(request, responseType, getUriAugmenter(uriTransformer), function((outbound, validRequest) -> outbound))
+    protected final <T> Mono<T> delete(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return doDelete(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> outbound)
             .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
     }
 
-    protected final <REQ, RSP> Mono<RSP> get(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
-        return doGet(request, responseType, getUriAugmenter(uriTransformer), function((outbound, validRequest) -> outbound))
+    protected final <T> Mono<T> get(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return doGet(responseType, getUriAugmenter(request, uriTransformer), outbound -> outbound)
             .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
     }
 
-    protected final <REQ> Mono<HttpInbound> get(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
-        return doGet(request, getUriAugmenter(uriTransformer), function((outbound, validRequest) -> outbound))
+    protected final Mono<HttpInbound> get(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return doGet(getUriAugmenter(request, uriTransformer), outbound -> outbound)
             .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
     }
 
-    protected final <REQ, RSP> Mono<RSP> patch(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
-        return doPatch(request, responseType, getUriAugmenter(uriTransformer), function((outbound, validRequest) -> outbound))
+    protected final <T> Mono<T> patch(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return doPatch(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> outbound)
             .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
     }
 
-    protected final <REQ, RSP> Mono<RSP> post(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
-        return doPost(request, responseType, getUriAugmenter(uriTransformer), function((outbound, validRequest) -> outbound))
+    protected final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return doPost(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> outbound)
             .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
     }
 
-    protected final <REQ, RSP> Mono<RSP> post(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
-                                              Function<Tuple2<MultipartHttpOutbound, REQ>, Mono<Void>> requestTransformer) {
+    protected final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+                                     Function<MultipartHttpOutbound, Mono<Void>> requestTransformer) {
 
-        return doPostComplete(request, responseType, getUriAugmenter(uriTransformer),
-            function((outbound, validRequest) -> requestTransformer.apply(Tuple.of(new MultipartHttpOutbound(outbound), validRequest))))
+        return doPost(responseType, getUriAugmenter(request, uriTransformer),
+            outbound -> requestTransformer.apply(new MultipartHttpOutbound(outbound)))
             .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
     }
 
-    protected final <REQ, RSP> Mono<RSP> put(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
-        return doPut(request, responseType, getUriAugmenter(uriTransformer), function((outbound, validRequest) -> outbound))
+    protected final <T> Mono<T> put(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return doPut(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> outbound)
             .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
     }
 
-    private static <REQ> Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> getUriAugmenter(
-        Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
-
-        return function((builder, validRequest) -> {
-            FilterBuilder.augment(builder, validRequest);
-            QueryBuilder.augment(builder, validRequest);
-            return uriTransformer.apply(Tuple.of(builder, validRequest));
-        });
+    private static Function<UriComponentsBuilder, UriComponentsBuilder> getUriAugmenter(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return builder -> {
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
+            return uriTransformer.apply(builder);
+        };
     }
 
 }

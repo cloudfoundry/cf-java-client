@@ -33,8 +33,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link SecurityGroups}
  */
@@ -54,34 +52,32 @@ public class ReactorSecurityGroups extends AbstractClientV2Operations implements
 
     @Override
     public Mono<Void> deleteRunningDefault(DeleteSecurityGroupRunningDefaultRequest request) {
-        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v2", "config", "running_security_groups", validRequest.getSecurityGroupRunningDefaultId())));
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "config", "running_security_groups", request.getSecurityGroupRunningDefaultId()));
     }
 
     @Override
     public Mono<Void> deleteStagingDefault(DeleteSecurityGroupStagingDefaultRequest request) {
-        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v2", "config", "staging_security_groups", validRequest.getSecurityGroupStagingDefaultId())));
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "config", "staging_security_groups", request.getSecurityGroupStagingDefaultId()));
     }
 
     @Override
     public Mono<ListSecurityGroupRunningDefaultsResponse> listRunningDefaults(ListSecurityGroupRunningDefaultsRequest request) {
-        return get(request, ListSecurityGroupRunningDefaultsResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "config", "running_security_groups")));
+        return get(request, ListSecurityGroupRunningDefaultsResponse.class, builder -> builder.pathSegment("v2", "config", "running_security_groups"));
     }
 
     @Override
     public Mono<ListSecurityGroupStagingDefaultsResponse> listStagingDefaults(ListSecurityGroupStagingDefaultsRequest request) {
-        return get(request, ListSecurityGroupStagingDefaultsResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "config", "staging_security_groups")));
+        return get(request, ListSecurityGroupStagingDefaultsResponse.class, builder -> builder.pathSegment("v2", "config", "staging_security_groups"));
     }
 
     @Override
     public Mono<SetSecurityGroupRunningDefaultResponse> setRunningDefault(SetSecurityGroupRunningDefaultRequest request) {
-        return put(request, SetSecurityGroupRunningDefaultResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("v2", "config", "running_security_groups", validRequest.getSecurityGroupRunningDefaultId())));
+        return put(request, SetSecurityGroupRunningDefaultResponse.class, builder -> builder.pathSegment("v2", "config", "running_security_groups", request.getSecurityGroupRunningDefaultId()));
     }
 
     @Override
     public Mono<SetSecurityGroupStagingDefaultResponse> setStagingDefault(SetSecurityGroupStagingDefaultRequest request) {
-        return put(request, SetSecurityGroupStagingDefaultResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("v2", "config", "staging_security_groups", validRequest.getSecurityGroupStagingDefaultId())));
+        return put(request, SetSecurityGroupStagingDefaultResponse.class, builder -> builder.pathSegment("v2", "config", "staging_security_groups", request.getSecurityGroupStagingDefaultId()));
     }
 
 }

@@ -20,14 +20,11 @@ package org.cloudfoundry.reactor.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.ByteBuf;
 import io.netty.util.AsciiString;
-import org.cloudfoundry.util.ValidationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.core.tuple.Tuple;
-import reactor.core.tuple.Tuple2;
 import reactor.io.netty.http.HttpClient;
 import reactor.io.netty.http.HttpException;
 import reactor.io.netty.http.HttpInbound;
@@ -35,8 +32,6 @@ import reactor.io.netty.http.HttpOutbound;
 
 import java.util.List;
 import java.util.function.Function;
-
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public abstract class AbstractReactorOperations {
 
@@ -65,106 +60,101 @@ public abstract class AbstractReactorOperations {
         this.root = root;
     }
 
-    protected final <REQ, RSP> Mono<RSP> doDelete(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
-                                                  Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
-
-        return prepareRequest(request, uriTransformer)
-            .then(function((validRequest, uri) -> this.httpClient.delete(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
-                .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
-                .then(o -> o.send(serializedRequest(o, validRequest))))
+    protected final <T> Mono<T> doDelete(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+                                         Function<HttpOutbound, HttpOutbound> requestTransformer) {
+        return this.root
+            .map(root -> buildUri(root, uriTransformer))
+            .then(uri -> this.httpClient.delete(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
+                .map(requestTransformer)
+                .then(o -> o.send(serializedRequest(o, request))))
                 .doOnSubscribe(s -> this.requestLogger.debug("DELETE {}", uri))
-                .compose(logResponse(uri))))
+                .compose(logResponse(uri)))
             .compose(deserializedResponse(responseType));
     }
 
-    protected final <REQ, RSP> Mono<RSP> doGet(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
-                                               Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
-
-        return doGet(request, uriTransformer, requestTransformer)
+    protected final <T> Mono<T> doGet(Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<HttpOutbound, HttpOutbound> requestTransformer) {
+        return doGet(uriTransformer, requestTransformer)
             .compose(deserializedResponse(responseType));
     }
 
-    protected final <REQ> Mono<HttpInbound> doGet(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
-                                                  Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
-
-        return prepareRequest(request, uriTransformer)
-            .then(function((validRequest, uri) -> this.httpClient.get(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
-                .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
+    protected final Mono<HttpInbound> doGet(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<HttpOutbound, HttpOutbound> requestTransformer) {
+        return this.root
+            .map(root -> buildUri(root, uriTransformer))
+            .then(uri -> this.httpClient.get(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
+                .map(requestTransformer)
                 .then(HttpOutbound::sendHeaders))
                 .doOnSubscribe(s -> this.requestLogger.debug("GET    {}", uri))
-                .compose(logResponse(uri))));
+                .compose(logResponse(uri)));
     }
 
-    protected final <REQ, RSP> Mono<RSP> doPatch(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
-                                                 Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
-
-        return prepareRequest(request, uriTransformer)
-            .then(function((validRequest, uri) -> this.httpClient.patch(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
-                .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
-                .then(o -> o.send(serializedRequest(o, validRequest))))
+    protected final <T> Mono<T> doPatch(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+                                        Function<HttpOutbound, HttpOutbound> requestTransformer) {
+        return this.root
+            .map(root -> buildUri(root, uriTransformer))
+            .then(uri -> this.httpClient.patch(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
+                .map(requestTransformer)
+                .then(o -> o.send(serializedRequest(o, request))))
                 .doOnSubscribe(s -> this.requestLogger.debug("PATCH  {}", uri))
-                .compose(logResponse(uri))))
+                .compose(logResponse(uri)))
             .compose(deserializedResponse(responseType));
     }
 
-    protected final <REQ, RSP> Mono<RSP> doPost(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
-                                                Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
+    protected final <T> Mono<T> doPost(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+                                       Function<HttpOutbound, HttpOutbound> requestTransformer) {
 
-        return doPostComplete(request, responseType, uriTransformer, function((outbound, validRequest) -> requestTransformer.apply(Tuple.of(outbound, validRequest))
-            .send(serializedRequest(outbound, validRequest))));
+        return doPost(responseType, uriTransformer, outbound -> requestTransformer.apply(outbound)
+            .send(serializedRequest(outbound, request)));
     }
 
-    protected final <REQ, RSP> Mono<RSP> doPostComplete(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
-                                                        Function<Tuple2<HttpOutbound, REQ>, Mono<Void>> requestTransformer) {
-        return prepareRequest(request, uriTransformer)
-            .then(function((validRequest, uri) -> this.httpClient.post(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
-                .then(o -> requestTransformer.apply(Tuple.of(o, validRequest))))
+    protected final <T> Mono<T> doPost(Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<HttpOutbound, Mono<Void>> requestTransformer) {
+        return this.root
+            .map(root -> buildUri(root, uriTransformer))
+            .then(uri -> this.httpClient.post(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
+                .then(requestTransformer))
                 .doOnSubscribe(s -> this.requestLogger.debug("POST   {}", uri))
-                .compose(logResponse(uri))))
+                .compose(logResponse(uri)))
             .compose(deserializedResponse(responseType));
     }
 
-    protected final <REQ, RSP> Mono<RSP> doPut(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
-                                               Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
-
-        return prepareRequest(request, uriTransformer)
-            .then(function((validRequest, uri) -> this.httpClient.put(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
-                .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
-                .then(o -> o.send(serializedRequest(o, validRequest))))
+    protected final <T> Mono<T> doPut(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+                                      Function<HttpOutbound, HttpOutbound> requestTransformer) {
+        return this.root
+            .map(root -> buildUri(root, uriTransformer))
+            .then(uri -> this.httpClient.put(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
+                .map(requestTransformer)
+                .then(o -> o.send(serializedRequest(o, request))))
                 .doOnSubscribe(s -> this.requestLogger.debug("PUT    {}", uri))
-                .compose(logResponse(uri))))
+                .compose(logResponse(uri)))
             .compose(deserializedResponse(responseType));
     }
 
-    protected final <REQ, RSP> Mono<RSP> doPutComplete(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
-                                                       Function<Tuple2<HttpOutbound, REQ>, Mono<Void>> requestTransformer) {
-
-        return prepareRequest(request, uriTransformer)
-            .then(function((validRequest, uri) -> this.httpClient.put(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
-                .then(o -> requestTransformer.apply(Tuple.of(o, validRequest))))
+    protected final <T> Mono<T> doPut(Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<HttpOutbound, Mono<Void>> requestTransformer) {
+        return this.root
+            .map(root -> buildUri(root, uriTransformer))
+            .then(uri -> this.httpClient.put(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
+                .then(requestTransformer))
                 .doOnSubscribe(s -> this.requestLogger.debug("PUT    {}", uri))
-                .compose(logResponse(uri))))
+                .compose(logResponse(uri)))
             .compose(deserializedResponse(responseType));
     }
 
-    protected final <REQ> Mono<HttpInbound> doWs(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer,
-                                                 Function<Tuple2<HttpOutbound, REQ>, HttpOutbound> requestTransformer) {
-
-        return prepareRequest(request, uriTransformer)
-            .then(function((validRequest, uri) -> this.httpClient.get(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
-                .map(o -> requestTransformer.apply(Tuple.of(o, validRequest)))
+    protected final Mono<HttpInbound> doWs(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<HttpOutbound, HttpOutbound> requestTransformer) {
+        return this.root
+            .map(root -> buildUri(root, uriTransformer))
+            .then(uri -> this.httpClient.get(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
+                .map(requestTransformer)
                 .then(HttpOutbound::upgradeToTextWebsocket))
                 .doOnSubscribe(s -> this.requestLogger.debug("WS     {}", uri))
-                .compose(logResponse(uri))));
+                .compose(logResponse(uri)));
     }
 
-    private static <REQ> String buildUri(String root, REQ validRequest, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
+    private static String buildUri(String root, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return uriTransformer
-            .apply(Tuple.of(UriComponentsBuilder.fromUriString(root), validRequest))
+            .apply(UriComponentsBuilder.fromUriString(root))
             .build().encode().toUriString();
     }
 
-    private <RSP> Function<Mono<HttpInbound>, Mono<RSP>> deserializedResponse(Class<RSP> responseType) {
+    private <T> Function<Mono<HttpInbound>, Mono<T>> deserializedResponse(Class<T> responseType) {
         return inbound -> inbound
             .then(i -> i.receive().aggregate().toInputStream())
             .map(JsonCodec.decode(this.objectMapper, responseType));
@@ -188,14 +178,8 @@ public abstract class AbstractReactorOperations {
             });
     }
 
-    private <REQ> Mono<Tuple2<REQ, String>> prepareRequest(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
-        return Mono
-            .when(ValidationUtils.validate(request), this.root)
-            .map(function((validRequest, r) -> Tuple.of(validRequest, buildUri(r, validRequest, uriTransformer))));
-    }
-
-    private <REQ> Mono<ByteBuf> serializedRequest(HttpOutbound outbound, REQ validRequest) {
-        return Mono.just(validRequest)
+    private Mono<ByteBuf> serializedRequest(HttpOutbound outbound, Object request) {
+        return Mono.just(request)
             .filter(req -> this.objectMapper.canSerialize(req.getClass()))
             .map(JsonCodec.encode(this.objectMapper, outbound));
     }

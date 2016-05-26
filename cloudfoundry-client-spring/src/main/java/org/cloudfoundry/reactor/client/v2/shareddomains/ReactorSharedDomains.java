@@ -27,8 +27,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link SharedDomains}
  */
@@ -48,12 +46,12 @@ public final class ReactorSharedDomains extends AbstractClientV2Operations imple
 
     @Override
     public Mono<CreateSharedDomainResponse> create(CreateSharedDomainRequest request) {
-        return post(request, CreateSharedDomainResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "shared_domains")));
+        return post(request, CreateSharedDomainResponse.class, builder -> builder.pathSegment("v2", "shared_domains"));
     }
 
     @Override
     public Mono<ListSharedDomainsResponse> list(ListSharedDomainsRequest request) {
-        return get(request, ListSharedDomainsResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "shared_domains")));
+        return get(request, ListSharedDomainsResponse.class, builder -> builder.pathSegment("v2", "shared_domains"));
     }
 
 }

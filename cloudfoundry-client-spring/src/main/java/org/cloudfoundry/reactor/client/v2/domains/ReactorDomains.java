@@ -33,8 +33,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link Domains}
  */
@@ -54,27 +52,27 @@ public final class ReactorDomains extends AbstractClientV2Operations implements 
 
     @Override
     public Mono<CreateDomainResponse> create(CreateDomainRequest request) {
-        return post(request, CreateDomainResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "domains")));
+        return post(request, CreateDomainResponse.class, builder -> builder.pathSegment("v2", "domains"));
     }
 
     @Override
     public Mono<DeleteDomainResponse> delete(DeleteDomainRequest request) {
-        return delete(request, DeleteDomainResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "domains", validRequest.getDomainId())));
+        return delete(request, DeleteDomainResponse.class, builder -> builder.pathSegment("v2", "domains", request.getDomainId()));
     }
 
     @Override
     public Mono<GetDomainResponse> get(GetDomainRequest request) {
-        return get(request, GetDomainResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "domains", validRequest.getDomainId())));
+        return get(request, GetDomainResponse.class, builder -> builder.pathSegment("v2", "domains", request.getDomainId()));
     }
 
     @Override
     public Mono<ListDomainsResponse> list(ListDomainsRequest request) {
-        return get(request, ListDomainsResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "domains")));
+        return get(request, ListDomainsResponse.class, builder -> builder.pathSegment("v2", "domains"));
     }
 
     @Override
     public Mono<ListDomainSpacesResponse> listSpaces(ListDomainSpacesRequest request) {
-        return get(request, ListDomainSpacesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "domains", validRequest.getDomainId(), "spaces")));
+        return get(request, ListDomainSpacesResponse.class, builder -> builder.pathSegment("v2", "domains", request.getDomainId(), "spaces"));
     }
 
 }

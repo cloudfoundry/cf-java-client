@@ -31,8 +31,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link Tasks}
  */
@@ -52,22 +50,22 @@ public final class ReactorTasks extends AbstractClientV3Operations implements Ta
 
     @Override
     public Mono<CancelTaskResponse> cancel(CancelTaskRequest request) {
-        return put(request, CancelTaskResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "tasks", validRequest.getTaskId(), "cancel")));
+        return put(request, CancelTaskResponse.class, builder -> builder.pathSegment("v3", "tasks", request.getTaskId(), "cancel"));
     }
 
     @Override
     public Mono<CreateTaskResponse> create(CreateTaskRequest request) {
-        return post(request, CreateTaskResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "apps", validRequest.getApplicationId(), "tasks")));
+        return post(request, CreateTaskResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "tasks"));
     }
 
     @Override
     public Mono<GetTaskResponse> get(GetTaskRequest request) {
-        return get(request, GetTaskResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "tasks", validRequest.getTaskId())));
+        return get(request, GetTaskResponse.class, builder -> builder.pathSegment("v3", "tasks", request.getTaskId()));
     }
 
     @Override
     public Mono<ListTasksResponse> list(ListTasksRequest request) {
-        return get(request, ListTasksResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "tasks")));
+        return get(request, ListTasksResponse.class, builder -> builder.pathSegment("v3", "tasks"));
     }
 
 }

@@ -44,8 +44,6 @@ import reactor.io.netty.http.HttpInbound;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link DopplerClient}
  */
@@ -63,7 +61,7 @@ public final class ReactorDopplerClient extends AbstractDopplerOperations implem
 
     @Override
     public Flux<ContainerMetric> containerMetrics(ContainerMetricsRequest request) {
-        return get(request, function((builder, validRequest) -> builder.pathSegment("apps", validRequest.getApplicationId(), "containermetrics")))
+        return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "containermetrics"))
             .flatMap(inbound -> inbound.receiveMultipart().receiveInputStream())
             .map(ReactorDopplerClient::toEnvelope)
             .map(ReactorDopplerClient::toEvent);
@@ -71,7 +69,7 @@ public final class ReactorDopplerClient extends AbstractDopplerOperations implem
 
     @Override
     public Flux<Event> firehose(FirehoseRequest request) {
-        return ws(request, function((builder, validRequest) -> builder.pathSegment("firehose", validRequest.getSubscriptionId())))
+        return ws(builder -> builder.pathSegment("firehose", request.getSubscriptionId()))
             .flatMap(HttpInbound::receiveInputStream)
             .map(ReactorDopplerClient::toEnvelope)
             .map(ReactorDopplerClient::toEvent);
@@ -79,7 +77,7 @@ public final class ReactorDopplerClient extends AbstractDopplerOperations implem
 
     @Override
     public Flux<LogMessage> recentLogs(RecentLogsRequest request) {
-        return get(request, function((builder, validRequest) -> builder.pathSegment("apps", validRequest.getApplicationId(), "recentlogs")))
+        return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "recentlogs"))
             .flatMap(inbound -> inbound.receiveMultipart().receiveInputStream())
             .map(ReactorDopplerClient::toEnvelope)
             .map(ReactorDopplerClient::toEvent);
@@ -87,7 +85,7 @@ public final class ReactorDopplerClient extends AbstractDopplerOperations implem
 
     @Override
     public Flux<Event> stream(StreamRequest request) {
-        return ws(request, function((builder, validRequest) -> builder.pathSegment("apps", validRequest.getApplicationId(), "stream")))
+        return ws(builder -> builder.pathSegment("apps", request.getApplicationId(), "stream"))
             .flatMap(HttpInbound::receiveInputStream)
             .map(ReactorDopplerClient::toEnvelope)
             .map(ReactorDopplerClient::toEvent);

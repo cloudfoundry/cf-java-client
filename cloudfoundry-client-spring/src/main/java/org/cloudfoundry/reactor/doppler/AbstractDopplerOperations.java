@@ -21,13 +21,10 @@ import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.core.tuple.Tuple2;
 import reactor.io.netty.http.HttpClient;
 import reactor.io.netty.http.HttpInbound;
 
 import java.util.function.Function;
-
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 abstract class AbstractDopplerOperations extends AbstractReactorOperations {
 
@@ -35,28 +32,28 @@ abstract class AbstractDopplerOperations extends AbstractReactorOperations {
         super(authorizationProvider, httpClient, objectMapper, root);
     }
 
-    final <REQ, RSP> Mono<RSP> delete(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
-        return doDelete(request, responseType, uriTransformer, function((outbound, validRequest) -> outbound));
+    final <T> Mono<T> delete(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return doDelete(request, responseType, uriTransformer, outbound -> outbound);
     }
 
-    final <REQ, RSP> Mono<RSP> get(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
-        return doGet(request, responseType, uriTransformer, function((outbound, validRequest) -> outbound));
+    final <T> Mono<T> get(Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return doGet(responseType, uriTransformer, outbound -> outbound);
     }
 
-    final <REQ> Mono<HttpInbound> get(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
-        return doGet(request, uriTransformer, function((outbound, validRequest) -> outbound));
+    final Mono<HttpInbound> get(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return doGet(uriTransformer, outbound -> outbound);
     }
 
-    final <REQ, RSP> Mono<RSP> post(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
-        return doPost(request, responseType, uriTransformer, function((outbound, validRequest) -> outbound));
+    final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return doPost(request, responseType, uriTransformer, outbound -> outbound);
     }
 
-    final <REQ, RSP> Mono<RSP> put(REQ request, Class<RSP> responseType, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
-        return doPut(request, responseType, uriTransformer, function((outbound, validRequest) -> outbound));
+    final <T> Mono<T> put(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return doPut(request, responseType, uriTransformer, outbound -> outbound);
     }
 
-    final <REQ> Mono<HttpInbound> ws(REQ request, Function<Tuple2<UriComponentsBuilder, REQ>, UriComponentsBuilder> uriTransformer) {
-        return doWs(request, uriTransformer, function((outbound, validRequest) -> outbound));
+    final Mono<HttpInbound> ws(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return doWs(uriTransformer, outbound -> outbound);
     }
 
 }

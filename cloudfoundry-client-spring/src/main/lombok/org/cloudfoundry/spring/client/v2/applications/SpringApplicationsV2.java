@@ -52,9 +52,9 @@ import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
+import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.reactor.client.v2.FilterBuilder;
 import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
@@ -109,32 +109,32 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
     @Override
     public Flux<byte[]> download(DownloadApplicationRequest request) {
-        return getStream(request, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "download"));
+        return getStream(builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "download"));
     }
 
     @Override
     public Flux<byte[]> downloadDroplet(DownloadApplicationDropletRequest request) {
-        return getStream(request, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "droplet", "download"));
+        return getStream(builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "droplet", "download"));
     }
 
     @Override
     public Mono<ApplicationEnvironmentResponse> environment(ApplicationEnvironmentRequest request) {
-        return get(request, ApplicationEnvironmentResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "env"));
+        return get(ApplicationEnvironmentResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "env"));
     }
 
     @Override
     public Mono<GetApplicationResponse> get(GetApplicationRequest request) {
-        return get(request, GetApplicationResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId()));
+        return get(GetApplicationResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId()));
     }
 
     @Override
     public Mono<ApplicationInstancesResponse> instances(ApplicationInstancesRequest request) {
-        return get(request, ApplicationInstancesResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "instances"));
+        return get(ApplicationInstancesResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "instances"));
     }
 
     @Override
     public Mono<ListApplicationsResponse> list(ListApplicationsRequest request) {
-        return get(request, ListApplicationsResponse.class, builder -> {
+        return get(ListApplicationsResponse.class, builder -> {
             builder.pathSegment("v2", "apps");
             FilterBuilder.augment(builder, request);
             QueryBuilder.augment(builder, request);
@@ -143,7 +143,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
     @Override
     public Mono<ListApplicationRoutesResponse> listRoutes(ListApplicationRoutesRequest request) {
-        return get(request, ListApplicationRoutesResponse.class, builder -> {
+        return get(ListApplicationRoutesResponse.class, builder -> {
             builder.pathSegment("v2", "apps", request.getApplicationId(), "routes");
             FilterBuilder.augment(builder, request);
             QueryBuilder.augment(builder, request);
@@ -152,7 +152,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
     @Override
     public Mono<ListApplicationServiceBindingsResponse> listServiceBindings(ListApplicationServiceBindingsRequest request) {
-        return get(request, ListApplicationServiceBindingsResponse.class, builder -> {
+        return get(ListApplicationServiceBindingsResponse.class, builder -> {
             builder.pathSegment("v2", "apps", request.getApplicationId(), "service_bindings");
             FilterBuilder.augment(builder, request);
             QueryBuilder.augment(builder, request);
@@ -176,12 +176,12 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
     @Override
     public Mono<ApplicationStatisticsResponse> statistics(ApplicationStatisticsRequest request) {
-        return get(request, ApplicationStatisticsResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "stats"));
+        return get(ApplicationStatisticsResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "stats"));
     }
 
     @Override
     public Mono<SummaryApplicationResponse> summary(SummaryApplicationRequest request) {
-        return get(request, SummaryApplicationResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "summary"));
+        return get(SummaryApplicationResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "summary"));
     }
 
     @Override
@@ -196,7 +196,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
     @Override
     public Mono<UploadApplicationResponse> upload(UploadApplicationRequest request) {
-        return putWithBody(request, () -> {
+        return putWithBody(() -> {
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
             body.add("resources", getResourcesPart(request));
             body.add("application", getApplicationPart(request));
