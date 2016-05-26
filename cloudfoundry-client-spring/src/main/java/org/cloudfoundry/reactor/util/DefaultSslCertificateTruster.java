@@ -20,9 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.tuple.Tuple2;
-import reactor.io.netty.config.HttpClientOptions;
-import reactor.io.netty.http.HttpClient;
-import reactor.io.netty.http.HttpException;
+import reactor.io.netty.config.ClientOptions;
+import reactor.io.netty.tcp.TcpClient;
 
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -73,7 +72,7 @@ final class DefaultSslCertificateTruster implements SslCertificateTruster {
     }
 
     @Override
-    public void trust(String host, int port, Duration duration) {
+    public void trust(String host, int port) {
         Tuple2<String, Integer> hostAndPort = Tuple2.of(host, port);
         if (this.trustedHostsAndPorts.contains(hostAndPort)) {
             return;
@@ -82,7 +81,7 @@ final class DefaultSslCertificateTruster implements SslCertificateTruster {
         this.logger.warn("Trusting SSL Certificate for {}:{}", host, port);
 
         X509TrustManager trustManager = this.delegate.get();
-        X509Certificate[] untrustedCertificates = getUntrustedCertificates(host, port, duration, this.proxyContext, trustManager);
+        X509Certificate[] untrustedCertificates = getUntrustedCertificates(host, port, this.proxyContext, trustManager);
 
         if (untrustedCertificates != null) {
             KeyStore trustStore = addToTrustStore(untrustedCertificates, trustManager);
@@ -111,9 +110,8 @@ final class DefaultSslCertificateTruster implements SslCertificateTruster {
         }
     }
 
-    private static HttpClient getHttpClient(ProxyContext proxyContext, CertificateCollectingTrustManager collector) {
-        return HttpClient.create(HttpClientOptions.create()
-            .followRedirects(false)
+    private static TcpClient getTcpClient(ProxyContext proxyContext, CertificateCollectingTrustManager collector, String host, int port) {
+        return TcpClient.create(ClientOptions.to(host, port)
             .sslSupport()
             .pipelineConfigurer(pipeline -> proxyContext.getHttpProxyHandler().ifPresent(handler -> pipeline.addBefore(SslHandler, null, handler)))
             .sslConfigurer(ssl -> ssl.trustManager(new StaticTrustManagerFactory(collector))));
@@ -140,14 +138,13 @@ final class DefaultSslCertificateTruster implements SslCertificateTruster {
         }
     }
 
-    private static X509Certificate[] getUntrustedCertificates(String host, int port, Duration duration, ProxyContext proxyContext, X509TrustManager delegate) {
+    private static X509Certificate[] getUntrustedCertificates(String host, int port, ProxyContext proxyContext, X509TrustManager delegate) {
         CertificateCollectingTrustManager collector = new CertificateCollectingTrustManager(delegate);
 
         try {
-            getHttpClient(proxyContext, collector)
-                .get(getUri(host, port))
-                .get(duration);
-        } catch (HttpException e) {
+            getTcpClient(proxyContext, collector, host, port)
+                .startAndAwait(channel -> channel.receive().then());
+        } catch (Exception e) {
             // swallow expected exception
         }
 
