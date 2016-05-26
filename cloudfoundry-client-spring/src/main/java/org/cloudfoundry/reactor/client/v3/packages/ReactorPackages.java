@@ -39,8 +39,6 @@ import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 import reactor.io.netty.http.HttpInbound;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link Packages}
  */
@@ -60,48 +58,48 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
 
     @Override
     public Mono<CopyPackageResponse> copy(CopyPackageRequest request) {
-        return post(request, CopyPackageResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "apps", validRequest.getApplicationId(), "packages")));
+        return post(request, CopyPackageResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "packages"));
     }
 
     @Override
     public Mono<CreatePackageResponse> create(CreatePackageRequest request) {
-        return post(request, CreatePackageResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "apps", validRequest.getApplicationId(), "packages")));
+        return post(request, CreatePackageResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "packages"));
     }
 
     @Override
     public Mono<Void> delete(DeletePackageRequest request) {
-        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v3", "packages", validRequest.getPackageId())));
+        return delete(request, Void.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId()));
     }
 
     @Override
     public Flux<byte[]> download(DownloadPackageRequest request) {
-        return get(request, function((builder, validRequest) -> builder.pathSegment("v3", "packages", validRequest.getPackageId(), "download")))
+        return get(request, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "download"))
             .flatMap(HttpInbound::receiveByteArray);
     }
 
     @Override
     public Mono<GetPackageResponse> get(GetPackageRequest request) {
-        return get(request, GetPackageResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "packages", validRequest.getPackageId())));
+        return get(request, GetPackageResponse.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId()));
     }
 
     @Override
     public Mono<ListPackagesResponse> list(ListPackagesRequest request) {
-        return get(request, ListPackagesResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "packages")));
+        return get(request, ListPackagesResponse.class, builder -> builder.pathSegment("v3", "packages"));
     }
 
     @Override
     public Mono<StagePackageResponse> stage(StagePackageRequest request) {
-        return post(request, StagePackageResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "packages", validRequest.getPackageId(), "droplets")));
+        return post(request, StagePackageResponse.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "droplets"));
     }
 
     @Override
     public Mono<UploadPackageResponse> upload(UploadPackageRequest request) {
-        return post(request, UploadPackageResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "packages", validRequest.getPackageId(), "upload")),
-            function((outbound, validRequest) -> outbound
+        return post(request, UploadPackageResponse.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "upload"),
+            outbound -> outbound
                 .addPart(part -> part.setContentDispositionFormData("bits", "application.zip")
                     .addHeader(CONTENT_TYPE, APPLICATION_ZIP)
-                    .sendInputStream(validRequest.getBits()))
-                .done()));
+                    .sendInputStream(request.getBits()))
+                .done());
     }
 
 }

@@ -33,8 +33,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link OrganizationQuotaDefinitions}
  */
@@ -54,30 +52,27 @@ public final class ReactorOrganizationQuotaDefinitions extends AbstractClientV2O
 
     @Override
     public Mono<CreateOrganizationQuotaDefinitionResponse> create(CreateOrganizationQuotaDefinitionRequest request) {
-        return post(request, CreateOrganizationQuotaDefinitionResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "quota_definitions")));
+        return post(request, CreateOrganizationQuotaDefinitionResponse.class, builder -> builder.pathSegment("v2", "quota_definitions"));
     }
 
     @Override
     public Mono<DeleteOrganizationQuotaDefinitionResponse> delete(DeleteOrganizationQuotaDefinitionRequest request) {
-        return delete(request, DeleteOrganizationQuotaDefinitionResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("v2", "quota_definitions", validRequest.getOrganizationQuotaDefinitionId())));
+        return delete(request, DeleteOrganizationQuotaDefinitionResponse.class, builder -> builder.pathSegment("v2", "quota_definitions", request.getOrganizationQuotaDefinitionId()));
     }
 
     @Override
     public Mono<GetOrganizationQuotaDefinitionResponse> get(GetOrganizationQuotaDefinitionRequest request) {
-        return get(request, GetOrganizationQuotaDefinitionResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("v2", "quota_definitions", validRequest.getOrganizationQuotaDefinitionId())));
+        return get(request, GetOrganizationQuotaDefinitionResponse.class, builder -> builder.pathSegment("v2", "quota_definitions", request.getOrganizationQuotaDefinitionId()));
     }
 
     @Override
     public Mono<ListOrganizationQuotaDefinitionsResponse> list(ListOrganizationQuotaDefinitionsRequest request) {
-        return get(request, ListOrganizationQuotaDefinitionsResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "quota_definitions")));
+        return get(request, ListOrganizationQuotaDefinitionsResponse.class, builder -> builder.pathSegment("v2", "quota_definitions"));
     }
 
     @Override
     public Mono<UpdateOrganizationQuotaDefinitionResponse> update(UpdateOrganizationQuotaDefinitionRequest request) {
-        return put(request, UpdateOrganizationQuotaDefinitionResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("v2", "quota_definitions", validRequest.getOrganizationQuotaDefinitionId())));
+        return put(request, UpdateOrganizationQuotaDefinitionResponse.class, builder -> builder.pathSegment("v2", "quota_definitions", request.getOrganizationQuotaDefinitionId()));
     }
 
 }

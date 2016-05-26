@@ -33,8 +33,6 @@ import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneResponse;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link IdentityZones}
  */
@@ -54,27 +52,27 @@ public final class ReactorIdentityZones extends AbstractUaaOperations implements
 
     @Override
     public Mono<CreateIdentityZoneResponse> create(CreateIdentityZoneRequest request) {
-        return post(request, CreateIdentityZoneResponse.class, function((builder, validRequest) -> builder.pathSegment("identity-zones")));
+        return post(request, CreateIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones"));
     }
 
     @Override
     public Mono<DeleteIdentityZoneResponse> delete(DeleteIdentityZoneRequest request) {
-        return delete(request, DeleteIdentityZoneResponse.class, function((builder, validRequest) -> builder.pathSegment("identity-zones", validRequest.getIdentityZoneId())));
+        return delete(request, DeleteIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones", request.getIdentityZoneId()));
     }
 
     @Override
     public Mono<GetIdentityZoneResponse> get(GetIdentityZoneRequest request) {
-        return get(request, GetIdentityZoneResponse.class, function((builder, validRequest) -> builder.pathSegment("identity-zones", validRequest.getIdentityZoneId())));
+        return get(request, GetIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones", request.getIdentityZoneId()));
     }
 
     @Override
     public Mono<ListIdentityZonesResponse> list(ListIdentityZonesRequest request) {
-        return get(request, ListIdentityZonesResponse.class, function((builder, validRequest) -> builder.pathSegment("identity-zones")));
+        return get(request, ListIdentityZonesResponse.class, builder -> builder.pathSegment("identity-zones"));
     }
 
     @Override
     public Mono<UpdateIdentityZoneResponse> update(UpdateIdentityZoneRequest request) {
-        return put(request, UpdateIdentityZoneResponse.class, function((builder, validRequest) -> builder.pathSegment("identity-zones", validRequest.getIdentityZoneId())));
+        return put(request, UpdateIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones", request.getIdentityZoneId()));
     }
 
 }

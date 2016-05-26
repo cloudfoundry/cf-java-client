@@ -30,8 +30,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link ServiceBindingsV3}
  */
@@ -51,22 +49,22 @@ public final class ReactorServiceBindingsV3 extends AbstractClientV3Operations i
 
     @Override
     public Mono<CreateServiceBindingResponse> create(CreateServiceBindingRequest request) {
-        return post(request, CreateServiceBindingResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "service_bindings")));
+        return post(request, CreateServiceBindingResponse.class, builder -> builder.pathSegment("v3", "service_bindings"));
     }
 
     @Override
     public Mono<Void> delete(DeleteServiceBindingRequest request) {
-        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v3", "service_bindings", validRequest.getServiceBindingId())));
+        return delete(request, Void.class, builder -> builder.pathSegment("v3", "service_bindings", request.getServiceBindingId()));
     }
 
     @Override
     public Mono<GetServiceBindingResponse> get(GetServiceBindingRequest request) {
-        return get(request, GetServiceBindingResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "service_bindings", validRequest.getServiceBindingId())));
+        return get(request, GetServiceBindingResponse.class, builder -> builder.pathSegment("v3", "service_bindings", request.getServiceBindingId()));
     }
 
     @Override
     public Mono<ListServiceBindingsResponse> list(ListServiceBindingsRequest request) {
-        return get(request, ListServiceBindingsResponse.class, function((builder, validRequest) -> builder.pathSegment("v3", "service_bindings")));
+        return get(request, ListServiceBindingsResponse.class, builder -> builder.pathSegment("v3", "service_bindings"));
     }
 
 }

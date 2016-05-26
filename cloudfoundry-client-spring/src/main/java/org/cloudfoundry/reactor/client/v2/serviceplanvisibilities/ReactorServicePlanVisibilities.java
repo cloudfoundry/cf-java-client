@@ -1,7 +1,7 @@
 /*
  * Copyright 2013-2016 the original author or authors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License";
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -34,8 +34,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link ServicePlanVisibilities}
  */
@@ -55,30 +53,27 @@ public final class ReactorServicePlanVisibilities extends AbstractClientV2Operat
 
     @Override
     public Mono<CreateServicePlanVisibilityResponse> create(CreateServicePlanVisibilityRequest request) {
-        return post(request, CreateServicePlanVisibilityResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_plan_visibilities")));
+        return post(request, CreateServicePlanVisibilityResponse.class, builder -> builder.pathSegment("v2", "service_plan_visibilities"));
     }
 
     @Override
     public Mono<DeleteServicePlanVisibilityResponse> delete(DeleteServicePlanVisibilityRequest request) {
-        return delete(request, DeleteServicePlanVisibilityResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("v2", "service_plan_visibilities", validRequest.getServicePlanVisibilityId())));
+        return delete(request, DeleteServicePlanVisibilityResponse.class, builder -> builder.pathSegment("v2", "service_plan_visibilities", request.getServicePlanVisibilityId()));
     }
 
     @Override
     public Mono<GetServicePlanVisibilityResponse> get(GetServicePlanVisibilityRequest request) {
-        return get(request, GetServicePlanVisibilityResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("v2", "service_plan_visibilities", validRequest.getServicePlanVisibilityId())));
+        return get(request, GetServicePlanVisibilityResponse.class, builder -> builder.pathSegment("v2", "service_plan_visibilities", request.getServicePlanVisibilityId()));
     }
 
     @Override
     public Mono<ListServicePlanVisibilitiesResponse> list(ListServicePlanVisibilitiesRequest request) {
-        return get(request, ListServicePlanVisibilitiesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_plan_visibilities")));
+        return get(request, ListServicePlanVisibilitiesResponse.class, builder -> builder.pathSegment("v2", "service_plan_visibilities"));
     }
 
     @Override
     public Mono<UpdateServicePlanVisibilityResponse> update(UpdateServicePlanVisibilityRequest request) {
-        return put(request, UpdateServicePlanVisibilityResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("v2", "service_plan_visibilities", validRequest.getServicePlanVisibilityId())));
+        return put(request, UpdateServicePlanVisibilityResponse.class, builder -> builder.pathSegment("v2", "service_plan_visibilities", request.getServicePlanVisibilityId()));
     }
 
 }

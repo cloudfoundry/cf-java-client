@@ -25,8 +25,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link Jobs}
  */
@@ -46,7 +44,7 @@ public final class ReactorJobs extends AbstractClientV2Operations implements Job
 
     @Override
     public Mono<GetJobResponse> get(GetJobRequest request) {
-        return get(request, GetJobResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "jobs", validRequest.getJobId())));
+        return get(request, GetJobResponse.class, builder -> builder.pathSegment("v2", "jobs", request.getJobId()));
     }
 
 }

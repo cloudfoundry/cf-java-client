@@ -35,8 +35,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link Buildpacks}
  */
@@ -56,38 +54,38 @@ public final class ReactorBuildpacks extends AbstractClientV2Operations implemen
 
     @Override
     public Mono<CreateBuildpackResponse> create(CreateBuildpackRequest request) {
-        return post(request, CreateBuildpackResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "buildpacks")));
+        return post(request, CreateBuildpackResponse.class, builder -> builder.pathSegment("v2", "buildpacks"));
     }
 
     @Override
     public Mono<DeleteBuildpackResponse> delete(DeleteBuildpackRequest request) {
-        return delete(request, DeleteBuildpackResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "buildpacks", validRequest.getBuildpackId())));
+        return delete(request, DeleteBuildpackResponse.class, builder -> builder.pathSegment("v2", "buildpacks", request.getBuildpackId()));
     }
 
     @Override
     public Mono<GetBuildpackResponse> get(GetBuildpackRequest request) {
-        return get(request, GetBuildpackResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "buildpacks", validRequest.getBuildpackId())));
+        return get(request, GetBuildpackResponse.class, builder -> builder.pathSegment("v2", "buildpacks", request.getBuildpackId()));
     }
 
     @Override
     public Mono<ListBuildpacksResponse> list(ListBuildpacksRequest request) {
-        return get(request, ListBuildpacksResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "buildpacks")));
+        return get(request, ListBuildpacksResponse.class, builder -> builder.pathSegment("v2", "buildpacks"));
     }
 
     @Override
     public Mono<UpdateBuildpackResponse> update(UpdateBuildpackRequest request) {
-        return put(request, UpdateBuildpackResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "buildpacks", validRequest.getBuildpackId())));
+        return put(request, UpdateBuildpackResponse.class, builder -> builder.pathSegment("v2", "buildpacks", request.getBuildpackId()));
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Mono<UploadBuildpackResponse> upload(UploadBuildpackRequest request) {
-        return put(request, UploadBuildpackResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "buildpacks", validRequest.getBuildpackId(), "bits")),
-            function((outbound, validRequest) -> outbound
-                .addPart(part -> part.setContentDispositionFormData("buildpack", validRequest.getFilename())
+        return put(request, UploadBuildpackResponse.class, builder -> builder.pathSegment("v2", "buildpacks", request.getBuildpackId(), "bits"),
+            outbound -> outbound
+                .addPart(part -> part.setContentDispositionFormData("buildpack", request.getFilename())
                     .addHeader(CONTENT_TYPE, APPLICATION_ZIP)
-                    .sendInputStream(validRequest.getBuildpack()))
-                .done()));
+                    .sendInputStream(request.getBuildpack()))
+                .done());
     }
 
 }

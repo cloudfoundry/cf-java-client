@@ -41,8 +41,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link ServiceInstances}
  */
@@ -62,51 +60,47 @@ public final class ReactorServiceInstances extends AbstractClientV2Operations im
 
     @Override
     public Mono<BindServiceInstanceToRouteResponse> bindToRoute(BindServiceInstanceToRouteRequest request) {
-        return put(request, BindServiceInstanceToRouteResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("v2", "service_instances", validRequest.getServiceInstanceId(), "routes", validRequest.getRouteId())));
+        return put(request, BindServiceInstanceToRouteResponse.class, builder -> builder.pathSegment("v2", "service_instances", request.getServiceInstanceId(), "routes", request.getRouteId()));
     }
 
     @Override
     public Mono<CreateServiceInstanceResponse> create(CreateServiceInstanceRequest request) {
-        return post(request, CreateServiceInstanceResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_instances")));
+        return post(request, CreateServiceInstanceResponse.class, builder -> builder.pathSegment("v2", "service_instances"));
     }
 
     @Override
     public Mono<DeleteServiceInstanceResponse> delete(DeleteServiceInstanceRequest request) {
-        return delete(request, DeleteServiceInstanceResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_instances", validRequest.getServiceInstanceId())));
+        return delete(request, DeleteServiceInstanceResponse.class, builder -> builder.pathSegment("v2", "service_instances", request.getServiceInstanceId()));
     }
 
     @Override
     public Mono<GetServiceInstanceResponse> get(GetServiceInstanceRequest request) {
-        return get(request, GetServiceInstanceResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_instances", validRequest.getServiceInstanceId())));
+        return get(request, GetServiceInstanceResponse.class, builder -> builder.pathSegment("v2", "service_instances", request.getServiceInstanceId()));
     }
 
     @Override
     public Mono<GetServiceInstancePermissionsResponse> getPermissions(GetServiceInstancePermissionsRequest request) {
-        return get(request, GetServiceInstancePermissionsResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("v2", "service_instances", validRequest.getServiceInstanceId(), "permissions")));
+        return get(request, GetServiceInstancePermissionsResponse.class, builder -> builder.pathSegment("v2", "service_instances", request.getServiceInstanceId(), "permissions"));
     }
 
     @Override
     public Mono<ListServiceInstancesResponse> list(ListServiceInstancesRequest request) {
-        return get(request, ListServiceInstancesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_instances")));
+        return get(request, ListServiceInstancesResponse.class, builder -> builder.pathSegment("v2", "service_instances"));
     }
 
     @Override
     public Mono<ListServiceInstanceServiceBindingsResponse> listServiceBindings(ListServiceInstanceServiceBindingsRequest request) {
-        return get(request, ListServiceInstanceServiceBindingsResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("v2", "service_instances", validRequest.getServiceInstanceId(), "service_bindings")));
+        return get(request, ListServiceInstanceServiceBindingsResponse.class, builder -> builder.pathSegment("v2", "service_instances", request.getServiceInstanceId(), "service_bindings"));
     }
 
     @Override
     public Mono<ListServiceInstanceServiceKeysResponse> listServiceKeys(ListServiceInstanceServiceKeysRequest request) {
-        return get(request, ListServiceInstanceServiceKeysResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("v2", "service_instances", validRequest.getServiceInstanceId(), "service_keys")));
+        return get(request, ListServiceInstanceServiceKeysResponse.class, builder -> builder.pathSegment("v2", "service_instances", request.getServiceInstanceId(), "service_keys"));
     }
 
     @Override
     public Mono<UpdateServiceInstanceResponse> update(UpdateServiceInstanceRequest request) {
-        return put(request, UpdateServiceInstanceResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_instances", validRequest.getServiceInstanceId())));
+        return put(request, UpdateServiceInstanceResponse.class, builder -> builder.pathSegment("v2", "service_instances", request.getServiceInstanceId()));
     }
 
 }

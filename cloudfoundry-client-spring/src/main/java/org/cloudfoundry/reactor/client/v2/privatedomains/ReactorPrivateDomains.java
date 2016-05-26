@@ -31,8 +31,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link PrivateDomains}
  */
@@ -52,22 +50,22 @@ public final class ReactorPrivateDomains extends AbstractClientV2Operations impl
 
     @Override
     public Mono<CreatePrivateDomainResponse> create(CreatePrivateDomainRequest request) {
-        return post(request, CreatePrivateDomainResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "private_domains")));
+        return post(request, CreatePrivateDomainResponse.class, builder -> builder.pathSegment("v2", "private_domains"));
     }
 
     @Override
     public Mono<DeletePrivateDomainResponse> delete(DeletePrivateDomainRequest request) {
-        return delete(request, DeletePrivateDomainResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "private_domains", validRequest.getPrivateDomainId())));
+        return delete(request, DeletePrivateDomainResponse.class, builder -> builder.pathSegment("v2", "private_domains", request.getPrivateDomainId()));
     }
 
     @Override
     public Mono<GetPrivateDomainResponse> get(GetPrivateDomainRequest request) {
-        return get(request, GetPrivateDomainResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "private_domains", validRequest.getPrivateDomainId())));
+        return get(request, GetPrivateDomainResponse.class, builder -> builder.pathSegment("v2", "private_domains", request.getPrivateDomainId()));
     }
 
     @Override
     public Mono<ListPrivateDomainsResponse> list(ListPrivateDomainsRequest request) {
-        return get(request, ListPrivateDomainsResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "private_domains")));
+        return get(request, ListPrivateDomainsResponse.class, builder -> builder.pathSegment("v2", "private_domains"));
     }
 
 }

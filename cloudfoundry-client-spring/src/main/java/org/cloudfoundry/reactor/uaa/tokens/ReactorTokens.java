@@ -41,8 +41,6 @@ import org.cloudfoundry.uaa.tokens.Tokens;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 
 public final class ReactorTokens extends AbstractUaaOperations implements Tokens {
 
@@ -68,55 +66,52 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
 
     @Override
     public Mono<CheckTokenResponse> check(CheckTokenRequest request) {
-        return post(request, CheckTokenResponse.class, function((builder, validRequest) -> builder.pathSegment("check_token")),
-            function((outbound, validRequest) -> basicAuth(outbound, this.clientId, this.clientSecret)));
+        return post(request, CheckTokenResponse.class, builder -> builder.pathSegment("check_token"),
+            outbound -> basicAuth(outbound, this.clientId, this.clientSecret));
     }
 
     @Override
     public Mono<GetTokenByAuthorizationCodeResponse> getByAuthorizationCode(GetTokenByAuthorizationCodeRequest request) {
         return post(request, GetTokenByAuthorizationCodeResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("oauth", "token").queryParam("grant_type", "authorization_code").queryParam("response_type", "token")));
+            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "authorization_code").queryParam("response_type", "token"));
     }
 
     @Override
     public Mono<GetTokenByClientCredentialsResponse> getByClientCredentials(GetTokenByClientCredentialsRequest request) {
         return post(request, GetTokenByClientCredentialsResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("oauth", "token").queryParam("grant_type", "client_credentials").queryParam("response_type", "token")));
+            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "client_credentials").queryParam("response_type", "token"));
     }
 
     @Override
     public Mono<GetTokenByOneTimePasscodeResponse> getByOneTimePasscode(GetTokenByOneTimePasscodeRequest request) {
         return post(request, GetTokenByOneTimePasscodeResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("oauth", "token").queryParam("grant_type", "password").queryParam("response_type", "token")),
-            function((outbound, validRequest) -> basicAuth(outbound, validRequest.getClientId(), validRequest.getClientSecret())));
+            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "password").queryParam("response_type", "token"),
+            outbound -> basicAuth(outbound, request.getClientId(), request.getClientSecret()));
     }
 
     @Override
     public Mono<GetTokenByOpenIdResponse> getByOpenId(GetTokenByOpenIdRequest request) {
-        return post(request, GetTokenByOpenIdResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("oauth", "token").queryParam("grant_type", "authorization_code").queryParam("response_type", "id_token")));
+        return post(request, GetTokenByOpenIdResponse.class, builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "authorization_code").queryParam("response_type", "id_token"));
     }
 
     @Override
     public Mono<GetTokenByPasswordResponse> getByPassword(GetTokenByPasswordRequest request) {
-        return post(request, GetTokenByPasswordResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("oauth", "token").queryParam("grant_type", "password").queryParam("response_type", "token")));
+        return post(request, GetTokenByPasswordResponse.class, builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "password").queryParam("response_type", "token"));
     }
 
     @Override
     public Mono<GetTokenKeyResponse> getKey(GetTokenKeyRequest request) {
-        return get(request, GetTokenKeyResponse.class, function((builder, validRequest) -> builder.pathSegment("token_key")));
+        return get(request, GetTokenKeyResponse.class, builder -> builder.pathSegment("token_key"));
     }
 
     @Override
     public Mono<ListTokenKeysResponse> listKeys(ListTokenKeysRequest request) {
-        return get(request, ListTokenKeysResponse.class, function((builder, validRequest) -> builder.pathSegment("token_keys")));
+        return get(request, ListTokenKeysResponse.class, builder -> builder.pathSegment("token_keys"));
     }
 
     @Override
     public Mono<RefreshTokenResponse> refresh(RefreshTokenRequest request) {
-        return post(request, RefreshTokenResponse.class,
-            function((builder, validRequest) -> builder.pathSegment("oauth", "token").queryParam("grant_type", "refresh_token")));
+        return post(request, RefreshTokenResponse.class, builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "refresh_token"));
     }
 
 }

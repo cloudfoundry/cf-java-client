@@ -32,8 +32,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link ServiceBrokers}
  */
@@ -53,27 +51,27 @@ public final class ReactorServiceBrokers extends AbstractClientV2Operations impl
 
     @Override
     public Mono<CreateServiceBrokerResponse> create(CreateServiceBrokerRequest request) {
-        return post(request, CreateServiceBrokerResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_brokers")));
+        return post(request, CreateServiceBrokerResponse.class, builder -> builder.pathSegment("v2", "service_brokers"));
     }
 
     @Override
     public Mono<Void> delete(DeleteServiceBrokerRequest request) {
-        return delete(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_brokers", validRequest.getServiceBrokerId())));
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "service_brokers", request.getServiceBrokerId()));
     }
 
     @Override
     public Mono<GetServiceBrokerResponse> get(GetServiceBrokerRequest request) {
-        return get(request, GetServiceBrokerResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_brokers", validRequest.getServiceBrokerId())));
+        return get(request, GetServiceBrokerResponse.class, builder -> builder.pathSegment("v2", "service_brokers", request.getServiceBrokerId()));
     }
 
     @Override
     public Mono<ListServiceBrokersResponse> list(ListServiceBrokersRequest request) {
-        return get(request, ListServiceBrokersResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_brokers")));
+        return get(request, ListServiceBrokersResponse.class, builder -> builder.pathSegment("v2", "service_brokers"));
     }
 
     @Override
     public Mono<UpdateServiceBrokerResponse> update(UpdateServiceBrokerRequest request) {
-        return put(request, UpdateServiceBrokerResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_brokers", validRequest.getServiceBrokerId())));
+        return put(request, UpdateServiceBrokerResponse.class, builder -> builder.pathSegment("v2", "service_brokers", request.getServiceBrokerId()));
     }
 
 }

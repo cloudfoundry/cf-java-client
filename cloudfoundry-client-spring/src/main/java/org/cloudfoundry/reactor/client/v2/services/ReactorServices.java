@@ -31,8 +31,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link Services}
  */
@@ -53,22 +51,22 @@ public final class ReactorServices extends AbstractClientV2Operations implements
 
     @Override
     public Mono<DeleteServiceResponse> delete(DeleteServiceRequest request) {
-        return delete(request, DeleteServiceResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "services", validRequest.getServiceId())));
+        return delete(request, DeleteServiceResponse.class, builder -> builder.pathSegment("v2", "services", request.getServiceId()));
     }
 
     @Override
     public Mono<GetServiceResponse> get(GetServiceRequest request) {
-        return get(request, GetServiceResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "services", validRequest.getServiceId())));
+        return get(request, GetServiceResponse.class, builder -> builder.pathSegment("v2", "services", request.getServiceId()));
     }
 
     @Override
     public Mono<ListServicesResponse> list(ListServicesRequest request) {
-        return get(request, ListServicesResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "services")));
+        return get(request, ListServicesResponse.class, builder -> builder.pathSegment("v2", "services"));
     }
 
     @Override
     public Mono<ListServiceServicePlansResponse> listServicePlans(ListServiceServicePlansRequest request) {
-        return get(request, ListServiceServicePlansResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "services", validRequest.getServiceId(), "service_plans")));
+        return get(request, ListServiceServicePlansResponse.class, builder -> builder.pathSegment("v2", "services", request.getServiceId(), "service_plans"));
     }
 
 }

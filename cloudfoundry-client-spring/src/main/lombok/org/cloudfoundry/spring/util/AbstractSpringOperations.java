@@ -18,7 +18,6 @@ package org.cloudfoundry.spring.util;
 
 import lombok.ToString;
 import org.cloudfoundry.reactor.client.CloudFoundryExceptionBuilder;
-import org.cloudfoundry.util.ValidationUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -58,7 +57,7 @@ public abstract class AbstractSpringOperations {
     }
 
     protected final <T> Mono<T> delete(Object request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, (Function<FluxEmitter<T>, T>) emitter -> {
+        return exchange((Function<FluxEmitter<T>, T>) emitter -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
             builderCallback.accept(builder);
             URI uri = builder.build().encode().toUri();
@@ -68,8 +67,8 @@ public abstract class AbstractSpringOperations {
             .next();
     }
 
-    protected final <T> Mono<T> get(Object request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, (Function<FluxEmitter<T>, T>) emitter -> {
+    protected final <T> Mono<T> get(Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange((Function<FluxEmitter<T>, T>) emitter -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
             builderCallback.accept(builder);
             URI uri = builder.build().encode().toUri();
@@ -79,8 +78,8 @@ public abstract class AbstractSpringOperations {
             .next();
     }
 
-    protected final Flux<byte[]> getStream(Object request, Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, emitter -> {
+    protected final Flux<byte[]> getStream(Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(emitter -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
             builderCallback.accept(builder);
             URI uri = builder.build().encode().toUri();
@@ -103,11 +102,11 @@ public abstract class AbstractSpringOperations {
     }
 
     protected final <T> Mono<T> post(Object request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
-        return postWithBody(request, () -> request, responseType, builderCallback);
+        return postWithBody(() -> request, responseType, builderCallback);
     }
 
-    protected final <T, B> Mono<T> postWithBody(Object request, Supplier<B> bodySupplier, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, (Function<FluxEmitter<T>, T>) emitter -> {
+    protected final <T, B> Mono<T> postWithBody(Supplier<B> bodySupplier, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange((Function<FluxEmitter<T>, T>) emitter -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
             builderCallback.accept(builder);
             URI uri = builder.build().encode().toUri();
@@ -118,11 +117,11 @@ public abstract class AbstractSpringOperations {
     }
 
     protected final <T> Mono<T> put(Object request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
-        return putWithBody(request, () -> request, responseType, builderCallback);
+        return putWithBody(() -> request, responseType, builderCallback);
     }
 
-    protected final <T, B> Mono<T> putWithBody(Object request, Supplier<B> bodySupplier, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, (Function<FluxEmitter<T>, T>) emitter -> {
+    protected final <T, B> Mono<T> putWithBody(Supplier<B> bodySupplier, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange((Function<FluxEmitter<T>, T>) emitter -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
             builderCallback.accept(builder);
             URI uri = builder.build().encode().toUri();
@@ -132,26 +131,24 @@ public abstract class AbstractSpringOperations {
             .next();
     }
 
-    final <T, V> Flux<T> exchange(V request, Function<FluxEmitter<T>, T> exchange) {
-        return ValidationUtils
-            .validate(request)
-            .flatMap(validRequest -> Flux
-                .create((Consumer<FluxEmitter<T>>) emitter -> {
+    final <T> Flux<T> exchange(Function<FluxEmitter<T>, T> exchange) {
+        return Flux
+            .create((Consumer<FluxEmitter<T>>) emitter -> {
 
-                    try {
-                        T result = exchange.apply(emitter);
-                        if (result != null) {
-                            emitter.next(result);
-                        }
-
-                        emitter.complete();
-                    } catch (HttpStatusCodeException e) {
-                        emitter.fail(CloudFoundryExceptionBuilder.build(e));
-                    } catch (Throwable t) {
-                        Exceptions.throwIfFatal(t);
-                        emitter.fail(t);
+                try {
+                    T result = exchange.apply(emitter);
+                    if (result != null) {
+                        emitter.next(result);
                     }
-                }))
+
+                    emitter.complete();
+                } catch (HttpStatusCodeException e) {
+                    emitter.fail(CloudFoundryExceptionBuilder.build(e));
+                } catch (Throwable t) {
+                    Exceptions.throwIfFatal(t);
+                    emitter.fail(t);
+                }
+            })
             .subscribeOn(this.schedulerGroup);
     }
 

@@ -29,8 +29,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link FeatureFlags}
  */
@@ -50,17 +48,17 @@ public final class ReactorFeatureFlags extends AbstractClientV2Operations implem
 
     @Override
     public Mono<GetFeatureFlagResponse> get(GetFeatureFlagRequest request) {
-        return get(request, GetFeatureFlagResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "config", "feature_flags", validRequest.getName())));
+        return get(request, GetFeatureFlagResponse.class, builder -> builder.pathSegment("v2", "config", "feature_flags", request.getName()));
     }
 
     @Override
     public Mono<ListFeatureFlagsResponse> list(ListFeatureFlagsRequest request) {
-        return get(request, ListFeatureFlagsResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "config", "feature_flags")));
+        return get(request, ListFeatureFlagsResponse.class, builder -> builder.pathSegment("v2", "config", "feature_flags"));
     }
 
     @Override
     public Mono<SetFeatureFlagResponse> set(SetFeatureFlagRequest request) {
-        return put(request, SetFeatureFlagResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "config", "feature_flags", validRequest.getName())));
+        return put(request, SetFeatureFlagResponse.class, builder -> builder.pathSegment("v2", "config", "feature_flags", request.getName()));
     }
 
 }

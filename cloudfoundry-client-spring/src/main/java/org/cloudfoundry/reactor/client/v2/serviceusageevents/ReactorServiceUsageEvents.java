@@ -28,8 +28,6 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The Reactor-based implementation of {@link ServiceUsageEvents}
  */
@@ -49,17 +47,17 @@ public final class ReactorServiceUsageEvents extends AbstractClientV2Operations 
 
     @Override
     public Mono<GetServiceUsageEventResponse> get(GetServiceUsageEventRequest request) {
-        return get(request, GetServiceUsageEventResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_usage_events", validRequest.getServiceUsageEventId())));
+        return get(request, GetServiceUsageEventResponse.class, builder -> builder.pathSegment("v2", "service_usage_events", request.getServiceUsageEventId()));
     }
 
     @Override
     public Mono<ListServiceUsageEventsResponse> list(ListServiceUsageEventsRequest request) {
-        return get(request, ListServiceUsageEventsResponse.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_usage_events")));
+        return get(request, ListServiceUsageEventsResponse.class, builder -> builder.pathSegment("v2", "service_usage_events"));
     }
 
     @Override
     public Mono<Void> purgeAndReseed(PurgeAndReseedServiceUsageEventsRequest request) {
-        return post(request, Void.class, function((builder, validRequest) -> builder.pathSegment("v2", "service_usage_events", "destructively_purge_all_and_reseed_existing_instances")));
+        return post(request, Void.class, builder -> builder.pathSegment("v2", "service_usage_events", "destructively_purge_all_and_reseed_existing_instances"));
     }
 
 }
