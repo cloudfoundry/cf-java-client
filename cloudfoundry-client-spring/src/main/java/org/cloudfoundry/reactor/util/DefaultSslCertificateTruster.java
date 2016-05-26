@@ -72,7 +72,7 @@ final class DefaultSslCertificateTruster implements SslCertificateTruster {
     }
 
     @Override
-    public void trust(String host, int port) {
+    public void trust(String host, int port, Duration duration) {
         Tuple2<String, Integer> hostAndPort = Tuple2.of(host, port);
         if (this.trustedHostsAndPorts.contains(hostAndPort)) {
             return;
@@ -81,7 +81,7 @@ final class DefaultSslCertificateTruster implements SslCertificateTruster {
         this.logger.warn("Trusting SSL Certificate for {}:{}", host, port);
 
         X509TrustManager trustManager = this.delegate.get();
-        X509Certificate[] untrustedCertificates = getUntrustedCertificates(host, port, this.proxyContext, trustManager);
+        X509Certificate[] untrustedCertificates = getUntrustedCertificates(duration, host, port, this.proxyContext, trustManager);
 
         if (untrustedCertificates != null) {
             KeyStore trustStore = addToTrustStore(untrustedCertificates, trustManager);
@@ -138,15 +138,12 @@ final class DefaultSslCertificateTruster implements SslCertificateTruster {
         }
     }
 
-    private static X509Certificate[] getUntrustedCertificates(String host, int port, ProxyContext proxyContext, X509TrustManager delegate) {
+    private static X509Certificate[] getUntrustedCertificates(Duration duration, String host, int port, ProxyContext proxyContext, X509TrustManager delegate) {
         CertificateCollectingTrustManager collector = new CertificateCollectingTrustManager(delegate);
 
-        try {
-            getTcpClient(proxyContext, collector, host, port)
-                .startAndAwait(channel -> channel.receive().then());
-        } catch (Exception e) {
-            // swallow expected exception
-        }
+        getTcpClient(proxyContext, collector, host, port)
+            .start(channel -> channel.receive().then())
+            .get(duration);
 
         X509Certificate[] chain = collector.getCollectedCertificateChain();
         if (chain == null) {

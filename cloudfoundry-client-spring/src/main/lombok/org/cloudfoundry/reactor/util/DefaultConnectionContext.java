@@ -25,6 +25,7 @@ import reactor.core.publisher.Mono;
 import reactor.io.netty.config.ClientOptions;
 import reactor.io.netty.http.HttpClient;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 
@@ -168,7 +169,7 @@ public final class DefaultConnectionContext implements ConnectionContext {
     }
 
     private static void trust(UriComponents components, Optional<SslCertificateTruster> sslCertificateTruster) {
-        sslCertificateTruster.ifPresent(t -> t.trust(components.getHost(), components.getPort()));
+        sslCertificateTruster.ifPresent(t -> t.trust(components.getHost(), components.getPort(), Duration.ofSeconds(30)));
     }
 
 }

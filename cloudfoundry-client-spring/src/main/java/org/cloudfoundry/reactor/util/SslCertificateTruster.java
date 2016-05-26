@@ -17,6 +17,7 @@
 package org.cloudfoundry.reactor.util;
 
 import javax.net.ssl.X509TrustManager;
+import java.time.Duration;
 
 /**
  * A utility that trusts certificates provided by connections
@@ -28,7 +29,8 @@ interface SslCertificateTruster extends X509TrustManager {
      *
      * @param host     the host
      * @param port     the port
+     * @param duration the duration to wait
      */
-    void trust(String host, int port);
+    void trust(String host, int port, Duration duration);
 
 }
