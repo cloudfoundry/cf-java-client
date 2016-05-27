@@ -1,0 +1,90 @@
+{
+  "resources" : [ {
+    "id" : "18f0aa45-941c-4fd0-a06a-97a72a1dcf99",
+    "externalId" : "test-user",
+    "meta" : {
+      "version" : 0,
+      "created" : "2016-04-29T23:20:50.611Z",
+      "lastModified" : "2016-04-29T23:20:50.611Z"
+    },
+    "userName" : "TLeoOn@test.org",
+    "name" : {
+      "familyName" : "family name",
+      "givenName" : "given name"
+    },
+    "emails" : [ {
+      "value" : "TLeoOn@test.org",
+      "primary" : false
+    } ],
+    "groups" : [ {
+      "value" : "cbd2053f-d266-4eb0-893a-48743e45611f",
+      "display" : "openid",
+      "type" : "DIRECT"
+    }, {
+      "value" : "1c413464-607a-4505-bf8b-0f9feaf7133f",
+      "display" : "password.write",
+      "type" : "DIRECT"
+    }, {
+      "value" : "84d79cdc-e638-4c96-bd1c-71162d9b227f",
+      "display" : "oauth.approvals",
+      "type" : "DIRECT"
+    }, {
+      "value" : "277a4d72-dad0-448a-abde-21bdb0a29d70",
+      "display" : "user_attributes",
+      "type" : "DIRECT"
+    }, {
+      "value" : "4a69732b-8696-44a8-8c1c-a9dd9261fecd",
+      "display" : "scim.userids",
+      "type" : "DIRECT"
+    }, {
+      "value" : "e485d91d-250e-49b0-b9fe-1f937f67bb24",
+      "display" : "uaa.user",
+      "type" : "DIRECT"
+    }, {
+      "value" : "4d325561-28d5-43df-b1ce-0424bd163180",
+      "display" : "profile",
+      "type" : "DIRECT"
+    }, {
+      "value" : "52cba040-893a-40be-b043-b5bc2d08cc58",
+      "display" : "cloud_controller.read",
+      "type" : "DIRECT"
+    }, {
+      "value" : "a8a60f05-f78b-47b7-990b-4d53952eec12",
+      "display" : "scim.me",
+      "type" : "DIRECT"
+    }, {
+      "value" : "a365936f-585a-4ced-b33e-d70bdc25697d",
+      "display" : "cloud_controller_service_permissions.read",
+      "type" : "DIRECT"
+    }, {
+      "value" : "84ab90cb-d181-41b8-8585-25f193b21bae",
+      "display" : "roles",
+      "type" : "DIRECT"
+    }, {
+      "value" : "c3f8c8cb-9cbd-435e-bedb-02e10be66146",
+      "display" : "approvals.me",
+      "type" : "DIRECT"
+    }, {
+      "value" : "86477ebe-4792-414c-a289-d1072a0cfe12",
+      "display" : "cloud_controller.write",
+      "type" : "DIRECT"
+    } ],
+    "approvals" : [ {
+      "userId" : "18f0aa45-941c-4fd0-a06a-97a72a1dcf99",
+      "clientId" : "client id",
+      "scope" : "scim.read",
+      "status" : "APPROVED",
+      "lastUpdatedAt" : "2016-04-29T23:20:50.624Z",
+      "expiresAt" : "2016-04-29T23:21:00.624Z"
+    } ],
+    "active" : true,
+    "verified" : true,
+    "origin" : "uaa",
+    "zoneId" : "uaa",
+    "passwordLastModified" : "2016-04-29T23:20:50.000Z",
+    "schemas" : [ "urn:scim:schemas:core:1.0" ]
+  } ],
+  "startIndex" : 1,
+  "itemsPerPage" : 50,
+  "totalResults" : 1
+}
