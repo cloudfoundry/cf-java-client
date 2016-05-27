@@ -24,10 +24,10 @@ import reactor.core.publisher.Mono;
 public interface Users {
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#authorization-code-grant12">Authorization Code Grant</a> request
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#authorization-code-grant12">List Users</a> request
      *
-     * @param request the Authorization Code request
-     * @return the response from the Authorization Code request
+     * @param request the List Users request
+     * @return the response from the List Users request
      */
     Mono<ListUsersResponse> list(ListUsersRequest request);
 
