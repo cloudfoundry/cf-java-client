@@ -751,25 +751,14 @@ public final class DefaultServices implements Services {
 
     private static Mono<UpdateServiceInstanceResponse> updateServiceInstance(CloudFoundryClient cloudFoundryClient, UpdateServiceInstanceRequest request, String serviceInstanceId,
                                                                              String servicePlanId) {
-        org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest.UpdateServiceInstanceRequestBuilder builder = org.cloudfoundry.client.v2.serviceinstances
-            .UpdateServiceInstanceRequest.builder();
-
-        if (!servicePlanId.isEmpty()) {
-            builder.servicePlanId(servicePlanId);
-        }
-
-        if (request.getParameters() != null && !request.getParameters().isEmpty()) {
-            builder.parameters(request.getParameters());
-        }
-
-        if (request.getTags() != null && !request.getTags().isEmpty()) {
-            builder.tags(request.getTags());
-        }
-
         return cloudFoundryClient.serviceInstances()
-            .update(builder
+            .update(org.cloudfoundry.client.v2.serviceinstances
+                .UpdateServiceInstanceRequest.builder()
                 .acceptsIncomplete(true)
+                .parameters(request.getParameters())
                 .serviceInstanceId(serviceInstanceId)
+                .servicePlanId(servicePlanId)
+                .tags(request.getTags())
                 .build());
     }
 

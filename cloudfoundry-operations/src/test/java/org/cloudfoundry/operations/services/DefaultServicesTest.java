@@ -1762,7 +1762,7 @@ public final class DefaultServicesTest {
 
     }
 
-    public static final class updateService extends AbstractOperationsApiTest<Void> {
+    public static final class UpdateService extends AbstractOperationsApiTest<Void> {
 
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
@@ -1794,7 +1794,7 @@ public final class DefaultServicesTest {
 
     }
 
-    public static final class updateServiceNoParameters extends AbstractOperationsApiTest<Void> {
+    public static final class UpdateServiceNoParameters extends AbstractOperationsApiTest<Void> {
 
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
@@ -1804,7 +1804,7 @@ public final class DefaultServicesTest {
             requestGetServicePlan(this.cloudFoundryClient, "test-service-plan-id", "test-service-plan", "test-service");
             requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
             requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-service-plan-id");
-            requestUpdateServiceInstance(this.cloudFoundryClient, Collections.emptyMap(), "test-service-instance-id", "test-service-plan-id", Collections.singletonList("test-tag"));
+            requestUpdateServiceInstance(this.cloudFoundryClient, null, "test-service-instance-id", "test-service-plan-id", Collections.singletonList("test-tag"));
         }
 
         @Override
@@ -1824,7 +1824,7 @@ public final class DefaultServicesTest {
 
     }
 
-    public static final class updateServiceNoPlan extends AbstractOperationsApiTest<Void> {
+    public static final class UpdateServiceNoPlan extends AbstractOperationsApiTest<Void> {
 
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
@@ -1850,7 +1850,7 @@ public final class DefaultServicesTest {
 
     }
 
-    public static final class updateServiceNoTags extends AbstractOperationsApiTest<Void> {
+    public static final class UpdateServiceNoTags extends AbstractOperationsApiTest<Void> {
 
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
@@ -1860,8 +1860,7 @@ public final class DefaultServicesTest {
             requestGetServicePlan(this.cloudFoundryClient, "test-service-plan-id", "test-service-plan", "test-service");
             requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
             requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
-            requestUpdateServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-parameter-key", "test-parameter-value"), "test-service-instance-id", "test-plan-id",
-                Collections.emptyList());
+            requestUpdateServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-parameter-key", "test-parameter-value"), "test-service-instance-id", "test-plan-id", null);
         }
 
         @Override
@@ -1881,7 +1880,7 @@ public final class DefaultServicesTest {
 
     }
 
-    public static final class updateServiceNotPublic extends AbstractOperationsApiTest<Void> {
+    public static final class UpdateServiceNotPublic extends AbstractOperationsApiTest<Void> {
 
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
@@ -1914,7 +1913,7 @@ public final class DefaultServicesTest {
 
     }
 
-    public static final class updateServiceNotVisible extends AbstractOperationsApiTest<Void> {
+    public static final class UpdateServiceNotVisible extends AbstractOperationsApiTest<Void> {
 
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
@@ -1946,7 +1945,7 @@ public final class DefaultServicesTest {
 
     }
 
-    public static final class updateServiceUserProvided extends AbstractOperationsApiTest<Void> {
+    public static final class UpdateServiceUserProvided extends AbstractOperationsApiTest<Void> {
 
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
@@ -1975,7 +1974,7 @@ public final class DefaultServicesTest {
 
     }
 
-    public static final class updateServiceUserProvidedNoPlan extends AbstractOperationsApiTest<Void> {
+    public static final class UpdateServiceUserProvidedNoPlan extends AbstractOperationsApiTest<Void> {
 
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
@@ -2002,7 +2001,7 @@ public final class DefaultServicesTest {
 
     }
 
-    public static final class updateUserProvidedService extends AbstractOperationsApiTest<Void> {
+    public static final class UpdateUserProvidedService extends AbstractOperationsApiTest<Void> {
 
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
@@ -2030,7 +2029,7 @@ public final class DefaultServicesTest {
 
     }
 
-    public static final class updateUserProvidedServiceNotUserProvided extends AbstractOperationsApiTest<Void> {
+    public static final class UpdateUserProvidedServiceNotUserProvided extends AbstractOperationsApiTest<Void> {
 
         private final DefaultServices services = new DefaultServices(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID), Mono.just(TEST_ORGANIZATION_ID));
 
