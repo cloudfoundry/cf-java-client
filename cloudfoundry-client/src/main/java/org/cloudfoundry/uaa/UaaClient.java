@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.uaa;
 
+import org.cloudfoundry.uaa.authorizations.Authorizations;
 import org.cloudfoundry.uaa.identityzones.IdentityZones;
 import org.cloudfoundry.uaa.tokens.Tokens;
 import org.cloudfoundry.uaa.users.Users;
@@ -29,6 +30,13 @@ public interface UaaClient {
      * The currently supported UAA API version
      */
     String SUPPORTED_API_VERSION = "3.3.0";
+
+    /**
+     * Main entry point to the UAA Authorizations Client API
+     *
+     * @return the UAA Authorizations Client API
+     */
+    Authorizations authorizations();
 
     /**
      * Main entry point to the UAA Identity Zone Client API
