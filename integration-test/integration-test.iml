@@ -25,7 +25,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: com.fasterxml.jackson.core:jackson-core:2.6.5" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: io.projectreactor:reactor-netty:2.5.0.BUILD-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: io.projectreactor:reactor-ipc:2.5.0.BUILD-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-all:4.1.0.CR7" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-all:4.1.0.Final" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.tomcat.embed:tomcat-embed-logging-juli:8.0.32" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.tomcat.embed:tomcat-embed-websocket:8.0.32" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.tomcat.embed:tomcat-embed-core:8.0.32" level="project" />
