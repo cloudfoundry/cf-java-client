@@ -18,11 +18,20 @@ package org.cloudfoundry.operations.serviceadmin;
 
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Service Admin API
  */
 public interface ServiceAdmin {
+
+    /**
+     * Create a new service broker
+     *
+     * @param request The Create Service Broker request
+     * @return a completion indicator
+     */
+    Mono<Void> create(CreateServiceBrokerRequest request);
 
     /**
      * Lists the service brokers

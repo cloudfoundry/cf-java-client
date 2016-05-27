@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations.serviceadmin;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerResponse;
 import org.cloudfoundry.client.v2.servicebrokers.ListServiceBrokersRequest;
 import org.cloudfoundry.client.v2.servicebrokers.ListServiceBrokersResponse;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokerEntity;
@@ -31,6 +32,20 @@ import static org.cloudfoundry.util.test.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
 public final class DefaultServiceAdminTest {
+
+    private static void requestCreateServiceBroker(CloudFoundryClient cloudFoundryClient, String name, String url, String username, String password, String spaceId){
+        when(cloudFoundryClient.serviceBrokers()
+            .create(org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerRequest.builder()
+                .name(name)
+                .brokerUrl(url)
+                .authenticationUsername(username)
+                .authenticationPassword(password)
+                .spaceId(spaceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(CreateServiceBrokerResponse.builder())
+                    .build()));
+    }
 
     private static void requestListServiceBrokers(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.serviceBrokers()
@@ -56,9 +71,66 @@ public final class DefaultServiceAdminTest {
                     .build()));
     }
 
+    public static final class CreateServiceBroker extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestCreateServiceBroker(this.cloudFoundryClient, "test-service-broker-name", "test-service-broker-url", "test-service-broker-username",
+                "test-service-broker-password", null);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.serviceAdmin
+                .create(CreateServiceBrokerRequest.builder()
+                    .name("test-service-broker-name")
+                    .url("test-service-broker-url")
+                    .username("test-service-broker-username")
+                    .password("test-service-broker-password")
+                    .build());
+        }
+
+    }
+
+    public static final class CreateServiceBrokerWithSpaceScope extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestCreateServiceBroker(this.cloudFoundryClient, "test-service-broker-name", "test-service-broker-url", "test-service-broker-username",
+                "test-service-broker-password", TEST_SPACE_ID);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.serviceAdmin
+                .create(CreateServiceBrokerRequest.builder()
+                    .name("test-service-broker-name")
+                    .url("test-service-broker-url")
+                    .username("test-service-broker-username")
+                    .password("test-service-broker-password")
+                    .isSpaceScoped(true)
+                    .build());
+        }
+
+    }
+
     public static final class ListServiceBrokers extends AbstractOperationsApiTest<ServiceBroker> {
 
-        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(this.cloudFoundryClient);
+        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -85,7 +157,7 @@ public final class DefaultServiceAdminTest {
 
     public static final class ListServiceBrokersNoBrokers extends AbstractOperationsApiTest<ServiceBroker> {
 
-        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(this.cloudFoundryClient);
+        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
