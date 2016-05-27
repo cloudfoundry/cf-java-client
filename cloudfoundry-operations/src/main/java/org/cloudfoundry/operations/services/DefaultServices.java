@@ -59,7 +59,6 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServicesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
-import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.util.DelayUtils;
 import org.cloudfoundry.util.ExceptionUtils;
@@ -241,7 +240,7 @@ public final class DefaultServices implements Services {
     }
 
     @Override
-    public Mono<Void> update(UpdateServiceInstanceRequest request) {
+    public Mono<Void> updateInstance(UpdateServiceInstanceRequest request) {
         return Mono
             .when(this.organizationId, this.spaceId)
             .then(function((organizationId, spaceId) -> Mono.when(
@@ -253,6 +252,14 @@ public final class DefaultServices implements Services {
                 getValidatedServicePlanId(this.cloudFoundryClient, request.getPlanName(), serviceInstance, organizationId)
             )))
             .then(function((serviceInstanceId, servicePlanId) -> updateServiceInstance(this.cloudFoundryClient, request, serviceInstanceId, servicePlanId)))
+            .then();
+    }
+
+    @Override
+    public Mono<Void> updateUserProvidedInstance(UpdateUserProvidedServiceInstanceRequest request) {
+        return this.spaceId
+            .then(spaceId -> getSpaceUserProvidedServiceInstanceId(this.cloudFoundryClient, request.getUserProvidedServiceInstanceName(), spaceId))
+            .then(userProvidedServiceInstanceId -> updateUserProvidedServiceInstance(this.cloudFoundryClient, request, userProvidedServiceInstanceId))
             .then();
     }
 
@@ -391,6 +398,18 @@ public final class DefaultServices implements Services {
 
     private static Mono<String> getSpaceServiceInstanceId(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
         return getSpaceServiceInstance(cloudFoundryClient, serviceInstanceName, spaceId)
+            .map(ResourceUtils::getId);
+    }
+
+    private static Mono<UnionServiceInstanceResource> getSpaceUserProvidedServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
+        return requestListServiceInstances(cloudFoundryClient, spaceId, serviceInstanceName)
+            .filter(DefaultServices::isUserProvidedService)
+            .single()
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("User provided service instance %s does not exist", serviceInstanceName));
+    }
+
+    private static Mono<String> getSpaceUserProvidedServiceInstanceId(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
+        return getSpaceUserProvidedServiceInstance(cloudFoundryClient, serviceInstanceName, spaceId)
             .map(ResourceUtils::getId);
     }
 
@@ -658,7 +677,7 @@ public final class DefaultServices implements Services {
 
     private static Mono<UpdateUserProvidedServiceInstanceResponse> requestUserProvidedServiceInstanceUpdate(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String newName) {
         return cloudFoundryClient.userProvidedServiceInstances()
-            .update(UpdateUserProvidedServiceInstanceRequest.builder()
+            .update(org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceRequest.builder()
                 .name(newName)
                 .userProvidedServiceInstanceId(serviceInstanceId)
                 .build());
@@ -751,6 +770,17 @@ public final class DefaultServices implements Services {
             .update(builder
                 .acceptsIncomplete(true)
                 .serviceInstanceId(serviceInstanceId)
+                .build());
+    }
+
+    private static Mono<UpdateUserProvidedServiceInstanceResponse> updateUserProvidedServiceInstance(CloudFoundryClient cloudFoundryClient,
+                                                                                                     UpdateUserProvidedServiceInstanceRequest request,
+                                                                                                     String userProvidedServiceInstanceId) {
+        return cloudFoundryClient.userProvidedServiceInstances()
+            .update(org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceRequest.builder()
+                .credentials(request.getCredentials())
+                .syslogDrainUrl(request.getSyslogDrainUrl())
+                .userProvidedServiceInstanceId(userProvidedServiceInstanceId)
                 .build());
     }
 
