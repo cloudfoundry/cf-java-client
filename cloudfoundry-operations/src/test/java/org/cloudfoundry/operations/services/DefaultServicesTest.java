@@ -749,7 +749,7 @@ public final class DefaultServicesTest {
                 .name(serviceName)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListSpaceServiceInstancesResponse.builder())
+                .just(fill(ListSpaceServiceInstancesResponse.builder())
                     .resource(fill(UnionServiceInstanceResource.builder(), "user-provided-service-instance-")
                         .entity(fill(UnionServiceInstanceEntity.builder())
                             .type("user_provided_service_instance")
