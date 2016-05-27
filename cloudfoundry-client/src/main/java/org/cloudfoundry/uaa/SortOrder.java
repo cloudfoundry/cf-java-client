@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.users;
+package org.cloudfoundry.uaa;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 

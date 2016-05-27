@@ -32,6 +32,27 @@ public abstract class PaginatedRequest {
     public abstract Integer getCount();
 
     /**
+     * The filter
+     */
+    @Nullable
+    @QueryParameter("filter")
+    public abstract String getFilter();
+
+    /**
+     * The sort by
+     */
+    @Nullable
+    @QueryParameter("sortBy")
+    public abstract String getSortBy();
+
+    /**
+     * The sort order
+     */
+    @Nullable
+    @QueryParameter("sortOrder")
+    public abstract SortOrder getSortOrder();
+
+    /**
      * The start index
      */
     @Nullable

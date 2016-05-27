@@ -21,18 +21,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.uaa.PaginatedResponse;
 import org.immutables.value.Value;
 
-import java.util.List;
-
 /**
  * The response from the list users request
  */
 @JsonDeserialize
 @Value.Immutable
 abstract class AbstractListUsersResponse extends PaginatedResponse<User> {
-
-    /**
-     * The users
-     */
-    abstract List<User> getUsers();
 
 }

@@ -18,11 +18,11 @@ package org.cloudfoundry.uaa;
 
 import org.junit.Test;
 
-import static org.cloudfoundry.uaa.users.SortOrder.ASCENDING;
-import static org.cloudfoundry.uaa.users.SortOrder.DESCENDING;
+import static org.cloudfoundry.uaa.SortOrder.ASCENDING;
+import static org.cloudfoundry.uaa.SortOrder.DESCENDING;
 import static org.junit.Assert.assertEquals;
 
-public final class PaginatedAndSortedRequestTest {
+public final class SortOrderTest {
 
     @Test
     public void sortOrder() {

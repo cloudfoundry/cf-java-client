@@ -28,18 +28,21 @@ import org.immutables.value.Value;
 abstract class AbstractGroup {
 
     /**
-     * The group id
-     */
-    @JsonProperty("value")
-    abstract String getId();
-
-    /**
      * The client id
      */
     @JsonProperty("display")
     abstract String getDisplay();
 
+    /**
+     * The type of membership
+     */
     @JsonProperty("type")
     abstract MembershipType getType();
+
+    /**
+     * The group value
+     */
+    @JsonProperty("value")
+    abstract String getValue();
 
 }

@@ -28,16 +28,16 @@ import org.immutables.value.Value;
 abstract class AbstractApproval {
 
     /**
-     * When the approval expires
-     */
-    @JsonProperty("expiresAt")
-    abstract String getExpiresAt();
-
-    /**
      * The client id
      */
     @JsonProperty("clientId")
     abstract String getClientId();
+
+    /**
+     * When the approval expires
+     */
+    @JsonProperty("expiresAt")
+    abstract String getExpiresAt();
 
     /**
      * When the approval was last updated

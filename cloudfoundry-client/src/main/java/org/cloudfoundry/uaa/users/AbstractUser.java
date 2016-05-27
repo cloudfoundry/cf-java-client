@@ -27,16 +27,16 @@ import java.util.List;
 abstract class AbstractUser {
 
     /**
-     * The approvals for the user
-     */
-    @JsonProperty("approvals")
-    abstract List<Approval> getApproval();
-
-    /**
      * Whether the user is active
      */
     @JsonProperty("active")
     abstract Boolean getActive();
+
+    /**
+     * The approvals for the user
+     */
+    @JsonProperty("approvals")
+    abstract List<Approval> getApproval();
 
     /**
      * The emails for the user

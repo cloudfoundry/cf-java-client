@@ -28,12 +28,6 @@ import java.util.List;
 public abstract class PaginatedResponse<T> {
 
     /**
-     * The startIndex
-     */
-    @JsonProperty("startIndex")
-    public abstract Integer getStartIndex();
-
-    /**
      * The itemsPerPage
      */
     @JsonProperty("itemsPerPage")
@@ -44,6 +38,18 @@ public abstract class PaginatedResponse<T> {
      */
     @JsonProperty("resources")
     public abstract List<T> getResources();
+
+    /**
+     * The schemas
+     */
+    @JsonProperty("schemas")
+    public abstract List<String> getSchemas();
+
+    /**
+     * The startIndex
+     */
+    @JsonProperty("startIndex")
+    public abstract Integer getStartIndex();
 
     /**
      * The total results

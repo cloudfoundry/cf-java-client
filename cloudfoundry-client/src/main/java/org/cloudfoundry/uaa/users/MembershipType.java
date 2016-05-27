@@ -33,7 +33,6 @@ public enum MembershipType {
      */
     INDIRECT("INDIRECT");
 
-
     private final String value;
 
     MembershipType(String value) {

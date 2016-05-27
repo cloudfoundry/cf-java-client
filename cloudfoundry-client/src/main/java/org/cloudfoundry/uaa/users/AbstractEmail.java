@@ -31,7 +31,7 @@ abstract class AbstractEmail {
      * The email address
      */
     @JsonProperty("value")
-    abstract String getAddress();
+    abstract String getValue();
 
     /**
      * Whether this email address is the primary

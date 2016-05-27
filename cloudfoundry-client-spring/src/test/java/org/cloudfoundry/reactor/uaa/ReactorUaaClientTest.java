@@ -35,4 +35,9 @@ public final class ReactorUaaClientTest extends AbstractRestTest {
         assertNotNull(this.client.identityZones());
     }
 
+    @Test
+    public void users() {
+        assertNotNull(this.client.users());
+    }
+
 }
