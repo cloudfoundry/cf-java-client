@@ -16,27 +16,39 @@
 
 package org.cloudfoundry.operations.serviceadmin;
 
-
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
 /**
- * Main entry point to the Cloud Foundry Service Admin API
+ * Request options for the create service broker operation
  */
-public interface ServiceAdmin {
+@Value.Immutable
+abstract class AbstractCreateServiceBrokerRequest {
 
     /**
-     * Create a new service broker
-     *
-     * @param request The Create Service Broker request
-     * @return a completion indicator
+     * The name of the service broker
      */
-    Mono<Void> create(CreateServiceBrokerRequest request);
+    abstract String getName();
 
     /**
-     * Lists the service brokers
-     *
-     * @return the service brokers
+     * The password to authenticate with the broker
      */
-    Flux<ServiceBroker> listServiceBrokers();
+    abstract String getPassword();
+
+    /**
+     * Whether the service broker should be space scoped
+     */
+    @Nullable
+    abstract Boolean getSpaceScoped();
+
+    /**
+     * The url of the service broker
+     */
+    abstract String getUrl();
+
+    /**
+     * The username to authenticate with the broker
+     */
+    abstract String getUsername();
+
 }
