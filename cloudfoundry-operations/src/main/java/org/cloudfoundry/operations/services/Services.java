@@ -133,7 +133,14 @@ public interface Services {
      * @param request the update service instance request
      * @return a completion indicator
      */
-    Mono<Void> update(UpdateServiceInstanceRequest request);
+    Mono<Void> updateInstance(UpdateServiceInstanceRequest request);
 
+    /**
+     * Update a user provided service instance
+     *
+     * @param request the update user provided service instance request
+     * @return a completion indicator
+     */
+    Mono<Void> updateUserProvidedInstance(UpdateUserProvidedServiceInstanceRequest request);
 
 }
