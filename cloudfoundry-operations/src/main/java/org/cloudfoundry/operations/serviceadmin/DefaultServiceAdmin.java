@@ -23,13 +23,10 @@ import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokerEntity;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokerResource;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.cloudfoundry.util.ValidationUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
-
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class DefaultServiceAdmin implements ServiceAdmin {
 
@@ -44,11 +41,8 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
 
     @Override
     public Mono<Void> create(CreateServiceBrokerRequest request) {
-        return ValidationUtils
-            .validate(request)
-            .and(this.spaceId)
-            .then(function((validRequest, spaceId) -> requestCreateServiceBroker(this.cloudFoundryClient, validRequest.getName(), validRequest.getUrl(), validRequest.getUsername(),
-                validRequest.getPassword(), Optional.ofNullable(validRequest.getIsSpaceScoped()).orElse(false), spaceId)))
+        return this.spaceId
+            .then(spaceId -> requestCreateServiceBroker(this.cloudFoundryClient, request.getName(), request.getUrl(), request.getUsername(), request.getPassword(), request.getSpaceScoped(), spaceId))
             .then();
     }
 
@@ -66,7 +60,7 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
                 .brokerUrl(url)
                 .authenticationUsername(username)
                 .authenticationPassword(password)
-                .spaceId(isSpaceScoped ? spaceId : null)
+                .spaceId(Optional.ofNullable(isSpaceScoped).orElse(false) ? spaceId : null)
                 .build());
     }
 

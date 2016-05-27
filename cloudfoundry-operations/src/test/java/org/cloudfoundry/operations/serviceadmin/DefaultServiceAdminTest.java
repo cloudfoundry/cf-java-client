@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 
 public final class DefaultServiceAdminTest {
 
-    private static void requestCreateServiceBroker(CloudFoundryClient cloudFoundryClient, String name, String url, String username, String password, String spaceId){
+    private static void requestCreateServiceBroker(CloudFoundryClient cloudFoundryClient, String name, String url, String username, String password, String spaceId) {
         when(cloudFoundryClient.serviceBrokers()
             .create(org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerRequest.builder()
                 .name(name)
@@ -77,8 +77,7 @@ public final class DefaultServiceAdminTest {
 
         @Before
         public void setUp() throws Exception {
-            requestCreateServiceBroker(this.cloudFoundryClient, "test-service-broker-name", "test-service-broker-url", "test-service-broker-username",
-                "test-service-broker-password", null);
+            requestCreateServiceBroker(this.cloudFoundryClient, "test-service-broker-name", "test-service-broker-url", "test-service-broker-username", "test-service-broker-password", null);
         }
 
         @Override
@@ -105,8 +104,7 @@ public final class DefaultServiceAdminTest {
 
         @Before
         public void setUp() throws Exception {
-            requestCreateServiceBroker(this.cloudFoundryClient, "test-service-broker-name", "test-service-broker-url", "test-service-broker-username",
-                "test-service-broker-password", TEST_SPACE_ID);
+            requestCreateServiceBroker(this.cloudFoundryClient, "test-service-broker-name", "test-service-broker-url", "test-service-broker-username", "test-service-broker-password", TEST_SPACE_ID);
         }
 
         @Override
@@ -122,7 +120,7 @@ public final class DefaultServiceAdminTest {
                     .url("test-service-broker-url")
                     .username("test-service-broker-username")
                     .password("test-service-broker-password")
-                    .isSpaceScoped(true)
+                    .spaceScoped(true)
                     .build());
         }
 

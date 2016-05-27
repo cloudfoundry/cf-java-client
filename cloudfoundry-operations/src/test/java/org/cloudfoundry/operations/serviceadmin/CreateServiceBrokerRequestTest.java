@@ -16,91 +16,54 @@
 
 package org.cloudfoundry.operations.serviceadmin;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class CreateServiceBrokerRequestTest {
 
-    @Test
-    public void isInValidNoName() {
-        ValidationResult result = CreateServiceBrokerRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        CreateServiceBrokerRequest.builder()
             .url("test-broker-url")
             .username("test-username")
             .password("test-password")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+            .build();
     }
 
-    @Test
-    public void isInValidNoUrl() {
-        ValidationResult result = CreateServiceBrokerRequest.builder()
-            .name("test-broker")
-            .username("test-username")
-            .password("test-password")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("url must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isInValidNoUsername() {
-        ValidationResult result = CreateServiceBrokerRequest.builder()
-            .name("test-broker")
-            .url("test-broker-url")
-            .password("test-password")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("username must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isInValidNoPassword() {
-        ValidationResult result = CreateServiceBrokerRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noPassword() {
+        CreateServiceBrokerRequest.builder()
             .name("test-broker")
             .url("test-broker-url")
             .username("test-username")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("password must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noUrl() {
+        CreateServiceBrokerRequest.builder()
+            .name("test-broker")
+            .username("test-username")
+            .password("test-password")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noUsername() {
+        CreateServiceBrokerRequest.builder()
+            .name("test-broker")
+            .url("test-broker-url")
+            .password("test-password")
+            .build();
     }
 
     @Test
-    public void isValid() {
-        ValidationResult result = CreateServiceBrokerRequest.builder()
+    public void valid() {
+        CreateServiceBrokerRequest.builder()
             .name("test-broker")
             .url("test-broker-url")
             .username("test-username")
             .password("test-password")
-            .isSpaceScoped(true)
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
-    @Test
-    public void isValidNoSpaceScoped() {
-        ValidationResult result = CreateServiceBrokerRequest.builder()
-            .name("test-broker")
-            .url("test-broker-url")
-            .username("test-username")
-            .password("test-password")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
 }
