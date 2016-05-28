@@ -41,7 +41,6 @@ import java.util.stream.Collectors;
  * <p>
  * {@code TestObjects} is designed to populate builder objects with test values. Object setters are called with standard values based upon the parameter type and the name of the setter method. Setters
  * which take collections are ignored.
- * <p>
  * <ul> <li>{@link String} types are set to {@code "test-"+modifier+settername}, where {@code modifier} is supplied on the call {@code fill(b,modifier)} or {@code fillPage(b,modifier)}.</li>
  * <li>{@link Boolean} types are set to {@code true}.</li> <li>{@link Integer} or {@link Long} types are set to {@code 1}.</li> <li>{@link Float} or {@link Double} types are set to {@code 1.0}.</li>
  * <li>Types with names ending in {@code Entity} or {@code Metadata}<sup>1</sup> are recursively filled, using {@link #fill fill(builder-of-type, modifier)}, if their builder types can be found.</li>

@@ -16,12 +16,51 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.immutables.value.Value;
+import java.util.List;
 
 /**
- * A Cloud Foundry Application as returned by list
+ * A Cloud Foundry Application summary base class
  */
-@Value.Immutable
-abstract class AbstractApplicationSummary extends AbstractAbstractApplicationSummary {
+abstract class AbstractApplicationSummary {
+
+    /**
+     * The disk quota in bytes
+     */
+    abstract Integer getDiskQuota();
+
+    /**
+     * The id
+     */
+    abstract String getId();
+
+    /**
+     * The number of instances
+     */
+    abstract Integer getInstances();
+
+    /**
+     * The memory limit in bytes
+     */
+    abstract Integer getMemoryLimit();
+
+    /**
+     * The name
+     */
+    abstract String getName();
+
+    /**
+     * The requested state
+     */
+    abstract String getRequestedState();
+
+    /**
+     * The number of running instances
+     */
+    abstract Integer getRunningInstances();
+
+    /**
+     * The list of bound urls
+     */
+    abstract List<String> getUrls();
 
 }

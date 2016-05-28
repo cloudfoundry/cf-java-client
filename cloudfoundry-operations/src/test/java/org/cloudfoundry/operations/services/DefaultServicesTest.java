@@ -626,7 +626,7 @@ public final class DefaultServicesTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListServicePlanVisibilitiesResponse.builder())
-                    .resource(ServicePlanVisibilityResource.builder()
+                    .resource(fill(ServicePlanVisibilityResource.builder())
                         .entity(ServicePlanVisibilityEntity.builder()
                             .organizationId(organizationId)
                             .servicePlanId(servicePlanId)

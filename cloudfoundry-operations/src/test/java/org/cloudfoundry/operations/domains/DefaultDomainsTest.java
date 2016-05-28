@@ -81,7 +81,7 @@ public final class DefaultDomainsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListPrivateDomainsResponse.builder())
-                    .resource(PrivateDomainResource.builder()
+                    .resource(fill(PrivateDomainResource.builder())
                         .metadata(fill(Metadata.builder(), "private-domain-")
                             .id(domainId)
                             .build())

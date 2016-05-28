@@ -47,7 +47,7 @@
     </modules>
 
     <properties>
-        <immutables.version>2.2</immutables.version>
+        <immutables.version>2.2.1</immutables.version>
         <java-semver.version>0.9.0</java-semver.version>
         <jjwt.version>0.6.0</jjwt.version>
         <lombok.version>1.16.8</lombok.version>
