@@ -41,6 +41,8 @@ import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneResponse;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
+
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
@@ -239,7 +241,7 @@ public final class ReactorIdentityZonesTest {
         protected InteractionContext getInteractionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
-                    .method(GET).path("/identity-zones/identity-zone-id")
+                    .method(GET).path("/identity-zones/twiglet-get")
                     .build())
                 .response(TestResponse.builder()
                     .status(OK)
@@ -251,20 +253,62 @@ public final class ReactorIdentityZonesTest {
         @Override
         protected GetIdentityZoneResponse getResponse() {
             return GetIdentityZoneResponse.builder()
-                .createdAt(946710000000L)
-                .description("The test zone")
-                .id("identity-zone-id")
-                .lastModified(946710000000L)
-                .name("test")
-                .subdomain("test")
+                .createdAt(1463595920104L)
+                .id("twiglet-get")
+                .lastModified(1463595920104L)
+                .name("The Twiglet Zone")
+                .subdomain("twiglet-get")
                 .version(0)
+                .configuration(IdentityZoneConfiguration.builder()
+                    .tokenPolicy(TokenPolicy.builder()
+                        .accessTokenValidity(-1)
+                        .jwtRevokable(false)
+                        .keys(Collections.emptyMap())
+                        .refreshTokenValidity(-1)
+                        .build())
+                    .samlConfiguration(SamlConfiguration.builder()
+                        .assertionSigned(true)
+                        .requestSigned(true)
+                        .wantAssertionSigned(false)
+                        .wantPartnerAuthenticationRequestSigned(false)
+                        .assertionTimeToLive(600)
+                        .build())
+                    .links(Links.builder()
+                        .logout(LogoutLink.builder()
+                            .redirectUrl("/login")
+                            .redirectParameterName("redirect")
+                            .disableRedirectParameter(true)
+                            .build())
+                        .selfService(SelfServiceLink.builder()
+                            .selfServiceLinksEnabled(true)
+                            .signupLink("/create_account")
+                            .resetPasswordLink("/forgot_password")
+                            .build())
+                        .build())
+                    .prompt(Prompt.builder()
+                        .fieldName("username")
+                        .text("Email")
+                        .fieldType("text")
+                        .build())
+                    .prompt(Prompt.builder()
+                        .fieldName("password")
+                        .text("Password")
+                        .fieldType("password")
+                        .build())
+                    .prompt(Prompt.builder()
+                        .fieldName("passcode")
+                        .text("One Time Code (Get on at /passcode)")
+                        .fieldType("password")
+                        .build())
+                    .ldapDiscoveryEnabled(false)
+                    .build())
                 .build();
         }
 
         @Override
         protected GetIdentityZoneRequest getValidRequest() throws Exception {
             return GetIdentityZoneRequest.builder()
-                .identityZoneId("identity-zone-id")
+                .identityZoneId("twiglet-get")
                 .build();
         }
 
