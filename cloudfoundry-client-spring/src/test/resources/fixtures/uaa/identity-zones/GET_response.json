@@ -1,20 +1,110 @@
 [
   {
-    "id": "uaa",
-    "subdomain": "",
-    "name": "uaa",
+    "config": {
+      "idpDiscoveryEnabled": false,
+      "links": {
+        "logout": {
+          "disableRedirectParameter": true,
+          "redirectUrl": "/login",
+          "redirectParameterName": "redirect"
+        },
+        "selfService": {
+          "selfServiceLinksEnabled": true,
+          "signup": "/create_account",
+          "passwd": "/forgot_password"
+        }
+      },
+      "prompts": [
+        {
+          "name": "username",
+          "type": "text",
+          "text": "Email"
+        },
+        {
+          "name": "password",
+          "type": "password",
+          "text": "Password"
+        },
+        {
+          "name": "passcode",
+          "type": "password",
+          "text": "One Time Code (Get on at /passcode)"
+        }
+      ],
+      "samlConfig": {
+        "assertionSigned": true,
+        "assertionTimeToLiveSeconds": 600,
+        "requestSigned": true,
+        "wantAssertionSigned": false,
+        "wantAuthnRequestSigned": false
+      },
+      "tokenPolicy": {
+        "accessTokenValidity": -1,
+        "jwtRevocable": false,
+        "refreshTokenValidity": -1,
+        "keys": {}
+      }
+    },
+    "created": 1463595916851,
+    "description": "Like the Twilight Zone but tastier.",
+    "id": "twiglet-list-1",
+    "last_modified": 1463595916851,
+    "name": "The Twiglet Zone",
     "version": 0,
-    "description": "The system zone for backwards compatibility",
-    "created": 946710000000,
-    "last_modified": 946710000000
+    "subdomain": "twiglet-list-1"
   },
   {
-    "id": "testzone1",
-    "subdomain": "testzone1",
-    "name": "The Twiglet Zone[testzone1]",
-    "version": 0,
-    "description": "Like the Twilight Zone but tastier[testzone1].",
-    "created": 1426260091139,
-    "last_modified": 1426260091139
+    "config": {
+      "idpDiscoveryEnabled": false,
+      "links": {
+        "logout": {
+          "disableRedirectParameter": true,
+          "redirectUrl": "/login",
+          "redirectParameterName": "redirect"
+        },
+        "selfService": {
+          "selfServiceLinksEnabled": true,
+          "signup": "/create_account",
+          "passwd": "/forgot_password"
+        }
+      },
+      "prompts": [
+        {
+          "name": "username",
+          "type": "text",
+          "text": "Email"
+        },
+        {
+          "name": "password",
+          "type": "password",
+          "text": "Password"
+        },
+        {
+          "name": "passcode",
+          "type": "password",
+          "text": "One Time Code (Get on at /passcode)"
+        }
+      ],
+      "samlConfig": {
+        "assertionSigned": true,
+        "assertionTimeToLiveSeconds": 600,
+        "requestSigned": true,
+        "wantAssertionSigned": false,
+        "wantAuthnRequestSigned": false
+      },
+      "tokenPolicy": {
+        "accessTokenValidity": -1,
+        "jwtRevocable": false,
+        "refreshTokenValidity": -1,
+        "keys": {}
+      }
+    },
+    "created": 1463595918196,
+    "description": "Like the Twilight Zone but tastier.",
+    "id": "twiglet-list-2",
+    "last_modified": 1463595918196,
+    "name": "The Twiglet Zone",
+    "subdomain": "twiglet-list-2",
+    "version": 0
   }
 ]
