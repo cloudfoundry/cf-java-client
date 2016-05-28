@@ -21,18 +21,8 @@ import org.junit.Test;
 public class UpdateIdentityZoneRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void noDescription() {
-        UpdateIdentityZoneRequest.builder()
-            .identityZoneId("test-id")
-            .name("test-name")
-            .subdomain("test-sub-domain")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
     public void noIdentityZoneId() {
         UpdateIdentityZoneRequest.builder()
-            .description("test-description")
             .name("test-name")
             .subdomain("test-sub-domain")
             .build();
@@ -41,7 +31,6 @@ public class UpdateIdentityZoneRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noName() {
         UpdateIdentityZoneRequest.builder()
-            .description("test-description")
             .identityZoneId("test-id")
             .subdomain("test-sub-domain")
             .build();
@@ -50,7 +39,6 @@ public class UpdateIdentityZoneRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noSubdomain() {
         UpdateIdentityZoneRequest.builder()
-            .description("test-description")
             .identityZoneId("test-id")
             .name("test-name")
             .build();
@@ -59,7 +47,6 @@ public class UpdateIdentityZoneRequestTest {
     @Test
     public void valid() {
         UpdateIdentityZoneRequest.builder()
-            .description("test-description")
             .identityZoneId("test-id")
             .name("test-name")
             .subdomain("test-sub-domain")
