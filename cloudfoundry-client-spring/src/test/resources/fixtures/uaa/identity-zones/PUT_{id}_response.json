@@ -1,0 +1,58 @@
+{
+  "id" : "twiglet-update",
+  "subdomain" : "twiglet-update",
+  "config" : {
+    "tokenPolicy" : {
+      "accessTokenValidity" : -1,
+      "jwtRevocable" : false,
+      "keys" : {
+        "exampleKeyId" : {
+          "signingKey" : "upD4t3d.s1gNiNg.K3y/t3XT"
+        }
+      },
+      "refreshTokenValidity" : -1
+    },
+    "samlConfig" : {
+      "assertionSigned" : true,
+      "requestSigned" : true,
+      "wantAssertionSigned" : false,
+      "wantAuthnRequestSigned" : false,
+      "assertionTimeToLiveSeconds" : 600,
+      "certificate" : null,
+      "privateKey" : null,
+      "privateKeyPassword" : null
+    },
+    "links" : {
+      "logout" : {
+        "redirectUrl" : "/login",
+        "redirectParameterName" : "redirect",
+        "disableRedirectParameter" : true,
+        "whitelist" : null
+      },
+      "selfService" : {
+        "selfServiceLinksEnabled" : true,
+        "signup" : "/create_account",
+        "passwd" : "/forgot_password"
+      }
+    },
+    "prompts" : [ {
+      "name" : "username",
+      "type" : "text",
+      "text" : "Email"
+    }, {
+      "name" : "password",
+      "type" : "password",
+      "text" : "Password"
+    }, {
+      "name" : "passcode",
+      "type" : "password",
+      "text" : "One Time Code (Get on at /passcode)"
+    } ],
+    "idpDiscoveryEnabled" : false
+  },
+  "name" : "The Updated Twiglet Zone",
+  "version" : 1,
+  "description" : "Like the Twilight Zone but not tastier.",
+  "created" : 1463595920023,
+  "last_modified" : 1463595920023
+}

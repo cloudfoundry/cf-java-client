@@ -32,12 +32,13 @@ abstract class _UpdateIdentityZoneRequest {
      */
     @JsonProperty("config")
     @Nullable
-    abstract Integer getConfiguration();
+    abstract IdentityZoneConfiguration getConfiguration();
 
     /**
      * The description of the identity zone
      */
     @JsonProperty("description")
+    @Nullable
     abstract String getDescription();
 
     /**
