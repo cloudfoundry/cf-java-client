@@ -1,9 +1,53 @@
 {
-  "id": "identity-zone-id",
-  "subdomain": "test",
-  "name": "test",
-  "version": 0,
-  "description": "The test zone",
-  "created": 946710000000,
-  "last_modified": 946710000000
+  "config": {
+    "idpDiscoveryEnabled": false,
+    "links": {
+      "logout": {
+        "redirectUrl": "/login",
+        "redirectParameterName": "redirect",
+        "disableRedirectParameter": true
+      },
+      "selfService": {
+        "selfServiceLinksEnabled": true,
+        "signup": "/create_account",
+        "passwd": "/forgot_password"
+      }
+    },
+    "prompts": [
+      {
+        "name": "username",
+        "type": "text",
+        "text": "Email"
+      },
+      {
+        "name": "password",
+        "type": "password",
+        "text": "Password"
+      },
+      {
+        "name": "passcode",
+        "type": "password",
+        "text": "One Time Code (Get on at /passcode)"
+      }
+    ],
+    "samlConfig": {
+      "assertionSigned": true,
+      "requestSigned": true,
+      "wantAssertionSigned": false,
+      "wantAuthnRequestSigned": false,
+      "assertionTimeToLiveSeconds": 600
+    },
+    "tokenPolicy": {
+      "accessTokenValidity": -1,
+      "refreshTokenValidity": -1,
+      "jwtRevocable": false,
+      "keys": {}
+    }
+  },
+  "created": 1463595920104,
+  "id": "twiglet-get",
+  "last_modified": 1463595920104,
+  "name": "The Twiglet Zone",
+  "subdomain": "twiglet-get",
+  "version": 0
 }
