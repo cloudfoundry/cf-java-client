@@ -36,6 +36,7 @@ abstract class _BuildpackData implements Data {
      * The stack
      */
     @JsonProperty("stack")
+    @Nullable
     abstract String getStack();
 
 }

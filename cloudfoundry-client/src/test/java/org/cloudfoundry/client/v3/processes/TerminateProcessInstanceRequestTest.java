@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v3.processes;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class TerminateProcessInstanceRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = TerminateProcessInstanceRequest.builder()
-            .index("test-index")
+    @Test(expected = IllegalStateException.class)
+    public void noIndex() {
+        TerminateProcessInstanceRequest.builder()
             .processId("test-process-id")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noProcessId() {
+        TerminateProcessInstanceRequest.builder()
+            .index("test-index")
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = TerminateProcessInstanceRequest.builder()
+    public void valid() {
+        TerminateProcessInstanceRequest.builder()
             .index("test-index")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("process id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoIndex() {
-        ValidationResult result = TerminateProcessInstanceRequest.builder()
             .processId("test-process-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("index must be specified", result.getMessages().get(0));
+            .build();
     }
 
 }

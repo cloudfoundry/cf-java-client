@@ -20,16 +20,9 @@ import org.junit.Test;
 
 public final class BuildpackDataTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noStack() {
-        BuildpackData.builder()
-            .build();
-    }
-
     @Test
     public void valid() {
         BuildpackData.builder()
-            .stack("test-stack")
             .build();
     }
 

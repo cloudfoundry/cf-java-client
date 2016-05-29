@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.client.v3.packages;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class DownloadPackageRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = DownloadPackageRequest.builder()
-            .packageId("test-package-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noPackageId() {
+        DownloadPackageRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = DownloadPackageRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("package id must be specified", result.getMessages().get(0));
+    public void valid() {
+        DownloadPackageRequest.builder()
+            .packageId("test-package-id")
+            .build();
     }
 
 }

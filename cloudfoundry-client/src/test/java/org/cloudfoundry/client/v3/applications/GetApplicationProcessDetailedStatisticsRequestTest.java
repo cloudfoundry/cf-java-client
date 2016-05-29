@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v3.applications;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class GetApplicationProcessDetailedStatisticsRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = GetApplicationProcessStatisticsRequest.builder()
-            .applicationId("test-id")
+    @Test(expected = IllegalStateException.class)
+    public void noApplicationId() {
+        GetApplicationProcessStatisticsRequest.builder()
             .type("test-type")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noType() {
+        GetApplicationProcessStatisticsRequest.builder()
+            .applicationId("test-id")
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = GetApplicationProcessStatisticsRequest.builder()
-            .type("test-type")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoType() {
-        ValidationResult result = GetApplicationProcessStatisticsRequest.builder()
+    public void valid() {
+        GetApplicationProcessStatisticsRequest.builder()
             .applicationId("test-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("process type must be specified", result.getMessages().get(0));
+            .type("test-type")
+            .build();
     }
 
 }

@@ -16,61 +16,41 @@
 
 package org.cloudfoundry.client.v3.tasks;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class CreateTaskRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = CreateTaskRequest.builder()
-            .applicationId("test-application-id")
+    @Test(expected = IllegalStateException.class)
+    public void noApplicationId() {
+        CreateTaskRequest.builder()
             .command("test-command")
             .name("test-name")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noCommand() {
+        CreateTaskRequest.builder()
+            .applicationId("test-application-id")
+            .name("test-name")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        CreateTaskRequest.builder()
+            .applicationId("test-application-id")
+            .command("test-command")
+            .build();
     }
 
     @Test
-    public void isValidNoApplicationId() {
-        ValidationResult result = CreateTaskRequest.builder()
-            .command("test-command")
-            .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoCommand() {
-        ValidationResult result = CreateTaskRequest.builder()
-            .applicationId("test-application-id")
-            .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("command must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoName() {
-        ValidationResult result = CreateTaskRequest.builder()
+    public void valid() {
+        CreateTaskRequest.builder()
             .applicationId("test-application-id")
             .command("test-command")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+            .name("test-name")
+            .build();
     }
 
 }

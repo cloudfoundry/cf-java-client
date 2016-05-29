@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.client.v3.applications;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class DeleteApplicationRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = DeleteApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noApplicationId() {
+        DeleteApplicationRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = DeleteApplicationRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application id must be specified", result.getMessages().get(0));
+    public void valid() {
+        DeleteApplicationRequest.builder()
+            .applicationId("test-application-id")
+            .build();
     }
 
 }

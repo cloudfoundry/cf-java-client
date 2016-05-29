@@ -16,44 +16,27 @@
 
 package org.cloudfoundry.client.v3;
 
-import lombok.Builder;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class PaginatedAndSortedRequestTest {
 
     @Test
-    public void isPaginatedAndSortedRequestValid() {
-        ValidationResult result = StubPaginatedAndSortedRequest.builder()
-            .build()
-            .isPaginatedAndSortedRequestValid()
+    public void valid() {
+        StubPaginatedAndSortedRequest.builder()
             .build();
-
-        assertEquals(VALID, result.getStatus());
     }
 
-    @Test
-    public void isPaginatedAndSortedRequestValidInvalidPaginatedRequest() {
-        ValidationResult result = StubPaginatedAndSortedRequest.builder()
-            .page(-1)
-            .build()
-            .isPaginatedAndSortedRequestValid()
+    @Test(expected = IllegalStateException.class)
+    public void zeroPage() {
+        StubPaginatedAndSortedRequest.builder()
+            .page(0)
             .build();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("page must be greater than or equal to 1", result.getMessages().get(0));
     }
 
-    private static final class StubPaginatedAndSortedRequest extends PaginatedAndSortedRequest {
+    @Value.Immutable
+    static abstract class _StubPaginatedAndSortedRequest extends PaginatedAndSortedRequest {
 
-        @Builder
-        private StubPaginatedAndSortedRequest(Integer page, Integer perPage, String orderBy) {
-            super(page, perPage, orderBy);
-        }
     }
 
 }

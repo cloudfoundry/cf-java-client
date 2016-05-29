@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v3.applications;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class GetApplicationTaskRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = GetApplicationTaskRequest.builder()
-            .applicationId("test-application-id")
+    @Test(expected = IllegalStateException.class)
+    public void noApplicationId() {
+        GetApplicationTaskRequest.builder()
             .taskId("test-task-id")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noTaskId() {
+        GetApplicationTaskRequest.builder()
+            .applicationId("test-application-id")
+            .build();
     }
 
     @Test
-    public void isValidNoApplicationId() {
-        ValidationResult result = GetApplicationTaskRequest.builder()
-            .taskId("test-task-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoTaskId() {
-        ValidationResult result = GetApplicationTaskRequest.builder()
+    public void valid() {
+        GetApplicationTaskRequest.builder()
             .applicationId("test-application-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("task id must be specified", result.getMessages().get(0));
+            .taskId("test-task-id")
+            .build();
     }
 
 }

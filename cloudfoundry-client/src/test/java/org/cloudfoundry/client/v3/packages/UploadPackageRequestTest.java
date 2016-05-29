@@ -16,48 +16,32 @@
 
 package org.cloudfoundry.client.v3.packages;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
-
 public final class UploadPackageRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = UploadPackageRequest.builder()
-            .bits(new ByteArrayInputStream(new byte[0]))
+    @Test(expected = IllegalStateException.class)
+    public void noBits() {
+        UploadPackageRequest.builder()
             .packageId("test-package-id")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noPackageId() {
+        UploadPackageRequest.builder()
+            .bits(new ByteArrayInputStream(new byte[0]))
+            .build();
     }
 
     @Test
-    public void isValidNoFile() {
-        ValidationResult result = UploadPackageRequest.builder()
-            .packageId("test-package-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("bits must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoId() {
-        ValidationResult result = UploadPackageRequest.builder()
+    public void valid() {
+        UploadPackageRequest.builder()
             .bits(new ByteArrayInputStream(new byte[0]))
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("package id must be specified", result.getMessages().get(0));
+            .packageId("test-package-id")
+            .build();
     }
 
 }

@@ -16,31 +16,14 @@
 
 package org.cloudfoundry.client.v3.servicebindings;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public final class ListServiceBindingsRequestTest {
 
     @Test
-    public void isValid() {
-        ValidationResult result = ListServiceBindingsRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(ValidationResult.Status.VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidInvalidPaginatedRequest() {
-        ValidationResult result = ListServiceBindingsRequest.builder()
-            .page(0)
-            .build()
-            .isValid();
-
-        assertEquals(ValidationResult.Status.INVALID, result.getStatus());
-        assertEquals("page must be greater than or equal to 1", result.getMessages().get(0));
+    public void valid() {
+        ListServiceBindingsRequest.builder()
+            .build();
     }
 
 }

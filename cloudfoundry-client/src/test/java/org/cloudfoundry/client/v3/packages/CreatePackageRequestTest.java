@@ -16,47 +16,32 @@
 
 package org.cloudfoundry.client.v3.packages;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
 
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.cloudfoundry.client.v3.packages.PackageType.BITS;
-import static org.junit.Assert.assertEquals;
 
 public final class CreatePackageRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = CreatePackageRequest.builder()
-            .applicationId("test-application-id")
+    @Test(expected = IllegalStateException.class)
+    public void noApplicationId() {
+        CreatePackageRequest.builder()
             .type(BITS)
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noType() {
+        CreatePackageRequest.builder()
+            .applicationId("test-application-id")
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = CreatePackageRequest.builder()
-            .type(BITS)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoType() {
-        ValidationResult result = CreatePackageRequest.builder()
+    public void valid() {
+        CreatePackageRequest.builder()
             .applicationId("test-application-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("type must be specified", result.getMessages().get(0));
+            .type(BITS)
+            .build();
     }
 
 }

@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v3.applications;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class ScaleApplicationRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = ScaleApplicationRequest.builder()
-            .applicationId("test-application-id")
+    @Test(expected = IllegalStateException.class)
+    public void noApplicationId() {
+        ScaleApplicationRequest.builder()
             .type("web")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noType() {
+        ScaleApplicationRequest.builder()
+            .applicationId("test-application-id")
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = ScaleApplicationRequest.builder()
-            .type("web")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoType() {
-        ValidationResult result = ScaleApplicationRequest.builder()
+    public void valid() {
+        ScaleApplicationRequest.builder()
             .applicationId("test-application-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("type must be specified", result.getMessages().get(0));
+            .type("web")
+            .build();
     }
 
 }
