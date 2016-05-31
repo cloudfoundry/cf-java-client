@@ -16,56 +16,53 @@
 
 package org.cloudfoundry.uaa.users;
 
+/**
+ * Created by ben on 29/05/16.
+ */
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.uaa.Versioned;
+import org.immutables.value.Value;
 
 import java.util.List;
 
 /**
- * The entity response payload for User
+ * The request payload for the update user operation
  */
-abstract class AbstractUser {
+@Value.Immutable
+abstract class _UpdateUserRequest implements Versioned {
 
     /**
      * Whether the user is active
      */
     @JsonProperty("active")
+    @Nullable
     abstract Boolean getActive();
-
-    /**
-     * The approvals for the user
-     */
-    @JsonProperty("approvals")
-    abstract List<Approval> getApproval();
 
     /**
      * The emails for the user
      */
     @JsonProperty("emails")
-    abstract List<Email> getEmail();
+    abstract List<Email> getEmails();
 
     /**
      * The external id
      */
     @JsonProperty("externalId")
+    @Nullable
     abstract String getExternalId();
-
-    /**
-     * The groups for the user
-     */
-    @JsonProperty("groups")
-    abstract List<Group> getGroup();
 
     /**
      * The id
      */
     @JsonProperty("id")
+    @JsonIgnore
     abstract String getId();
 
-    /**
-     * Metadata for the result
-     */
-    @JsonProperty("meta")
-    abstract Meta getMeta();
+    @JsonIgnore
+    public abstract String getVersion();
 
     /**
      * The user's name
@@ -77,19 +74,8 @@ abstract class AbstractUser {
      * The identity provider that authenticated this user
      */
     @JsonProperty("origin")
+    @Nullable
     abstract String getOrigin();
-
-    /**
-     * The timestamp when the user's password was last modified
-     */
-    @JsonProperty("passwordLastModified")
-    abstract String getPasswordLastModified();
-
-    /**
-     * The schemas
-     */
-    @JsonProperty("schemas")
-    abstract List<String> getSchemas();
 
     /**
      * The user name
@@ -101,12 +87,7 @@ abstract class AbstractUser {
      * Whether the user's email is verified
      */
     @JsonProperty("verified")
+    @Nullable
     abstract Boolean getVerified();
-
-    /**
-     * The zone id the user belongs to
-     */
-    @JsonProperty("zoneId")
-    abstract String getZoneId();
 
 }
