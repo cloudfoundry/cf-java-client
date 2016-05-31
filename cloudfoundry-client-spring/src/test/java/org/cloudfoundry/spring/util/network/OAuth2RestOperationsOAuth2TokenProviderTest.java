@@ -35,6 +35,6 @@ public final class OAuth2RestOperationsOAuth2TokenProviderTest {
     public void test() {
         when(this.restOperations.getAccessToken()).thenReturn(new DefaultOAuth2AccessToken("test-token"));
 
-        assertEquals("test-token", this.tokenProvider.getToken().get());
+        assertEquals("test-token", this.tokenProvider.getToken().block());
     }
 }

@@ -169,7 +169,7 @@ final class CloudFoundryCleaner {
             .doOnError(Throwable::printStackTrace)
             .doOnComplete(() -> this.logger.debug("<< CLEANUP >>"))
             .then()
-            .get(Duration.ofMinutes(10));
+            .block(Duration.ofMinutes(10));
     }
 
     private static Flux<Void> cleanApplicationsV2(CloudFoundryClient cloudFoundryClient, Predicate<ApplicationResource> predicate) {

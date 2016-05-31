@@ -62,7 +62,7 @@ public final class UsernameBuilderTest extends AbstractOperationsTest {
             .cloudFoundryClient(this.cloudFoundryClient)
             .uaaClient(this.uaaClient)
             .build()
-            .get();
+            .block();
 
         assertEquals("test-username", username);
     }
