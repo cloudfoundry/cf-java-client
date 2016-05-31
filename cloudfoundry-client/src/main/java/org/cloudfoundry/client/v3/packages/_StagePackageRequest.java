@@ -31,13 +31,6 @@ import java.util.Map;
 abstract class _StagePackageRequest {
 
     /**
-     * The disk limit
-     */
-    @JsonProperty("disk_limit")
-    @Nullable
-    abstract Integer getDiskLimit();
-
-    /**
      * The environment variables
      */
     @JsonProperty("environment_variables")
@@ -52,16 +45,23 @@ abstract class _StagePackageRequest {
     abstract Lifecycle getLifecycle();
 
     /**
-     * The memory limit
-     */
-    @JsonProperty("memory_limit")
-    @Nullable
-    abstract Integer getMemoryLimit();
-
-    /**
      * The package id
      */
     @JsonIgnore
     abstract String getPackageId();
+
+    /**
+     * The staging disk in MB
+     */
+    @JsonProperty("staging_disk_in_mb")
+    @Nullable
+    abstract Integer getStagingDiskInMb();
+
+    /**
+     * The staging memory in MB
+     */
+    @JsonProperty("staging_memory_in_mb")
+    @Nullable
+    abstract Integer getStagingMemoryInMb();
 
 }
