@@ -19,12 +19,14 @@ package org.cloudfoundry.client.v3.servicebindings;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Link;
+import org.immutables.value.Value;
 
 import java.util.Map;
 
 /**
  * Base class for responses that are service bindings
  */
+@Value.Enclosing
 public abstract class ServiceBinding {
 
     /**
@@ -37,7 +39,7 @@ public abstract class ServiceBinding {
      * The datas
      */
     @JsonProperty("data")
-    public abstract Map<String, Object> getDatas();
+    public abstract ServiceBindingData getData();
 
     /**
      * The id

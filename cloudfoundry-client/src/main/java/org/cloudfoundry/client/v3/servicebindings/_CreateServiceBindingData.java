@@ -16,14 +16,23 @@
 
 package org.cloudfoundry.client.v3.servicebindings;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
-public final class DataTest {
+import java.util.Map;
 
-    @Test
-    public void valid() {
-        Data.builder()
-            .build();
-    }
+/**
+ * The data to use when created a {@link ServiceBinding}
+ */
+@Value.Immutable
+abstract class _CreateServiceBindingData {
+
+    /**
+     * The parameters
+     */
+    @JsonProperty("parameters")
+    @Nullable
+    abstract Map<String, Object> getParameters();
 
 }

@@ -17,19 +17,39 @@
 package org.cloudfoundry.client.v3.servicebindings;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.util.List;
 import java.util.Map;
 
+/**
+ * The data for a {@link ServiceBinding}
+ */
+@JsonDeserialize
 @Value.Immutable
-abstract class _Data {
+abstract class _ServiceBindingData {
 
     /**
-     * The parameters
+     * The service binding credentials
      */
-    @JsonProperty("parameters")
+    @JsonProperty("credentials")
     @Nullable
-    abstract Map<String, Object> getParameters();
+    abstract Map<String, Object> getCredentials();
+
+    /**
+     * The syslog drain URL
+     */
+    @JsonProperty("syslog_drain_url")
+    @Nullable
+    abstract String getSyslogDrainUrl();
+
+    /**
+     * The (experimental) volume mounts
+     */
+    @JsonProperty("volume_mounts")
+    @Nullable
+    abstract List<String> getVolumeMounts();
 
 }

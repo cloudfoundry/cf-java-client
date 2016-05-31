@@ -16,34 +16,14 @@
 
 package org.cloudfoundry.client.v3.servicebindings;
 
+import org.junit.Test;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.Nullable;
-import org.immutables.value.Value;
+public final class CreateServiceBindingDataTest {
 
-/**
- * The request payload for the Delete Service Binding operation.
- */
-@Value.Immutable
-abstract class _CreateServiceBindingRequest {
-
-    /**
-     * The data
-     */
-    @JsonProperty("data")
-    @Nullable
-    abstract CreateServiceBindingData getData();
-
-    /**
-     * The relationships
-     */
-    @JsonProperty("relationships")
-    abstract Relationships getRelationships();
-
-    /**
-     * The type
-     */
-    @JsonProperty("type")
-    abstract ServiceBindingType getType();
+    @Test
+    public void valid() {
+        CreateServiceBindingData.builder()
+            .build();
+    }
 
 }

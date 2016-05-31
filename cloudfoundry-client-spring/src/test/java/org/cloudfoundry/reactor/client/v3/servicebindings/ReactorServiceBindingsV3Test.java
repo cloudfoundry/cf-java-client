@@ -19,15 +19,16 @@ package org.cloudfoundry.reactor.client.v3.servicebindings;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingData;
 import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingResponse;
-import org.cloudfoundry.client.v3.servicebindings.Data;
 import org.cloudfoundry.client.v3.servicebindings.DeleteServiceBindingRequest;
 import org.cloudfoundry.client.v3.servicebindings.GetServiceBindingRequest;
 import org.cloudfoundry.client.v3.servicebindings.GetServiceBindingResponse;
 import org.cloudfoundry.client.v3.servicebindings.ListServiceBindingsRequest;
 import org.cloudfoundry.client.v3.servicebindings.ListServiceBindingsResponse;
 import org.cloudfoundry.client.v3.servicebindings.Relationships;
+import org.cloudfoundry.client.v3.servicebindings.ServiceBindingData;
 import org.cloudfoundry.client.v3.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v3.servicebindings.ServiceBindingType;
 import org.cloudfoundry.reactor.InteractionContext;
@@ -35,8 +36,6 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
-
-import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -70,8 +69,10 @@ public final class ReactorServiceBindingsV3Test {
             return CreateServiceBindingResponse.builder()
                 .id("dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
                 .type("app")
-                .data("credentials", Collections.singletonMap("super-secret", "password"))
-                .data("syslog_drain_url", "syslog://drain.url.com")
+                .data(ServiceBindingData.builder()
+                    .credential("super-secret", "password")
+                    .syslogDrainUrl("syslog://drain.url.com")
+                    .build())
                 .createdAt("2015-11-13T17:02:56Z")
                 .link("self", Link.builder()
                     .href("/v3/service_bindings/dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
@@ -88,8 +89,8 @@ public final class ReactorServiceBindingsV3Test {
         @Override
         protected CreateServiceBindingRequest getValidRequest() throws Exception {
             return CreateServiceBindingRequest.builder()
-                .data(Data.builder()
-                    .parameters(Collections.singletonMap("some_object_id", "for_the_service_broker"))
+                .data(CreateServiceBindingData.builder()
+                    .parameter("some_object_id", "for_the_service_broker")
                     .build())
                 .relationships(Relationships.builder()
                     .application(Relationship.builder()
@@ -167,8 +168,10 @@ public final class ReactorServiceBindingsV3Test {
             return GetServiceBindingResponse.builder()
                 .id("dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
                 .type("app")
-                .data("credentials", Collections.singletonMap("super-secret", "password"))
-                .data("syslog_drain_url", "syslog://drain.url.com")
+                .data(ServiceBindingData.builder()
+                    .credential("super-secret", "password")
+                    .syslogDrainUrl("syslog://drain.url.com")
+                    .build())
                 .createdAt("2015-11-13T17:02:56Z")
                 .link("self", Link.builder()
                     .href("/v3/service_bindings/dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
@@ -231,8 +234,10 @@ public final class ReactorServiceBindingsV3Test {
                 .resource(ServiceBindingResource.builder()
                     .id("dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
                     .type("app")
-                    .data("credentials", Collections.singletonMap("super-secret", "password"))
-                    .data("syslog_drain_url", "syslog://drain.url.com")
+                    .data(ServiceBindingData.builder()
+                        .credential("super-secret", "password")
+                        .syslogDrainUrl("syslog://drain.url.com")
+                        .build())
                     .createdAt("2015-11-13T17:02:56Z")
                     .link("self", Link.builder()
                         .href("/v3/service_bindings/dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
@@ -247,8 +252,10 @@ public final class ReactorServiceBindingsV3Test {
                 .resource(ServiceBindingResource.builder()
                     .id("7aa37bad-6ccb-4ef9-ba48-9ce3a91b2b62")
                     .type("app")
-                    .data("credentials", Collections.singletonMap("super-secret", "password"))
-                    .data("syslog_drain_url", "syslog://drain.url.com")
+                    .data(ServiceBindingData.builder()
+                        .credential("super-secret", "password")
+                        .syslogDrainUrl("syslog://drain.url.com")
+                        .build())
                     .createdAt("2015-11-13T17:02:56Z")
                     .link("self", Link.builder()
                         .href("/v3/service_bindings/7aa37bad-6ccb-4ef9-ba48-9ce3a91b2b62")
