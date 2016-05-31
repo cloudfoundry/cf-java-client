@@ -17,7 +17,6 @@
 package org.cloudfoundry.spring;
 
 import lombok.Getter;
-import org.cloudfoundry.spring.util.SchedulerGroupBuilder;
 import org.cloudfoundry.spring.util.network.FallbackHttpMessageConverter;
 import org.cloudfoundry.spring.util.network.OAuth2RestTemplateBuilder;
 import org.cloudfoundry.spring.util.network.OAuth2TokenProvider;
@@ -38,7 +37,6 @@ import org.springframework.test.web.client.ResponseActions;
 import org.springframework.test.web.client.ResponseCreator;
 import org.springframework.util.Assert;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.scheduler.Scheduler;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -52,11 +50,6 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 public abstract class AbstractRestTest {
-
-    protected static final Scheduler PROCESSOR_GROUP = new SchedulerGroupBuilder()
-        .name("test")
-        .autoShutdown(false)
-        .build();
 
     protected final OAuth2RestTemplate restTemplate = new OAuth2RestTemplateBuilder()
         .clientContext(new DefaultOAuth2ClientContext(new DefaultOAuth2AccessToken("test-access-token")))

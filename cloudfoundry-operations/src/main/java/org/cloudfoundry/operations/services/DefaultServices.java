@@ -321,7 +321,7 @@ public final class DefaultServices implements Services {
             .flatMap(applicationId -> requestGetApplication(cloudFoundryClient, applicationId))
             .map(ResourceUtils::getEntity)
             .map(ApplicationEntity::getName)
-            .toList();
+            .asList();
     }
 
     @SuppressWarnings("unchecked")
@@ -787,7 +787,7 @@ public final class DefaultServices implements Services {
 
     private Mono<List<ServicePlanResource>> getServicePlans(CloudFoundryClient cloudFoundryClient, String serviceId) {
         return requestListServicePlans(cloudFoundryClient, serviceId)
-            .toList();
+            .asList();
     }
 
 }

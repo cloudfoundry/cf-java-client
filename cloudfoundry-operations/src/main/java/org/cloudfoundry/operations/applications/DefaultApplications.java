@@ -557,7 +557,7 @@ public final class DefaultApplications implements Applications {
     private static Flux<LogMessage> getLogs(Mono<DopplerClient> dopplerClient, String applicationId, Boolean recent) {
         if (Optional.ofNullable(recent).orElse(false)) {
             return requestLogsRecent(dopplerClient, applicationId)
-                .toSortedList((a, b) -> a.getTimestamp().compareTo(b.getTimestamp()))
+                .asSortedList((a, b) -> a.getTimestamp().compareTo(b.getTimestamp()))
                 .flatMapIterable(d -> d);
         } else {
             return requestLogsStream(dopplerClient, applicationId)
@@ -1216,7 +1216,7 @@ public final class DefaultApplications implements Applications {
         return Flux
             .fromIterable(instancesResponse.entrySet())
             .map(entry -> toInstanceDetail(entry, statisticsResponse))
-            .toList();
+            .asList();
     }
 
     private static String toUrl(Route route) {
@@ -1230,7 +1230,7 @@ public final class DefaultApplications implements Applications {
         return Flux
             .fromIterable(routes)
             .map(DefaultApplications::toUrl)
-            .toList();
+            .asList();
     }
 
     private static Mono<UpdateApplicationResponse> updateHealthCheck(CloudFoundryClient cloudFoundryClient, String applicationId, ApplicationHealthCheck type) {
