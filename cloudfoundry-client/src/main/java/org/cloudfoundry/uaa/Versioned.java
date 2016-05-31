@@ -17,15 +17,15 @@
 package org.cloudfoundry.uaa;
 
 /**
- * An interface that indicates that a UAA request can specify an identity zone in its header
+ * An interface that indicates that a UAA request can specify an If Match in its header
  */
-public interface IdentityZoned {
+public interface Versioned {
 
     /**
-     * Returns the identity zone id
+     * Returns the version
      *
-     * @return the identity zone id
+     * @return the version
      */
-    String getIdentityZoneId();
+    String getVersion();
 
 }

@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa;
+package org.cloudfoundry.uaa.users;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
 /**
- * An interface that indicates that a UAA request can specify an identity zone in its header
+ * The response from the update user request
  */
-public interface IdentityZoned {
-
-    /**
-     * Returns the identity zone id
-     *
-     * @return the identity zone id
-     */
-    String getIdentityZoneId();
+@JsonDeserialize
+@Value.Immutable
+abstract class _UpdateUserResponse extends AbstractUser {
 
 }
