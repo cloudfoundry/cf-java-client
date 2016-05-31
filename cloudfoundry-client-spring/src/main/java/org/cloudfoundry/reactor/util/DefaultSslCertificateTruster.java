@@ -142,7 +142,7 @@ final class DefaultSslCertificateTruster implements SslCertificateTruster {
 
         getTcpClient(proxyContext, collector, host, port)
             .start(channel -> channel.receive().then())
-            .get(duration);
+            .block(duration);
 
         X509Certificate[] chain = collector.getCollectedCertificateChain();
         if (chain == null) {
