@@ -16,14 +16,30 @@
 
 package org.cloudfoundry.client.v2.featureflags;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.immutables.value.Value;
 
-public final class ListFeatureFlagsRequestTest {
+import java.util.regex.Pattern;
 
-    @Test
-    public void valid() {
-        ListFeatureFlagsRequest.builder()
-            .build();
+/**
+ * The request payload for the Get SetUserRoles feature flag operation
+ */
+@Value.Immutable
+abstract class _GetFeatureFlagRequest {
+
+    private static final Pattern ALPHAS_AND_UNDERS = Pattern.compile("[a-z_]*");
+
+    @Value.Check
+    void check() {
+        if (!ALPHAS_AND_UNDERS.matcher(getName()).matches()) {
+            throw new IllegalStateException("name must consist only of alphabetic characters and underscores");
+        }
     }
+
+    /**
+     * The name of the feature flag
+     */
+    @JsonIgnore
+    abstract String getName();
 
 }

@@ -17,36 +17,26 @@
 package org.cloudfoundry.client.v2.stacks;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
 /**
  * The entity response payload for the Stack resource
  */
-@Data
-public final class StackEntity {
+@JsonDeserialize
+@Value.Immutable
+abstract class _StackEntity {
 
     /**
      * The description
-     *
-     * @param description the description
-     * @return the description
      */
-    private final String description;
+    @JsonProperty("description")
+    abstract String getDescription();
 
     /**
      * The name
-     *
-     * @param name the name
-     * @return the name
      */
-    private final String name;
-
-    @Builder
-    StackEntity(@JsonProperty("description") String description,
-                @JsonProperty("name") String name) {
-        this.description = description;
-        this.name = name;
-    }
+    @JsonProperty("name")
+    abstract String getName();
 
 }

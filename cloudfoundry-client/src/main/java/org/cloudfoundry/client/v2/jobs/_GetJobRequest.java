@@ -17,41 +17,18 @@
 package org.cloudfoundry.client.v2.jobs;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
  * The request payload for the Get Job operation
  */
-@Data
-public final class GetJobRequest implements Validatable {
+@Value.Immutable
+abstract class _GetJobRequest {
 
     /**
      * The job id
-     *
-     * @param jobId the job id
-     * @return the job id
      */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String jobId;
-
-    @Builder
-    GetJobRequest(String jobId) {
-        this.jobId = jobId;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.jobId == null) {
-            builder.message("job id must be specified");
-        }
-
-        return builder.build();
-    }
+    @JsonIgnore
+    abstract String getJobId();
 
 }

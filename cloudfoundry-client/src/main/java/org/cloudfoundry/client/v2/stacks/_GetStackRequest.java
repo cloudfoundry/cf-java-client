@@ -17,41 +17,18 @@
 package org.cloudfoundry.client.v2.stacks;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
  * The request payload for the Get Stack operation
  */
-@Data
-public final class GetStackRequest implements Validatable {
+@Value.Immutable
+abstract class _GetStackRequest {
 
     /**
      * The stack id
-     *
-     * @param stackId the stack id
-     * @return the stack id
      */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String stackId;
-
-    @Builder
-    GetStackRequest(String stackId) {
-        this.stackId = stackId;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.stackId == null) {
-            builder.message("stack id must be specified");
-        }
-
-        return builder.build();
-    }
+    @JsonIgnore
+    abstract String getStackId();
 
 }

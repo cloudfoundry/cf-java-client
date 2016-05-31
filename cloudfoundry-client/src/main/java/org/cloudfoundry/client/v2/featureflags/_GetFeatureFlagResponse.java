@@ -16,25 +16,14 @@
 
 package org.cloudfoundry.client.v2.featureflags;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
 /**
  * The response payload for the Get SetUserRoles feature flag operation
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public final class GetFeatureFlagResponse extends AbstractFeatureFlag {
+@JsonDeserialize
+@Value.Immutable
+abstract class _GetFeatureFlagResponse extends AbstractFeatureFlag {
 
-    @Builder
-    GetFeatureFlagResponse(@JsonProperty("enabled") Boolean enabled,
-                           @JsonProperty("error_message") String errorMessage,
-                           @JsonProperty("name") String name,
-                           @JsonProperty("url") String url) {
-        super(enabled, errorMessage, name, url);
-    }
 }

@@ -16,32 +16,14 @@
 
 package org.cloudfoundry.client.v2.featureflags;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Singular;
-import lombok.ToString;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
 /**
- * The response payload for the List Feature Flags operation
+ * The response payload for the Set feature flag operation
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public final class ListFeatureFlagsResponse extends ArrayList<FeatureFlagEntity> {
-
-    private static final long serialVersionUID = 57968076084301252L;
-
-    ListFeatureFlagsResponse() {
-        super();
-    }
-
-    @Builder
-    ListFeatureFlagsResponse(@Singular List<FeatureFlagEntity> featureFlags) {
-        super(featureFlags);
-    }
+@JsonDeserialize
+@Value.Immutable
+abstract class _SetFeatureFlagResponse extends AbstractFeatureFlag {
 
 }

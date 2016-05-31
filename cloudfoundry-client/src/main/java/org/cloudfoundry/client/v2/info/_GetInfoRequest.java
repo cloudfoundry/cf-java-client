@@ -16,24 +16,12 @@
 
 package org.cloudfoundry.client.v2.info;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
  * The request payload for the Get Info operation
  */
-@Data
-public final class GetInfoRequest implements Validatable {
-
-    @Builder
-    GetInfoRequest() {
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        return ValidationResult.builder().build();
-    }
+@Value.Immutable
+abstract class _GetInfoRequest {
 
 }

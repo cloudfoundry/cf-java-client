@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v2.featureflags;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class SetFeatureFlagRequestTest {
 
-    @Test
-    public void isNotValidNoEnabled() {
-        ValidationResult result = SetFeatureFlagRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noEnabled() {
+        SetFeatureFlagRequest.builder()
             .name("test-name")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("enabled must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        SetFeatureFlagRequest.builder()
+            .enabled(false)
+            .build();
     }
 
     @Test
-    public void isNotValidNoName() {
-        ValidationResult result = SetFeatureFlagRequest.builder()
-            .enabled(false)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValid() {
-        ValidationResult result = SetFeatureFlagRequest.builder()
+    public void valid() {
+        SetFeatureFlagRequest.builder()
             .enabled(false)
             .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

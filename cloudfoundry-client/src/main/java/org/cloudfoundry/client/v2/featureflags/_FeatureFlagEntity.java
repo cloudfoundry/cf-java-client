@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.info;
+package org.cloudfoundry.client.v2.featureflags;
 
-import org.junit.Test;
 
-public final class GetInfoRequestTest {
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
-    @Test
-    public void valid() {
-        GetInfoRequest.builder()
-            .build();
-    }
+/**
+ * The entity response payload for Feature Flag operation
+ */
+@JsonDeserialize
+@Value.Immutable
+abstract class _FeatureFlagEntity extends AbstractFeatureFlag {
 
 }

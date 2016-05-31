@@ -16,27 +16,34 @@
 
 package org.cloudfoundry.client.v2.featureflags;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
 /**
- * The response payload for the Set feature flag operation
+ * The request payload for the Set Feature Flag operation
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public final class SetFeatureFlagResponse extends AbstractFeatureFlag {
+@Value.Immutable
+abstract class _SetFeatureFlagRequest {
 
-    @Builder
-    SetFeatureFlagResponse(@JsonProperty("enabled") Boolean enabled,
-                           @JsonProperty("error_message") String errorMessage,
-                           @JsonProperty("name") String name,
-                           @JsonProperty("url") String url) {
+    /**
+     * The state of the feature flag
+     */
+    @JsonProperty("enabled")
+    abstract Boolean getEnabled();
 
-        super(enabled, errorMessage, name, url);
-    }
+    /**
+     * The custom error message for the feature flag
+     */
+    @JsonProperty("error_message")
+    @Nullable
+    abstract String getErrorMessage();
+
+    /**
+     * The name of the feature flag
+     */
+    @JsonIgnore
+    abstract String getName();
 
 }

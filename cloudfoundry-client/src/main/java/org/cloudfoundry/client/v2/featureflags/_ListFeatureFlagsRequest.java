@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.info;
+package org.cloudfoundry.client.v2.featureflags;
 
-import org.junit.Test;
+import org.immutables.value.Value;
 
-public final class GetInfoRequestTest {
-
-    @Test
-    public void valid() {
-        GetInfoRequest.builder()
-            .build();
-    }
+/**
+ * The request payload for the List Feature Flags operation
+ */
+@Value.Immutable
+abstract class _ListFeatureFlagsRequest {
 
 }

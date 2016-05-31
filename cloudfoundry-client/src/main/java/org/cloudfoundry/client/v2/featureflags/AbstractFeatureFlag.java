@@ -16,28 +16,39 @@
 
 package org.cloudfoundry.client.v2.featureflags;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import org.cloudfoundry.Nullable;
 
 /**
- * The entity response payload for Feature Flag operation
+ * General feature flag payload.
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public final class FeatureFlagEntity extends AbstractFeatureFlag {
+public abstract class AbstractFeatureFlag {
 
-    @Builder
-    FeatureFlagEntity(@JsonProperty("enabled") Boolean enabled,
-                      @JsonProperty("error_message") String errorMessage,
-                      @JsonProperty("name") String name,
-                      @JsonProperty("url") String url) {
+    /**
+     * The state of the feature flag
+     */
+    @JsonProperty("enabled")
+    abstract Boolean getEnabled();
 
-        super(enabled, errorMessage, name, url);
-    }
+    /**
+     * The custom error message for the feature flag
+     */
+    @JsonProperty("error_message")
+    @Nullable
+    abstract String getErrorMessage();
+
+    /**
+     * The name of the feature flag
+     */
+    @JsonProperty("name")
+    @Nullable
+    abstract String getName();
+
+    /**
+     * The url for the feature flag
+     */
+    @JsonProperty("url")
+    @Nullable
+    abstract String getUrl();
 
 }

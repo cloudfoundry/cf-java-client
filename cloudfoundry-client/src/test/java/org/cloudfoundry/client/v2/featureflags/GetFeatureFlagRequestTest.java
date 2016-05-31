@@ -16,66 +16,42 @@
 
 package org.cloudfoundry.client.v2.featureflags;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class GetFeatureFlagRequestTest {
 
-    @Test
-    public void isValid() throws Exception {
-        ValidationResult result = GetFeatureFlagRequest.builder()
-            .name("test_feature_flag_name")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidBadName1() throws Exception {
-        ValidationResult result = GetFeatureFlagRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void badName1() throws Exception {
+        GetFeatureFlagRequest.builder()
             .name("mustn't have spaces or / chars (or quotes, or parentheses, or commas)")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must consist only of alphabetic characters and underscores", result.getMessages().get(0));
+            .build();
     }
 
-    @Test
-    public void isValidBadName2() throws Exception {
-        ValidationResult result = GetFeatureFlagRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void badName2() throws Exception {
+        GetFeatureFlagRequest.builder()
             .name("good_name_with_bad_at_end ")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must consist only of alphabetic characters and underscores", result.getMessages().get(0));
+            .build();
     }
 
-    @Test
-    public void isValidBadName3() throws Exception {
-        ValidationResult result = GetFeatureFlagRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void badName3() throws Exception {
+        GetFeatureFlagRequest.builder()
             .name("good_name_with_bad_at_end.")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must consist only of alphabetic characters and underscores", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noName() throws Exception {
+        GetFeatureFlagRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValidNoName() throws Exception {
-        ValidationResult result = GetFeatureFlagRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+    public void valid() throws Exception {
+        GetFeatureFlagRequest.builder()
+            .name("test_feature_flag_name")
+            .build();
     }
 
 }

@@ -30,6 +30,7 @@ import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v2.featureflags.FeatureFlagEntity;
 import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsRequest;
+import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsResponse;
 import org.cloudfoundry.client.v2.featureflags.SetFeatureFlagRequest;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
@@ -239,7 +240,7 @@ final class CloudFoundryCleaner {
         return cloudFoundryClient.featureFlags()
             .list(ListFeatureFlagsRequest.builder()
                 .build())
-            .flatMapIterable(d -> d)
+            .flatMapIterable(ListFeatureFlagsResponse::getFeatureFlags)
             .filter(predicate)
             .flatMap(flagEntity -> {
                 if (standardFeatureFlags.containsKey(flagEntity.getName())

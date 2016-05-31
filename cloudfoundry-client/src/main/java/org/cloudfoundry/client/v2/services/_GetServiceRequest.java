@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.info;
+package org.cloudfoundry.client.v2.services;
 
-import org.junit.Test;
 
-public final class GetInfoRequestTest {
+import org.immutables.value.Value;
 
-    @Test
-    public void valid() {
-        GetInfoRequest.builder()
-            .build();
-    }
+/**
+ * The request payload for the Get Service operation
+ */
+@Value.Immutable
+abstract class _GetServiceRequest {
+
+    /**
+     * The service id
+     */
+    abstract String getServiceId();
 
 }

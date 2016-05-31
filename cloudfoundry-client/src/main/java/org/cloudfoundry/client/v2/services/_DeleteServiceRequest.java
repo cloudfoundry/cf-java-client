@@ -16,21 +16,36 @@
 
 package org.cloudfoundry.client.v2.services;
 
-import org.junit.Test;
 
-public final class GetServiceRequestTest {
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.QueryParameter;
+import org.immutables.value.Value;
 
-    @Test(expected = IllegalStateException.class)
-    public void noServiceId() {
-        GetServiceRequest.builder()
-            .build();
-    }
+/**
+ * The request payload for the Delete Service operation.
+ */
+@Value.Immutable
+abstract class _DeleteServiceRequest {
 
-    @Test
-    public void valid() {
-        GetServiceRequest.builder()
-            .serviceId("test-service-id")
-            .build();
-    }
+    /**
+     * The async flag
+     */
+    @Nullable
+    @QueryParameter("async")
+    abstract Boolean getAsync();
+
+    /**
+     * The purge flag
+     */
+    @Nullable
+    @QueryParameter("purge")
+    abstract Boolean getPurge();
+
+    /**
+     * The service id
+     */
+    @JsonIgnore
+    abstract String getServiceId();
 
 }

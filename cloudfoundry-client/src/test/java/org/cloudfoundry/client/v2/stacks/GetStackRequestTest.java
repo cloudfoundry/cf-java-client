@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.client.v2.stacks;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class GetStackRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = GetStackRequest.builder()
-            .stackId("test-stack-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noStackId() {
+        GetStackRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = GetStackRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("stack id must be specified", result.getMessages().get(0));
+    public void valid() {
+        GetStackRequest.builder()
+            .stackId("test-stack-id")
+            .build();
     }
 
 }

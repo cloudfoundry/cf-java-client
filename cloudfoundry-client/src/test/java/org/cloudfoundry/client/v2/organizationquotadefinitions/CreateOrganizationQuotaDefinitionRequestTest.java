@@ -16,187 +16,85 @@
 
 package org.cloudfoundry.client.v2.organizationquotadefinitions;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import java.util.Arrays;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class CreateOrganizationQuotaDefinitionRequestTest {
 
-    @Test
-    public void isValidMax() {
-        ValidationResult result = CreateOrganizationQuotaDefinitionRequest.builder()
-            .applicationInstanceLimit(-1)
-            .applicationTaskLimit(-1)
-            .instanceMemoryLimit(1024)
-            .memoryLimit(1024)
-            .name("test-quota-definition-name")
-            .nonBasicServicesAllowed(false)
-            .totalPrivateDomains(-1)
-            .totalRoutes(-1)
-            .totalServiceKeys(-1)
-            .totalServices(-1)
-            .trialDatabaseAllowed(false)
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidMin() {
-        ValidationResult result = CreateOrganizationQuotaDefinitionRequest.builder()
-            .instanceMemoryLimit(1024)
+    @Test(expected = IllegalStateException.class)
+    public void noInstanceMemoryLimit() {
+        CreateOrganizationQuotaDefinitionRequest.builder()
             .memoryLimit(1024)
             .name("test-quota-definition-name")
             .nonBasicServicesAllowed(false)
             .totalRoutes(-1)
             .totalServices(-1)
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
-    @Test
-    public void isValidNoInstanceMemoryLimit() {
-        ValidationResult result = CreateOrganizationQuotaDefinitionRequest.builder()
-            .applicationInstanceLimit(-1)
-            .applicationTaskLimit(-1)
-            .memoryLimit(1024)
-            .name("test-quota-definition-name")
-            .nonBasicServicesAllowed(false)
-            .totalPrivateDomains(-1)
-            .totalRoutes(-1)
-            .totalServiceKeys(-1)
-            .totalServices(-1)
-            .trialDatabaseAllowed(false)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("instance memory limit must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoMemoryLimit() {
-        ValidationResult result = CreateOrganizationQuotaDefinitionRequest.builder()
-            .applicationInstanceLimit(-1)
-            .applicationTaskLimit(-1)
+    @Test(expected = IllegalStateException.class)
+    public void noMemoryLimit() {
+        CreateOrganizationQuotaDefinitionRequest.builder()
             .instanceMemoryLimit(1024)
             .name("test-quota-definition-name")
             .nonBasicServicesAllowed(false)
-            .totalPrivateDomains(-1)
             .totalRoutes(-1)
-            .totalServiceKeys(-1)
             .totalServices(-1)
-            .trialDatabaseAllowed(false)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("memory limit must be specified", result.getMessages().get(0));
+            .build();
     }
 
-    @Test
-    public void isValidNoName() {
-        ValidationResult result = CreateOrganizationQuotaDefinitionRequest.builder()
-            .applicationInstanceLimit(-1)
-            .applicationTaskLimit(-1)
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        CreateOrganizationQuotaDefinitionRequest.builder()
             .instanceMemoryLimit(1024)
             .memoryLimit(1024)
             .nonBasicServicesAllowed(false)
-            .totalPrivateDomains(-1)
             .totalRoutes(-1)
-            .totalServiceKeys(-1)
             .totalServices(-1)
-            .trialDatabaseAllowed(false)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+            .build();
     }
 
-    @Test
-    public void isValidNoNonBasicServicesAllowed() {
-        ValidationResult result = CreateOrganizationQuotaDefinitionRequest.builder()
-            .applicationInstanceLimit(-1)
-            .applicationTaskLimit(-1)
+    @Test(expected = IllegalStateException.class)
+    public void noNonBasicServicesAllowed() {
+        CreateOrganizationQuotaDefinitionRequest.builder()
             .instanceMemoryLimit(1024)
             .memoryLimit(1024)
             .name("test-quota-definition-name")
-            .totalPrivateDomains(-1)
             .totalRoutes(-1)
-            .totalServiceKeys(-1)
             .totalServices(-1)
-            .trialDatabaseAllowed(false)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("non basic services allowed must be specified", result.getMessages().get(0));
+            .build();
     }
 
-    @Test
-    public void isValidNoTotalRoutes() {
-        ValidationResult result = CreateOrganizationQuotaDefinitionRequest.builder()
-            .applicationInstanceLimit(-1)
-            .applicationTaskLimit(-1)
+    @Test(expected = IllegalStateException.class)
+    public void noTotalRoutes() {
+        CreateOrganizationQuotaDefinitionRequest.builder()
+            .instanceMemoryLimit(1024)
+            .memoryLimit(1024)
+            .name("test-quota-definition-name")
+            .totalServices(-1)
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noTotalServices() {
+        CreateOrganizationQuotaDefinitionRequest.builder()
             .instanceMemoryLimit(1024)
             .memoryLimit(1024)
             .name("test-quota-definition-name")
             .nonBasicServicesAllowed(false)
-            .totalPrivateDomains(-1)
-            .totalServiceKeys(-1)
-            .totalServices(-1)
-            .trialDatabaseAllowed(false)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("total routes must be specified", result.getMessages().get(0));
+            .totalRoutes(-1)
+            .build();
     }
 
     @Test
-    public void isValidNoTotalServices() {
-        ValidationResult result = CreateOrganizationQuotaDefinitionRequest.builder()
-            .applicationInstanceLimit(-1)
-            .applicationTaskLimit(-1)
+    public void valid() {
+        CreateOrganizationQuotaDefinitionRequest.builder()
             .instanceMemoryLimit(1024)
             .memoryLimit(1024)
             .name("test-quota-definition-name")
             .nonBasicServicesAllowed(false)
-            .totalPrivateDomains(-1)
             .totalRoutes(-1)
-            .totalServiceKeys(-1)
-            .trialDatabaseAllowed(false)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("total services must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNothingSpecified() {
-        ValidationResult result = CreateOrganizationQuotaDefinitionRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals(Arrays.asList(
-            "instance memory limit must be specified",
-            "memory limit must be specified",
-            "name must be specified",
-            "non basic services allowed must be specified",
-            "total routes must be specified",
-            "total services must be specified"),
-            result.getMessages());
+            .totalServices(-1)
+            .build();
     }
 
 }

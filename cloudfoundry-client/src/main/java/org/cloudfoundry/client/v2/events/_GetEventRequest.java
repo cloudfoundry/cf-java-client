@@ -14,26 +14,21 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.featureflags;
+package org.cloudfoundry.client.v2.events;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.immutables.value.Value;
 
 /**
- * The request payload for the List Feature Flags operation
+ * The request payload for the Get Event operation
  */
-@Data
-public final class ListFeatureFlagsRequest implements Validatable {
+@Value.Immutable
+abstract class _GetEventRequest {
 
-    @Builder
-    ListFeatureFlagsRequest() {
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        return ValidationResult.builder().build();
-    }
+    /**
+     * The event id
+     */
+    @JsonIgnore
+    abstract String getEventId();
 
 }
