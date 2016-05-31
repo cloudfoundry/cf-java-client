@@ -162,12 +162,12 @@ public final class DefaultRoutes implements Routes {
     private static Mono<List<String>> getApplicationNames(CloudFoundryClient cloudFoundryClient, RouteResource routeResource) {
         return requestApplications(cloudFoundryClient, ResourceUtils.getId(routeResource))
             .map(resource -> ResourceUtils.getEntity(resource).getName())
-            .toList();
+            .asList();
     }
 
     private static Mono<List<ApplicationResource>> getApplications(CloudFoundryClient cloudFoundryClient, String routeId) {
         return requestApplications(cloudFoundryClient, routeId)
-            .toList();
+            .asList();
     }
 
     private static Mono<Resource<?>> getDomain(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
