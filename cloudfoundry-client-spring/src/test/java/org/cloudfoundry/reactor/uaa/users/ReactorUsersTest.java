@@ -23,6 +23,8 @@ import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
 import org.cloudfoundry.uaa.users.Approval;
 import org.cloudfoundry.uaa.users.CreateUserRequest;
 import org.cloudfoundry.uaa.users.CreateUserResponse;
+import org.cloudfoundry.uaa.users.DeleteUserRequest;
+import org.cloudfoundry.uaa.users.DeleteUserResponse;
 import org.cloudfoundry.uaa.users.Email;
 import org.cloudfoundry.uaa.users.Group;
 import org.cloudfoundry.uaa.users.ListUsersRequest;
@@ -34,6 +36,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -177,6 +180,147 @@ public final class ReactorUsersTest {
         @Override
         protected Mono<CreateUserResponse> invoke(CreateUserRequest request) {
             return this.users.create(request);
+        }
+
+    }
+
+
+    public static final class Delete extends AbstractUaaApiTest<DeleteUserRequest, DeleteUserResponse> {
+
+        private final ReactorUsers users = new ReactorUsers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/Users/421225f4-318e-4a4d-9219-4b6a0ed3678a")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/users/DELETE_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected DeleteUserResponse getResponse() {
+            return DeleteUserResponse.builder()
+                .id("421225f4-318e-4a4d-9219-4b6a0ed3678a")
+                .externalId("test-user")
+                .meta(Meta.builder()
+                    .version(0)
+                    .created("2016-05-18T18:25:23.102Z")
+                    .lastModified("2016-05-18T18:25:23.102Z")
+                    .build())
+                .userName("7Q4Rqr@test.org")
+                .name(Name.builder()
+                    .familyName("family name")
+                    .givenName("given name")
+                    .build())
+                .email(Email.builder()
+                    .value("7Q4Rqr@test.org")
+                    .primary(false)
+                    .build())
+                .group(Group.builder()
+                    .value("4622c5e1-ddfd-4e17-9e81-2ae3c03972be")
+                    .display("password.write")
+                    .type(DIRECT)
+                    .build())
+                .group(Group.builder()
+                    .value("62f67643-05d8-43c6-b193-4cd6ab9960cb")
+                    .display("cloud_controller.write")
+                    .type(DIRECT)
+                    .build())
+                .group(Group.builder()
+                    .value("c47bf470-f9c4-4eea-97e4-490ce7b8f6f7")
+                    .display("uaa.user")
+                    .type(DIRECT)
+                    .build())
+                .group(Group.builder()
+                    .value("8a6add1f-d3ee-400c-a263-c4197351b78e")
+                    .display("approvals.me")
+                    .type(DIRECT)
+                    .build())
+                .group(Group.builder()
+                    .value("e10424ed-ed80-45ac-848b-7f7e79b00c42")
+                    .display("cloud_controller.read")
+                    .type(DIRECT)
+                    .build())
+                .group(Group.builder()
+                    .value("ede11441-6ffe-4510-81f8-bb40626155f0")
+                    .display("openid")
+                    .type(DIRECT)
+                    .build())
+                .group(Group.builder()
+                    .value("7e3d4b06-0d6b-43a1-ac3a-5f1b2642262c")
+                    .display("scim.me")
+                    .type(DIRECT)
+                    .build())
+                .group(Group.builder()
+                    .value("3b481f3c-d9a7-4920-a687-72cb0381b671")
+                    .display("cloud_controller_service_permissions.read")
+                    .type(DIRECT)
+                    .build())
+                .group(Group.builder()
+                    .value("4480c647-4047-4c6a-877f-70f5f96e8c11")
+                    .display("oauth.approvals")
+                    .type(DIRECT)
+                    .build())
+                .group(Group.builder()
+                    .value("542bb178-1c04-4bb5-813a-5a038319ac1d")
+                    .display("user_attributes")
+                    .type(DIRECT)
+                    .build())
+                .group(Group.builder()
+                    .value("c4ac4653-2fdd-4901-a028-9c9866cb4e9c")
+                    .display("scim.userids")
+                    .type(DIRECT)
+                    .build())
+                .group(Group.builder()
+                    .value("74fde138-daf3-4e4d-bb52-93a6cb727030")
+                    .display("profile")
+                    .type(DIRECT)
+                    .build())
+                .group(Group.builder()
+                    .value("1b18551f-eead-4076-90dd-b464998f6ddd")
+                    .display("roles")
+                    .type(DIRECT)
+                    .build())
+                .approval(Approval.builder()
+                    .userId("421225f4-318e-4a4d-9219-4b6a0ed3678a")
+                    .clientId("identity")
+                    .scope("uaa.user")
+                    .status(APPROVED)
+                    .lastUpdatedAt("2016-05-18T18:25:53.114Z")
+                    .expiresAt("2016-05-18T18:25:53.114Z")
+                    .build())
+                .approval(Approval.builder()
+                    .userId("421225f4-318e-4a4d-9219-4b6a0ed3678a")
+                    .clientId("client id")
+                    .scope("scim.read")
+                    .status(APPROVED)
+                    .lastUpdatedAt("2016-05-18T18:25:23.112Z")
+                    .expiresAt("2016-05-18T18:25:33.112Z")
+                    .build())
+                .active(true)
+                .verified(true)
+                .origin("uaa")
+                .zoneId("uaa")
+                .passwordLastModified("2016-05-18T18:25:23.000Z")
+                .schemas(Collections.singletonList("urn:scim:schemas:core:1.0"))
+                .build();
+        }
+
+        @Override
+        protected DeleteUserRequest getValidRequest() throws Exception {
+            return DeleteUserRequest.builder()
+                .userId("421225f4-318e-4a4d-9219-4b6a0ed3678a")
+                .build();
+        }
+
+        @Override
+        protected Mono<DeleteUserResponse> invoke(DeleteUserRequest request) {
+            return this.users.delete(request);
         }
 
     }
