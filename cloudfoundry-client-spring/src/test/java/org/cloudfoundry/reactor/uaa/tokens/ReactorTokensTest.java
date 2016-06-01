@@ -53,14 +53,14 @@ public final class ReactorTokensTest {
 
     public static final class Check extends AbstractUaaApiTest<CheckTokenRequest, CheckTokenResponse> {
 
-        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, CLIENT_ID, CLIENT_SECRET, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(POST).path("/check_token?scopes=password.write,scim.userids&token=f9f2f98d88e04ff7bb1f69041d3c0346")
-                    .header("Authorization", "Basic dGVzdC1jbGllbnQtaWQ6dGVzdC1jbGllbnQtc2VjcmV0")
+                    .header("Authorization", "Basic YXBwOmFwcGNsaWVudHNlY3JldA==")
                     .build())
                 .response(TestResponse.builder()
                     .status(OK)
@@ -100,6 +100,8 @@ public final class ReactorTokensTest {
                 .token("f9f2f98d88e04ff7bb1f69041d3c0346")
                 .scope("password.write")
                 .scope("scim.userids")
+                .clientId("app")
+                .clientSecret("appclientsecret")
                 .build();
         }
 
@@ -112,7 +114,7 @@ public final class ReactorTokensTest {
 
     public static final class GetKey extends AbstractUaaApiTest<GetTokenKeyRequest, GetTokenKeyResponse> {
 
-        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, CLIENT_ID, CLIENT_SECRET, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -165,7 +167,7 @@ public final class ReactorTokensTest {
 
     public static final class GetTokenByAuthorizationCode extends AbstractUaaApiTest<GetTokenByAuthorizationCodeRequest, GetTokenByAuthorizationCodeResponse> {
 
-        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, CLIENT_ID, CLIENT_SECRET, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -215,7 +217,7 @@ public final class ReactorTokensTest {
 
     public static final class GetTokenByClientCredentials extends AbstractUaaApiTest<GetTokenByClientCredentialsRequest, GetTokenByClientCredentialsResponse> {
 
-        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, CLIENT_ID, CLIENT_SECRET, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -261,7 +263,7 @@ public final class ReactorTokensTest {
 
     public static final class GetTokenByOneTimePasscode extends AbstractUaaApiTest<GetTokenByOneTimePasscodeRequest, GetTokenByOneTimePasscodeResponse> {
 
-        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, CLIENT_ID, CLIENT_SECRET, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -309,7 +311,7 @@ public final class ReactorTokensTest {
 
     public static final class GetTokenByOpenId extends AbstractUaaApiTest<GetTokenByOpenIdRequest, GetTokenByOpenIdResponse> {
 
-        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, CLIENT_ID, CLIENT_SECRET, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -360,7 +362,7 @@ public final class ReactorTokensTest {
 
     public static final class GetTokenByPassword extends AbstractUaaApiTest<GetTokenByPasswordRequest, GetTokenByPasswordResponse> {
 
-        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, CLIENT_ID, CLIENT_SECRET, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -410,7 +412,7 @@ public final class ReactorTokensTest {
 
     public static final class ListKeys extends AbstractUaaApiTest<ListTokenKeysRequest, ListTokenKeysResponse> {
 
-        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, CLIENT_ID, CLIENT_SECRET, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -464,7 +466,7 @@ public final class ReactorTokensTest {
 
     public static final class RefreshToken extends AbstractUaaApiTest<RefreshTokenRequest, RefreshTokenResponse> {
 
-        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, CLIENT_ID, CLIENT_SECRET, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorTokens tokens = new ReactorTokens(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {

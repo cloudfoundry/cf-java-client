@@ -43,14 +43,13 @@ public final class ReactorUaaClient implements UaaClient {
 
     @Builder
     ReactorUaaClient(ConnectionContextSupplier cloudFoundryClient) {
-        this(cloudFoundryClient.getConnectionContext().getAuthorizationProvider(), cloudFoundryClient.getConnectionContext().getClientId(), cloudFoundryClient.getConnectionContext().getClientSecret(),
-            cloudFoundryClient.getConnectionContext().getHttpClient(), cloudFoundryClient.getConnectionContext().getObjectMapper(),
-            cloudFoundryClient.getConnectionContext().getRoot("token_endpoint"));
+        this(cloudFoundryClient.getConnectionContext().getAuthorizationProvider(), cloudFoundryClient.getConnectionContext().getHttpClient(),
+            cloudFoundryClient.getConnectionContext().getObjectMapper(), cloudFoundryClient.getConnectionContext().getRoot("token_endpoint"));
     }
 
-    ReactorUaaClient(AuthorizationProvider authorizationProvider, String clientId, String clientSecret, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
+    ReactorUaaClient(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
         this.identityZones = new ReactorIdentityZones(authorizationProvider, httpClient, objectMapper, root);
-        this.tokens = new ReactorTokens(authorizationProvider, clientId, clientSecret, httpClient, objectMapper, root);
+        this.tokens = new ReactorTokens(authorizationProvider, httpClient, objectMapper, root);
         this.users = new ReactorUsers(authorizationProvider, httpClient, objectMapper, root);
     }
 

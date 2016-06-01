@@ -97,10 +97,10 @@ public abstract class AbstractIntegrationTest {
     }
 
     protected final <T> void assertTupleEquality(Tuple2<T, T> tuple) {
-        T actual = tuple.t1;
-        T expected = tuple.t2;
+        T expected = tuple.t1;
+        T actual = tuple.t2;
 
-        assertEquals(expected, actual);
+        assertEquals("tuple components not equal", expected, actual);
     }
 
     protected final String getApplicationName() {

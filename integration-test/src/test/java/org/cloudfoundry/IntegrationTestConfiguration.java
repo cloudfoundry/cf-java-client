@@ -57,10 +57,19 @@ public class IntegrationTestConfiguration {
 
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.test");
 
+    @Bean
+    String clientId(@Value("${test.client.id:}") String clientId) {
+        return clientId;
+    }
+
+    @Bean
+    String clientSecret(@Value("${test.client.secret:}") String clientSecret) {
+        return clientSecret;
+    }
+
     @Bean(initMethod = "clean", destroyMethod = "clean")
-    CloudFoundryCleaner cloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Mono<List<String>> protectedBuildpackIds, Mono<Optional<String>> protectedDomainId, Mono<List<String>>
-        protectedFeatureFlags, Mono<Optional<String>>
-                                                protectedOrganizationId, Mono<List<String>> protectedSpaceIds) {
+    CloudFoundryCleaner cloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Mono<List<String>> protectedBuildpackIds, Mono<Optional<String>> protectedDomainId,
+                                            Mono<List<String>> protectedFeatureFlags, Mono<Optional<String>> protectedOrganizationId, Mono<List<String>> protectedSpaceIds) {
         return new CloudFoundryCleaner(cloudFoundryClient, protectedBuildpackIds, protectedDomainId, protectedFeatureFlags, protectedOrganizationId, protectedSpaceIds);
     }
 
