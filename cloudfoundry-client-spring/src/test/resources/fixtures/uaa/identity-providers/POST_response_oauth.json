@@ -1,0 +1,30 @@
+{
+  "type": "oauth2.0",
+  "config": {
+    "emailDomain": null,
+    "additionalConfiguration": null,
+    "providerDescription": null,
+    "externalGroupsWhitelist": [],
+    "attributeMappings": {},
+    "authUrl": "http://auth.url",
+    "tokenUrl": "http://token.url",
+    "tokenKeyUrl": null,
+    "tokenKey": "token-key",
+    "linkText": null,
+    "showLinkText": false,
+    "skipSslValidation": false,
+    "relyingPartyId": "uaa",
+    "relyingPartySecret": "secret",
+    "scopes": null,
+    "addShadowUserOnLogin": true,
+    "checkTokenUrl": null
+  },
+  "id": "16506900-561d-411f-904b-15c3e2722cba",
+  "originKey": "oauth2.0",
+  "name": "UAA Provider",
+  "version": 0,
+  "created": 1465001966855,
+  "last_modified": 1465001966855,
+  "active": true,
+  "identityZoneId": "uaa"
+}

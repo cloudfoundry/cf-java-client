@@ -26,13 +26,23 @@ public final class ReactorUaaClientTest extends AbstractRestTest {
     private final ReactorUaaClient client = new ReactorUaaClient(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
     @Test
-    public void accessTokenAdministration() {
-        assertNotNull(this.client.tokens());
+    public void authorizations() {
+        assertNotNull(this.client.authorizations());
     }
 
     @Test
-    public void identityZoneManagement() {
+    public void identityProviders() {
+        assertNotNull(this.client.identityProviders());
+    }
+
+    @Test
+    public void identityZones() {
         assertNotNull(this.client.identityZones());
+    }
+
+    @Test
+    public void tokens() {
+        assertNotNull(this.client.tokens());
     }
 
     @Test
