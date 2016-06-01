@@ -21,6 +21,8 @@ import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.uaa.users.CreateUserRequest;
 import org.cloudfoundry.uaa.users.CreateUserResponse;
+import org.cloudfoundry.uaa.users.DeleteUserRequest;
+import org.cloudfoundry.uaa.users.DeleteUserResponse;
 import org.cloudfoundry.uaa.users.ListUsersRequest;
 import org.cloudfoundry.uaa.users.ListUsersResponse;
 import org.cloudfoundry.uaa.users.Users;
@@ -47,6 +49,11 @@ public final class ReactorUsers extends AbstractUaaOperations implements Users {
     @Override
     public Mono<CreateUserResponse> create(CreateUserRequest request) {
         return post(request, CreateUserResponse.class, builder -> builder.pathSegment("Users"));
+    }
+
+    @Override
+    public Mono<DeleteUserResponse> delete(DeleteUserRequest request) {
+        return delete(request, DeleteUserResponse.class, builder -> builder.pathSegment("Users", request.getUserId()));
     }
 
     @Override
