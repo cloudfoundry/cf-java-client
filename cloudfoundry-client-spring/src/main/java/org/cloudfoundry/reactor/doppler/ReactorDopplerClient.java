@@ -20,19 +20,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
 import org.cloudfoundry.doppler.ContainerMetric;
 import org.cloudfoundry.doppler.ContainerMetricsRequest;
-import org.cloudfoundry.doppler.CounterEvent;
 import org.cloudfoundry.doppler.DopplerClient;
-import org.cloudfoundry.doppler.Error;
+import org.cloudfoundry.doppler.Envelope;
 import org.cloudfoundry.doppler.Event;
+import org.cloudfoundry.doppler.EventBuilder;
 import org.cloudfoundry.doppler.FirehoseRequest;
-import org.cloudfoundry.doppler.HttpStart;
-import org.cloudfoundry.doppler.HttpStartStop;
-import org.cloudfoundry.doppler.HttpStop;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
-import org.cloudfoundry.doppler.ValueMetric;
-import org.cloudfoundry.dropsonde.events.Envelope;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.reactor.util.ConnectionContextSupplier;
 import reactor.core.publisher.Flux;
@@ -64,7 +59,7 @@ public final class ReactorDopplerClient extends AbstractDopplerOperations implem
         return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "containermetrics"))
             .flatMap(inbound -> inbound.receiveMultipart().receiveInputStream())
             .map(ReactorDopplerClient::toEnvelope)
-            .map(ReactorDopplerClient::toEvent);
+            .map(EventBuilder::toEvent);
     }
 
     @Override
@@ -72,7 +67,15 @@ public final class ReactorDopplerClient extends AbstractDopplerOperations implem
         return ws(builder -> builder.pathSegment("firehose", request.getSubscriptionId()))
             .flatMap(HttpInbound::receiveInputStream)
             .map(ReactorDopplerClient::toEnvelope)
-            .map(ReactorDopplerClient::toEvent);
+            .map(EventBuilder::toEvent);
+    }
+
+    @Override
+    public Flux<Envelope<? extends Event>> envelopedFirehose(FirehoseRequest request) {
+        return ws(builder -> builder.pathSegment("firehose", request.getSubscriptionId()))
+            .flatMap(HttpInbound::receiveInputStream)
+            .map(ReactorDopplerClient::toEnvelope)
+            .map(Envelope::from);
     }
 
     @Override
@@ -80,7 +83,7 @@ public final class ReactorDopplerClient extends AbstractDopplerOperations implem
         return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "recentlogs"))
             .flatMap(inbound -> inbound.receiveMultipart().receiveInputStream())
             .map(ReactorDopplerClient::toEnvelope)
-            .map(ReactorDopplerClient::toEvent);
+            .map(EventBuilder::toEvent);
     }
 
     @Override
@@ -88,39 +91,17 @@ public final class ReactorDopplerClient extends AbstractDopplerOperations implem
         return ws(builder -> builder.pathSegment("apps", request.getApplicationId(), "stream"))
             .flatMap(HttpInbound::receiveInputStream)
             .map(ReactorDopplerClient::toEnvelope)
-            .map(ReactorDopplerClient::toEvent);
+            .map(EventBuilder::toEvent);
     }
 
-    private static Envelope toEnvelope(InputStream inputStream) {
+    private static org.cloudfoundry.dropsonde.events.Envelope toEnvelope(InputStream inputStream) {
         try (InputStream in = inputStream) {
-            return Envelope.ADAPTER.decode(in);
+            return org.cloudfoundry.dropsonde.events.Envelope.ADAPTER.decode(in);
         } catch (IOException e) {
             throw Exceptions.propagate(e);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private static <T extends Event> T toEvent(Envelope envelope) {
-        switch (envelope.eventType) {
-            case HttpStart:
-                return (T) HttpStart.from(envelope.httpStart);
-            case HttpStop:
-                return (T) HttpStop.from(envelope.httpStop);
-            case HttpStartStop:
-                return (T) HttpStartStop.from(envelope.httpStartStop);
-            case LogMessage:
-                return (T) LogMessage.from(envelope.logMessage);
-            case ValueMetric:
-                return (T) ValueMetric.from(envelope.valueMetric);
-            case CounterEvent:
-                return (T) CounterEvent.from(envelope.counterEvent);
-            case Error:
-                return (T) Error.from(envelope.error);
-            case ContainerMetric:
-                return (T) ContainerMetric.from(envelope.containerMetric);
-            default:
-                throw new IllegalStateException(String.format("Envelope event type %s is unsupported", envelope.eventType));
-        }
-    }
+
 
 }

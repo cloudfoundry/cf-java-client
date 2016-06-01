@@ -40,6 +40,14 @@ public interface DopplerClient {
     Flux<Event> firehose(FirehoseRequest request);
 
     /**
+     * Makes the <a href="https://github.com/cloudfoundry/loggregator/tree/develop/src/trafficcontroller#endpoints">Firehose</a> request
+     *
+     * @param request the Firehose request
+     * @return the events wrapped with an Envelope holding metadata from the firehose
+     */
+    Flux<Envelope<? extends Event>> envelopedFirehose(FirehoseRequest request);
+
+    /**
      * Makes the <a href="https://github.com/cloudfoundry/loggregator/tree/develop/src/trafficcontroller#endpoints">Recent Logs</a> request
      *
      * @param request the Recent Logs request
