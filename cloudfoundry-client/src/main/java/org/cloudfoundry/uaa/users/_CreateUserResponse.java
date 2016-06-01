@@ -16,11 +16,15 @@
 
 package org.cloudfoundry.uaa.users;
 
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
+/**
+ * The response from the create user request
+ */
 @JsonDeserialize
 @Value.Immutable
-abstract class _User extends AbstractUser {
+abstract class _CreateUserResponse extends AbstractUser {
 
 }

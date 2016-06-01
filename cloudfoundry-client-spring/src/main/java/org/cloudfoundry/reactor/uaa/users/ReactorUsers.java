@@ -19,6 +19,8 @@ package org.cloudfoundry.reactor.uaa.users;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
+import org.cloudfoundry.uaa.users.CreateUserRequest;
+import org.cloudfoundry.uaa.users.CreateUserResponse;
 import org.cloudfoundry.uaa.users.ListUsersRequest;
 import org.cloudfoundry.uaa.users.ListUsersResponse;
 import org.cloudfoundry.uaa.users.Users;
@@ -40,6 +42,11 @@ public final class ReactorUsers extends AbstractUaaOperations implements Users {
      */
     public ReactorUsers(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
         super(authorizationProvider, httpClient, objectMapper, root);
+    }
+
+    @Override
+    public Mono<CreateUserResponse> create(CreateUserRequest request) {
+        return post(request, CreateUserResponse.class, builder -> builder.pathSegment("Users"));
     }
 
     @Override

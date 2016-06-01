@@ -1,0 +1,78 @@
+{
+  "id" : "9d175c69-8f25-4460-82d7-be9657f87a68",
+  "externalId" : "test-user",
+  "meta" : {
+    "version" : 0,
+    "created" : "2016-05-18T18:25:24.559Z",
+    "lastModified" : "2016-05-18T18:25:24.559Z"
+  },
+  "userName" : "ZO6FEI@test.org",
+  "name" : {
+    "familyName" : "family name",
+    "givenName" : "given name"
+  },
+  "emails" : [ {
+    "value" : "ZO6FEI@test.org",
+    "primary" : false
+  } ],
+  "groups" : [ {
+    "value" : "4622c5e1-ddfd-4e17-9e81-2ae3c03972be",
+    "display" : "password.write",
+    "type" : "DIRECT"
+  }, {
+    "value" : "62f67643-05d8-43c6-b193-4cd6ab9960cb",
+    "display" : "cloud_controller.write",
+    "type" : "DIRECT"
+  }, {
+    "value" : "c47bf470-f9c4-4eea-97e4-490ce7b8f6f7",
+    "display" : "uaa.user",
+    "type" : "DIRECT"
+  }, {
+    "value" : "8a6add1f-d3ee-400c-a263-c4197351b78e",
+    "display" : "approvals.me",
+    "type" : "DIRECT"
+  }, {
+    "value" : "e10424ed-ed80-45ac-848b-7f7e79b00c42",
+    "display" : "cloud_controller.read",
+    "type" : "DIRECT"
+  }, {
+    "value" : "ede11441-6ffe-4510-81f8-bb40626155f0",
+    "display" : "openid",
+    "type" : "DIRECT"
+  }, {
+    "value" : "7e3d4b06-0d6b-43a1-ac3a-5f1b2642262c",
+    "display" : "scim.me",
+    "type" : "DIRECT"
+  }, {
+    "value" : "3b481f3c-d9a7-4920-a687-72cb0381b671",
+    "display" : "cloud_controller_service_permissions.read",
+    "type" : "DIRECT"
+  }, {
+    "value" : "4480c647-4047-4c6a-877f-70f5f96e8c11",
+    "display" : "oauth.approvals",
+    "type" : "DIRECT"
+  }, {
+    "value" : "542bb178-1c04-4bb5-813a-5a038319ac1d",
+    "display" : "user_attributes",
+    "type" : "DIRECT"
+  }, {
+    "value" : "c4ac4653-2fdd-4901-a028-9c9866cb4e9c",
+    "display" : "scim.userids",
+    "type" : "DIRECT"
+  }, {
+    "value" : "74fde138-daf3-4e4d-bb52-93a6cb727030",
+    "display" : "profile",
+    "type" : "DIRECT"
+  }, {
+    "value" : "1b18551f-eead-4076-90dd-b464998f6ddd",
+    "display" : "roles",
+    "type" : "DIRECT"
+  } ],
+  "approvals" : [ ],
+  "active" : true,
+  "verified" : true,
+  "origin" : "uaa",
+  "zoneId" : "uaa",
+  "passwordLastModified" : "2016-05-18T18:25:24.000Z",
+  "schemas" : [ "urn:scim:schemas:core:1.0" ]
+}
