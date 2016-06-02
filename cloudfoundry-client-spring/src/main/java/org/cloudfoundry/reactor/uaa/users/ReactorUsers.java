@@ -53,7 +53,8 @@ public final class ReactorUsers extends AbstractUaaOperations implements Users {
 
     @Override
     public Mono<DeleteUserResponse> delete(DeleteUserRequest request) {
-        return delete(request, DeleteUserResponse.class, builder -> builder.pathSegment("Users", request.getUserId()));
+        return delete(request, DeleteUserResponse.class, builder -> builder.pathSegment("Users", request.getUserId()),
+            outbound -> ifMatch(outbound, request.getVersion()));
     }
 
     @Override
