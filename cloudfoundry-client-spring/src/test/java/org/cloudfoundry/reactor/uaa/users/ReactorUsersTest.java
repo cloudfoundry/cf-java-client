@@ -315,6 +315,7 @@ public final class ReactorUsersTest {
         protected DeleteUserRequest getValidRequest() throws Exception {
             return DeleteUserRequest.builder()
                 .userId("421225f4-318e-4a4d-9219-4b6a0ed3678a")
+                .version(0)
                 .build();
         }
 

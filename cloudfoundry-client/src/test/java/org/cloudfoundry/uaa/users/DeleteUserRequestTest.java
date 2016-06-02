@@ -16,27 +16,22 @@
 
 package org.cloudfoundry.uaa.users;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.cloudfoundry.Nullable;
-import org.immutables.value.Value;
+import org.junit.Test;
 
-/**
- * The request payload for the delete user operation
- */
-@Value.Immutable
-abstract class _DeleteUserRequest {
+public final class DeleteUserRequestTest {
 
-    /**
-     * The user id
-     */
-    @JsonIgnore
-    abstract String getUserId();
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        DeleteUserRequest.builder()
+            .build();
+    }
 
-    /**
-     * The version of the SCIM object to be deleted
-     */
-    @JsonIgnore
-    @Nullable
-    abstract Integer getVersion();
+    @Test
+    public void valid() {
+        DeleteUserRequest.builder()
+            .userId("test-user-id")
+            .version(1)
+            .build();
+    }
 
 }
