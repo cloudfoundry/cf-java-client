@@ -21,6 +21,8 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
 import org.cloudfoundry.uaa.users.Approval;
+import org.cloudfoundry.uaa.users.ChangeUserPasswordRequest;
+import org.cloudfoundry.uaa.users.ChangeUserPasswordResponse;
 import org.cloudfoundry.uaa.users.CreateUserRequest;
 import org.cloudfoundry.uaa.users.CreateUserResponse;
 import org.cloudfoundry.uaa.users.DeleteUserRequest;
@@ -39,12 +41,55 @@ import java.util.Collections;
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.uaa.SortOrder.ASCENDING;
 import static org.cloudfoundry.uaa.users.ApprovalStatus.APPROVED;
 import static org.cloudfoundry.uaa.users.MembershipType.DIRECT;
 
 public final class ReactorUsersTest {
+
+    public static final class ChangePassword extends AbstractUaaApiTest<ChangeUserPasswordRequest, ChangeUserPasswordResponse> {
+
+        private final ReactorUsers users = new ReactorUsers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/Users/9140c37c-c5d9-4c4d-a265-b6fe2f9dd02d/password")
+                    .payload("fixtures/uaa/users/PUT_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/users/PUT_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ChangeUserPasswordResponse getResponse() {
+            return ChangeUserPasswordResponse.builder()
+                .status("ok")
+                .message("password updated")
+                .build();
+        }
+
+        @Override
+        protected ChangeUserPasswordRequest getValidRequest() throws Exception {
+            return ChangeUserPasswordRequest.builder()
+                .oldPassword("secret")
+                .password("newsecret")
+                .userId("9140c37c-c5d9-4c4d-a265-b6fe2f9dd02d")
+                .build();
+        }
+
+        @Override
+        protected Mono<ChangeUserPasswordResponse> invoke(ChangeUserPasswordRequest request) {
+            return this.users.changePassword(request);
+        }
+
+    }
 
     public static final class Create extends AbstractUaaApiTest<CreateUserRequest, CreateUserResponse> {
 
@@ -183,7 +228,6 @@ public final class ReactorUsersTest {
         }
 
     }
-
 
     public static final class Delete extends AbstractUaaApiTest<DeleteUserRequest, DeleteUserResponse> {
 
