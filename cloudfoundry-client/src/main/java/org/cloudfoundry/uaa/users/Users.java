@@ -24,6 +24,14 @@ import reactor.core.publisher.Mono;
 public interface Users {
 
     /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#change-user-password">Change User Password</a> request
+     *
+     * @param request the Change User Password request
+     * @return the response from the Change User Password request
+     */
+    Mono<ChangeUserPasswordResponse> changePassword(ChangeUserPasswordRequest request);
+
+    /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#create48">Create User</a> request
      *
      * @param request the Create User request

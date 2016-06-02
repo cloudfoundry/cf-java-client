@@ -19,6 +19,8 @@ package org.cloudfoundry.reactor.uaa.users;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
+import org.cloudfoundry.uaa.users.ChangeUserPasswordRequest;
+import org.cloudfoundry.uaa.users.ChangeUserPasswordResponse;
 import org.cloudfoundry.uaa.users.CreateUserRequest;
 import org.cloudfoundry.uaa.users.CreateUserResponse;
 import org.cloudfoundry.uaa.users.DeleteUserRequest;
@@ -44,6 +46,11 @@ public final class ReactorUsers extends AbstractUaaOperations implements Users {
      */
     public ReactorUsers(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
         super(authorizationProvider, httpClient, objectMapper, root);
+    }
+
+    @Override
+    public Mono<ChangeUserPasswordResponse> changePassword(ChangeUserPasswordRequest request) {
+        return put(request, ChangeUserPasswordResponse.class, builder -> builder.pathSegment("Users", request.getUserId(), "password"));
     }
 
     @Override
