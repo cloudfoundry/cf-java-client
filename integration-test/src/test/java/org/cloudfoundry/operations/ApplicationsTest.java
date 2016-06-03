@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.cloudfoundry.operations.applications.ApplicationEnvironments;
 import org.cloudfoundry.operations.applications.ApplicationHealthCheck;
 import org.cloudfoundry.operations.applications.DeleteApplicationRequest;
@@ -98,7 +99,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .get(GetApplicationRequest.builder()
                     .name(applicationName)
                     .build()))
-            .map(response -> response.getName())
+            .map(ApplicationDetail::getName)
             .subscribe(testSubscriber()
                 .assertEquals(applicationName));
     }
@@ -125,7 +126,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .get(GetApplicationRequest.builder()
                     .name(applicationName)
                     .build()))
-            .map(response -> response.getName())
+            .map(ApplicationDetail::getName)
             .subscribe(testSubscriber()
                 .assertEquals(applicationName));
     }
