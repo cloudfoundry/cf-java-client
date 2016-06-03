@@ -48,6 +48,14 @@ public interface Users {
     Mono<DeleteUserResponse> delete(DeleteUserRequest request);
 
     /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#get-user-verification-link">Get User Verification Link</a> request
+     *
+     * @param request the Get User Verification Link request
+     * @return the response from the Get User Verification Link request
+     */
+    Mono<GetUserVerificationLinkResponse> getVerificationLink(GetUserVerificationLinkRequest request);
+
+    /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#list">List Users</a> request
      *
      * @param request the List Users request
