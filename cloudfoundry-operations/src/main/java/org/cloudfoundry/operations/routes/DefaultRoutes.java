@@ -48,8 +48,10 @@ import org.cloudfoundry.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
@@ -344,7 +346,7 @@ public final class DefaultRoutes implements Routes {
                     .domainId(domainId)
                     .host(host)
                     .page(page)
-                    .path(path)
+                    .paths(Optional.ofNullable(path).map(Collections::singletonList).orElse(null))
                     .build()));
     }
 
