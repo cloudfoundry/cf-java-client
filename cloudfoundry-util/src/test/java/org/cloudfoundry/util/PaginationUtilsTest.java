@@ -39,7 +39,7 @@ public final class PaginationUtilsTest {
         List<SpaceResource> actual = PaginationUtils
             .requestPages(i -> testPaginatedResponsePublisher(i, 3))
             .flatMap(response -> Flux.fromIterable(response.getResources()))
-            .asList()
+            .collectList()
             .block();
 
         assertEquals(expected, actual);
@@ -52,7 +52,7 @@ public final class PaginationUtilsTest {
                 .just(ListSpacesResponse.builder()
                     .resource(testSpaceResource(0))
                     .build()))
-            .asList()
+            .collectList()
             .block();
     }
 
@@ -62,7 +62,7 @@ public final class PaginationUtilsTest {
 
         List<SpaceResource> actual = PaginationUtils
             .requestResources(i -> testPaginatedResponsePublisher(i - 1, 3))
-            .asList()
+            .collectList()
             .block();
 
         assertEquals(expected, actual);

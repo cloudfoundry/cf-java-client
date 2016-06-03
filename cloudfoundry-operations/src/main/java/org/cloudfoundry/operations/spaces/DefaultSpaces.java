@@ -162,13 +162,13 @@ public final class DefaultSpaces implements Spaces {
     private static Mono<List<String>> getApplicationNames(CloudFoundryClient cloudFoundryClient, SpaceResource spaceResource) {
         return requestSpaceApplications(cloudFoundryClient, ResourceUtils.getId(spaceResource))
             .map(applicationResource -> ResourceUtils.getEntity(applicationResource).getName())
-            .asList();
+            .collectList();
     }
 
     private static Mono<List<String>> getDomainNames(CloudFoundryClient cloudFoundryClient, SpaceResource spaceResource) {
         return requestSpaceDomains(cloudFoundryClient, ResourceUtils.getId(spaceResource))
             .map(domainResource -> ResourceUtils.getEntity(domainResource).getName())
-            .asList();
+            .collectList();
     }
 
     private static Mono<Optional<SpaceQuota>> getOptionalSpaceQuotaDefinition(CloudFoundryClient cloudFoundryClient, SpaceResource spaceResource) {
@@ -248,13 +248,13 @@ public final class DefaultSpaces implements Spaces {
                 }
                 return entity;
             })
-            .asList();
+            .collectList();
     }
 
     private static Mono<List<String>> getServiceNames(CloudFoundryClient cloudFoundryClient, SpaceResource spaceResource) {
         return requestSpaceServices(cloudFoundryClient, ResourceUtils.getId(spaceResource))
             .map(serviceResource -> ResourceUtils.getEntity(serviceResource).getLabel())
-            .asList();
+            .collectList();
     }
 
     private static Mono<SpaceDetail> getSpaceDetail(CloudFoundryClient cloudFoundryClient, SpaceResource resource, GetSpaceRequest request) {

@@ -67,7 +67,7 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
                     .name(flagName)
                     .build())
                 .map(response -> Tuple2.of(flagName, response)))
-            .asList()
+            .collectList()
             .subscribe(this.<List<Tuple2<String, GetFeatureFlagResponse>>>testSubscriber()
                 .assertThat(getFlagList -> {
                     for (Tuple2<String, GetFeatureFlagResponse> tuple : getFlagList) {
@@ -121,7 +121,7 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
                                 .enabled(getResponse.getEnabled())
                                 .build())
                     ))))
-            .asList()
+            .collectList()
             .subscribe(this.<List<Tuple3<GetFeatureFlagResponse, SetFeatureFlagResponse, SetFeatureFlagResponse>>>testSubscriber()
                 .assertThat(responsesList -> {
                     for (Tuple3<GetFeatureFlagResponse, SetFeatureFlagResponse, SetFeatureFlagResponse> responses : responsesList) {

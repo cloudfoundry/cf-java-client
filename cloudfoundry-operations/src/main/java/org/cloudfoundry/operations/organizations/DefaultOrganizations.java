@@ -138,7 +138,7 @@ public final class DefaultOrganizations implements Organizations {
     private static Mono<List<String>> getDomainNames(CloudFoundryClient cloudFoundryClient, String organizationId) {
         return requestDomains(cloudFoundryClient, organizationId)
             .map(resource -> ResourceUtils.getEntity(resource).getName())
-            .asList();
+            .collectList();
     }
 
     private static Mono<Boolean> getFeatureFlagEnabled(CloudFoundryClient cloudFoundryClient, String featureFlag) {
@@ -177,13 +177,13 @@ public final class DefaultOrganizations implements Organizations {
     private static Mono<List<String>> getSpaceNames(CloudFoundryClient cloudFoundryClient, String organizationId) {
         return requestSpaces(cloudFoundryClient, organizationId)
             .map(resource -> ResourceUtils.getEntity(resource).getName())
-            .asList();
+            .collectList();
     }
 
     private static Mono<List<SpaceQuota>> getSpaceQuotas(CloudFoundryClient cloudFoundryClient, String organizationId) {
         return requestSpaceQuotaDefinitions(cloudFoundryClient, organizationId)
             .map(DefaultOrganizations::toSpaceQuota)
-            .asList();
+            .collectList();
     }
 
     private static Mono<AssociateOrganizationManagerByUsernameResponse> requestAssociateOrganizationManagerByUsername(CloudFoundryClient cloudFoundryClient, String organizationId, String username) {
