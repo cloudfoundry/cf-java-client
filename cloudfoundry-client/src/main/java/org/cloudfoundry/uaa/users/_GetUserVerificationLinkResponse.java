@@ -16,32 +16,22 @@
 
 package org.cloudfoundry.uaa.users;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 /**
- * The request payload for the change user password operation
+ * The response from the get user verification link request
  */
+@JsonDeserialize
 @Value.Immutable
-abstract class _ChangeUserPasswordRequest {
+abstract class _GetUserVerificationLinkResponse {
 
     /**
-     * The user's existing password
+     * The verification link
      */
-    @JsonProperty("oldPassword")
-    abstract String getOldPassword();
-
-    /**
-     * The user's desired password
-     */
-    @JsonProperty("password")
-    abstract String getPassword();
-
-    /**
-     * The user id
-     */
-    @JsonIgnore
-    abstract String getUserId();
+    @JsonProperty("verify_link")
+    abstract String getVerifyLink();
 
 }

@@ -18,38 +18,27 @@ package org.cloudfoundry.uaa.users;
 
 import org.junit.Test;
 
-public final class ChangePasswordRequestTest {
+public final class GetUserVerificationLinkRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void noOldPassword() {
-        ChangeUserPasswordRequest.builder()
-            .password("test-password")
-            .userId("test-user-id")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noPassword() {
-        ChangeUserPasswordRequest.builder()
-            .oldPassword("test-old-password")
+    public void noRedirectUri() {
+        GetUserVerificationLinkRequest.builder()
             .userId("test-user-id")
             .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noUserId() {
-        ChangeUserPasswordRequest.builder()
-            .oldPassword("test-old-password")
-            .password("test-password")
+        GetUserVerificationLinkRequest.builder()
+            .redirectUri("test-redirect-uri")
             .build();
     }
 
     @Test
     public void valid() {
-        ChangeUserPasswordRequest.builder()
-            .oldPassword("test-old-password")
-            .password("test-password")
+        GetUserVerificationLinkRequest.builder()
             .userId("test-user-id")
+            .redirectUri("test-redirect-uri")
             .build();
     }
 

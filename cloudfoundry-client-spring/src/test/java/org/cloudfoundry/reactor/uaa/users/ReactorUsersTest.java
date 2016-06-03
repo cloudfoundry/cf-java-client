@@ -28,6 +28,8 @@ import org.cloudfoundry.uaa.users.CreateUserResponse;
 import org.cloudfoundry.uaa.users.DeleteUserRequest;
 import org.cloudfoundry.uaa.users.DeleteUserResponse;
 import org.cloudfoundry.uaa.users.Email;
+import org.cloudfoundry.uaa.users.GetUserVerificationLinkRequest;
+import org.cloudfoundry.uaa.users.GetUserVerificationLinkResponse;
 import org.cloudfoundry.uaa.users.Group;
 import org.cloudfoundry.uaa.users.ListUsersRequest;
 import org.cloudfoundry.uaa.users.ListUsersResponse;
@@ -366,6 +368,45 @@ public final class ReactorUsersTest {
         @Override
         protected Mono<DeleteUserResponse> invoke(DeleteUserRequest request) {
             return this.users.delete(request);
+        }
+
+    }
+
+    public static final class GetVerificationLink extends AbstractUaaApiTest<GetUserVerificationLinkRequest, GetUserVerificationLinkResponse> {
+
+        private final ReactorUsers users = new ReactorUsers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/Users/1faa46a0-0c6f-4e13-8334-d1f6e5f2e1dd/verify-link?redirect_uri=http://redirect.to/app")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/users/GET_{id}_verify_link_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected GetUserVerificationLinkResponse getResponse() {
+            return GetUserVerificationLinkResponse.builder()
+                .verifyLink("http://localhost/verify_user?code=nOGQWBqCx5")
+                .build();
+        }
+
+        @Override
+        protected GetUserVerificationLinkRequest getValidRequest() throws Exception {
+            return GetUserVerificationLinkRequest.builder()
+                .redirectUri("http://redirect.to/app")
+                .userId("1faa46a0-0c6f-4e13-8334-d1f6e5f2e1dd")
+                .build();
+        }
+
+        @Override
+        protected Mono<GetUserVerificationLinkResponse> invoke(GetUserVerificationLinkRequest request) {
+            return this.users.getVerificationLink(request);
         }
 
     }
