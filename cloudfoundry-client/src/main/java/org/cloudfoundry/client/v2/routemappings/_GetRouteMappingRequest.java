@@ -18,41 +18,18 @@
 package org.cloudfoundry.client.v2.routemappings;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
  * The request payload object for the Get a Route Mapping operation
  */
-@Data
-public final class GetRouteMappingRequest implements Validatable {
+@Value.Immutable
+abstract class _GetRouteMappingRequest {
 
     /**
      * The route mapping id
-     *
-     * @param routeMappingId the route mapping id
-     * @return the route mapping id
      */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String routeMappingId;
-
-    @Builder
-    GetRouteMappingRequest(String routeMappingId) {
-        this.routeMappingId = routeMappingId;
-    }
-
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (routeMappingId == null) {
-            builder.message("route mapping id must be specified");
-        }
-        return builder.build();
-    }
+    @JsonIgnore
+    abstract String getRouteMappingId();
 
 }

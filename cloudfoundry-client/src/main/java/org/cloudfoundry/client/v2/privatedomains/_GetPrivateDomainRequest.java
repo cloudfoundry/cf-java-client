@@ -17,41 +17,18 @@
 package org.cloudfoundry.client.v2.privatedomains;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import org.cloudfoundry.Validatable;
-import org.cloudfoundry.ValidationResult;
+import org.immutables.value.Value;
 
 /**
  * The request payload for the Get Private Domain operation
  */
-@Data
-public final class GetPrivateDomainRequest implements Validatable {
+@Value.Immutable
+abstract class _GetPrivateDomainRequest {
 
     /**
      * The private domain id
-     *
-     * @param privateDomainId the private domain id
-     * @return the private domain id
      */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String privateDomainId;
-
-    @Builder
-    GetPrivateDomainRequest(String privateDomainId) {
-        this.privateDomainId = privateDomainId;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.privateDomainId == null) {
-            builder.message("private domain id must be specified");
-        }
-
-        return builder.build();
-    }
+    @JsonIgnore
+    abstract String getPrivateDomainId();
 
 }

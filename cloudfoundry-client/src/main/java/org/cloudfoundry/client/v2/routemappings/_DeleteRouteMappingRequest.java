@@ -14,23 +14,31 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.organizationquotadefinitions;
 
-import org.junit.Test;
+package org.cloudfoundry.client.v2.routemappings;
 
-public class UpdateOrganizationQuotaDefinitionRequestTest {
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.QueryParameter;
+import org.immutables.value.Value;
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationQuotaDefinitionId() {
-        UpdateOrganizationQuotaDefinitionRequest.builder()
-            .build();
-    }
+/**
+ * The request payload object for the Delete a Route Mapping operation
+ */
+@Value.Immutable
+abstract class _DeleteRouteMappingRequest {
 
-    @Test
-    public void valid() {
-        UpdateOrganizationQuotaDefinitionRequest.builder()
-            .organizationQuotaDefinitionId("test-organization-quota-definition-id")
-            .build();
-    }
+    /**
+     * The async parameter
+     */
+    @QueryParameter("async")
+    @Nullable
+    abstract Boolean getAsync();
+
+    /**
+     * The route mapping id
+     */
+    @JsonIgnore
+    abstract String getRouteMappingId();
 
 }

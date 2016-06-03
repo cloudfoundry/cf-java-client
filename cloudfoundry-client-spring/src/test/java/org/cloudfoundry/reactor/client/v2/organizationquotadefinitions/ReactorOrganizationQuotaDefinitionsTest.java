@@ -64,6 +64,7 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
                 .build();
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         protected CreateOrganizationQuotaDefinitionResponse getResponse() {
             return CreateOrganizationQuotaDefinitionResponse.builder()
@@ -161,6 +162,7 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
                 .build();
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         protected GetOrganizationQuotaDefinitionResponse getResponse() {
             return GetOrganizationQuotaDefinitionResponse.builder()
@@ -216,6 +218,7 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
                 .build();
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         protected ListOrganizationQuotaDefinitionsResponse getResponse() {
             return ListOrganizationQuotaDefinitionsResponse.builder()
@@ -276,6 +279,7 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
                 .build();
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         protected UpdateOrganizationQuotaDefinitionResponse getResponse() {
             return UpdateOrganizationQuotaDefinitionResponse.builder()

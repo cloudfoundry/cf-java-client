@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.client.v2.privatedomains;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class DeletePrivateDomainRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = DeletePrivateDomainRequest.builder()
-            .privateDomainId("test-private-domain-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noPrivateDomainId() {
+        DeletePrivateDomainRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = DeletePrivateDomainRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("private domain id must be specified", result.getMessages().get(0));
+    public void valid() {
+        DeletePrivateDomainRequest.builder()
+            .privateDomainId("test-private-domain-id")
+            .build();
     }
 
 }

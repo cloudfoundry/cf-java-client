@@ -16,21 +16,19 @@
 
 package org.cloudfoundry.client.v2.organizationquotadefinitions;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.immutables.value.Value;
 
-public class UpdateOrganizationQuotaDefinitionRequestTest {
+/**
+ * The request payload for the Retrieve a Particular Organization Quota Definition operation
+ */
+@Value.Immutable
+abstract class _GetOrganizationQuotaDefinitionRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationQuotaDefinitionId() {
-        UpdateOrganizationQuotaDefinitionRequest.builder()
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        UpdateOrganizationQuotaDefinitionRequest.builder()
-            .organizationQuotaDefinitionId("test-organization-quota-definition-id")
-            .build();
-    }
+    /**
+     * The quota definition id
+     */
+    @JsonIgnore
+    abstract String getOrganizationQuotaDefinitionId();
 
 }

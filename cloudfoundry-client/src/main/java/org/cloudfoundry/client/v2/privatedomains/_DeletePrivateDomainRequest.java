@@ -14,23 +14,30 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.organizationquotadefinitions;
+package org.cloudfoundry.client.v2.privatedomains;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.QueryParameter;
+import org.immutables.value.Value;
 
-public class UpdateOrganizationQuotaDefinitionRequestTest {
+/**
+ * The request payload for the Delete a Particular Private Domain operation
+ */
+@Value.Immutable
+abstract class _DeletePrivateDomainRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationQuotaDefinitionId() {
-        UpdateOrganizationQuotaDefinitionRequest.builder()
-            .build();
-    }
+    /**
+     * The async
+     */
+    @QueryParameter("async")
+    @Nullable
+    abstract Boolean getAsync();
 
-    @Test
-    public void valid() {
-        UpdateOrganizationQuotaDefinitionRequest.builder()
-            .organizationQuotaDefinitionId("test-organization-quota-definition-id")
-            .build();
-    }
+    /**
+     * The private domain id
+     */
+    @JsonIgnore
+    abstract String getPrivateDomainId();
 
 }

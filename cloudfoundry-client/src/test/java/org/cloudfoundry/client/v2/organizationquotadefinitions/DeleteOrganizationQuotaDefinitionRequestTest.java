@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.client.v2.organizationquotadefinitions;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public class DeleteOrganizationQuotaDefinitionRequestTest {
 
-    @Test
-    public void isNotValidNoId() {
-        ValidationResult result = DeleteOrganizationQuotaDefinitionRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("organization quota definition id must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noOrganizationQuotaDefinitionId() {
+        DeleteOrganizationQuotaDefinitionRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValid() {
-        ValidationResult result = DeleteOrganizationQuotaDefinitionRequest.builder()
+    public void valid() {
+        DeleteOrganizationQuotaDefinitionRequest.builder()
             .organizationQuotaDefinitionId("test-organization-quota-definition-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

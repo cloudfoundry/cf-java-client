@@ -74,7 +74,7 @@ public final class TestRequest {
         } else if (this.contents.isPresent()) {
             this.contents.get().accept(Tuple.of(request.getHeaders(), request.getBody()));
         } else {
-            Assert.assertEquals(0, request.getBodySize());
+            Assert.assertEquals("Invalid request body: " + request.getBody().readUtf8(), 0, request.getBodySize());
         }
     }
 

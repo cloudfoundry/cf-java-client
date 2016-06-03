@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v2.routemappings;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class CreateRouteMappingRequestTest {
 
-    @Test
-    public void isNotValidNoApplicationId() {
-        ValidationResult result = CreateRouteMappingRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noApplicationId() {
+        CreateRouteMappingRequest.builder()
             .routeId("route-id")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application id must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noRouteId() {
+        CreateRouteMappingRequest.builder()
+            .applicationId("application-id")
+            .build();
     }
 
     @Test
-    public void isNotValidNoRouteId() {
-        ValidationResult result = CreateRouteMappingRequest.builder()
-            .applicationId("application-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("route id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValid() {
-        ValidationResult result = CreateRouteMappingRequest.builder()
+    public void valid() {
+        CreateRouteMappingRequest.builder()
             .applicationId("application-id")
             .routeId("route-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

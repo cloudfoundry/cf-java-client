@@ -16,21 +16,28 @@
 
 package org.cloudfoundry.client.v2.organizationquotadefinitions;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.QueryParameter;
+import org.immutables.value.Value;
 
-public class UpdateOrganizationQuotaDefinitionRequestTest {
+/**
+ * The request payload for the Delete an Organization Quota Definition operation
+ */
+@Value.Immutable
+abstract class _DeleteOrganizationQuotaDefinitionRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationQuotaDefinitionId() {
-        UpdateOrganizationQuotaDefinitionRequest.builder()
-            .build();
-    }
+    /**
+     * The async flag
+     */
+    @Nullable
+    @QueryParameter("async")
+    abstract Boolean getAsync();
 
-    @Test
-    public void valid() {
-        UpdateOrganizationQuotaDefinitionRequest.builder()
-            .organizationQuotaDefinitionId("test-organization-quota-definition-id")
-            .build();
-    }
+    /**
+     * The quota definition id
+     */
+    @JsonIgnore
+    abstract String getOrganizationQuotaDefinitionId();
 
 }

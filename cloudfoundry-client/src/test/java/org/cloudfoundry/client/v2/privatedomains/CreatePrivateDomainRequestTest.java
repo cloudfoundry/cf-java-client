@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v2.privatedomains;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class CreatePrivateDomainRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = CreatePrivateDomainRequest.builder()
-            .name("test-name")
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        CreatePrivateDomainRequest.builder()
             .owningOrganizationId("test-owning-organization-id")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noOwningOrganizationId() {
+        CreatePrivateDomainRequest.builder()
+            .name("test-name")
+            .build();
     }
 
     @Test
-    public void isValidNoName() {
-        ValidationResult result = CreatePrivateDomainRequest.builder()
-            .owningOrganizationId("test-owning-organization-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoOrganization() {
-        ValidationResult result = CreatePrivateDomainRequest.builder()
+    public void valid() {
+        CreatePrivateDomainRequest.builder()
             .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("owning organization id must be specified", result.getMessages().get(0));
+            .owningOrganizationId("test-owning-organization-id")
+            .build();
     }
 
 }

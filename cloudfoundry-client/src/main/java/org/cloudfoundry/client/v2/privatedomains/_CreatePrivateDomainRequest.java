@@ -14,23 +14,27 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.organizationquotadefinitions;
+package org.cloudfoundry.client.v2.privatedomains;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.immutables.value.Value;
 
-public class UpdateOrganizationQuotaDefinitionRequestTest {
+/**
+ * The request payload for the deprecated Create a Private Domain operation
+ */
+@Value.Immutable
+abstract class _CreatePrivateDomainRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationQuotaDefinitionId() {
-        UpdateOrganizationQuotaDefinitionRequest.builder()
-            .build();
-    }
+    /**
+     * The domain name
+     */
+    @JsonProperty("name")
+    abstract String getName();
 
-    @Test
-    public void valid() {
-        UpdateOrganizationQuotaDefinitionRequest.builder()
-            .organizationQuotaDefinitionId("test-organization-quota-definition-id")
-            .build();
-    }
+    /**
+     * The owning organization id
+     */
+    @JsonProperty("owning_organization_guid")
+    abstract String getOwningOrganizationId();
 
 }

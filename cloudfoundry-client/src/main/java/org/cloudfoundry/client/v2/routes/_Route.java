@@ -17,68 +17,47 @@
 package org.cloudfoundry.client.v2.routes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v2.domains.Domain;
+import org.immutables.value.Value;
 
 /**
  * A route bound to an application
  */
-@Data
-public final class Route {
+@JsonDeserialize
+@Value.Immutable
+abstract class _Route {
 
     /**
      * The domain
-     *
-     * @param domain the domain
-     * @return the domain
      */
-    private final Domain domain;
+    @JsonProperty("domain")
+    abstract Domain getDomain();
 
     /**
      * The host
-     *
-     * @param host the host
-     * @return the host
      */
-    private final String host;
+    @JsonProperty("host")
+    abstract String getHost();
 
     /**
      * The id
-     *
-     * @param id the id
-     * @return the id
      */
-    private final String id;
+    @JsonProperty("guid")
+    abstract String getId();
 
     /**
      * The path
-     *
-     * @param path the path
-     * @return the path
      */
-    private final String path;
+    @JsonProperty("path")
+    abstract String getPath();
 
     /**
      * The port
-     *
-     * @param port the port
-     * @return the port
      */
-    private final Integer port;
-
-    @Builder
-    Route(@JsonProperty("domain") Domain domain,
-          @JsonProperty("host") String host,
-          @JsonProperty("guid") String id,
-          @JsonProperty("path") String path,
-          @JsonProperty("port") Integer port) {
-
-        this.domain = domain;
-        this.host = host;
-        this.id = id;
-        this.path = path;
-        this.port = port;
-    }
+    @JsonProperty("port")
+    @Nullable
+    abstract Integer getPort();
 
 }
