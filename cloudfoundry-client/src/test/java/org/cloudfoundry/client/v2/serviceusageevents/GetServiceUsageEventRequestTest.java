@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.client.v2.serviceusageevents;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class GetServiceUsageEventRequestTest {
 
-    @Test
-    public void isNotValidNoId() {
-        ValidationResult result = GetServiceUsageEventRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service usage event id must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noServiceUsageEventId() {
+        GetServiceUsageEventRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValid() {
-        ValidationResult result = GetServiceUsageEventRequest.builder()
+    public void valid() {
+        GetServiceUsageEventRequest.builder()
             .serviceUsageEventId("test-service-usage-event-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

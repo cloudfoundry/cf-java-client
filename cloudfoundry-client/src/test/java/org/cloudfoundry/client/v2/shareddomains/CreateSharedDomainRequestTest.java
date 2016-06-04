@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.client.v2.shareddomains;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class CreateSharedDomainRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = CreateSharedDomainRequest.builder()
-            .name("test-test-name")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        CreateSharedDomainRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValidNoName() {
-        ValidationResult result = CreateSharedDomainRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+    public void valid() {
+        CreateSharedDomainRequest.builder()
+            .name("test-test-name")
+            .build();
     }
 
 }

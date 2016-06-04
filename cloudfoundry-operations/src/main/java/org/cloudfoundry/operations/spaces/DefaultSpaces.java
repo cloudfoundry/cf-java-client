@@ -28,6 +28,7 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefini
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
+import org.cloudfoundry.client.v2.securitygroups.RuleEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
 import org.cloudfoundry.client.v2.services.ServiceResource;
@@ -446,7 +447,7 @@ public final class DefaultSpaces implements Spaces {
             .build();
     }
 
-    private static List<Rule> toSpaceDetailSecurityGroupRules(List<SecurityGroupEntity.RuleEntity> rules) {
+    private static List<Rule> toSpaceDetailSecurityGroupRules(List<RuleEntity> rules) {
         return rules.stream()
             .map(ruleEntity -> Rule.builder()
                 .destination(ruleEntity.getDestination())

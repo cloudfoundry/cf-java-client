@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.client.v2.routes;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class UpdateRouteRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = UpdateRouteRequest.builder()
-            .routeId("test-route-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noRouteId() {
+        UpdateRouteRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = UpdateRouteRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("route id must be specified", result.getMessages().get(0));
+    public void valid() {
+        UpdateRouteRequest.builder()
+            .routeId("test-route-id")
+            .build();
     }
 
 }

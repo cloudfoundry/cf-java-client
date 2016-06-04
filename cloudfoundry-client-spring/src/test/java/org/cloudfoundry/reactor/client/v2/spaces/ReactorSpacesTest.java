@@ -27,6 +27,7 @@ import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteResource;
+import org.cloudfoundry.client.v2.securitygroups.RuleEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
 import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
@@ -1356,7 +1357,7 @@ public final class ReactorSpacesTest {
                         .build())
                     .entity(SecurityGroupEntity.builder()
                         .name("name-47")
-                        .rule(SecurityGroupEntity.RuleEntity.builder()
+                        .rule(RuleEntity.builder()
                             .destination("198.41.191.47/1")
                             .ports("8080")
                             .protocol("udp")

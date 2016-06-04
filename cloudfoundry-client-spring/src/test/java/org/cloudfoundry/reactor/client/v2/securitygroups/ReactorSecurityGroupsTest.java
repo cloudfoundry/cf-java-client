@@ -23,6 +23,7 @@ import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefault
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsResponse;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsResponse;
+import org.cloudfoundry.client.v2.securitygroups.RuleEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultRequest;
@@ -143,7 +144,7 @@ public final class ReactorSecurityGroupsTest {
                         .build())
                     .entity(SecurityGroupEntity.builder()
                         .name("name-114")
-                        .rule(SecurityGroupEntity.RuleEntity.builder()
+                        .rule(RuleEntity.builder()
                             .destination("198.41.191.47/1")
                             .ports("8080")
                             .protocol("udp")
@@ -197,7 +198,7 @@ public final class ReactorSecurityGroupsTest {
                         .build())
                     .entity(SecurityGroupEntity.builder()
                         .name("name-570")
-                        .rule(SecurityGroupEntity.RuleEntity.builder()
+                        .rule(RuleEntity.builder()
                             .destination("198.41.191.47/1")
                             .ports("8080")
                             .protocol("udp")
@@ -249,7 +250,7 @@ public final class ReactorSecurityGroupsTest {
                     .build())
                 .entity(SecurityGroupEntity.builder()
                     .name("name-109")
-                    .rule(SecurityGroupEntity.RuleEntity.builder()
+                    .rule(RuleEntity.builder()
                         .destination("198.41.191.47/1")
                         .ports("8080")
                         .protocol("udp")
@@ -302,7 +303,7 @@ public final class ReactorSecurityGroupsTest {
                     .build())
                 .entity(SecurityGroupEntity.builder()
                     .name("name-567")
-                    .rule(SecurityGroupEntity.RuleEntity.builder()
+                    .rule(RuleEntity.builder()
                         .destination("198.41.191.47/1")
                         .ports("8080")
                         .protocol("udp")

@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v2.routes;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class RemoveRouteApplicationRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = RemoveRouteApplicationRequest.builder()
-            .applicationId("test-app-id")
+    @Test(expected = IllegalStateException.class)
+    public void noApplicationId() {
+        RemoveRouteApplicationRequest.builder()
             .routeId("test-route-id")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noRouteId() {
+        RemoveRouteApplicationRequest.builder()
+            .applicationId("test-app-id")
+            .build();
     }
 
     @Test
-    public void isValidNoAppId() {
-        ValidationResult result = RemoveRouteApplicationRequest.builder()
-            .routeId("test-route-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("application id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoId() {
-        ValidationResult result = RemoveRouteApplicationRequest.builder()
+    public void valid() {
+        RemoveRouteApplicationRequest.builder()
             .applicationId("test-app-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("route id must be specified", result.getMessages().get(0));
+            .routeId("test-route-id")
+            .build();
     }
 
 }

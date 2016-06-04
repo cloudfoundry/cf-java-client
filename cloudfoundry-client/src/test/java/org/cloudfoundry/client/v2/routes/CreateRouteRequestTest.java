@@ -16,58 +16,30 @@
 
 package org.cloudfoundry.client.v2.routes;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class CreateRouteRequestTest {
 
-    @Test
-    public void isNotValidNoDomainId() {
-        ValidationResult result = CreateRouteRequest.builder()
-            .generatePort("test-generate-port")
-            .host("test-host")
-            .path("test-path")
-            .port(10000)
+    @Test(expected = IllegalStateException.class)
+    public void noDomainId() {
+        CreateRouteRequest.builder()
             .spaceId("test-space-id")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("domain id must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noSpaceId() {
+        CreateRouteRequest.builder()
+            .domainId("test-domain-id")
+            .build();
     }
 
     @Test
-    public void isNotValidNoSpaceId() {
-        ValidationResult result = CreateRouteRequest.builder()
+    public void valid() {
+        CreateRouteRequest.builder()
             .domainId("test-domain-id")
-            .generatePort("test-generate-port")
-            .host("test-host")
-            .path("test-path")
-            .port(10000)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("space id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValid() {
-        ValidationResult result = CreateRouteRequest.builder()
-            .domainId("test-domain-id")
-            .generatePort("test-generate-port")
-            .host("test-host")
-            .path("test-path")
-            .port(10000)
             .spaceId("test-space-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

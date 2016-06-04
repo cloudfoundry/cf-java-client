@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.client.v2.spacequotadefinitions;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class GetSpaceQuotaDefinitionRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = GetSpaceQuotaDefinitionRequest.builder()
+        GetSpaceQuotaDefinitionRequest.builder()
             .spaceQuotaDefinitionId("test-space-quota-definition-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
-    @Test
-    public void isValidNoId() {
-        ValidationResult result = GetSpaceQuotaDefinitionRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("space quota definition id must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noSpaceQuotaDefinitionId() {
+        GetSpaceQuotaDefinitionRequest.builder()
+            .build();
     }
 
 }

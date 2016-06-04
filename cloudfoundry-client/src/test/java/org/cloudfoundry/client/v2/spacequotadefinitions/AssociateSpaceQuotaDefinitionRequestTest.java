@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v2.spacequotadefinitions;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class AssociateSpaceQuotaDefinitionRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = AssociateSpaceQuotaDefinitionRequest.builder()
-            .spaceId("test-space-id")
+    @Test(expected = IllegalStateException.class)
+    public void noSpaceId() {
+        AssociateSpaceQuotaDefinitionRequest.builder()
             .spaceQuotaDefinitionId("test-space-quota-definition-id")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noSpaceQuotaDefinitionId() {
+        AssociateSpaceQuotaDefinitionRequest.builder()
+            .spaceId("test-space-id")
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = AssociateSpaceQuotaDefinitionRequest.builder()
+    public void valid() {
+        AssociateSpaceQuotaDefinitionRequest.builder()
             .spaceId("test-space-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("space quota definition id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoSpaceId() {
-        ValidationResult result = AssociateSpaceQuotaDefinitionRequest.builder()
             .spaceQuotaDefinitionId("test-space-quota-definition-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("space id must be specified", result.getMessages().get(0));
+            .build();
     }
 
 }

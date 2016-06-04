@@ -16,78 +16,54 @@
 
 package org.cloudfoundry.client.v2.servicebrokers;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class CreateServiceBrokerRequestTest {
 
-    @Test
-    public void isNotValidNoName() {
-        ValidationResult result = CreateServiceBrokerRequest.builder()
-            .authenticationPassword("password")
-            .authenticationUsername("username")
-            .brokerUrl("http://somewhere-over-the-rainbow.org")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isNotValidNoPassword() {
-        ValidationResult result = CreateServiceBrokerRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noAuthenticationPassword() {
+        CreateServiceBrokerRequest.builder()
             .name("name")
             .authenticationUsername("username")
             .brokerUrl("http://somewhere-over-the-rainbow.org")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("authentication password must be specified", result.getMessages().get(0));
+            .build();
     }
 
-    @Test
-    public void isNotValidNoUrl() {
-        ValidationResult result = CreateServiceBrokerRequest.builder()
-            .name("name")
-            .authenticationPassword("password")
-            .authenticationUsername("username")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("broker url must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isNotValidNoUsername() {
-        ValidationResult result = CreateServiceBrokerRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noAuthenticationUsername() {
+        CreateServiceBrokerRequest.builder()
             .name("name")
             .authenticationPassword("password")
             .brokerUrl("http://somewhere-over-the-rainbow.org")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("authentication username must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noBrokerUrl() {
+        CreateServiceBrokerRequest.builder()
+            .name("name")
+            .authenticationPassword("password")
+            .authenticationUsername("username")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        CreateServiceBrokerRequest.builder()
+            .authenticationPassword("password")
+            .authenticationUsername("username")
+            .brokerUrl("http://somewhere-over-the-rainbow.org")
+            .build();
     }
 
     @Test
-    public void isValid() {
-        ValidationResult result = CreateServiceBrokerRequest.builder()
+    public void valid() {
+        CreateServiceBrokerRequest.builder()
             .name("name")
             .authenticationPassword("password")
             .authenticationUsername("username")
             .brokerUrl("http://somewhere-over-the-rainbow.org")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

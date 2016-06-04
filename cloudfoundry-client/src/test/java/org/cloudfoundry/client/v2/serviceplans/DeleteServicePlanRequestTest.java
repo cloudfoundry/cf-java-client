@@ -16,36 +16,22 @@
 
 package org.cloudfoundry.client.v2.serviceplans;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 
 public final class DeleteServicePlanRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = DeleteServicePlanRequest.builder()
-            .async(true)
-            .servicePlanId("test-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noServicePlanId() {
+        DeleteServicePlanRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = DeleteServicePlanRequest.builder()
-            .async(true)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service plan id must be specified", result.getMessages().get(0));
+    public void valid() {
+        DeleteServicePlanRequest.builder()
+            .servicePlanId("test-id")
+            .build();
     }
 
 }

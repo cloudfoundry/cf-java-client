@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.client.v2.securitygroups;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class SetSecurityGroupStagingDefaultRequestTest {
 
-    @Test
-    public void isNotValidNoId() {
-        ValidationResult result = SetSecurityGroupStagingDefaultRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("security group staging default id must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noSecurityGroupStagingDefaultId() {
+        SetSecurityGroupStagingDefaultRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValid() {
-        ValidationResult result = SetSecurityGroupStagingDefaultRequest.builder()
+    public void valid() {
+        SetSecurityGroupStagingDefaultRequest.builder()
             .securityGroupStagingDefaultId("test-security-group-default-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

@@ -16,59 +16,41 @@
 
 package org.cloudfoundry.client.v2.serviceplanvisibilities;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class UpdateServicePlanVisibilityRequestTest {
 
-    @Test
-    public void isNotValidNoId() {
-        ValidationResult result = GetServicePlanVisibilityRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service plan visibility id must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noServicePlanVisibilityId() {
+        UpdateServicePlanVisibilityRequest.builder()
+            .organizationId("organization-id")
+            .servicePlanId("service-plan-id")
+            .build();
     }
 
-    @Test
-    public void isNotValidNoOrganizationId() {
-        ValidationResult result = UpdateServicePlanVisibilityRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noOrganizationId() {
+        UpdateServicePlanVisibilityRequest.builder()
             .servicePlanId("service-plan-id")
             .servicePlanVisibilityId("test-service-plan-visibility-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("organization id must be specified", result.getMessages().get(0));
+            .build();
     }
 
-    @Test
-    public void isNotValidNoServicePlanId() {
-        ValidationResult result = UpdateServicePlanVisibilityRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noServicePlanId() {
+        UpdateServicePlanVisibilityRequest.builder()
             .organizationId("organization-id")
             .servicePlanVisibilityId("test-service-plan-visibility-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service plan id must be specified", result.getMessages().get(0));
+            .build();
     }
 
     @Test
-    public void isValid() {
-        ValidationResult result = UpdateServicePlanVisibilityRequest.builder()
+    public void valid() {
+        UpdateServicePlanVisibilityRequest.builder()
             .organizationId("organization-id")
             .servicePlanId("service-plan-id")
             .servicePlanVisibilityId("test-service-plan-visibility-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

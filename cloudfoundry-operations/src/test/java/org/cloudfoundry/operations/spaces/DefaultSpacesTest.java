@@ -35,6 +35,7 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
+import org.cloudfoundry.client.v2.securitygroups.RuleEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
 import org.cloudfoundry.client.v2.services.ServiceResource;
@@ -350,7 +351,7 @@ public final class DefaultSpacesTest {
                 .just(fill(ListSpaceSecurityGroupsResponse.builder())
                     .resource(fill(SecurityGroupResource.builder(), "security-group-")
                         .entity(fill(SecurityGroupEntity.builder(), "security-group-")
-                            .rule(fill(SecurityGroupEntity.RuleEntity.builder(), "security-group-")
+                            .rule(fill(RuleEntity.builder(), "security-group-")
                                 .build())
                             .build())
                         .build())
