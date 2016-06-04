@@ -34,6 +34,14 @@ public interface ServiceAdmin {
     Mono<Void> create(CreateServiceBrokerRequest request);
 
     /**
+     * Deletes a service broker
+     *
+     * @param request the Delete Service Broker request
+     * @return a completion indicator
+     */
+    Mono<Void> deleteServiceBroker(DeleteServiceBrokerRequest request);
+
+    /**
      * Lists the service brokers
      *
      * @return the service brokers
