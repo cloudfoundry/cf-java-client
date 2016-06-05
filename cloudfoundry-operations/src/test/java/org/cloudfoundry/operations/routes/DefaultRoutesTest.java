@@ -24,6 +24,7 @@ import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteRequest;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteResponse;
 import org.cloudfoundry.client.v2.domains.GetDomainRequest;
 import org.cloudfoundry.client.v2.domains.GetDomainResponse;
+import org.cloudfoundry.client.v2.jobs.ErrorDetails;
 import org.cloudfoundry.client.v2.jobs.GetJobRequest;
 import org.cloudfoundry.client.v2.jobs.GetJobResponse;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
@@ -181,7 +182,7 @@ public final class DefaultRoutesTest {
                             .build(),
                         fill(GetJobResponse.builder(), "job-")
                             .entity(fill(JobEntity.builder())
-                                .errorDetails(fill(JobEntity.ErrorDetails.builder(), "error-details-")
+                                .errorDetails(fill(ErrorDetails.builder(), "error-details-")
                                     .build())
                                 .status("failed")
                                 .build())

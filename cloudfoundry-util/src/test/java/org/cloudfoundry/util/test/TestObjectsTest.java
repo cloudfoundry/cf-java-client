@@ -27,6 +27,7 @@ import static org.junit.Assert.assertEquals;
 
 public final class TestObjectsTest {
 
+    @SuppressWarnings("deprecation")
     @Test
     public void fillEntityWithModifier() {
 

@@ -65,6 +65,7 @@ import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
+import org.cloudfoundry.client.v2.serviceinstances.Service;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstance;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
@@ -87,8 +88,6 @@ import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-
-import org.cloudfoundry.client.v2.serviceinstances.Service;
 import static org.cloudfoundry.client.v2.serviceinstances.Plan.builder;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.junit.Assert.assertArrayEquals;
@@ -113,6 +112,7 @@ public final class ReactorApplicationsV2Test {
                 .build();
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         protected AssociateApplicationRouteResponse getResponse() {
             return AssociateApplicationRouteResponse.builder()
@@ -136,6 +136,7 @@ public final class ReactorApplicationsV2Test {
                     .name("name-657")
                     .packageState("PENDING")
                     .packageUpdatedAt("2015-07-27T22:43:19Z")
+                    .ports(Collections.emptyList())
                     .production(false)
                     .routesUrl("/v2/apps/638e90b6-502f-47a8-a3bf-b18fdf3fb70a/routes")
                     .routeMappingsUrl("/v2/apps/638e90b6-502f-47a8-a3bf-b18fdf3fb70a/route_mappings")
@@ -230,6 +231,7 @@ public final class ReactorApplicationsV2Test {
                 .build();
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         protected CreateApplicationResponse getResponse() {
             return CreateApplicationResponse.builder()
@@ -253,6 +255,7 @@ public final class ReactorApplicationsV2Test {
                     .name("docker_app")
                     .packageState("PENDING")
                     .packageUpdatedAt("2015-07-27T22:43:20Z")
+                    .ports(Collections.emptyList())
                     .production(false)
                     .routesUrl("/v2/apps/78d1a119-2ded-405f-8675-421d8dade602/routes")
                     .routeMappingsUrl("/v2/apps/78d1a119-2ded-405f-8675-421d8dade602/route_mappings")
@@ -479,6 +482,7 @@ public final class ReactorApplicationsV2Test {
                 .build();
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         protected GetApplicationResponse getResponse() {
             return GetApplicationResponse.builder()
@@ -588,6 +592,7 @@ public final class ReactorApplicationsV2Test {
                 .build();
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         protected ListApplicationsResponse getResponse() {
             return ListApplicationsResponse.builder()
@@ -915,6 +920,7 @@ public final class ReactorApplicationsV2Test {
                 .build();
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         protected RestageApplicationResponse getResponse() {
             return RestageApplicationResponse.builder()
@@ -938,6 +944,7 @@ public final class ReactorApplicationsV2Test {
                     .packageState("PENDING")
                     .healthCheckType("port")
                     .diego(false)
+                    .ports(Collections.emptyList())
                     .packageUpdatedAt("2015-07-27T22:43:33Z")
                     .detectedStartCommand("")
                     .enableSsh(true)
@@ -1033,6 +1040,7 @@ public final class ReactorApplicationsV2Test {
                 .build();
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         protected SummaryApplicationResponse getResponse() {
             return SummaryApplicationResponse.builder()
@@ -1087,6 +1095,7 @@ public final class ReactorApplicationsV2Test {
                 .healthCheckType("port")
                 .diego(false)
                 .packageUpdatedAt("2016-04-22T19:33:29Z")
+                .ports(Collections.emptyList())
                 .detectedStartCommand("")
                 .enableSsh(true)
                 .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
@@ -1161,6 +1170,7 @@ public final class ReactorApplicationsV2Test {
                 .build();
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         protected UpdateApplicationResponse getResponse() {
             return UpdateApplicationResponse.builder()
@@ -1180,6 +1190,7 @@ public final class ReactorApplicationsV2Test {
                     .diego(false)
                     .packageUpdatedAt("2015-07-27T22:43:21Z")
                     .detectedStartCommand("")
+                    .ports(Collections.emptyList())
                     .enableSsh(true)
                     .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
                     .spaceUrl("/v2/spaces/701aebe5-92fd-44cf-a7e6-bc54685c32ea")

@@ -53,6 +53,7 @@ import org.cloudfoundry.client.v2.events.EventEntity;
 import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.client.v2.events.ListEventsResponse;
+import org.cloudfoundry.client.v2.jobs.ErrorDetails;
 import org.cloudfoundry.client.v2.jobs.GetJobRequest;
 import org.cloudfoundry.client.v2.jobs.GetJobResponse;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
@@ -644,7 +645,7 @@ public final class DefaultApplicationsTest {
                             .build(),
                         fill(GetJobResponse.builder(), "job-")
                             .entity(fill(JobEntity.builder())
-                                .errorDetails(fill(JobEntity.ErrorDetails.builder(), "error-details-")
+                                .errorDetails(fill(ErrorDetails.builder(), "error-details-")
                                     .build())
                                 .status("failed")
                                 .build())
@@ -957,7 +958,7 @@ public final class DefaultApplicationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(GetSpaceResponse.builder())
-                    .entity(SpaceEntity.builder()
+                    .entity(fill(SpaceEntity.builder())
                         .organizationId(organizationId)
                         .build())
                     .build()));

@@ -1960,9 +1960,9 @@ public final class ReactorOrganizationsTest {
                     .id("dec1c7b0-8ea6-488a-9410-f73649d30228")
                     .name("name-359")
                     .serviceCount(0)
-                    .appCount(0)
-                    .memDevTotal(0)
-                    .memProdTotal(0)
+                    .applicationCount(0)
+                    .memoryDevelopmentTotal(0)
+                    .memoryProductionTotal(0)
                     .build())
                 .build();
         }

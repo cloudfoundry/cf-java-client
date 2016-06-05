@@ -17,6 +17,7 @@
 package org.cloudfoundry.reactor.client.v2.jobs;
 
 import org.cloudfoundry.client.v2.Metadata;
+import org.cloudfoundry.client.v2.jobs.ErrorDetails;
 import org.cloudfoundry.client.v2.jobs.GetJobRequest;
 import org.cloudfoundry.client.v2.jobs.GetJobResponse;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
@@ -60,7 +61,7 @@ public final class ReactorJobsTest {
                     .id("e86ffe00-a243-48f7-be05-8f1f41bee864")
                     .status("failed")
                     .error("Use of entity>error is deprecated in favor of entity>error_details.")
-                    .errorDetails(JobEntity.ErrorDetails.builder()
+                    .errorDetails(ErrorDetails.builder()
                         .errorCode("UnknownError")
                         .description("An unknown error occurred.")
                         .code(10001)

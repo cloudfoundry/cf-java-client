@@ -69,45 +69,4 @@ public final class JobEntity {
         this.status = status;
     }
 
-    /**
-     * The error details in {@link JobEntity} response payloads
-     */
-    @Data
-    public static final class ErrorDetails {
-
-        /**
-         * The code
-         *
-         * @param code the code
-         * @return the code
-         */
-        private final Integer code;
-
-        /**
-         * The description
-         *
-         * @param description the description
-         * @return the description
-         */
-        private final String description;
-
-        /**
-         * The error code
-         *
-         * @param errorCode the error code
-         * @return the error code
-         */
-        private final String errorCode;
-
-        @Builder
-        ErrorDetails(@JsonProperty("code") Integer code,
-                     @JsonProperty("description") String description,
-                     @JsonProperty("error_code") String errorCode) {
-            this.code = code;
-            this.description = description;
-            this.errorCode = errorCode;
-        }
-
-    }
-
 }

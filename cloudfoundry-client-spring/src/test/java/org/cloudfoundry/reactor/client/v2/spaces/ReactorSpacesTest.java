@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.spaces;
 
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.domains.Domain;
@@ -31,6 +32,8 @@ import org.cloudfoundry.client.v2.securitygroups.RuleEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
 import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
+import org.cloudfoundry.client.v2.serviceinstances.Plan;
+import org.cloudfoundry.client.v2.serviceinstances.Service;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceResource;
 import org.cloudfoundry.client.v2.services.ServiceEntity;
@@ -107,6 +110,8 @@ import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.cloudfoundry.util.StringMap;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
+
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
@@ -114,11 +119,6 @@ import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-
-import org.cloudfoundry.client.v2.Metadata;
-import org.cloudfoundry.client.v2.serviceinstances.Plan;
-
-import org.cloudfoundry.client.v2.serviceinstances.Service;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.builder;
 
 public final class ReactorSpacesTest {
@@ -756,6 +756,7 @@ public final class ReactorSpacesTest {
                 .build();
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         protected GetSpaceSummaryResponse getResponse() {
             return GetSpaceSummaryResponse.builder()
@@ -789,6 +790,7 @@ public final class ReactorSpacesTest {
                     .packageState("PENDING")
                     .healthCheckType("port")
                     .diego(false)
+                    .ports(Collections.emptyList())
                     .packageUpdatedAt("2016-04-22T19:33:13Z")
                     .detectedStartCommand("")
                     .enableSsh(true)
@@ -911,6 +913,7 @@ public final class ReactorSpacesTest {
                 .build();
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         protected ListSpaceApplicationsResponse getResponse() {
             return ListSpaceApplicationsResponse.builder()

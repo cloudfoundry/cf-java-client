@@ -25,6 +25,7 @@ import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsResponse;
+import org.cloudfoundry.client.v2.jobs.ErrorDetails;
 import org.cloudfoundry.client.v2.jobs.GetJobRequest;
 import org.cloudfoundry.client.v2.jobs.GetJobResponse;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
@@ -253,7 +254,7 @@ public final class DefaultServicesTest {
                     .metadata(fill(Metadata.builder())
                         .id(applicationId)
                         .build())
-                    .entity(ApplicationEntity.builder()
+                    .entity(fill(ApplicationEntity.builder())
                         .name(application)
                         .build())
                     .build())
@@ -336,7 +337,7 @@ public final class DefaultServicesTest {
                             .build(),
                         fill(GetJobResponse.builder(), "job-")
                             .entity(fill(JobEntity.builder())
-                                .errorDetails(fill(JobEntity.ErrorDetails.builder(), "error-details-")
+                                .errorDetails(fill(ErrorDetails.builder(), "error-details-")
                                     .build())
                                 .status("failed")
                                 .build())

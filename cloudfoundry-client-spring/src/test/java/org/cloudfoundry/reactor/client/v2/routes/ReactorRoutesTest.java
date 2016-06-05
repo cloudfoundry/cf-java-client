@@ -414,6 +414,7 @@ public final class ReactorRoutesTest {
                 .build();
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         protected ListRouteApplicationsResponse getResponse() {
             return ListRouteApplicationsResponse.builder()

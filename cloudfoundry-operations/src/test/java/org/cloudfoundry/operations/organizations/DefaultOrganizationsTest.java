@@ -22,6 +22,7 @@ import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagRequest;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagResponse;
+import org.cloudfoundry.client.v2.jobs.ErrorDetails;
 import org.cloudfoundry.client.v2.jobs.GetJobRequest;
 import org.cloudfoundry.client.v2.jobs.GetJobResponse;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
@@ -162,7 +163,7 @@ public final class DefaultOrganizationsTest {
                         GetJobResponse.builder()
                             .metadata(fill(Metadata.builder()).build())
                             .entity(fill(JobEntity.builder())
-                                .errorDetails(fill(JobEntity.ErrorDetails.builder(), "error-details-")
+                                .errorDetails(fill(ErrorDetails.builder(), "error-details-")
                                     .build())
                                 .status("failed")
                                 .build())

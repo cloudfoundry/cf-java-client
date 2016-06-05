@@ -21,6 +21,7 @@ import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.domains.DomainResource;
+import org.cloudfoundry.client.v2.jobs.ErrorDetails;
 import org.cloudfoundry.client.v2.jobs.GetJobRequest;
 import org.cloudfoundry.client.v2.jobs.GetJobResponse;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
@@ -158,7 +159,7 @@ public final class DefaultSpacesTest {
                             .build(),
                         fill(GetJobResponse.builder(), "job-")
                             .entity(fill(JobEntity.builder())
-                                .errorDetails(fill(JobEntity.ErrorDetails.builder(), "error-details-")
+                                .errorDetails(fill(ErrorDetails.builder(), "error-details-")
                                     .build())
                                 .status("failed")
                                 .build())
