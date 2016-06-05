@@ -22,6 +22,8 @@ import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.ListApplicationsResponse;
 import org.junit.Test;
 
+import java.util.Collections;
+
 import static org.cloudfoundry.util.test.TestObjects.fill;
 import static org.junit.Assert.assertEquals;
 
@@ -40,6 +42,7 @@ public final class TestObjectsTest {
             .detectedStartCommand("test-1detectedStartCommand")
             .diego(true)
             .diskQuota(1)
+            .dockerCredentialsJsons(Collections.emptyMap())
             .dockerImage("test-1dockerImage")
             .healthCheckTimeout(1)
             .healthCheckType("test-1healthCheckType")
@@ -58,6 +61,7 @@ public final class TestObjectsTest {
             .eventsUrl("test-1eventsUrl")
             .packageState("test-1packageState")
             .packageUpdatedAt("test-1packageUpdatedAt")
+            .ports(Collections.emptyList())
             .routesUrl("test-1routesUrl")
             .routeMappingsUrl("test-1routeMappingsUrl")
             .serviceBindingsUrl("test-1serviceBindingsUrl")
