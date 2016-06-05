@@ -1197,7 +1197,7 @@ public final class DefaultApplications implements Applications {
     }
 
     private static InstanceDetail toInstanceDetail(Map.Entry<String, ApplicationInstanceInfo> entry, ApplicationStatisticsResponse statisticsResponse) {
-        InstanceStatistics instanceStatistics = Optional.ofNullable(statisticsResponse.get(entry.getKey())).orElse(emptyInstanceStats());
+        InstanceStatistics instanceStatistics = Optional.ofNullable(statisticsResponse.getInstances().get(entry.getKey())).orElse(emptyInstanceStats());
         Statistics stats = Optional.ofNullable(instanceStatistics.getStatistics()).orElse(emptyApplicationStatistics());
         Usage usage = Optional.ofNullable(stats.getUsage()).orElse(emptyApplicationUsage());
 
@@ -1214,7 +1214,7 @@ public final class DefaultApplications implements Applications {
 
     private static Mono<List<InstanceDetail>> toInstanceDetailList(ApplicationInstancesResponse instancesResponse, ApplicationStatisticsResponse statisticsResponse) {
         return Flux
-            .fromIterable(instancesResponse.entrySet())
+            .fromIterable(instancesResponse.getInstances().entrySet())
             .map(entry -> toInstanceDetail(entry, statisticsResponse))
             .collectList();
     }
@@ -1250,7 +1250,7 @@ public final class DefaultApplications implements Applications {
         Duration timeout = Optional.ofNullable(startupTimeout).orElse(Duration.ofMinutes(5));
 
         return requestApplicationInstances(cloudFoundryClient, applicationId)
-            .flatMap(response -> Flux.fromIterable(response.values()))
+            .flatMap(response -> Flux.fromIterable(response.getInstances().values()))
             .map(ApplicationInstanceInfo::getState)
             .reduce("UNKNOWN", collectStates())
             .filter(isInstanceComplete())

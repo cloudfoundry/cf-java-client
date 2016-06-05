@@ -664,7 +664,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .statistics(ApplicationStatisticsRequest.builder()
                     .applicationId(applicationId)
                     .build())
-                .map(instanceStatistics -> instanceStatistics.get("0").getStatistics().getName()))
+                .map(instanceStatistics -> instanceStatistics.getInstances().get("0").getStatistics().getName()))
             .subscribe(this.testSubscriber()
                 .assertEquals(applicationName));
     }
@@ -820,8 +820,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     private static Mono<ApplicationInstanceInfo> getInstanceInfo(CloudFoundryClient cloudFoundryClient, String applicationId, String instanceName) {
         return requestInstances(cloudFoundryClient, applicationId)
-            .filter(response -> response.containsKey(instanceName))
-            .map(response -> response.get(instanceName));
+            .filter(response -> response.getInstances().containsKey(instanceName))
+            .map(response -> response.getInstances().get(instanceName));
     }
 
     private static Mono<String> getSingleRouteId(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -986,7 +986,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .instances(ApplicationInstancesRequest.builder()
                 .applicationId(applicationId)
                 .build())
-            .flatMap(response -> Flux.fromIterable(response.values()))
+            .flatMap(response -> Flux.fromIterable(response.getInstances().values()))
             .filter(applicationInstanceInfo -> "RUNNING".equals(applicationInstanceInfo.getState()))
             .next()
             .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
