@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v2.organizations;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class AssociateOrganizationBillingManagerRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = AssociateOrganizationBillingManagerRequest.builder()
-            .billingManagerId("test-billing-manager-id")
+    @Test(expected = IllegalStateException.class)
+    public void noBillingManagerId() {
+        AssociateOrganizationBillingManagerRequest.builder()
             .organizationId("test-organization-id")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noOrganizationId() {
+        AssociateOrganizationBillingManagerRequest.builder()
+            .billingManagerId("test-billing-manager-id")
+            .build();
     }
 
     @Test
-    public void isValidNoBillingManagerId() {
-        ValidationResult result = AssociateOrganizationBillingManagerRequest.builder()
-            .organizationId("test-organization-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("billing manager id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoId() {
-        ValidationResult result = AssociateOrganizationBillingManagerRequest.builder()
+    public void valid() {
+        AssociateOrganizationBillingManagerRequest.builder()
             .billingManagerId("test-billing-manager-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("organization id must be specified", result.getMessages().get(0));
+            .organizationId("test-organization-id")
+            .build();
     }
 
 }

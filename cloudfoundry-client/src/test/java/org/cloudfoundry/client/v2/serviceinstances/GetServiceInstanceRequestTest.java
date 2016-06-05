@@ -17,33 +17,21 @@
 package org.cloudfoundry.client.v2.serviceinstances;
 
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class GetServiceInstanceRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = GetServiceInstanceRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noServiceInstanceId() {
+        GetServiceInstanceRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = GetServiceInstanceRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service instance id must be specified", result.getMessages().get(0));
+    public void valid() {
+        GetServiceInstanceRequest.builder()
+            .serviceInstanceId("test-service-instance-id")
+            .build();
     }
 
 }

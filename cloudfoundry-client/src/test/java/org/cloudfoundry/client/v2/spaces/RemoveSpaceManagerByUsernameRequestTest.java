@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v2.spaces;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class RemoveSpaceManagerByUsernameRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = RemoveSpaceManagerByUsernameRequest.builder()
-            .spaceId("test-space-id")
+    @Test(expected = IllegalStateException.class)
+    public void noSpaceId() {
+        RemoveSpaceManagerByUsernameRequest.builder()
             .username("test-username")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noUsername() {
+        RemoveSpaceManagerByUsernameRequest.builder()
+            .spaceId("test-space-id")
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = RemoveSpaceManagerByUsernameRequest.builder()
-            .username("test-username")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("space id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoUsername() {
-        ValidationResult result = RemoveSpaceManagerByUsernameRequest.builder()
+    public void valid() {
+        RemoveSpaceManagerByUsernameRequest.builder()
             .spaceId("test-space-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("username must be specified", result.getMessages().get(0));
+            .username("test-username")
+            .build();
     }
 
 }

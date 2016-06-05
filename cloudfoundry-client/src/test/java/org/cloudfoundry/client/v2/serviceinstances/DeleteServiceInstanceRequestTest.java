@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.client.v2.serviceinstances;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class DeleteServiceInstanceRequestTest {
 
-    @Test
-    public void isNotValidNoId() {
-        ValidationResult result = DeleteServiceInstanceRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service instance id must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noServiceInstanceId() {
+        DeleteServiceInstanceRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValid() {
-        ValidationResult result = DeleteServiceInstanceRequest.builder()
+    public void valid() {
+        DeleteServiceInstanceRequest.builder()
             .serviceInstanceId("test-service-instance-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

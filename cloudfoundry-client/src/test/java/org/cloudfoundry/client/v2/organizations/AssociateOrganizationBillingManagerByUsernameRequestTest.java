@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v2.organizations;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class AssociateOrganizationBillingManagerByUsernameRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = AssociateOrganizationBillingManagerByUsernameRequest.builder()
-            .organizationId("test-organization-id")
+    @Test(expected = IllegalStateException.class)
+    public void noOrganizationId() {
+        AssociateOrganizationBillingManagerByUsernameRequest.builder()
             .username("test-username")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noUsername() {
+        AssociateOrganizationBillingManagerByUsernameRequest.builder()
+            .organizationId("test-organization-id")
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = AssociateOrganizationBillingManagerByUsernameRequest.builder()
-            .username("test-username")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("organization id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoUsername() {
-        ValidationResult result = AssociateOrganizationBillingManagerByUsernameRequest.builder()
+    public void valid() {
+        AssociateOrganizationBillingManagerByUsernameRequest.builder()
             .organizationId("test-organization-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("username must be specified", result.getMessages().get(0));
+            .username("test-username")
+            .build();
     }
 
 }

@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v2.spaces;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class RemoveSpaceAuditorRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = RemoveSpaceAuditorRequest.builder()
-            .auditorId("test-auditor-id")
+    @Test(expected = IllegalStateException.class)
+    public void noAuditorId() {
+        RemoveSpaceAuditorRequest.builder()
             .spaceId("test-space-id")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noSpaceId() {
+        RemoveSpaceAuditorRequest.builder()
+            .auditorId("test-auditor-id")
+            .build();
     }
 
     @Test
-    public void isValidNoAuditorId() {
-        ValidationResult result = RemoveSpaceAuditorRequest.builder()
-            .spaceId("test-space-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("auditor id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoId() {
-        ValidationResult result = RemoveSpaceAuditorRequest.builder()
+    public void valid() {
+        RemoveSpaceAuditorRequest.builder()
             .auditorId("test-auditor-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("space id must be specified", result.getMessages().get(0));
+            .spaceId("test-space-id")
+            .build();
     }
 
 }

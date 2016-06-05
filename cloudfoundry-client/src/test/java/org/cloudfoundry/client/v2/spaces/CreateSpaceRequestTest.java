@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v2.spaces;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class CreateSpaceRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = CreateSpaceRequest.builder()
-            .name("test-name")
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        CreateSpaceRequest.builder()
             .organizationId("test-organization-id")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noOrganizationId() {
+        CreateSpaceRequest.builder()
+            .name("test-name")
+            .build();
     }
 
     @Test
-    public void isValidNoName() {
-        ValidationResult result = CreateSpaceRequest.builder()
-            .organizationId("test-organization-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoOrganizationId() {
-        ValidationResult result = CreateSpaceRequest.builder()
+    public void valid() {
+        CreateSpaceRequest.builder()
             .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("organization id must be specified", result.getMessages().get(0));
+            .organizationId("test-organization-id")
+            .build();
     }
 
 }

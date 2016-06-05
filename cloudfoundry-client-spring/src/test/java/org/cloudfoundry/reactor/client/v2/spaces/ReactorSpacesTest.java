@@ -116,8 +116,9 @@ import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 import org.cloudfoundry.client.v2.Metadata;
-import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan;
-import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.Service;
+import org.cloudfoundry.client.v2.serviceinstances.Plan;
+
+import org.cloudfoundry.client.v2.serviceinstances.Service;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.builder;
 
 public final class ReactorSpacesTest {

@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v2.spaces;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class AssociateSpaceSecurityGroupRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = AssociateSpaceSecurityGroupRequest.builder()
-            .securityGroupId("test-security-group-id")
+    @Test(expected = IllegalStateException.class)
+    public void noSecurityGroupId() {
+        AssociateSpaceSecurityGroupRequest.builder()
             .spaceId("test-space-id")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noSpaceId() {
+        AssociateSpaceSecurityGroupRequest.builder()
+            .securityGroupId("test-security-group-id")
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = AssociateSpaceSecurityGroupRequest.builder()
+    public void valid() {
+        AssociateSpaceSecurityGroupRequest.builder()
             .securityGroupId("test-security-group-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("space id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoSecurityGroupId() {
-        ValidationResult result = AssociateSpaceSecurityGroupRequest.builder()
             .spaceId("test-space-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("security group id must be specified", result.getMessages().get(0));
+            .build();
     }
 
 }

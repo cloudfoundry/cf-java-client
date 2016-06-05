@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v2.organizations;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class RemoveOrganizationManagerRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = RemoveOrganizationManagerRequest.builder()
-            .managerId("test-manager-id")
+    @Test(expected = IllegalStateException.class)
+    public void noManagerId() {
+        RemoveOrganizationManagerRequest.builder()
             .organizationId("test-organization-id")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noOrganizationId() {
+        RemoveOrganizationManagerRequest.builder()
+            .managerId("test-manager-id")
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = RemoveOrganizationManagerRequest.builder()
+    public void valid() {
+        RemoveOrganizationManagerRequest.builder()
             .managerId("test-manager-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("organization id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoManagerId() {
-        ValidationResult result = RemoveOrganizationManagerRequest.builder()
             .organizationId("test-organization-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("manager id must be specified", result.getMessages().get(0));
+            .build();
     }
 
 }

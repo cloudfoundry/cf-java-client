@@ -1857,7 +1857,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     }
 
     private static Mono<CreateOrganizationResponse> requestCreateOrganization(CloudFoundryClient cloudFoundryClient, String organizationName,
-                                                                              UnaryOperator<CreateOrganizationRequest.CreateOrganizationRequestBuilder> transformer) {
+                                                                              UnaryOperator<CreateOrganizationRequest.Builder> transformer) {
         return cloudFoundryClient.organizations()
             .create(transformer.apply(CreateOrganizationRequest.builder())
                 .name(organizationName)

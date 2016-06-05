@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v2.servicekeys;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class CreateServiceKeyRequestTest {
 
-    @Test
-    public void isNotValidNoName() {
-        ValidationResult result = CreateServiceKeyRequest.builder()
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        CreateServiceKeyRequest.builder()
             .serviceInstanceId("service-instance-id")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noServiceInstanceId() {
+        CreateServiceKeyRequest.builder()
+            .name("name")
+            .build();
     }
 
     @Test
-    public void isNotValidNoServiceInstanceId() {
-        ValidationResult result = CreateServiceKeyRequest.builder()
-            .name("name")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service instance id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValid() {
-        ValidationResult result = CreateServiceKeyRequest.builder()
+    public void valid() {
+        CreateServiceKeyRequest.builder()
             .name("name")
             .serviceInstanceId("service-instance-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

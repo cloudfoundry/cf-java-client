@@ -16,33 +16,21 @@
 
 package org.cloudfoundry.client.v2.userprovidedserviceinstances;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class GetUserProvidedServiceInstanceRequestTest {
 
-    @Test
-    public void isNotValidNoId() {
-        ValidationResult result = GetUserProvidedServiceInstanceRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("user provided service instance id must be specified", result.getMessages().get(0));
+    @Test(expected = IllegalStateException.class)
+    public void noUserProvidedServiceInstanceId() {
+        GetUserProvidedServiceInstanceRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValid() {
-        ValidationResult result = GetUserProvidedServiceInstanceRequest.builder()
+    public void valid() {
+        GetUserProvidedServiceInstanceRequest.builder()
             .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+            .build();
     }
 
 }

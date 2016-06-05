@@ -87,8 +87,9 @@ import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.Service;
-import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.builder;
+
+import org.cloudfoundry.client.v2.serviceinstances.Service;
+import static org.cloudfoundry.client.v2.serviceinstances.Plan.builder;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;

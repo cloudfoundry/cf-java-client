@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v2.spaces;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class AssociateSpaceDeveloperRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = AssociateSpaceDeveloperRequest.builder()
-            .developerId("test-developer-id")
+    @Test(expected = IllegalStateException.class)
+    public void noDeveloperId() {
+        AssociateSpaceDeveloperRequest.builder()
             .spaceId("test-space-id")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noSpaceId() {
+        AssociateSpaceDeveloperRequest.builder()
+            .developerId("test-developer-id")
+            .build();
     }
 
     @Test
-    public void isValidNoAuditorId() {
-        ValidationResult result = AssociateSpaceDeveloperRequest.builder()
-            .spaceId("test-space-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("developer id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoId() {
-        ValidationResult result = AssociateSpaceDeveloperRequest.builder()
+    public void valid() {
+        AssociateSpaceDeveloperRequest.builder()
             .developerId("test-developer-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("space id must be specified", result.getMessages().get(0));
+            .spaceId("test-space-id")
+            .build();
     }
 
 }

@@ -17,33 +17,21 @@
 package org.cloudfoundry.client.v2.servicebindings;
 
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class DeleteServiceBindingRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = DeleteServiceBindingRequest.builder()
-            .serviceBindingId("test-service-binding-id")
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noServiceBindingId() {
+        DeleteServiceBindingRequest.builder()
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = DeleteServiceBindingRequest.builder()
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("service binding id must be specified", result.getMessages().get(0));
+    public void valid() {
+        DeleteServiceBindingRequest.builder()
+            .serviceBindingId("test-service-binding-id")
+            .build();
     }
 
 }

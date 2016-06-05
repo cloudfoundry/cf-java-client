@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v2.organizations;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class RemoveOrganizationPrivateDomainRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = RemoveOrganizationPrivateDomainRequest.builder()
-            .organizationId("test-organization-id")
+    @Test(expected = IllegalStateException.class)
+    public void noOrganizationId() {
+        RemoveOrganizationPrivateDomainRequest.builder()
             .privateDomainId("test-private-domain-id")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noPrivateDomainId() {
+        RemoveOrganizationPrivateDomainRequest.builder()
+            .organizationId("test-organization-id")
+            .build();
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = RemoveOrganizationPrivateDomainRequest.builder()
-            .privateDomainId("test-private-domain-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("organization id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoPrivateDomainId() {
-        ValidationResult result = RemoveOrganizationPrivateDomainRequest.builder()
+    public void valid() {
+        RemoveOrganizationPrivateDomainRequest.builder()
             .organizationId("test-organization-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("private domain id must be specified", result.getMessages().get(0));
+            .privateDomainId("test-private-domain-id")
+            .build();
     }
 
 }

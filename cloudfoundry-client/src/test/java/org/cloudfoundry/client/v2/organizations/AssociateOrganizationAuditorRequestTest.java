@@ -16,46 +16,30 @@
 
 package org.cloudfoundry.client.v2.organizations;
 
-import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
-
-import static org.cloudfoundry.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertEquals;
 
 public final class AssociateOrganizationAuditorRequestTest {
 
-    @Test
-    public void isValid() {
-        ValidationResult result = AssociateOrganizationAuditorRequest.builder()
-            .auditorId("test-auditor-id")
+    @Test(expected = IllegalStateException.class)
+    public void noAuditorId() {
+        AssociateOrganizationAuditorRequest.builder()
             .organizationId("test-organization-id")
-            .build()
-            .isValid();
+            .build();
+    }
 
-        assertEquals(VALID, result.getStatus());
+    @Test(expected = IllegalStateException.class)
+    public void noOrganizationId() {
+        AssociateOrganizationAuditorRequest.builder()
+            .auditorId("test-auditor-id")
+            .build();
     }
 
     @Test
-    public void isValidNoAuditorId() {
-        ValidationResult result = AssociateOrganizationAuditorRequest.builder()
-            .organizationId("test-organization-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("auditor id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoOrganizationId() {
-        ValidationResult result = AssociateOrganizationAuditorRequest.builder()
+    public void valid() {
+        AssociateOrganizationAuditorRequest.builder()
             .auditorId("test-auditor-id")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("organization id must be specified", result.getMessages().get(0));
+            .organizationId("test-organization-id")
+            .build();
     }
 
 }
