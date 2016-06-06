@@ -24,6 +24,7 @@ import lombok.experimental.Accessors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
@@ -126,7 +127,7 @@ public final class OAuth2RestTemplateBuilder {
 
     private static void setRequestFactory(OAuth2RestTemplate restTemplate, HostnameVerifier hostnameVerifier, SSLContext sslContext) {
         if (hostnameVerifier != null && sslContext != null) {
-            CustomSslSimpleClientHttpRequestFactory requestFactory = new CustomSslSimpleClientHttpRequestFactory(hostnameVerifier, sslContext);
+            ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(HttpClientFactory.getHttpClient(hostnameVerifier, sslContext));
 
             restTemplate.setRequestFactory(requestFactory);
             restTemplate.setAccessTokenProvider(getAccessTokenProvider(requestFactory));
