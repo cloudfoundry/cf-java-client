@@ -19,49 +19,52 @@ package org.cloudfoundry.uaa.tokens;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
 
-abstract class AbstractTokenKey {
+/**
+ * The base class for token keys
+ */
+public abstract class AbstractTokenKey {
 
     /**
      * The algorithm
      */
     @JsonProperty("alg")
-    abstract String getAlgorithm();
+    public abstract String getAlgorithm();
 
     /**
      * The exponent
      */
     @JsonProperty("e")
-    abstract String getE();
+    public abstract String getE();
 
     /**
      * The id
      */
     @JsonProperty("kid")
     @Nullable  // TODO: Remove once all test environments are on UAA 3.3.0 or later
-    abstract String getId();
+    public abstract String getId();
 
     /**
      * The key type
      */
     @JsonProperty("kty")
-    abstract KeyType getKeyType();
+    public abstract KeyType getKeyType();
 
     /**
      * The modulus
      */
     @JsonProperty("n")
-    abstract String getN();
+    public abstract String getN();
 
     /**
      * The use
      */
     @JsonProperty("use")
-    abstract String getUse();
+    public abstract String getUse();
 
     /**
      * The value
      */
     @JsonProperty("value")
-    abstract String getValue();
+    public abstract String getValue();
 
 }

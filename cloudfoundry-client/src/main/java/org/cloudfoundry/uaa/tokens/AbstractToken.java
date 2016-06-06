@@ -18,36 +18,39 @@ package org.cloudfoundry.uaa.tokens;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-abstract class AbstractToken {
+/**
+ * The base class for all tokens
+ */
+public abstract class AbstractToken {
 
     /**
      * The access token
      */
     @JsonProperty("access_token")
-    abstract String getAccessToken();
+    public abstract String getAccessToken();
 
     /**
      * The number of seconds until token expiry
      */
     @JsonProperty("expires_in")
-    abstract Integer getExpiresInSeconds();
+    public abstract Integer getExpiresInSeconds();
 
     /**
      * The space-delimited list of scopes authorized by the user for this client
      */
     @JsonProperty("scope")
-    abstract String getScopes();
+    public abstract String getScopes();
 
     /**
      * The identifier for this token
      */
     @JsonProperty("jti")
-    abstract String getTokenId();
+    public abstract String getTokenId();
 
     /**
      * The type of the access token issued
      */
     @JsonProperty("token_type")
-    abstract String getTokenType();
+    public abstract String getTokenType();
 
 }

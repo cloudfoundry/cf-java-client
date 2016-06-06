@@ -21,46 +21,46 @@ import java.util.List;
 /**
  * A Cloud Foundry Application summary base class
  */
-abstract class AbstractApplicationSummary {
+public abstract class AbstractApplicationSummary {
 
     /**
      * The disk quota in bytes
      */
-    abstract Integer getDiskQuota();
+    public abstract Integer getDiskQuota();
 
     /**
      * The id
      */
-    abstract String getId();
+    public abstract String getId();
 
     /**
      * The number of instances
      */
-    abstract Integer getInstances();
+    public abstract Integer getInstances();
 
     /**
      * The memory limit in bytes
      */
-    abstract Integer getMemoryLimit();
+    public abstract Integer getMemoryLimit();
 
     /**
      * The name
      */
-    abstract String getName();
+    public abstract String getName();
 
     /**
      * The requested state
      */
-    abstract String getRequestedState();
+    public abstract String getRequestedState();
 
     /**
      * The number of running instances
      */
-    abstract Integer getRunningInstances();
+    public abstract Integer getRunningInstances();
 
     /**
      * The list of bound urls
      */
-    abstract List<String> getUrls();
+    public abstract List<String> getUrls();
 
 }
