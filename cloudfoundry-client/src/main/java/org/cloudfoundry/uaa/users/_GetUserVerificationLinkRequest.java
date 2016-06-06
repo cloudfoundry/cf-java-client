@@ -17,6 +17,7 @@
 package org.cloudfoundry.uaa.users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.QueryParameter;
 import org.immutables.value.Value;
 
 /**
@@ -28,7 +29,7 @@ abstract class _GetUserVerificationLinkRequest {
     /**
      * The redirect URI
      */
-    @JsonIgnore
+    @QueryParameter("redirect_uri")
     abstract String getRedirectUri();
 
     /**

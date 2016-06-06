@@ -69,7 +69,7 @@ public final class ReactorUsers extends AbstractUaaOperations implements Users {
 
     @Override
     public Mono<GetUserVerificationLinkResponse> getVerificationLink(GetUserVerificationLinkRequest request) {
-        return get(request, GetUserVerificationLinkResponse.class, builder -> builder.pathSegment("Users", request.getUserId(), "verify-link").queryParam("redirect_uri", request.getRedirectUri()));
+        return get(request, GetUserVerificationLinkResponse.class, builder -> builder.pathSegment("Users", request.getUserId(), "verify-link"));
     }
 
     @Override
