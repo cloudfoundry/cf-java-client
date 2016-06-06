@@ -55,17 +55,17 @@ abstract class _CreateUserRequest {
     abstract Name getName();
 
     /**
-     * The password
-     */
-    @JsonProperty("password")
-    abstract String getPassword();
-
-    /**
      * The identity provider that authenticated this user
      */
     @JsonProperty("origin")
     @Nullable
     abstract String getOrigin();
+
+    /**
+     * The password
+     */
+    @JsonProperty("password")
+    abstract String getPassword();
 
     /**
      * The user name

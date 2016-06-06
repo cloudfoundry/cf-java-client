@@ -26,85 +26,85 @@ public abstract class AbstractUser {
      * Whether the user is active
      */
     @JsonProperty("active")
-    abstract Boolean getActive();
+    public abstract Boolean getActive();
 
     /**
      * The approvals for the user
      */
     @JsonProperty("approvals")
-    abstract List<Approval> getApproval();
+    public abstract List<Approval> getApproval();
 
     /**
      * The emails for the user
      */
     @JsonProperty("emails")
-    abstract List<Email> getEmail();
+    public abstract List<Email> getEmail();
 
     /**
      * The external id
      */
     @JsonProperty("externalId")
-    abstract String getExternalId();
+    public abstract String getExternalId();
 
     /**
      * The groups for the user
      */
     @JsonProperty("groups")
-    abstract List<Group> getGroup();
+    public abstract List<Group> getGroup();
 
     /**
      * The id
      */
     @JsonProperty("id")
-    abstract String getId();
+    public abstract String getId();
 
     /**
      * Metadata for the result
      */
     @JsonProperty("meta")
-    abstract Meta getMeta();
+    public abstract Meta getMeta();
 
     /**
      * The user's name
      */
     @JsonProperty("name")
-    abstract Name getName();
+    public abstract Name getName();
 
     /**
      * The identity provider that authenticated this user
      */
     @JsonProperty("origin")
-    abstract String getOrigin();
+    public abstract String getOrigin();
 
     /**
      * The timestamp when the user's password was last modified
      */
     @JsonProperty("passwordLastModified")
-    abstract String getPasswordLastModified();
+    public abstract String getPasswordLastModified();
 
     /**
      * The schemas
      */
     @JsonProperty("schemas")
-    abstract List<String> getSchemas();
+    public abstract List<String> getSchemas();
 
     /**
      * The user name
      */
     @JsonProperty("userName")
-    abstract String getUserName();
+    public abstract String getUserName();
 
     /**
      * Whether the user's email is verified
      */
     @JsonProperty("verified")
-    abstract Boolean getVerified();
+    public abstract Boolean getVerified();
 
     /**
      * The zone id the user belongs to
      */
     @JsonProperty("zoneId")
-    abstract String getZoneId();
+    public abstract String getZoneId();
 
 
 }
