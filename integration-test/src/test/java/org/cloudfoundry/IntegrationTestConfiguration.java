@@ -109,7 +109,7 @@ public class IntegrationTestConfiguration {
         return new RandomNameFactory(random);
     }
 
-    @Bean(initMethod = "get")
+    @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
     Mono<String> organizationId(CloudFoundryClient cloudFoundryClient, String organizationName) throws InterruptedException {
         return cloudFoundryClient.organizations()
@@ -143,7 +143,7 @@ public class IntegrationTestConfiguration {
             .cache();
     }
 
-    @Bean(initMethod = "get")
+    @Bean(initMethod = "block")
     Mono<Optional<String>> protectedDomainId(CloudFoundryClient cloudFoundryClient, @Value("${test.protected.domain:}") String protectedDomain) {
         return Mono
             .just(protectedDomain)
@@ -164,12 +164,12 @@ public class IntegrationTestConfiguration {
             .cache();
     }
 
-    @Bean(initMethod = "get")
+    @Bean(initMethod = "block")
     Mono<List<String>> protectedFeatureFlags(@Value("${test.protected.featureflags:}") List<String> protectedFlags) {
         return Mono.just(protectedFlags);
     }
 
-    @Bean(initMethod = "get")
+    @Bean(initMethod = "block")
     Mono<Optional<String>> protectedOrganizationId(CloudFoundryClient cloudFoundryClient, @Value("${test.protected.organization:}") String protectedOrganization) {
         return Mono
             .just(protectedOrganization)
@@ -190,7 +190,7 @@ public class IntegrationTestConfiguration {
             .cache();
     }
 
-    @Bean(initMethod = "get")
+    @Bean(initMethod = "block")
     Mono<List<String>> protectedSpaceIds(CloudFoundryClient cloudFoundryClient, Mono<Optional<String>> protectedOrganizationId) {
         return protectedOrganizationId
             .then(protectedOrganizationId1 -> protectedOrganizationId1
@@ -214,7 +214,7 @@ public class IntegrationTestConfiguration {
         return new SecureRandom();
     }
 
-    @Bean(initMethod = "get")
+    @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
     Mono<String> spaceId(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, String spaceName) throws InterruptedException {
         return organizationId
@@ -235,7 +235,7 @@ public class IntegrationTestConfiguration {
         return nameFactory.getName("test-space-");
     }
 
-    @Bean(initMethod = "get")
+    @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
     Mono<String> stackId(CloudFoundryClient cloudFoundryClient, String stackName) throws InterruptedException {
         return PaginationUtils
@@ -264,7 +264,7 @@ public class IntegrationTestConfiguration {
             .build();
     }
 
-    @Bean(initMethod = "get")
+    @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
     Mono<String> userId(CloudFoundryClient cloudFoundryClient, String userName) {  // TODO: Create new user when APIs available
         return PaginationUtils
