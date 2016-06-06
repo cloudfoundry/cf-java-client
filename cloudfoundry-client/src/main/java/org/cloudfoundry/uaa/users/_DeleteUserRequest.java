@@ -17,26 +17,19 @@
 package org.cloudfoundry.uaa.users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.cloudfoundry.Nullable;
+import org.cloudfoundry.uaa.Versioned;
 import org.immutables.value.Value;
 
 /**
  * The request payload for the delete user operation
  */
 @Value.Immutable
-abstract class _DeleteUserRequest {
+abstract class _DeleteUserRequest implements Versioned {
 
     /**
      * The user id
      */
     @JsonIgnore
     abstract String getUserId();
-
-    /**
-     * The version of the SCIM object to be deleted
-     */
-    @JsonIgnore
-    @Nullable
-    abstract Integer getVersion();
 
 }

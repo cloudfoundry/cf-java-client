@@ -243,6 +243,7 @@ public final class ReactorUsersTest {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(DELETE).path("/Users/421225f4-318e-4a4d-9219-4b6a0ed3678a")
+                    .header("If-Match", "*")
                     .build())
                 .response(TestResponse.builder()
                     .status(OK)
@@ -364,7 +365,7 @@ public final class ReactorUsersTest {
         protected DeleteUserRequest getValidRequest() throws Exception {
             return DeleteUserRequest.builder()
                 .userId("421225f4-318e-4a4d-9219-4b6a0ed3678a")
-                .version(0)
+                .version("*")
                 .build();
         }
 

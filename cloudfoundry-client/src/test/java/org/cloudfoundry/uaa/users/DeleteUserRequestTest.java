@@ -30,7 +30,6 @@ public final class DeleteUserRequestTest {
     public void valid() {
         DeleteUserRequest.builder()
             .userId("test-user-id")
-            .version(1)
             .build();
     }
 

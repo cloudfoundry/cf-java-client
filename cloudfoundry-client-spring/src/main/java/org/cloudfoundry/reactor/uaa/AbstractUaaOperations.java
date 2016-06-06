@@ -34,8 +34,6 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
 
     private static final AsciiString BASIC_PREAMBLE = new AsciiString("Basic ");
 
-    private static final AsciiString IF_MATCH = new AsciiString("If-Match");
-
     protected AbstractUaaOperations(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
         super(authorizationProvider, httpClient, objectMapper, root);
     }
@@ -72,13 +70,6 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
 
     protected final <T> Mono<T> get(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doGet(responseType, getUriAugmenter(request, uriTransformer), getRequestTransformer(request));
-    }
-
-    protected final HttpOutbound ifMatch(HttpOutbound outbound, Integer version) {
-        if (version != null) {
-            outbound.headers().set(IF_MATCH, version);
-        }
-        return outbound;
     }
 
     protected final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
