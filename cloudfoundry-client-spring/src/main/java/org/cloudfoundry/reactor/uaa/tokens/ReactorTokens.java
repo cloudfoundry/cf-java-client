@@ -48,30 +48,22 @@ import java.util.function.Function;
 
 public final class ReactorTokens extends AbstractUaaOperations implements Tokens {
 
-    private final String clientId;
-
-    private final String clientSecret;
-
     /**
      * Creates an instance
      *
      * @param authorizationProvider the {@link AuthorizationProvider} to use when communicating with the server
-     * @param clientId              the client id
-     * @param clientSecret          the client secret
      * @param httpClient            the {@link HttpClient} to use when communicating with the server
      * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
      * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
      */
-    public ReactorTokens(AuthorizationProvider authorizationProvider, String clientId, String clientSecret, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
+    public ReactorTokens(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
         super(authorizationProvider, httpClient, objectMapper, root);
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
     }
 
     @Override
     public Mono<CheckTokenResponse> check(CheckTokenRequest request) {
         return post(request, CheckTokenResponse.class, builder -> builder.pathSegment("check_token"),
-            outbound -> basicAuth(outbound, this.clientId, this.clientSecret));
+            outbound -> basicAuth(outbound, request.getClientId(), request.getClientSecret()));
     }
 
     @Override

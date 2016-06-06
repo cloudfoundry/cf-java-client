@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.uaa.tokens;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.QueryParameter;
 import org.immutables.value.Value;
@@ -27,6 +28,18 @@ import java.util.List;
  */
 @Value.Immutable
 abstract class _CheckTokenRequest {
+
+    /**
+     * The client identifier
+     */
+    @JsonIgnore
+    abstract String getClientId();
+
+    /**
+     * The client's secret passphrase
+     */
+    @JsonIgnore
+    abstract String getClientSecret();
 
     /**
      * The scopes authorized by the user for this client

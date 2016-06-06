@@ -21,14 +21,47 @@ import org.junit.Test;
 public final class CheckTokenRequestTest {
 
     @Test(expected = IllegalStateException.class)
+    public void noClientId() {
+        CheckTokenRequest.builder()
+            .clientSecret("test-client-secret")
+            .token("test-token")
+            .scope("test-scope")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noClientSecret() {
+        CheckTokenRequest.builder()
+            .clientId("test-client-id")
+            .token("test-token")
+            .scope("test-scope")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
     public void noToken() {
         CheckTokenRequest.builder()
+            .clientId("test-client-id")
+            .clientSecret("test-client-secret")
+            .scope("test-scope")
             .build();
     }
 
     @Test
-    public void valid() {
+    public void validMax() {
         CheckTokenRequest.builder()
+            .clientId("test-client-id")
+            .clientSecret("test-client-secret")
+            .token("test-token")
+            .scope("test-scope")
+            .build();
+    }
+
+    @Test
+    public void validMin() {
+        CheckTokenRequest.builder()
+            .clientId("test-client-id")
+            .clientSecret("test-client-secret")
             .token("test-token")
             .build();
     }

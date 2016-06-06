@@ -17,6 +17,8 @@
       <value defaultName="singleModule" />
     </option>
     <envs>
+      <env name="TEST_CLIENT_ID" value="admin" />
+      <env name="TEST_CLIENT_SECRET" value="admin-client-secret" />
       <env name="TEST_HOST" value="api.local.pcfdev.io" />
       <env name="TEST_PASSWORD" value="admin" />
       <env name="TEST_SKIPSSLVALIDATION" value="true" />
