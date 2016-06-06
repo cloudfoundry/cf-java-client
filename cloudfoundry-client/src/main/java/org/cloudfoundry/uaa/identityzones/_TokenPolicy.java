@@ -17,53 +17,52 @@
 package org.cloudfoundry.uaa.identityzones;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.util.Map;
+
 /**
- * The request payload for the create identity zone operation
+ * The payload for the identity zone token policy
  */
+@JsonDeserialize
 @Value.Immutable
-abstract class _CreateIdentityZoneRequest {
+abstract class _TokenPolicy {
 
     /**
-     * The configuration
+     * Time in seconds between when a access token is issued and when it expires
      */
-    @JsonProperty("config")
+    @JsonProperty("accessTokenValidity")
     @Nullable
-    abstract IdentityZoneConfiguration getConfiguration();
+    abstract Integer getAccessTokenValidity();
 
     /**
-     * The description of the identity zone
+     * The ID of the key that is used to sign tokens
      */
-    @JsonProperty("description")
+    @JsonProperty("activeKeyId")
     @Nullable
-    abstract String getDescription();
+    abstract String getActiveKeyId();
 
     /**
-     * The id of the identity zone. When not provided, an identifier will be generated
+     *
      */
-    @JsonProperty("id")
+    @JsonProperty("jwtRevocable")
     @Nullable
-    abstract String getIdentityZoneId();
+    abstract Boolean getJwtRevokable();
 
     /**
-     * The name of the identity zone
+     * The keys of the token policy
      */
-    @JsonProperty("name")
-    abstract String getName();
-
-    /**
-     * The unique subdomain. It will be converted into lowercase upon creation.
-     */
-    @JsonProperty("subdomain")
-    abstract String getSubdomain();
-
-    /**
-     * The version of the identity zone
-     */
-    @JsonProperty("version")
+    @JsonProperty("keys")
     @Nullable
-    abstract Integer getVersion();
+    abstract Map<String, KeyInformation> getKeys();
+
+    /**
+     * Time in seconds between when a refresh token is issued and when it expires
+     */
+    @JsonProperty("refreshTokenValidity")
+    @Nullable
+    abstract Integer getRefreshTokenValidity();
 
 }

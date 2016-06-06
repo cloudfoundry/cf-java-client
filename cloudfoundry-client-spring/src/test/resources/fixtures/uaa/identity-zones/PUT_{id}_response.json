@@ -1,13 +1,13 @@
 {
-  "id" : "twiglet-create",
-  "subdomain" : "twiglet-create",
+  "id" : "twiglet-update",
+  "subdomain" : "twiglet-update",
   "config" : {
     "tokenPolicy" : {
       "accessTokenValidity" : -1,
       "jwtRevocable" : false,
       "keys" : {
         "exampleKeyId" : {
-          "signingKey" : "s1gNiNg.K3y/t3XT"
+          "signingKey" : "upD4t3d.s1gNiNg.K3y/t3XT"
         }
       },
       "refreshTokenValidity" : -1
@@ -50,9 +50,9 @@
     } ],
     "idpDiscoveryEnabled" : false
   },
-  "name" : "The Twiglet Zone",
-  "version" : 0,
-  "description" : "Like the Twilight Zone but tastier.",
-  "created" : 1463595920184,
-  "last_modified" : 1463595920184
+  "name" : "The Updated Twiglet Zone",
+  "version" : 1,
+  "description" : "Like the Twilight Zone but not tastier.",
+  "created" : 1463595920023,
+  "last_modified" : 1463595920023
 }

@@ -17,53 +17,52 @@
 package org.cloudfoundry.uaa.identityzones;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.util.List;
+
 /**
- * The request payload for the create identity zone operation
+ * The payload for the identity zone configuration
  */
+@JsonDeserialize
 @Value.Immutable
-abstract class _CreateIdentityZoneRequest {
+abstract class _IdentityZoneConfiguration {
 
     /**
-     * The configuration
+     * IDP Discovery should be set to true if you have configured more than one identity provider for UAA. The discovery relies on email domain being set for each additional provider.
      */
-    @JsonProperty("config")
+    @JsonProperty("idpDiscoveryEnabled")
     @Nullable
-    abstract IdentityZoneConfiguration getConfiguration();
+    abstract Boolean getLdapDiscoveryEnabled();
 
     /**
-     * The description of the identity zone
+     * Array The links
      */
-    @JsonProperty("description")
+    @JsonProperty("links")
     @Nullable
-    abstract String getDescription();
+    abstract Links getLinks();
 
     /**
-     * The id of the identity zone. When not provided, an identifier will be generated
+     * The prompts
      */
-    @JsonProperty("id")
+    @JsonProperty("prompts")
     @Nullable
-    abstract String getIdentityZoneId();
+    abstract List<Prompt> getPrompts();
 
     /**
-     * The name of the identity zone
+     * The saml configuration
      */
-    @JsonProperty("name")
-    abstract String getName();
-
-    /**
-     * The unique subdomain. It will be converted into lowercase upon creation.
-     */
-    @JsonProperty("subdomain")
-    abstract String getSubdomain();
-
-    /**
-     * The version of the identity zone
-     */
-    @JsonProperty("version")
+    @JsonProperty("samlConfig")
     @Nullable
-    abstract Integer getVersion();
+    abstract SamlConfiguration getSamlConfiguration();
+
+    /**
+     * The token policy
+     */
+    @JsonProperty("tokenPolicy")
+    @Nullable
+    abstract TokenPolicy getTokenPolicy();
 
 }

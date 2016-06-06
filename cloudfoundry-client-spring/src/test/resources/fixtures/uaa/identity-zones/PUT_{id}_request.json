@@ -1,0 +1,51 @@
+{
+  "config" : {
+    "idpDiscoveryEnabled" : false,
+    "links" : {
+      "logout" : {
+        "disableRedirectParameter" : true,
+        "redirectParameterName" : "redirect",
+        "redirectUrl" : "/login"
+      },
+      "selfService" : {
+        "passwd" : "/forgot_password",
+        "selfServiceLinksEnabled" : true,
+        "signup" : "/create_account"
+      }
+    },
+    "prompts" : [ {
+      "name" : "username",
+      "type" : "text",
+      "text" : "Email"
+    }, {
+      "name" : "password",
+      "type" : "password",
+      "text" : "Password"
+    }, {
+      "name" : "passcode",
+      "type" : "password",
+      "text" : "One Time Code (Get on at /passcode)"
+    } ],
+    "samlConfig" : {
+      "assertionSigned" : true,
+      "assertionTimeToLiveSeconds" : 600,
+      "requestSigned" : true,
+      "wantAssertionSigned" : false,
+      "wantAuthnRequestSigned" : false
+    },
+    "tokenPolicy" : {
+      "accessTokenValidity" : -1,
+      "jwtRevocable" : false,
+      "keys" : {
+        "exampleKeyId" : {
+          "signingKey" : "upD4t3d.s1gNiNg.K3y/t3XT"
+        }
+      },
+      "refreshTokenValidity" : -1
+    }
+  },
+  "description" : "Like the Twilight Zone but not tastier.",
+  "name" : "The Updated Twiglet Zone",
+  "subdomain" : "twiglet-update",
+  "version" : 1
+}

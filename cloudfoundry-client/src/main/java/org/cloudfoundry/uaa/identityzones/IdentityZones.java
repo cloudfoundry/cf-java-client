@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface IdentityZones {
 
     /**
-     * Makes the <a href="https://github.com/cloudfoundry/uaa/blob/master/docs/UAA-APIs.rst#create-or-update-identity-zones-post-or-put-identity-zones">Create Identity Zone</a> request
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#creating-an-identity-zone">Create Identity Zone</a> request
      *
      * @param request the Create Identity Zone request
      * @return the response from the Create Identity Zone request
@@ -32,7 +32,7 @@ public interface IdentityZones {
     Mono<CreateIdentityZoneResponse> create(CreateIdentityZoneRequest request);
 
     /**
-     * Makes the <a href="https://github.com/cloudfoundry/uaa/blob/master/docs/UAA-APIs.rst#delete-single-identity-zone-delete-identity-zones-identityzoneid">Delete the Identity Zone</a> request
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#deleting-an-identity-zone">Delete the Identity Zone</a> request
      *
      * @param request the Delete Identity Zone request
      * @return the response from the Delete Identity Zone request
@@ -40,7 +40,7 @@ public interface IdentityZones {
     Mono<DeleteIdentityZoneResponse> delete(DeleteIdentityZoneRequest request);
 
     /**
-     * Makes the <a href="https://github.com/cloudfoundry/uaa/blob/master/docs/UAA-APIs.rst#get-single-identity-zone-get-identity-zones-identityzoneid">Get Identity Zone</a> request
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#retrieving-an-identity-zone">Get Identity Zone</a> request
      *
      * @param request the Get Identity Zone request
      * @return the response from the Get Identity Zone request
@@ -48,7 +48,7 @@ public interface IdentityZones {
     Mono<GetIdentityZoneResponse> get(GetIdentityZoneRequest request);
 
     /**
-     * Makes the <a href="https://github.com/cloudfoundry/uaa/blob/master/docs/UAA-APIs.rst#list-identity-zones-get-identity-zones">List Identity Zones</a> request
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#retrieving-all-identity-zones">List Identity Zones</a> request
      *
      * @param request the List Identity Zones request
      * @return the response from the List Identity Zones request
@@ -56,7 +56,7 @@ public interface IdentityZones {
     Mono<ListIdentityZonesResponse> list(ListIdentityZonesRequest request);
 
     /**
-     * Makes the <a href="https://github.com/cloudfoundry/uaa/blob/master/docs/UAA-APIs.rst#create-or-update-identity-zones-post-or-put-identity-zones">Update Identity Zone</a> request
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#updating-an-identity-zone">Update Identity Zone</a> request
      *
      * @param request the Update Identity Zone request
      * @return the response from the Update Identity Zone request
