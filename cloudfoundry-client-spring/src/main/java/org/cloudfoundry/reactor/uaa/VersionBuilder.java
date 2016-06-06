@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa;
+package org.cloudfoundry.reactor.uaa;
 
-/**
- * An interface that indicates that a UAA request can specify an identity zone in its header
- */
-public interface IdentityZoned {
+import org.cloudfoundry.uaa.Versioned;
+import reactor.io.netty.http.HttpOutbound;
 
-    /**
-     * Returns the identity zone id
-     *
-     * @return the identity zone id
-     */
-    String getIdentityZoneId();
+final class VersionBuilder {
+
+    private VersionBuilder() {
+    }
+
+    static void augment(HttpOutbound outbound, Object request) {
+        if (request instanceof Versioned) {
+            Versioned identityZoned = (Versioned) request;
+            outbound.addHeader("If-Match", identityZoned.getVersion());
+        }
+    }
 
 }

@@ -35,6 +35,8 @@ import org.cloudfoundry.uaa.users.ListUsersRequest;
 import org.cloudfoundry.uaa.users.ListUsersResponse;
 import org.cloudfoundry.uaa.users.Meta;
 import org.cloudfoundry.uaa.users.Name;
+import org.cloudfoundry.uaa.users.UpdateUserRequest;
+import org.cloudfoundry.uaa.users.UpdateUserResponse;
 import org.cloudfoundry.uaa.users.User;
 import reactor.core.publisher.Mono;
 
@@ -47,6 +49,7 @@ import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.uaa.SortOrder.ASCENDING;
 import static org.cloudfoundry.uaa.users.ApprovalStatus.APPROVED;
+import static org.cloudfoundry.uaa.users.ApprovalStatus.DENIED;
 import static org.cloudfoundry.uaa.users.MembershipType.DIRECT;
 
 public final class ReactorUsersTest {
@@ -552,6 +555,111 @@ public final class ReactorUsersTest {
             return this.users.list(request);
         }
 
+    }
+
+    public static final class Update extends AbstractUaaApiTest<UpdateUserRequest, UpdateUserResponse> {
+
+        private final ReactorUsers users = new ReactorUsers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/Users/test-user-id")
+                    .header("If-Match", "*")
+                    .payload("fixtures/uaa/users/PUT_{id}_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/users/PUT_{id}_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected UpdateUserResponse getResponse() {
+            return UpdateUserResponse.builder()
+                .active(true)
+                .approval(Approval.builder()
+                    .clientId("identity")
+                    .expiresAt("2016-05-18T18:25:54.239Z")
+                    .lastUpdatedAt("2016-05-18T18:25:54.239Z")
+                    .scope("uaa.user")
+                    .status(DENIED)
+                    .userId("test-user-id")
+                    .build())
+                .approval(Approval.builder()
+                    .clientId("client id")
+                    .expiresAt("2016-05-18T18:25:34.236Z")
+                    .lastUpdatedAt("2016-05-18T18:25:34.236Z")
+                    .scope("scim.read")
+                    .status(APPROVED)
+                    .userId("test-user-id")
+                    .build())
+                .email(Email.builder()
+                    .primary(false)
+                    .value("oH4jON@test.org")
+                    .build())
+                .externalId("test-user")
+                .group(Group.builder()
+                    .display("password.write")
+                    .value("4622c5e1-ddfd-4e17-9e81-2ae3c03972be")
+                    .type(DIRECT)
+                    .build())
+                .group(Group.builder()
+                    .display("cloud_controller.write")
+                    .value("62f67643-05d8-43c6-b193-4cd6ab9960cb")
+                    .type(DIRECT)
+                    .build())
+                .group(Group.builder()
+                    .display("uaa.user")
+                    .value("c47bf470-f9c4-4eea-97e4-490ce7b8f6f7")
+                    .type(DIRECT)
+                    .build())
+                .id(("test-user-id"))
+                .meta(Meta.builder()
+                    .created("2016-05-18T18:25:24.222Z")
+                    .lastModified("2016-05-18T18:25:24.265Z")
+                    .version(1)
+                    .build())
+                .name(Name.builder()
+                    .familyName("family name")
+                    .givenName("given name")
+                    .build())
+                .origin("uaa")
+                .passwordLastModified("2016-05-18T18:25:24.000Z")
+                .schema("urn:scim:schemas:core:1.0")
+                .userName("oH4jON@test.org")
+                .verified(true)
+                .zoneId("uaa")
+                .build();
+        }
+
+        @Override
+        protected UpdateUserRequest getValidRequest() throws Exception {
+            return UpdateUserRequest.builder()
+                .active(true)
+                .email(Email.builder()
+                    .primary(false)
+                    .value("oH4jON@test.org")
+                    .build())
+                .externalId("test-user")
+                .id(("test-user-id"))
+                .version("*")
+                .name(Name.builder()
+                    .familyName("family name")
+                    .givenName("given name")
+                    .build())
+                .origin("uaa")
+                .userName("oH4jON@test.org")
+                .verified(true)
+                .build();
+        }
+
+        @Override
+        protected Mono<UpdateUserResponse> invoke(UpdateUserRequest request) {
+            return this.users.update(request);
+        }
     }
 
 }
