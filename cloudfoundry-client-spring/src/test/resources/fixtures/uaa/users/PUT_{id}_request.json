@@ -1,0 +1,17 @@
+{
+  "active": true,
+  "emails": [
+    {
+      "value": "oH4jON@test.org",
+      "primary": false
+    }
+  ],
+  "externalId": "test-user",
+  "name": {
+    "familyName": "family name",
+    "givenName": "given name"
+  },
+  "origin": "uaa",
+  "userName": "oH4jON@test.org",
+  "verified": true
+}

@@ -63,4 +63,12 @@ public interface Users {
      */
     Mono<ListUsersResponse> list(ListUsersRequest request);
 
+    /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#update49">Update User</a> request
+     *
+     * @param request the Update User request
+     * @return the response from the Update User request
+     */
+    Mono<UpdateUserResponse> update(UpdateUserRequest request);
+
 }

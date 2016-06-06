@@ -24,12 +24,10 @@ final class IdentityZoneBuilder {
     private IdentityZoneBuilder() {
     }
 
-    static HttpOutbound augment(HttpOutbound outbound, Object request) {
+    static void augment(HttpOutbound outbound, Object request) {
         if (request instanceof IdentityZoned) {
             IdentityZoned identityZoned = (IdentityZoned) request;
-            return outbound.addHeader("X-Identity-Zone-Id", identityZoned.getIdentityZoneId());
-        } else {
-            return outbound;
+            outbound.addHeader("X-Identity-Zone-Id", identityZoned.getIdentityZoneId());
         }
     }
 

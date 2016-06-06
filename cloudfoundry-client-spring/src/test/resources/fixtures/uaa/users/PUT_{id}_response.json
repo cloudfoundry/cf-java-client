@@ -1,0 +1,63 @@
+{
+  "active": true,
+  "approvals": [
+    {
+      "clientId": "identity",
+      "expiresAt": "2016-05-18T18:25:54.239Z",
+      "lastUpdatedAt": "2016-05-18T18:25:54.239Z",
+      "scope": "uaa.user",
+      "status": "DENIED",
+      "userId": "test-user-id"
+    },
+    {
+      "clientId": "client id",
+      "expiresAt": "2016-05-18T18:25:34.236Z",
+      "lastUpdatedAt": "2016-05-18T18:25:34.236Z",
+      "scope": "scim.read",
+      "status": "APPROVED",
+      "userId": "test-user-id"
+    }
+  ],
+  "id": "test-user-id",
+  "emails": [
+    {
+      "value": "oH4jON@test.org",
+      "primary": false
+    }
+  ],
+  "externalId": "test-user",
+  "groups": [
+    {
+      "display": "password.write",
+      "value": "4622c5e1-ddfd-4e17-9e81-2ae3c03972be",
+      "type": "DIRECT"
+    },
+    {
+      "display": "cloud_controller.write",
+      "value": "62f67643-05d8-43c6-b193-4cd6ab9960cb",
+      "type": "DIRECT"
+    },
+    {
+      "display": "uaa.user",
+      "value": "c47bf470-f9c4-4eea-97e4-490ce7b8f6f7",
+      "type": "DIRECT"
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "created": "2016-05-18T18:25:24.222Z",
+    "lastModified": "2016-05-18T18:25:24.265Z"
+  },
+  "name": {
+    "familyName": "family name",
+    "givenName": "given name"
+  },
+  "origin": "uaa",
+  "passwordLastModified": "2016-05-18T18:25:24.000Z",
+  "schemas": [
+    "urn:scim:schemas:core:1.0"
+  ],
+  "userName": "oH4jON@test.org",
+  "verified": true,
+  "zoneId": "uaa"
+}

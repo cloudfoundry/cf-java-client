@@ -53,6 +53,27 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
         return outbound;
     }
 
+    protected final <T> Mono<T> delete(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return doDelete(request, responseType, getUriAugmenter(request, uriTransformer), getRequestTransformer(request));
+    }
+
+    protected final <T> Mono<T> delete(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+                                       Function<HttpOutbound, HttpOutbound> requestTransformer) {
+
+        return doDelete(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> {
+            getRequestTransformer(request).apply(outbound);
+            return requestTransformer.apply(outbound);
+        });
+    }
+
+    protected final Mono<HttpInbound> get(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return doGet(getUriAugmenter(request, uriTransformer), getRequestTransformer(request));
+    }
+
+    protected final <T> Mono<T> get(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return doGet(responseType, getUriAugmenter(request, uriTransformer), getRequestTransformer(request));
+    }
+
     protected final HttpOutbound ifMatch(HttpOutbound outbound, Integer version) {
         if (version != null) {
             outbound.headers().set(IF_MATCH, version);
@@ -60,40 +81,29 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
         return outbound;
     }
 
-    protected final <T> Mono<T> delete(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doDelete(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> IdentityZoneBuilder.augment(outbound, request));
-    }
-
-    protected final <T> Mono<T> delete(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
-                                       Function<HttpOutbound, HttpOutbound> requestTransformer) {
-        return doDelete(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> {
-            IdentityZoneBuilder.augment(outbound, request);
-            return requestTransformer.apply(outbound);
-        });
-    }
-
-    protected final Mono<HttpInbound> get(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doGet(getUriAugmenter(request, uriTransformer), outbound -> IdentityZoneBuilder.augment(outbound, request));
-    }
-
-    protected final <T> Mono<T> get(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doGet(responseType, getUriAugmenter(request, uriTransformer), outbound -> IdentityZoneBuilder.augment(outbound, request));
-    }
-
     protected final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
                                      Function<HttpOutbound, HttpOutbound> requestTransformer) {
+
         return doPost(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> {
-            IdentityZoneBuilder.augment(outbound, request);
+            getRequestTransformer(request).apply(outbound);
             return requestTransformer.apply(outbound);
         });
     }
 
     protected final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doPost(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> IdentityZoneBuilder.augment(outbound, request));
+        return doPost(request, responseType, getUriAugmenter(request, uriTransformer), getRequestTransformer(request));
     }
 
     protected final <T> Mono<T> put(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doPut(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> IdentityZoneBuilder.augment(outbound, request));
+        return doPut(request, responseType, getUriAugmenter(request, uriTransformer), getRequestTransformer(request));
+    }
+
+    private static Function<HttpOutbound, HttpOutbound> getRequestTransformer(Object request) {
+        return outbound -> {
+            IdentityZoneBuilder.augment(outbound, request);
+            VersionBuilder.augment(outbound, request);
+            return outbound;
+        };
     }
 
 }

@@ -16,97 +16,71 @@
 
 package org.cloudfoundry.uaa.users;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.uaa.Versioned;
+import org.immutables.value.Value;
 
 import java.util.List;
 
 /**
- * The entity response payload for User
+ * The request payload for the update user operation
  */
-abstract class AbstractUser {
+@Value.Immutable
+abstract class _UpdateUserRequest implements Versioned {
 
     /**
      * Whether the user is active
      */
     @JsonProperty("active")
-    public abstract Boolean getActive();
-
-    /**
-     * The approvals for the user
-     */
-    @JsonProperty("approvals")
-    public abstract List<Approval> getApproval();
+    @Nullable
+    abstract Boolean getActive();
 
     /**
      * The emails for the user
      */
     @JsonProperty("emails")
-    public abstract List<Email> getEmail();
+    abstract List<Email> getEmails();
 
     /**
      * The external id
      */
     @JsonProperty("externalId")
-    public abstract String getExternalId();
-
-    /**
-     * The groups for the user
-     */
-    @JsonProperty("groups")
-    public abstract List<Group> getGroup();
+    @Nullable
+    abstract String getExternalId();
 
     /**
      * The id
      */
     @JsonProperty("id")
-    public abstract String getId();
-
-    /**
-     * Metadata for the result
-     */
-    @JsonProperty("meta")
-    public abstract Meta getMeta();
+    @JsonIgnore
+    abstract String getId();
 
     /**
      * The user's name
      */
     @JsonProperty("name")
-    public abstract Name getName();
+    abstract Name getName();
 
     /**
      * The identity provider that authenticated this user
      */
     @JsonProperty("origin")
-    public abstract String getOrigin();
-
-    /**
-     * The timestamp when the user's password was last modified
-     */
-    @JsonProperty("passwordLastModified")
-    public abstract String getPasswordLastModified();
-
-    /**
-     * The schemas
-     */
-    @JsonProperty("schemas")
-    public abstract List<String> getSchemas();
+    @Nullable
+    abstract String getOrigin();
 
     /**
      * The user name
      */
     @JsonProperty("userName")
-    public abstract String getUserName();
+    abstract String getUserName();
 
     /**
      * Whether the user's email is verified
      */
     @JsonProperty("verified")
-    public abstract Boolean getVerified();
-
-    /**
-     * The zone id the user belongs to
-     */
-    @JsonProperty("zoneId")
-    public abstract String getZoneId();
+    @Nullable
+    abstract Boolean getVerified();
 
 }
