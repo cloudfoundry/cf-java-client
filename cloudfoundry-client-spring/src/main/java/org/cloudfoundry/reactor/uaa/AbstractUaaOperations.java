@@ -40,14 +40,6 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
         super(authorizationProvider, httpClient, objectMapper, root);
     }
 
-    protected static Function<HttpOutbound, HttpOutbound> getRequestTransformer(Object request) {
-        return outbound -> {
-            IdentityZoneBuilder.augment(outbound, request);
-            VersionBuilder.augment(outbound, request);
-            return outbound;
-        };
-    }
-
     protected static Function<UriComponentsBuilder, UriComponentsBuilder> getUriAugmenter(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return builder -> {
             QueryBuilder.augment(builder, request);
@@ -67,6 +59,7 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
 
     protected final <T> Mono<T> delete(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
                                        Function<HttpOutbound, HttpOutbound> requestTransformer) {
+
         return doDelete(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> {
             getRequestTransformer(request).apply(outbound);
             return requestTransformer.apply(outbound);
@@ -90,6 +83,7 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
 
     protected final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
                                      Function<HttpOutbound, HttpOutbound> requestTransformer) {
+
         return doPost(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> {
             getRequestTransformer(request).apply(outbound);
             return requestTransformer.apply(outbound);
@@ -102,6 +96,14 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
 
     protected final <T> Mono<T> put(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doPut(request, responseType, getUriAugmenter(request, uriTransformer), getRequestTransformer(request));
+    }
+
+    private static Function<HttpOutbound, HttpOutbound> getRequestTransformer(Object request) {
+        return outbound -> {
+            IdentityZoneBuilder.augment(outbound, request);
+            VersionBuilder.augment(outbound, request);
+            return outbound;
+        };
     }
 
 }

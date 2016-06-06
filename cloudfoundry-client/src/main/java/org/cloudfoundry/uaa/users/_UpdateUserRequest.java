@@ -16,10 +16,6 @@
 
 package org.cloudfoundry.uaa.users;
 
-/**
- * Created by ben on 29/05/16.
- */
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
@@ -60,9 +56,6 @@ abstract class _UpdateUserRequest implements Versioned {
     @JsonProperty("id")
     @JsonIgnore
     abstract String getId();
-
-    @JsonIgnore
-    public abstract String getVersion();
 
     /**
      * The user's name
