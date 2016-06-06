@@ -178,7 +178,7 @@ public final class DefaultServiceAdminTest {
         @Override
         protected Mono<Void> invoke() {
             return this.serviceAdmin
-                .deleteServiceBroker(DeleteServiceBrokerRequest.builder()
+                .delete(DeleteServiceBrokerRequest.builder()
                     .name("test-service-broker-name")
                     .build());
         }
@@ -204,7 +204,7 @@ public final class DefaultServiceAdminTest {
         @Override
         protected Mono<Void> invoke() {
             return this.serviceAdmin
-                .deleteServiceBroker(DeleteServiceBrokerRequest.builder()
+                .delete(DeleteServiceBrokerRequest.builder()
                     .name("test-service-broker-name")
                     .build());
         }
@@ -233,7 +233,7 @@ public final class DefaultServiceAdminTest {
         @Override
         protected Publisher<ServiceBroker> invoke() {
             return this.serviceAdmin
-                .listServiceBrokers();
+                .list();
         }
 
     }
@@ -255,7 +255,7 @@ public final class DefaultServiceAdminTest {
         @Override
         protected Publisher<ServiceBroker> invoke() {
             return this.serviceAdmin
-                .listServiceBrokers();
+                .list();
         }
 
     }

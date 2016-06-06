@@ -39,12 +39,13 @@ public interface ServiceAdmin {
      * @param request the Delete Service Broker request
      * @return a completion indicator
      */
-    Mono<Void> deleteServiceBroker(DeleteServiceBrokerRequest request);
+    Mono<Void> delete(DeleteServiceBrokerRequest request);
 
     /**
      * Lists the service brokers
      *
      * @return the service brokers
      */
-    Flux<ServiceBroker> listServiceBrokers();
+    Flux<ServiceBroker> list();
+
 }

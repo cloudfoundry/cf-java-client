@@ -49,14 +49,13 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
     }
 
     @Override
-    public Mono<Void> deleteServiceBroker(DeleteServiceBrokerRequest request) {
+    public Mono<Void> delete(DeleteServiceBrokerRequest request) {
         return getServiceBrokerId(this.cloudFoundryClient, request.getName())
-            .then(serviceBrokerId -> requestDeleteServiceBroker(this.cloudFoundryClient, serviceBrokerId))
-            .then();
+            .then(serviceBrokerId -> requestDeleteServiceBroker(this.cloudFoundryClient, serviceBrokerId));
     }
 
     @Override
-    public Flux<ServiceBroker> listServiceBrokers() {
+    public Flux<ServiceBroker> list() {
         return requestServiceBrokers(this.cloudFoundryClient)
             .map(this::toServiceBroker);
     }
@@ -91,19 +90,19 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
                 .build());
     }
 
-    private static Flux<ServiceBrokerResource> requestServiceBrokers(CloudFoundryClient cloudFoundryClient) {
-        return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.serviceBrokers()
-                .list(ListServiceBrokersRequest.builder()
-                    .page(page)
-                    .build()));
-    }
-
     private static Flux<ServiceBrokerResource> requestListServiceBrokers(CloudFoundryClient cloudFoundryClient, String serviceBrokerName) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.serviceBrokers()
                 .list(ListServiceBrokersRequest.builder()
                     .name(serviceBrokerName)
+                    .page(page)
+                    .build()));
+    }
+
+    private static Flux<ServiceBrokerResource> requestServiceBrokers(CloudFoundryClient cloudFoundryClient) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.serviceBrokers()
+                .list(ListServiceBrokersRequest.builder()
                     .page(page)
                     .build()));
     }

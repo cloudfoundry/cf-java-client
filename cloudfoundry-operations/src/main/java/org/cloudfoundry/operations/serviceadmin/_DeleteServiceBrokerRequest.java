@@ -21,7 +21,6 @@ import org.immutables.value.Value;
 /**
  * Request options for the delete service broker operation
  */
-
 @Value.Immutable
 abstract class _DeleteServiceBrokerRequest {
 
