@@ -22,6 +22,9 @@ import org.cloudfoundry.uaa.authorizations.ResponseType;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public final class AuthorizationsTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -35,8 +38,11 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
                 .responseType(ResponseType.CODE)
                 .state("test-state")
                 .build())
-            .subscribe(this.testSubscriber()
-                .assertEquals("foo"));
+            .subscribe(this.<String>testSubscriber()
+                .assertThat(code -> {
+                    assertNotNull(code);
+                    assertTrue(code.length() == 6);
+                }));
     }
 
 }

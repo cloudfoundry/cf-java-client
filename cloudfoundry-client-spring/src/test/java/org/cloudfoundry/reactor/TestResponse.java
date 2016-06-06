@@ -20,11 +20,13 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
+import lombok.Singular;
 import okhttp3.mockwebserver.MockResponse;
 import okio.Buffer;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Optional;
 
 @Data
@@ -32,19 +34,24 @@ public final class TestResponse {
 
     private final Optional<String> contentType;
 
+    private final Map<String, String> headers;
+
     private final Optional<Buffer> payload;
 
     private final HttpResponseStatus status;
 
     @Builder
-    TestResponse(String contentType, String payload, @NonNull HttpResponseStatus status) {
+    TestResponse(String contentType, @Singular Map<String, String> headers, String payload, @NonNull HttpResponseStatus status) {
         this.contentType = Optional.ofNullable(contentType);
+        this.headers = headers;
         this.payload = Optional.ofNullable(payload).map(TestResponse::getBuffer);
         this.status = status;
     }
 
     MockResponse getMockResponse() {
-        MockResponse response = new MockResponse().setResponseCode(status.code());
+        MockResponse response = new MockResponse().setResponseCode(this.status.code());
+
+        this.headers.forEach(response::addHeader);
 
         this.payload.ifPresent(buffer -> response
             .setHeader("Content-Type", this.contentType.orElse("application/json"))

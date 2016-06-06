@@ -17,14 +17,26 @@
 package org.cloudfoundry.reactor.uaa.authorizations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.netty.handler.ssl.util.SimpleTrustManagerFactory;
 import io.netty.util.AsciiString;
 import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.uaa.authorizations.Authorizations;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
+import reactor.io.netty.config.HttpClientOptions;
 import reactor.io.netty.http.HttpClient;
+import reactor.io.netty.http.HttpException;
+
+import javax.net.ssl.ManagerFactoryParameters;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.lang.reflect.Field;
+import java.security.KeyStore;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 /**
  * The Reactor-based implementation of {@link Authorizations}
@@ -42,14 +54,57 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
      * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
      */
     public ReactorAuthorizations(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
-        super(authorizationProvider, httpClient, objectMapper, root);
+        super(authorizationProvider, getHttpClient(), objectMapper, root);
     }
 
     @Override
     public Mono<String> authorizeByAuthorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest request) {
         return get(request, builder -> builder.pathSegment("oauth", "authorize"))
-            .map(inbound -> inbound.responseHeaders().get(LOCATION))
+            .cast(String.class)
+            .otherwise(HttpException.class, t -> {
+                Field field = ReflectionUtils.findField(t.getClass(), "location");
+                ReflectionUtils.makeAccessible(field);
+                return Mono.just((String) ReflectionUtils.getField(field, t));
+            })
             .map(location -> UriComponentsBuilder.fromUriString(location).build().getQueryParams().getFirst("code"));
+    }
+
+    private static HttpClient getHttpClient() {  // TODO: I'm going to hell for this
+        return HttpClient.create(HttpClientOptions.create()
+            .sslSupport()
+            .sslConfigurer(ssl -> ssl.trustManager(new SimpleTrustManagerFactory() {
+
+                @Override
+                protected TrustManager[] engineGetTrustManagers() {
+                    return new TrustManager[]{new X509TrustManager() {
+
+                        @Override
+                        public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+
+                        }
+
+                        @Override
+                        public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+
+                        }
+
+                        @Override
+                        public X509Certificate[] getAcceptedIssuers() {
+                            return new X509Certificate[0];
+                        }
+                    }};
+                }
+
+                @Override
+                protected void engineInit(ManagerFactoryParameters managerFactoryParameters) throws Exception {
+
+                }
+
+                @Override
+                protected void engineInit(KeyStore keyStore) throws Exception {
+
+                }
+            })));
     }
 
 }

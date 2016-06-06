@@ -14,11 +14,29 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.tokens;
+package org.cloudfoundry.uaa;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
-import org.cloudfoundry.uaa.UaaClient;
+import org.cloudfoundry.uaa.tokens.AbstractTokenKey;
+import org.cloudfoundry.uaa.tokens.CheckTokenRequest;
+import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeRequest;
+import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeResponse;
+import org.cloudfoundry.uaa.tokens.GetTokenByClientCredentialsRequest;
+import org.cloudfoundry.uaa.tokens.GetTokenByClientCredentialsResponse;
+import org.cloudfoundry.uaa.tokens.GetTokenByOneTimePasscodeRequest;
+import org.cloudfoundry.uaa.tokens.GetTokenByOneTimePasscodeResponse;
+import org.cloudfoundry.uaa.tokens.GetTokenByOpenIdRequest;
+import org.cloudfoundry.uaa.tokens.GetTokenByOpenIdResponse;
+import org.cloudfoundry.uaa.tokens.GetTokenByPasswordRequest;
+import org.cloudfoundry.uaa.tokens.GetTokenByPasswordResponse;
+import org.cloudfoundry.uaa.tokens.GetTokenKeyRequest;
+import org.cloudfoundry.uaa.tokens.GetTokenKeyResponse;
+import org.cloudfoundry.uaa.tokens.ListTokenKeysRequest;
+import org.cloudfoundry.uaa.tokens.RefreshTokenRequest;
+import org.cloudfoundry.uaa.tokens.RefreshTokenResponse;
+import org.cloudfoundry.uaa.tokens.TokenFormat;
+import org.cloudfoundry.uaa.tokens.TokenKey;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
