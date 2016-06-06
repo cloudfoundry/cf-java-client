@@ -16,18 +16,25 @@
 
 package org.cloudfoundry.reactor.uaa;
 
-import org.cloudfoundry.uaa.Versioned;
+import io.netty.util.AsciiString;
+import org.cloudfoundry.uaa.BasicAuthorized;
 import reactor.io.netty.http.HttpOutbound;
 
-final class VersionBuilder {
+import java.util.Base64;
 
-    private VersionBuilder() {
-    }
+final class BasicAuthorizationBuilder {
+
+    private static final AsciiString AUTHORIZATION = new AsciiString("Authorization");
+
+    private static final AsciiString BASIC_PREAMBLE = new AsciiString("Basic ");
+
+    private BasicAuthorizationBuilder(){}
 
     static void augment(HttpOutbound outbound, Object request) {
-        if (request instanceof Versioned) {
-            Versioned versioned = (Versioned) request;
-            outbound.addHeader("If-Match", versioned.getVersion());
+        if(request instanceof BasicAuthorized) {
+            BasicAuthorized basicAuthorized = (BasicAuthorized)request;
+            String encoded = Base64.getEncoder().encodeToString(new AsciiString(basicAuthorized.getClientId()).concat(":").concat(basicAuthorized.getClientSecret()).toByteArray());
+            outbound.headers().set(AUTHORIZATION, BASIC_PREAMBLE + encoded);
         }
     }
 

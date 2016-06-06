@@ -17,7 +17,6 @@
 package org.cloudfoundry.reactor.uaa;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.netty.util.AsciiString;
 import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
@@ -27,12 +26,9 @@ import reactor.io.netty.http.HttpClient;
 import reactor.io.netty.http.HttpInbound;
 import reactor.io.netty.http.HttpOutbound;
 
-import java.util.Base64;
 import java.util.function.Function;
 
 public abstract class AbstractUaaOperations extends AbstractReactorOperations {
-
-    private static final AsciiString BASIC_PREAMBLE = new AsciiString("Basic ");
 
     protected AbstractUaaOperations(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
         super(authorizationProvider, httpClient, objectMapper, root);
@@ -43,12 +39,6 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
             QueryBuilder.augment(builder, request);
             return uriTransformer.apply(builder);
         };
-    }
-
-    protected final HttpOutbound basicAuth(HttpOutbound outbound, String clientId, String clientSecret) {
-        String encoded = Base64.getEncoder().encodeToString(new AsciiString(clientId).concat(":").concat(clientSecret).toByteArray());
-        outbound.headers().set(AUTHORIZATION, BASIC_PREAMBLE + encoded);
-        return outbound;
     }
 
     protected final <T> Mono<T> delete(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
@@ -85,12 +75,29 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
         return doPost(request, responseType, getUriAugmenter(request, uriTransformer), getRequestTransformer(request));
     }
 
+    protected final <T> Mono<T> postForm(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return postForm(request, responseType, uriTransformer, outbound -> outbound);
+    }
+
+    protected final <T> Mono<T> postForm(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<HttpOutbound, HttpOutbound>
+        requestTransformer) {
+        return doPost(responseType, getUriAugmenter(request, uriTransformer), outbound -> {
+            outbound.headers().remove(AUTHORIZATION);
+            getRequestTransformer(request).apply(outbound);
+            return requestTransformer.apply(outbound)
+                .addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED)
+                .removeTransferEncodingChunked()
+                .sendHeaders();
+        });
+    }
+
     protected final <T> Mono<T> put(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doPut(request, responseType, getUriAugmenter(request, uriTransformer), getRequestTransformer(request));
     }
 
     private static Function<HttpOutbound, HttpOutbound> getRequestTransformer(Object request) {
         return outbound -> {
+            BasicAuthorizationBuilder.augment(outbound, request);
             IdentityZoneBuilder.augment(outbound, request);
             VersionBuilder.augment(outbound, request);
             return outbound;

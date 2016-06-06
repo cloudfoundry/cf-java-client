@@ -14,30 +14,25 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.tokens;
+package org.cloudfoundry.uaa;
 
-import org.cloudfoundry.Nullable;
-import org.cloudfoundry.QueryParameter;
-import org.cloudfoundry.uaa.BasicAuthorized;
-import org.immutables.value.Value;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
- * The request payload for the get token by one-time passcode operation
+ * An interface that indicates that a UAA request should use basic authorization
  */
-@Value.Immutable
-abstract class _GetTokenByOneTimePasscodeRequest implements BasicAuthorized {
+public interface BasicAuthorized {
 
     /**
-     * The passcode
+     * The client id
      */
-    @QueryParameter("passcode")
-    abstract String getPasscode();
+    @JsonIgnore
+    String getClientId();
 
     /**
-     * The token format
+     * The client secret
      */
-    @Nullable
-    @QueryParameter("token_format")
-    abstract TokenFormat getTokenFormat();
+    @JsonIgnore
+    String getClientSecret();
 
 }

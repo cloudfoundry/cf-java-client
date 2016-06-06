@@ -38,12 +38,8 @@ import org.cloudfoundry.uaa.tokens.ListTokenKeysResponse;
 import org.cloudfoundry.uaa.tokens.RefreshTokenRequest;
 import org.cloudfoundry.uaa.tokens.RefreshTokenResponse;
 import org.cloudfoundry.uaa.tokens.Tokens;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
-import reactor.io.netty.http.HttpOutbound;
-
-import java.util.function.Function;
 
 
 public final class ReactorTokens extends AbstractUaaOperations implements Tokens {
@@ -62,8 +58,7 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
 
     @Override
     public Mono<CheckTokenResponse> check(CheckTokenRequest request) {
-        return post(request, CheckTokenResponse.class, builder -> builder.pathSegment("check_token"),
-            outbound -> basicAuth(outbound, request.getClientId(), request.getClientSecret()));
+        return post(request, CheckTokenResponse.class, builder -> builder.pathSegment("check_token"));
     }
 
     @Override
@@ -80,9 +75,7 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
 
     @Override
     public Mono<GetTokenByOneTimePasscodeResponse> getByOneTimePasscode(GetTokenByOneTimePasscodeRequest request) {
-        return postForm(request, GetTokenByOneTimePasscodeResponse.class,
-            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "password").queryParam("response_type", "token"),
-            outbound -> basicAuth(outbound, request.getClientId(), request.getClientSecret()));
+        return postForm(request, GetTokenByOneTimePasscodeResponse.class, builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "password").queryParam("response_type", "token"));
     }
 
     @Override
@@ -109,21 +102,6 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
     @Override
     public Mono<RefreshTokenResponse> refresh(RefreshTokenRequest request) {
         return postForm(request, RefreshTokenResponse.class, builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "refresh_token"));
-    }
-
-    private <T> Mono<T> postForm(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return postForm(request, responseType, uriTransformer, outbound -> outbound);
-    }
-
-    private <T> Mono<T> postForm(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<HttpOutbound, HttpOutbound> requestTransformer) {
-        return doPost(responseType, getUriAugmenter(request, uriTransformer), outbound -> {
-            outbound.headers().remove(AUTHORIZATION);
-
-            return requestTransformer.apply(outbound)
-                .addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED)
-                .removeTransferEncodingChunked()
-                .sendHeaders();
-        });
     }
 
 }
