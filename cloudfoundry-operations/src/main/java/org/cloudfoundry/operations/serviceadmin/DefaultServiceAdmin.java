@@ -21,11 +21,13 @@ import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerResponse;
 import org.cloudfoundry.client.v2.servicebrokers.ListServiceBrokersRequest;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokerEntity;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokerResource;
+import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 public final class DefaultServiceAdmin implements ServiceAdmin {
@@ -47,9 +49,26 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
     }
 
     @Override
-    public Flux<ServiceBroker> listServiceBrokers() {
+    public Mono<Void> delete(DeleteServiceBrokerRequest request) {
+        return getServiceBrokerId(this.cloudFoundryClient, request.getName())
+            .then(serviceBrokerId -> requestDeleteServiceBroker(this.cloudFoundryClient, serviceBrokerId));
+    }
+
+    @Override
+    public Flux<ServiceBroker> list() {
         return requestServiceBrokers(this.cloudFoundryClient)
             .map(this::toServiceBroker);
+    }
+
+    private static Mono<ServiceBrokerResource> getServiceBroker(CloudFoundryClient cloudFoundryClient, String serviceBrokerName) {
+        return requestListServiceBrokers(cloudFoundryClient, serviceBrokerName)
+            .single()
+            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Service Broker %s does not exist", serviceBrokerName));
+    }
+
+    private static Mono<String> getServiceBrokerId(CloudFoundryClient cloudFoundryClient, String serviceBrokerName) {
+        return getServiceBroker(cloudFoundryClient, serviceBrokerName)
+            .map(ResourceUtils::getId);
     }
 
     private static Mono<CreateServiceBrokerResponse> requestCreateServiceBroker(CloudFoundryClient cloudFoundryClient, String name, String url, String username, String password,
@@ -62,6 +81,22 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
                 .authenticationPassword(password)
                 .spaceId(Optional.ofNullable(isSpaceScoped).orElse(false) ? spaceId : null)
                 .build());
+    }
+
+    private static Mono<Void> requestDeleteServiceBroker(CloudFoundryClient cloudFoundryClient, String serviceBrokerId) {
+        return cloudFoundryClient.serviceBrokers()
+            .delete(org.cloudfoundry.client.v2.servicebrokers.DeleteServiceBrokerRequest.builder()
+                .serviceBrokerId(serviceBrokerId)
+                .build());
+    }
+
+    private static Flux<ServiceBrokerResource> requestListServiceBrokers(CloudFoundryClient cloudFoundryClient, String serviceBrokerName) {
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.serviceBrokers()
+                .list(ListServiceBrokersRequest.builder()
+                    .name(serviceBrokerName)
+                    .page(page)
+                    .build()));
     }
 
     private static Flux<ServiceBrokerResource> requestServiceBrokers(CloudFoundryClient cloudFoundryClient) {

@@ -16,36 +16,17 @@
 
 package org.cloudfoundry.operations.serviceadmin;
 
-
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import org.immutables.value.Value;
 
 /**
- * Main entry point to the Cloud Foundry Service Admin API
+ * Request options for the delete service broker operation
  */
-public interface ServiceAdmin {
+@Value.Immutable
+abstract class _DeleteServiceBrokerRequest {
 
     /**
-     * Create a new service broker
-     *
-     * @param request The Create Service Broker request
-     * @return a completion indicator
+     * The name of the Service Broker
      */
-    Mono<Void> create(CreateServiceBrokerRequest request);
-
-    /**
-     * Deletes a service broker
-     *
-     * @param request the Delete Service Broker request
-     * @return a completion indicator
-     */
-    Mono<Void> delete(DeleteServiceBrokerRequest request);
-
-    /**
-     * Lists the service brokers
-     *
-     * @return the service brokers
-     */
-    Flux<ServiceBroker> list();
+    abstract String getName();
 
 }
