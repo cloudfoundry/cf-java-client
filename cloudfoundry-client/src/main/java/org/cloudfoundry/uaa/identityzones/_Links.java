@@ -17,14 +17,9 @@
 package org.cloudfoundry.uaa.identityzones;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
-
-import java.io.IOException;
 
 /**
  * The payload for the identity zone links
@@ -36,7 +31,6 @@ abstract class _Links {
     /**
      * The logout link
      */
-    @JsonDeserialize(using = LogoutLinkDeserializer.class)
     @JsonProperty("logout")
     @Nullable
     abstract LogoutLink getLogout();
@@ -44,37 +38,8 @@ abstract class _Links {
     /**
      * The self service link
      */
-    @JsonDeserialize(using = SelfServiceLinkDeserializer.class)
     @JsonProperty("selfService")
     @Nullable
     abstract SelfServiceLink getSelfService();
-
-    static final class LogoutLinkDeserializer extends StdDeserializer<LogoutLink> {
-
-
-        LogoutLinkDeserializer() {
-            super(LogoutLink.class);
-        }
-
-        @SuppressWarnings("deprecation")
-        @Override
-        public LogoutLink deserialize(JsonParser p, DeserializationContext ctx) throws IOException {
-            return p.readValueAs(LogoutLink.class);
-        }
-    }
-
-    static final class SelfServiceLinkDeserializer extends StdDeserializer<SelfServiceLink> {
-
-
-        SelfServiceLinkDeserializer() {
-            super(SelfServiceLink.class);
-        }
-
-        @SuppressWarnings("deprecation")
-        @Override
-        public SelfServiceLink deserialize(JsonParser p, DeserializationContext ctx) throws IOException {
-            return p.readValueAs(SelfServiceLink.class);
-        }
-    }
 
 }

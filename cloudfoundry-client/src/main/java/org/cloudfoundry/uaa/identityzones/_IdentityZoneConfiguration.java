@@ -17,15 +17,10 @@
 package org.cloudfoundry.uaa.identityzones;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -45,7 +40,6 @@ abstract class _IdentityZoneConfiguration {
     /**
      * Array The links
      */
-    @JsonDeserialize(using = LinksDeserializer.class)
     @JsonProperty("links")
     @Nullable
     abstract Links getLinks();
@@ -53,7 +47,6 @@ abstract class _IdentityZoneConfiguration {
     /**
      * The prompts
      */
-    @JsonDeserialize(using = PromptsDeserializer.class)
     @JsonProperty("prompts")
     @Nullable
     abstract List<Prompt> getPrompts();
@@ -61,7 +54,6 @@ abstract class _IdentityZoneConfiguration {
     /**
      * The saml configuration
      */
-    @JsonDeserialize(using = SamlConfigurationDeserializer.class)
     @JsonProperty("samlConfig")
     @Nullable
     abstract SamlConfiguration getSamlConfiguration();
@@ -69,67 +61,8 @@ abstract class _IdentityZoneConfiguration {
     /**
      * The token policy
      */
-    @JsonDeserialize(using = TokenPolicyDeserializer.class)
     @JsonProperty("tokenPolicy")
     @Nullable
     abstract TokenPolicy getTokenPolicy();
-
-    static final class LinksDeserializer extends StdDeserializer<Links> {
-
-
-        LinksDeserializer() {
-            super(Links.class);
-        }
-
-        @SuppressWarnings("deprecation")
-        @Override
-        public Links deserialize(JsonParser p, DeserializationContext ctx) throws IOException {
-            return p.readValueAs(Links.class);
-        }
-    }
-
-    static final class PromptsDeserializer extends StdDeserializer<List<Prompt>> {
-
-
-        PromptsDeserializer() {
-            super(List.class);
-        }
-
-        @SuppressWarnings("deprecation")
-        @Override
-        public List<Prompt> deserialize(JsonParser p, DeserializationContext ctx) throws IOException {
-            return p.readValueAs(new TypeReference<List<Prompt>>() {
-
-            });
-        }
-    }
-
-    static final class SamlConfigurationDeserializer extends StdDeserializer<SamlConfiguration> {
-
-
-        SamlConfigurationDeserializer() {
-            super(SamlConfiguration.class);
-        }
-
-        @SuppressWarnings("deprecation")
-        @Override
-        public SamlConfiguration deserialize(JsonParser p, DeserializationContext ctx) throws IOException {
-            return p.readValueAs(SamlConfiguration.class);
-        }
-    }
-
-    static final class TokenPolicyDeserializer extends StdDeserializer<TokenPolicy> {
-
-
-        TokenPolicyDeserializer() {
-            super(TokenPolicy.class);
-        }
-
-        @SuppressWarnings("deprecation")
-        @Override
-        public TokenPolicy deserialize(JsonParser p, DeserializationContext ctx) throws IOException {
-            return p.readValueAs(TokenPolicy.class);
-        }
-    }
 
 }

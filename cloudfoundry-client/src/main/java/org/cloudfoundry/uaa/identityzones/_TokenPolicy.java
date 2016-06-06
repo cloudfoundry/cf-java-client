@@ -17,15 +17,10 @@
 package org.cloudfoundry.uaa.identityzones;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
-import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -59,7 +54,6 @@ abstract class _TokenPolicy {
     /**
      * The keys of the token policy
      */
-    @JsonDeserialize(using = KeysDeserializer.class)
     @JsonProperty("keys")
     @Nullable
     abstract Map<String, KeyInformation> getKeys();
@@ -70,21 +64,5 @@ abstract class _TokenPolicy {
     @JsonProperty("refreshTokenValidity")
     @Nullable
     abstract Integer getRefreshTokenValidity();
-
-    static final class KeysDeserializer extends StdDeserializer<Map<String, KeyInformation>> {
-
-
-        KeysDeserializer() {
-            super(Map.class);
-        }
-
-        @SuppressWarnings("deprecation")
-        @Override
-        public Map<String, KeyInformation> deserialize(JsonParser p, DeserializationContext ctx) throws IOException {
-            return p.readValueAs(new TypeReference<Map<String, KeyInformation>>() {
-
-            });
-        }
-    }
 
 }
