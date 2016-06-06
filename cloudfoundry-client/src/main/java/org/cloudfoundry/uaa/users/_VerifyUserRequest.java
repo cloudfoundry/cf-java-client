@@ -16,21 +16,20 @@
 
 package org.cloudfoundry.uaa.users;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.uaa.Versioned;
+import org.immutables.value.Value;
 
-public final class DeleteUserRequestTest {
+/**
+ * The request payload for the change user password operation
+ */
+@Value.Immutable
+abstract class _VerifyUserRequest implements Versioned {
 
-    @Test(expected = IllegalStateException.class)
-    public void noUserId() {
-        DeleteUserRequest.builder()
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        DeleteUserRequest.builder()
-            .userId("test-user-id")
-            .build();
-    }
+    /**
+     * The user id
+     */
+    @JsonIgnore
+    abstract String getUserId();
 
 }

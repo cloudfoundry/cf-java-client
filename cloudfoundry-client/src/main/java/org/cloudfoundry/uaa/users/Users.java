@@ -71,4 +71,12 @@ public interface Users {
      */
     Mono<UpdateUserResponse> update(UpdateUserRequest request);
 
+    /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#verify-user">Verify User</a> request
+     *
+     * @param request the Verify User request
+     * @return the response from the Verify User request
+     */
+    Mono<VerifyUserResponse> verify(VerifyUserRequest request);
+
 }

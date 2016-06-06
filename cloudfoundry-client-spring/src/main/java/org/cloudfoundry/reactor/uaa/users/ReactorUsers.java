@@ -32,6 +32,8 @@ import org.cloudfoundry.uaa.users.ListUsersResponse;
 import org.cloudfoundry.uaa.users.UpdateUserRequest;
 import org.cloudfoundry.uaa.users.UpdateUserResponse;
 import org.cloudfoundry.uaa.users.Users;
+import org.cloudfoundry.uaa.users.VerifyUserRequest;
+import org.cloudfoundry.uaa.users.VerifyUserResponse;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
@@ -80,6 +82,11 @@ public final class ReactorUsers extends AbstractUaaOperations implements Users {
     @Override
     public Mono<UpdateUserResponse> update(UpdateUserRequest request) {
         return put(request, UpdateUserResponse.class, builder -> builder.pathSegment("Users", request.getId()));
+    }
+
+    @Override
+    public Mono<VerifyUserResponse> verify(VerifyUserRequest request) {
+        return get(request, VerifyUserResponse.class, builder -> builder.pathSegment("Users", request.getUserId(), "verify"));
     }
 
 }
