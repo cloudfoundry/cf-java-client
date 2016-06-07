@@ -22,6 +22,8 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.uaa.identityproviders.CreateIdentityProviderRequest;
 import org.cloudfoundry.uaa.identityproviders.CreateIdentityProviderResponse;
 import org.cloudfoundry.uaa.identityproviders.IdentityProviders;
+import org.cloudfoundry.uaa.identityproviders.UpdateIdentityProviderRequest;
+import org.cloudfoundry.uaa.identityproviders.UpdateIdentityProviderResponse;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
@@ -45,6 +47,11 @@ public final class ReactorIdentityProviders extends AbstractUaaOperations implem
     @Override
     public Mono<CreateIdentityProviderResponse> create(CreateIdentityProviderRequest request) {
         return post(request, CreateIdentityProviderResponse.class, builder -> builder.pathSegment("identity-providers"));
+    }
+
+    @Override
+    public Mono<UpdateIdentityProviderResponse> update(UpdateIdentityProviderRequest request) {
+        return put(request, UpdateIdentityProviderResponse.class, builder -> builder.pathSegment("identity-providers", request.getIdentityProviderId()));
     }
 
 }

@@ -1,0 +1,15 @@
+{
+  "active": true,
+  "config": {
+    "disableInternalUserManagement": false,
+    "lockoutPolicy": {
+      "countFailuresWithin": 8,
+      "lockoutAfterFailures": 8,
+      "lockoutPeriodSeconds": 8
+    }
+  },
+  "originKey": "uaa",
+  "name": "uaa",
+  "type": "uaa",
+  "version": 1
+}

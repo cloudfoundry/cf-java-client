@@ -31,4 +31,12 @@ public interface IdentityProviders {
      */
     Mono<CreateIdentityProviderResponse> create(CreateIdentityProviderRequest request);
 
+    /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#update">Update Identity Provider</a> request
+     *
+     * @param request the Update Identity Provider request
+     * @return the response from the Update Identity Provider request
+     */
+    Mono<UpdateIdentityProviderResponse> update(UpdateIdentityProviderRequest request);
+
 }
