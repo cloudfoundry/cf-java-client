@@ -27,7 +27,11 @@ final class VersionBuilder {
     static void augment(HttpOutbound outbound, Object request) {
         if (request instanceof Versioned) {
             Versioned versioned = (Versioned) request;
-            outbound.addHeader("If-Match", versioned.getVersion());
+            String version = versioned.getVersion();
+
+            if (version != null) {
+                outbound.addHeader("If-Match", version);
+            }
         }
     }
 

@@ -31,23 +31,33 @@ public final class VersionBuilderTest {
 
     @Test
     public void augment() {
-        VersionBuilder.augment(this.outbound, new StubVersioned());
-
+        VersionBuilder.augment(this.outbound, new StubVersioned("test-version"));
         verify(this.outbound).addHeader("If-Match", "test-version");
     }
 
     @Test
-    public void augmentNotIVersioned() {
+    public void augmentNotVersioned() {
         IdentityZoneBuilder.augment(this.outbound, new Object());
+        verifyZeroInteractions(this.outbound);
+    }
 
+    @Test
+    public void augmentNullVersion() {
+        IdentityZoneBuilder.augment(this.outbound, new StubVersioned(null));
         verifyZeroInteractions(this.outbound);
     }
 
     private static final class StubVersioned implements Versioned {
 
+        private final String version;
+
+        private StubVersioned(String version) {
+            this.version = version;
+        }
+
         @Override
         public String getVersion() {
-            return "test-version";
+            return this.version;
         }
 
     }
