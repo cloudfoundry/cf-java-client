@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * The entity response payload for User
  */
-abstract class AbstractUser {
+public abstract class AbstractUser {
 
     /**
      * Whether the user is active
