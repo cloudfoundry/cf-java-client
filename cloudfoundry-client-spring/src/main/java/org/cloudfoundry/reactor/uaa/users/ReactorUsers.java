@@ -27,6 +27,8 @@ import org.cloudfoundry.uaa.users.DeleteUserRequest;
 import org.cloudfoundry.uaa.users.DeleteUserResponse;
 import org.cloudfoundry.uaa.users.GetUserVerificationLinkRequest;
 import org.cloudfoundry.uaa.users.GetUserVerificationLinkResponse;
+import org.cloudfoundry.uaa.users.InviteUsersRequest;
+import org.cloudfoundry.uaa.users.InviteUsersResponse;
 import org.cloudfoundry.uaa.users.ListUsersRequest;
 import org.cloudfoundry.uaa.users.ListUsersResponse;
 import org.cloudfoundry.uaa.users.LookupUseridsRequest;
@@ -74,6 +76,11 @@ public final class ReactorUsers extends AbstractUaaOperations implements Users {
     @Override
     public Mono<GetUserVerificationLinkResponse> getVerificationLink(GetUserVerificationLinkRequest request) {
         return get(request, GetUserVerificationLinkResponse.class, builder -> builder.pathSegment("Users", request.getUserId(), "verify-link"));
+    }
+
+    @Override
+    public Mono<InviteUsersResponse> invite(InviteUsersRequest request) {
+        return post(request, InviteUsersResponse.class, builder -> builder.pathSegment("invite_users"));
     }
 
     @Override
