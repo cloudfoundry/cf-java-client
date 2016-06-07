@@ -25,6 +25,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum Type {
     INTERNAL("uaa"),
 
+    KEYSTONE("keystone"),
+
     SAML("saml"),
 
     LDAP("ldap"),
@@ -54,6 +56,8 @@ public enum Type {
         switch (s.toLowerCase()) {
             case "uaa":
                 return INTERNAL;
+            case "keystone":
+                return KEYSTONE;
             case "saml":
                 return SAML;
             case "ldap":
