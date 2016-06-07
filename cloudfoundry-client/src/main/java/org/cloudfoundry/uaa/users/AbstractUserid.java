@@ -18,29 +18,27 @@ package org.cloudfoundry.uaa.users;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
-
 /**
- * The entity response payload for User
+ * The entity response payload for a userid
  */
-public abstract class AbstractUser extends AbstractUserSummary {
+public abstract class AbstractUserid {
 
     /**
-     * The approvals for the user
+     * The id
      */
-    @JsonProperty("approvals")
-    public abstract List<Approval> getApproval();
+    @JsonProperty("id")
+    public abstract String getId();
 
     /**
-     * The external id
+     * The identity provider that authenticated this user
      */
-    @JsonProperty("externalId")
-    public abstract String getExternalId();
+    @JsonProperty("origin")
+    public abstract String getOrigin();
 
     /**
-     * The groups for the user
+     * The user name
      */
-    @JsonProperty("groups")
-    public abstract List<Group> getGroup();
+    @JsonProperty("userName")
+    public abstract String getUserName();
 
 }

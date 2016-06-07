@@ -33,11 +33,14 @@ import org.cloudfoundry.uaa.users.GetUserVerificationLinkResponse;
 import org.cloudfoundry.uaa.users.Group;
 import org.cloudfoundry.uaa.users.ListUsersRequest;
 import org.cloudfoundry.uaa.users.ListUsersResponse;
+import org.cloudfoundry.uaa.users.LookupUseridsRequest;
+import org.cloudfoundry.uaa.users.LookupUseridsResponse;
 import org.cloudfoundry.uaa.users.Meta;
 import org.cloudfoundry.uaa.users.Name;
 import org.cloudfoundry.uaa.users.UpdateUserRequest;
 import org.cloudfoundry.uaa.users.UpdateUserResponse;
 import org.cloudfoundry.uaa.users.User;
+import org.cloudfoundry.uaa.users.Userid;
 import org.cloudfoundry.uaa.users.VerifyUserRequest;
 import org.cloudfoundry.uaa.users.VerifyUserResponse;
 import reactor.core.publisher.Mono;
@@ -50,6 +53,7 @@ import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.uaa.SortOrder.ASCENDING;
+import static org.cloudfoundry.uaa.SortOrder.DESCENDING;
 import static org.cloudfoundry.uaa.users.ApprovalStatus.APPROVED;
 import static org.cloudfoundry.uaa.users.ApprovalStatus.DENIED;
 import static org.cloudfoundry.uaa.users.MembershipType.DIRECT;
@@ -556,6 +560,63 @@ public final class ReactorUsersTest {
         @Override
         protected Mono<ListUsersResponse> invoke(ListUsersRequest request) {
             return this.users.list(request);
+        }
+
+    }
+
+    public static final class Lookup extends AbstractUaaApiTest<LookupUseridsRequest, LookupUseridsResponse> {
+
+        private final ReactorUsers users = new ReactorUsers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path(
+                        "/ids/Users?count=10&filter=userName%2Beq%2B%22bobOu38vE@test.org%22%2Bor%2Bid%2Beq%2B%22c1476587-5ec9-4b7e-9ed2-381e3133f07a%22" +
+                            "&includeInactive=true&sortOrder=descending&startIndex=1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/users/GET_ids_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected LookupUseridsResponse getResponse() {
+            return LookupUseridsResponse.builder()
+                .resource(Userid.builder()
+                    .id("c1476587-5ec9-4b7e-9ed2-381e3133f07a")
+                    .userName("dwayneSnbjBm@test.org")
+                    .origin("uaa")
+                    .build())
+                .resource(Userid.builder()
+                    .id("2fc67623-ee31-4edc-9b1f-0b50416195fb")
+                    .userName("bobOu38vE@test.org")
+                    .origin("uaa")
+                    .build())
+                .startIndex(1)
+                .itemsPerPage(10)
+                .totalResults(2)
+                .schema("urn:scim:schemas:core:1.0")
+                .build();
+        }
+
+        @Override
+        protected LookupUseridsRequest getValidRequest() throws Exception {
+            return LookupUseridsRequest.builder()
+                .filter("userName+eq+\"bobOu38vE@test.org\"+or+id+eq+\"c1476587-5ec9-4b7e-9ed2-381e3133f07a\"")
+                .count(10)
+                .startIndex(1)
+                .sortOrder(DESCENDING)
+                .includeInactive(true)
+                .build();
+        }
+
+        @Override
+        protected Mono<LookupUseridsResponse> invoke(LookupUseridsRequest request) {
+            return this.users.lookup(request);
         }
 
     }

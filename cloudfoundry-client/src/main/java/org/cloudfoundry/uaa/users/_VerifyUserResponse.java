@@ -17,83 +17,14 @@
 package org.cloudfoundry.uaa.users;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
-
-import java.util.List;
 
 /**
  * The response from the verify user request
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _VerifyUserResponse {
-
-    /**
-     * Whether the user is active
-     */
-    @JsonProperty("active")
-    abstract Boolean getActive();
-
-    /**
-     * The emails for the user
-     */
-    @JsonProperty("emails")
-    abstract List<Email> getEmail();
-
-    /**
-     * The user id
-     */
-    @JsonProperty("id")
-    abstract String getId();
-
-    /**
-     * Metadata for the result
-     */
-    @JsonProperty("meta")
-    abstract Meta getMeta();
-
-    /**
-     * The user's name
-     */
-    @JsonProperty("name")
-    abstract Name getName();
-
-    /**
-     * The identity provider that authenticated this user
-     */
-    @JsonProperty("origin")
-    abstract String getOrigin();
-
-    /**
-     * The timestamp when the user's password was last modified
-     */
-    @JsonProperty("passwordLastModified")
-    abstract String getPasswordLastModified();
-
-    /**
-     * The schemas
-     */
-    @JsonProperty("schemas")
-    abstract List<String> getSchemas();
-
-    /**
-     * The user name
-     */
-    @JsonProperty("userName")
-    public abstract String getUserName();
-
-    /**
-     * Whether the user's email is verified
-     */
-    @JsonProperty("verified")
-    abstract Boolean getVerified();
-
-    /**
-     * The zone id the user belongs to
-     */
-    @JsonProperty("zoneId")
-    abstract String getZoneId();
+abstract class _VerifyUserResponse extends AbstractUserSummary {
 
 }

@@ -16,31 +16,16 @@
 
 package org.cloudfoundry.uaa.users;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.uaa.PaginatedResponse;
+import org.immutables.value.Value;
 
 /**
- * The entity response payload for User
+ * The response from the lookup userid and usernames request
  */
-public abstract class AbstractUser extends AbstractUserSummary {
-
-    /**
-     * The approvals for the user
-     */
-    @JsonProperty("approvals")
-    public abstract List<Approval> getApproval();
-
-    /**
-     * The external id
-     */
-    @JsonProperty("externalId")
-    public abstract String getExternalId();
-
-    /**
-     * The groups for the user
-     */
-    @JsonProperty("groups")
-    public abstract List<Group> getGroup();
+@JsonDeserialize
+@Value.Immutable
+abstract class _LookupUseridsResponse extends PaginatedResponse<Userid> {
 
 }
