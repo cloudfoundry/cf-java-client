@@ -48,6 +48,7 @@ abstract class _AuthorizeByAuthorizationCodeGrantApiRequest {
     /**
      * Any random string to be returned in the Location header as a query parameter, used to achieve per-request customization
      */
+    @Nullable
     @QueryParameter("state")
     abstract String getState();
 

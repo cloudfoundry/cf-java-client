@@ -14,34 +14,33 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa;
+package org.cloudfoundry.operations.advanced;
 
-import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
 import org.cloudfoundry.uaa.authorizations.ResponseType;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import reactor.core.publisher.Mono;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+public final class DefaultAdvanced implements Advanced {
 
-public final class AuthorizationsTest extends AbstractIntegrationTest {
+    private final Mono<UaaClient> uaaClient;
 
-    @Autowired
-    private UaaClient uaaClient;
+    public DefaultAdvanced(Mono<UaaClient> uaaClient) {
+        this.uaaClient = uaaClient;
+    }
 
-    @Test
-    public void authorizeByAuthorizationCodeGrantApi() {
-        this.uaaClient.authorizations()
+    @Override
+    public Mono<String> sshCode() {
+        return this.uaaClient
+            .then(DefaultAdvanced::requestAuthorizeByAuthorizationCodeGrantApi);
+    }
+
+    private static Mono<String> requestAuthorizeByAuthorizationCodeGrantApi(UaaClient uaaClient) {
+        return uaaClient.authorizations()
             .authorizeByAuthorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest.builder()
                 .clientId("ssh-proxy")
                 .responseType(ResponseType.CODE)
-                .build())
-            .subscribe(this.<String>testSubscriber()
-                .assertThat(code -> {
-                    assertNotNull(code);
-                    assertTrue(code.length() == 6);
-                }));
+                .build());
     }
 
 }

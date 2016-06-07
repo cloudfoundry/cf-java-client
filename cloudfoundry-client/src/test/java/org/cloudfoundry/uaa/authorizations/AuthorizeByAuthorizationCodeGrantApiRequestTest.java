@@ -36,14 +36,6 @@ public final class AuthorizeByAuthorizationCodeGrantApiRequestTest {
             .build();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noState() {
-        AuthorizeByAuthorizationCodeGrantApiRequest.builder()
-            .clientId("test-client-id")
-            .responseType(ResponseType.CODE)
-            .build();
-    }
-
     @Test
     public void valid() {
         AuthorizeByAuthorizationCodeGrantApiRequest.builder()

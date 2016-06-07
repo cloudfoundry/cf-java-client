@@ -14,34 +14,29 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa;
+package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
-import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
-import org.cloudfoundry.uaa.authorizations.ResponseType;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public final class AuthorizationsTest extends AbstractIntegrationTest {
+public final class AdvancedTest extends AbstractIntegrationTest {
 
     @Autowired
-    private UaaClient uaaClient;
+    private CloudFoundryOperations cloudFoundryOperations;
 
     @Test
-    public void authorizeByAuthorizationCodeGrantApi() {
-        this.uaaClient.authorizations()
-            .authorizeByAuthorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest.builder()
-                .clientId("ssh-proxy")
-                .responseType(ResponseType.CODE)
-                .build())
+    public void sshCode() {
+        this.cloudFoundryOperations.advanced()
+            .sshCode()
             .subscribe(this.<String>testSubscriber()
                 .assertThat(code -> {
                     assertNotNull(code);
                     assertTrue(code.length() == 6);
                 }));
-    }
 
+    }
 }

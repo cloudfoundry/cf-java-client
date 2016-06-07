@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.operations;
 
+import org.cloudfoundry.operations.advanced.Advanced;
 import org.cloudfoundry.operations.applications.Applications;
 import org.cloudfoundry.operations.buildpacks.Buildpacks;
 import org.cloudfoundry.operations.domains.Domains;
@@ -37,6 +38,13 @@ public interface CloudFoundryOperations {
      * The currently supported Cloud Foundry CLI version
      */
     String SUPPORTED_CLI_VERSION = "6.16.1";
+
+    /**
+     * Main entry point to the Cloud Foundry Advanced Operations API
+     *
+     * @return the Cloud Foundry Advanced Operations API
+     */
+    Advanced advanced();
 
     /**
      * Main entry point to the Cloud Foundry Applications Operations API
