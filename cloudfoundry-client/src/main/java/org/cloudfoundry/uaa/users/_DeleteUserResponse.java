@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 /**
- * The response from the create user request
+ * The response from the delete user request
  */
 @JsonDeserialize
 @Value.Immutable

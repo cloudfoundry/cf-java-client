@@ -21,7 +21,7 @@ import org.cloudfoundry.uaa.Versioned;
 import org.immutables.value.Value;
 
 /**
- * The request payload for the change user password operation
+ * The request payload for the verify user operation
  */
 @Value.Immutable
 abstract class _VerifyUserRequest implements Versioned {
