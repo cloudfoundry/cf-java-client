@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.securitygroups;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -37,6 +38,7 @@ abstract class _RuleEntity {
      * The ports
      */
     @JsonProperty("ports")
+    @Nullable
     abstract String getPorts();
 
     /**
