@@ -31,6 +31,9 @@ import org.cloudfoundry.uaa.users.Email;
 import org.cloudfoundry.uaa.users.GetUserVerificationLinkRequest;
 import org.cloudfoundry.uaa.users.GetUserVerificationLinkResponse;
 import org.cloudfoundry.uaa.users.Group;
+import org.cloudfoundry.uaa.users.Invite;
+import org.cloudfoundry.uaa.users.InviteUsersRequest;
+import org.cloudfoundry.uaa.users.InviteUsersResponse;
 import org.cloudfoundry.uaa.users.ListUsersRequest;
 import org.cloudfoundry.uaa.users.ListUsersResponse;
 import org.cloudfoundry.uaa.users.LookupUseridsRequest;
@@ -421,6 +424,61 @@ public final class ReactorUsersTest {
 
     }
 
+    public static final class InviteUsers extends AbstractUaaApiTest<InviteUsersRequest, InviteUsersResponse> {
+
+        private final ReactorUsers users = new ReactorUsers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/invite_users?client_id=u7ptqw&redirect_uri=example.com")
+                    .payload("fixtures/uaa/users/POST_invite_users_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/users//POST_invite_users_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected InviteUsersResponse getResponse() {
+            return InviteUsersResponse.builder()
+                .newInvite(Invite.builder()
+                    .email("user1@pjy596.com")
+                    .userId("68af461b-484e-464a-96ac-a336abed48ad")
+                    .origin("uaa")
+                    .success(true)
+                    .inviteLink("http://localhost/invitations/accept?code=WEqtpOh73k")
+                    .build())
+                .newInvite(Invite.builder()
+                    .email("user2@pjy596.com")
+                    .userId("d256cf96-5c14-4649-9a0d-5564c66411b5")
+                    .origin("uaa")
+                    .success(true)
+                    .inviteLink("http://localhost/invitations/accept?code=n5X0hCsD3N")
+                    .build())
+                .failedInvite()
+                .build();
+        }
+
+        @Override
+        protected InviteUsersRequest getValidRequest() throws Exception {
+            return InviteUsersRequest.builder()
+                .clientId("u7ptqw")
+                .email("user1@pjy596.com", "user2@pjy596.com")
+                .redirectUri("example.com")
+                .build();
+        }
+
+        @Override
+        protected Mono<InviteUsersResponse> invoke(InviteUsersRequest request) {
+            return this.users.invite(request);
+        }
+
+    }
+
     public static final class List extends AbstractUaaApiTest<ListUsersRequest, ListUsersResponse> {
 
         private final ReactorUsers users = new ReactorUsers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
@@ -726,7 +784,7 @@ public final class ReactorUsersTest {
         }
     }
 
-    public static final class VerifyUser extends AbstractUaaApiTest<VerifyUserRequest, VerifyUserResponse> {
+    public static final class Verify extends AbstractUaaApiTest<VerifyUserRequest, VerifyUserResponse> {
 
         private final ReactorUsers users = new ReactorUsers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
@@ -735,6 +793,7 @@ public final class ReactorUsersTest {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/Users/c0d42e48-9b69-461d-a77b-f75d3a5948b6/verify")
+                    .header("If-Match", "12")
                     .build())
                 .response(TestResponse.builder()
                     .status(OK)
