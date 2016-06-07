@@ -18,6 +18,8 @@ package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.doppler.DopplerClient;
+import org.cloudfoundry.operations.advanced.Advanced;
+import org.cloudfoundry.operations.advanced.DefaultAdvanced;
 import org.cloudfoundry.operations.applications.Applications;
 import org.cloudfoundry.operations.applications.DefaultApplications;
 import org.cloudfoundry.operations.buildpacks.Buildpacks;
@@ -40,9 +42,12 @@ import org.cloudfoundry.operations.spaces.DefaultSpaces;
 import org.cloudfoundry.operations.spaces.Spaces;
 import org.cloudfoundry.operations.stacks.DefaultStacks;
 import org.cloudfoundry.operations.stacks.Stacks;
+import org.cloudfoundry.uaa.UaaClient;
 import reactor.core.publisher.Mono;
 
 final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
+
+    private final Advanced advanced;
 
     private final Applications applications;
 
@@ -66,7 +71,9 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
 
     private final Stacks stacks;
 
-    DefaultCloudFoundryOperations(CloudFoundryClient cloudFoundryClient, Mono<DopplerClient> dopplerClient, Mono<String> organizationId, Mono<String> spaceId, Mono<String> username) {
+    DefaultCloudFoundryOperations(CloudFoundryClient cloudFoundryClient, Mono<DopplerClient> dopplerClient, Mono<String> organizationId, Mono<String> spaceId, Mono<UaaClient> uaaClient,
+                                  Mono<String> username) {
+        this.advanced = new DefaultAdvanced(uaaClient);
         this.applications = new DefaultApplications(cloudFoundryClient, dopplerClient, spaceId);
         this.buildpacks = new DefaultBuildpacks(cloudFoundryClient);
         this.domains = new DefaultDomains(cloudFoundryClient);
@@ -78,6 +85,11 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
         this.spaceAdmin = new DefaultSpaceAdmin(cloudFoundryClient, organizationId);
         this.spaces = new DefaultSpaces(cloudFoundryClient, organizationId, username);
         this.stacks = new DefaultStacks(cloudFoundryClient);
+    }
+
+    @Override
+    public Advanced advanced() {
+        return this.advanced;
     }
 
     @Override

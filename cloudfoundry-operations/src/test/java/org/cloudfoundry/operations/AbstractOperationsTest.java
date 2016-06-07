@@ -41,8 +41,8 @@ import org.cloudfoundry.client.v2.stacks.Stacks;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstances;
 import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.doppler.DopplerClient;
-import org.cloudfoundry.operations.serviceadmin.ServiceBroker;
 import org.cloudfoundry.uaa.UaaClient;
+import org.cloudfoundry.uaa.authorizations.Authorizations;
 import org.cloudfoundry.uaa.tokens.Tokens;
 import org.junit.Before;
 import reactor.core.publisher.Mono;
@@ -71,9 +71,9 @@ public abstract class AbstractOperationsTest {
 
     protected static final String TEST_USERNAME = "test-username";
 
-    protected final Tokens tokens = mock(Tokens.class, RETURNS_SMART_NULLS);
-
     protected final ApplicationsV2 applications = mock(ApplicationsV2.class, RETURNS_SMART_NULLS);
+
+    protected final Authorizations authorizations = mock(Authorizations.class, RETURNS_SMART_NULLS);
 
     protected final Buildpacks buildpacks = mock(Buildpacks.class, RETURNS_SMART_NULLS);
 
@@ -119,6 +119,8 @@ public abstract class AbstractOperationsTest {
 
     protected final Stacks stacks = mock(Stacks.class, RETURNS_SMART_NULLS);
 
+    protected final Tokens tokens = mock(Tokens.class, RETURNS_SMART_NULLS);
+
     protected final UaaClient uaaClient = mock(UaaClient.class, RETURNS_SMART_NULLS);
 
     protected final UserProvidedServiceInstances userProvidedServiceInstances = mock(UserProvidedServiceInstances.class, RETURNS_SMART_NULLS);
@@ -151,6 +153,7 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.userProvidedServiceInstances()).thenReturn(this.userProvidedServiceInstances);
         when(this.cloudFoundryClient.users()).thenReturn(this.users);
 
+        when(this.uaaClient.authorizations()).thenReturn(this.authorizations);
         when(this.uaaClient.tokens()).thenReturn(this.tokens);
     }
 
