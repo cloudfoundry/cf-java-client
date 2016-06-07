@@ -23,6 +23,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * The type of Identity provider in paylaod
  */
 public enum Type {
+    INTERNAL("uaa"),
+
     SAML("saml"),
 
     LDAP("ldap"),
@@ -50,6 +52,8 @@ public enum Type {
     @JsonCreator
     static Type from(String s) {
         switch (s.toLowerCase()) {
+            case "uaa":
+                return INTERNAL;
             case "saml":
                 return SAML;
             case "ldap":

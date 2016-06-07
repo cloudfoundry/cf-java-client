@@ -25,16 +25,22 @@ import org.cloudfoundry.uaa.identityproviders.AttributeMappings;
 import org.cloudfoundry.uaa.identityproviders.CreateIdentityProviderRequest;
 import org.cloudfoundry.uaa.identityproviders.CreateIdentityProviderResponse;
 import org.cloudfoundry.uaa.identityproviders.ExternalGroupMappingMode;
+import org.cloudfoundry.uaa.identityproviders.InternalConfiguration;
 import org.cloudfoundry.uaa.identityproviders.LdapConfiguration;
+import org.cloudfoundry.uaa.identityproviders.LockoutPolicy;
 import org.cloudfoundry.uaa.identityproviders.Oauth2Configuration;
 import org.cloudfoundry.uaa.identityproviders.SamlConfiguration;
 import org.cloudfoundry.uaa.identityproviders.Type;
+import org.cloudfoundry.uaa.identityproviders.UpdateIdentityProviderRequest;
+import org.cloudfoundry.uaa.identityproviders.UpdateIdentityProviderResponse;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorIdentityProvidersTest {
 
@@ -295,6 +301,75 @@ public final class ReactorIdentityProvidersTest {
         @Override
         protected Mono<CreateIdentityProviderResponse> invoke(CreateIdentityProviderRequest request) {
             return this.identityProviderManagement.create(request);
+        }
+    }
+
+    public static final class Update extends AbstractUaaApiTest<UpdateIdentityProviderRequest, UpdateIdentityProviderResponse> {
+
+        private final ReactorIdentityProviders identityProviderManagement = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/identity-providers/test-identity-provider-id")
+                    .header("X-Identity-Zone-Id", "test-identity-zone-id")
+                    .payload("fixtures/uaa/identity-providers/PUT_{id}_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/identity-providers/PUT_{id}_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected UpdateIdentityProviderResponse getResponse() {
+            return UpdateIdentityProviderResponse.builder()
+                .active(true)
+                .createdAt(946713600000L)
+                .configuration(InternalConfiguration.builder()
+                    .disableInternalUserManagement(false)
+                    .lockoutPolicy(LockoutPolicy.builder()
+                        .lockAccountPeriodInSecond(8)
+                        .lockoutPeriodInSecond(8)
+                        .numberOfAllowedFailures(8)
+                        .build())
+                    .build())
+                .id("test-identity-provider-id")
+                .identityZoneId("uaa")
+                .lastModified(1465001967669L)
+                .name("uaa")
+                .originKey("uaa")
+                .type(Type.INTERNAL)
+                .version(2)
+                .build();
+        }
+
+        @Override
+        protected UpdateIdentityProviderRequest getValidRequest() throws Exception {
+            return UpdateIdentityProviderRequest.builder()
+                .active(true)
+                .configuration(InternalConfiguration.builder()
+                    .disableInternalUserManagement(false)
+                    .lockoutPolicy(LockoutPolicy.builder()
+                        .lockAccountPeriodInSecond(8)
+                        .lockoutPeriodInSecond(8)
+                        .numberOfAllowedFailures(8)
+                        .build())
+                    .build())
+                .name("uaa")
+                .originKey("uaa")
+                .type(Type.INTERNAL)
+                .version(1)
+                .identityZoneId("test-identity-zone-id")
+                .identityProviderId("test-identity-provider-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<UpdateIdentityProviderResponse> invoke(UpdateIdentityProviderRequest request) {
+            return this.identityProviderManagement.update(request);
         }
     }
 

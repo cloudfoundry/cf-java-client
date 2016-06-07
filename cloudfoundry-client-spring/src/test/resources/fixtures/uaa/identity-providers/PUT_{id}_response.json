@@ -1,0 +1,23 @@
+{
+  "type": "uaa",
+  "config": {
+    "emailDomain": null,
+    "additionalConfiguration": null,
+    "providerDescription": null,
+    "passwordPolicy": null,
+    "lockoutPolicy": {
+      "lockoutPeriodSeconds": 8,
+      "lockoutAfterFailures": 8,
+      "countFailuresWithin": 8
+    },
+    "disableInternalUserManagement": false
+  },
+  "id": "test-identity-provider-id",
+  "originKey": "uaa",
+  "name": "uaa",
+  "version": 2,
+  "created": 946713600000,
+  "last_modified": 1465001967669,
+  "active": true,
+  "identityZoneId": "uaa"
+}
