@@ -1,0 +1,23 @@
+{
+  "id" : "c0d42e48-9b69-461d-a77b-f75d3a5948b6",
+  "meta" : {
+    "version" : 12,
+    "created" : "2016-06-03T17:59:31.027Z",
+    "lastModified" : "2016-06-03T17:59:31.027Z"
+  },
+  "userName" : "billy_o@example.com",
+  "name" : {
+    "familyName" : "d'Orange",
+    "givenName" : "William"
+  },
+  "emails" : [ {
+    "value" : "billy_o@example.com",
+    "primary" : false
+  } ],
+  "active" : true,
+  "verified" : true,
+  "origin" : "uaa",
+  "zoneId" : "uaa",
+  "passwordLastModified" : "2016-06-03T17:59:31.000Z",
+  "schemas" : [ "urn:scim:schemas:core:1.0" ]
+}

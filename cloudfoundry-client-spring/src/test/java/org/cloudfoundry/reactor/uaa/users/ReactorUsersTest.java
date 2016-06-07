@@ -38,6 +38,8 @@ import org.cloudfoundry.uaa.users.Name;
 import org.cloudfoundry.uaa.users.UpdateUserRequest;
 import org.cloudfoundry.uaa.users.UpdateUserResponse;
 import org.cloudfoundry.uaa.users.User;
+import org.cloudfoundry.uaa.users.VerifyUserRequest;
+import org.cloudfoundry.uaa.users.VerifyUserResponse;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -661,6 +663,65 @@ public final class ReactorUsersTest {
         protected Mono<UpdateUserResponse> invoke(UpdateUserRequest request) {
             return this.users.update(request);
         }
+    }
+
+    public static final class VerifyUser extends AbstractUaaApiTest<VerifyUserRequest, VerifyUserResponse> {
+
+        private final ReactorUsers users = new ReactorUsers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/Users/c0d42e48-9b69-461d-a77b-f75d3a5948b6/verify")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/users/GET_{id}_verify_user_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected VerifyUserResponse getResponse() {
+            return VerifyUserResponse.builder()
+                .id("c0d42e48-9b69-461d-a77b-f75d3a5948b6")
+                .meta(Meta.builder()
+                    .version(12)
+                    .created("2016-06-03T17:59:31.027Z")
+                    .lastModified("2016-06-03T17:59:31.027Z")
+                    .build())
+                .userName("billy_o@example.com")
+                .name(Name.builder()
+                    .familyName("d'Orange")
+                    .givenName("William")
+                    .build())
+                .email(Email.builder()
+                    .value("billy_o@example.com")
+                    .primary(false)
+                    .build())
+                .active(true)
+                .verified(true)
+                .origin("uaa")
+                .zoneId("uaa")
+                .passwordLastModified("2016-06-03T17:59:31.000Z")
+                .schema("urn:scim:schemas:core:1.0")
+                .build();
+        }
+
+        @Override
+        protected VerifyUserRequest getValidRequest() throws Exception {
+            return VerifyUserRequest.builder()
+                .userId("c0d42e48-9b69-461d-a77b-f75d3a5948b6")
+                .version("12")
+                .build();
+        }
+
+        @Override
+        protected Mono<VerifyUserResponse> invoke(VerifyUserRequest request) {
+            return this.users.verify(request);
+        }
+
     }
 
 }

@@ -62,6 +62,14 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
         return doGet(responseType, getUriAugmenter(request, uriTransformer), getRequestTransformer(request));
     }
 
+    protected final <T> Mono<T> get(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+                                    Function<HttpOutbound, HttpOutbound> requestTransformer) {
+        return doGet(responseType, getUriAugmenter(request, uriTransformer), outbound -> {
+            IdentityZoneBuilder.augment(outbound, request);
+            return requestTransformer.apply(outbound);
+        });
+    }
+
     protected final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
                                      Function<HttpOutbound, HttpOutbound> requestTransformer) {
 
