@@ -107,7 +107,7 @@ public final class DefaultServiceAdminTest {
 
     public static final class CreateServiceBroker extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(Mono.just(this.cloudFoundryClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -134,7 +134,7 @@ public final class DefaultServiceAdminTest {
 
     public static final class CreateServiceBrokerWithSpaceScope extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(Mono.just(this.cloudFoundryClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -162,7 +162,7 @@ public final class DefaultServiceAdminTest {
 
     public static final class DeleteServiceBroker extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(Mono.just(this.cloudFoundryClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -187,7 +187,7 @@ public final class DefaultServiceAdminTest {
 
     public static final class DeleteServiceBrokerNoServiceBroker extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(Mono.just(this.cloudFoundryClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -213,7 +213,7 @@ public final class DefaultServiceAdminTest {
 
     public static final class ListServiceBrokers extends AbstractOperationsApiTest<ServiceBroker> {
 
-        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(Mono.just(this.cloudFoundryClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -240,7 +240,7 @@ public final class DefaultServiceAdminTest {
 
     public static final class ListServiceBrokersNoBrokers extends AbstractOperationsApiTest<ServiceBroker> {
 
-        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(Mono.just(this.cloudFoundryClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {

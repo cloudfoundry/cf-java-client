@@ -28,28 +28,32 @@ import reactor.core.publisher.Mono;
 
 import java.util.NoSuchElementException;
 
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
+
 public final class DefaultSpaceAdmin implements SpaceAdmin {
 
-    private final CloudFoundryClient cloudFoundryClient;
+    private final Mono<CloudFoundryClient> cloudFoundryClient;
 
     private final Mono<String> organizationId;
 
-    public DefaultSpaceAdmin(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId) {
+    public DefaultSpaceAdmin(Mono<CloudFoundryClient> cloudFoundryClient, Mono<String> organizationId) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.organizationId = organizationId;
     }
 
     @Override
     public Mono<SpaceQuota> get(GetSpaceQuotaRequest request) {
-        return this.organizationId
-            .then(organizationId -> getSpaceQuotaDefinition(this.cloudFoundryClient, organizationId, request.getName()))
+        return Mono
+            .when(this.cloudFoundryClient, this.organizationId)
+            .then(function((cloudFoundryClient, organizationId) -> getSpaceQuotaDefinition(cloudFoundryClient, organizationId, request.getName())))
             .map(DefaultSpaceAdmin::toSpaceQuota);
     }
 
     @Override
     public Flux<SpaceQuota> listQuotas() {
-        return this.organizationId
-            .flatMap(organizationId1 -> requestSpaceQuotaDefinitions(this.cloudFoundryClient, organizationId1))
+        return Mono
+            .when(this.cloudFoundryClient, this.organizationId)
+            .flatMap(function(DefaultSpaceAdmin::requestSpaceQuotaDefinitions))
             .map(DefaultSpaceAdmin::toSpaceQuota);
     }
 

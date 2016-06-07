@@ -1134,7 +1134,7 @@ public final class DefaultApplicationsTest {
 
     public static final class CopySourceNoRestartOrgSpace extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1167,7 +1167,7 @@ public final class DefaultApplicationsTest {
 
     public static final class CopySourceNoRestartSpace extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1198,7 +1198,7 @@ public final class DefaultApplicationsTest {
 
     public static final class CopySourceOrganizationNotFound extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1228,7 +1228,7 @@ public final class DefaultApplicationsTest {
 
     public static final class CopySourceRestart extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1262,7 +1262,7 @@ public final class DefaultApplicationsTest {
 
     public static final class CopySourceSpaceNotFound extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1291,7 +1291,7 @@ public final class DefaultApplicationsTest {
 
     public static final class DeleteAndDeleteRoutes extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1321,7 +1321,7 @@ public final class DefaultApplicationsTest {
 
     public static final class DeleteAndDeleteRoutesFailure extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1351,7 +1351,7 @@ public final class DefaultApplicationsTest {
 
     public static final class DeleteAndDoNotDeleteRoutes extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1378,7 +1378,7 @@ public final class DefaultApplicationsTest {
 
     public static final class DeleteWithBoundRoutes extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1409,7 +1409,7 @@ public final class DefaultApplicationsTest {
 
     public static final class DisableSsh extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1434,7 +1434,7 @@ public final class DefaultApplicationsTest {
 
     public static final class DisableSshAlreadyDisabled extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1458,7 +1458,7 @@ public final class DefaultApplicationsTest {
 
     public static final class DisableSshNoApp extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1483,7 +1483,7 @@ public final class DefaultApplicationsTest {
 
     public static final class EnableSsh extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1508,7 +1508,7 @@ public final class DefaultApplicationsTest {
 
     public static final class EnableSshAlreadyEnabled extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1532,7 +1532,7 @@ public final class DefaultApplicationsTest {
 
     public static final class EnableSshNoApp extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1557,7 +1557,7 @@ public final class DefaultApplicationsTest {
 
     public static final class Get extends AbstractOperationsApiTest<ApplicationDetail> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1598,7 +1598,7 @@ public final class DefaultApplicationsTest {
 
     public static final class GetApplicationManifest extends AbstractOperationsApiTest<ApplicationManifest> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1637,7 +1637,7 @@ public final class DefaultApplicationsTest {
 
     public static final class GetApplicationManifestNoRoutes extends AbstractOperationsApiTest<ApplicationManifest> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1673,7 +1673,7 @@ public final class DefaultApplicationsTest {
 
     public static final class GetDetectedBuildpack extends AbstractOperationsApiTest<ApplicationDetail> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1714,7 +1714,7 @@ public final class DefaultApplicationsTest {
 
     public static final class GetEnvironments extends AbstractOperationsApiTest<ApplicationEnvironments> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1753,7 +1753,7 @@ public final class DefaultApplicationsTest {
 
     public static final class GetEnvironmentsNoApp extends AbstractOperationsApiTest<ApplicationEnvironments> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1778,7 +1778,7 @@ public final class DefaultApplicationsTest {
 
     public static final class GetEvents extends AbstractOperationsApiTest<ApplicationEvent> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1819,7 +1819,7 @@ public final class DefaultApplicationsTest {
 
     public static final class GetEventsBadTimeSparseMetadata extends AbstractOperationsApiTest<ApplicationEvent> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1858,7 +1858,7 @@ public final class DefaultApplicationsTest {
 
     public static final class GetEventsFoundZero extends AbstractOperationsApiTest<ApplicationEvent> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1883,7 +1883,7 @@ public final class DefaultApplicationsTest {
 
     public static final class GetEventsLimitZero extends AbstractOperationsApiTest<ApplicationEvent> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1918,7 +1918,7 @@ public final class DefaultApplicationsTest {
 
     public static final class GetEventsTwo extends AbstractOperationsApiTest<ApplicationEvent> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1974,7 +1974,7 @@ public final class DefaultApplicationsTest {
 
     public static final class GetHealthCheck extends AbstractOperationsApiTest<ApplicationHealthCheck> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -2001,7 +2001,7 @@ public final class DefaultApplicationsTest {
 
         private static final int CF_INSTANCES_ERROR = 220001;
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -2038,7 +2038,7 @@ public final class DefaultApplicationsTest {
 
     public static final class GetNoBuildpack extends AbstractOperationsApiTest<ApplicationDetail> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -2081,7 +2081,7 @@ public final class DefaultApplicationsTest {
 
         private static final int CF_STAGING_NOT_FINISHED = 170002;
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -2120,7 +2120,7 @@ public final class DefaultApplicationsTest {
 
         private static final int CF_APP_STOPPED_STATS_ERROR = 200003;
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -2161,7 +2161,7 @@ public final class DefaultApplicationsTest {
 
     public static final class GetWithEmptyInstance extends AbstractOperationsApiTest<ApplicationDetail> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -2202,7 +2202,7 @@ public final class DefaultApplicationsTest {
 
     public static final class GetWithEmptyInstanceStats extends AbstractOperationsApiTest<ApplicationDetail> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -2243,7 +2243,7 @@ public final class DefaultApplicationsTest {
 
     public static final class GetWithNoInstances extends AbstractOperationsApiTest<ApplicationDetail> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -2280,7 +2280,7 @@ public final class DefaultApplicationsTest {
 
     public static final class GetWithNullStats extends AbstractOperationsApiTest<ApplicationDetail> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -2321,7 +2321,7 @@ public final class DefaultApplicationsTest {
 
     public static final class GetWithNullUsage extends AbstractOperationsApiTest<ApplicationDetail> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -2364,7 +2364,7 @@ public final class DefaultApplicationsTest {
 
     public static final class List extends AbstractOperationsApiTest<ApplicationSummary> {
 
-        private final Applications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final Applications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -2390,7 +2390,7 @@ public final class DefaultApplicationsTest {
 
     public static final class Logs extends AbstractOperationsApiTest<LogMessage> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -2418,7 +2418,7 @@ public final class DefaultApplicationsTest {
 
     public static final class LogsNoApp extends AbstractOperationsApiTest<LogMessage> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -2443,7 +2443,7 @@ public final class DefaultApplicationsTest {
 
     public static final class LogsRecent extends AbstractOperationsApiTest<LogMessage> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -2471,7 +2471,7 @@ public final class DefaultApplicationsTest {
 
     public static final class LogsRecentNotSet extends AbstractOperationsApiTest<LogMessage> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
 
         @Before
@@ -2501,7 +2501,7 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
             .application(this.applicationBits)
@@ -2536,7 +2536,7 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
             .application(this.applicationBits)
@@ -2578,7 +2578,7 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
             .application(this.applicationBits)
@@ -2620,7 +2620,7 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
             .application(this.applicationBits)
@@ -2662,7 +2662,7 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -2691,7 +2691,7 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
             .application(this.applicationBits)
@@ -2733,7 +2733,7 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
             .application(this.applicationBits)
@@ -2776,7 +2776,7 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
             .application(this.applicationBits)
@@ -2819,7 +2819,7 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
             .application(this.applicationBits)
@@ -2854,7 +2854,7 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
             .application(this.applicationBits)
@@ -2897,7 +2897,7 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
             .application(this.applicationBits)
@@ -2939,7 +2939,7 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
             .application(this.applicationBits)
@@ -2979,7 +2979,7 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
             .application(this.applicationBits)
@@ -3028,7 +3028,7 @@ public final class DefaultApplicationsTest {
 
         private final RandomWords randomWords = mock(RandomWords.class, RETURNS_SMART_NULLS);
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID), this.randomWords);
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID), this.randomWords);
 
         @Before
         public void setUp() throws Exception {
@@ -3065,7 +3065,7 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
             .application(this.applicationBits)
@@ -3108,7 +3108,7 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
             .application(this.applicationBits)
@@ -3151,7 +3151,7 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
             .application(this.applicationBits)
@@ -3193,7 +3193,7 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
             .application(this.applicationBits)
@@ -3230,7 +3230,7 @@ public final class DefaultApplicationsTest {
 
     public static final class Rename extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3256,7 +3256,7 @@ public final class DefaultApplicationsTest {
 
     public static final class RenameNoApp extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3282,7 +3282,7 @@ public final class DefaultApplicationsTest {
 
     public static final class Restage extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3309,7 +3309,7 @@ public final class DefaultApplicationsTest {
 
     public static final class RestageInvalidApplication extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3334,7 +3334,7 @@ public final class DefaultApplicationsTest {
 
     public static final class RestageStagingFailure extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3361,7 +3361,7 @@ public final class DefaultApplicationsTest {
 
     public static final class RestageStartingFailurePartial extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3388,7 +3388,7 @@ public final class DefaultApplicationsTest {
 
     public static final class RestageStartingFailureTotal extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3416,7 +3416,7 @@ public final class DefaultApplicationsTest {
 
     public static final class RestageTimeout extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3444,7 +3444,7 @@ public final class DefaultApplicationsTest {
 
     public static final class RestartFailurePartial extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3472,7 +3472,7 @@ public final class DefaultApplicationsTest {
 
     public static final class RestartFailureTotal extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3501,7 +3501,7 @@ public final class DefaultApplicationsTest {
 
     public static final class RestartInstance extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3527,7 +3527,7 @@ public final class DefaultApplicationsTest {
 
     public static final class RestartNoApp extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3552,7 +3552,7 @@ public final class DefaultApplicationsTest {
 
     public static final class RestartNotStartedAndNotStopped extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3580,7 +3580,7 @@ public final class DefaultApplicationsTest {
 
     public static final class RestartStarted extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3608,7 +3608,7 @@ public final class DefaultApplicationsTest {
 
     public static final class RestartStopped extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3635,7 +3635,7 @@ public final class DefaultApplicationsTest {
 
     public static final class ScaleDiskAndInstancesNotStarted extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3662,7 +3662,7 @@ public final class DefaultApplicationsTest {
 
     public static final class ScaleDiskAndInstancesStarted extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3691,7 +3691,7 @@ public final class DefaultApplicationsTest {
 
     public static final class ScaleInstances extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3717,7 +3717,7 @@ public final class DefaultApplicationsTest {
 
     public static final class ScaleInstancesNoApp extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3743,7 +3743,7 @@ public final class DefaultApplicationsTest {
 
     public static final class ScaleNoChange extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3767,7 +3767,7 @@ public final class DefaultApplicationsTest {
 
     public static final class SetEnvironmentVariable extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3804,7 +3804,7 @@ public final class DefaultApplicationsTest {
 
     public static final class SetEnvironmentVariableNoApp extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3831,7 +3831,7 @@ public final class DefaultApplicationsTest {
 
     public static final class SetHealthCheck extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3857,7 +3857,7 @@ public final class DefaultApplicationsTest {
 
     public static final class SshEnabled extends AbstractOperationsApiTest<Boolean> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3882,7 +3882,7 @@ public final class DefaultApplicationsTest {
 
     public static final class SshEnabledNoApp extends AbstractOperationsApiTest<Boolean> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3907,7 +3907,7 @@ public final class DefaultApplicationsTest {
 
     public static final class StartApplicationFailurePartial extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3934,7 +3934,7 @@ public final class DefaultApplicationsTest {
 
     public static final class StartApplicationFailureTotal extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3962,7 +3962,7 @@ public final class DefaultApplicationsTest {
 
     public static final class StartApplicationTimeout extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -3991,7 +3991,7 @@ public final class DefaultApplicationsTest {
 
     public static final class StartInvalidApplication extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -4016,7 +4016,7 @@ public final class DefaultApplicationsTest {
 
     public static final class StartStartedApplication extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -4040,7 +4040,7 @@ public final class DefaultApplicationsTest {
 
     public static final class StartStoppedApplication extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -4067,7 +4067,7 @@ public final class DefaultApplicationsTest {
 
     public static final class StopInvalidApplication extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -4092,7 +4092,7 @@ public final class DefaultApplicationsTest {
 
     public static final class StopStartedApplication extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -4117,7 +4117,7 @@ public final class DefaultApplicationsTest {
 
     public static final class StopStoppedApplication extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -4141,7 +4141,7 @@ public final class DefaultApplicationsTest {
 
     public static final class UnsetEnvironmentVariable extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -4176,7 +4176,7 @@ public final class DefaultApplicationsTest {
 
     public static final class UnsetEnvironmentVariableNoApp extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {

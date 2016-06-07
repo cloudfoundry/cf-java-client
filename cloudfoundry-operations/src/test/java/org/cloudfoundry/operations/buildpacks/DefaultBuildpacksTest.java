@@ -86,7 +86,7 @@ public final class DefaultBuildpacksTest {
 
         private static final Integer POSITION = 1;
 
-        private final DefaultBuildpacks buildpacks = new DefaultBuildpacks(this.cloudFoundryClient);
+        private final DefaultBuildpacks buildpacks = new DefaultBuildpacks(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {
@@ -115,7 +115,7 @@ public final class DefaultBuildpacksTest {
 
     public static final class List extends AbstractOperationsApiTest<Buildpack> {
 
-        private final DefaultBuildpacks buildpacks = new DefaultBuildpacks(this.cloudFoundryClient);
+        private final DefaultBuildpacks buildpacks = new DefaultBuildpacks(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {

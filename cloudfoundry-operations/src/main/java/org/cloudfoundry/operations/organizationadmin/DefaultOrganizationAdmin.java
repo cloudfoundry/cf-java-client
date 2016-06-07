@@ -45,51 +45,63 @@ import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class DefaultOrganizationAdmin implements OrganizationAdmin {
 
-    private final CloudFoundryClient cloudFoundryClient;
+    private final Mono<CloudFoundryClient> cloudFoundryClient;
 
-    public DefaultOrganizationAdmin(CloudFoundryClient cloudFoundryClient) {
+    public DefaultOrganizationAdmin(Mono<CloudFoundryClient> cloudFoundryClient) {
         this.cloudFoundryClient = cloudFoundryClient;
     }
 
     @Override
     public Mono<OrganizationQuota> createQuota(CreateQuotaRequest request) {
-        return createOrganizationQuota(this.cloudFoundryClient, request)
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> createOrganizationQuota(cloudFoundryClient, request))
             .map(DefaultOrganizationAdmin::toOrganizationQuota);
     }
 
     @Override
     public Mono<Void> deleteQuota(DeleteQuotaRequest request) {
-        return getOrganizationQuotaId(this.cloudFoundryClient, request.getName())
-            .then(quotaId -> deleteOrganizationQuota(this.cloudFoundryClient, quotaId));
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getOrganizationQuotaId(cloudFoundryClient, request.getName())
+            ))
+            .then(function(DefaultOrganizationAdmin::deleteOrganizationQuota));
     }
 
     @Override
     public Mono<OrganizationQuota> getQuota(GetQuotaRequest request) {
-        return getOrganizationQuota(this.cloudFoundryClient, request.getName())
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> getOrganizationQuota(cloudFoundryClient, request.getName()))
             .map(DefaultOrganizationAdmin::toOrganizationQuota);
     }
 
     @Override
     public Flux<OrganizationQuota> listQuotas() {
-        return requestListOrganizationQuotas(this.cloudFoundryClient)
+        return this.cloudFoundryClient
+            .flatMap(DefaultOrganizationAdmin::requestListOrganizationQuotas)
             .map(DefaultOrganizationAdmin::toOrganizationQuota);
     }
 
     @Override
     public Mono<Void> setQuota(SetQuotaRequest request) {
-        return Mono
-            .when(
-                getOrganizationId(this.cloudFoundryClient, request.getOrganizationName()),
-                getOrganizationQuotaId(this.cloudFoundryClient, request.getQuotaName())
-            )
-            .then(function(((organizationId, quotaDefinitionId) -> requestUpdateOrganization(this.cloudFoundryClient, organizationId, quotaDefinitionId))))
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getOrganizationId(cloudFoundryClient, request.getOrganizationName()),
+                getOrganizationQuotaId(cloudFoundryClient, request.getQuotaName())
+            ))
+            .then(function((DefaultOrganizationAdmin::requestUpdateOrganization)))
             .then();
     }
 
     @Override
     public Mono<OrganizationQuota> updateQuota(UpdateQuotaRequest request) {
-        return getOrganizationQuota(this.cloudFoundryClient, request.getName())
-            .then(exitingQuotaDefinition -> updateOrganizationQuota(this.cloudFoundryClient, request, exitingQuotaDefinition))
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getOrganizationQuota(cloudFoundryClient, request.getName())
+            ))
+            .then(function((cloudFoundryClient, exitingQuotaDefinition) -> updateOrganizationQuota(cloudFoundryClient, request, exitingQuotaDefinition)))
             .map(DefaultOrganizationAdmin::toOrganizationQuota);
     }
 

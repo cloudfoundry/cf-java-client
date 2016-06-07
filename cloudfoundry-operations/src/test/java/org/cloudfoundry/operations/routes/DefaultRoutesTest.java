@@ -427,7 +427,7 @@ public final class DefaultRoutesTest {
 
     public static final class CheckRouteInvalidDomain extends AbstractOperationsApiTest<Boolean> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -454,7 +454,7 @@ public final class DefaultRoutesTest {
 
     public static final class CheckRouteInvalidHost extends AbstractOperationsApiTest<Boolean> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -482,7 +482,7 @@ public final class DefaultRoutesTest {
 
     public static final class CheckRouteNoOrganization extends AbstractOperationsApiTest<Boolean> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_SPACE_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, MISSING_SPACE_ID);
 
         @Override
         protected void assertions(TestSubscriber<Boolean> testSubscriber) {
@@ -504,7 +504,7 @@ public final class DefaultRoutesTest {
 
     public static final class CheckRoutePrivateDomain extends AbstractOperationsApiTest<Boolean> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -532,7 +532,7 @@ public final class DefaultRoutesTest {
 
     public static final class CheckRouteSharedDomain extends AbstractOperationsApiTest<Boolean> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -561,7 +561,7 @@ public final class DefaultRoutesTest {
 
     public static final class CreateRouteInvalidDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -590,7 +590,7 @@ public final class DefaultRoutesTest {
 
     public static final class CreateRouteInvalidSpace extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -619,7 +619,7 @@ public final class DefaultRoutesTest {
 
     public static final class CreateRouteNoOrganization extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_SPACE_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, MISSING_SPACE_ID);
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
@@ -642,7 +642,7 @@ public final class DefaultRoutesTest {
 
     public static final class CreateRoutePrivateDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -671,7 +671,7 @@ public final class DefaultRoutesTest {
 
     public static final class DeleteFailure extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() {
@@ -702,7 +702,7 @@ public final class DefaultRoutesTest {
 
     public static final class DeleteInvalidDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() {
@@ -730,7 +730,7 @@ public final class DefaultRoutesTest {
 
     public static final class DeleteInvalidRoute extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() {
@@ -758,7 +758,7 @@ public final class DefaultRoutesTest {
 
     public static final class DeleteNoOrganization extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, Mono.just(TEST_SPACE_ID));
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
@@ -780,7 +780,7 @@ public final class DefaultRoutesTest {
 
     public static final class DeleteOrphanedRoutesAssociatedApplication extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -804,7 +804,7 @@ public final class DefaultRoutesTest {
 
     public static final class DeleteOrphanedRoutesNoAssociatedApplications extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -829,7 +829,7 @@ public final class DefaultRoutesTest {
 
     public static final class DeleteOrphanedRoutesNoAssociatedApplicationsFailure extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -855,7 +855,7 @@ public final class DefaultRoutesTest {
 
     public static final class DeleteOrphanedRoutesNoRoutes extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -877,7 +877,7 @@ public final class DefaultRoutesTest {
 
     public static final class DeletePrivateDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() {
@@ -907,7 +907,7 @@ public final class DefaultRoutesTest {
 
     public static final class DeleteSharedDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() {
@@ -937,7 +937,7 @@ public final class DefaultRoutesTest {
 
     public static final class ListCurrentOrganizationNoOrganization extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, Mono.just(TEST_SPACE_ID));
 
         @Override
         protected void assertions(TestSubscriber<Route> testSubscriber) {
@@ -956,7 +956,7 @@ public final class DefaultRoutesTest {
 
     public static final class ListCurrentOrganizationNoOrganizationNoSpace extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_SPACE_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, MISSING_SPACE_ID);
 
         @Override
         protected void assertions(TestSubscriber<Route> testSubscriber) {
@@ -975,7 +975,7 @@ public final class DefaultRoutesTest {
 
     public static final class ListCurrentOrganizationNoSpace extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -1009,7 +1009,7 @@ public final class DefaultRoutesTest {
 
     public static final class ListCurrentOrganizationNoSpaceNoRoutes extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -1035,7 +1035,7 @@ public final class DefaultRoutesTest {
 
     public static final class ListCurrentSpace extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1069,7 +1069,7 @@ public final class DefaultRoutesTest {
 
     public static final class ListCurrentSpaceNoOrganization extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1103,7 +1103,7 @@ public final class DefaultRoutesTest {
 
     public static final class ListCurrentSpaceNoOrganizationNoSpace extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_SPACE_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, MISSING_SPACE_ID);
 
         @Override
         protected void assertions(TestSubscriber<Route> testSubscriber) {
@@ -1122,7 +1122,7 @@ public final class DefaultRoutesTest {
 
     public static final class ListCurrentSpaceNoSpace extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Override
         protected void assertions(TestSubscriber<Route> testSubscriber) {
@@ -1141,7 +1141,7 @@ public final class DefaultRoutesTest {
 
     public static final class MapRouteExists extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1170,7 +1170,7 @@ public final class DefaultRoutesTest {
 
     public static final class MapRouteInvalidApplicationName extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1200,7 +1200,7 @@ public final class DefaultRoutesTest {
 
     public static final class MapRouteInvalidDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1229,7 +1229,7 @@ public final class DefaultRoutesTest {
 
     public static final class MapRouteNoOrganization extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1256,7 +1256,7 @@ public final class DefaultRoutesTest {
 
     public static final class MapRouteNoSpace extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
@@ -1278,7 +1278,7 @@ public final class DefaultRoutesTest {
 
     public static final class MapRoutePrivateDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1308,7 +1308,7 @@ public final class DefaultRoutesTest {
 
     public static final class MapRouteSharedDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1339,7 +1339,7 @@ public final class DefaultRoutesTest {
 
     public static final class UnmapRouteInvalidApplicationName extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1366,7 +1366,7 @@ public final class DefaultRoutesTest {
 
     public static final class UnmapRouteInvalidDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1394,7 +1394,7 @@ public final class DefaultRoutesTest {
 
     public static final class UnmapRouteInvalidRoute extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1423,7 +1423,7 @@ public final class DefaultRoutesTest {
 
     public static final class UnmapRouteNoOrganization extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, Mono.just(TEST_SPACE_ID));
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
@@ -1444,7 +1444,7 @@ public final class DefaultRoutesTest {
 
     public static final class UnmapRouteNoSpace extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
@@ -1465,7 +1465,7 @@ public final class DefaultRoutesTest {
 
     public static final class UnmapRoutePrivateDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1495,7 +1495,7 @@ public final class DefaultRoutesTest {
 
     public static final class UnmapRouteSharedDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {

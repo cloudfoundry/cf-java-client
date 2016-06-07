@@ -122,9 +122,10 @@ CloudFoundryClient cloudFoundryClient(@Value("${cf.host}") String host,
 The `CloudFoundryClient` provides direct access to the raw REST APIs.  This level of abstraction provides the most detailed and powerful access to the Cloud Foundry instance, but also requires users to perform quite a lot of orchestration on their own.  Most users will instead want to work at the `CloudFoundryOperations` layer.  Once again this is only an interface and the default implementation of this is the `DefaultCloudFoundryOperations`.  To instantiate one, you configure it with a builder:
 
 ```java
-new CloudFoundryOperationsBuilder()
+DefaultCloudFoundryOperations.builder()
     .cloudFoundryClient(cloudFoundryClient)
-    .target("example-organization", "example-space")
+    .organization("example-organization")
+    .space("example-space")
     .build();
 ```
 
@@ -135,9 +136,10 @@ In Spring-based applications, you'll want to encapsulate this in a bean definiti
 CloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient,
                                               @Value("${cf.organization}") String organization,
                                               @Value("${cf.space}") String space) {
-    return new CloudFoundryOperationsBuilder()
+    return DefaultCloudFoundryOperations.builder()
             .cloudFoundryClient(cloudFoundryClient)
-            .target(organization, space)
+            .organization(organization)
+            .space(space)
             .build();
 }
 ```

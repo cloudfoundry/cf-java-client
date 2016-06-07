@@ -180,7 +180,7 @@ public final class DefaultDomainsTest {
 
     public static final class CreateDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultDomains domains = new DefaultDomains(this.cloudFoundryClient);
+        private final DefaultDomains domains = new DefaultDomains(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {
@@ -206,7 +206,7 @@ public final class DefaultDomainsTest {
 
     public static final class CreateDomainInvalidOrganization extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultDomains domains = new DefaultDomains(this.cloudFoundryClient);
+        private final DefaultDomains domains = new DefaultDomains(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {
@@ -232,7 +232,7 @@ public final class DefaultDomainsTest {
 
     public static final class CreateSharedDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultDomains domains = new DefaultDomains(this.cloudFoundryClient);
+        private final DefaultDomains domains = new DefaultDomains(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {
@@ -256,7 +256,7 @@ public final class DefaultDomainsTest {
 
     public static final class ListDomains extends AbstractOperationsApiTest<Domain> {
 
-        private final DefaultDomains domains = new DefaultDomains(this.cloudFoundryClient);
+        private final DefaultDomains domains = new DefaultDomains(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {
@@ -290,7 +290,7 @@ public final class DefaultDomainsTest {
 
     public static final class ListDomainsOnlyPrivate extends AbstractOperationsApiTest<Domain> {
 
-        private final DefaultDomains domains = new DefaultDomains(this.cloudFoundryClient);
+        private final DefaultDomains domains = new DefaultDomains(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {
@@ -318,7 +318,7 @@ public final class DefaultDomainsTest {
 
     public static final class ListDomainsOnlyShared extends AbstractOperationsApiTest<Domain> {
 
-        private final DefaultDomains domains = new DefaultDomains(this.cloudFoundryClient);
+        private final DefaultDomains domains = new DefaultDomains(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {
@@ -346,7 +346,7 @@ public final class DefaultDomainsTest {
 
     public static final class ShareDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultDomains domains = new DefaultDomains(this.cloudFoundryClient);
+        private final DefaultDomains domains = new DefaultDomains(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {
@@ -373,7 +373,7 @@ public final class DefaultDomainsTest {
 
     public static final class ShareDomainSharedDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultDomains domains = new DefaultDomains(this.cloudFoundryClient);
+        private final DefaultDomains domains = new DefaultDomains(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {
@@ -400,7 +400,7 @@ public final class DefaultDomainsTest {
 
     public static final class UnshareDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultDomains domains = new DefaultDomains(this.cloudFoundryClient);
+        private final DefaultDomains domains = new DefaultDomains(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {

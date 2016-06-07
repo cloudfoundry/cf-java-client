@@ -57,7 +57,7 @@ public final class DefaultSpaceAdminTest {
 
     public static final class Get extends AbstractOperationsApiTest<SpaceQuota> {
 
-        private final DefaultSpaceAdmin spaceAdmin = new DefaultSpaceAdmin(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+        private final DefaultSpaceAdmin spaceAdmin = new DefaultSpaceAdmin(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -83,7 +83,7 @@ public final class DefaultSpaceAdminTest {
 
     public static final class GetNoOrganization extends AbstractOperationsApiTest<SpaceQuota> {
 
-        private final DefaultSpaceAdmin spaceAdmin = new DefaultSpaceAdmin(this.cloudFoundryClient, MISSING_ORGANIZATION_ID);
+        private final DefaultSpaceAdmin spaceAdmin = new DefaultSpaceAdmin(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID);
 
         @Override
         protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) {
@@ -103,11 +103,11 @@ public final class DefaultSpaceAdminTest {
 
     public static final class GetNotFound extends AbstractOperationsApiTest<SpaceQuota> {
 
-        private final DefaultSpaceAdmin spaceAdmin = new DefaultSpaceAdmin(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+        private final DefaultSpaceAdmin spaceAdmin = new DefaultSpaceAdmin(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
-            requestSpaceQuotaDefinitionsEmpty(cloudFoundryClient, TEST_ORGANIZATION_ID);
+            requestSpaceQuotaDefinitionsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         }
 
         @Override
@@ -128,7 +128,7 @@ public final class DefaultSpaceAdminTest {
 
     public static final class List extends AbstractOperationsApiTest<SpaceQuota> {
 
-        private final DefaultSpaceAdmin spaceAdmin = new DefaultSpaceAdmin(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+        private final DefaultSpaceAdmin spaceAdmin = new DefaultSpaceAdmin(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -152,7 +152,7 @@ public final class DefaultSpaceAdminTest {
 
     public static final class ListNoOrganization extends AbstractOperationsApiTest<SpaceQuota> {
 
-        private final DefaultSpaceAdmin spaceAdmin = new DefaultSpaceAdmin(this.cloudFoundryClient, MISSING_ORGANIZATION_ID);
+        private final DefaultSpaceAdmin spaceAdmin = new DefaultSpaceAdmin(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID);
 
         @Override
         protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) {

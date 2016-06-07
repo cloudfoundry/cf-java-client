@@ -409,7 +409,7 @@ public final class DefaultSpacesTest {
 
     public static final class AllowSsh extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -434,7 +434,7 @@ public final class DefaultSpacesTest {
 
     public static final class AllowSshAlreadyAllowed extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -458,7 +458,7 @@ public final class DefaultSpacesTest {
 
     public static final class AllowSshNoSpace extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -483,7 +483,7 @@ public final class DefaultSpacesTest {
 
     public static final class CreateNoOrgNoQuota extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_USERNAME));
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_USERNAME));
 
         @Before
         public void setUp() {
@@ -510,7 +510,7 @@ public final class DefaultSpacesTest {
 
     public static final class CreateNoOrgQuota extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_USERNAME));
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_USERNAME));
 
         @Before
         public void setUp() {
@@ -539,7 +539,7 @@ public final class DefaultSpacesTest {
 
     public static final class CreateNoOrgQuotaNotFound extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_USERNAME));
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_USERNAME));
 
         @Before
         public void setUp() {
@@ -565,7 +565,7 @@ public final class DefaultSpacesTest {
 
     public static final class CreateOrgNotFound extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_USERNAME));
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_USERNAME));
 
         @Before
         public void setUp() {
@@ -592,7 +592,7 @@ public final class DefaultSpacesTest {
 
     public static final class CreateOrgQuota extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_USERNAME));
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_USERNAME));
 
         @Before
         public void setUp() {
@@ -623,7 +623,7 @@ public final class DefaultSpacesTest {
 
     public static final class Delete extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() {
@@ -648,7 +648,7 @@ public final class DefaultSpacesTest {
 
     public static final class DeleteFailure extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() {
@@ -675,7 +675,7 @@ public final class DefaultSpacesTest {
 
     public static final class DeleteInvalidSpace extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() {
@@ -700,7 +700,7 @@ public final class DefaultSpacesTest {
 
     public static final class DeleteNoOrganization extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_USERNAME);
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, MISSING_USERNAME);
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
@@ -720,7 +720,7 @@ public final class DefaultSpacesTest {
 
     public static final class DisallowSsh extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -745,7 +745,7 @@ public final class DefaultSpacesTest {
 
     public static final class DisallowSshAlreadyDisallowed extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -769,7 +769,7 @@ public final class DefaultSpacesTest {
 
     public static final class DisallowSshNoSpace extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -794,7 +794,7 @@ public final class DefaultSpacesTest {
 
     public static final class Get extends AbstractOperationsApiTest<SpaceDetail> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -841,7 +841,7 @@ public final class DefaultSpacesTest {
 
     public static final class GetNoOrganization extends AbstractOperationsApiTest<SpaceDetail> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_USERNAME);
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, MISSING_USERNAME);
 
         @Override
         protected void assertions(TestSubscriber<SpaceDetail> testSubscriber) {
@@ -861,7 +861,7 @@ public final class DefaultSpacesTest {
 
     public static final class GetNoSecurityGroupRules extends AbstractOperationsApiTest<SpaceDetail> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -904,7 +904,7 @@ public final class DefaultSpacesTest {
 
     public static final class GetSpaceQuotaNull extends AbstractOperationsApiTest<SpaceDetail> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -945,7 +945,7 @@ public final class DefaultSpacesTest {
 
     public static final class List extends AbstractOperationsApiTest<SpaceSummary> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -969,7 +969,7 @@ public final class DefaultSpacesTest {
 
     public static final class ListNoOrganization extends AbstractOperationsApiTest<SpaceSummary> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, MISSING_ORGANIZATION_ID, MISSING_USERNAME);
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, MISSING_USERNAME);
 
         @Override
         protected void assertions(TestSubscriber<SpaceSummary> testSubscriber) {
@@ -987,7 +987,7 @@ public final class DefaultSpacesTest {
 
     public static final class Rename extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -1013,7 +1013,7 @@ public final class DefaultSpacesTest {
 
     public static final class RenameNoSpace extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -1039,7 +1039,7 @@ public final class DefaultSpacesTest {
 
     public static final class SshAllowed extends AbstractOperationsApiTest<Boolean> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {
@@ -1064,7 +1064,7 @@ public final class DefaultSpacesTest {
 
     public static final class SshAllowedNoSpace extends AbstractOperationsApiTest<Boolean> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
+        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
 
         @Before
         public void setUp() throws Exception {

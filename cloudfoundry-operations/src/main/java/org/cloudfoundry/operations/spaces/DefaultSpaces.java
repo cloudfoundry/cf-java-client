@@ -57,6 +57,7 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.tuple.Tuple;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -64,18 +65,17 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class DefaultSpaces implements Spaces {
 
-    private final CloudFoundryClient cloudFoundryClient;
+    private final Mono<CloudFoundryClient> cloudFoundryClient;
 
     private final Mono<String> organizationId;
 
     private final Mono<String> username;
 
-    public DefaultSpaces(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, Mono<String> username) {
+    public DefaultSpaces(Mono<CloudFoundryClient> cloudFoundryClient, Mono<String> organizationId, Mono<String> username) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.organizationId = organizationId;
         this.username = username;
@@ -83,75 +83,108 @@ public final class DefaultSpaces implements Spaces {
 
     @Override
     public Mono<Void> allowSsh(AllowSpaceSshRequest request) {
-        return this.organizationId
-            .then(organizationId -> getOrganizationSpaceIdWhere(this.cloudFoundryClient, organizationId, request.getName(), sshEnabled(false)))
-            .then(spaceId -> requestUpdateSpaceSsh(this.cloudFoundryClient, spaceId, true))
+        return Mono
+            .when(this.cloudFoundryClient, this.organizationId)
+            .then(function((cloudFoundryClient, organizationId) -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getOrganizationSpaceIdWhere(cloudFoundryClient, organizationId, request.getName(), sshEnabled(false))
+            )))
+            .then(function((cloudFoundryClient, spaceId) -> requestUpdateSpaceSsh(cloudFoundryClient, spaceId, true)))
             .then();
     }
 
     @Override
     public Mono<Void> create(CreateSpaceRequest request) {
-        return getOrganizationOrDefault(this.cloudFoundryClient, request, this.organizationId)
-            .then(organizationId -> Mono.when(
-                Mono.just(organizationId),
-                getOptionalSpaceQuotaId(this.cloudFoundryClient, organizationId, request.getSpaceQuota())
-            ))
-            .then(function((organizationId, spaceQuotaId) -> Mono.when(
-                Mono.just(organizationId),
-                requestCreateSpace(this.cloudFoundryClient, organizationId, request.getName(), spaceQuotaId.orElse(null))
-                    .map(ResourceUtils::getId),
-                this.username
+        return Mono
+            .when(this.cloudFoundryClient, this.username)
+            .then(function((cloudFoundryClient, username) -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                Mono.just(username),
+                getOrganizationOrDefault(cloudFoundryClient, request, this.organizationId)
             )))
-            .as(thenKeep(function((organizationId, spaceId, username) -> requestAssociateOrganizationUserByUsername(
-                this.cloudFoundryClient, organizationId, username))))
-            .then(function((organizationId, spaceId, username) -> Mono.when(
-                requestAssociateSpaceManagerByUsername(this.cloudFoundryClient, spaceId, username),
-                requestAssociateSpaceDeveloperByUsername(this.cloudFoundryClient, spaceId, username)
+            .then(function((cloudFoundryClient, username, organizationId) -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                Mono.just(username),
+                Mono.just(organizationId),
+                getOptionalSpaceQuotaId(cloudFoundryClient, organizationId, request.getSpaceQuota())
+            )))
+            .then(function((cloudFoundryClient, username, organizationId, spaceQuotaId) -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                Mono.just(organizationId),
+                requestCreateSpace(cloudFoundryClient, organizationId, request.getName(), spaceQuotaId.orElse(null))
+                    .map(ResourceUtils::getId),
+                Mono.just(username)
+            )))
+            .then(function((cloudFoundryClient, organizationId, spaceId, username) -> {
+                return requestAssociateOrganizationUserByUsername(cloudFoundryClient, organizationId, username)
+                    .then(Mono.just(Tuple.of(cloudFoundryClient, organizationId, spaceId, username)));
+            }))
+            .then(function((cloudFoundryClient, organizationId, spaceId, username) -> Mono.when(
+                requestAssociateSpaceManagerByUsername(cloudFoundryClient, spaceId, username),
+                requestAssociateSpaceDeveloperByUsername(cloudFoundryClient, spaceId, username)
             )))
             .then();
     }
 
     @Override
     public Mono<Void> delete(DeleteSpaceRequest request) {
-        return this.organizationId
-            .then(organizationId -> getOrganizationSpaceId(this.cloudFoundryClient, organizationId, request.getName()))
-            .then(spaceId -> deleteSpace(this.cloudFoundryClient, spaceId));
+        return Mono
+            .when(this.cloudFoundryClient, this.organizationId)
+            .then(function((cloudFoundryClient, organizationId) -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getOrganizationSpaceId(cloudFoundryClient, organizationId, request.getName())
+            )))
+            .then(function(DefaultSpaces::deleteSpace));
     }
 
     @Override
     public Mono<Void> disallowSsh(DisallowSpaceSshRequest request) {
-        return this.organizationId
-            .then(organizationId -> getOrganizationSpaceIdWhere(this.cloudFoundryClient, organizationId, request.getName(), sshEnabled(true)))
-            .then(spaceId -> requestUpdateSpaceSsh(this.cloudFoundryClient, spaceId, false))
+        return Mono
+            .when(this.cloudFoundryClient, this.organizationId)
+            .then(function((cloudFoundryClient, organizationId) -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getOrganizationSpaceIdWhere(cloudFoundryClient, organizationId, request.getName(), sshEnabled(true))
+            )))
+            .then(function((cloudFoundryClient, spaceId) -> requestUpdateSpaceSsh(cloudFoundryClient, spaceId, false)))
             .then();
     }
 
     @Override
     public Mono<SpaceDetail> get(GetSpaceRequest request) {
-        return this.organizationId
-            .then(organizationId -> getOrganizationSpace(this.cloudFoundryClient, organizationId, request.getName()))
-            .then(resource -> getSpaceDetail(this.cloudFoundryClient, resource, request));
+        return Mono
+            .when(this.cloudFoundryClient, this.organizationId)
+            .then(function((cloudFoundryClient, organizationId) -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getOrganizationSpace(cloudFoundryClient, organizationId, request.getName())
+            )))
+            .then(function((cloudFoundryClient, resource) -> getSpaceDetail(cloudFoundryClient, resource, request)));
     }
 
     @Override
     public Flux<SpaceSummary> list() {
-        return this.organizationId
-            .flatMap(organizationId -> requestSpaces(this.cloudFoundryClient, organizationId))
+        return Mono
+            .when(this.cloudFoundryClient, this.organizationId)
+            .flatMap(function(DefaultSpaces::requestSpaces))
             .map(DefaultSpaces::toSpaceSummary);
     }
 
     @Override
     public Mono<Void> rename(RenameSpaceRequest request) {
-        return this.organizationId
-            .then(organizationId -> getOrganizationSpaceId(this.cloudFoundryClient, organizationId, request.getName()))
-            .then(spaceId -> requestUpdateSpace(this.cloudFoundryClient, spaceId, request.getNewName()))
+        return Mono
+            .when(this.cloudFoundryClient, this.organizationId)
+            .then(function((cloudFoundryClient, organizationId) -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getOrganizationSpaceId(cloudFoundryClient, organizationId, request.getName())
+            )))
+            .then(function((cloudFoundryClient, spaceId) -> requestUpdateSpace(cloudFoundryClient, spaceId, request.getNewName())))
             .then();
     }
 
     @Override
     public Mono<Boolean> sshAllowed(SpaceSshAllowedRequest request) {
-        return this.organizationId
-            .then(organizationId -> getOrganizationSpace(this.cloudFoundryClient, organizationId, request.getName()))
+        return Mono
+            .when(this.cloudFoundryClient, this.organizationId)
+            .then(function((cloudFoundryClient, organizationId) -> getOrganizationSpace(cloudFoundryClient, organizationId, request.getName())))
             .map(resource -> ResourceUtils.getEntity(resource).getAllowSsh());
     }
 

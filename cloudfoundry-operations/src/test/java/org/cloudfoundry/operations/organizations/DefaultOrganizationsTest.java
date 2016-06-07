@@ -301,7 +301,7 @@ public final class DefaultOrganizationsTest {
 
     public static final class Create extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
+        private final DefaultOrganizations organizations = new DefaultOrganizations(Mono.just(this.cloudFoundryClient), Mono.just(TEST_USERNAME));
 
         @Before
         public void setUp() throws Exception {
@@ -328,7 +328,7 @@ public final class DefaultOrganizationsTest {
 
     public static final class CreateSetRolesByUsernameDisabled extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
+        private final DefaultOrganizations organizations = new DefaultOrganizations(Mono.just(this.cloudFoundryClient), Mono.just(TEST_USERNAME));
 
         @Before
         public void setUp() throws Exception {
@@ -353,7 +353,7 @@ public final class DefaultOrganizationsTest {
 
     public static final class CreateWithQuota extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
+        private final DefaultOrganizations organizations = new DefaultOrganizations(Mono.just(this.cloudFoundryClient), Mono.just(TEST_USERNAME));
 
         @Before
         public void setUp() throws Exception {
@@ -381,7 +381,7 @@ public final class DefaultOrganizationsTest {
 
     public static final class Delete extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
+        private final DefaultOrganizations organizations = new DefaultOrganizations(Mono.just(this.cloudFoundryClient), Mono.just(TEST_USERNAME));
 
         @Before
         public void setUp() throws Exception {
@@ -407,7 +407,7 @@ public final class DefaultOrganizationsTest {
 
     public static final class DeleteFailure extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
+        private final DefaultOrganizations organizations = new DefaultOrganizations(Mono.just(this.cloudFoundryClient), Mono.just(TEST_USERNAME));
 
         @Before
         public void setUp() throws Exception {
@@ -434,7 +434,7 @@ public final class DefaultOrganizationsTest {
 
     public static final class Info extends AbstractOperationsApiTest<OrganizationDetail> {
 
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
+        private final DefaultOrganizations organizations = new DefaultOrganizations(Mono.just(this.cloudFoundryClient), Mono.just(TEST_USERNAME));
 
         @Before
         public void setUp() throws Exception {
@@ -473,7 +473,7 @@ public final class DefaultOrganizationsTest {
 
     public static final class List extends AbstractOperationsApiTest<OrganizationSummary> {
 
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
+        private final DefaultOrganizations organizations = new DefaultOrganizations(Mono.just(this.cloudFoundryClient), Mono.just(TEST_USERNAME));
 
         @Before
         public void setUp() throws Exception {
@@ -497,7 +497,7 @@ public final class DefaultOrganizationsTest {
 
     public static final class Rename extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
+        private final DefaultOrganizations organizations = new DefaultOrganizations(Mono.just(this.cloudFoundryClient), Mono.just(TEST_USERNAME));
 
         @Before
         public void setUp() throws Exception {

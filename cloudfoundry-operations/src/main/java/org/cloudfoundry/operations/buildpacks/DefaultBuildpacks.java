@@ -31,24 +31,31 @@ import reactor.core.publisher.Mono;
 import java.io.InputStream;
 import java.util.Optional;
 
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
+
 public final class DefaultBuildpacks implements Buildpacks {
 
-    private final CloudFoundryClient cloudFoundryClient;
+    private final Mono<CloudFoundryClient> cloudFoundryClient;
 
-    public DefaultBuildpacks(CloudFoundryClient cloudFoundryClient) {
+    public DefaultBuildpacks(Mono<CloudFoundryClient> cloudFoundryClient) {
         this.cloudFoundryClient = cloudFoundryClient;
     }
 
     @Override
     public Mono<Void> create(CreateBuildpackRequest request) {
-        return requestCreateBuildpack(this.cloudFoundryClient, request.getName(), request.getPosition(), request.getEnable())
-            .then(response -> requestUploadBuildpackBits(this.cloudFoundryClient, ResourceUtils.getId(response), request.getFileName(), request.getBuildpack()))
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                requestCreateBuildpack(cloudFoundryClient, request.getName(), request.getPosition(), request.getEnable())
+            ))
+            .then(function((cloudFoundryClient, response) -> requestUploadBuildpackBits(cloudFoundryClient, ResourceUtils.getId(response), request.getFileName(), request.getBuildpack())))
             .then();
     }
 
     @Override
     public Flux<Buildpack> list() {
-        return requestBuildpacks(this.cloudFoundryClient)
+        return this.cloudFoundryClient
+            .flatMap(DefaultBuildpacks::requestBuildpacks)
             .map(DefaultBuildpacks::toBuildpackResource);
     }
 

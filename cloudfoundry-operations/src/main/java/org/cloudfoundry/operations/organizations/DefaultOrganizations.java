@@ -56,52 +56,67 @@ import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
 
 public final class DefaultOrganizations implements Organizations {
 
-    public static final String SET_ROLES_BY_USERNAME_FEATURE_FLAG = "set_roles_by_username";
+    private static final String SET_ROLES_BY_USERNAME_FEATURE_FLAG = "set_roles_by_username";
 
-    private final CloudFoundryClient cloudFoundryClient;
+    private final Mono<CloudFoundryClient> cloudFoundryClient;
 
     private final Mono<String> username;
 
-    public DefaultOrganizations(CloudFoundryClient cloudFoundryClient, Mono<String> username) {
+    public DefaultOrganizations(Mono<CloudFoundryClient> cloudFoundryClient, Mono<String> username) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.username = username;
     }
 
     @Override
     public Mono<Void> create(CreateOrganizationRequest request) {
-        return this.username
-            .then(username -> Mono.when(
-                createOrganization(this.cloudFoundryClient, request),
-                getFeatureFlagEnabled(this.cloudFoundryClient, SET_ROLES_BY_USERNAME_FEATURE_FLAG),
+        return Mono
+            .when(this.cloudFoundryClient, this.username)
+            .then(function((cloudFoundryClient, username) -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                createOrganization(cloudFoundryClient, request),
+                getFeatureFlagEnabled(cloudFoundryClient, SET_ROLES_BY_USERNAME_FEATURE_FLAG),
                 Mono.just(username)
-            ))
-            .filter(predicate((organizationId, setRolesByUsernameEnabled, username) -> setRolesByUsernameEnabled))
-            .then(function((organizationId, setRolesByUsernameEnabled, username) -> setOrganizationManager(this.cloudFoundryClient, organizationId, username)));
+            )))
+            .filter(predicate((cloudFoundryClient, organizationId, setRolesByUsernameEnabled, username) -> setRolesByUsernameEnabled))
+            .then(function((cloudFoundryClient, organizationId, setRolesByUsernameEnabled, username) -> setOrganizationManager(cloudFoundryClient, organizationId, username)));
     }
 
     @Override
     public Mono<Void> delete(DeleteOrganizationRequest request) {
-        return getOrganizationId(this.cloudFoundryClient, request.getName())
-            .then(organizationId -> deleteOrganization(this.cloudFoundryClient, organizationId));
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getOrganizationId(cloudFoundryClient, request.getName())
+            ))
+            .then(function(DefaultOrganizations::deleteOrganization));
     }
 
     @Override
     public Mono<OrganizationDetail> get(OrganizationInfoRequest request) {
-        return getOrganization(this.cloudFoundryClient, request.getName())
-            .then(organizationResource -> getAuxiliaryContent(this.cloudFoundryClient, organizationResource)
-                .map(function((domains, organizationQuota, spacesQuotas, spaces) -> toOrganizationDetail(domains, organizationQuota, spacesQuotas, spaces, organizationResource, request))));
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getOrganization(cloudFoundryClient, request.getName())
+            ))
+            .then(function((cloudFoundryClient, organizationResource) -> getAuxiliaryContent(cloudFoundryClient, organizationResource)
+                .map(function((domains, organizationQuota, spacesQuotas, spaces) -> toOrganizationDetail(domains, organizationQuota, spacesQuotas, spaces, organizationResource, request)))));
     }
 
     @Override
     public Flux<OrganizationSummary> list() {
-        return requestOrganizations(this.cloudFoundryClient)
+        return this.cloudFoundryClient
+            .flatMap(DefaultOrganizations::requestOrganizations)
             .map(DefaultOrganizations::toOrganizationSummary);
     }
 
     @Override
     public Mono<Void> rename(RenameOrganizationRequest request) {
-        return getOrganizationId(this.cloudFoundryClient, request.getName())
-            .then(organizationId -> requestUpdateOrganization(this.cloudFoundryClient, organizationId, request.getNewName()))
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getOrganizationId(cloudFoundryClient, request.getName())
+            ))
+            .then(function((cloudFoundryClient, organizationId) -> requestUpdateOrganization(cloudFoundryClient, organizationId, request.getNewName())))
             .then();
     }
 

@@ -58,7 +58,7 @@ public final class DefaultStacksTest {
 
     public static final class GetStack extends AbstractOperationsApiTest<Stack> {
 
-        private final DefaultStacks stacks = new DefaultStacks(this.cloudFoundryClient);
+        private final DefaultStacks stacks = new DefaultStacks(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {
@@ -84,7 +84,7 @@ public final class DefaultStacksTest {
 
     public static final class ListStacks extends AbstractOperationsApiTest<Stack> {
 
-        private final DefaultStacks stacks = new DefaultStacks(this.cloudFoundryClient);
+        private final DefaultStacks stacks = new DefaultStacks(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {

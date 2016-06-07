@@ -29,21 +29,23 @@ import java.util.NoSuchElementException;
 
 public final class DefaultStacks implements Stacks {
 
-    private final CloudFoundryClient cloudFoundryClient;
+    private final Mono<CloudFoundryClient> cloudFoundryClient;
 
-    public DefaultStacks(CloudFoundryClient cloudFoundryClient) {
+    public DefaultStacks(Mono<CloudFoundryClient> cloudFoundryClient) {
         this.cloudFoundryClient = cloudFoundryClient;
     }
 
     @Override
     public Mono<Stack> get(GetStackRequest request) {
-        return getStack(this.cloudFoundryClient, request.getName())
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> getStack(cloudFoundryClient, request.getName()))
             .map(this::toStack);
     }
 
     @Override
     public Flux<Stack> list() {
-        return requestStacks(this.cloudFoundryClient)
+        return this.cloudFoundryClient
+            .flatMap(DefaultStacks::requestStacks)
             .map(this::toStack);
     }
 

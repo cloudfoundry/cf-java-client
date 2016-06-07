@@ -30,33 +30,42 @@ import reactor.core.publisher.Mono;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
+
 public final class DefaultServiceAdmin implements ServiceAdmin {
 
-    private final CloudFoundryClient cloudFoundryClient;
+    private final Mono<CloudFoundryClient> cloudFoundryClient;
 
     private final Mono<String> spaceId;
 
-    public DefaultServiceAdmin(CloudFoundryClient cloudFoundryClient, Mono<String> spaceId) {
+    public DefaultServiceAdmin(Mono<CloudFoundryClient> cloudFoundryClient, Mono<String> spaceId) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.spaceId = spaceId;
     }
 
     @Override
     public Mono<Void> create(CreateServiceBrokerRequest request) {
-        return this.spaceId
-            .then(spaceId -> requestCreateServiceBroker(this.cloudFoundryClient, request.getName(), request.getUrl(), request.getUsername(), request.getPassword(), request.getSpaceScoped(), spaceId))
+        return Mono
+            .when(this.cloudFoundryClient, this.spaceId)
+            .then(function((cloudFoundryClient, spaceId) -> requestCreateServiceBroker(cloudFoundryClient, request.getName(), request.getUrl(), request.getUsername(), request.getPassword(),
+                request.getSpaceScoped(), spaceId)))
             .then();
     }
 
     @Override
     public Mono<Void> delete(DeleteServiceBrokerRequest request) {
-        return getServiceBrokerId(this.cloudFoundryClient, request.getName())
-            .then(serviceBrokerId -> requestDeleteServiceBroker(this.cloudFoundryClient, serviceBrokerId));
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getServiceBrokerId(cloudFoundryClient, request.getName())
+            ))
+            .then(function(DefaultServiceAdmin::requestDeleteServiceBroker));
     }
 
     @Override
     public Flux<ServiceBroker> list() {
-        return requestServiceBrokers(this.cloudFoundryClient)
+        return this.cloudFoundryClient
+            .flatMap(DefaultServiceAdmin::requestServiceBrokers)
             .map(this::toServiceBroker);
     }
 

@@ -43,52 +43,59 @@ import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class DefaultDomains implements Domains {
 
-    private final CloudFoundryClient cloudFoundryClient;
+    private final Mono<CloudFoundryClient> cloudFoundryClient;
 
-    public DefaultDomains(CloudFoundryClient cloudFoundryClient) {
+    public DefaultDomains(Mono<CloudFoundryClient> cloudFoundryClient) {
         this.cloudFoundryClient = cloudFoundryClient;
     }
 
     public Mono<Void> create(CreateDomainRequest request) {
-        return getOrganizationId(this.cloudFoundryClient, request.getOrganization())
-            .then(domainId -> requestCreateDomain(this.cloudFoundryClient, request.getDomain(), domainId))
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getOrganizationId(cloudFoundryClient, request.getOrganization())
+            ))
+            .then(function((cloudFoundryClient, domainId) -> requestCreateDomain(cloudFoundryClient, request.getDomain(), domainId)))
             .then();
     }
 
     @Override
     public Mono<Void> createShared(CreateSharedDomainRequest request) {
-        return requestCreateSharedDomain(this.cloudFoundryClient, request.getDomain())
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> requestCreateSharedDomain(cloudFoundryClient, request.getDomain()))
             .then();
     }
 
     @Override
     public Flux<Domain> list() {
-        return requestListPrivateDomains(this.cloudFoundryClient)
-            .map(DefaultDomains::toDomain)
-            .mergeWith(requestListSharedDomains(this.cloudFoundryClient)
-                .map(DefaultDomains::toDomain));
-
+        return this.cloudFoundryClient
+            .flatMap(cloudFoundryClient -> requestListPrivateDomains(cloudFoundryClient)
+                .map(DefaultDomains::toDomain)
+                .mergeWith(requestListSharedDomains(cloudFoundryClient)
+                    .map(DefaultDomains::toDomain)));
     }
 
     @Override
     public Mono<Void> share(ShareDomainRequest request) {
-        return Mono
-            .when(
-                getPrivateDomainId(this.cloudFoundryClient, request.getDomain()),
-                getOrganizationId(this.cloudFoundryClient, request.getOrganization())
-            )
-            .then(function((domainId, organizationId) -> requestAssociateOrganizationPrivateDomainRequest(this.cloudFoundryClient, domainId, organizationId)))
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getPrivateDomainId(cloudFoundryClient, request.getDomain()),
+                getOrganizationId(cloudFoundryClient, request.getOrganization())
+            ))
+            .then(function(DefaultDomains::requestAssociateOrganizationPrivateDomainRequest))
             .then();
     }
 
     @Override
     public Mono<Void> unshare(UnshareDomainRequest request) {
-        return Mono
-            .when(
-                getPrivateDomainId(this.cloudFoundryClient, request.getDomain()),
-                getOrganizationId(this.cloudFoundryClient, request.getOrganization())
-            )
-            .then(function((domainId, organizationId) -> requestRemoveOrganizationPrivateDomainRequest(this.cloudFoundryClient, domainId, organizationId)));
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getPrivateDomainId(cloudFoundryClient, request.getDomain()),
+                getOrganizationId(cloudFoundryClient, request.getOrganization())
+            ))
+            .then(function(DefaultDomains::requestRemoveOrganizationPrivateDomainRequest));
     }
 
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {

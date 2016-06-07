@@ -27,7 +27,7 @@ import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.operations.CloudFoundryOperations;
-import org.cloudfoundry.operations.CloudFoundryOperationsBuilder;
+import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
 import org.cloudfoundry.reactor.doppler.ReactorDopplerClient;
 import org.cloudfoundry.reactor.uaa.ReactorUaaClient;
 import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
@@ -98,11 +98,12 @@ public class IntegrationTestConfiguration {
 
     @Bean
     CloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient, DopplerClient dopplerClient, UaaClient uaaClient, String organizationName, String spaceName) {
-        return new CloudFoundryOperationsBuilder()
+        return DefaultCloudFoundryOperations.builder()
             .cloudFoundryClient(cloudFoundryClient)
             .dopplerClient(dopplerClient)
             .uaaClient(uaaClient)
-            .target(organizationName, spaceName)
+            .organization(organizationName)
+            .space(spaceName)
             .build();
     }
 

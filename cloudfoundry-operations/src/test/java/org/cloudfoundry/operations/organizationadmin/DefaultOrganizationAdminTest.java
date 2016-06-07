@@ -184,7 +184,7 @@ public final class DefaultOrganizationAdminTest {
 
     public static final class CreateQuota extends AbstractOperationsApiTest<OrganizationQuota> {
 
-        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(this.cloudFoundryClient);
+        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {
@@ -221,7 +221,7 @@ public final class DefaultOrganizationAdminTest {
 
     public static final class CreateQuotaError extends AbstractOperationsApiTest<OrganizationQuota> {
 
-        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(this.cloudFoundryClient);
+        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {
@@ -244,7 +244,7 @@ public final class DefaultOrganizationAdminTest {
 
     public static final class GetQuota extends AbstractOperationsApiTest<OrganizationQuota> {
 
-        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(this.cloudFoundryClient);
+        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {
@@ -276,7 +276,7 @@ public final class DefaultOrganizationAdminTest {
 
     public static final class GetQuotaNotFound extends AbstractOperationsApiTest<OrganizationQuota> {
 
-        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(this.cloudFoundryClient);
+        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {
@@ -300,7 +300,7 @@ public final class DefaultOrganizationAdminTest {
 
     public static final class ListQuotas extends AbstractOperationsApiTest<OrganizationQuota> {
 
-        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(this.cloudFoundryClient);
+        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {
@@ -330,7 +330,7 @@ public final class DefaultOrganizationAdminTest {
 
     public static final class SetQuota extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(this.cloudFoundryClient);
+        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {
@@ -355,7 +355,7 @@ public final class DefaultOrganizationAdminTest {
 
     public static final class SetQuotaOrganizationNotFound extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(this.cloudFoundryClient);
+        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {
@@ -381,7 +381,7 @@ public final class DefaultOrganizationAdminTest {
 
     public static final class SetQuotaQuotaNotFound extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(this.cloudFoundryClient);
+        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {
@@ -406,7 +406,7 @@ public final class DefaultOrganizationAdminTest {
 
     public static final class UpdateQuota extends AbstractOperationsApiTest<OrganizationQuota> {
 
-        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(this.cloudFoundryClient);
+        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {
@@ -445,7 +445,7 @@ public final class DefaultOrganizationAdminTest {
 
     public static final class UpdateQuotaNotFound extends AbstractOperationsApiTest<OrganizationQuota> {
 
-        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(this.cloudFoundryClient);
+        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(Mono.just(this.cloudFoundryClient));
 
         @Before
         public void setUp() throws Exception {
