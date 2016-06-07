@@ -24,7 +24,7 @@ import org.immutables.value.Value;
 import java.util.List;
 
 /**
- * The response from the create user request
+ * The response from the verify user request
  */
 @JsonDeserialize
 @Value.Immutable
