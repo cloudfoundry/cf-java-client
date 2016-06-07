@@ -14,49 +14,24 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa;
+package org.cloudfoundry.uaa.users;
 
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.QueryParameter;
+import org.cloudfoundry.uaa.PaginatedAndSortedRequest;
+import org.immutables.value.Value;
 
 /**
- * Base class for requests that are paginated
+ * The request payload for the lookup user ids and usernames operation
  */
-public abstract class PaginatedRequest {
+@Value.Immutable
+abstract class _LookupUseridsRequest extends PaginatedAndSortedRequest {
 
     /**
-     * The number of results per page
+     * Whether to include users from inactive identity providers
      */
     @Nullable
-    @QueryParameter("count")
-    public abstract Integer getCount();
-
-    /**
-     * The filter
-     */
-    @Nullable
-    @QueryParameter("filter")
-    public abstract String getFilter();
-
-    /**
-     * The sort by
-     */
-    @Nullable
-    @QueryParameter("sortBy")
-    public abstract String getSortBy();
-
-    /**
-     * The sort order
-     */
-    @Nullable
-    @QueryParameter("sortOrder")
-    public abstract SortOrder getSortOrder();
-
-    /**
-     * The start index
-     */
-    @Nullable
-    @QueryParameter("startIndex")
-    public abstract Integer getStartIndex();
+    @QueryParameter("includeInactive")
+    abstract Boolean getIncludeInactive();
 
 }

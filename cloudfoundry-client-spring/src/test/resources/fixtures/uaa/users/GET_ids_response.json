@@ -1,0 +1,20 @@
+{
+  "resources": [
+    {
+      "id": "c1476587-5ec9-4b7e-9ed2-381e3133f07a",
+      "userName": "dwayneSnbjBm@test.org",
+      "origin": "uaa"
+    },
+    {
+      "id": "2fc67623-ee31-4edc-9b1f-0b50416195fb",
+      "userName": "bobOu38vE@test.org",
+      "origin": "uaa"
+    }
+  ],
+  "startIndex": 1,
+  "itemsPerPage": 10,
+  "totalResults": 2,
+  "schemas": [
+    "urn:scim:schemas:core:1.0"
+  ]
+}

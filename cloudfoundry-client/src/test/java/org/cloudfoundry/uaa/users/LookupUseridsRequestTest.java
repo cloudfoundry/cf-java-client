@@ -16,31 +16,26 @@
 
 package org.cloudfoundry.uaa.users;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.uaa.SortOrder;
+import org.junit.Test;
 
-import java.util.List;
+public final class LookupUseridsRequestTest {
 
-/**
- * The entity response payload for User
- */
-public abstract class AbstractUser extends AbstractUserSummary {
+    @Test
+    public void validMax() {
+        LookupUseridsRequest.builder()
+            .count(1)
+            .filter("test-filter")
+            .includeInactive(true)
+            .sortOrder(SortOrder.ASCENDING)
+            .startIndex(99)
+            .build();
+    }
 
-    /**
-     * The approvals for the user
-     */
-    @JsonProperty("approvals")
-    public abstract List<Approval> getApproval();
-
-    /**
-     * The external id
-     */
-    @JsonProperty("externalId")
-    public abstract String getExternalId();
-
-    /**
-     * The groups for the user
-     */
-    @JsonProperty("groups")
-    public abstract List<Group> getGroup();
+    @Test
+    public void validMin() {
+        LookupUseridsRequest.builder()
+            .build();
+    }
 
 }

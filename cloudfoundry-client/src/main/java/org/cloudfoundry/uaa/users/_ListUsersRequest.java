@@ -16,13 +16,13 @@
 
 package org.cloudfoundry.uaa.users;
 
-import org.cloudfoundry.uaa.PaginatedRequest;
+import org.cloudfoundry.uaa.PaginatedAndSortedByRequest;
 import org.immutables.value.Value;
 
 /**
  * The request payload for the list users operation
  */
 @Value.Immutable
-abstract class _ListUsersRequest extends PaginatedRequest {
+abstract class _ListUsersRequest extends PaginatedAndSortedByRequest {
 
 }

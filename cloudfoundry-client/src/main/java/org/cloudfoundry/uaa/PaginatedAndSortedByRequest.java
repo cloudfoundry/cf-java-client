@@ -14,33 +14,21 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.users;
+package org.cloudfoundry.uaa;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.List;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.QueryParameter;
 
 /**
- * The entity response payload for User
+ * Base class for requests that are paginated
  */
-public abstract class AbstractUser extends AbstractUserSummary {
+public abstract class PaginatedAndSortedByRequest extends PaginatedAndSortedRequest {
 
     /**
-     * The approvals for the user
+     * The sort by
      */
-    @JsonProperty("approvals")
-    public abstract List<Approval> getApproval();
-
-    /**
-     * The external id
-     */
-    @JsonProperty("externalId")
-    public abstract String getExternalId();
-
-    /**
-     * The groups for the user
-     */
-    @JsonProperty("groups")
-    public abstract List<Group> getGroup();
+    @Nullable
+    @QueryParameter("sortBy")
+    public abstract String getSortBy();
 
 }

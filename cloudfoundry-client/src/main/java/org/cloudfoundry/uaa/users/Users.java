@@ -64,6 +64,14 @@ public interface Users {
     Mono<ListUsersResponse> list(ListUsersRequest request);
 
     /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#lookup-user-ids-usernames">Lookup User IDs/Usernames</a> request
+     *
+     * @param request the lookup userid and usernames request
+     * @return the response from the lookup userid and usernames request
+     */
+    Mono<LookupUseridsResponse> lookup(LookupUseridsRequest request);
+
+    /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#update49">Update User</a> request
      *
      * @param request the Update User request
