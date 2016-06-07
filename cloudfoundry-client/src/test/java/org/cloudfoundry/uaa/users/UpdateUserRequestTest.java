@@ -68,6 +68,23 @@ public final class UpdateUserRequestTest {
             .build();
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void noVersion() {
+        UpdateUserRequest.builder()
+            .active(true)
+            .email(Email.builder()
+                .primary(true)
+                .value("john.doe@pivotal.io")
+                .build())
+            .id("user-id")
+            .name(Name.builder()
+                .familyName("Doe")
+                .givenName("John")
+                .build())
+            .userName("jdoe")
+            .build();
+    }
+
     @Test
     public void valid() {
         UpdateUserRequest.builder()

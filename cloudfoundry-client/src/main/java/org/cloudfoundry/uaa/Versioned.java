@@ -26,8 +26,6 @@ public interface Versioned {
 
     /**
      * Returns the version
-     *
-     * @return the version
      */
     @JsonIgnore
     @Nullable

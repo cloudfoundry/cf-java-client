@@ -31,6 +31,13 @@ import java.util.List;
 abstract class _UpdateUserRequest implements Versioned {
 
     /**
+     * The version
+     */
+    @JsonIgnore
+    @Override
+    public abstract String getVersion();
+
+    /**
      * Whether the user is active
      */
     @JsonProperty("active")
