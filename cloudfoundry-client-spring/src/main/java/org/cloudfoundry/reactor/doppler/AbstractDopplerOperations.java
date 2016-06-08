@@ -22,7 +22,7 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
-import reactor.io.netty.http.HttpInbound;
+import reactor.io.netty.http.HttpClientResponse;
 
 import java.util.function.Function;
 
@@ -40,7 +40,7 @@ abstract class AbstractDopplerOperations extends AbstractReactorOperations {
         return doGet(responseType, uriTransformer, outbound -> outbound);
     }
 
-    final Mono<HttpInbound> get(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+    final Mono<HttpClientResponse> get(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doGet(uriTransformer, outbound -> outbound);
     }
 
@@ -52,7 +52,7 @@ abstract class AbstractDopplerOperations extends AbstractReactorOperations {
         return doPut(request, responseType, uriTransformer, outbound -> outbound);
     }
 
-    final Mono<HttpInbound> ws(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+    final Mono<HttpClientResponse> ws(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doWs(uriTransformer, outbound -> outbound);
     }
 

@@ -57,7 +57,8 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
-import reactor.io.netty.http.HttpInbound;
+import reactor.io.netty.http.HttpClientRequest;
+import reactor.io.netty.http.HttpClientResponse;
 
 /**
  * The Reactor-based implementation of {@link ApplicationsV2}
@@ -98,14 +99,14 @@ public final class ReactorApplicationsV2 extends AbstractClientV2Operations impl
 
     @Override
     public Flux<byte[]> download(DownloadApplicationRequest request) {
-        return get(request, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "download"))
-            .flatMap(HttpInbound::receiveByteArray);
+        return get(request, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "download"), HttpClientRequest::followRedirect)
+            .flatMap(HttpClientResponse::receiveByteArray);
     }
 
     @Override
     public Flux<byte[]> downloadDroplet(DownloadApplicationDropletRequest request) {
-        return get(request, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "droplet", "download"))
-            .flatMap(HttpInbound::receiveByteArray);
+        return get(request, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "droplet", "download"), HttpClientRequest::followRedirect)
+            .flatMap(HttpClientResponse::receiveByteArray);
     }
 
     @Override

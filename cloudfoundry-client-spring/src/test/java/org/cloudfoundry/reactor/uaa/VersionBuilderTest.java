@@ -18,7 +18,7 @@ package org.cloudfoundry.reactor.uaa;
 
 import org.cloudfoundry.uaa.Versioned;
 import org.junit.Test;
-import reactor.io.netty.http.HttpOutbound;
+import reactor.io.netty.http.HttpClientRequest;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 public final class VersionBuilderTest {
 
-    private final HttpOutbound outbound = mock(HttpOutbound.class);
+    private final HttpClientRequest outbound = mock(HttpClientRequest.class);
 
     @Test
     public void augment() {

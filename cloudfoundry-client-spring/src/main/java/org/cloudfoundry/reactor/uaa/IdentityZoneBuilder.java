@@ -17,14 +17,14 @@
 package org.cloudfoundry.reactor.uaa;
 
 import org.cloudfoundry.uaa.IdentityZoned;
-import reactor.io.netty.http.HttpOutbound;
+import reactor.io.netty.http.HttpClientRequest;
 
 final class IdentityZoneBuilder {
 
     private IdentityZoneBuilder() {
     }
 
-    static void augment(HttpOutbound outbound, Object request) {
+    static void augment(HttpClientRequest outbound, Object request) {
         if (request instanceof IdentityZoned) {
             IdentityZoned identityZoned = (IdentityZoned) request;
             outbound.addHeader("X-Identity-Zone-Id", identityZoned.getIdentityZoneId());

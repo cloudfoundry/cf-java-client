@@ -223,7 +223,10 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         DefaultConnectionContext.Builder connectionContextBuilder = DefaultConnectionContext.builder()
             .authorizationProvider(outbound -> tokenProvider.getToken()
                 .map(token -> String.format("bearer %s", token))
-                .map(token -> outbound.addHeader("Authorization", token)))
+                .map(token -> {
+                    outbound.addHeader("Authorization", token);
+                    return outbound;
+                }))
             .host(host)
             .objectMapper(objectMapper)
             .port(port)

@@ -22,7 +22,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.util.AsciiString;
 import reactor.core.util.Exceptions;
-import reactor.io.netty.http.HttpOutbound;
+import reactor.io.netty.http.HttpClientRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,9 +44,9 @@ final class JsonCodec {
         };
     }
 
-    static <T> Function<T, ByteBuf> encode(ObjectMapper objectMapper, HttpOutbound httpOutbound) {
-        httpOutbound.header(CONTENT_TYPE, APPLICATION_JSON);
-        return source -> encode(httpOutbound.delegate().alloc(), objectMapper, source);
+    static <T> Function<T, ByteBuf> encode(ObjectMapper objectMapper, HttpClientRequest request) {
+        request.header(CONTENT_TYPE, APPLICATION_JSON);
+        return source -> encode(request.delegate().alloc(), objectMapper, source);
     }
 
     static <T> ByteBuf encode(ByteBufAllocator allocator, ObjectMapper objectMapper, T source) {

@@ -23,8 +23,8 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
-import reactor.io.netty.http.HttpInbound;
-import reactor.io.netty.http.HttpOutbound;
+import reactor.io.netty.http.HttpClientRequest;
+import reactor.io.netty.http.HttpClientResponse;
 
 import java.util.function.Function;
 
@@ -46,7 +46,7 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
     }
 
     protected final <T> Mono<T> delete(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
-                                       Function<HttpOutbound, HttpOutbound> requestTransformer) {
+                                       Function<HttpClientRequest, HttpClientRequest> requestTransformer) {
 
         return doDelete(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> {
             getRequestTransformer(request).apply(outbound);
@@ -54,7 +54,7 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
         });
     }
 
-    protected final Mono<HttpInbound> get(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+    protected final Mono<HttpClientResponse> get(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doGet(getUriAugmenter(request, uriTransformer), getRequestTransformer(request));
     }
 
@@ -63,7 +63,7 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
     }
 
     protected final <T> Mono<T> get(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
-                                    Function<HttpOutbound, HttpOutbound> requestTransformer) {
+                                    Function<HttpClientRequest, HttpClientRequest> requestTransformer) {
         return doGet(responseType, getUriAugmenter(request, uriTransformer), outbound -> {
             IdentityZoneBuilder.augment(outbound, request);
             return requestTransformer.apply(outbound);
@@ -71,7 +71,7 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
     }
 
     protected final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
-                                     Function<HttpOutbound, HttpOutbound> requestTransformer) {
+                                     Function<HttpClientRequest, HttpClientRequest> requestTransformer) {
 
         return doPost(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> {
             getRequestTransformer(request).apply(outbound);
@@ -87,8 +87,9 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
         return postForm(request, responseType, uriTransformer, outbound -> outbound);
     }
 
-    protected final <T> Mono<T> postForm(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<HttpOutbound, HttpOutbound>
-        requestTransformer) {
+    protected final <T> Mono<T> postForm(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+                                         Function<HttpClientRequest, HttpClientRequest> requestTransformer) {
+
         return doPost(responseType, getUriAugmenter(request, uriTransformer), outbound -> {
             outbound.headers().remove(AUTHORIZATION);
             getRequestTransformer(request).apply(outbound);
@@ -103,7 +104,7 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
         return doPut(request, responseType, getUriAugmenter(request, uriTransformer), getRequestTransformer(request));
     }
 
-    private static Function<HttpOutbound, HttpOutbound> getRequestTransformer(Object request) {
+    private static Function<HttpClientRequest, HttpClientRequest> getRequestTransformer(Object request) {
         return outbound -> {
             BasicAuthorizationBuilder.augment(outbound, request);
             IdentityZoneBuilder.augment(outbound, request);

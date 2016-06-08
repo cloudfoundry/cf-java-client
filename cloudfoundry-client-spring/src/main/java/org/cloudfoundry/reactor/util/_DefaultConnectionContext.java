@@ -29,7 +29,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 
-import static reactor.io.netty.config.NettyHandlerNames.SslHandler;
+import static reactor.io.netty.common.NettyHandlerNames.SslHandler;
 
 @Value.Immutable
 abstract class _DefaultConnectionContext implements ConnectionContext {
@@ -53,7 +53,6 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     @Value.Derived
     public HttpClient getHttpClient() {
         return HttpClient.create(HttpClientOptions.create()
-            .followRedirects(true)
             .sslSupport()
             .pipelineConfigurer(pipeline -> getProxyContext().getHttpProxyHandler().ifPresent(handler -> pipeline.addBefore(SslHandler, null, handler)))
             .sslConfigurer(ssl -> getSslCertificateTruster().ifPresent(trustManager -> ssl.trustManager(new StaticTrustManagerFactory(trustManager)))));

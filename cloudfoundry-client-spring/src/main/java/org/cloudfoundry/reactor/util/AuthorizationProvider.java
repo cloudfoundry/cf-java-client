@@ -17,7 +17,7 @@
 package org.cloudfoundry.reactor.util;
 
 import reactor.core.publisher.Mono;
-import reactor.io.netty.http.HttpOutbound;
+import reactor.io.netty.http.HttpClientRequest;
 
 /**
  * A provider that adds the {@code Authorization} header to requests
@@ -25,11 +25,11 @@ import reactor.io.netty.http.HttpOutbound;
 public interface AuthorizationProvider {
 
     /**
-     * Adds the {@code Authorization} header to an {@link HttpOutbound}
+     * Adds the {@code Authorization} header to an {@link HttpClientRequest}
      *
-     * @param outbound the {@link HttpOutbound} to modify
-     * @return an uncompleted {@link HttpOutbound}
+     * @param outbound the {@link HttpClientRequest} to modify
+     * @return an uncompleted {@link HttpClientRequest}
      */
-    Mono<HttpOutbound> addAuthorization(HttpOutbound outbound);
+    Mono<HttpClientRequest> addAuthorization(HttpClientRequest outbound);
 
 }

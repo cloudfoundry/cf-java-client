@@ -37,7 +37,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static reactor.io.netty.config.NettyHandlerNames.SslHandler;
+import static reactor.io.netty.common.NettyHandlerNames.SslHandler;
 
 final class DefaultSslCertificateTruster implements SslCertificateTruster {
 

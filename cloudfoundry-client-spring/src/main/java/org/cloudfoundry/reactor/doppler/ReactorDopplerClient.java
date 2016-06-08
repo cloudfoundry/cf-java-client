@@ -39,7 +39,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.util.Exceptions;
 import reactor.io.netty.http.HttpClient;
-import reactor.io.netty.http.HttpInbound;
+import reactor.io.netty.http.HttpClientResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,7 +70,7 @@ public final class ReactorDopplerClient extends AbstractDopplerOperations implem
     @Override
     public Flux<Event> firehose(FirehoseRequest request) {
         return ws(builder -> builder.pathSegment("firehose", request.getSubscriptionId()))
-            .flatMap(HttpInbound::receiveInputStream)
+            .flatMap(HttpClientResponse::receiveInputStream)
             .map(ReactorDopplerClient::toEnvelope)
             .map(ReactorDopplerClient::toEvent);
     }
@@ -86,7 +86,7 @@ public final class ReactorDopplerClient extends AbstractDopplerOperations implem
     @Override
     public Flux<Event> stream(StreamRequest request) {
         return ws(builder -> builder.pathSegment("apps", request.getApplicationId(), "stream"))
-            .flatMap(HttpInbound::receiveInputStream)
+            .flatMap(HttpClientResponse::receiveInputStream)
             .map(ReactorDopplerClient::toEnvelope)
             .map(ReactorDopplerClient::toEvent);
     }

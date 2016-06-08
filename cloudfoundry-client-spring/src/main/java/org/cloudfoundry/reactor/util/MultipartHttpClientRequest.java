@@ -25,7 +25,7 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.util.AsciiString;
 import reactor.core.publisher.Mono;
 import reactor.core.util.Exceptions;
-import reactor.io.netty.http.HttpOutbound;
+import reactor.io.netty.http.HttpClientRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Consumer;
 
-public final class MultipartHttpOutbound {
+public final class MultipartHttpClientRequest {
 
     private static final byte[] BOUNDARY_CHARS = new byte[]{'-', '_', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
         'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
@@ -60,16 +60,16 @@ public final class MultipartHttpOutbound {
 
     private final ObjectMapper objectMapper;
 
-    private final HttpOutbound outbound;
+    private final HttpClientRequest outbound;
 
-    private final List<Consumer<PartHttpOutbound>> partConsumers = new ArrayList<>();
+    private final List<Consumer<PartHttpClientRequest>> partConsumers = new ArrayList<>();
 
-    public MultipartHttpOutbound(ObjectMapper objectMapper, HttpOutbound outbound) {
+    public MultipartHttpClientRequest(ObjectMapper objectMapper, HttpClientRequest outbound) {
         this.objectMapper = objectMapper;
         this.outbound = outbound;
     }
 
-    public MultipartHttpOutbound addPart(Consumer<PartHttpOutbound> partConsumer) {
+    public MultipartHttpClientRequest addPart(Consumer<PartHttpClientRequest> partConsumer) {
         this.partConsumers.add(partConsumer);
         return this;
     }
@@ -107,8 +107,8 @@ public final class MultipartHttpOutbound {
         return allocator.directBuffer(s.length()).writeBytes(s.toByteArray());
     }
 
-    private static ByteBuf getPart(ByteBufAllocator allocator, AsciiString boundary, ObjectMapper objectMapper, Consumer<PartHttpOutbound> partConsumer) {
-        PartHttpOutbound part = new PartHttpOutbound(objectMapper);
+    private static ByteBuf getPart(ByteBufAllocator allocator, AsciiString boundary, ObjectMapper objectMapper, Consumer<PartHttpClientRequest> partConsumer) {
+        PartHttpClientRequest part = new PartHttpClientRequest(objectMapper);
         partConsumer.accept(part);
 
         CompositeByteBuf body = allocator.compositeBuffer();
@@ -119,7 +119,7 @@ public final class MultipartHttpOutbound {
         return body.writerIndex(body.capacity());
     }
 
-    public static final class PartHttpOutbound {
+    public static final class PartHttpClientRequest {
 
         private final HttpHeaders headers = new DefaultHttpHeaders(true);
 
@@ -129,11 +129,11 @@ public final class MultipartHttpOutbound {
 
         private Object source;
 
-        private PartHttpOutbound(ObjectMapper objectMapper) {
+        private PartHttpClientRequest(ObjectMapper objectMapper) {
             this.objectMapper = objectMapper;
         }
 
-        public PartHttpOutbound addHeader(CharSequence name, CharSequence value) {
+        public PartHttpClientRequest addHeader(CharSequence name, CharSequence value) {
             this.headers.add(name, value);
             return this;
         }
@@ -146,11 +146,11 @@ public final class MultipartHttpOutbound {
             this.inputStream = inputStream;
         }
 
-        public PartHttpOutbound setContentDispositionFormData(String name) {
+        public PartHttpClientRequest setContentDispositionFormData(String name) {
             return setContentDispositionFormData(name, null);
         }
 
-        public PartHttpOutbound setContentDispositionFormData(String name, String filename) {
+        public PartHttpClientRequest setContentDispositionFormData(String name, String filename) {
             StringBuilder sb = new StringBuilder("form-data; name=\"");
             sb.append(name).append('\"');
             if (filename != null) {

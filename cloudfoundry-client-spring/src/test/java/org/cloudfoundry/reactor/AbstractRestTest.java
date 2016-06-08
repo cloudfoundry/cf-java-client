@@ -33,7 +33,10 @@ import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractRestTest {
 
-    protected static final AuthorizationProvider AUTHORIZATION_PROVIDER = outbound -> Mono.just(outbound.addHeader("Authorization", "test-authorization"));
+    protected static final AuthorizationProvider AUTHORIZATION_PROVIDER = outbound -> {
+        outbound.addHeader("Authorization", "test-authorization");
+        return Mono.just(outbound);
+    };
 
     protected static final HttpClient HTTP_CLIENT = HttpClient.create();
 

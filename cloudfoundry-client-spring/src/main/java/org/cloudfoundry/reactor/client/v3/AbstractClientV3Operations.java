@@ -21,12 +21,12 @@ import org.cloudfoundry.reactor.client.CloudFoundryExceptionBuilder;
 import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
-import org.cloudfoundry.reactor.util.MultipartHttpOutbound;
+import org.cloudfoundry.reactor.util.MultipartHttpClientRequest;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
+import reactor.io.netty.http.HttpClientResponse;
 import reactor.io.netty.http.HttpException;
-import reactor.io.netty.http.HttpInbound;
 
 import java.util.function.Function;
 
@@ -49,7 +49,7 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
             .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
     }
 
-    protected final Mono<HttpInbound> get(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+    protected final Mono<HttpClientResponse> get(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doGet(getUriAugmenter(request, uriTransformer), outbound -> outbound)
             .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
     }
@@ -65,10 +65,10 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
     }
 
     protected final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
-                                     Function<MultipartHttpOutbound, Mono<Void>> requestTransformer) {
+                                     Function<MultipartHttpClientRequest, Mono<Void>> requestTransformer) {
 
         return doPost(responseType, getUriAugmenter(request, uriTransformer),
-            outbound -> requestTransformer.apply(new MultipartHttpOutbound(this.objectMapper, outbound)))
+            outbound -> requestTransformer.apply(new MultipartHttpClientRequest(this.objectMapper, outbound)))
             .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
     }
 

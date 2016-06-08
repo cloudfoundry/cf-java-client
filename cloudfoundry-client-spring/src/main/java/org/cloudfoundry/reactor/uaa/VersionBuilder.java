@@ -17,14 +17,14 @@
 package org.cloudfoundry.reactor.uaa;
 
 import org.cloudfoundry.uaa.Versioned;
-import reactor.io.netty.http.HttpOutbound;
+import reactor.io.netty.http.HttpClientRequest;
 
 final class VersionBuilder {
 
     private VersionBuilder() {
     }
 
-    static void augment(HttpOutbound outbound, Object request) {
+    static void augment(HttpClientRequest outbound, Object request) {
         if (request instanceof Versioned) {
             Versioned versioned = (Versioned) request;
             String version = versioned.getVersion();
