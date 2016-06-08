@@ -61,6 +61,7 @@ abstract class _SpaceApplicationSummary extends AbstractApplicationEntity {
      * When the package was update
      */
     @JsonProperty("package_updated_at")
+    @Nullable
     abstract String getPackageUpdatedAt();
 
     /**
