@@ -18,30 +18,27 @@ package org.cloudfoundry.reactor.util;
 
 import io.netty.channel.ChannelHandler;
 import io.netty.handler.proxy.HttpProxyHandler;
-import lombok.Builder;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 import org.springframework.util.StringUtils;
 
 import java.net.InetSocketAddress;
 import java.util.Optional;
 
-@Builder
-final class ProxyContext {
+@Value.Immutable
+abstract class _ProxyContext {
 
-    private final String host;
+    @Nullable
+    abstract String getHost();
 
-    private final String password;
-
-    private final Integer port;
-
-    private final String username;
-
+    @Value.Derived
     Optional<ChannelHandler> getHttpProxyHandler() {
-        if (StringUtils.hasText(this.host)) {
-            InetSocketAddress proxyAddress = new InetSocketAddress(this.host, Optional.ofNullable(this.port).orElse(8080));
+        if (StringUtils.hasText(getHost())) {
+            InetSocketAddress proxyAddress = new InetSocketAddress(getHost(), Optional.ofNullable(getPort()).orElse(8080));
 
             HttpProxyHandler httpProxyHandler;
-            if (this.username != null) {
-                httpProxyHandler = new HttpProxyHandler(proxyAddress, this.username, this.password);
+            if (getUsername() != null) {
+                httpProxyHandler = new HttpProxyHandler(proxyAddress, getUsername(), getPassword());
             } else {
                 httpProxyHandler = new HttpProxyHandler(proxyAddress);
             }
@@ -51,4 +48,13 @@ final class ProxyContext {
 
         return Optional.empty();
     }
+
+    @Nullable
+    abstract String getPassword();
+
+    @Nullable
+    abstract Integer getPort();
+
+    @Nullable
+    abstract String getUsername();
 }

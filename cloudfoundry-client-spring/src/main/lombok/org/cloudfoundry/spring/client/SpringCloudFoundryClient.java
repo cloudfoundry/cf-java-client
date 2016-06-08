@@ -107,6 +107,7 @@ import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
@@ -219,12 +220,10 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
             .disable(FAIL_ON_UNKNOWN_PROPERTIES);
         problemHandlers.forEach(objectMapper::addHandler);
 
-        this.connectionContext = DefaultConnectionContext.builder()
+        DefaultConnectionContext.Builder connectionContextBuilder = DefaultConnectionContext.builder()
             .authorizationProvider(outbound -> tokenProvider.getToken()
                 .map(token -> String.format("bearer %s", token))
                 .map(token -> outbound.addHeader("Authorization", token)))
-            .clientId(clientId)
-            .clientSecret(clientSecret)
             .host(host)
             .objectMapper(objectMapper)
             .port(port)
@@ -232,8 +231,12 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
             .proxyPassword(proxyPassword)
             .proxyPort(proxyPort)
             .proxyUsername(proxyUsername)
-            .trustCertificates(skipSslValidation)
-            .build();
+            .trustCertificates(skipSslValidation);
+
+        Optional.ofNullable(clientId).ifPresent(connectionContextBuilder::clientId);
+        Optional.ofNullable(clientSecret).ifPresent(connectionContextBuilder::clientSecret);
+
+        this.connectionContext = connectionContextBuilder.build();
 
         AuthorizationProvider authorizationProvider = this.connectionContext.getAuthorizationProvider();
         HttpClient httpClient = this.connectionContext.getHttpClient();
