@@ -25,6 +25,8 @@ import org.cloudfoundry.uaa.identityproviders.AttributeMappings;
 import org.cloudfoundry.uaa.identityproviders.CreateIdentityProviderRequest;
 import org.cloudfoundry.uaa.identityproviders.CreateIdentityProviderResponse;
 import org.cloudfoundry.uaa.identityproviders.ExternalGroupMappingMode;
+import org.cloudfoundry.uaa.identityproviders.GetIdentityProviderRequest;
+import org.cloudfoundry.uaa.identityproviders.GetIdentityProviderResponse;
 import org.cloudfoundry.uaa.identityproviders.IdentityProvider;
 import org.cloudfoundry.uaa.identityproviders.InternalConfiguration;
 import org.cloudfoundry.uaa.identityproviders.LdapConfiguration;
@@ -304,6 +306,82 @@ public final class ReactorIdentityProvidersTest {
         @Override
         protected Mono<CreateIdentityProviderResponse> invoke(CreateIdentityProviderRequest request) {
             return this.identityProviderManagement.create(request);
+        }
+    }
+
+    public static final class Get extends AbstractUaaApiTest<GetIdentityProviderRequest, GetIdentityProviderResponse> {
+
+        private final ReactorIdentityProviders identityProviderManagement = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/identity-providers/test-identity-provider-id")
+                    .header("X-Identity-Zone-Id", "test-identity-zone-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/uaa/identity-providers/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected GetIdentityProviderResponse getResponse() {
+            return GetIdentityProviderResponse.builder()
+                .active(true)
+                .createdAt(1465001966715L)
+                .configuration(SamlConfiguration.builder()
+                    .addShadowUserOnLogin(true)
+                    .assertionConsumerIndex(0)
+                    .attributeMappings(AttributeMappings.builder()
+                        .build())
+                    .externalGroupsWhitelist(Collections.emptyList())
+                    .groupMappingMode(ExternalGroupMappingMode.EXPLICITLY_MAPPED)
+                    .idpEntityAlias("saml-for-get")
+                    .linkText("IDPEndpointsMockTests Saml Provider:saml-for-get")
+                    .metaDataLocation("<?xml version=\"1.0\" encoding=\"UTF-8\"?><md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"http://www.okta" +
+                        ".com/saml-for-get\"><md:IDPSSODescriptor WantAuthnRequestsSigned=\"true\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\"><md:KeyDescriptor " +
+                        "use=\"signing\"><ds:KeyInfo xmlns:ds=\"http://www.w3" +
+                        ".org/2000/09/xmldsig#\"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG" +
+                        "\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu" +
+                        "\nZm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM" +
+                        "\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN\nAQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU" +
+                        "\nWWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O\nBw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL\n3tL" +
+                        "/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\nvvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\nGFHNkZ6DmoT" +
+                        "/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1" +
+                        ".1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService " +
+                        "Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://pivotal.oktapreview" +
+                        ".com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/><md:SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" " +
+                        "Location=\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/></md:IDPSSODescriptor></md:EntityDescriptor>\n")
+                    .metadataTrustCheck(false)
+                    .nameId("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress")
+                    .showSamlLink(false)
+                    .socketFactoryClassName("org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory")
+                    .zoneId("uaa")
+                    .build())
+                .id("0077d56d-4e10-447a-9438-57d058e033ae")
+                .identityZoneId("uaa")
+                .lastModified(1465001966715L)
+                .name("saml-for-get name")
+                .originKey("saml-for-get")
+                .type(Type.SAML)
+                .version(0)
+                .build();
+        }
+
+        @Override
+        protected GetIdentityProviderRequest getValidRequest() throws Exception {
+            return GetIdentityProviderRequest.builder()
+                .identityProviderId("test-identity-provider-id")
+                .identityZoneId("test-identity-zone-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<GetIdentityProviderResponse> invoke(GetIdentityProviderRequest request) {
+            return this.identityProviderManagement.get(request);
         }
     }
 

@@ -21,6 +21,8 @@ import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.uaa.identityproviders.CreateIdentityProviderRequest;
 import org.cloudfoundry.uaa.identityproviders.CreateIdentityProviderResponse;
+import org.cloudfoundry.uaa.identityproviders.GetIdentityProviderRequest;
+import org.cloudfoundry.uaa.identityproviders.GetIdentityProviderResponse;
 import org.cloudfoundry.uaa.identityproviders.IdentityProviders;
 import org.cloudfoundry.uaa.identityproviders.ListIdentityProvidersRequest;
 import org.cloudfoundry.uaa.identityproviders.ListIdentityProvidersResponse;
@@ -52,6 +54,11 @@ public final class ReactorIdentityProviders extends AbstractUaaOperations implem
     }
 
     @Override
+    public Mono<GetIdentityProviderResponse> get(GetIdentityProviderRequest request) {
+        return get(request, GetIdentityProviderResponse.class, builder -> builder.pathSegment("identity-providers", request.getIdentityProviderId()));
+    }
+
+    @Override
     public Mono<ListIdentityProvidersResponse> list(ListIdentityProvidersRequest request) {
         return get(request, ListIdentityProvidersResponse.class, builder -> builder.pathSegment("identity-providers"));
     }
@@ -60,5 +67,5 @@ public final class ReactorIdentityProviders extends AbstractUaaOperations implem
     public Mono<UpdateIdentityProviderResponse> update(UpdateIdentityProviderRequest request) {
         return put(request, UpdateIdentityProviderResponse.class, builder -> builder.pathSegment("identity-providers", request.getIdentityProviderId()));
     }
-    
+
 }
