@@ -34,7 +34,7 @@ Most projects will need two dependencies; the Operations API and an implementati
 </dependencies>
 ```
 
-The artifacts can be found in the Spring release and snapshot repositories:
+The artifacts can be found in the Spring release, milestone, and snapshot repositories:
 
 ```xml
 <repositories>
@@ -42,6 +42,17 @@ The artifacts can be found in the Spring release and snapshot repositories:
         <id>spring-releases</id>
         <name>Spring Releases</name>
         <url>http://repo.spring.io/release</url>
+    </repository>
+    ...
+</repositories>
+```
+
+```xml
+<repositories>
+    <repository>
+        <id>spring-milestones</id>
+        <name>Spring Milestones</name>
+        <url>http://repo.spring.io/milestone</url>
     </repository>
     ...
 </repositories>
@@ -73,11 +84,18 @@ dependencies {
 }
 ```
 
-The artifacts can be found in the Spring release and snapshot repositories:
+The artifacts can be found in the Spring release, milestone, and snapshot repositories:
 
 ```groovy
 repositories {
     maven { url 'http://repo.spring.io/release' }
+    ...
+}
+```
+
+```groovy
+repositories {
+    maven { url 'http://repo.spring.io/milestone' }
     ...
 }
 ```
