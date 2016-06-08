@@ -17,14 +17,11 @@
 package org.cloudfoundry.client.v3;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
-
-import java.io.IOException;
 
 /**
  * Represents the lifecycle of an application
@@ -36,7 +33,11 @@ abstract class _Lifecycle {
     /**
      * The datas
      */
-    @JsonDeserialize(using = DataDeserializer.class)
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "type")
+    @JsonSubTypes({
+        @JsonSubTypes.Type(name = "buildpack", value = BuildpackData.class),
+        @JsonSubTypes.Type(name = "docker", value = DockerData.class)
+    })
     @JsonProperty("data")
     @Nullable
     abstract Data getData();
@@ -47,29 +48,5 @@ abstract class _Lifecycle {
     @JsonProperty("type")
     @Nullable
     abstract Type getType();
-
-    static final class DataDeserializer extends StdDeserializer<Data> {
-
-        private static final long serialVersionUID = -8299189647244106624L;
-
-        DataDeserializer() {
-            super(Data.class);
-        }
-
-        @SuppressWarnings("deprecation")
-        @Override
-        public Data deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-            Lifecycle.Json lifecycle = (Lifecycle.Json) p.getParsingContext().getParent().getCurrentValue();
-
-            switch (lifecycle.type) {
-                case BUILDPACK:
-                    return p.readValueAs(BuildpackData.class);
-                case DOCKER:
-                    return p.readValueAs(DockerData.class);
-                default:
-                    throw new IllegalArgumentException(String.format("Unknown lifecycle type: %s", lifecycle.getType()));
-            }
-        }
-    }
 
 }
