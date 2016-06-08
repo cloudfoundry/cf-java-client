@@ -17,55 +17,34 @@
 package org.cloudfoundry.client.v2.securitygroups;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
-/**
- * A security group rule
- */
-@JsonDeserialize
+import java.util.List;
+
+
 @Value.Immutable
-abstract class _RuleEntity {
+abstract class _CreateSecurityGroupRequest {
 
     /**
-     * The destination
+     * The security group name
      */
-    @JsonProperty("destination")
-    abstract String getDestination();
+    @JsonProperty("name")
+    abstract String getName();
 
     /**
-     * The ports
+     * The security group rules
      */
-    @JsonProperty("ports")
+    @JsonProperty("rules")
     @Nullable
-    abstract String getPorts();
+    abstract List<RuleEntity> getRules();
 
     /**
-     * The protocol
+     * The list of associated spaces
      */
-    @JsonProperty("protocol")
-    abstract String getProtocol();
-
-    /**
-     * The control signal for icmp
-     */
-    @JsonProperty("type")
+    @JsonProperty("space_guids")
     @Nullable
-    abstract Byte getType();
+    abstract List<String> getSpaceIds();
 
-    /**
-     * The control signal for icmp
-     */
-    @JsonProperty("code")
-    @Nullable
-    abstract Byte getCode();
-
-    /**
-     * Enables logging for the egress rule
-     */
-    @JsonProperty("log")
-    @Nullable
-    abstract Boolean getLog();
 
 }
