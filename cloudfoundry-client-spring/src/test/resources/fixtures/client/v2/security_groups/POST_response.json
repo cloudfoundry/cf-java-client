@@ -1,0 +1,37 @@
+{
+  "metadata": {
+    "guid": "966e7ac0-1c1a-4ca9-8a5f-77c96576beb7",
+    "url": "/v2/security_groups/966e7ac0-1c1a-4ca9-8a5f-77c96576beb7",
+    "created_at": "2016-05-12T00:45:26Z",
+    "updated_at": null
+  },
+  "entity": {
+    "name": "my_super_sec_group",
+    "rules": [
+      {
+        "protocol": "icmp",
+        "destination": "0.0.0.0/0",
+        "type": 0,
+        "code": 1
+      },
+      {
+        "protocol": "tcp",
+        "destination": "0.0.0.0/0",
+        "ports": "2048-3000",
+        "log": true
+      },
+      {
+        "protocol": "udp",
+        "destination": "0.0.0.0/0",
+        "ports": "53, 5353"
+      },
+      {
+        "protocol": "all",
+        "destination": "0.0.0.0/0"
+      }
+    ],
+    "running_default": false,
+    "staging_default": false,
+    "spaces_url": "/v2/security_groups/966e7ac0-1c1a-4ca9-8a5f-77c96576beb7/spaces"
+  }
+}
