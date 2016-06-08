@@ -32,6 +32,14 @@ public interface IdentityProviders {
     Mono<CreateIdentityProviderResponse> create(CreateIdentityProviderRequest request);
 
     /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#retrieve">Get Identity Provider</a> request
+     *
+     * @param request the Get Identity Provider request
+     * @return the response from the Get Identity Provider request
+     */
+    Mono<GetIdentityProviderResponse> get(GetIdentityProviderRequest request);
+
+    /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#retrieve-all">List Identity Providers</a> request
      *
      * @param request the List Identity Providers request
