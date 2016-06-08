@@ -47,4 +47,25 @@ abstract class _RuleEntity {
     @JsonProperty("protocol")
     abstract String getProtocol();
 
+    /**
+     * The control signal for icmp
+     */
+    @JsonProperty("type")
+    @Nullable
+    abstract Byte getType();
+
+    /**
+     * The control signal for icmp
+     */
+    @JsonProperty("code")
+    @Nullable
+    abstract Byte getCode();
+
+    /**
+     * Enables logging for the egress rule
+     */
+    @JsonProperty("log")
+    @Nullable
+    abstract Boolean getLog();
+
 }
