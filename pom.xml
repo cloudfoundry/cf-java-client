@@ -55,7 +55,7 @@
         <netty.version>4.1.0.Final</netty.version>
         <okhttp.version>3.3.1</okhttp.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <reactor-core.version>2.5.0.BUILD-SNAPSHOT</reactor-core.version>
+        <reactor-core.version>2.5.0.M4</reactor-core.version>
         <reactor-netty.version>2.5.0.BUILD-SNAPSHOT</reactor-netty.version>
         <wire.version>2.1.2</wire.version>
     </properties>
