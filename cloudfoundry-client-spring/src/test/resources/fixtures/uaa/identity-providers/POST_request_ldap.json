@@ -1,0 +1,15 @@
+{
+  "type" : "ldap",
+  "config" : {
+    "attributeMappings" : { },
+    "ldapProfileFile" : "ldap/ldap-simple-bind.xml",
+    "baseUrl" : "ldap://localhost:33389",
+    "skipSSLVerification" : false,
+    "mailAttributeName" : "mail",
+    "mailSubstituteOverridesLdap" : false,
+    "ldapGroupFile" : "ldap/ldap-groups-null.xml"
+  },
+  "originKey" : "ldap",
+  "name" : "ldap name",
+  "active" : true
+}

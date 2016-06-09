@@ -1,0 +1,17 @@
+{
+  "active" : true,
+  "config" : {
+    "addShadowUserOnLogin" : true,
+    "attributeMappings" : { },
+    "authUrl" : "http://auth.url",
+    "relyingPartyId" : "uaa",
+    "relyingPartySecret" : "secret",
+    "showLinkText" : false,
+    "skipSslValidation" : false,
+    "tokenKey" : "token-key",
+    "tokenUrl" : "http://token.url"
+  },
+  "name" : "UAA Provider",
+  "originKey" : "oauth2.0",
+  "type" : "oauth2.0"
+}
