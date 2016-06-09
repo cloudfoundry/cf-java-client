@@ -89,6 +89,7 @@ public abstract class AbstractReactorOperations {
             .then(uri -> this.httpClient.get(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
                 .map(requestTransformer)
                 .then(HttpClientRequest::sendHeaders))
+                .log("stream.afterSendHeaders")
                 .doOnSubscribe(s -> this.requestLogger.debug("GET    {}", uri))
                 .compose(logResponse(uri)));
     }
