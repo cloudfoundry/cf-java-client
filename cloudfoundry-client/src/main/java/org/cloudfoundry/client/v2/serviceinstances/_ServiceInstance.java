@@ -64,6 +64,7 @@ abstract class _ServiceInstance {
      * The service plan
      */
     @JsonProperty("service_plan")
+    @Nullable
     abstract Plan getServicePlan();
 
 }
