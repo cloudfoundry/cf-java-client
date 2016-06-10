@@ -20,6 +20,7 @@ import okhttp3.Headers;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.reactor.AbstractApiTest;
 import org.junit.Test;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.util.Exceptions;
@@ -44,10 +45,21 @@ public abstract class AbstractClientApiTest<REQ, RSP> extends AbstractApiTest<RE
     public final void error() throws Exception {
         mockRequest(getInteractionContext().getErrorResponse());
         this.testSubscriber.assertError(CloudFoundryException.class, "CF-UnprocessableEntity(10008): The request is semantically invalid: space_guid and name unique");
-        invoke(getValidRequest()).subscribe(this.testSubscriber);
+
+        addHide(invoke(getValidRequest())).subscribe(this.testSubscriber);
 
         this.testSubscriber.verify(Duration.ofSeconds(5));
         verify();
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <RSP> Publisher<RSP> addHide(Publisher<RSP> rspPublisher) {
+        if ( rspPublisher instanceof Flux) {
+            rspPublisher = ((Flux) rspPublisher).hide();
+        } else if ( rspPublisher instanceof Mono) {
+            rspPublisher = ((Mono) rspPublisher).hide();
+        }
+        return rspPublisher;
     }
 
     protected static Mono<byte[]> collectByteArray(Flux<byte[]> bytes) {
