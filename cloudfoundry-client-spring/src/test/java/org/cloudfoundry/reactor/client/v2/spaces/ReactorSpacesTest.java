@@ -1145,7 +1145,7 @@ public final class ReactorSpacesTest {
 
         @Override
         protected Mono<ListSpaceDomainsResponse> invoke(ListSpaceDomainsRequest request) {
-            return this.spaces.listDomains(request);
+            return this.spaces.listDomains(request).hide();
         }
     }
 
