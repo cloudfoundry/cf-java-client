@@ -18,6 +18,7 @@ package org.cloudfoundry.spring.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Singular;
@@ -216,8 +217,9 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient, Conne
         this.tokenProvider = tokenProvider;
 
         ObjectMapper objectMapper = new ObjectMapper()
-            .setSerializationInclusion(NON_NULL)
-            .disable(FAIL_ON_UNKNOWN_PROPERTIES);
+            .disable(FAIL_ON_UNKNOWN_PROPERTIES)
+            .registerModule(new Jdk8Module())
+            .setSerializationInclusion(NON_NULL);
         problemHandlers.forEach(objectMapper::addHandler);
 
         DefaultConnectionContext.Builder connectionContextBuilder = DefaultConnectionContext.builder()

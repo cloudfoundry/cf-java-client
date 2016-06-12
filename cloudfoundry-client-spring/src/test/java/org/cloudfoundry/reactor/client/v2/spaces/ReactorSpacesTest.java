@@ -111,6 +111,7 @@ import org.cloudfoundry.util.StringMap;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
+import java.util.Optional;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -1186,11 +1187,9 @@ public final class ReactorSpacesTest {
                         .acteeType("space")
                         .acteeName("name-56")
                         .timestamp("2015-07-27T22:43:07Z")
-                        .metadatas(StringMap.builder()
-                            .entry("request", StringMap.builder()
-                                .entry("name", "new_name")
-                                .build())
-                            .build())
+                        .metadata("request", Optional.of(StringMap.builder()
+                            .entry("name", "new_name")
+                            .build()))
                         .spaceId("33d44b03-6203-47a7-b71c-9bf6fcaeb54a")
                         .organizationId("ab7dff90-0bc7-4ce0-be5b-b8ecc676bc4a")
                         .build())

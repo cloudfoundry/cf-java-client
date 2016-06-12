@@ -1786,12 +1786,12 @@ public final class DefaultApplicationsTest {
             requestEvents(this.cloudFoundryClient, "test-metadata-id",
                 fill(EventEntity.builder(), "event-")
                     .timestamp("2016-02-08T15:45:59Z")
-                    .metadata("request", StringMap.builder()
+                    .metadata("request", Optional.of(StringMap.builder()
                         .entry("instances", 1)
                         .entry("memory", 2)
                         .entry("environment_json", "test-data")
                         .entry("state", "test-state")
-                        .build())
+                        .build()))
                     .build());
         }
 
@@ -1827,11 +1827,11 @@ public final class DefaultApplicationsTest {
             requestEvents(this.cloudFoundryClient, "test-metadata-id",
                 fill(EventEntity.builder(), "event-")
                     .timestamp("BAD-TIMESTAMP")
-                    .metadata("request", StringMap.builder()
+                    .metadata("request", Optional.of(StringMap.builder()
                         .entry("memory", 2)
                         .entry("environment_json", "test-data")
                         .entry("state", "test-state")
-                        .build())
+                        .build()))
                     .build());
         }
 
@@ -1891,12 +1891,12 @@ public final class DefaultApplicationsTest {
             requestEvents(this.cloudFoundryClient, "test-metadata-id",
                 fill(EventEntity.builder(), "event-")
                     .timestamp("2016-02-08T15:45:59Z")
-                    .metadata("request", StringMap.builder()
+                    .metadata("request", Optional.of(StringMap.builder()
                         .entry("instances", 1)
                         .entry("memory", 2)
                         .entry("environment_json", "test-data")
                         .entry("state", "test-state")
-                        .build())
+                        .build()))
                     .build());
         }
 
@@ -1926,18 +1926,18 @@ public final class DefaultApplicationsTest {
             requestEvents(this.cloudFoundryClient, "test-metadata-id",
                 fill(EventEntity.builder(), "event-")
                     .timestamp("2016-02-08T15:45:59Z")
-                    .metadata("request", StringMap.builder()
+                    .metadata("request", Optional.of(StringMap.builder()
                         .entry("instances", 1)
                         .entry("memory", 2)
                         .entry("environment_json", "test-data")
                         .entry("state", "test-state")
-                        .build())
+                        .build()))
                     .build(),
                 fill(EventEntity.builder(), "event-")
                     .timestamp("2016-02-08T15:49:07Z")
-                    .metadata("request", StringMap.builder()
+                    .metadata("request", Optional.of(StringMap.builder()
                         .entry("state", "test-state-two")
-                        .build())
+                        .build()))
                     .build()
             );
         }

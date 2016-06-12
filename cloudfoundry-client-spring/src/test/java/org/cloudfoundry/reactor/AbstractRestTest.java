@@ -17,6 +17,7 @@
 package org.cloudfoundry.reactor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -42,6 +43,7 @@ public abstract class AbstractRestTest {
 
     protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
         .addHandler(new FailingDeserializationProblemHandler())
+        .registerModule(new Jdk8Module())
         .setSerializationInclusion(NON_NULL);
 
     static {

@@ -34,7 +34,7 @@ public abstract class Resource<T> {
     public abstract T getEntity();
 
     /**
-     * The resource's metdata
+     * The resource's metadata
      */
     @JsonProperty("metadata")
     @Nullable

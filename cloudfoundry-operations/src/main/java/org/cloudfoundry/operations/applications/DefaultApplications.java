@@ -660,12 +660,12 @@ public final class DefaultApplications implements Applications {
 
     @SuppressWarnings("unchecked")
     private static Map<String, Object> getMetadataRequest(EventEntity entity) {
-        Map<String, Object> metadata = Optional
+        Map<String, Optional<Object>> metadata = Optional
             .ofNullable(entity.getMetadatas())
             .orElse(Collections.emptyMap());
 
-        return Optional
-            .ofNullable((Map<String, Object>) metadata.get("request"))
+        return metadata.get("request")
+            .map(m -> (Map<String, Object>) m)
             .orElse(Collections.emptyMap());
     }
 
