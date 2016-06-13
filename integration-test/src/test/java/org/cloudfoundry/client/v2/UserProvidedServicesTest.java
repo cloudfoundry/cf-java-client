@@ -30,6 +30,7 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedS
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceResponse;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceEntity;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceResource;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
@@ -37,6 +38,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.tuple.Tuple2;
 import reactor.core.tuple.Tuple3;
 
 import java.util.Collections;
@@ -168,17 +170,21 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                         .map(UpdateUserProvidedServiceInstanceResponse::getEntity)
                 ))
             .then(function((instanceId, entity1) -> Mono
-            .when(
-                Mono.just(entity1),
-                this.cloudFoundryClient.userProvidedServiceInstances()
-                    .update(UpdateUserProvidedServiceInstanceRequest.builder()
-                        .userProvidedServiceInstanceId(instanceId)
-                        .credentials(Collections.emptyMap())
-                        .build())
-                    .map(UpdateUserProvidedServiceInstanceResponse::getEntity)
-            )))
-            .subscribe(this.testSubscriber()
-                .assertEquals(newInstanceName));
+                .when(
+                    Mono.just(entity1),
+                    this.cloudFoundryClient.userProvidedServiceInstances()
+                        .update(UpdateUserProvidedServiceInstanceRequest.builder()
+                            .userProvidedServiceInstanceId(instanceId)
+                            .credentials(Collections.emptyMap())
+                            .build())
+                        .map(UpdateUserProvidedServiceInstanceResponse::getEntity)
+                )))
+            .subscribe(this.<Tuple2<UserProvidedServiceInstanceEntity, UserProvidedServiceInstanceEntity>>testSubscriber()
+                .assertThat(consumer((entity1, entity2) -> {
+                    assertEquals("name not updated", newInstanceName, entity1.getName());
+                    assertEquals("credentials not set", Collections.singletonMap("test-cred", "some value"), entity1.getCredentials());
+                    assertEquals("credentials not cleared", Collections.emptyMap(), entity2.getCredentials());
+                })));
     }
 
     private static Mono<String> getCreateApplicationId(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
