@@ -16,10 +16,10 @@
 
 package org.cloudfoundry.doppler;
 
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -34,12 +34,12 @@ abstract class _HttpStartStop implements Event {
         return HttpStartStop.builder()
             .applicationId(UuidUtils.from(dropsonde.applicationId))
             .contentLength(dropsonde.contentLength)
-            .instanceId(dropsonde.instanceId)
-            .instanceIndex(dropsonde.instanceIndex)
+            .instanceId(Optional.ofNullable(dropsonde.instanceId))
+            .instanceIndex(Optional.ofNullable(dropsonde.instanceIndex))
             .method(Method.from(dropsonde.method))
             .peerType(PeerType.from(dropsonde.peerType))
             .remoteAddress(dropsonde.remoteAddress)
-            .requestId(UuidUtils.from(dropsonde.requestId))
+            .requestId(UuidUtils.from(dropsonde.requestId).orElseThrow(() -> new IllegalStateException("requestId must be specified")))
             .startTimestamp(dropsonde.startTimestamp)
             .statusCode(dropsonde.statusCode)
             .stopTimestamp(dropsonde.stopTimestamp)
@@ -51,8 +51,7 @@ abstract class _HttpStartStop implements Event {
     /**
      * The application id
      */
-    @Nullable
-    abstract UUID getApplicationId();
+    abstract Optional<UUID> getApplicationId();
 
     /**
      * The length of the response in bytes
@@ -62,14 +61,12 @@ abstract class _HttpStartStop implements Event {
     /**
      * The ID of the application instance
      */
-    @Nullable
-    abstract String getInstanceId();
+    abstract Optional<String> getInstanceId();
 
     /**
      * The index of the application instance
      */
-    @Nullable
-    abstract Integer getInstanceIndex();
+    abstract Optional<Integer> getInstanceIndex();
 
     /**
      * The method of the request
