@@ -38,6 +38,8 @@ import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
+
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
@@ -345,6 +347,59 @@ public final class ReactorUserProvidedServiceInstancesTest {
         protected UpdateUserProvidedServiceInstanceRequest getValidRequest() throws Exception {
             return UpdateUserProvidedServiceInstanceRequest.builder()
                 .credential("somekey", "somenewvalue")
+                .userProvidedServiceInstanceId("e2c198b1-fa15-414e-a9a4-31537996b39d")
+                .build();
+        }
+
+        @Override
+        protected Mono<UpdateUserProvidedServiceInstanceResponse> invoke(UpdateUserProvidedServiceInstanceRequest request) {
+            return this.userProvidedServiceInstances.update(request);
+        }
+    }
+
+    public static final class UpdateWithEmptyCredentials extends AbstractClientApiTest<UpdateUserProvidedServiceInstanceRequest, UpdateUserProvidedServiceInstanceResponse> {
+
+        private final ReactorUserProvidedServiceInstances userProvidedServiceInstances = new ReactorUserProvidedServiceInstances(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d")
+                    .payload("fixtures/client/v2/user_provided_service_instances/PUT_{id}_empty_creds_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(ACCEPTED)
+                    .payload("fixtures/client/v2/user_provided_service_instances/PUT_{id}_empty_creds_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected UpdateUserProvidedServiceInstanceResponse getResponse() {
+            return UpdateUserProvidedServiceInstanceResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2016-02-19T02:04:06Z")
+                    .id("e2c198b1-fa15-414e-a9a4-31537996b39d")
+                    .updatedAt("2016-02-19T02:04:06Z")
+                    .url("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d")
+                    .build())
+                .entity(UserProvidedServiceInstanceEntity.builder()
+                    .name("name-2565")
+                    .spaceId("438b5923-fe7a-4459-bbcd-a7c27332bad3")
+                    .type("user_provided_service_instance")
+                    .syslogDrainUrl("https://foo.com/url-91")
+                    .spaceUrl("/v2/spaces/438b5923-fe7a-4459-bbcd-a7c27332bad3")
+                    .serviceBindingsUrl("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d/service_bindings")
+                    .routesUrl("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d/routes")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected UpdateUserProvidedServiceInstanceRequest getValidRequest() throws Exception {
+            return UpdateUserProvidedServiceInstanceRequest.builder()
+                .credentials(Collections.emptyMap())
                 .userProvidedServiceInstanceId("e2c198b1-fa15-414e-a9a4-31537996b39d")
                 .build();
         }

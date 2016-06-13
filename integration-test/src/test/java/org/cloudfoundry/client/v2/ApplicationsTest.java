@@ -76,6 +76,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -718,13 +719,32 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .update(UpdateApplicationRequest.builder()
                     .applicationId(applicationId)
                     .name(applicationName2)
+                    .environmentJson("test-var", "test-value")
                     .build())
                 .map(ResourceUtils::getId))
-            .then(applicationId -> requestGetApplication(this.cloudFoundryClient, applicationId)
-                .map(ResourceUtils::getEntity)
-                .map(ApplicationEntity::getName))
-            .subscribe(testSubscriber()
-                .assertEquals(applicationName2));
+            .then(applicationId -> Mono
+                .when(
+                    Mono.just(applicationId),
+                    requestGetApplication(this.cloudFoundryClient, applicationId)
+                        .map(ResourceUtils::getEntity)
+                ))
+            .then(function((applicationId, entity1) -> Mono
+                .when(
+                    Mono.just(entity1),
+                    this.cloudFoundryClient.applicationsV2()
+                        .update(UpdateApplicationRequest.builder()
+                            .applicationId(applicationId)
+                            .environmentJsons(Collections.emptyMap())
+                            .build())
+                        .then(requestGetApplication(this.cloudFoundryClient, applicationId)
+                            .map(ResourceUtils::getEntity))
+                )))
+            .subscribe(this.<Tuple2<ApplicationEntity, ApplicationEntity>>testSubscriber()
+                .assertThat(consumer((entity1, entity2) -> {
+                    assertEquals("name change failed", applicationName2, entity1.getName());
+                    assertEquals("env change failed", Collections.singletonMap("test-var", "test-value"), entity1.getEnvironmentJsons());
+                    assertEquals("env not emptied", Collections.emptyMap(), entity2.getEnvironmentJsons());
+                })));
     }
 
     @Test

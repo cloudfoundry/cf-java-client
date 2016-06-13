@@ -39,28 +39,28 @@ abstract class _UpdateSpaceRequest {
     /**
      * The auditor ids
      */
-    @JsonProperty("auditor_guid")
+    @JsonProperty("auditor_guids")
     @Nullable
-    abstract List<String> getAuditorsIds();
+    abstract List<String> getAuditorIds();
 
     /**
      * The developer ids
      */
-    @JsonProperty("developer_guid")
+    @JsonProperty("developer_guids")
     @Nullable
     abstract List<String> getDeveloperIds();
 
     /**
      * The domain ids
      */
-    @JsonProperty("domain_guid")
+    @JsonProperty("domain_guids")
     @Nullable
     abstract List<String> getDomainIds();
 
     /**
      * The manager ids
      */
-    @JsonProperty("manager_guid")
+    @JsonProperty("manager_guids")
     @Nullable
     abstract List<String> getManagerIds();
 

@@ -7,9 +7,7 @@
   },
   "entity": {
     "name": "name-2565",
-    "credentials": {
-      "somekey": "somenewvalue"
-    },
+    "credentials": {},
     "space_guid": "438b5923-fe7a-4459-bbcd-a7c27332bad3",
     "type": "user_provided_service_instance",
     "syslog_drain_url": "https://foo.com/url-91",

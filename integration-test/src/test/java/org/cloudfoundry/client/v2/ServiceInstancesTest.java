@@ -146,6 +146,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     @Ignore("TODO: awaiting story https://www.pivotaltracker.com/story/show/118387501")
     @Test
     public void update() {
+        // TODO: ensure empty collections are tested on request
         fail("TODO: finish story https://www.pivotaltracker.com/story/show/118387501");
     }
 

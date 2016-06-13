@@ -1158,6 +1158,25 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .assertEquals(spaceName2));
     }
 
+    @Test
+    public void updateEmptyManagers() {
+        String organizationName = getOrganizationName();
+        String spaceName = getSpaceName();
+
+        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
+            .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
+            .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
+                .update(UpdateSpaceRequest.builder()
+                    .spaceId(spaceId)
+                    .managerIds(Collections.emptyList())
+                    .build()))))
+            .flatMap(function((userId, spaceId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId)
+                .map(ResourceUtils::getEntity)
+                .map(UserEntity::getUsername)
+            ))
+            .subscribe(this.testSubscriber());
+    }
+
     private static Mono<String> createApplicationId(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
         return requestCreateApplication(cloudFoundryClient, spaceId, applicationName)
             .map(ResourceUtils::getId);
