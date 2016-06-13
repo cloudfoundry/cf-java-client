@@ -46,5 +46,4 @@ abstract class _CreateSecurityGroupRequest {
     @Nullable
     abstract List<String> getSpaceIds();
 
-
 }

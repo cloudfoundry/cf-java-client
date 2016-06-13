@@ -52,14 +52,14 @@ abstract class _RuleEntity {
      */
     @JsonProperty("type")
     @Nullable
-    abstract Byte getType();
+    abstract Integer getType();
 
     /**
      * The control signal for icmp
      */
     @JsonProperty("code")
     @Nullable
-    abstract Byte getCode();
+    abstract Integer getCode();
 
     /**
      * Enables logging for the egress rule
