@@ -77,7 +77,7 @@ public interface Users {
      * @param request the lookup userid and usernames request
      * @return the response from the lookup userid and usernames request
      */
-    Mono<LookupUseridsResponse> lookup(LookupUseridsRequest request);
+    Mono<LookupUserIdsResponse> lookup(LookupUserIdsRequest request);
 
     /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#update49">Update User</a> request

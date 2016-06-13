@@ -16,16 +16,11 @@
 
 package org.cloudfoundry.uaa.users;
 
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.uaa.PaginatedResponse;
 import org.immutables.value.Value;
 
-/**
- * The response from the lookup userid and usernames request
- */
 @JsonDeserialize
 @Value.Immutable
-abstract class _LookupUseridsResponse extends PaginatedResponse<Userid> {
+abstract class _UserId extends AbstractUserId {
 
 }

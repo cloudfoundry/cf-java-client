@@ -31,8 +31,8 @@ import org.cloudfoundry.uaa.users.InviteUsersRequest;
 import org.cloudfoundry.uaa.users.InviteUsersResponse;
 import org.cloudfoundry.uaa.users.ListUsersRequest;
 import org.cloudfoundry.uaa.users.ListUsersResponse;
-import org.cloudfoundry.uaa.users.LookupUseridsRequest;
-import org.cloudfoundry.uaa.users.LookupUseridsResponse;
+import org.cloudfoundry.uaa.users.LookupUserIdsRequest;
+import org.cloudfoundry.uaa.users.LookupUserIdsResponse;
 import org.cloudfoundry.uaa.users.UpdateUserRequest;
 import org.cloudfoundry.uaa.users.UpdateUserResponse;
 import org.cloudfoundry.uaa.users.Users;
@@ -89,8 +89,8 @@ public final class ReactorUsers extends AbstractUaaOperations implements Users {
     }
 
     @Override
-    public Mono<LookupUseridsResponse> lookup(LookupUseridsRequest request) {
-        return get(request, LookupUseridsResponse.class, builder -> builder.pathSegment("ids", "Users"));
+    public Mono<LookupUserIdsResponse> lookup(LookupUserIdsRequest request) {
+        return get(request, LookupUserIdsResponse.class, builder -> builder.pathSegment("ids", "Users"));
     }
 
     @Override

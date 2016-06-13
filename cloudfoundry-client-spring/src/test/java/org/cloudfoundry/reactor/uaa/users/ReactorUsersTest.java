@@ -36,14 +36,14 @@ import org.cloudfoundry.uaa.users.InviteUsersRequest;
 import org.cloudfoundry.uaa.users.InviteUsersResponse;
 import org.cloudfoundry.uaa.users.ListUsersRequest;
 import org.cloudfoundry.uaa.users.ListUsersResponse;
-import org.cloudfoundry.uaa.users.LookupUseridsRequest;
-import org.cloudfoundry.uaa.users.LookupUseridsResponse;
+import org.cloudfoundry.uaa.users.LookupUserIdsRequest;
+import org.cloudfoundry.uaa.users.LookupUserIdsResponse;
 import org.cloudfoundry.uaa.users.Meta;
 import org.cloudfoundry.uaa.users.Name;
 import org.cloudfoundry.uaa.users.UpdateUserRequest;
 import org.cloudfoundry.uaa.users.UpdateUserResponse;
 import org.cloudfoundry.uaa.users.User;
-import org.cloudfoundry.uaa.users.Userid;
+import org.cloudfoundry.uaa.users.UserId;
 import org.cloudfoundry.uaa.users.VerifyUserRequest;
 import org.cloudfoundry.uaa.users.VerifyUserResponse;
 import reactor.core.publisher.Mono;
@@ -622,7 +622,7 @@ public final class ReactorUsersTest {
 
     }
 
-    public static final class Lookup extends AbstractUaaApiTest<LookupUseridsRequest, LookupUseridsResponse> {
+    public static final class Lookup extends AbstractUaaApiTest<LookupUserIdsRequest, LookupUserIdsResponse> {
 
         private final ReactorUsers users = new ReactorUsers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
@@ -642,14 +642,14 @@ public final class ReactorUsersTest {
         }
 
         @Override
-        protected LookupUseridsResponse getResponse() {
-            return LookupUseridsResponse.builder()
-                .resource(Userid.builder()
+        protected LookupUserIdsResponse getResponse() {
+            return LookupUserIdsResponse.builder()
+                .resource(UserId.builder()
                     .id("c1476587-5ec9-4b7e-9ed2-381e3133f07a")
                     .userName("dwayneSnbjBm@test.org")
                     .origin("uaa")
                     .build())
-                .resource(Userid.builder()
+                .resource(UserId.builder()
                     .id("2fc67623-ee31-4edc-9b1f-0b50416195fb")
                     .userName("bobOu38vE@test.org")
                     .origin("uaa")
@@ -662,8 +662,8 @@ public final class ReactorUsersTest {
         }
 
         @Override
-        protected LookupUseridsRequest getValidRequest() throws Exception {
-            return LookupUseridsRequest.builder()
+        protected LookupUserIdsRequest getValidRequest() throws Exception {
+            return LookupUserIdsRequest.builder()
                 .filter("userName+eq+\"bobOu38vE@test.org\"+or+id+eq+\"c1476587-5ec9-4b7e-9ed2-381e3133f07a\"")
                 .count(10)
                 .startIndex(1)
@@ -673,7 +673,7 @@ public final class ReactorUsersTest {
         }
 
         @Override
-        protected Mono<LookupUseridsResponse> invoke(LookupUseridsRequest request) {
+        protected Mono<LookupUserIdsResponse> invoke(LookupUserIdsRequest request) {
             return this.users.lookup(request);
         }
 

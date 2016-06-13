@@ -25,7 +25,7 @@ import org.immutables.value.Value;
  * The request payload for the lookup user ids and usernames operation
  */
 @Value.Immutable
-abstract class _LookupUseridsRequest extends PaginatedAndSortedRequest {
+abstract class _LookupUserIdsRequest extends PaginatedAndSortedRequest {
 
     /**
      * Whether to include users from inactive identity providers

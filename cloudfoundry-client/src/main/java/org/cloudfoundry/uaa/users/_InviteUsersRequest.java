@@ -49,7 +49,7 @@ abstract class _InviteUsersRequest {
     abstract String getRedirectUri();
 
     @Value.Check
-    protected void check() {
+    void check() {
         if (getEmails().isEmpty()) {
             throw new IllegalStateException("At least one email must be provided");
         }

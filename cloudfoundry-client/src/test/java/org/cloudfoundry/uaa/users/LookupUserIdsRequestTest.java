@@ -16,11 +16,14 @@
 
 package org.cloudfoundry.uaa.users;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.immutables.value.Value;
+import org.junit.Test;
 
-@JsonDeserialize
-@Value.Immutable
-abstract class _Userid extends AbstractUserid {
+public final class LookupUserIdsRequestTest {
+
+    @Test
+    public void valid() {
+        LookupUserIdsRequest.builder()
+            .build();
+    }
 
 }

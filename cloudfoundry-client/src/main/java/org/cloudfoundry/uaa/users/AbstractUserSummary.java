@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * The summary entity response payload for User
  */
-public abstract class AbstractUserSummary extends AbstractUserid {
+public abstract class AbstractUserSummary extends AbstractUserId {
 
     /**
      * Whether the user is active

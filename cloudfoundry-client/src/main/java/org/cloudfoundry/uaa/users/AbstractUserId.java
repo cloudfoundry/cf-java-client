@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * The entity response payload for a userid
  */
-public abstract class AbstractUserid {
+public abstract class AbstractUserId {
 
     /**
      * The id
