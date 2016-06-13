@@ -42,6 +42,7 @@ abstract class _ApplicationDetail extends AbstractApplicationSummary {
     /**
      * The time the application was last updated
      */
+    @Nullable
     abstract Date getLastUploaded();
 
     /**
