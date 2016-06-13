@@ -53,6 +53,7 @@ abstract class _SpaceQuotaDefinitionEntity {
      * The name
      */
     @JsonProperty("name")
+    @Nullable
     abstract String getName();
 
     /**

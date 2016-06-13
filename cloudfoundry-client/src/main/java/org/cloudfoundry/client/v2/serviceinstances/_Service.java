@@ -32,12 +32,14 @@ abstract class _Service {
      * The id
      */
     @JsonProperty("guid")
+    @Nullable
     abstract String getId();
 
     /**
      * The label
      */
     @JsonProperty("label")
+    @Nullable
     abstract String getLabel();
 
     /**

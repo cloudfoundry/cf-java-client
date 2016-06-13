@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.stacks;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -31,12 +32,14 @@ abstract class _StackEntity {
      * The description
      */
     @JsonProperty("description")
+    @Nullable
     abstract String getDescription();
 
     /**
      * The name
      */
     @JsonProperty("name")
+    @Nullable
     abstract String getName();
 
 }

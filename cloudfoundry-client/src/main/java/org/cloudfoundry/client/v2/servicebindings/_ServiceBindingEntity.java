@@ -34,6 +34,7 @@ abstract class _ServiceBindingEntity {
      * The application id
      */
     @JsonProperty("app_guid")
+    @Nullable
     abstract String getApplicationId();
 
     /**
@@ -47,18 +48,21 @@ abstract class _ServiceBindingEntity {
      * The binding options
      */
     @JsonProperty("binding_options")
+    @Nullable
     abstract Map<String, Object> getBindingOptions();
 
     /**
      * The credentials
      */
     @JsonProperty("credentials")
+    @Nullable
     abstract Map<String, Object> getCredentials();
 
     /**
      * The gateway data
      */
     @JsonProperty("gateway_data")
+    @Nullable
     abstract Map<String, Object> getGatewayDatas();
 
     /**

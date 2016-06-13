@@ -32,6 +32,7 @@ abstract class _RuleEntity {
      * The destination
      */
     @JsonProperty("destination")
+    @Nullable
     abstract String getDestination();
 
     /**
@@ -45,6 +46,7 @@ abstract class _RuleEntity {
      * The protocol
      */
     @JsonProperty("protocol")
+    @Nullable
     abstract String getProtocol();
 
     /**

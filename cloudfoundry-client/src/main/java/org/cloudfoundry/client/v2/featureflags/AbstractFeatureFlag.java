@@ -28,6 +28,7 @@ public abstract class AbstractFeatureFlag {
      * The state of the feature flag
      */
     @JsonProperty("enabled")
+    @Nullable
     abstract Boolean getEnabled();
 
     /**

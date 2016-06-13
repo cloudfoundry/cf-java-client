@@ -28,30 +28,35 @@ public abstract class AbstractUserEntity {
      * The active property
      */
     @JsonProperty("active")
+    @Nullable
     public abstract Boolean getActive();
 
     /**
      * The admin property
      */
     @JsonProperty("admin")
+    @Nullable
     public abstract Boolean getAdmin();
 
     /**
      * The audited organizations url
      */
     @JsonProperty("audited_organizations_url")
+    @Nullable
     public abstract String getAuditedOrganizationsUrl();
 
     /**
      * The audited spaces url
      */
     @JsonProperty("audited_spaces_url")
+    @Nullable
     public abstract String getAuditedSpacesUrl();
 
     /**
      * The billing managed organizations url
      */
     @JsonProperty("billing_managed_organizations_url")
+    @Nullable
     public abstract String getBillingManagedOrganizationsUrl();
 
     /**
@@ -72,24 +77,28 @@ public abstract class AbstractUserEntity {
      * The managed organizations url
      */
     @JsonProperty("managed_organizations_url")
+    @Nullable
     public abstract String getManagedOrganizationsUrl();
 
     /**
      * The managed spaces url
      */
     @JsonProperty("managed_spaces_url")
+    @Nullable
     public abstract String getManagedSpacesUrl();
 
     /**
      * The organizations url
      */
     @JsonProperty("organizations_url")
+    @Nullable
     public abstract String getOrganizationsUrl();
 
     /**
      * The spaces url
      */
     @JsonProperty("spaces_url")
+    @Nullable
     public abstract String getSpacesUrl();
 
     /**

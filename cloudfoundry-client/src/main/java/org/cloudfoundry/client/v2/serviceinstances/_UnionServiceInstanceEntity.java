@@ -92,6 +92,7 @@ abstract class _UnionServiceInstanceEntity extends BaseServiceInstanceEntity {
      * The tags
      */
     @JsonProperty("tags")
+    @Nullable
     abstract List<String> getTags();
 
 }

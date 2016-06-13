@@ -36,6 +36,8 @@ import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
+
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
@@ -213,6 +215,8 @@ public final class ReactorServicesTest {
                         .description("desc-220")
                         .active(true)
                         .bindable(true)
+                        .requires(Collections.emptyList())
+                        .tags(Collections.emptyList())
                         .uniqueId("e46b095e-aa85-4ffb-98d9-0bc94b84d45c")
                         .serviceBrokerId("5c323c18-e26c-45ff-a4f9-6a8916912a22")
                         .planUpdateable(false)

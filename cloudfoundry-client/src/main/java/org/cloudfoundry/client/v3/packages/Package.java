@@ -37,6 +37,7 @@ public abstract class Package {
      * The created at
      */
     @JsonProperty("created_at")
+    @Nullable
     public abstract String getCreatedAt();
 
     /**
@@ -44,30 +45,35 @@ public abstract class Package {
      */
     @JsonDeserialize(using = DataDeserializer.class)
     @JsonProperty("data")
+    @Nullable
     public abstract Data getData();
 
     /**
      * The id
      */
     @JsonProperty("guid")
+    @Nullable
     public abstract String getId();
 
     /**
      * The links
      */
     @JsonProperty("links")
+    @Nullable
     public abstract Map<String, Link> getLinks();
 
     /**
      * The state
      */
     @JsonProperty("state")
+    @Nullable
     public abstract State getState();
 
     /**
      * The type
      */
     @JsonProperty("type")
+    @Nullable
     public abstract PackageType getType();
 
     /**

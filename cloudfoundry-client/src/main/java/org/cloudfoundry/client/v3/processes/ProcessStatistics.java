@@ -17,7 +17,7 @@
 package org.cloudfoundry.client.v3.processes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Singular;
+import org.cloudfoundry.Nullable;
 
 import java.util.List;
 
@@ -30,60 +30,70 @@ public abstract class ProcessStatistics {
      * The disk quota
      */
     @JsonProperty("disk_quota")
+    @Nullable
     public abstract Long getDiskQuota();
 
     /**
      * The file desriptor quota
      */
     @JsonProperty("fds_quota")
+    @Nullable
     public abstract Long getFdsQuota();
 
     /**
      * The host
      */
     @JsonProperty("host")
+    @Nullable
     public abstract String getHost();
 
     /**
      * The index
      */
     @JsonProperty("index")
+    @Nullable
     public abstract Integer getIndex();
 
     /**
      * The instance port mappings
      */
     @JsonProperty("instance_ports")
+    @Nullable
     public abstract List<PortMapping> getInstancePorts();
 
     /**
      * The memory quota
      */
     @JsonProperty("mem_quota")
+    @Nullable
     public abstract Long getMemoryQuota();
 
     /**
      * The state
      */
     @JsonProperty("state")
+    @Nullable
     public abstract String getState();
 
     /**
      * The type
      */
     @JsonProperty("type")
+    @Nullable
     public abstract String getType();
 
     /**
      * The uptime
      */
     @JsonProperty("uptime")
+    @Nullable
     public abstract Long getUptime();
 
     /**
      * The usage
      */
     @JsonProperty("usage")
+    @Nullable
     public abstract ProcessUsage getUsage();
 
 }

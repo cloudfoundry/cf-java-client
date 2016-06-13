@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.organizations;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -31,36 +32,42 @@ abstract class _OrganizationSpaceSummary {
      * The application count
      */
     @JsonProperty("app_count")
+    @Nullable
     abstract Integer getApplicationCount();
 
     /**
      * The space id
      */
     @JsonProperty("guid")
+    @Nullable
     abstract String getId();
 
     /**
      * The mem_dev_total
      */
     @JsonProperty("mem_dev_total")
+    @Nullable
     abstract Integer getMemoryDevelopmentTotal();
 
     /**
      * The mem_prod_total
      */
     @JsonProperty("mem_prod_total")
+    @Nullable
     abstract Integer getMemoryProductionTotal();
 
     /**
      * The space name
      */
     @JsonProperty("name")
+    @Nullable
     abstract String getName();
 
     /**
      * The service count
      */
     @JsonProperty("service_count")
+    @Nullable
     abstract Integer getServiceCount();
 
 }

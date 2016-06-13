@@ -44,6 +44,7 @@ abstract class _DockerData implements Data {
      * The Docker image
      */
     @JsonProperty("image")
+    @Nullable
     abstract String getImage();
 
 }

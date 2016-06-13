@@ -33,6 +33,7 @@ abstract class _ServicePlanVisibilityEntity {
      * The organization id
      */
     @JsonProperty("organization_guid")
+    @Nullable
     abstract String getOrganizationId();
 
     /**
@@ -46,6 +47,7 @@ abstract class _ServicePlanVisibilityEntity {
      * The service plan id
      */
     @JsonProperty("service_plan_guid")
+    @Nullable
     abstract String getServicePlanId();
 
     /**

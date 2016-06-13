@@ -59,6 +59,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -481,13 +482,15 @@ public final class DefaultSpaces implements Spaces {
     }
 
     private static List<Rule> toSpaceDetailSecurityGroupRules(List<RuleEntity> rules) {
-        return rules.stream()
-            .map(ruleEntity -> Rule.builder()
-                .destination(ruleEntity.getDestination())
-                .ports(ruleEntity.getPorts())
-                .protocol(ruleEntity.getProtocol())
-                .build())
-            .collect(Collectors.toList());
+        return Optional.ofNullable(rules)
+            .map(r -> r.stream()
+                .map(ruleEntity -> Rule.builder()
+                    .destination(ruleEntity.getDestination())
+                    .ports(ruleEntity.getPorts())
+                    .protocol(ruleEntity.getProtocol())
+                    .build())
+                .collect(Collectors.toList()))
+            .orElse(Collections.emptyList());
     }
 
     private static List<SecurityGroup> toSpaceDetailSecurityGroups(List<SecurityGroupEntity> securityGroups) {

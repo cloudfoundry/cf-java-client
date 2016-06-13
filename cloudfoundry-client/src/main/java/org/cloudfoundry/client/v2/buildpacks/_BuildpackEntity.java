@@ -32,6 +32,7 @@ abstract class _BuildpackEntity {
      * Whether the buildpack is enabled
      */
     @JsonProperty("enabled")
+    @Nullable
     abstract Boolean getEnabled();
 
     /**
@@ -45,18 +46,21 @@ abstract class _BuildpackEntity {
      * Whether the buildpack is locked
      */
     @JsonProperty("locked")
+    @Nullable
     abstract Boolean getLocked();
 
     /**
      * The name
      */
     @JsonProperty("name")
+    @Nullable
     abstract String getName();
 
     /**
      * The position
      */
     @JsonProperty("position")
+    @Nullable
     abstract Integer getPosition();
 
 }

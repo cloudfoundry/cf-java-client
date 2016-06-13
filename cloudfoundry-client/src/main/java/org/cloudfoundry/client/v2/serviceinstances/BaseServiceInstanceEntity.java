@@ -31,12 +31,14 @@ public abstract class BaseServiceInstanceEntity {
      * The credentials
      */
     @JsonProperty("credentials")
+    @Nullable
     public abstract Map<String, Object> getCredentials();
 
     /**
      * The name
      */
     @JsonProperty("name")
+    @Nullable
     public abstract String getName();
 
     /**
@@ -71,6 +73,7 @@ public abstract class BaseServiceInstanceEntity {
      * The type
      */
     @JsonProperty("type")
+    @Nullable
     public abstract String getType();
 
 }

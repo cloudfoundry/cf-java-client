@@ -33,48 +33,56 @@ abstract class _ApplicationUsageEventEntity {
      * The application id
      */
     @JsonProperty("app_guid")
+    @Nullable
     abstract String getApplicationId();
 
     /**
      * The application name
      */
     @JsonProperty("app_name")
+    @Nullable
     abstract String getApplicationName();
 
     /**
      * The buildpack id
      */
     @JsonProperty("buildpack_guid")
+    @Nullable
     abstract String getBuildpackId();
 
     /**
      * The buildpack name
      */
     @JsonProperty("buildpack_name")
+    @Nullable
     abstract String getBuildpackName();
 
     /**
      * The instance count
      */
     @JsonProperty("instance_count")
+    @Nullable
     abstract Integer getInstanceCount();
 
     /**
      * The memory in mb by instances
      */
     @JsonProperty("memory_in_mb_per_instance")
+    @Nullable
     abstract Integer getMemoryInMbPerInstances();
 
     /**
      * The organization id
      */
     @JsonProperty("org_guid")
+    @Nullable
     abstract String getOrganizationId();
 
     /**
      * The state of the package
      */
     @JsonProperty("package_state")
+    @Nullable
     abstract String getPackageState();
 
     /**
@@ -95,24 +103,28 @@ abstract class _ApplicationUsageEventEntity {
      * The process type (experimental)
      */
     @JsonProperty("process_type")
+    @Nullable
     abstract String getProcessType();
 
     /**
      * The space id
      */
     @JsonProperty("space_guid")
+    @Nullable
     abstract String getSpaceId();
 
     /**
      * The space name
      */
     @JsonProperty("space_name")
+    @Nullable
     abstract String getSpaceName();
 
     /**
      * The desired state of the application
      */
     @JsonProperty("state")
+    @Nullable
     abstract String getState();
 
     /**

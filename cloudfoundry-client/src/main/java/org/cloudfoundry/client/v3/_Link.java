@@ -32,6 +32,7 @@ abstract class _Link {
      * The href
      */
     @JsonProperty("href")
+    @Nullable
     abstract String getHref();
 
     /**

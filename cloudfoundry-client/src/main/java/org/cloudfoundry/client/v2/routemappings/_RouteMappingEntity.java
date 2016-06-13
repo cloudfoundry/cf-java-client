@@ -32,6 +32,7 @@ abstract class _RouteMappingEntity {
      * The application id
      */
     @JsonProperty("app_guid")
+    @Nullable
     abstract String getApplicationId();
 
     /**
@@ -45,18 +46,21 @@ abstract class _RouteMappingEntity {
      * The application url
      */
     @JsonProperty("app_url")
+    @Nullable
     abstract String getApplicationUrl();
 
     /**
      * The route id
      */
     @JsonProperty("route_guid")
+    @Nullable
     abstract String getRouteId();
 
     /**
      * The route url
      */
     @JsonProperty("route_url")
+    @Nullable
     abstract String getRouteUrl();
 
 }

@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.organizations;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -33,24 +34,28 @@ abstract class _SummaryOrganizationResponse {
      * The organization id
      */
     @JsonProperty("guid")
+    @Nullable
     abstract String getId();
 
     /**
      * The organization name
      */
     @JsonProperty("name")
+    @Nullable
     abstract String getName();
 
     /**
      * List of spaces that are in the organization
      */
     @JsonProperty("spaces")
+    @Nullable
     abstract List<OrganizationSpaceSummary> getSpaces();
 
     /**
      * The organization status
      */
     @JsonProperty("status")
+    @Nullable
     abstract String getStatus();
 
 }

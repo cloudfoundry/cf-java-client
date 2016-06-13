@@ -32,84 +32,98 @@ abstract class _SpaceEntity {
      * Allow SSH
      */
     @JsonProperty("allow_ssh")
+    @Nullable
     abstract Boolean getAllowSsh();
 
     /**
      * The application events url
      */
     @JsonProperty("app_events_url")
+    @Nullable
     abstract String getApplicationEventsUrl();
 
     /**
      * The applications url
      */
     @JsonProperty("apps_url")
+    @Nullable
     abstract String getApplicationsUrl();
 
     /**
      * The auditors url
      */
     @JsonProperty("auditors_url")
+    @Nullable
     abstract String getAuditorsUrl();
 
     /**
      * The developers url
      */
     @JsonProperty("developers_url")
+    @Nullable
     abstract String getDevelopersUrl();
 
     /**
      * The domains url
      */
     @JsonProperty("domains_url")
+    @Nullable
     abstract String getDomainsUrl();
 
     /**
      * The events url
      */
     @JsonProperty("events_url")
+    @Nullable
     abstract String getEventsUrl();
 
     /**
      * The managers url
      */
     @JsonProperty("managers_url")
+    @Nullable
     abstract String getManagersUrl();
 
     /**
      * The name
      */
     @JsonProperty("name")
+    @Nullable
     abstract String getName();
 
     /**
      * The organization id
      */
     @JsonProperty("organization_guid")
+    @Nullable
     abstract String getOrganizationId();
 
     /**
      * The organization url
      */
     @JsonProperty("organization_url")
+    @Nullable
     abstract String getOrganizationUrl();
 
     /**
      * The routes url
      */
     @JsonProperty("routes_url")
+    @Nullable
     abstract String getRoutesUrl();
 
     /**
      * The security groups url
      */
     @JsonProperty("security_groups_url")
+    @Nullable
     abstract String getSecurityGroupsUrl();
 
     /**
      * The service instances url
      */
     @JsonProperty("service_instances_url")
+    @Nullable
     abstract String getServiceInstancesUrl();
 
     /**

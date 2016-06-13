@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v3.processes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -31,12 +32,14 @@ abstract class _PortMapping {
      * The external port
      */
     @JsonProperty("external")
+    @Nullable
     abstract Integer getExternal();
 
     /**
      * The internal port
      */
     @JsonProperty("internal")
+    @Nullable
     abstract Integer getInternal();
 
 }

@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.organizations;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v2.users.AbstractUserEntity;
 import org.immutables.value.Value;
 
@@ -34,6 +35,7 @@ abstract class _UserOrganizationRoleEntity extends AbstractUserEntity {
      * The organization roles
      */
     @JsonProperty("organization_roles")
+    @Nullable
     abstract List<String> getOrganizationRoles();
 
 }

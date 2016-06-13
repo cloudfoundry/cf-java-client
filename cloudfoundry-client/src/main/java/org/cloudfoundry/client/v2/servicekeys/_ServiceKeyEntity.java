@@ -35,12 +35,14 @@ abstract class _ServiceKeyEntity {
      * The credentials
      */
     @JsonProperty("credentials")
+    @Nullable
     abstract Map<String, Object> getCredentials();
 
     /**
      * The name
      */
     @JsonProperty("name")
+    @Nullable
     abstract String getName();
 
     /**

@@ -41,18 +41,21 @@ abstract class _ApplicationEntity extends AbstractApplicationEntity {
      * Whether SSH is enabled
      */
     @JsonProperty("enable_ssh")
+    @Nullable
     abstract Boolean getEnableSsh();
 
     /**
      * The events url
      */
     @JsonProperty("events_url")
+    @Nullable
     abstract String getEventsUrl();
 
     /**
      * The package state
      */
     @JsonProperty("package_state")
+    @Nullable
     abstract String getPackageState();
 
     /**
@@ -80,30 +83,35 @@ abstract class _ApplicationEntity extends AbstractApplicationEntity {
      * The routes url
      */
     @JsonProperty("routes_url")
+    @Nullable
     abstract String getRoutesUrl();
 
     /**
      * The service bindings url
      */
     @JsonProperty("service_bindings_url")
+    @Nullable
     abstract String getServiceBindingsUrl();
 
     /**
      * The space url
      */
     @JsonProperty("space_url")
+    @Nullable
     abstract String getSpaceUrl();
 
     /**
      * The stack url
      */
     @JsonProperty("stack_url")
+    @Nullable
     abstract String getStackUrl();
 
     /**
      * The version
      */
     @JsonProperty("version")
+    @Nullable
     abstract String getVersion();
 
 }

@@ -45,6 +45,7 @@ public abstract class Droplet {
      * The environment variables
      */
     @JsonProperty("environment_variables")
+    @Nullable
     public abstract Map<String, Object> getEnvironmentVariables();
 
     /**
@@ -58,18 +59,21 @@ public abstract class Droplet {
      * The id
      */
     @JsonProperty("guid")
+    @Nullable
     public abstract String getId();
 
     /**
      * The lifecycle
      */
     @JsonProperty("lifecycle")
+    @Nullable
     public abstract Lifecycle getLifecycle();
 
     /**
      * The links
      */
     @JsonProperty("links")
+    @Nullable
     public abstract Map<String, Link> getLinks();
 
     /**
@@ -98,6 +102,7 @@ public abstract class Droplet {
      * The state
      */
     @JsonProperty("state")
+    @Nullable
     public abstract State getState();
 
     /**

@@ -32,18 +32,21 @@ abstract class _GetInfoResponse {
      * The API version
      */
     @JsonProperty("api_version")
+    @Nullable
     abstract String getApiVersion();
 
     /**
      * The application SSH endpoint
      */
     @JsonProperty("app_ssh_endpoint")
+    @Nullable
     abstract String getApplicationSshEndpoint();
 
     /**
      * The application SSH host key fingerprint
      */
     @JsonProperty("app_ssh_host_key_fingerprint")
+    @Nullable
     abstract String getApplicationSshHostKeyFingerprint();
 
     /**
@@ -57,18 +60,21 @@ abstract class _GetInfoResponse {
      * The authorization endpoint
      */
     @JsonProperty("authorization_endpoint")
+    @Nullable
     abstract String getAuthorizationEndpoint();
 
     /**
      * The build number
      */
     @JsonProperty("build")
+    @Nullable
     abstract String getBuildNumber();
 
     /**
      * The description
      */
     @JsonProperty("description")
+    @Nullable
     abstract String getDescription();
 
     /**
@@ -82,6 +88,7 @@ abstract class _GetInfoResponse {
      * The logging endpoint
      */
     @JsonProperty("logging_endpoint")
+    @Nullable
     abstract String getLoggingEndpoint();
 
     /**
@@ -102,6 +109,7 @@ abstract class _GetInfoResponse {
      * The name
      */
     @JsonProperty("name")
+    @Nullable
     abstract String getName();
 
     /**
@@ -115,12 +123,14 @@ abstract class _GetInfoResponse {
      * The support url
      */
     @JsonProperty("support")
+    @Nullable
     abstract String getSupport();
 
     /**
      * The token endpoint
      */
     @JsonProperty("token_endpoint")
+    @Nullable
     abstract String getTokenEndpoint();
 
     /**
@@ -134,6 +144,7 @@ abstract class _GetInfoResponse {
      * The version
      */
     @JsonProperty("version")
+    @Nullable
     abstract Integer getVersion();
 
 }

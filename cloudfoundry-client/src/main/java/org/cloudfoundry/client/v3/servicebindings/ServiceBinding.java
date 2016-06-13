@@ -31,30 +31,35 @@ public abstract class ServiceBinding {
      * The created at
      */
     @JsonProperty("created_at")
+    @Nullable
     public abstract String getCreatedAt();
 
     /**
      * The datas
      */
     @JsonProperty("data")
+    @Nullable
     public abstract ServiceBindingData getData();
 
     /**
      * The id
      */
     @JsonProperty("guid")
+    @Nullable
     public abstract String getId();
 
     /**
      * The links
      */
     @JsonProperty("links")
+    @Nullable
     public abstract Map<String, Link> getLinks();
 
     /**
      * The type
      */
     @JsonProperty("type")
+    @Nullable
     public abstract String getType();
 
     /**

@@ -32,18 +32,21 @@ abstract class _ServiceBrokerEntity {
      * The authentication username
      */
     @JsonProperty("auth_username")
+    @Nullable
     abstract String getAuthenticationUsername();
 
     /**
      * The url of the service broker.
      */
     @JsonProperty("broker_url")
+    @Nullable
     abstract String getBrokerUrl();
 
     /**
      * The name
      */
     @JsonProperty("name")
+    @Nullable
     abstract String getName();
 
     /**

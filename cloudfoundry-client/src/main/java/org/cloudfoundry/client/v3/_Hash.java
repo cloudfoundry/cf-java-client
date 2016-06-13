@@ -32,6 +32,7 @@ abstract class _Hash {
      * The type
      */
     @JsonProperty("type")
+    @Nullable
     abstract String getType();
 
     /**

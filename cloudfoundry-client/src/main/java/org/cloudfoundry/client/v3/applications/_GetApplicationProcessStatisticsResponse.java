@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v3.applications;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
 import org.immutables.value.Value;
 
@@ -34,6 +35,7 @@ abstract class _GetApplicationProcessStatisticsResponse {
      * The resources
      */
     @JsonProperty("resources")
+    @Nullable
     abstract List<ProcessStatisticsResource> getResources();
 
 }

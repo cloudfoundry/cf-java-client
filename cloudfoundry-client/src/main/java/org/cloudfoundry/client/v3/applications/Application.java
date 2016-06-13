@@ -32,48 +32,56 @@ public abstract class Application {
      * When the application was created
      */
     @JsonProperty("created_at")
+    @Nullable
     public abstract String getCreatedAt();
 
     /**
      * The desired state
      */
     @JsonProperty("desired_state")
+    @Nullable
     public abstract String getDesiredState();
 
     /**
      * The environment variables\
      */
     @JsonProperty("environment_variables")
+    @Nullable
     public abstract Map<String, String> getEnvironmentVariables();
 
     /**
      * The id
      */
     @JsonProperty("guid")
+    @Nullable
     public abstract String getId();
 
     /**
      * The lifecycle
      */
     @JsonProperty("lifecycle")
+    @Nullable
     public abstract Lifecycle getLifecycle();
 
     /**
      * The links
      */
     @JsonProperty("links")
+    @Nullable
     public abstract Map<String, Link> getLinks();
 
     /**
      * The name
      */
     @JsonProperty("name")
+    @Nullable
     public abstract String getName();
 
     /**
      * The total desired instances
      */
     @JsonProperty("total_desired_instances")
+    @Nullable
     public abstract Integer getTotalDesiredInstances();
 
     /**

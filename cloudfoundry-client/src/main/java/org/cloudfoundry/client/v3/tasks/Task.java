@@ -31,6 +31,7 @@ public abstract class Task {
      * The command
      */
     @JsonProperty("command")
+    @Nullable
     public abstract String getCommand();
 
     /**
@@ -44,42 +45,49 @@ public abstract class Task {
      * The environment variables
      */
     @JsonProperty("environment_variables")
+    @Nullable
     public abstract Map<String, String> getEnvironmentVariables();
 
     /**
      * The id
      */
     @JsonProperty("guid")
+    @Nullable
     public abstract String getId();
 
     /**
      * The links
      */
     @JsonProperty("links")
+    @Nullable
     public abstract Map<String, Link> getLinks();
 
     /**
      * The memory in megabytes=
      */
     @JsonProperty("memory_in_mb")
+    @Nullable
     public abstract Integer getMemoryInMb();
 
     /**
      * The tasks name
      */
     @JsonProperty("name")
+    @Nullable
     public abstract String getName();
 
     /**
      * The task result
      */
     @JsonProperty("result")
+    @Nullable
     public abstract Result getResult();
 
     /**
      * The task state
      */
     @JsonProperty("state")
+    @Nullable
     public abstract State getState();
 
     /**

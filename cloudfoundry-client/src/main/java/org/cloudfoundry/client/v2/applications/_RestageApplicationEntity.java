@@ -41,18 +41,21 @@ abstract class _RestageApplicationEntity extends AbstractApplicationEntity {
      * Whether SSH is enabled
      */
     @JsonProperty("enable_ssh")
+    @Nullable
     abstract Boolean getEnableSsh();
 
     /**
      * The package state
      */
     @JsonProperty("package_state")
+    @Nullable
     abstract String getPackageState();
 
     /**
      * When the package was update
      */
     @JsonProperty("package_updated_at")
+    @Nullable
     abstract String getPackageUpdatedAt();
 
     /**
@@ -66,6 +69,7 @@ abstract class _RestageApplicationEntity extends AbstractApplicationEntity {
      * The version
      */
     @JsonProperty("version")
+    @Nullable
     abstract String getVersion();
 
 }

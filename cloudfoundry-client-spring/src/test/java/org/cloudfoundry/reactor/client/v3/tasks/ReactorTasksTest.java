@@ -35,6 +35,8 @@ import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
+
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
@@ -68,6 +70,7 @@ public final class ReactorTasksTest {
                 .command("rake db:migrate")
                 .state(State.CANCELING_STATE)
                 .memoryInMb(512)
+                .environmentVariables(Collections.emptyMap())
                 .result(Result.builder()
                     .build())
                 .link("self", Link.builder()
@@ -122,6 +125,7 @@ public final class ReactorTasksTest {
                 .command("rake db:migrate")
                 .state(State.RUNNING_STATE)
                 .memoryInMb(256)
+                .environmentVariables(Collections.emptyMap())
                 .result(Result.builder()
                     .build())
                 .link("self", Link.builder()
@@ -178,6 +182,7 @@ public final class ReactorTasksTest {
                 .command("rake db:migrate")
                 .state(State.RUNNING_STATE)
                 .memoryInMb(256)
+                .environmentVariables(Collections.emptyMap())
                 .result(Result.builder()
                     .build())
                 .link("self", Link.builder()
@@ -244,6 +249,7 @@ public final class ReactorTasksTest {
                     .command("echo \"hello world\"")
                     .state(State.SUCCEEDED_STATE)
                     .memoryInMb(256)
+                    .environmentVariables(Collections.emptyMap())
                     .result(Result.builder()
                         .build())
                     .link("self", Link.builder()
@@ -262,6 +268,7 @@ public final class ReactorTasksTest {
                     .command("rake db:migrate")
                     .state(State.FAILED_STATE)
                     .memoryInMb(256)
+                    .environmentVariables(Collections.emptyMap())
                     .result(Result.builder()
                         .failureReason("Exited with status 1")
                         .build())

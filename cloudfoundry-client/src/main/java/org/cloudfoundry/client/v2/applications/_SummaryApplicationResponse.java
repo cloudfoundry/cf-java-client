@@ -37,6 +37,7 @@ abstract class _SummaryApplicationResponse extends AbstractApplicationEntity {
      * The available domains
      */
     @JsonProperty("available_domains")
+    @Nullable
     abstract List<Domain> getAvailableDomains();
 
     /**
@@ -50,18 +51,21 @@ abstract class _SummaryApplicationResponse extends AbstractApplicationEntity {
      * Whether SSH is enabled
      */
     @JsonProperty("enable_ssh")
+    @Nullable
     abstract Boolean getEnableSsh();
 
     /**
      * The id
      */
     @JsonProperty("guid")
+    @Nullable
     abstract String getId();
 
     /**
      * The package state
      */
     @JsonProperty("package_state")
+    @Nullable
     abstract String getPackageState();
 
     /**
@@ -82,24 +86,28 @@ abstract class _SummaryApplicationResponse extends AbstractApplicationEntity {
      * The routes
      */
     @JsonProperty("routes")
+    @Nullable
     abstract List<Route> getRoutes();
 
     /**
      * The running instances
      */
     @JsonProperty("running_instances")
+    @Nullable
     abstract Integer getRunningInstances();
 
     /**
      * The services
      */
     @JsonProperty("services")
+    @Nullable
     abstract List<ServiceInstance> getServices();
 
     /**
      * The version
      */
     @JsonProperty("version")
+    @Nullable
     abstract String getVersion();
 
 }

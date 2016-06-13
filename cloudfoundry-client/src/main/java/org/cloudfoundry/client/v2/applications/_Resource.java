@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.applications;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -31,18 +32,21 @@ abstract class _Resource {
      * The hash
      */
     @JsonProperty("sha1")
+    @Nullable
     abstract String getHash();
 
     /**
      * The path
      */
     @JsonProperty("fn")
+    @Nullable
     abstract String getPath();
 
     /**
      * The size
      */
     @JsonProperty("size")
+    @Nullable
     abstract Integer getSize();
 
 }

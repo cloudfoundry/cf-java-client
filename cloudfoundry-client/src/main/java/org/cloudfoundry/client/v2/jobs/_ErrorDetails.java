@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.jobs;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -31,18 +32,21 @@ abstract class _ErrorDetails {
      * The code
      */
     @JsonProperty("code")
+    @Nullable
     abstract Integer getCode();
 
     /**
      * The description
      */
     @JsonProperty("description")
+    @Nullable
     abstract String getDescription();
 
     /**
      * The error code
      */
     @JsonProperty("error_code")
+    @Nullable
     abstract String getErrorCode();
 
 }

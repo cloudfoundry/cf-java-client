@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.applications;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.Map;
@@ -30,30 +31,35 @@ abstract class _ApplicationEnvironmentResponse {
      * The application environment variables
      */
     @JsonProperty("application_env_json")
+    @Nullable
     abstract Map<String, Object> getApplicationEnvironmentJsons();
 
     /**
      * The environment variables
      */
     @JsonProperty("environment_json")
+    @Nullable
     abstract Map<String, Object> getEnvironmentJsons();
 
     /**
      * The running environment variables
      */
     @JsonProperty("running_env_json")
+    @Nullable
     abstract Map<String, Object> getRunningEnvironmentJsons();
 
     /**
      * The staging environment variables
      */
     @JsonProperty("staging_env_json")
+    @Nullable
     abstract Map<String, Object> getStagingEnvironmentJsons();
 
     /**
      * The system environment variables
      */
     @JsonProperty("system_env_json")
+    @Nullable
     abstract Map<String, Object> getSystemEnvironmentJsons();
 
 }

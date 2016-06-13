@@ -29,6 +29,7 @@ abstract class _Pagination {
      * The first
      */
     @JsonProperty("first")
+    @Nullable
     abstract Link getFirst();
 
     /**
@@ -63,6 +64,7 @@ abstract class _Pagination {
      * The total results
      */
     @JsonProperty("total_results")
+    @Nullable
     abstract Integer getTotalResults();
 
 }

@@ -34,18 +34,21 @@ abstract class _SecurityGroupEntity {
      * The name
      */
     @JsonProperty("name")
+    @Nullable
     abstract String getName();
 
     /**
      * The rules
      */
     @JsonProperty("rules")
+    @Nullable
     abstract List<RuleEntity> getRules();
 
     /**
      * The running default
      */
     @JsonProperty("running_default")
+    @Nullable
     abstract Boolean getRunningDefault();
 
     /**
@@ -59,6 +62,7 @@ abstract class _SecurityGroupEntity {
      * The staging default
      */
     @JsonProperty("staging_default")
+    @Nullable
     abstract Boolean getStagingDefault();
 
 }

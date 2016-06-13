@@ -37,6 +37,7 @@ abstract class _StagedResult implements Result {
     abstract String getExecutionMetadata();
 
     @JsonProperty("hash")
+    @Nullable
     abstract Hash getHash();
 
     @JsonProperty("process_types")

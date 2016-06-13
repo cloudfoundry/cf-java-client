@@ -109,6 +109,7 @@ abstract class _ServiceEntity {
      * Required dependencies
      */
     @JsonProperty("requires")
+    @Nullable
     abstract List<String> getRequires();
 
     /**
@@ -129,6 +130,7 @@ abstract class _ServiceEntity {
      * The tags
      */
     @JsonProperty("tags")
+    @Nullable
     abstract List<String> getTags();
 
     /**

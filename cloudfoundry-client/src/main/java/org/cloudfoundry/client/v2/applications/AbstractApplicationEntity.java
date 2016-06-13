@@ -60,25 +60,28 @@ public abstract class AbstractApplicationEntity {
      * The detected start command
      */
     @JsonProperty("detected_start_command")
+    @Nullable
     public abstract String getDetectedStartCommand();
 
     /**
      * Diego
      */
     @JsonProperty("diego")
+    @Nullable
     public abstract Boolean getDiego();
 
     /**
      * The disk quota in megabytes
      */
     @JsonProperty("disk_quota")
+    @Nullable
     public abstract Integer getDiskQuota();
 
     /**
      * The docker credentials JSONs
      */
-    @Nullable
     @JsonProperty("docker_credentials_json")
+    @Nullable
     public abstract Map<String, Object> getDockerCredentialsJsons();
 
     /**
@@ -92,6 +95,7 @@ public abstract class AbstractApplicationEntity {
      * The environment JSONs
      */
     @JsonProperty("environment_json")
+    @Nullable
     public abstract Map<String, Object> getEnvironmentJsons();
 
     /**
@@ -105,24 +109,28 @@ public abstract class AbstractApplicationEntity {
      * The health check type
      */
     @JsonProperty("health_check_type")
+    @Nullable
     public abstract String getHealthCheckType();
 
     /**
      * The instances
      */
     @JsonProperty("instances")
+    @Nullable
     public abstract Integer getInstances();
 
     /**
      * The memory in megabytes
      */
     @JsonProperty("memory")
+    @Nullable
     public abstract Integer getMemory();
 
     /**
      * The name
      */
     @JsonProperty("name")
+    @Nullable
     public abstract String getName();
 
     /**
@@ -130,18 +138,21 @@ public abstract class AbstractApplicationEntity {
      */
     @Deprecated
     @JsonProperty("production")
+    @Nullable
     public abstract Boolean getProduction();
 
     /**
      * The space id
      */
     @JsonProperty("space_guid")
+    @Nullable
     public abstract String getSpaceId();
 
     /**
      * The stack id
      */
     @JsonProperty("stack_guid")
+    @Nullable
     public abstract String getStackId();
 
     /**
@@ -169,6 +180,7 @@ public abstract class AbstractApplicationEntity {
      * The state
      */
     @JsonProperty("state")
+    @Nullable
     public abstract String getState();
 
 }

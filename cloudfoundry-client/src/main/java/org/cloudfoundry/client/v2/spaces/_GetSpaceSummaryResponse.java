@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.spaces;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstance;
 import org.immutables.value.Value;
 
@@ -34,24 +35,28 @@ abstract class _GetSpaceSummaryResponse {
      * The applications
      */
     @JsonProperty("apps")
+    @Nullable
     abstract List<SpaceApplicationSummary> getApplications();
 
     /**
      * The id
      */
     @JsonProperty("guid")
+    @Nullable
     abstract String getId();
 
     /**
      * The name
      */
     @JsonProperty("name")
+    @Nullable
     abstract String getName();
 
     /**
      * The services
      */
     @JsonProperty("services")
+    @Nullable
     abstract List<ServiceInstance> getServices();
 
 }

@@ -32,12 +32,14 @@ abstract class _Domain {
      * The id
      */
     @JsonProperty("guid")
+    @Nullable
     abstract String getId();
 
     /**
      * The name
      */
     @JsonProperty("name")
+    @Nullable
     abstract String getName();
 
     /**

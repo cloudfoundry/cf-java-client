@@ -19,6 +19,7 @@ package org.cloudfoundry.client.v2.privatedomains;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -32,24 +33,28 @@ abstract class _PrivateDomainEntity {
      * The name
      */
     @JsonProperty("name")
+    @Nullable
     abstract String getName();
 
     /**
      * The owning organization id
      */
     @JsonProperty("owning_organization_guid")
+    @Nullable
     abstract String getOwningOrganizationId();
 
     /**
      * The owning organization url
      */
     @JsonProperty("owning_organization_url")
+    @Nullable
     abstract String getOwningOrganizationUrl();
 
     /**
      * The shared organizations url
      */
     @JsonProperty("shared_organizations_url")
+    @Nullable
     abstract String getSharedOrganizationsUrl();
 
 }

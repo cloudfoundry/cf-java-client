@@ -32,6 +32,7 @@ abstract class _ServiceInstance {
      * The bound application count
      */
     @JsonProperty("bound_app_count")
+    @Nullable
     abstract Integer getBoundApplicationCount();
 
     /**
@@ -45,6 +46,7 @@ abstract class _ServiceInstance {
      * The id
      */
     @JsonProperty("guid")
+    @Nullable
     abstract String getId();
 
     /**
@@ -58,6 +60,7 @@ abstract class _ServiceInstance {
      * The name
      */
     @JsonProperty("name")
+    @Nullable
     abstract String getName();
 
     /**

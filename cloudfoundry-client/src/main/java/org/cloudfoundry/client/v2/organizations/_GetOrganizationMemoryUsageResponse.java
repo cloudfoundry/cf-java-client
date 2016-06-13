@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.organizations;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -31,6 +32,7 @@ abstract class _GetOrganizationMemoryUsageResponse {
      * The memory usage in mb
      */
     @JsonProperty("memory_usage_in_mb")
+    @Nullable
     abstract Integer getMemoryUsageInMb();
 
 }

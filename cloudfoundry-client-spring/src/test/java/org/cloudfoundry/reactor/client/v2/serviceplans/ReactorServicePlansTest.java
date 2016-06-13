@@ -38,6 +38,8 @@ import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
+
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
@@ -274,6 +276,7 @@ public final class ReactorServicePlansTest {
                         .servicePlanId("bb29926c-7482-4ae5-803c-ec99e95aa278")
                         .spaceId("cf5812f5-bf43-40cc-88d4-d50b76d7797d")
                         .type("managed_service_instance")
+                        .tags(Collections.emptyList())
                         .spaceUrl("/v2/spaces/cf5812f5-bf43-40cc-88d4-d50b76d7797d")
                         .servicePlanUrl("/v2/service_plans/bb29926c-7482-4ae5-803c-ec99e95aa278")
                         .serviceBindingsUrl("/v2/service_instances/b95c56b9-f81b-4d34-9a00-a1a1ddba5f2f/service_bindings")

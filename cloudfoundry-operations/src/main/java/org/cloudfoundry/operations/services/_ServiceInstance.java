@@ -99,6 +99,7 @@ abstract class _ServiceInstance {
     /**
      * The tags for the service
      */
+    @Nullable
     abstract List<String> getTags();
 
     /**

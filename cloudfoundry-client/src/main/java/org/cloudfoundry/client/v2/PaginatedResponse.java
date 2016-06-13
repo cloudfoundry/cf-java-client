@@ -46,18 +46,21 @@ public abstract class PaginatedResponse<T extends Resource<?>> {
      * The resources
      */
     @JsonProperty("resources")
+    @Nullable
     public abstract List<T> getResources();
 
     /**
      * The total pages
      */
     @JsonProperty("total_pages")
+    @Nullable
     public abstract Integer getTotalPages();
 
     /**
      * The total results
      */
     @JsonProperty("total_results")
+    @Nullable
     public abstract Integer getTotalResults();
 
 }

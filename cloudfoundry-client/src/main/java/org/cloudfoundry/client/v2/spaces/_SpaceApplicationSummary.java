@@ -43,18 +43,21 @@ abstract class _SpaceApplicationSummary extends AbstractApplicationEntity {
      * Whether SSH is enabled
      */
     @JsonProperty("enable_ssh")
+    @Nullable
     abstract Boolean getEnableSsh();
 
     /**
      * The id
      */
     @JsonProperty("guid")
+    @Nullable
     abstract String getId();
 
     /**
      * The package state
      */
     @JsonProperty("package_state")
+    @Nullable
     abstract String getPackageState();
 
     /**
@@ -75,18 +78,21 @@ abstract class _SpaceApplicationSummary extends AbstractApplicationEntity {
      * The routes
      */
     @JsonProperty("routes")
+    @Nullable
     abstract List<Route> getRoutes();
 
     /**
      * The running instances
      */
     @JsonProperty("running_instances")
+    @Nullable
     abstract Integer getRunningInstances();
 
     /**
      * The service count
      */
     @JsonProperty("service_count")
+    @Nullable
     abstract Integer getServiceCount();
 
     /**
@@ -99,12 +105,14 @@ abstract class _SpaceApplicationSummary extends AbstractApplicationEntity {
      * The urls
      */
     @JsonProperty("urls")
+    @Nullable
     abstract List<String> getUrls();
 
     /**
      * The version
      */
     @JsonProperty("version")
+    @Nullable
     abstract String getVersion();
 
 }

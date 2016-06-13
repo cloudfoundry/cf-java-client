@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.io.IOException;
@@ -37,12 +38,14 @@ abstract class _Lifecycle {
      */
     @JsonDeserialize(using = DataDeserializer.class)
     @JsonProperty("data")
+    @Nullable
     abstract Data getData();
 
     /**
      * The type
      */
     @JsonProperty("type")
+    @Nullable
     abstract Type getType();
 
     static final class DataDeserializer extends StdDeserializer<Data> {

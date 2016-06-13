@@ -42,6 +42,8 @@ import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
+
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PATCH;
@@ -276,6 +278,7 @@ public final class ReactorProcessesTest {
                     .instances(1)
                     .memoryInMb(256)
                     .diskInMb(1_024)
+                    .ports(Collections.emptyList())
                     .healthCheck(HealthCheck.builder()
                         .type(Type.PROCESS)
                         .data(Data.builder()

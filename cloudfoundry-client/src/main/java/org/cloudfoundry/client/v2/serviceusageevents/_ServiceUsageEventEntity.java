@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.serviceusageevents;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -31,42 +32,49 @@ abstract class _ServiceUsageEventEntity {
      * The organization id
      */
     @JsonProperty("org_guid")
+    @Nullable
     abstract String getOrganizationId();
 
     /**
      * The service id
      */
     @JsonProperty("service_guid")
+    @Nullable
     abstract String getServiceId();
 
     /**
      * The service instance id
      */
     @JsonProperty("service_instance_guid")
+    @Nullable
     abstract String getServiceInstanceId();
 
     /**
      * The service instance name
      */
     @JsonProperty("service_instance_name")
+    @Nullable
     abstract String getServiceInstanceName();
 
     /**
      * The service instance type
      */
     @JsonProperty("service_instance_type")
+    @Nullable
     abstract String getServiceInstanceType();
 
     /**
      * The service label
      */
     @JsonProperty("service_label")
+    @Nullable
     abstract String getServiceLabel();
 
     /**
      * The service plan id
      */
     @JsonProperty("service_plan_guid")
+    @Nullable
     abstract String getServicePlanId();
 
     /**
@@ -79,18 +87,21 @@ abstract class _ServiceUsageEventEntity {
      * The space id
      */
     @JsonProperty("space_guid")
+    @Nullable
     abstract String getSpaceId();
 
     /**
      * The space name
      */
     @JsonProperty("space_name")
+    @Nullable
     abstract String getSpaceName();
 
     /**
      * The state
      */
     @JsonProperty("state")
+    @Nullable
     abstract String getState();
 
 }

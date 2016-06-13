@@ -33,24 +33,28 @@ abstract class _Route {
      * The domain
      */
     @JsonProperty("domain")
+    @Nullable
     abstract Domain getDomain();
 
     /**
      * The host
      */
     @JsonProperty("host")
+    @Nullable
     abstract String getHost();
 
     /**
      * The id
      */
     @JsonProperty("guid")
+    @Nullable
     abstract String getId();
 
     /**
      * The path
      */
     @JsonProperty("path")
+    @Nullable
     abstract String getPath();
 
     /**

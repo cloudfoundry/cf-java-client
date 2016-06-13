@@ -34,6 +34,7 @@ abstract class _DomainEntity {
      * The name
      */
     @JsonProperty("name")
+    @Nullable
     abstract String getName();
 
     /**
@@ -68,6 +69,7 @@ abstract class _DomainEntity {
      * The shared organizations
      */
     @JsonProperty("shared_organizations")
+    @Nullable
     abstract List<String> getSharedOrganizations();
 
     /**

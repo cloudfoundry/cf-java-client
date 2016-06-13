@@ -32,12 +32,14 @@ abstract class _Metadata {
      * When the resource was created
      */
     @JsonProperty("created_at")
+    @Nullable
     abstract String getCreatedAt();
 
     /**
      * The resource's id
      */
     @JsonProperty("guid")
+    @Nullable
     abstract String getId();
 
     /**
@@ -51,6 +53,7 @@ abstract class _Metadata {
      * The resource's URL
      */
     @JsonProperty("url")
+    @Nullable
     abstract String getUrl();
 
 }

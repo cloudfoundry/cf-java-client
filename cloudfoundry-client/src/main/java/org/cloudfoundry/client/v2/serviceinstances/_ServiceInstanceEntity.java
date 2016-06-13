@@ -57,24 +57,28 @@ abstract class _ServiceInstanceEntity extends BaseServiceInstanceEntity {
      * The service keys url
      */
     @JsonProperty("service_keys_url")
+    @Nullable
     abstract String getServiceKeysUrl();
 
     /**
      * The service plan id
      */
     @JsonProperty("service_plan_guid")
+    @Nullable
     abstract String getServicePlanId();
 
     /**
      * The service plan url
      */
     @JsonProperty("service_plan_url")
+    @Nullable
     abstract String getServicePlanUrl();
 
     /**
      * The tags
      */
     @JsonProperty("tags")
+    @Nullable
     abstract List<String> getTags();
 
 }

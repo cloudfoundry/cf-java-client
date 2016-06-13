@@ -58,6 +58,7 @@ public final class TestObjectsTest {
             .state("test-1state")
             .detectedBuildpack("test-1detectedBuildpack")
             .enableSsh(true)
+            .environmentJsons(Collections.emptyMap())
             .eventsUrl("test-1eventsUrl")
             .packageState("test-1packageState")
             .packageUpdatedAt("test-1packageUpdatedAt")
@@ -95,6 +96,7 @@ public final class TestObjectsTest {
             .previousUrl("test-previousUrl")
             .totalPages(1)
             .totalResults(1)
+            .resources(Collections.emptyList())
             .build();
 
         assertEquals(expected, actual);
