@@ -24,6 +24,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -120,7 +121,6 @@ public abstract class TestObjects {
             .filter(TestObjects::isPublic)
             .filter(method -> returnsBuilder(method, builderType))
             .filter(TestObjects::hasSingleParameter)
-            .filter(method -> !hasOptionalParameter(method))
             .filter(method -> hasMatchingGetter(method, builtGetters))
             .collect(Collectors.toList());
     }
@@ -153,6 +153,8 @@ public abstract class TestObjects {
             return getConfiguredEnum(parameterType);
         } else if (parameterType == Boolean.class) {
             return Boolean.TRUE;
+        } else if (parameterType == Collection.class) {  // TODO: Remove once Lombok is gone
+            return Collections.emptyList();
         } else if (parameterType == Date.class) {
             return new Date(0);
         } else if (parameterType == Double.class) {
@@ -162,6 +164,8 @@ public abstract class TestObjects {
         } else if (parameterType == Integer.class) {
             return 1;
         } else if (parameterType == Iterable.class) {
+            return Collections.emptyList();
+        } else if (parameterType == List.class) {  // TODO: Remove once Lombok is gone
             return Collections.emptyList();
         } else if (parameterType == Long.class) {
             return 1L;
@@ -182,10 +186,6 @@ public abstract class TestObjects {
         String propertyName = method.getName();
         String candidate = String.format("get%s%s", propertyName.substring(0, 1).toUpperCase(), propertyName.substring(1));
         return builtGetters.contains(candidate);
-    }
-
-    private static boolean hasOptionalParameter(Method method) {
-        return Optional.class == getParameter(method).getType();
     }
 
     private static boolean hasSingleParameter(Method method) {

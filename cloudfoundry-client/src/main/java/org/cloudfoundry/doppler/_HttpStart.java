@@ -16,10 +16,10 @@
 
 package org.cloudfoundry.doppler;
 
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -33,13 +33,13 @@ abstract class _HttpStart implements Event {
 
         return HttpStart.builder()
             .applicationId(UuidUtils.from(dropsonde.applicationId))
-            .instanceId(Optional.ofNullable(dropsonde.instanceId))
-            .instanceIndex(Optional.ofNullable(dropsonde.instanceIndex))
+            .instanceId(dropsonde.instanceId)
+            .instanceIndex(dropsonde.instanceIndex)
             .method(Method.from(dropsonde.method))
             .parentRequestId(UuidUtils.from(dropsonde.parentRequestId))
             .peerType(PeerType.from(dropsonde.peerType))
             .remoteAddress(dropsonde.remoteAddress)
-            .requestId(UuidUtils.from(dropsonde.requestId).orElseThrow(() -> new IllegalStateException("requestId must be specified")))
+            .requestId(UuidUtils.from(dropsonde.requestId))
             .timestamp(dropsonde.timestamp)
             .uri(dropsonde.uri)
             .userAgent(dropsonde.userAgent)
@@ -49,17 +49,20 @@ abstract class _HttpStart implements Event {
     /**
      * The application id
      */
-    abstract Optional<UUID> getApplicationId();
+    @Nullable
+    abstract UUID getApplicationId();
 
     /**
      * The ID of the application instance
      */
-    abstract Optional<String> getInstanceId();
+    @Nullable
+    abstract String getInstanceId();
 
     /**
      * The index of the application instance
      */
-    abstract Optional<Integer> getInstanceIndex();
+    @Nullable
+    abstract Integer getInstanceIndex();
 
     /**
      * The method of the request
@@ -69,7 +72,8 @@ abstract class _HttpStart implements Event {
     /**
      * The ID of the parent request of any request made to service an incoming request
      */
-    abstract Optional<UUID> getParentRequestId();
+    @Nullable
+    abstract UUID getParentRequestId();
 
     /**
      * The role of the emitting process in the request cycle
