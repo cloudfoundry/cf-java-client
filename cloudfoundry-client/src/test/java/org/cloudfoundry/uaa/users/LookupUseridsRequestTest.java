@@ -16,24 +16,12 @@
 
 package org.cloudfoundry.uaa.users;
 
-import org.cloudfoundry.uaa.SortOrder;
 import org.junit.Test;
 
 public final class LookupUseridsRequestTest {
 
     @Test
-    public void validMax() {
-        LookupUseridsRequest.builder()
-            .count(1)
-            .filter("test-filter")
-            .includeInactive(true)
-            .sortOrder(SortOrder.ASCENDING)
-            .startIndex(99)
-            .build();
-    }
-
-    @Test
-    public void validMin() {
+    public void valid() {
         LookupUseridsRequest.builder()
             .build();
     }
