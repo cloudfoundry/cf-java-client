@@ -23,7 +23,6 @@ public final class VerifyUserRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noUserId() {
         VerifyUserRequest.builder()
-            .version("test-version")
             .build();
     }
 
