@@ -17,6 +17,8 @@
 package org.cloudfoundry.reactor.client.v2.securitygroups;
 
 import org.cloudfoundry.client.v2.Metadata;
+import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupRequest;
+import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupResponse;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRunningDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupStagingDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsRequest;
@@ -38,6 +40,7 @@ import reactor.core.publisher.Mono;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -324,6 +327,97 @@ public final class ReactorSecurityGroupsTest {
         @Override
         protected Mono<SetSecurityGroupStagingDefaultResponse> invoke(SetSecurityGroupStagingDefaultRequest request) {
             return this.securityGroups.setStagingDefault(request);
+        }
+
+    }
+
+    public static final class Create extends AbstractClientApiTest<CreateSecurityGroupRequest, CreateSecurityGroupResponse> {
+
+        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v2/security_groups")
+                    .payload("fixtures/client/v2/security_groups/POST_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/security_groups/POST_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected CreateSecurityGroupResponse getResponse() {
+            return CreateSecurityGroupResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2016-05-12T00:45:26Z")
+                    .id("966e7ac0-1c1a-4ca9-8a5f-77c96576beb7")
+                    .url("/v2/security_groups/966e7ac0-1c1a-4ca9-8a5f-77c96576beb7")
+                    .build())
+                .entity(SecurityGroupEntity.builder()
+                    .name("my_super_sec_group")
+                    .rule(RuleEntity.builder()
+                        .protocol("icmp")
+                        .destination("0.0.0.0/0")
+                        .type(new Byte("0"))
+                        .code(new Byte("1"))
+                        .build())
+                    .rule(RuleEntity.builder()
+                        .protocol("tcp")
+                        .destination("0.0.0.0/0")
+                        .ports("2048-3000")
+                        .log(true)
+                        .build())
+                    .rule(RuleEntity.builder()
+                        .protocol("udp")
+                        .destination("0.0.0.0/0")
+                        .ports("53, 5353")
+                        .build())
+                    .rule(RuleEntity.builder()
+                        .protocol("all")
+                        .destination("0.0.0.0/0")
+                        .build())
+                    .runningDefault(false)
+                    .stagingDefault(false)
+                    .spacesUrl("/v2/security_groups/966e7ac0-1c1a-4ca9-8a5f-77c96576beb7/spaces")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected CreateSecurityGroupRequest getValidRequest() throws Exception {
+            return CreateSecurityGroupRequest.builder()
+                .name("my_super_sec_group")
+                .rule(RuleEntity.builder()
+                    .protocol("icmp")
+                    .destination("0.0.0.0/0")
+                    .type(new Byte("0"))
+                    .code(new Byte("1"))
+                    .build())
+                .rule(RuleEntity.builder()
+                    .protocol("tcp")
+                    .destination("0.0.0.0/0")
+                    .ports("2048-3000")
+                    .log(true)
+                    .build())
+                .rule(RuleEntity.builder()
+                    .protocol("udp")
+                    .destination("0.0.0.0/0")
+                    .ports("53, 5353")
+                    .build())
+                .rule(RuleEntity.builder()
+                    .protocol("all")
+                    .destination("0.0.0.0/0")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected Mono<CreateSecurityGroupResponse> invoke(CreateSecurityGroupRequest request) {
+            return this.securityGroups.create(request);
         }
 
     }

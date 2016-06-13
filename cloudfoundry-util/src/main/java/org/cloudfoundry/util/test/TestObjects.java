@@ -163,6 +163,8 @@ public abstract class TestObjects {
             return Duration.ofSeconds(15);
         } else if (parameterType == Integer.class) {
             return 1;
+        } else if (parameterType == Byte.class) {
+            return new Byte("1");
         } else if (parameterType == Iterable.class) {
             return Collections.emptyList();
         } else if (parameterType == List.class) {  // TODO: Remove once Lombok is gone

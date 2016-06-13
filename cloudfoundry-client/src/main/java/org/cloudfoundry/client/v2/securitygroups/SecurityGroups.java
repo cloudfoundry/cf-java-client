@@ -73,4 +73,11 @@ public interface SecurityGroups {
      */
     Mono<SetSecurityGroupStagingDefaultResponse> setStagingDefault(SetSecurityGroupStagingDefaultRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_groups/creating_a_security_group.html">Creating a Security Group</a> request.
+     *
+     * @param request the create security group request
+     * @return the response from the create security group request
+     */
+    Mono<CreateSecurityGroupResponse> create(CreateSecurityGroupRequest request);
 }
