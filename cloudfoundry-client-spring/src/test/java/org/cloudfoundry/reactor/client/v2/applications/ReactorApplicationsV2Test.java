@@ -1214,6 +1214,7 @@ public final class ReactorApplicationsV2Test {
             return UpdateApplicationRequest.builder()
                 .applicationId("test-application-id")
                 .name("new_name")
+                .environmentJsons(Collections.emptyMap())
                 .build();
         }
 

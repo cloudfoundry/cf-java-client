@@ -30,6 +30,8 @@ import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
+
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -133,7 +135,7 @@ public class ReactorEnvironmentVariableGroupsTest {
         protected UpdateRunningEnvironmentVariablesResponse getResponse() {
             return UpdateRunningEnvironmentVariablesResponse.builder()
                 .environmentVariable("abc", 123)
-                .environmentVariable("do-re-me", "far-so-la-tee")
+                .environmentVariable("do-re-me", "fa-so-la-tee")
                 .build();
         }
 
@@ -141,7 +143,45 @@ public class ReactorEnvironmentVariableGroupsTest {
         protected UpdateRunningEnvironmentVariablesRequest getValidRequest() throws Exception {
             return UpdateRunningEnvironmentVariablesRequest.builder()
                 .environmentVariable("abc", 123)
-                .environmentVariable("do-re-me", "far-so-la-tee")
+                .environmentVariable("do-re-me", "fa-so-la-tee")
+                .build();
+        }
+
+        @Override
+        protected Mono<UpdateRunningEnvironmentVariablesResponse> invoke(UpdateRunningEnvironmentVariablesRequest request) {
+            return this.environmentVariableGroups.updateRunningEnvironmentVariables(request);
+        }
+    }
+
+    public static final class UpdateRunningEnvironmentVariablesEmpty extends AbstractClientApiTest<UpdateRunningEnvironmentVariablesRequest, UpdateRunningEnvironmentVariablesResponse> {
+
+        private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/config/environment_variable_groups/running")
+                    .payload("fixtures/client/v2/environment_variable_groups/PUT_running_request_empty.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/environment_variable_groups/PUT_running_response_empty.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected UpdateRunningEnvironmentVariablesResponse getResponse() {
+            return UpdateRunningEnvironmentVariablesResponse.builder()
+                .environmentVariables(Collections.emptyMap())
+                .build();
+        }
+
+        @Override
+        protected UpdateRunningEnvironmentVariablesRequest getValidRequest() throws Exception {
+            return UpdateRunningEnvironmentVariablesRequest.builder()
+                .environmentVariables(Collections.emptyMap())
                 .build();
         }
 
@@ -182,6 +222,44 @@ public class ReactorEnvironmentVariableGroupsTest {
             return UpdateStagingEnvironmentVariablesRequest.builder()
                 .environmentVariable("abc", 123)
                 .environmentVariable("do-re-me", "far-so-la-tee")
+                .build();
+        }
+
+        @Override
+        protected Mono<UpdateStagingEnvironmentVariablesResponse> invoke(UpdateStagingEnvironmentVariablesRequest request) {
+            return this.environmentVariableGroups.updateStagingEnvironmentVariables(request);
+        }
+    }
+
+    public static final class UpdateStagingEnvironmentVariablesEmpty extends AbstractClientApiTest<UpdateStagingEnvironmentVariablesRequest, UpdateStagingEnvironmentVariablesResponse> {
+
+        private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/config/environment_variable_groups/staging")
+                    .payload("fixtures/client/v2/environment_variable_groups/PUT_staging_request_empty.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/environment_variable_groups/PUT_staging_response_empty.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected UpdateStagingEnvironmentVariablesResponse getResponse() {
+            return UpdateStagingEnvironmentVariablesResponse.builder()
+                .environmentVariables(Collections.emptyMap())
+                .build();
+        }
+
+        @Override
+        protected UpdateStagingEnvironmentVariablesRequest getValidRequest() throws Exception {
+            return UpdateStagingEnvironmentVariablesRequest.builder()
+                .environmentVariables(Collections.emptyMap())
                 .build();
         }
 

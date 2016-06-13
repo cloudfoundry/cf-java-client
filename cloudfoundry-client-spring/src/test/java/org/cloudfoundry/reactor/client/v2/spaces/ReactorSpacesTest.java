@@ -1943,6 +1943,7 @@ public final class ReactorSpacesTest {
             return UpdateSpaceRequest.builder()
                 .spaceId("test-space-id")
                 .name("New Space Name")
+                .auditorIds(Collections.emptyList())
                 .build();
         }
 

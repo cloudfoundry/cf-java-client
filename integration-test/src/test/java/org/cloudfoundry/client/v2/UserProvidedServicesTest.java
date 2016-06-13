@@ -29,6 +29,7 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.GetUserProvidedSe
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceServiceBindingsRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceResource;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
@@ -38,6 +39,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple3;
 
+import java.util.Collections;
 import java.util.function.Consumer;
 
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
@@ -154,12 +156,27 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
 
         this.spaceId
             .then(spaceId -> getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))
-            .then(instanceId -> this.cloudFoundryClient.userProvidedServiceInstances()
-                .update(UpdateUserProvidedServiceInstanceRequest.builder()
-                    .userProvidedServiceInstanceId(instanceId)
-                    .name(newInstanceName)
-                    .build()))
-            .map(response -> response.getEntity().getName())
+            .then(instanceId -> Mono
+                .when(
+                    Mono.just(instanceId),
+                    this.cloudFoundryClient.userProvidedServiceInstances()
+                        .update(UpdateUserProvidedServiceInstanceRequest.builder()
+                            .userProvidedServiceInstanceId(instanceId)
+                            .name(newInstanceName)
+                            .credential("test-cred", "some value")
+                            .build())
+                        .map(UpdateUserProvidedServiceInstanceResponse::getEntity)
+                ))
+            .then(function((instanceId, entity1) -> Mono
+            .when(
+                Mono.just(entity1),
+                this.cloudFoundryClient.userProvidedServiceInstances()
+                    .update(UpdateUserProvidedServiceInstanceRequest.builder()
+                        .userProvidedServiceInstanceId(instanceId)
+                        .credentials(Collections.emptyMap())
+                        .build())
+                    .map(UpdateUserProvidedServiceInstanceResponse::getEntity)
+            )))
             .subscribe(this.testSubscriber()
                 .assertEquals(newInstanceName));
     }

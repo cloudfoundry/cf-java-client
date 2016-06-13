@@ -49,6 +49,8 @@ import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
+
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
@@ -606,6 +608,7 @@ public final class ReactorServiceInstancesTest {
                 .serviceInstanceId("test-service-instance-id")
                 .servicePlanId("5b5e984f-bbf6-477b-9d3a-b6d5df941b50")
                 .parameter("the_service_broker", "wants this object")
+                .tags(Collections.emptyList())
                 .build();
         }
 
