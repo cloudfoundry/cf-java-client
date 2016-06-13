@@ -16,10 +16,10 @@
 
 package org.cloudfoundry.doppler;
 
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Represents the increment of a counter. It contains only the change in the value; it is the responsibility of downstream consumers to maintain the value of the counter.
@@ -33,7 +33,7 @@ abstract class _CounterEvent implements Event {
         return CounterEvent.builder()
             .delta(dropsonde.delta)
             .name(dropsonde.name)
-            .total(dropsonde.total)
+            .total(Optional.ofNullable(dropsonde.total))
             .build();
     }
 
@@ -50,7 +50,6 @@ abstract class _CounterEvent implements Event {
     /**
      * The total value of the counter. This will be overridden by Metron, which internally tracks the total of each named Counter it receives.
      */
-    @Nullable
-    abstract Long getTotal();
+    abstract Optional<Long> getTotal();
 
 }

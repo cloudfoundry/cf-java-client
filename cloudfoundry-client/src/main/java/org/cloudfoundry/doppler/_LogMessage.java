@@ -16,10 +16,10 @@
 
 package org.cloudfoundry.doppler;
 
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Contains a "log line" and associated metadata.
@@ -31,11 +31,11 @@ abstract class _LogMessage implements Event {
         Objects.requireNonNull(dropsonde, "dropsonde");
 
         return LogMessage.builder()
-            .applicationId(dropsonde.app_id)
+            .applicationId(Optional.ofNullable(dropsonde.app_id))
             .message(dropsonde.message.utf8())
             .messageType(MessageType.from(dropsonde.message_type))
-            .sourceInstance(dropsonde.source_instance)
-            .sourceType(dropsonde.source_type)
+            .sourceInstance(Optional.ofNullable(dropsonde.source_instance))
+            .sourceType(Optional.ofNullable(dropsonde.source_type))
             .timestamp(dropsonde.timestamp)
             .build();
     }
@@ -43,8 +43,7 @@ abstract class _LogMessage implements Event {
     /**
      * The application that emitted the message (or to which the application is related)
      */
-    @Nullable
-    abstract String getApplicationId();
+    abstract Optional<String> getApplicationId();
 
     /**
      * The log message
@@ -59,14 +58,12 @@ abstract class _LogMessage implements Event {
     /**
      * The instance that emitted the message
      */
-    @Nullable
-    abstract String getSourceInstance();
+    abstract Optional<String> getSourceInstance();
 
     /**
      * The source of the message. For Cloud Foundry, this can be {@code APPLICATION}, {@code RTR}, {@code DEA}, {@code STG}, etc.
      */
-    @Nullable
-    abstract String getSourceType();
+    abstract Optional<String> getSourceType();
 
     /**
      * The UNIX timestamp (in nanoseconds) when the log was written

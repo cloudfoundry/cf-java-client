@@ -16,10 +16,10 @@
 
 package org.cloudfoundry.doppler;
 
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -35,7 +35,7 @@ abstract class _HttpStop implements Event {
             .applicationId(UuidUtils.from(dropsonde.applicationId))
             .contentLength(dropsonde.contentLength)
             .peerType(PeerType.from(dropsonde.peerType))
-            .requestId(UuidUtils.from(dropsonde.requestId))
+            .requestId(UuidUtils.from(dropsonde.requestId).orElseThrow(() -> new IllegalStateException("requestId must be specified")))
             .statusCode(dropsonde.statusCode)
             .timestamp(dropsonde.timestamp)
             .uri(dropsonde.uri)
@@ -45,8 +45,7 @@ abstract class _HttpStop implements Event {
     /**
      * The application id
      */
-    @Nullable
-    abstract UUID getApplicationId();
+    abstract Optional<UUID> getApplicationId();
 
     /**
      * The length of the response in bytes

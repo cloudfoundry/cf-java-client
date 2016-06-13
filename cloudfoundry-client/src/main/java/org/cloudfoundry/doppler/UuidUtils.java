@@ -24,10 +24,9 @@ final class UuidUtils {
     private UuidUtils() {
     }
 
-    static UUID from(org.cloudfoundry.dropsonde.events.UUID dropsonde) {
+    static Optional<UUID> from(org.cloudfoundry.dropsonde.events.UUID dropsonde) {
         return Optional.ofNullable(dropsonde)
-            .map(d -> new UUID(d.high, d.low))
-            .orElse(null);
+            .map(d -> new UUID(d.high, d.low));
     }
 
 }
