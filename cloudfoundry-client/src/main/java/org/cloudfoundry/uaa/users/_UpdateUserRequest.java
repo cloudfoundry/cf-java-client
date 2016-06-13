@@ -37,6 +37,17 @@ abstract class _UpdateUserRequest implements Versioned {
     @Override
     public abstract String getVersion();
 
+    @Value.Check
+    void check() {
+        if (getName().getFamilyName() == null || getName().getFamilyName().isEmpty()) {
+            throw new IllegalStateException("Family name must be provided");
+        }
+
+        if (getName().getGivenName() == null || getName().getGivenName().isEmpty()) {
+            throw new IllegalStateException("Given name must be provided");
+        }
+    }
+
     /**
      * Whether the user is active
      */

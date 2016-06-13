@@ -80,4 +80,15 @@ abstract class _CreateUserRequest {
     @Nullable
     abstract Boolean getVerified();
 
+    @Value.Check
+    void check() {
+        if (getName().getFamilyName() == null || getName().getFamilyName().isEmpty()) {
+            throw new IllegalStateException("Family name must be provided");
+        }
+
+        if (getName().getGivenName() == null || getName().getGivenName().isEmpty()) {
+            throw new IllegalStateException("Given name must be provided");
+        }
+    }
+
 }

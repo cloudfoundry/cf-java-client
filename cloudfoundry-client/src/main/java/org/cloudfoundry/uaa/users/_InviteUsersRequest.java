@@ -30,7 +30,7 @@ import java.util.List;
 abstract class _InviteUsersRequest {
 
     /**
-     * The emails to invite
+     * The client registration information
      */
     @Nullable
     @QueryParameter("client_id")

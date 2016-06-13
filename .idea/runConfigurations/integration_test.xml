@@ -25,6 +25,7 @@
       <env name="TEST_USERNAME" value="admin" />
       <env name="TEST_PROTECTED_DOMAIN" value="local.pcfdev.io" />
       <env name="TEST_PROTECTED_ORGANIZATION" value="pcfdev-org" />
+      <env name="TEST_PROTECTED_USERS" value="admin" />
     </envs>
     <patterns />
     <method />

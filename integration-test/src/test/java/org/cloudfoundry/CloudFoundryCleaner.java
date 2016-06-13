@@ -55,6 +55,10 @@ import org.cloudfoundry.client.v3.packages.DeletePackageRequest;
 import org.cloudfoundry.client.v3.packages.ListPackagesRequest;
 import org.cloudfoundry.client.v3.packages.Package;
 import org.cloudfoundry.client.v3.packages.PackageResource;
+import org.cloudfoundry.uaa.UaaClient;
+import org.cloudfoundry.uaa.users.DeleteUserRequest;
+import org.cloudfoundry.uaa.users.ListUsersRequest;
+import org.cloudfoundry.uaa.users.User;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
@@ -103,21 +107,29 @@ final class CloudFoundryCleaner {
 
     private final Mono<List<String>> protectedSpaceIds;
 
-    CloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Mono<List<String>> protectedBuildpackIds, Mono<Optional<String>> protectedDomainId, Mono<List<String>> protectedFeatureFlags,
-                        Mono<Optional<String>> protectedOrganizationId, Mono<List<String>> protectedSpaceIds) {
+    private final Mono<List<String>> protectedUserIds;
+
+    private final UaaClient uaaClient;
+
+    CloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, UaaClient uaaClient, Mono<List<String>> protectedBuildpackIds, Mono<Optional<String>> protectedDomainId,
+                        Mono<List<String>> protectedFeatureFlags, Mono<Optional<String>> protectedOrganizationId, Mono<List<String>> protectedSpaceIds, Mono<List<String>> protectedUserIds) {
 
         this.cloudFoundryClient = cloudFoundryClient;
+        this.uaaClient = uaaClient;
         this.protectedBuildpackIds = protectedBuildpackIds;
         this.protectedDomainId = protectedDomainId;
         this.protectedFeatureFlags = protectedFeatureFlags;
         this.protectedOrganizationId = protectedOrganizationId;
         this.protectedSpaceIds = protectedSpaceIds;
+        this.protectedUserIds = protectedUserIds;
     }
 
     void clean() {
         Mono
-            .when(this.protectedBuildpackIds, this.protectedDomainId, this.protectedOrganizationId, this.protectedSpaceIds, this.protectedFeatureFlags)
-            .flatMap(function((protectedBuildpackIds, protectedDomainId, protectedOrganizationId, protectedSpaceIds, protectedFeatureFlags) -> {
+            .when(this.protectedBuildpackIds, this.protectedDomainId, this.protectedOrganizationId, this.protectedSpaceIds, this.protectedFeatureFlags, this.protectedUserIds)
+            .flatMap(function((protectedBuildpackIds, protectedDomainId, protectedOrganizationId, protectedSpaceIds, protectedFeatureFlags, protectedUserIds) -> {
+
+                System.out.println("*** " + protectedUserIds);
 
                 Predicate<ApplicationResource> applicationV2Predicate = protectedOrganizationId
                     .map(id -> (Predicate<ApplicationResource>) r -> !protectedSpaceIds.contains(ResourceUtils.getEntity(r).getSpaceId()))
@@ -151,6 +163,8 @@ final class CloudFoundryCleaner {
                     .map(id -> (Predicate<OrganizationResource>) r -> !ResourceUtils.getId(r).equals(id))
                     .orElse(r -> true);
 
+                Predicate<User> userPredicate = r -> !protectedUserIds.contains(r.getId());
+
                 return Flux.empty()
                     .thenMany(cleanBuildpacks(this.cloudFoundryClient, buildpackPredicate))
                     .thenMany(cleanFeatureFlags(this.cloudFoundryClient, featureFlagPredicate))
@@ -162,6 +176,7 @@ final class CloudFoundryCleaner {
                     .thenMany(cleanUserProvidedServiceInstances(this.cloudFoundryClient, userProvidedServiceInstancePredicate))
                     .thenMany(cleanDomains(this.cloudFoundryClient, domainPredicate))
                     .thenMany(cleanPrivateDomains(this.cloudFoundryClient, privateDomainPredicate))
+                    .thenMany(cleanUsers(this.uaaClient, userPredicate))
                     .thenMany(cleanSpaces(this.cloudFoundryClient, spacePredicate))
                     .thenMany(cleanOrganizations(this.cloudFoundryClient, organizationPredicate));
             }))
@@ -363,6 +378,22 @@ final class CloudFoundryCleaner {
                 .delete(DeleteUserProvidedServiceInstanceRequest.builder()
                     .userProvidedServiceInstanceId(userProvidedServiceInstanceId)
                     .build()));
+    }
+
+    private static Flux<Void> cleanUsers(UaaClient uaaClient, Predicate<User> predicate) {
+        return uaaClient.users()
+            .list(ListUsersRequest.builder()
+                .count(5_000)
+                .build())
+            .flatMap(response -> Flux.fromIterable(response.getResources()))
+            .filter(predicate)
+            .map(User::getId)
+            .flatMap(userId -> uaaClient.users()
+                .delete(DeleteUserRequest.builder()
+                    .userId(userId)
+                    .version("*")
+                    .build())
+                .then());
     }
 
     private static Flux<Void> removeServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId) {

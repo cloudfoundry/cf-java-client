@@ -21,6 +21,23 @@ import org.junit.Test;
 public final class UpdateUserRequestTest {
 
     @Test(expected = IllegalStateException.class)
+    public void incompleteName() {
+        UpdateUserRequest.builder()
+            .active(true)
+            .email(Email.builder()
+                .primary(true)
+                .value("john.doe@pivotal.io")
+                .build())
+            .id("user-id")
+            .version("*")
+            .name(Name.builder()
+                .givenName("John")
+                .build())
+            .userName("jdoe")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
     public void noId() {
         UpdateUserRequest.builder()
             .active(true)
