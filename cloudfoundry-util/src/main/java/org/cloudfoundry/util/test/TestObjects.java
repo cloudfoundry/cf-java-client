@@ -24,7 +24,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -153,8 +152,6 @@ public abstract class TestObjects {
             return getConfiguredEnum(parameterType);
         } else if (parameterType == Boolean.class) {
             return Boolean.TRUE;
-        } else if (parameterType == Collection.class) {  // TODO: Remove once Lombok is gone
-            return Collections.emptyList();
         } else if (parameterType == Date.class) {
             return new Date(0);
         } else if (parameterType == Double.class) {
@@ -164,8 +161,6 @@ public abstract class TestObjects {
         } else if (parameterType == Integer.class) {
             return 1;
         } else if (parameterType == Iterable.class) {
-            return Collections.emptyList();
-        } else if (parameterType == List.class) {  // TODO: Remove once Lombok is gone
             return Collections.emptyList();
         } else if (parameterType == Long.class) {
             return 1L;

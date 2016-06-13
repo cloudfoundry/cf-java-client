@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 /**
  * A builder for Cloud Foundry V2 filters
  */
-public final class FilterBuilder {  // TODO: reduce visibility once Spring is gone
+final class FilterBuilder {
 
     private FilterBuilder() {
     }

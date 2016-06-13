@@ -40,7 +40,7 @@ public abstract class AbstractTokenKey {
      * The id
      */
     @JsonProperty("kid")
-    @Nullable  // TODO: Remove once all test environments are on UAA 3.3.0 or later
+    @Nullable
     public abstract String getId();
 
     /**
