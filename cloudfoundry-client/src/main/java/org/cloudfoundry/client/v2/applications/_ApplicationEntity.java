@@ -73,6 +73,7 @@ abstract class _ApplicationEntity extends AbstractApplicationEntity {
      * The route mappings url
      */
     @JsonProperty("route_mappings_url")
+    @Nullable
     abstract String getRouteMappingsUrl();
 
     /**
