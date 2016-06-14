@@ -16,27 +16,19 @@
 
 package org.cloudfoundry.uaa.groups;
 
-import reactor.core.publisher.Mono;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.immutables.value.Value;
 
 /**
- * Main entry point to the UAA Group Management Client API
+ * The request payload for the get group
  */
-public interface Groups {
+@Value.Immutable
+abstract class _GetGroupRequest {
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#create57">Create Group</a> request
-     *
-     * @param request the Create Group request
-     * @return the response from the Create Group request
+     * The group id
      */
-    Mono<CreateGroupResponse> create(CreateGroupRequest request);
-
-    /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#retrieve58">Retrieve a Group</a> request
-     *
-     * @param request the Get Group request
-     * @return the response from the Get Group request
-     */
-    Mono<GetGroupResponse> get(GetGroupRequest request);
+    @JsonIgnore
+    abstract String getGroupId();
 
 }

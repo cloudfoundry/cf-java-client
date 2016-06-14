@@ -21,6 +21,8 @@ import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.uaa.groups.CreateGroupRequest;
 import org.cloudfoundry.uaa.groups.CreateGroupResponse;
+import org.cloudfoundry.uaa.groups.GetGroupRequest;
+import org.cloudfoundry.uaa.groups.GetGroupResponse;
 import org.cloudfoundry.uaa.groups.Groups;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
@@ -47,4 +49,9 @@ public class ReactorGroups extends AbstractUaaOperations implements Groups {
         return post(request, CreateGroupResponse.class, builder -> builder.pathSegment("Groups"));
     }
 
+    @Override
+    public Mono<GetGroupResponse> get(GetGroupRequest request) {
+        return get(request, GetGroupResponse.class, builder -> builder.pathSegment("Groups", request.getGroupId()));
+    }
+    
 }

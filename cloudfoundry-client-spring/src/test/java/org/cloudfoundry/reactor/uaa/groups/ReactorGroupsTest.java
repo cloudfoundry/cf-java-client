@@ -23,12 +23,16 @@ import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
 import org.cloudfoundry.uaa.Metadata;
 import org.cloudfoundry.uaa.groups.CreateGroupRequest;
 import org.cloudfoundry.uaa.groups.CreateGroupResponse;
+import org.cloudfoundry.uaa.groups.GetGroupRequest;
+import org.cloudfoundry.uaa.groups.GetGroupResponse;
 import org.cloudfoundry.uaa.groups.Member;
 import org.cloudfoundry.uaa.groups.MemberType;
 import reactor.core.publisher.Mono;
 
+import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 
 public final class ReactorGroupsTest {
@@ -90,6 +94,57 @@ public final class ReactorGroupsTest {
         @Override
         protected Mono<CreateGroupResponse> invoke(CreateGroupRequest request) {
             return this.groups.create(request);
+        }
+    }
+
+    public static final class Get extends AbstractUaaApiTest<GetGroupRequest, GetGroupResponse> {
+
+        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/Groups/test-group-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/groups/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected GetGroupResponse getResponse() {
+            return GetGroupResponse.builder()
+                .id("test-group-id")
+                .metadata(Metadata.builder()
+                    .created("2016-06-03T17:59:30.527Z")
+                    .lastModified("2016-06-03T17:59:30.561Z")
+                    .version(1)
+                    .build())
+                .description("the cool group")
+                .displayName("Cooler Group Name for Retrieve")
+                .member(Member.builder()
+                    .identityProviderOriginKey("uaa")
+                    .type(MemberType.USER)
+                    .value("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
+                    .build())
+                .schema("urn:scim:schemas:core:1.0")
+                .zoneId("uaa")
+                .build();
+        }
+
+        @Override
+        protected GetGroupRequest getValidRequest() throws Exception {
+            return GetGroupRequest.builder()
+                .groupId("test-group-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<GetGroupResponse> invoke(GetGroupRequest request) {
+            return this.groups.get(request);
         }
     }
 
