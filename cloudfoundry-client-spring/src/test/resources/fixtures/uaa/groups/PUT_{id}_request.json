@@ -1,0 +1,11 @@
+{
+  "description": "the cool group",
+  "displayName": "Cooler Group Name for Update",
+  "members": [
+    {
+      "origin": "uaa",
+      "type": "USER",
+      "value": "f0e6a061-6e3a-4be9-ace5-142ee24e20b7"
+    }
+  ]
+}
