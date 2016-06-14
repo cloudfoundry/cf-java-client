@@ -571,6 +571,7 @@ public final class DefaultServicesTest {
                             .type("user_provided_service_instance")
                             .dashboardUrl(null)
                             .name(instanceName1)
+                            .tags(null)
                             .servicePlanId(null)
                             .lastOperation(null)
                             .build())
