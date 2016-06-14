@@ -79,7 +79,7 @@ abstract class AbstractIdentityProvider {
     abstract String getName();
 
     /**
-     * A unique alias for the SAML provider
+     * A unique alias for the provider
      */
     @JsonProperty("originKey")
     abstract String getOriginKey();
