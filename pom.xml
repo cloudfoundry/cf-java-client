@@ -47,7 +47,7 @@
     </modules>
 
     <properties>
-        <immutables.version>2.2.5</immutables.version>
+        <immutables.version>2.2.7-SNAPSHOT</immutables.version>
         <jackson.version>2.7.5</jackson.version>
         <java-semver.version>0.9.0</java-semver.version>
         <jjwt.version>0.6.0</jjwt.version>
@@ -243,6 +243,14 @@
             <id>spring-snapshots</id>
             <name>Spring Snapshots</name>
             <url>http://repo.spring.io/snapshot</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>sonatype-oss-snapshots</id>
+            <name>Sonatype OSS Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
