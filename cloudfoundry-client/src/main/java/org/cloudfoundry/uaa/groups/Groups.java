@@ -39,4 +39,12 @@ public interface Groups {
      */
     Mono<GetGroupResponse> get(GetGroupRequest request);
 
+    /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#update59">Update Group</a> request
+     *
+     * @param request the Update Group request
+     * @return the response from the Update Group request
+     */
+    Mono<UpdateGroupResponse> update(UpdateGroupRequest request);
+
 }
