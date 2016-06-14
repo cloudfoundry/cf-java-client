@@ -14,39 +14,35 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3;
+package org.cloudfoundry.uaa.identityproviders;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * Represents the lifecycle of an application
+ * The payload for lockout policy in internal identity provider management {@link InternalConfiguration}
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _Lifecycle {
+abstract class _LockoutPolicy {
 
     /**
-     * The datas
+     * Number of seconds to lock out an account when lockoutAfterFailures failures is exceeded (defaults to 300).
      */
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "type")
-    @JsonSubTypes({
-        @JsonSubTypes.Type(name = "buildpack", value = BuildpackData.class),
-        @JsonSubTypes.Type(name = "docker", value = DockerData.class)
-    })
-    @JsonProperty("data")
-    @Nullable
-    abstract Data getData();
+    @JsonProperty("countFailuresWithin")
+    abstract Integer getLockAccountPeriodInSecond();
 
     /**
-     * The type
+     * Number of seconds in which lockoutAfterFailures failures must occur in order for account to be locked (defaults to 3600).
      */
-    @JsonProperty("type")
-    @Nullable
-    abstract Type getType();
+    @JsonProperty("lockoutPeriodSeconds")
+    abstract Integer getLockoutPeriodInSecond();
+
+    /**
+     * Number of allowed failures before account is locked (defaults to 5).
+     */
+    @JsonProperty("lockoutAfterFailures")
+    abstract Integer getNumberOfAllowedFailures();
 
 }

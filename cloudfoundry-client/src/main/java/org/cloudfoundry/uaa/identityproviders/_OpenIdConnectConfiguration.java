@@ -14,39 +14,25 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3;
+package org.cloudfoundry.uaa.identityproviders;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * Represents the lifecycle of an application
+ * The payload for the OpenId Connect (oidc) identity provider configuration
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _Lifecycle {
+abstract class _OpenIdConnectConfiguration extends AbstractAuthenticationConfiguration {
 
     /**
-     * The datas
+     * The Open Id user info endpoint URL. Reserved for future OIDC  use.
      */
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "type")
-    @JsonSubTypes({
-        @JsonSubTypes.Type(name = "buildpack", value = BuildpackData.class),
-        @JsonSubTypes.Type(name = "docker", value = DockerData.class)
-    })
-    @JsonProperty("data")
+    @JsonProperty("userInfoUrl")
     @Nullable
-    abstract Data getData();
-
-    /**
-     * The type
-     */
-    @JsonProperty("type")
-    @Nullable
-    abstract Type getType();
+    abstract String getUserInfoUrl();
 
 }

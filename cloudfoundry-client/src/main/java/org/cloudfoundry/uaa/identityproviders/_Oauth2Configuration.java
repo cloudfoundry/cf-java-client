@@ -14,39 +14,25 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3;
+package org.cloudfoundry.uaa.identityproviders;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * Represents the lifecycle of an application
+ * The payload for the oauth2 identity provider configuration
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _Lifecycle {
+abstract class _Oauth2Configuration extends AbstractAuthenticationConfiguration {
 
     /**
-     * The datas
+     * The OAuth check token endpoint URL. Reserved for future OAuth use.
      */
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "type")
-    @JsonSubTypes({
-        @JsonSubTypes.Type(name = "buildpack", value = BuildpackData.class),
-        @JsonSubTypes.Type(name = "docker", value = DockerData.class)
-    })
-    @JsonProperty("data")
+    @JsonProperty("checkTokenUrl")
     @Nullable
-    abstract Data getData();
-
-    /**
-     * The type
-     */
-    @JsonProperty("type")
-    @Nullable
-    abstract Type getType();
+    abstract String getCheckTokenUrl();
 
 }

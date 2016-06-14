@@ -14,39 +14,49 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3;
+package org.cloudfoundry.uaa.identityproviders;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.uaa.IdentityZoned;
 import org.immutables.value.Value;
 
 /**
- * Represents the lifecycle of an application
+ * The request payload for the create identity provider
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class _Lifecycle {
+abstract class _CreateIdentityProviderRequest implements IdentityZoned {
 
     /**
-     * The datas
+     * Whether the identity provider is active
      */
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "type")
-    @JsonSubTypes({
-        @JsonSubTypes.Type(name = "buildpack", value = BuildpackData.class),
-        @JsonSubTypes.Type(name = "docker", value = DockerData.class)
-    })
-    @JsonProperty("data")
+    @JsonProperty("active")
     @Nullable
-    abstract Data getData();
+    abstract Boolean getActive();
 
     /**
-     * The type
+     * The configuration of this identity provider according to its type.
+     */
+    @JsonProperty("config")
+    @Nullable
+    abstract IdentityProviderConfiguration getConfiguration();
+
+    /**
+     * Human-readable name for this provider
+     */
+    @JsonProperty("name")
+    abstract String getName();
+
+    /**
+     * A unique alias for the provider
+     */
+    @JsonProperty("originKey")
+    abstract String getOriginKey();
+
+    /**
+     * The type of the identity provider.
      */
     @JsonProperty("type")
-    @Nullable
     abstract Type getType();
 
 }
