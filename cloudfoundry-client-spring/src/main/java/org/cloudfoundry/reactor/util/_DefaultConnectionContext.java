@@ -36,6 +36,10 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
 
     private static final int DEFAULT_PORT = 443;
 
+    private static final int RECEIVE_BUFFER_SIZE = 10 * 1024 * 1024;
+
+    private static final int SEND_BUFFER_SIZE = 10 * 1024 * 1024;
+
     private static final int UNDEFINED_PORT = -1;
 
     public abstract AuthorizationProvider getAuthorizationProvider();
@@ -54,6 +58,8 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     public HttpClient getHttpClient() {
         return HttpClient.create(HttpClientOptions.create()
             .sslSupport()
+            .sndbuf(SEND_BUFFER_SIZE)
+            .rcvbuf(RECEIVE_BUFFER_SIZE)
             .pipelineConfigurer(pipeline -> getProxyContext().getHttpProxyHandler().ifPresent(handler -> pipeline.addBefore(SslHandler, null, handler)))
             .sslConfigurer(ssl -> getSslCertificateTruster().ifPresent(trustManager -> ssl.trustManager(new StaticTrustManagerFactory(trustManager)))));
     }
