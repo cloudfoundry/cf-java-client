@@ -32,6 +32,14 @@ public interface Groups {
     Mono<CreateGroupResponse> create(CreateGroupRequest request);
 
     /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#delete60">Delete a Group</a> request
+     *
+     * @param request the Delete Group request
+     * @return the response from the Delete Group request
+     */
+    Mono<DeleteGroupResponse> delete(DeleteGroupRequest request);
+
+    /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#retrieve58">Retrieve a Group</a> request
      *
      * @param request the Get Group request
