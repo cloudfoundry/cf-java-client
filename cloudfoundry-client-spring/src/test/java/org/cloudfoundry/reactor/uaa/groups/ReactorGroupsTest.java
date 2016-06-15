@@ -23,6 +23,8 @@ import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
 import org.cloudfoundry.uaa.Metadata;
 import org.cloudfoundry.uaa.groups.CreateGroupRequest;
 import org.cloudfoundry.uaa.groups.CreateGroupResponse;
+import org.cloudfoundry.uaa.groups.DeleteGroupRequest;
+import org.cloudfoundry.uaa.groups.DeleteGroupResponse;
 import org.cloudfoundry.uaa.groups.GetGroupRequest;
 import org.cloudfoundry.uaa.groups.GetGroupResponse;
 import org.cloudfoundry.uaa.groups.Member;
@@ -31,6 +33,7 @@ import org.cloudfoundry.uaa.groups.UpdateGroupRequest;
 import org.cloudfoundry.uaa.groups.UpdateGroupResponse;
 import reactor.core.publisher.Mono;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
@@ -97,6 +100,59 @@ public final class ReactorGroupsTest {
         @Override
         protected Mono<CreateGroupResponse> invoke(CreateGroupRequest request) {
             return this.groups.create(request);
+        }
+    }
+
+    public static final class Delete extends AbstractUaaApiTest<DeleteGroupRequest, DeleteGroupResponse> {
+
+        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .header("If-Match", "*")
+                    .method(DELETE).path("/Groups/test-group-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/groups/DELETE_{id}_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected DeleteGroupResponse getResponse() {
+            return DeleteGroupResponse.builder()
+                .id("test-group-id")
+                .metadata(Metadata.builder()
+                    .created("2016-06-03T17:59:30.527Z")
+                    .lastModified("2016-06-03T17:59:30.561Z")
+                    .version(1)
+                    .build())
+                .description("the cool group")
+                .displayName("Cooler Group Name for Delete")
+                .member(Member.builder()
+                    .identityProviderOriginKey("uaa")
+                    .type(MemberType.USER)
+                    .value("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
+                    .build())
+                .schema("urn:scim:schemas:core:1.0")
+                .zoneId("uaa")
+                .build();
+        }
+
+        @Override
+        protected DeleteGroupRequest getValidRequest() throws Exception {
+            return DeleteGroupRequest.builder()
+                .groupId("test-group-id")
+                .version("*")
+                .build();
+        }
+
+        @Override
+        protected Mono<DeleteGroupResponse> invoke(DeleteGroupRequest request) {
+            return this.groups.delete(request);
         }
     }
 
