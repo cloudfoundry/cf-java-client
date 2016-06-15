@@ -32,6 +32,6 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.projectlombok:lombok:1.16.8" level="project" />
     <orderEntry type="library" name="Maven: io.projectreactor:reactor-core:2.5.0.M4" level="project" />
     <orderEntry type="library" name="Maven: org.reactivestreams:reactive-streams:1.0.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.immutables:value:2.2.5" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.immutables:value:2.2.7-SNAPSHOT" level="project" />
   </component>
 </module>
