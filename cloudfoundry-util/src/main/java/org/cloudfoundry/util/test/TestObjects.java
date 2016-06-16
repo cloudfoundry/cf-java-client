@@ -30,22 +30,38 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
- * {@code TestObjects} provides a utility which calls setters of an object of {@code *Builder} type and returns the resulting builder object.
+ * {@code TestObjects} provides a generic utility which transforms a builder object of type {@code T}, by calling its configuration methods with default values.
  * <p>
- * The exported static methods are {@link #fill &lt;T&gt;fill(T,String)} The {@code T} argument is a builder object, and the {@code String} is a <i>modifier</i> which is used to augment the {@code
- * String} values set. {@code fill(b)} is equivalent to {@code fill(b,"")} and {@code fillPage(b)} is equivalent to {@code fillPage(b,"")}.
+ * A <i>builder object</i> of type <b>T</b> is an object with a {@code build()} method returning a <i>built object</i> whose type has a {@code builder} of type <b>T</b>.
  * <p>
- * {@code TestObjects} is designed to populate builder objects with test values. Object setters are called with standard values based upon the parameter type and the name of the setter method. Setters
- * which take collections are ignored.
- * <ul> <li>{@link String} types are set to {@code "test-"+modifier+settername}, where {@code modifier} is supplied on the call {@code fill(b,modifier)} or {@code fillPage(b,modifier)}.</li>
- * <li>{@link Boolean} types are set to {@code true}.</li> <li>{@link Integer} or {@link Long} types are set to {@code 1}.</li> <li>{@link Float} or {@link Double} types are set to {@code 1.0}.</li>
- * <li>Types with names ending in {@code Entity} or {@code Metadata}<sup>1</sup> are recursively filled, using {@link #fill fill(builder-of-type, modifier)}, if their builder types can be found.</li>
+ * A <i>built object</i> of type <b>B</b> is an object with a {@code builder()} method returning a <i>builder object</i> which builds type <b>B</b>.
+ * <p>
+ * The exported static methods are {@link #fill T fill(T, String)} and {@link #fill T fill(T)}. The {@code T} argument must be an object of builder type (which is returned as result), 
+ * and the {@code String} is a <i>modifier</i> which is used to augment the {@code String} values set.  The modifier must not be {@code null}.
+ * <p>
+ * {@code fill(b)} is equivalent to {@code fill(b, "")}.
+ * <p>
+ * {@code TestObjects} populates builder objects with test values. Builder setter methods are called with standard values based upon the parameter type and the name of the setter method.
+ * <ul> 
+ *      <li>{@code enum} types are set to the first enumerated constant value.</li> 
+ *      <li>{@link Boolean} types are set to {@code true}.</li> 
+ *      <li>{@link Date} types are set to {@code new Date(0)}.</li> 
+ *      <li>{@link Double} types are set to {@code 1.0}.</li> 
+ *      <li>{@link Duration} types are set to a duration of 15 seconds.</li> 
+ *      <li>{@link Integer} or {@link Long} types are set to {@code 1}.</li> 
+ *      <li>{@link Iterable} types are set to empty.</li> 
+ *      <li>{@link Map} types are set to empty.</li> 
+ *      <li>{@link String} types are set to {@code "test-"+modifier+settername}.</li> 
+ *      <li>Types of <i>built objects</i> are set to a value built from a (recursively) {@code fill()}ed builder instance.</li> 
  * </ul>
  * <p>
- * <sup>1</sup>These special cases make the {@code TestObjects} class specific to v2 CloudFoundry REST api interfaces.
+ * Only public, chainable, single-parameter setter methods which have a corresponding getter (on the type built) are configured.
+ * <p>
+ * Non-builder objects, or builder objects that build {@code *Request} types, are rejected (by assertion failure).
  */
 public abstract class TestObjects {
 
@@ -81,9 +97,10 @@ public abstract class TestObjects {
 
     private static <T> T fill(T builder, Optional<String> modifier) {
         Class<?> builderType = builder.getClass();
+        Assert.assertTrue(String.format("Cannot fill type %s", builderType.getName()), isBuilderType(builderType));
         Assert.assertFalse("Do not fill Request types", buildsRequestType(builderType));
 
-        List<Method> builderMethods = getBuilderMethods(builderType);
+        List<Method> builderMethods = getMethods(builderType);
         Set<String> builtGetters = getBuiltGetters(builderType);
 
         return getConfigurationMethods(builderType, builderMethods, builtGetters).stream()
@@ -91,16 +108,12 @@ public abstract class TestObjects {
             });
     }
 
-    private static Method getBuildMethod(Class<?> builderType) {
-        return ReflectionUtils.findMethod(builderType, "build");
-    }
-
     private static Method getBuilderMethod(Class<?> builderType) {
         return ReflectionUtils.findMethod(builderType, "builder");
     }
 
-    private static List<Method> getBuilderMethods(Class<?> builderType) {
-        return Arrays.asList(ReflectionUtils.getUniqueDeclaredMethods(builderType));
+    private static Method getBuildMethod(Class<?> builderType) {
+        return ReflectionUtils.findMethod(builderType, "build");
     }
 
     private static Set<String> getBuiltGetters(Class<?> builderType) {
@@ -118,14 +131,14 @@ public abstract class TestObjects {
     private static List<Method> getConfigurationMethods(Class<?> builderType, List<Method> builderMethods, Set<String> builtGetters) {
         return builderMethods.stream()
             .filter(TestObjects::isPublic)
-            .filter(method -> returnsBuilder(method, builderType))
+            .filter(returnsThisType(builderType))
             .filter(TestObjects::hasSingleParameter)
             .filter(method -> hasMatchingGetter(method, builtGetters))
             .collect(Collectors.toList());
     }
 
-    private static Object getConfiguredBuilder(Method builderMethod, Optional<String> modifier) {
-        Object builder = ReflectionUtils.invokeMethod(builderMethod, null);
+    private static Object getConfiguredBuilder(Class<?> parameterType, Optional<String> modifier) {
+        Object builder = ReflectionUtils.invokeMethod(getBuilderMethod(parameterType), null);
         Method buildMethod = getBuildMethod(builder.getClass());
 
         return ReflectionUtils.invokeMethod(buildMethod, fill(builder, modifier));
@@ -144,10 +157,9 @@ public abstract class TestObjects {
     @SuppressWarnings("unchecked")
     private static Object getConfiguredValue(Method configurationMethod, Optional<String> modifier) {
         Class<?> parameterType = getParameter(configurationMethod).getType();
-        Method builderMethod = getBuilderMethod(parameterType);
 
-        if (builderMethod != null) {
-            return getConfiguredBuilder(builderMethod, modifier);
+        if (isBuiltType(parameterType)) {
+            return getConfiguredBuilder(parameterType, modifier);
         } else if (Enum.class.isAssignableFrom(parameterType)) {
             return getConfiguredEnum(parameterType);
         } else if (parameterType == Boolean.class) {
@@ -173,6 +185,10 @@ public abstract class TestObjects {
         }
     }
 
+    private static List<Method> getMethods(Class<?> builderType) {
+        return Arrays.asList(ReflectionUtils.getUniqueDeclaredMethods(builderType));
+    }
+
     private static Parameter getParameter(Method method) {
         return method.getParameters()[0];
     }
@@ -187,12 +203,30 @@ public abstract class TestObjects {
         return 1 == method.getParameterCount();
     }
 
+    private static boolean isBuilderType(Class<?> aType) {
+        return Optional.ofNullable(getBuildMethod(aType))
+            .map(Method::getReturnType)
+            .map(TestObjects::getBuilderMethod)
+            .map(Method::getReturnType)
+            .map(aType::equals)
+            .orElse(false);
+    }
+
+    private static boolean isBuiltType(Class<?> aType) {
+        return Optional.ofNullable(getBuilderMethod(aType))
+            .map(Method::getReturnType)
+            .map(TestObjects::getBuildMethod)
+            .map(Method::getReturnType)
+            .map(aType::equals)
+            .orElse(false);
+    }
+
     private static boolean isPublic(Method method) {
         return Modifier.isPublic(method.getModifiers());
     }
 
-    private static boolean returnsBuilder(Method method, Class<?> builderType) {
-        return builderType == method.getReturnType();
+    private static Predicate<Method> returnsThisType(Class<?> aType) {
+        return method -> aType == method.getReturnType();
     }
 
 }
