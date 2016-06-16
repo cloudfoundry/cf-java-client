@@ -27,6 +27,9 @@ import org.cloudfoundry.uaa.groups.DeleteGroupRequest;
 import org.cloudfoundry.uaa.groups.DeleteGroupResponse;
 import org.cloudfoundry.uaa.groups.GetGroupRequest;
 import org.cloudfoundry.uaa.groups.GetGroupResponse;
+import org.cloudfoundry.uaa.groups.Group;
+import org.cloudfoundry.uaa.groups.ListGroupsRequest;
+import org.cloudfoundry.uaa.groups.ListGroupsResponse;
 import org.cloudfoundry.uaa.groups.Member;
 import org.cloudfoundry.uaa.groups.MemberType;
 import org.cloudfoundry.uaa.groups.UpdateGroupRequest;
@@ -39,6 +42,7 @@ import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.cloudfoundry.uaa.SortOrder.ASCENDING;
 
 
 public final class ReactorGroupsTest {
@@ -204,6 +208,70 @@ public final class ReactorGroupsTest {
         @Override
         protected Mono<GetGroupResponse> invoke(GetGroupRequest request) {
             return this.groups.get(request);
+        }
+    }
+
+    public static final class List extends AbstractUaaApiTest<ListGroupsRequest, ListGroupsResponse> {
+
+        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET)
+                    .path("/Groups?count=50&filter=id%2Beq%2B%22f87c557a-8ddc-43d3-98fb-e420ebc7f0f1%22%2Bor%2BdisplayName%2Beq%2B%22Cooler%20Group%20Name%20for%20List%22" +
+                        "&sortBy=email&sortOrder=ascending&startIndex=1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/groups/GET_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListGroupsResponse getResponse() {
+            return ListGroupsResponse.builder()
+                .resource(Group.builder()
+                    .id("f87c557a-8ddc-43d3-98fb-e420ebc7f0f1")
+                    .metadata(Metadata.builder()
+                        .created("2016-06-16T00:01:41.692Z")
+                        .lastModified("2016-06-16T00:01:41.728Z")
+                        .version(1)
+                        .build())
+                    .description("the cool group")
+                    .displayName("Cooler Group Name for List")
+                    .member(Member.builder()
+                        .identityProviderOriginKey("uaa")
+                        .type(MemberType.USER)
+                        .value("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+                        .build())
+                    .schema("urn:scim:schemas:core:1.0")
+                    .zoneId("uaa")
+                    .build()
+                )
+                .startIndex(1)
+                .itemsPerPage(50)
+                .totalResults(1)
+                .schema("urn:scim:schemas:core:1.0")
+                .build();
+        }
+
+        @Override
+        protected ListGroupsRequest getValidRequest() throws Exception {
+            return ListGroupsRequest.builder()
+                .filter("id+eq+\"f87c557a-8ddc-43d3-98fb-e420ebc7f0f1\"+or+displayName+eq+\"Cooler Group Name for List\"")
+                .count(50)
+                .startIndex(1)
+                .sortBy("email")
+                .sortOrder(ASCENDING)
+                .build();
+        }
+
+        @Override
+        protected Mono<ListGroupsResponse> invoke(ListGroupsRequest request) {
+            return this.groups.list(request);
         }
     }
 
