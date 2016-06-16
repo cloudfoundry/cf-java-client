@@ -26,6 +26,8 @@ import org.cloudfoundry.uaa.groups.DeleteGroupResponse;
 import org.cloudfoundry.uaa.groups.GetGroupRequest;
 import org.cloudfoundry.uaa.groups.GetGroupResponse;
 import org.cloudfoundry.uaa.groups.Groups;
+import org.cloudfoundry.uaa.groups.ListGroupsRequest;
+import org.cloudfoundry.uaa.groups.ListGroupsResponse;
 import org.cloudfoundry.uaa.groups.UpdateGroupRequest;
 import org.cloudfoundry.uaa.groups.UpdateGroupResponse;
 import reactor.core.publisher.Mono;
@@ -61,6 +63,11 @@ public class ReactorGroups extends AbstractUaaOperations implements Groups {
     @Override
     public Mono<GetGroupResponse> get(GetGroupRequest request) {
         return get(request, GetGroupResponse.class, builder -> builder.pathSegment("Groups", request.getGroupId()));
+    }
+
+    @Override
+    public Mono<ListGroupsResponse> list(ListGroupsRequest request) {
+        return get(request, ListGroupsResponse.class, builder -> builder.pathSegment("Groups"));
     }
 
     @Override
