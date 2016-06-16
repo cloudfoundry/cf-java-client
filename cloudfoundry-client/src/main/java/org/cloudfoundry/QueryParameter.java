@@ -34,10 +34,16 @@ import java.lang.annotation.Target;
 public @interface QueryParameter {
 
     /**
+     * Returns the delimiter to use between Iterable elements
+     *
+     * @return the delimiter to use between Iterable elements
+     */
+    String delimiter() default ",";
+
+    /**
      * Returns the name of the query parameter
      *
      * @return the name of the query parameter
      */
     String value();
-
 }

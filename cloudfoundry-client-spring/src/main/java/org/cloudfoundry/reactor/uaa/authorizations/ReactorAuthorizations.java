@@ -20,11 +20,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.util.AsciiString;
 import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
+import org.cloudfoundry.uaa.ResponseType;
 import org.cloudfoundry.uaa.authorizations.Authorizations;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
+import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantBrowserRequest;
+import org.cloudfoundry.util.ExceptionUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
+
+import java.util.Optional;
 
 /**
  * The Reactor-based implementation of {@link Authorizations}
@@ -47,9 +52,21 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
 
     @Override
     public Mono<String> authorizeByAuthorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest request) {
-        return get(request, builder -> builder.pathSegment("oauth", "authorize"))
+        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE))
             .map(inbound -> inbound.responseHeaders().get(LOCATION))
-            .map(location -> UriComponentsBuilder.fromUriString(location).build().getQueryParams().getFirst("code"));
+            .then(location -> extractParameterFromLocation(location, "code"));
     }
 
+    @Override
+    public Mono<String> authorizeByAuthorizationCodeGrantBrowser(AuthorizeByAuthorizationCodeGrantBrowserRequest request) {
+        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE))
+            .map(inbound -> inbound.responseHeaders().get(LOCATION))
+            .then(location -> extractParameterFromLocation(location, "code"));
+    }
+
+    private static Mono<String> extractParameterFromLocation(String location, String parameter) {
+        return Optional.ofNullable(UriComponentsBuilder.fromUriString(location).build().getQueryParams().getFirst(parameter))
+            .map(parameterValue -> Mono.just(parameterValue))
+            .orElse(ExceptionUtils.illegalState(String.format("Parameter %s not found in location", parameter)));
+    }
 }

@@ -20,11 +20,13 @@ import org.cloudfoundry.Nullable;
 import org.cloudfoundry.QueryParameter;
 import org.immutables.value.Value;
 
+import java.util.List;
+
 /**
  * The request payload for authorization with an authorization code grant operation
  */
 @Value.Immutable
-abstract class _AuthorizeByAuthorizationCodeGrantApiRequest {
+abstract class _AuthorizeByAuthorizationCodeGrantBrowserRequest {
 
     /**
      * A unique string representing the registration information provided by the client
@@ -40,10 +42,10 @@ abstract class _AuthorizeByAuthorizationCodeGrantApiRequest {
     abstract String getRedirectUri();
 
     /**
-     * Any random string to be returned in the Location header as a query parameter, used to achieve per-request customization
+     * requested scopes, space-delimited
      */
     @Nullable
-    @QueryParameter("state")
-    abstract String getState();
+    @QueryParameter(value = "scope", delimiter = " ")
+    abstract List<String> getScopes();
 
 }

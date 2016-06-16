@@ -18,28 +18,28 @@ package org.cloudfoundry.uaa.authorizations;
 
 import org.junit.Test;
 
-public final class AuthorizeByAuthorizationCodeGrantApiRequestTest {
+public final class AuthorizeByAuthorizationCodeGrantBrowserRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noClientId() {
-        AuthorizeByAuthorizationCodeGrantApiRequest.builder()
+        AuthorizeByAuthorizationCodeGrantBrowserRequest.builder()
+            .scope("test-scope")
             .redirectUri("test-redirect-uri")
-            .state("test-state")
             .build();
     }
 
     @Test
     public void validMax() {
-        AuthorizeByAuthorizationCodeGrantApiRequest.builder()
+        AuthorizeByAuthorizationCodeGrantBrowserRequest.builder()
             .clientId("test-client-id")
+            .scope("test-scope")
             .redirectUri("test-redirect-uri")
-            .state("test-state")
             .build();
     }
 
     @Test
     public void validMin() {
-        AuthorizeByAuthorizationCodeGrantApiRequest.builder()
+        AuthorizeByAuthorizationCodeGrantBrowserRequest.builder()
             .clientId("test-client-id")
             .build();
     }

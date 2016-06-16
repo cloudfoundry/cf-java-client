@@ -58,7 +58,7 @@ public final class QueryBuilder {
                 if (value instanceof Collection) {
                     builder.queryParam(queryParameter.value(), ((Collection<?>) value).stream()
                         .map(Object::toString)
-                        .collect(Collectors.joining(",")));
+                        .collect(Collectors.joining(queryParameter.delimiter())));
                 } else {
                     builder.queryParam(queryParameter.value(), value);
                 }
