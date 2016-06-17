@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.authorizations;
+package org.cloudfoundry.uaa;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -23,7 +23,11 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum ResponseType {
 
-    CODE("code");
+    CODE("code"),
+
+    TOKEN("token"),
+
+    ID_TOKEN("id_token");
 
     private final String value;
 

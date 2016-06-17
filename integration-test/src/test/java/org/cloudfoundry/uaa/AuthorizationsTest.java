@@ -18,7 +18,7 @@ package org.cloudfoundry.uaa;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
-import org.cloudfoundry.uaa.authorizations.ResponseType;
+import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantBrowserRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -35,7 +35,19 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
         this.uaaClient.authorizations()
             .authorizeByAuthorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest.builder()
                 .clientId("ssh-proxy")
-                .responseType(ResponseType.CODE)
+                .build())
+            .subscribe(this.<String>testSubscriber()
+                .assertThat(code -> {
+                    assertNotNull(code);
+                    assertTrue(code.length() == 6);
+                }));
+    }
+
+    @Test
+    public void authorizeByAuthorizationCodeGrantBrowser() {
+        this.uaaClient.authorizations()
+            .authorizeByAuthorizationCodeGrantBrowser(AuthorizeByAuthorizationCodeGrantBrowserRequest.builder()
+                .clientId("ssh-proxy")
                 .build())
             .subscribe(this.<String>testSubscriber()
                 .assertThat(code -> {

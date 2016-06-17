@@ -21,6 +21,9 @@ import org.junit.Test;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 
 public final class QueryBuilderTest {
@@ -32,9 +35,10 @@ public final class QueryBuilderTest {
         QueryBuilder.augment(builder, new StubQueryParamsSubClass());
 
         MultiValueMap<String, String> queryParams = builder.build().getQueryParams();
-        assertEquals(2, queryParams.size());
-        assertEquals("test-value-1", queryParams.getFirst("test-parameter-1"));
+        assertEquals(3, queryParams.size());
+        assertEquals("test-value-1,test-value-2", queryParams.getFirst("test-parameter-1"));
         assertEquals("test-value-3", queryParams.getFirst("test-parameter-3"));
+        assertEquals("test-value-4 test-value-5", queryParams.getFirst("test-parameter-4"));
     }
 
     private static abstract class StubQueryParams {
@@ -45,8 +49,8 @@ public final class QueryBuilderTest {
         }
 
         @QueryParameter("test-parameter-1")
-        final String getParameter1() {
-            return "test-value-1";
+        final List<String> getParameter1() {
+            return Arrays.asList("test-value-1", "test-value-2");
         }
 
     }
@@ -58,6 +62,10 @@ public final class QueryBuilderTest {
             return "test-value-3";
         }
 
+        @QueryParameter(value = "test-parameter-4", delimiter = " ")
+        List<String> getParameter4() {
+            return Arrays.asList("test-value-4", "test-value-5");
+        }
     }
 
 }

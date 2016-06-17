@@ -19,6 +19,7 @@ package org.cloudfoundry.reactor.uaa.tokens;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
+import org.cloudfoundry.uaa.ResponseType;
 import org.cloudfoundry.uaa.tokens.CheckTokenRequest;
 import org.cloudfoundry.uaa.tokens.CheckTokenResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeRequest;
@@ -64,29 +65,31 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
     @Override
     public Mono<GetTokenByAuthorizationCodeResponse> getByAuthorizationCode(GetTokenByAuthorizationCodeRequest request) {
         return postForm(request, GetTokenByAuthorizationCodeResponse.class,
-            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "authorization_code").queryParam("response_type", "token"));
+            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "authorization_code").queryParam("response_type", ResponseType.TOKEN));
     }
 
     @Override
     public Mono<GetTokenByClientCredentialsResponse> getByClientCredentials(GetTokenByClientCredentialsRequest request) {
         return postForm(request, GetTokenByClientCredentialsResponse.class,
-            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "client_credentials").queryParam("response_type", "token"));
+            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "client_credentials").queryParam("response_type", ResponseType.TOKEN));
     }
 
     @Override
     public Mono<GetTokenByOneTimePasscodeResponse> getByOneTimePasscode(GetTokenByOneTimePasscodeRequest request) {
-        return postForm(request, GetTokenByOneTimePasscodeResponse.class, builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "password").queryParam("response_type", "token"));
+        return postForm(request, GetTokenByOneTimePasscodeResponse.class,
+            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "password").queryParam("response_type", ResponseType.TOKEN));
     }
 
     @Override
     public Mono<GetTokenByOpenIdResponse> getByOpenId(GetTokenByOpenIdRequest request) {
         return postForm(request, GetTokenByOpenIdResponse.class,
-            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "authorization_code").queryParam("response_type", "id_token"));
+            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "authorization_code").queryParam("response_type", ResponseType.ID_TOKEN));
     }
 
     @Override
     public Mono<GetTokenByPasswordResponse> getByPassword(GetTokenByPasswordRequest request) {
-        return postForm(request, GetTokenByPasswordResponse.class, builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "password").queryParam("response_type", "token"));
+        return postForm(request, GetTokenByPasswordResponse.class,
+            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "password").queryParam("response_type", ResponseType.TOKEN));
     }
 
     @Override

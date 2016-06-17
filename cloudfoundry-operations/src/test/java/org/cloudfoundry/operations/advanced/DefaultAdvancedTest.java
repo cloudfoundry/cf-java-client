@@ -19,7 +19,6 @@ package org.cloudfoundry.operations.advanced;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
-import org.cloudfoundry.uaa.authorizations.ResponseType;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import reactor.core.publisher.Mono;
@@ -33,7 +32,6 @@ public final class DefaultAdvancedTest {
         when(uaaClient.authorizations()
             .authorizeByAuthorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest.builder()
                 .clientId("ssh-proxy")
-                .responseType(ResponseType.CODE)
                 .build()))
             .thenReturn(Mono.just("test-code"));
     }

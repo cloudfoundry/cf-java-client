@@ -21,7 +21,7 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
-import org.cloudfoundry.uaa.authorizations.ResponseType;
+import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantBrowserRequest;
 import reactor.core.publisher.Mono;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -37,7 +37,7 @@ public final class ReactorAuthorizationsTest {
         protected InteractionContext getInteractionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
-                    .method(GET).path("/oauth/authorize?client_id=login&redirect_uri=https://uaa.cloudfoundry.com/redirect/cf&response_type=code&state=v4LpFF")
+                    .method(GET).path("/oauth/authorize?client_id=login&redirect_uri=https://uaa.cloudfoundry.com/redirect/cf&state=v4LpFF&response_type=code")
                     .build())
                 .response(TestResponse.builder()
                     .status(FOUND)
@@ -54,7 +54,6 @@ public final class ReactorAuthorizationsTest {
         @Override
         protected AuthorizeByAuthorizationCodeGrantApiRequest getValidRequest() throws Exception {
             return AuthorizeByAuthorizationCodeGrantApiRequest.builder()
-                .responseType(ResponseType.CODE)
                 .clientId("login")
                 .redirectUri("https://uaa.cloudfoundry.com/redirect/cf")
                 .state("v4LpFF")
@@ -64,6 +63,44 @@ public final class ReactorAuthorizationsTest {
         @Override
         protected Mono<String> invoke(AuthorizeByAuthorizationCodeGrantApiRequest request) {
             return this.authorizations.authorizeByAuthorizationCodeGrantApi(request);
+        }
+    }
+
+    public static final class AuthorizeByAuthorizationCodeGrantBrowser extends AbstractUaaApiTest<AuthorizeByAuthorizationCodeGrantBrowserRequest, String> {
+
+        private final ReactorAuthorizations authorizations = new ReactorAuthorizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/oauth/authorize?client_id=login&redirect_uri=https://uaa.cloudfoundry.com/redirect/cf&scope=openid%20oauth.approvals&response_type=code")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(FOUND)
+                    .header("Location", "http://redirect.to/app?code=JuEj0D")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected String getResponse() {
+            return "JuEj0D";
+        }
+
+        @Override
+        protected AuthorizeByAuthorizationCodeGrantBrowserRequest getValidRequest() throws Exception {
+            return AuthorizeByAuthorizationCodeGrantBrowserRequest.builder()
+                .clientId("login")
+                .redirectUri("https://uaa.cloudfoundry.com/redirect/cf")
+                .scope("openid")
+                .scope("oauth.approvals")
+                .build();
+        }
+
+        @Override
+        protected Mono<String> invoke(AuthorizeByAuthorizationCodeGrantBrowserRequest request) {
+            return this.authorizations.authorizeByAuthorizationCodeGrantBrowser(request);
         }
     }
 

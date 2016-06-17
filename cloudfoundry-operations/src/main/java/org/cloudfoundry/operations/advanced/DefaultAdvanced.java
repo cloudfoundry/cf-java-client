@@ -18,7 +18,6 @@ package org.cloudfoundry.operations.advanced;
 
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
-import org.cloudfoundry.uaa.authorizations.ResponseType;
 import reactor.core.publisher.Mono;
 
 public final class DefaultAdvanced implements Advanced {
@@ -39,7 +38,6 @@ public final class DefaultAdvanced implements Advanced {
         return uaaClient.authorizations()
             .authorizeByAuthorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest.builder()
                 .clientId("ssh-proxy")
-                .responseType(ResponseType.CODE)
                 .build());
     }
 
