@@ -1,0 +1,21 @@
+{
+  "id": "46081184-7ca9-453d-9bf8-74da7113bec6",
+  "meta": {
+    "version": 0,
+    "created": "2016-06-03T17:59:30.527Z",
+    "lastModified": "2016-06-03T17:59:30.527Z"
+  },
+  "displayName": "Cool Group Name",
+  "zoneId": "uaa",
+  "description": "the cool group",
+  "members": [
+    {
+      "origin": "uaa",
+      "type": "USER",
+      "value": "f0e6a061-6e3a-4be9-ace5-142ee24e20b7"
+    }
+  ],
+  "schemas": [
+    "urn:scim:schemas:core:1.0"
+  ]
+}
