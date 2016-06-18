@@ -30,6 +30,8 @@ import org.cloudfoundry.uaa.groups.ListGroupsRequest;
 import org.cloudfoundry.uaa.groups.ListGroupsResponse;
 import org.cloudfoundry.uaa.groups.MapExternalGroupRequest;
 import org.cloudfoundry.uaa.groups.MapExternalGroupResponse;
+import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupDisplayNameRequest;
+import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupDisplayNameResponse;
 import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupIdRequest;
 import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupIdResponse;
 import org.cloudfoundry.uaa.groups.UpdateGroupRequest;
@@ -77,6 +79,14 @@ public class ReactorGroups extends AbstractUaaOperations implements Groups {
     @Override
     public Mono<MapExternalGroupResponse> mapExternalGroup(MapExternalGroupRequest request) {
         return post(request, MapExternalGroupResponse.class, builder -> builder.pathSegment("Groups", "External"));
+    }
+
+    @Override
+    public Mono<UnmapExternalGroupByGroupDisplayNameResponse> unmapExternalGroupByGroupDisplayName(UnmapExternalGroupByGroupDisplayNameRequest request) {
+        return delete(
+            request,
+            UnmapExternalGroupByGroupDisplayNameResponse.class,
+            builder -> builder.pathSegment("Groups", "External", "displayName", request.getGroupDisplayName(), "externalGroup", request.getExternalGroup(), "origin", request.getOriginKey()));
     }
 
     @Override
