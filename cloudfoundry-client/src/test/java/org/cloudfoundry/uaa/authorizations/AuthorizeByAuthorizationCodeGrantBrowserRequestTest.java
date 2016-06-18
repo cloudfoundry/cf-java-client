@@ -23,22 +23,11 @@ public final class AuthorizeByAuthorizationCodeGrantBrowserRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noClientId() {
         AuthorizeByAuthorizationCodeGrantBrowserRequest.builder()
-            .scope("test-scope")
-            .redirectUri("test-redirect-uri")
             .build();
     }
 
     @Test
-    public void validMax() {
-        AuthorizeByAuthorizationCodeGrantBrowserRequest.builder()
-            .clientId("test-client-id")
-            .scope("test-scope")
-            .redirectUri("test-redirect-uri")
-            .build();
-    }
-
-    @Test
-    public void validMin() {
+    public void valid() {
         AuthorizeByAuthorizationCodeGrantBrowserRequest.builder()
             .clientId("test-client-id")
             .build();
