@@ -1,0 +1,17 @@
+{
+  "id" : "test-group-id",
+  "meta" : {
+    "version" : 1,
+    "created" : "2016-06-03T17:59:30.527Z",
+    "lastModified" : "2016-06-03T17:59:30.561Z"
+  },
+  "displayName" : "Cooler Group Name for Retrieve",
+  "zoneId" : "uaa",
+  "description" : "the cool group",
+  "members" : [ {
+    "origin" : "uaa",
+    "type" : "USER",
+    "value" : "f0e6a061-6e3a-4be9-ace5-142ee24e20b7"
+  } ],
+  "schemas" : [ "urn:scim:schemas:core:1.0" ]
+}

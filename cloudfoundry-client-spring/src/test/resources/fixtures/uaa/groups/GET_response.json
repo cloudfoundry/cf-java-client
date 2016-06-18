@@ -1,0 +1,23 @@
+{
+  "resources" : [ {
+    "id" : "f87c557a-8ddc-43d3-98fb-e420ebc7f0f1",
+    "meta" : {
+      "version" : 1,
+      "created" : "2016-06-16T00:01:41.692Z",
+      "lastModified" : "2016-06-16T00:01:41.728Z"
+    },
+    "displayName" : "Cooler Group Name for List",
+    "zoneId" : "uaa",
+    "description" : "the cool group",
+    "members" : [ {
+      "origin" : "uaa",
+      "type" : "USER",
+      "value" : "40bc8ef1-0719-4a0c-9f60-e9f843cd4af2"
+    } ],
+    "schemas" : [ "urn:scim:schemas:core:1.0" ]
+  } ],
+  "startIndex" : 1,
+  "itemsPerPage" : 50,
+  "totalResults" : 1,
+  "schemas" : [ "urn:scim:schemas:core:1.0" ]
+}
