@@ -16,13 +16,33 @@
 
 package org.cloudfoundry.uaa.identityproviders;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 /**
  * The mapping mode for a {@link SamlConfiguration}
  */
 public enum ExternalGroupMappingMode {
 
+    /**
+     * The explicitly mapped type
+     */
     EXPLICITLY_MAPPED,
 
-    AS_SCOPES
+    /**
+     * The as scopes type
+     */
+    AS_SCOPES;
+
+    @JsonCreator
+    static ExternalGroupMappingMode from(String s) {
+        switch (s.toLowerCase()) {
+            case "explicitly_mapped":
+                return EXPLICITLY_MAPPED;
+            case "as_scopes":
+                return AS_SCOPES;
+            default:
+                throw new IllegalArgumentException(String.format("Unknown external group mapping mode: %s", s));
+        }
+    }
 
 }

@@ -23,8 +23,14 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum MemberType {
 
+    /**
+     * The user type
+     */
     USER("USER"),
 
+    /**
+     * The group type
+     */
     GROUP("GROUP");
 
     private final String value;
