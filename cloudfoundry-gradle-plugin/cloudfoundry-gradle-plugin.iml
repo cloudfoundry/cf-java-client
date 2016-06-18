@@ -18,8 +18,8 @@
     <orderEntry type="library" name="Maven: io.projectreactor:reactor-ipc:2.5.0.BUILD-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-all:4.1.1.Final" level="project" />
     <orderEntry type="module" module-name="cloudfoundry-client" />
-    <orderEntry type="library" name="Maven: com.squareup.wire:wire-runtime:2.1.2" level="project" />
-    <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.5.0" level="project" />
+    <orderEntry type="library" name="Maven: com.squareup.wire:wire-runtime:2.2.0" level="project" />
+    <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.8.0" level="project" />
     <orderEntry type="library" name="Maven: io.projectreactor:reactor-core:2.5.0.M4" level="project" />
     <orderEntry type="library" name="Maven: org.reactivestreams:reactive-streams:1.0.0" level="project" />
     <orderEntry type="module" module-name="cloudfoundry-util" />
