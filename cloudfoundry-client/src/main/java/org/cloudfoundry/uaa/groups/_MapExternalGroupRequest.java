@@ -14,39 +14,35 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa;
+package org.cloudfoundry.uaa.groups;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * The metadata payload entities
+ * The request payload for the map external group request
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class _Metadata {
+abstract class _MapExternalGroupRequest {
 
     /**
-     * When the resource record was created
+     * The identifier for the group in external identity provider that needs to be mapped to internal UAA groups
      */
-    @JsonProperty("created")
-    @Nullable
-    abstract String getCreated();
+    @JsonProperty("externalGroup")
+    abstract String getExternalGroup();
 
     /**
-     * When the resource record was last modified
+     * The group unique ID
      */
-    @JsonProperty("lastModified")
-    @Nullable
-    abstract String getLastModified();
+    @JsonProperty("groupId")
+    abstract String getGroupId();
 
     /**
-     * The metadata version
+     * Unique alias of the identity provider
      */
-    @JsonProperty("version")
+    @JsonProperty("origin")
     @Nullable
-    abstract Integer getVersion();
+    abstract String getOriginKey();
 
 }

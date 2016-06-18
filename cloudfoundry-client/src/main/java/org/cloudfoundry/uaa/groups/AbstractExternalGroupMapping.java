@@ -17,40 +17,32 @@
 package org.cloudfoundry.uaa.groups;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.Nullable;
 import org.cloudfoundry.uaa.Metadata;
 
 import java.util.List;
 
 /**
- * The entity response payload for Group
+ * The entity response payload for External Group
  */
-abstract class AbstractGroup {
+abstract class AbstractExternalGroupMapping {
 
     /**
-     * Human readable description of the group, displayed e.g. when approving scopes
+     * The identifier for the group in external identity provider that needs to be mapped to internal UAA groups
      */
-    @JsonProperty("description")
-    @Nullable
-    abstract String getDescription();
+    @JsonProperty("externalGroup")
+    abstract String getExternalGroup();
 
     /**
-     * The identifier specified upon creation of the group, unique within the identity zone
+     * The group's displayed name
      */
     @JsonProperty("displayName")
-    abstract String getDisplayName();
+    abstract String getGroupDisplayName();
 
     /**
-     * The globally unique group ID
+     * The group unique ID
      */
-    @JsonProperty("id")
-    abstract String getId();
-
-    /**
-     * Array of group members
-     */
-    @JsonProperty("members")
-    abstract List<Member> getMembers();
+    @JsonProperty("groupId")
+    abstract String getGroupId();
 
     /**
      * The group's metadata
@@ -59,15 +51,15 @@ abstract class AbstractGroup {
     abstract Metadata getMetadata();
 
     /**
+     * Unique alias of the identity provider
+     */
+    @JsonProperty("origin")
+    abstract String getOriginKey();
+
+    /**
      * The group's schemas:  "urn:scim:schemas:core:1.0" ]
      */
     @JsonProperty("schemas")
     abstract List<String> getSchemas();
-
-    /**
-     * Identifier for the identity zone to which the group belongs
-     */
-    @JsonProperty("zoneId")
-    abstract String getZoneId();
 
 }
