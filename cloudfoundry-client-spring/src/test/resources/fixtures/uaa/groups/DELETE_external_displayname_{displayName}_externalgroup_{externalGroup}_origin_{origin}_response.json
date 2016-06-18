@@ -1,0 +1,14 @@
+{
+  "meta": {
+    "version": 0,
+    "created": "2016-06-16T00:01:41.465Z",
+    "lastModified": "2016-06-16T00:01:41.465Z"
+  },
+  "groupId": "f8f0048f-de32-4d20-b41d-5820b690063d",
+  "externalGroup": "external group",
+  "displayName": "Group For Testing Deleting External Group Mapping By Name",
+  "origin": "ldap",
+  "schemas": [
+    "urn:scim:schemas:core:1.0"
+  ]
+}

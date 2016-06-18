@@ -34,6 +34,8 @@ import org.cloudfoundry.uaa.groups.MapExternalGroupRequest;
 import org.cloudfoundry.uaa.groups.MapExternalGroupResponse;
 import org.cloudfoundry.uaa.groups.Member;
 import org.cloudfoundry.uaa.groups.MemberType;
+import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupDisplayNameRequest;
+import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupDisplayNameResponse;
 import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupIdRequest;
 import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupIdResponse;
 import org.cloudfoundry.uaa.groups.UpdateGroupRequest;
@@ -324,6 +326,54 @@ public final class ReactorGroupsTest {
         @Override
         protected Mono<MapExternalGroupResponse> invoke(MapExternalGroupRequest request) {
             return this.groups.mapExternalGroup(request);
+        }
+    }
+
+    public static final class UnmapExternalGroupByGroupDisplayName extends AbstractUaaApiTest<UnmapExternalGroupByGroupDisplayNameRequest, UnmapExternalGroupByGroupDisplayNameResponse> {
+
+        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/Groups/External/displayName/Group For Testing Deleting External Group Mapping By Name/externalGroup/external group/origin/ldap")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/groups/DELETE_external_displayname_{displayName}_externalgroup_{externalGroup}_origin_{origin}_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected UnmapExternalGroupByGroupDisplayNameResponse getResponse() {
+            return UnmapExternalGroupByGroupDisplayNameResponse.builder()
+                .groupId("f8f0048f-de32-4d20-b41d-5820b690063d")
+                .groupDisplayName("Group For Testing Deleting External Group Mapping By Name")
+                .originKey("ldap")
+                .externalGroup("external group")
+                .metadata(Metadata.builder()
+                    .created("2016-06-16T00:01:41.465Z")
+                    .lastModified("2016-06-16T00:01:41.465Z")
+                    .version(0)
+                    .build())
+                .schema("urn:scim:schemas:core:1.0")
+                .build();
+        }
+
+        @Override
+        protected UnmapExternalGroupByGroupDisplayNameRequest getValidRequest() throws Exception {
+            return UnmapExternalGroupByGroupDisplayNameRequest.builder()
+                .groupDisplayName("Group For Testing Deleting External Group Mapping By Name")
+                .externalGroup("external group")
+                .originKey("ldap")
+                .build();
+        }
+
+        @Override
+        protected Mono<UnmapExternalGroupByGroupDisplayNameResponse> invoke(UnmapExternalGroupByGroupDisplayNameRequest request) {
+            return this.groups.unmapExternalGroupByGroupDisplayName(request);
         }
     }
 
