@@ -30,6 +30,8 @@ import org.cloudfoundry.uaa.groups.GetGroupResponse;
 import org.cloudfoundry.uaa.groups.Group;
 import org.cloudfoundry.uaa.groups.ListGroupsRequest;
 import org.cloudfoundry.uaa.groups.ListGroupsResponse;
+import org.cloudfoundry.uaa.groups.MapExternalGroupRequest;
+import org.cloudfoundry.uaa.groups.MapExternalGroupResponse;
 import org.cloudfoundry.uaa.groups.Member;
 import org.cloudfoundry.uaa.groups.MemberType;
 import org.cloudfoundry.uaa.groups.UpdateGroupRequest;
@@ -272,6 +274,54 @@ public final class ReactorGroupsTest {
         @Override
         protected Mono<ListGroupsResponse> invoke(ListGroupsRequest request) {
             return this.groups.list(request);
+        }
+    }
+
+    public static final class MapExternalGroup extends AbstractUaaApiTest<MapExternalGroupRequest, MapExternalGroupResponse> {
+
+        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/Groups/External")
+                    .payload("fixtures/uaa/groups/POST_external_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/uaa/groups/POST_external_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected MapExternalGroupResponse getResponse() {
+            return MapExternalGroupResponse.builder()
+                .groupId("76937b62-346c-4848-953c-d790b87ec80a")
+                .groupDisplayName("Group For Testing Creating External Group Mapping")
+                .originKey("ldap")
+                .externalGroup("External group")
+                .metadata(Metadata.builder()
+                    .created("2016-06-16T00:01:41.393Z")
+                    .lastModified("2016-06-16T00:01:41.393Z")
+                    .version(0)
+                    .build())
+                .schema("urn:scim:schemas:core:1.0")
+                .build();
+        }
+
+        @Override
+        protected MapExternalGroupRequest getValidRequest() throws Exception {
+            return MapExternalGroupRequest.builder()
+                .groupId("76937b62-346c-4848-953c-d790b87ec80a")
+                .externalGroup("External group")
+                .build();
+        }
+
+        @Override
+        protected Mono<MapExternalGroupResponse> invoke(MapExternalGroupRequest request) {
+            return this.groups.mapExternalGroup(request);
         }
     }
 

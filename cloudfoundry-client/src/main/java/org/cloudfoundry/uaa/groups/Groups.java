@@ -56,6 +56,14 @@ public interface Groups {
     Mono<ListGroupsResponse> list(ListGroupsRequest request);
 
     /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#update59">Map External Group</a> request
+     *
+     * @param request the Map External Group request
+     * @return the response from the Map External Group request
+     */
+    Mono<MapExternalGroupResponse> mapExternalGroup(MapExternalGroupRequest request);
+
+    /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#update59">Update Group</a> request
      *
      * @param request the Update Group request
