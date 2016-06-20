@@ -70,9 +70,10 @@ public abstract class AbstractReactorOperations {
                                          Function<HttpClientRequest, HttpClientRequest> requestTransformer) {
         return this.root
             .map(root -> buildUri(root, uriTransformer))
-            .then(uri -> this.httpClient.delete(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
-                .map(requestTransformer)
-                .then(o -> o.send(serializedRequest(o, request))))
+            .then(uri -> this.httpClient
+                .delete(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
+                    .map(requestTransformer)
+                    .then(o -> o.send(serializedRequest(o, request))))
                 .doOnSubscribe(s -> this.requestLogger.debug("DELETE {}", uri))
                 .compose(logResponse(uri)))
             .compose(deserializedResponse(responseType));
@@ -86,9 +87,10 @@ public abstract class AbstractReactorOperations {
     protected final Mono<HttpClientResponse> doGet(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<HttpClientRequest, HttpClientRequest> requestTransformer) {
         return this.root
             .map(root -> buildUri(root, uriTransformer))
-            .then(uri -> this.httpClient.get(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
-                .map(requestTransformer)
-                .then(HttpClientRequest::sendHeaders))
+            .then(uri -> this.httpClient
+                .get(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
+                    .map(requestTransformer)
+                    .then(HttpClientRequest::sendHeaders))
                 .doOnSubscribe(s -> this.requestLogger.debug("GET    {}", uri))
                 .compose(logResponse(uri)));
     }
@@ -97,9 +99,10 @@ public abstract class AbstractReactorOperations {
                                         Function<HttpClientRequest, HttpClientRequest> requestTransformer) {
         return this.root
             .map(root -> buildUri(root, uriTransformer))
-            .then(uri -> this.httpClient.patch(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
-                .map(requestTransformer)
-                .then(o -> o.send(serializedRequest(o, request))))
+            .then(uri -> this.httpClient
+                .patch(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
+                    .map(requestTransformer)
+                    .then(o -> o.send(serializedRequest(o, request))))
                 .doOnSubscribe(s -> this.requestLogger.debug("PATCH  {}", uri))
                 .compose(logResponse(uri)))
             .compose(deserializedResponse(responseType));
@@ -115,8 +118,9 @@ public abstract class AbstractReactorOperations {
     protected final <T> Mono<T> doPost(Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<HttpClientRequest, Mono<Void>> requestTransformer) {
         return this.root
             .map(root -> buildUri(root, uriTransformer))
-            .then(uri -> this.httpClient.post(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
-                .then(requestTransformer))
+            .then(uri -> this.httpClient
+                .post(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
+                    .then(requestTransformer))
                 .doOnSubscribe(s -> this.requestLogger.debug("POST   {}", uri))
                 .compose(logResponse(uri)))
             .compose(deserializedResponse(responseType));
@@ -126,9 +130,10 @@ public abstract class AbstractReactorOperations {
                                       Function<HttpClientRequest, HttpClientRequest> requestTransformer) {
         return this.root
             .map(root -> buildUri(root, uriTransformer))
-            .then(uri -> this.httpClient.put(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
-                .map(requestTransformer)
-                .then(o -> o.send(serializedRequest(o, request))))
+            .then(uri -> this.httpClient
+                .put(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
+                    .map(requestTransformer)
+                    .then(o -> o.send(serializedRequest(o, request))))
                 .doOnSubscribe(s -> this.requestLogger.debug("PUT    {}", uri))
                 .compose(logResponse(uri)))
             .compose(deserializedResponse(responseType));
@@ -137,8 +142,9 @@ public abstract class AbstractReactorOperations {
     protected final <T> Mono<T> doPut(Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<HttpClientRequest, Mono<Void>> requestTransformer) {
         return this.root
             .map(root -> buildUri(root, uriTransformer))
-            .then(uri -> this.httpClient.put(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
-                .then(requestTransformer))
+            .then(uri -> this.httpClient
+                .put(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
+                    .then(requestTransformer))
                 .doOnSubscribe(s -> this.requestLogger.debug("PUT    {}", uri))
                 .compose(logResponse(uri)))
             .compose(deserializedResponse(responseType));
@@ -147,9 +153,10 @@ public abstract class AbstractReactorOperations {
     protected final Mono<HttpClientResponse> doWs(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<HttpClientRequest, HttpClientRequest> requestTransformer) {
         return this.root
             .map(root -> buildUri(root, uriTransformer))
-            .then(uri -> this.httpClient.get(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
-                .map(requestTransformer)
-                .then(HttpClientRequest::upgradeToTextWebsocket))
+            .then(uri -> this.httpClient
+                .get(uri, outbound -> this.authorizationProvider.addAuthorization(outbound)
+                    .map(requestTransformer)
+                    .then(HttpClientRequest::upgradeToTextWebsocket))
                 .doOnSubscribe(s -> this.requestLogger.debug("WS     {}", uri))
                 .compose(logResponse(uri)));
     }
