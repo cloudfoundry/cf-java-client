@@ -47,7 +47,7 @@
     </modules>
 
     <properties>
-        <immutables.version>2.2.7-SNAPSHOT</immutables.version>
+        <immutables.version>2.2.7</immutables.version>
         <jackson.version>2.7.5</jackson.version>
         <java-semver.version>0.9.0</java-semver.version>
         <jjwt.version>0.6.0</jjwt.version>
