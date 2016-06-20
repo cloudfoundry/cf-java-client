@@ -71,6 +71,10 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
         });
     }
 
+    protected final Mono<HttpClientResponse> getNoAuth(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return doGetNoAuth(getUriAugmenter(request, uriTransformer), getRequestTransformer(request));
+    }
+
     protected final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
                                      Function<HttpClientRequest, HttpClientRequest> requestTransformer) {
 

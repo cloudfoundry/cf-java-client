@@ -54,19 +54,19 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
     public Mono<String> authorizeByAuthorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest request) {
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE))
             .map(inbound -> inbound.responseHeaders().get(LOCATION))
-            .then(location -> extractParameterFromLocation(location, "code"));
+            .then(location -> uriParameterValue(location, "code"));
     }
 
     @Override
     public Mono<String> authorizeByAuthorizationCodeGrantBrowser(AuthorizeByAuthorizationCodeGrantBrowserRequest request) {
-        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE))
+        return getNoAuth(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE))
             .map(inbound -> inbound.responseHeaders().get(LOCATION))
-            .then(location -> extractParameterFromLocation(location, "code"));
+            .then(location -> uriParameterValue(location, "code"));
     }
 
-    private static Mono<String> extractParameterFromLocation(String location, String parameter) {
-        return Optional.ofNullable(UriComponentsBuilder.fromUriString(location).build().getQueryParams().getFirst(parameter))
+    private static Mono<String> uriParameterValue(String uriString, String parameter) {
+        return Optional.ofNullable(UriComponentsBuilder.fromUriString(uriString).build().getQueryParams().getFirst(parameter))
             .map(parameterValue -> Mono.just(parameterValue))
-            .orElse(ExceptionUtils.illegalState(String.format("Parameter %s not found in location", parameter)));
+            .orElse(ExceptionUtils.illegalState(String.format("Parameter %s not in URI %s", parameter, uriString)));
     }
 }
