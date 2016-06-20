@@ -95,6 +95,17 @@ public abstract class AbstractReactorOperations {
                 .compose(logResponse(uri)));
     }
 
+    protected final Mono<HttpClientResponse> doGetNoAuth(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<HttpClientRequest, HttpClientRequest> requestTransformer) {
+        return this.root
+            .map(root -> buildUri(root, uriTransformer))
+            .then(uri -> this.httpClient
+                .get(uri, outbound -> Mono.just(outbound)
+                    .map(requestTransformer)
+                    .then(HttpClientRequest::sendHeaders))
+                .doOnSubscribe(s -> this.requestLogger.debug("GET    {}", uri))
+                .compose(logResponse(uri)));
+    }
+
     protected final <T> Mono<T> doPatch(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
                                         Function<HttpClientRequest, HttpClientRequest> requestTransformer) {
         return this.root

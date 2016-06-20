@@ -19,6 +19,7 @@ package org.cloudfoundry.uaa;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantBrowserRequest;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -43,11 +44,13 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
                 }));
     }
 
+    @Ignore("TODO: awaiting response to issue https://github.com/cloudfoundry/uaa/issues/395")
     @Test
     public void authorizeByAuthorizationCodeGrantBrowser() {
         this.uaaClient.authorizations()
             .authorizeByAuthorizationCodeGrantBrowser(AuthorizeByAuthorizationCodeGrantBrowserRequest.builder()
                 .clientId("ssh-proxy")
+                .redirectUri("http://redirect.to/app")
                 .build())
             .subscribe(this.<String>testSubscriber()
                 .assertThat(code -> {
