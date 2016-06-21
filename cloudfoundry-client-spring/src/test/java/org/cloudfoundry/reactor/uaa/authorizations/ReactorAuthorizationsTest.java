@@ -78,14 +78,14 @@ public final class ReactorAuthorizationsTest {
                     .build())
                 .response(TestResponse.builder()
                     .status(FOUND)
-                    .header("Location", "http://redirect.to/app?code=JuEj0D")
+                    .header("Location", "http://redirect.to/login")
                     .build())
                 .build();
         }
 
         @Override
         protected String getResponse() {
-            return "JuEj0D";
+            return "http://redirect.to/login";
         }
 
         @Override

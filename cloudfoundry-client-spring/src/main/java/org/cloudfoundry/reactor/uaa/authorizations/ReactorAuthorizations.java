@@ -60,8 +60,7 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
     @Override
     public Mono<String> authorizeByAuthorizationCodeGrantBrowser(AuthorizeByAuthorizationCodeGrantBrowserRequest request) {
         return getNoAuth(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE))
-            .map(inbound -> inbound.responseHeaders().get(LOCATION))
-            .then(location -> uriParameterValue(location, "code"));
+            .map(inbound -> inbound.responseHeaders().get(LOCATION));
     }
 
     private static Mono<String> uriParameterValue(String uriString, String parameter) {

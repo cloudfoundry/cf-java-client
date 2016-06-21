@@ -35,7 +35,7 @@ public interface Authorizations {
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#browser-flow">Authorize By Authorization Code Grant (Browser)</a> request
      *
      * @param request Authorize By Authorization Code Grant (Browser) request
-     * @return the authorization code
+     * @return the authentication redirect URI
      */
     Mono<String> authorizeByAuthorizationCodeGrantBrowser(AuthorizeByAuthorizationCodeGrantBrowserRequest request);
 

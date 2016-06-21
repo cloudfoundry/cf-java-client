@@ -19,7 +19,6 @@ package org.cloudfoundry.uaa;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantBrowserRequest;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -44,7 +43,6 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
                 }));
     }
 
-    @Ignore("TODO: awaiting response to issue https://github.com/cloudfoundry/uaa/issues/395")
     @Test
     public void authorizeByAuthorizationCodeGrantBrowser() {
         this.uaaClient.authorizations()
@@ -53,10 +51,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
                 .redirectUri("http://redirect.to/app")
                 .build())
             .subscribe(this.<String>testSubscriber()
-                .assertThat(code -> {
-                    assertNotNull(code);
-                    assertTrue(code.length() == 6);
-                }));
+                .assertThat(location -> assertTrue(location.startsWith("https://uaa."))));
     }
 
 }
