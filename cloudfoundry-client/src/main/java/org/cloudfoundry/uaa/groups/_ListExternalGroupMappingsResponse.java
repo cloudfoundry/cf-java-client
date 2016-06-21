@@ -16,13 +16,12 @@
 
 package org.cloudfoundry.uaa.groups;
 
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.uaa.PaginatedResponse;
 import org.immutables.value.Value;
 
 /**
- * The response from the list External Group Mappings request
+ * The response from the list external group mappings request
  */
 @JsonDeserialize
 @Value.Immutable

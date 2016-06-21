@@ -59,7 +59,7 @@ abstract class AbstractGroup {
     abstract Metadata getMetadata();
 
     /**
-     * The group's schemas:  "urn:scim:schemas:core:1.0" ]
+     * The group's schemas
      */
     @JsonProperty("schemas")
     abstract List<String> getSchemas();
