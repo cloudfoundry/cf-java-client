@@ -30,7 +30,7 @@ public final class DefaultAdvancedTest {
 
     private static void requestAuthorizeByAuthorizationCodeGrantApi(UaaClient uaaClient) {
         when(uaaClient.authorizations()
-            .authorizeByAuthorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest.builder()
+            .authorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest.builder()
                 .clientId("ssh-proxy")
                 .build()))
             .thenReturn(Mono.just("test-code"));
