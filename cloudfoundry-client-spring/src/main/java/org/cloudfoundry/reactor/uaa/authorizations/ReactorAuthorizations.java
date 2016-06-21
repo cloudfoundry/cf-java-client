@@ -24,6 +24,7 @@ import org.cloudfoundry.uaa.ResponseType;
 import org.cloudfoundry.uaa.authorizations.Authorizations;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantBrowserRequest;
+import org.cloudfoundry.uaa.authorizations.AuthorizeByImplicitGrantBrowserRequest;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
@@ -51,15 +52,21 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
     }
 
     @Override
-    public Mono<String> authorizeByAuthorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest request) {
+    public Mono<String> authorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest request) {
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE))
             .map(inbound -> inbound.responseHeaders().get(LOCATION))
             .then(location -> uriParameterValue(location, "code"));
     }
 
     @Override
-    public Mono<String> authorizeByAuthorizationCodeGrantBrowser(AuthorizeByAuthorizationCodeGrantBrowserRequest request) {
+    public Mono<String> authorizationCodeGrantBrowser(AuthorizeByAuthorizationCodeGrantBrowserRequest request) {
         return getNoAuth(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE))
+            .map(inbound -> inbound.responseHeaders().get(LOCATION));
+    }
+
+    @Override
+    public Mono<String> implicitGrantBrowser(AuthorizeByImplicitGrantBrowserRequest request) {
+        return getNoAuth(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.TOKEN))
             .map(inbound -> inbound.responseHeaders().get(LOCATION));
     }
 

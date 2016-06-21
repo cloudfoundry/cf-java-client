@@ -36,7 +36,7 @@ public final class DefaultAdvanced implements Advanced {
 
     private static Mono<String> requestAuthorizeByAuthorizationCodeGrantApi(UaaClient uaaClient) {
         return uaaClient.authorizations()
-            .authorizeByAuthorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest.builder()
+            .authorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest.builder()
                 .clientId("ssh-proxy")
                 .build());
     }
