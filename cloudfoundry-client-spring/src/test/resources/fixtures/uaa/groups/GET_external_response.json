@@ -1,0 +1,21 @@
+{
+  "resources": [
+    {
+      "groupId": "0480db7f-d1bc-4d2b-b723-febc684c0ee9",
+      "displayName": "Group For Testing Retrieving External Group Mappings",
+      "externalGroup": "external group",
+      "origin": "ldap",
+      "meta": {
+        "version": 0,
+        "created": "2016-06-16T00:01:41.223Z",
+        "lastModified": "2016-06-16T00:01:41.223Z"
+      }
+    }
+  ],
+  "startIndex": 1,
+  "itemsPerPage": 1,
+  "totalResults": 1,
+  "schemas": [
+    "urn:scim:schemas:core:1.0"
+  ]
+}

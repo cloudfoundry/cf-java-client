@@ -26,8 +26,16 @@ import org.cloudfoundry.uaa.groups.DeleteGroupResponse;
 import org.cloudfoundry.uaa.groups.GetGroupRequest;
 import org.cloudfoundry.uaa.groups.GetGroupResponse;
 import org.cloudfoundry.uaa.groups.Groups;
+import org.cloudfoundry.uaa.groups.ListExternalGroupMappingsRequest;
+import org.cloudfoundry.uaa.groups.ListExternalGroupMappingsResponse;
 import org.cloudfoundry.uaa.groups.ListGroupsRequest;
 import org.cloudfoundry.uaa.groups.ListGroupsResponse;
+import org.cloudfoundry.uaa.groups.MapExternalGroupRequest;
+import org.cloudfoundry.uaa.groups.MapExternalGroupResponse;
+import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupDisplayNameRequest;
+import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupDisplayNameResponse;
+import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupIdRequest;
+import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupIdResponse;
 import org.cloudfoundry.uaa.groups.UpdateGroupRequest;
 import org.cloudfoundry.uaa.groups.UpdateGroupResponse;
 import reactor.core.publisher.Mono;
@@ -68,6 +76,32 @@ public class ReactorGroups extends AbstractUaaOperations implements Groups {
     @Override
     public Mono<ListGroupsResponse> list(ListGroupsRequest request) {
         return get(request, ListGroupsResponse.class, builder -> builder.pathSegment("Groups"));
+    }
+
+    @Override
+    public Mono<ListExternalGroupMappingsResponse> listExternalGroupMappings(ListExternalGroupMappingsRequest request) {
+        return get(request, ListExternalGroupMappingsResponse.class, builder -> builder.pathSegment("Groups", "External"));
+    }
+
+    @Override
+    public Mono<MapExternalGroupResponse> mapExternalGroup(MapExternalGroupRequest request) {
+        return post(request, MapExternalGroupResponse.class, builder -> builder.pathSegment("Groups", "External"));
+    }
+
+    @Override
+    public Mono<UnmapExternalGroupByGroupDisplayNameResponse> unmapExternalGroupByGroupDisplayName(UnmapExternalGroupByGroupDisplayNameRequest request) {
+        return delete(
+            request,
+            UnmapExternalGroupByGroupDisplayNameResponse.class,
+            builder -> builder.pathSegment("Groups", "External", "displayName", request.getGroupDisplayName(), "externalGroup", request.getExternalGroup(), "origin", request.getOriginKey()));
+    }
+
+    @Override
+    public Mono<UnmapExternalGroupByGroupIdResponse> unmapExternalGroupByGroupId(UnmapExternalGroupByGroupIdRequest request) {
+        return delete(
+            request,
+            UnmapExternalGroupByGroupIdResponse.class,
+            builder -> builder.pathSegment("Groups", "External", "groupId", request.getGroupId(), "externalGroup", request.getExternalGroup(), "origin", request.getOriginKey()));
     }
 
     @Override

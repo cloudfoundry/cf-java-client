@@ -14,39 +14,16 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa;
+package org.cloudfoundry.uaa.groups;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * The metadata payload entities
+ * The response payload for the unmap external group by group id request
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _Metadata {
-
-    /**
-     * When the resource record was created
-     */
-    @JsonProperty("created")
-    @Nullable
-    abstract String getCreated();
-
-    /**
-     * When the resource record was last modified
-     */
-    @JsonProperty("lastModified")
-    @Nullable
-    abstract String getLastModified();
-
-    /**
-     * The metadata version
-     */
-    @JsonProperty("version")
-    @Nullable
-    abstract Integer getVersion();
+abstract class _UnmapExternalGroupByGroupIdResponse extends AbstractExternalGroupMapping {
 
 }
