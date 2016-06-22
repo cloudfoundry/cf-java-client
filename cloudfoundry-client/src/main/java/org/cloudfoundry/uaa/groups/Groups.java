@@ -56,6 +56,38 @@ public interface Groups {
     Mono<ListGroupsResponse> list(ListGroupsRequest request);
 
     /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#list72">List External Group Mappings</a> request
+     *
+     * @param request the List External Group Mappings request
+     * @return the response from the List External Group Mappings request
+     */
+    Mono<ListExternalGroupMappingsResponse> listExternalGroupMappings(ListExternalGroupMappingsRequest request);
+
+    /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#update59">Map External Group</a> request
+     *
+     * @param request the Map External Group request
+     * @return the response from the Map External Group request
+     */
+    Mono<MapExternalGroupResponse> mapExternalGroup(MapExternalGroupRequest request);
+
+    /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#by-group-display-name">Unmap External Group By Group Display Name</a> request
+     *
+     * @param request the Unmap External Group By Group Display Name request
+     * @return the response from the Unmap External Group By Group Display Name request
+     */
+    Mono<UnmapExternalGroupByGroupDisplayNameResponse> unmapExternalGroupByGroupDisplayName(UnmapExternalGroupByGroupDisplayNameRequest request);
+
+    /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#by-group-id">Unmap External Group By Group Id</a> request
+     *
+     * @param request the Unmap External Group By Group Id request
+     * @return the response from the Unmap External Group By Group Id request
+     */
+    Mono<UnmapExternalGroupByGroupIdResponse> unmapExternalGroupByGroupId(UnmapExternalGroupByGroupIdRequest request);
+
+    /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#update59">Update Group</a> request
      *
      * @param request the Update Group request

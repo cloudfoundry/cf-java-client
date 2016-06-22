@@ -1,0 +1,14 @@
+{
+  "meta": {
+    "version": 0,
+    "created": "2016-06-16T00:01:41.393Z",
+    "lastModified": "2016-06-16T00:01:41.393Z"
+  },
+  "groupId": "76937b62-346c-4848-953c-d790b87ec80a",
+  "externalGroup": "External group",
+  "displayName": "Group For Testing Creating External Group Mapping",
+  "origin": "ldap",
+  "schemas": [
+    "urn:scim:schemas:core:1.0"
+  ]
+}
