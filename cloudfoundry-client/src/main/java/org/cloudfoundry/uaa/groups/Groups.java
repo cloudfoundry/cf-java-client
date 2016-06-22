@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface Groups {
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#create57">Create Group</a> request
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#create58">Create Group</a> request
      *
      * @param request the Create Group request
      * @return the response from the Create Group request
@@ -32,7 +32,7 @@ public interface Groups {
     Mono<CreateGroupResponse> create(CreateGroupRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#delete60">Delete a Group</a> request
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#delete61">Delete a Group</a> request
      *
      * @param request the Delete Group request
      * @return the response from the Delete Group request
@@ -40,7 +40,7 @@ public interface Groups {
     Mono<DeleteGroupResponse> delete(DeleteGroupRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#retrieve58">Retrieve a Group</a> request
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#retrieve59">Retrieve a Group</a> request
      *
      * @param request the Get Group request
      * @return the response from the Get Group request
@@ -64,7 +64,7 @@ public interface Groups {
     Mono<ListExternalGroupMappingsResponse> listExternalGroupMappings(ListExternalGroupMappingsRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#update59">Map External Group</a> request
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#map">Map External Group</a> request
      *
      * @param request the Map External Group request
      * @return the response from the Map External Group request
@@ -88,7 +88,7 @@ public interface Groups {
     Mono<UnmapExternalGroupByGroupIdResponse> unmapExternalGroupByGroupId(UnmapExternalGroupByGroupIdRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#update59">Update Group</a> request
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#update60">Update Group</a> request
      *
      * @param request the Update Group request
      * @return the response from the Update Group request
