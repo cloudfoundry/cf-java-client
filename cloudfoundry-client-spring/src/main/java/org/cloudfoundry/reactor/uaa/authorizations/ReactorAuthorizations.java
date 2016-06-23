@@ -72,7 +72,8 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
 
     private static Mono<String> uriParameterValue(String uriString, String parameter) {
         return Optional.ofNullable(UriComponentsBuilder.fromUriString(uriString).build().getQueryParams().getFirst(parameter))
-            .map(parameterValue -> Mono.just(parameterValue))
+            .map(Mono::just)
             .orElse(ExceptionUtils.illegalState(String.format("Parameter %s not in URI %s", parameter, uriString)));
     }
+
 }
