@@ -25,7 +25,6 @@ import reactor.core.publisher.Mono;
 
 import static org.mockito.Mockito.when;
 
-
 public final class DefaultAdvancedTest {
 
     private static void requestAuthorizeByAuthorizationCodeGrantApi(UaaClient uaaClient) {
@@ -58,4 +57,5 @@ public final class DefaultAdvancedTest {
                 .sshCode();
         }
     }
+
 }
