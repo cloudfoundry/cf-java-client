@@ -21,11 +21,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.util.AsciiString;
+import org.slf4j.Logger;
 import reactor.core.util.Exceptions;
 import reactor.io.netty.http.HttpClientRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.util.Optional;
 import java.util.function.Function;
 
 final class JsonCodec {
@@ -35,10 +40,17 @@ final class JsonCodec {
     private static final AsciiString CONTENT_TYPE = new AsciiString("Content-Type");
 
     static <T> Function<InputStream, T> decode(ObjectMapper objectMapper, Class<T> type) {
+        return decode(objectMapper, type, Optional.empty());
+    }
+    
+    static <T> Function<InputStream, T> decode(ObjectMapper objectMapper, Class<T> type, Optional<Logger> optionalLogger) {
         return inputStream -> {
             try (InputStream in = inputStream) {
                 return objectMapper.readValue(in, type);
             } catch (IOException e) {
+                optionalLogger
+                    .ifPresent(logger -> logger.debug("Exception decoding Json, input starts: {}", getNextChars(inputStream, 20)));
+                e.printStackTrace();
                 throw Exceptions.propagate(e);
             }
         };
@@ -57,4 +69,27 @@ final class JsonCodec {
         }
     }
 
+    private static String getNextChars(InputStream in, int charsToGet) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            char[] buffer = new char[charsToGet];
+            in.reset();
+            try (Reader rdr = new InputStreamReader(in, "UTF-8")) {
+                while (0 < charsToGet) {
+                    int rsz = rdr.read(buffer, 0, charsToGet);
+                    if (rsz < 0) {
+                        sb.append("<eof>");
+                        break;
+                    }
+                    sb.append(buffer, 0, rsz);
+                    charsToGet -= rsz;
+                }
+            }
+        } catch (UnsupportedEncodingException uee) {
+            sb.append("<encoding exception on read>");
+        } catch (IOException ioe) {
+            sb.append("<io exception on read>");
+        }
+        return sb.toString();
+    }
 }

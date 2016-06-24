@@ -31,6 +31,7 @@ import reactor.io.netty.http.HttpClientResponse;
 import reactor.io.netty.http.HttpException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 public abstract class AbstractReactorOperations {
@@ -181,7 +182,7 @@ public abstract class AbstractReactorOperations {
     private <T> Function<Mono<HttpClientResponse>, Mono<T>> deserializedResponse(Class<T> responseType) {
         return inbound -> inbound
             .then(i -> i.receive().aggregate().toInputStream())
-            .map(JsonCodec.decode(this.objectMapper, responseType));
+            .map(JsonCodec.decode(this.objectMapper, responseType, Optional.of(responseLogger)));
     }
 
     private Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> logResponse(String uri) {
