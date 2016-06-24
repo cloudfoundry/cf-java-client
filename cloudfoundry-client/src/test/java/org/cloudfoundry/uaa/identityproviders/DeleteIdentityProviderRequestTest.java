@@ -18,38 +18,27 @@ package org.cloudfoundry.uaa.identityproviders;
 
 import org.junit.Test;
 
-public final class LdapConfigurationTest {
+public final class DeleteIdentityProviderRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void noBaseUrl() {
-        LdapConfiguration.builder()
-            .ldapProfileFile(LdapProfileFile.SimpleBind)
-            .ldapGroupFile(LdapGroupFile.NoGroup)
+    public void noIdentityProviderId() {
+        DeleteIdentityProviderRequest.builder()
+            .identityZoneId("test-identity-zone-id")
             .build();
     }
 
     @Test(expected = IllegalStateException.class)
-    public void noLdapGroupFile() {
-        LdapConfiguration.builder()
-            .ldapProfileFile(LdapProfileFile.SimpleBind)
-            .baseUrl("test-base-url")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noLdapProfileFile() {
-        LdapConfiguration.builder()
-            .ldapGroupFile(LdapGroupFile.NoGroup)
-            .baseUrl("test-base-url")
+    public void noIdentityZoneId() {
+        DeleteIdentityProviderRequest.builder()
+            .identityProviderId("test-identity-provider-id")
             .build();
     }
 
     @Test
     public void valid() {
-        LdapConfiguration.builder()
-            .ldapProfileFile(LdapProfileFile.SimpleBind)
-            .ldapGroupFile(LdapGroupFile.NoGroup)
-            .baseUrl("test-base-url")
+        DeleteIdentityProviderRequest.builder()
+            .identityProviderId("test-identity-provider-id")
+            .identityZoneId("test-identity-zone-id")
             .build();
     }
 
