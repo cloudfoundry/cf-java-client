@@ -98,16 +98,16 @@ abstract class _LdapConfiguration extends AbstractExternalIdentityProviderConfig
     abstract Boolean getGroupsIgnorePartialResults();
 
     /**
-     * The file to be used for group integration. Options are: ldap/ldap-no-groups.xml, ldap/ldap-groups-as-scopes.xml, ldap/ldap-groups-map-to-scopes.xml
+     * The file to be used for group integration.
      */
     @JsonProperty("ldapGroupFile")
-    abstract String getLdapGroupFile();
+    abstract LdapGroupFile getLdapGroupFile();
 
     /**
-     * The file to be used for configuring the LDAP authentication. Options are: ldap/ldap-simple-bind.xml, ldap/ldap-search-and-bind.xml, ldap/ldap-search-and-compare.xml
+     * The file to be used for configuring the LDAP authentication.
      */
     @JsonProperty("ldapProfileFile")
-    abstract String getLdapProfileFile();
+    abstract LdapProfileFile getLdapProfileFile();
 
     /**
      *

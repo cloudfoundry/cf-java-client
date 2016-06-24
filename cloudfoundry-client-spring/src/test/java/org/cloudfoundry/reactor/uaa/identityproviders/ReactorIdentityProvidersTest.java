@@ -24,12 +24,16 @@ import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
 import org.cloudfoundry.uaa.identityproviders.AttributeMappings;
 import org.cloudfoundry.uaa.identityproviders.CreateIdentityProviderRequest;
 import org.cloudfoundry.uaa.identityproviders.CreateIdentityProviderResponse;
+import org.cloudfoundry.uaa.identityproviders.DeleteIdentityProviderRequest;
+import org.cloudfoundry.uaa.identityproviders.DeleteIdentityProviderResponse;
 import org.cloudfoundry.uaa.identityproviders.ExternalGroupMappingMode;
 import org.cloudfoundry.uaa.identityproviders.GetIdentityProviderRequest;
 import org.cloudfoundry.uaa.identityproviders.GetIdentityProviderResponse;
 import org.cloudfoundry.uaa.identityproviders.IdentityProvider;
 import org.cloudfoundry.uaa.identityproviders.InternalConfiguration;
 import org.cloudfoundry.uaa.identityproviders.LdapConfiguration;
+import org.cloudfoundry.uaa.identityproviders.LdapGroupFile;
+import org.cloudfoundry.uaa.identityproviders.LdapProfileFile;
 import org.cloudfoundry.uaa.identityproviders.ListIdentityProvidersRequest;
 import org.cloudfoundry.uaa.identityproviders.ListIdentityProvidersResponse;
 import org.cloudfoundry.uaa.identityproviders.LockoutPolicy;
@@ -42,6 +46,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
@@ -82,8 +87,8 @@ public final class ReactorIdentityProvidersTest {
                     .externalGroupsWhitelist(Collections.emptyList())
                     .groupSearchDepthLimit(10)
                     .groupSearchSubTree(true)
-                    .ldapProfileFile("ldap/ldap-simple-bind.xml")
-                    .ldapGroupFile("ldap/ldap-groups-null.xml")
+                    .ldapProfileFile(LdapProfileFile.SimpleBind)
+                    .ldapGroupFile(LdapGroupFile.NoGroup)
                     .mailAttributeName("mail")
                     .mailSubstituteOverridesLdap(false)
                     .skipSSLVerification(false)
@@ -107,8 +112,8 @@ public final class ReactorIdentityProvidersTest {
                 .configuration(LdapConfiguration.builder()
                     .attributeMappings(AttributeMappings.builder()
                         .build())
-                    .ldapProfileFile("ldap/ldap-simple-bind.xml")
-                    .ldapGroupFile("ldap/ldap-groups-null.xml")
+                    .ldapProfileFile(LdapProfileFile.SimpleBind)
+                    .ldapGroupFile(LdapGroupFile.NoGroup)
                     .baseUrl("ldap://localhost:33389")
                     .skipSSLVerification(false)
                     .mailAttributeName("mail")
@@ -306,6 +311,82 @@ public final class ReactorIdentityProvidersTest {
         @Override
         protected Mono<CreateIdentityProviderResponse> invoke(CreateIdentityProviderRequest request) {
             return this.identityProviderManagement.create(request);
+        }
+    }
+
+    public static final class Delete extends AbstractUaaApiTest<DeleteIdentityProviderRequest, DeleteIdentityProviderResponse> {
+
+        private final ReactorIdentityProviders identityProviderManagement = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/identity-providers/test-identity-provider-id")
+                    .header("X-Identity-Zone-Id", "test-identity-zone-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/identity-providers/DELETE_{id}_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected DeleteIdentityProviderResponse getResponse() {
+            return DeleteIdentityProviderResponse.builder()
+                .active(true)
+                .createdAt(1466035298319L)
+                .configuration(SamlConfiguration.builder()
+                    .addShadowUserOnLogin(true)
+                    .assertionConsumerIndex(0)
+                    .attributeMappings(AttributeMappings.builder()
+                        .build())
+                    .externalGroupsWhitelist(Collections.emptyList())
+                    .groupMappingMode(ExternalGroupMappingMode.EXPLICITLY_MAPPED)
+                    .idpEntityAlias("saml-for-delete")
+                    .linkText("IDPEndpointsMockTests Saml Provider:saml-for-delete")
+                    .metaDataLocation("<?xml version=\"1.0\" encoding=\"UTF-8\"?><md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"http://www.okta" +
+                        ".com/saml-for-delete\"><md:IDPSSODescriptor WantAuthnRequestsSigned=\"true\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\"><md:KeyDescriptor " +
+                        "use=\"signing\"><ds:KeyInfo xmlns:ds=\"http://www.w3" +
+                        ".org/2000/09/xmldsig#\"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG" +
+                        "\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu" +
+                        "\nZm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM" +
+                        "\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN\nAQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU" +
+                        "\nWWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O\nBw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL\n3tL" +
+                        "/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\nvvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\nGFHNkZ6DmoT" +
+                        "/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1" +
+                        ".1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService " +
+                        "Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://pivotal.oktapreview" +
+                        ".com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/><md:SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" " +
+                        "Location=\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/></md:IDPSSODescriptor></md:EntityDescriptor>\n")
+                    .metadataTrustCheck(false)
+                    .nameId("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress")
+                    .showSamlLink(false)
+                    .socketFactoryClassName("org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory")
+                    .zoneId("uaa")
+                    .build())
+                .id("3ba5978b-8db1-4f27-bfbd-f24f6773b52f")
+                .identityZoneId("uaa")
+                .lastModified(1466035298319L)
+                .name("saml-for-delete name")
+                .originKey("saml-for-delete")
+                .type(Type.SAML)
+                .version(0)
+                .build();
+        }
+
+        @Override
+        protected DeleteIdentityProviderRequest getValidRequest() throws Exception {
+            return DeleteIdentityProviderRequest.builder()
+                .identityProviderId("test-identity-provider-id")
+                .identityZoneId("test-identity-zone-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<DeleteIdentityProviderResponse> invoke(DeleteIdentityProviderRequest request) {
+            return this.identityProviderManagement.delete(request);
         }
     }
 

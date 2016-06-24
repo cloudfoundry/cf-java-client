@@ -32,6 +32,14 @@ public interface IdentityProviders {
     Mono<CreateIdentityProviderResponse> create(CreateIdentityProviderRequest request);
 
     /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#delete">Delete Identity Provider</a> request
+     *
+     * @param request the Delete Identity Provider request
+     * @return the response from the Delete Identity Provider request
+     */
+    Mono<DeleteIdentityProviderResponse> delete(DeleteIdentityProviderRequest request);
+
+    /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#retrieve">Get Identity Provider</a> request
      *
      * @param request the Get Identity Provider request

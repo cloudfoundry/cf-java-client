@@ -7,7 +7,7 @@
     "skipSSLVerification" : false,
     "mailAttributeName" : "mail",
     "mailSubstituteOverridesLdap" : false,
-    "ldapGroupFile" : "ldap/ldap-groups-null.xml"
+    "ldapGroupFile" : "ldap/ldap-no-groups.xml"
   },
   "originKey" : "ldap",
   "name" : "ldap name",
