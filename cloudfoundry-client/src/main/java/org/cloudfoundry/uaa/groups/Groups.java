@@ -80,6 +80,14 @@ public interface Groups {
     Mono<MapExternalGroupResponse> mapExternalGroup(MapExternalGroupRequest request);
 
     /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#remove-member">Remove Member</a> request
+     *
+     * @param request the Remove Member request
+     * @return the response from the Remove Member request
+     */
+    Mono<RemoveMemberResponse> removeMember(RemoveMemberRequest request);
+
+    /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#by-group-display-name">Unmap External Group By Group Display Name</a> request
      *
      * @param request the Unmap External Group By Group Display Name request
