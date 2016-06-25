@@ -39,6 +39,8 @@ import org.cloudfoundry.uaa.groups.MapExternalGroupRequest;
 import org.cloudfoundry.uaa.groups.MapExternalGroupResponse;
 import org.cloudfoundry.uaa.groups.Member;
 import org.cloudfoundry.uaa.groups.MemberType;
+import org.cloudfoundry.uaa.groups.RemoveMemberRequest;
+import org.cloudfoundry.uaa.groups.RemoveMemberResponse;
 import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupDisplayNameRequest;
 import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupDisplayNameResponse;
 import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupIdRequest;
@@ -432,6 +434,46 @@ public final class ReactorGroupsTest {
         }
     }
 
+    public static final class RemoveMember extends AbstractUaaApiTest<RemoveMemberRequest, RemoveMemberResponse> {
+
+        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/Groups/test-group-id/members/40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/groups/DELETE_{id}_members_{id}_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected RemoveMemberResponse getResponse() {
+            return RemoveMemberResponse.builder()
+                .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+                .type(MemberType.USER)
+                .identityProviderOriginKey("uaa")
+                .build();
+        }
+
+        @Override
+        protected RemoveMemberRequest getValidRequest() throws Exception {
+            return RemoveMemberRequest.builder()
+                .groupId("test-group-id")
+                .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+                .build();
+        }
+
+        @Override
+        protected Mono<RemoveMemberResponse> invoke(RemoveMemberRequest request) {
+            return this.groups.removeMember(request);
+        }
+    }
+
     public static final class UnmapExternalGroupByGroupDisplayName extends AbstractUaaApiTest<UnmapExternalGroupByGroupDisplayNameRequest, UnmapExternalGroupByGroupDisplayNameResponse> {
 
         private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
@@ -527,7 +569,7 @@ public final class ReactorGroupsTest {
             return this.groups.unmapExternalGroupByGroupId(request);
         }
     }
-    
+
     public static final class Update extends AbstractUaaApiTest<UpdateGroupRequest, UpdateGroupResponse> {
 
         private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
