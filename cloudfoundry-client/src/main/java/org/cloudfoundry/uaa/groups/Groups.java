@@ -24,6 +24,14 @@ import reactor.core.publisher.Mono;
 public interface Groups {
 
     /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#add-member">Add Member</a> request
+     *
+     * @param request the Add Member request
+     * @return the response from the Add Member request
+     */
+    Mono<AddMemberResponse> addMember(AddMemberRequest request);
+
+    /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#create58">Create Group</a> request
      *
      * @param request the Create Group request

@@ -16,21 +16,21 @@
 
 package org.cloudfoundry.uaa.groups;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
-public final class MemberTest {
+/**
+ * The request payload to add a member to a group
+ */
+@JsonDeserialize
+@Value.Immutable
+abstract class _AddMemberRequest extends AbstractMember {
 
-    @Test(expected = IllegalStateException.class)
-    public void noValue() {
-        Member.builder()
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        Member.builder()
-            .value("value-test")
-            .build();
-    }
+    /**
+     * The group id
+     */
+    @JsonIgnore
+    abstract String getGroupId();
 
 }
