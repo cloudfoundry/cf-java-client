@@ -46,6 +46,6 @@ abstract class _CreateGroupRequest implements IdentityZoned {
      * Array of group members
      */
     @JsonProperty("members")
-    abstract List<Member> getMembers();
+    abstract List<MemberSummary> getMembers();
 
 }

@@ -1,0 +1,35 @@
+[
+  {
+    "origin": "uaa",
+    "type": "USER",
+    "entity": {
+      "id": "40bc8ef1-0719-4a0c-9f60-e9f843cd4af2",
+      "externalId": "test-user",
+      "meta": {
+        "version": 0,
+        "created": "2016-06-16T00:01:41.665Z",
+        "lastModified": "2016-06-16T00:01:41.665Z"
+      },
+      "userName": "40HfKc",
+      "name": {
+        "familyName": "cool-familyName",
+        "givenName": "cool-name"
+      },
+      "emails": [
+        {
+          "value": "cool@chill.com",
+          "primary": false
+        }
+      ],
+      "active": true,
+      "verified": true,
+      "origin": "uaa",
+      "zoneId": "uaa",
+      "passwordLastModified": "2016-06-16T00:01:41.000Z",
+      "schemas": [
+        "urn:scim:schemas:core:1.0"
+      ]
+    },
+    "value": "40bc8ef1-0719-4a0c-9f60-e9f843cd4af2"
+  }
+]

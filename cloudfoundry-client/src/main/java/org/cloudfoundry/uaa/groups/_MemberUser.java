@@ -17,13 +17,15 @@
 package org.cloudfoundry.uaa.groups;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.uaa.groups.GroupMembered;
+import org.cloudfoundry.uaa.users.AbstractUser;
 import org.immutables.value.Value;
 
 /**
- * The response payload from the check a membership of a group request
+ * The resource in the list members response
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _CheckMembershipResponse extends AbstractMemberSummary {
+abstract class _MemberUser extends AbstractUser implements GroupMembered {
 
 }

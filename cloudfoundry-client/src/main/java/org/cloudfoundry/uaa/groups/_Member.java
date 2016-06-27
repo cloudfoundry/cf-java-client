@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 /**
- * The payload for members in response
+ * The payload for members in list members response
  */
 @JsonDeserialize
 @Value.Immutable

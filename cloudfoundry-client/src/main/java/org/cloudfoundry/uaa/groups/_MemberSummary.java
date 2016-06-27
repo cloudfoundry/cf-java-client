@@ -20,10 +20,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 /**
- * The response payload from the check a membership of a group request
+ * The payload for members in response
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _CheckMembershipResponse extends AbstractMemberSummary {
+abstract class _MemberSummary extends AbstractMemberSummary {
 
 }
