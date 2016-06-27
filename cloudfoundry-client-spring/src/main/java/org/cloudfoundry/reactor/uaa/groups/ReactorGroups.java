@@ -21,6 +21,8 @@ import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.uaa.groups.AddMemberRequest;
 import org.cloudfoundry.uaa.groups.AddMemberResponse;
+import org.cloudfoundry.uaa.groups.CheckMembershipRequest;
+import org.cloudfoundry.uaa.groups.CheckMembershipResponse;
 import org.cloudfoundry.uaa.groups.CreateGroupRequest;
 import org.cloudfoundry.uaa.groups.CreateGroupResponse;
 import org.cloudfoundry.uaa.groups.DeleteGroupRequest;
@@ -65,6 +67,11 @@ public class ReactorGroups extends AbstractUaaOperations implements Groups {
     @Override
     public Mono<AddMemberResponse> addMember(AddMemberRequest request) {
         return post(request, AddMemberResponse.class, builder -> builder.pathSegment("Groups", request.getGroupId(), "members"));
+    }
+
+    @Override
+    public Mono<CheckMembershipResponse> checkMembership(CheckMembershipRequest request) {
+        return get(request, CheckMembershipResponse.class, builder -> builder.pathSegment("Groups", request.getGroupId(), "members", request.getMemberId()));
     }
 
     @Override
