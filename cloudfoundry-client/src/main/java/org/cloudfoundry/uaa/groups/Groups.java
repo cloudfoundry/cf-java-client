@@ -32,6 +32,14 @@ public interface Groups {
     Mono<AddMemberResponse> addMember(AddMemberRequest request);
 
     /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#check-membership">Check Membership</a> request
+     *
+     * @param request the Check Membership request
+     * @return the response from the Check Membership request
+     */
+    Mono<CheckMembershipResponse> checkMembership(CheckMembershipRequest request);
+
+    /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#create58">Create Group</a> request
      *
      * @param request the Create Group request

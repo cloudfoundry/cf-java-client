@@ -23,6 +23,8 @@ import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
 import org.cloudfoundry.uaa.Metadata;
 import org.cloudfoundry.uaa.groups.AddMemberRequest;
 import org.cloudfoundry.uaa.groups.AddMemberResponse;
+import org.cloudfoundry.uaa.groups.CheckMembershipRequest;
+import org.cloudfoundry.uaa.groups.CheckMembershipResponse;
 import org.cloudfoundry.uaa.groups.CreateGroupRequest;
 import org.cloudfoundry.uaa.groups.CreateGroupResponse;
 import org.cloudfoundry.uaa.groups.DeleteGroupRequest;
@@ -47,6 +49,7 @@ import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupIdRequest;
 import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupIdResponse;
 import org.cloudfoundry.uaa.groups.UpdateGroupRequest;
 import org.cloudfoundry.uaa.groups.UpdateGroupResponse;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
@@ -100,6 +103,46 @@ public final class ReactorGroupsTest {
         @Override
         protected Mono<AddMemberResponse> invoke(AddMemberRequest request) {
             return this.groups.addMember(request);
+        }
+    }
+
+    public static final class CheckMember extends AbstractUaaApiTest<CheckMembershipRequest, CheckMembershipResponse> {
+
+        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/Groups/test-group-id/members/test-member-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/groups/GET_{id}_members_{id}_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected CheckMembershipResponse getResponse() {
+            return CheckMembershipResponse.builder()
+                .identityProviderOriginKey("uaa")
+                .type(MemberType.USER)
+                .memberId("test-member-id")
+                .build();
+        }
+
+        @Override
+        protected CheckMembershipRequest getValidRequest() throws Exception {
+            return CheckMembershipRequest.builder()
+                .groupId("test-group-id")
+                .memberId("test-member-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<CheckMembershipResponse> invoke(CheckMembershipRequest request) {
+            return this.groups.checkMembership(request);
         }
     }
 
