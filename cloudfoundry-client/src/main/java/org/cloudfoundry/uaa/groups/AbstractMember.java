@@ -17,31 +17,25 @@
 package org.cloudfoundry.uaa.groups;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.cloudfoundry.Nullable;
 
 /**
- * The payload for Group member
+ * The payload for members in list response
  */
-abstract class AbstractMember {
+abstract class AbstractMember extends AbstractMemberSummary {
 
     /**
-     * The alias of the identity provider that authenticated this user. "uaa" is an internal UAA user.
+     * Present only if requested with returnEntities; user or group with membership in the group
      */
-    @JsonProperty("origin")
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "type")
+    @JsonSubTypes({
+        @JsonSubTypes.Type(name = "USER", value = MemberUser.class),
+        @JsonSubTypes.Type(name = "GROUP", value = MemberGroup.class)
+    })
+    @JsonProperty("entity")
     @Nullable
-    abstract String getOrigin();
-
-    /**
-     * Globally unique identifier of the member, either a user ID or another group ID
-     */
-    @JsonProperty("value")
-    abstract String getMemberId();
-
-    /**
-     * The member type
-     */
-    @JsonProperty("type")
-    @Nullable
-    abstract MemberType getType();
+    abstract GroupMembered getEntity();
 
 }

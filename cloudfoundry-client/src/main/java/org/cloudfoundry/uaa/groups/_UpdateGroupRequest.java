@@ -61,6 +61,6 @@ abstract class _UpdateGroupRequest implements Versioned, IdentityZoned {
      * Array of group members
      */
     @JsonProperty("members")
-    abstract List<Member> getMembers();
+    abstract List<MemberSummary> getMembers();
 
 }
