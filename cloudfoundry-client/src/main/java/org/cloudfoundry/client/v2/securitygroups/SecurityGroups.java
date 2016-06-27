@@ -80,4 +80,12 @@ public interface SecurityGroups {
      * @return the response from the create security group request
      */
     Mono<CreateSecurityGroupResponse> create(CreateSecurityGroupRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_groups/delete_a_particular_security_group.html">Delete a Particular Security Group</a> request.
+     *
+     * @param request the delete security group request
+     * @return the response from the delete security group request
+     */
+    Mono<DeleteSecurityGroupResponse> delete(DeleteSecurityGroupRequest request);
 }

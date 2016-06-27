@@ -17,8 +17,11 @@
 package org.cloudfoundry.reactor.client.v2.securitygroups;
 
 import org.cloudfoundry.client.v2.Metadata;
+import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupRequest;
 import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupResponse;
+import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRequest;
+import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupResponse;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRunningDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupStagingDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsRequest;
@@ -42,6 +45,7 @@ import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
@@ -420,6 +424,87 @@ public final class ReactorSecurityGroupsTest {
             return this.securityGroups.create(request);
         }
 
+    }
+
+    public static final class Delete extends AbstractClientApiTest<DeleteSecurityGroupRequest, DeleteSecurityGroupResponse> {
+
+        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/security_groups/test-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected DeleteSecurityGroupResponse getResponse() {
+            return null;
+        }
+
+        @Override
+        protected DeleteSecurityGroupRequest getValidRequest() throws Exception {
+            return DeleteSecurityGroupRequest.builder()
+                .securityGroupId("test-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<DeleteSecurityGroupResponse> invoke(DeleteSecurityGroupRequest request) {
+            return this.securityGroups.delete(request);
+        }
+
+    }
+
+    public static final class DeleteAsync extends AbstractClientApiTest<DeleteSecurityGroupRequest, DeleteSecurityGroupResponse> {
+
+        private final ReactorSecurityGroups domains = new ReactorSecurityGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/security_groups/test-id?async=true")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(ACCEPTED)
+                    .payload("fixtures/client/v2/security_groups/DELETE_{id}_async_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected DeleteSecurityGroupResponse getResponse() {
+            return DeleteSecurityGroupResponse.builder()
+                .metadata(Metadata.builder()
+                    .id("260ba675-47b6-4094-be7a-349d58e3d36a")
+                    .createdAt("2016-02-02T17:16:31Z")
+                    .url("/v2/jobs/260ba675-47b6-4094-be7a-349d58e3d36a")
+                    .build())
+                .entity(JobEntity.builder()
+                    .id("260ba675-47b6-4094-be7a-349d58e3d36a")
+                    .status("queued")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected DeleteSecurityGroupRequest getValidRequest() throws Exception {
+            return DeleteSecurityGroupRequest.builder()
+                .async(true)
+                .securityGroupId("test-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<DeleteSecurityGroupResponse> invoke(DeleteSecurityGroupRequest request) {
+            return this.domains.delete(request);
+        }
     }
 
 }
