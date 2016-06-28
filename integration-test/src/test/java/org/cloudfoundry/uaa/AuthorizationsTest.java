@@ -20,6 +20,9 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantBrowserRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByImplicitGrantBrowserRequest;
+import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithAuthorizationCodeGrantRequest;
+import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithIdTokenRequest;
+import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithImplicitGrantRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -37,6 +40,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
             .authorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest.builder()
                 .clientId("ssh-proxy")
                 .build())
+            .log("stream.this")
             .subscribe(this.<String>testSubscriber()
                 .assertThat(code -> {
                     assertNotNull(code);
@@ -65,5 +69,42 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
             .subscribe(this.<String>testSubscriber()
                 .assertThat(location -> assertTrue(location.startsWith("https://uaa."))));
     }
+
+    @Test
+    public void authorizeByOpenIdWithAuthorizationCodeGrant() {
+        this.uaaClient.authorizations()
+            .openIdWithAuthorizationCodeGrant(AuthorizeByOpenIdWithAuthorizationCodeGrantRequest.builder()
+                .clientId("app")
+                .redirectUri("http://redirect.to/app")
+                .scope("openid")
+                .build())
+            .subscribe(this.<String>testSubscriber()
+                .assertThat(location -> assertTrue(location.startsWith("https://uaa."))));
+    }
+
+    @Test
+    public void authorizeByOpenIdWithIdToken() {
+        this.uaaClient.authorizations()
+            .openIdWithIdToken(AuthorizeByOpenIdWithIdTokenRequest.builder()
+                .clientId("app")
+                .redirectUri("http://redirect.to/app")
+                .scope("open-id")
+                .build())
+            .subscribe(this.<String>testSubscriber()
+                .assertThat(location -> assertTrue(location.startsWith("https://uaa."))));
+    }
+
+    @Test
+    public void authorizeByOpenIdWithImplicitGrant() {
+        this.uaaClient.authorizations()
+            .openIdWithImplicitGrant(AuthorizeByOpenIdWithImplicitGrantRequest.builder()
+                .clientId("app")
+                .redirectUri("http://redirect.to/app")
+                .scope("openid")
+                .build())
+            .subscribe(this.<String>testSubscriber()
+                .assertThat(location -> assertTrue(location.startsWith("https://uaa."))));
+    }
+
 
 }

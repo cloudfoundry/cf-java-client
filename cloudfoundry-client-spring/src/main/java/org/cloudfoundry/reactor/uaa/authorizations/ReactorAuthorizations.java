@@ -25,6 +25,9 @@ import org.cloudfoundry.uaa.authorizations.Authorizations;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantBrowserRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByImplicitGrantBrowserRequest;
+import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithAuthorizationCodeGrantRequest;
+import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithIdTokenRequest;
+import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithImplicitGrantRequest;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
@@ -67,6 +70,24 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
     @Override
     public Mono<String> implicitGrantBrowser(AuthorizeByImplicitGrantBrowserRequest request) {
         return getNoAuth(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.TOKEN))
+            .map(inbound -> inbound.responseHeaders().get(LOCATION));
+    }
+
+    @Override
+    public Mono<String> openIdWithAuthorizationCodeGrant(AuthorizeByOpenIdWithAuthorizationCodeGrantRequest request) {
+        return getNoAuth(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.ID_TOKEN_CODE))
+            .map(inbound -> inbound.responseHeaders().get(LOCATION));
+    }
+
+    @Override
+    public Mono<String> openIdWithIdToken(AuthorizeByOpenIdWithIdTokenRequest request) {
+        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.ID_TOKEN))
+            .map(inbound -> inbound.responseHeaders().get(LOCATION));
+    }
+
+    @Override
+    public Mono<String> openIdWithImplicitGrant(AuthorizeByOpenIdWithImplicitGrantRequest request) {
+        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.ID_TOKEN_TOKEN))
             .map(inbound -> inbound.responseHeaders().get(LOCATION));
     }
 

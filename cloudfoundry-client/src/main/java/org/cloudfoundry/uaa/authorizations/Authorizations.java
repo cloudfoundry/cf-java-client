@@ -47,4 +47,28 @@ public interface Authorizations {
      */
     Mono<String> implicitGrantBrowser(AuthorizeByImplicitGrantBrowserRequest request);
 
+    /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#with-authorization-code-grant">Authorize By Open ID with Authorization Code Grant</a> request
+     *
+     * @param request Authorize By Open ID with an Authorization Code Grant request
+     * @return the authentication location URI, including Access Token
+     */
+    Mono<String> openIdWithAuthorizationCodeGrant(AuthorizeByOpenIdWithAuthorizationCodeGrantRequest request);
+
+    /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#id-token">Authorize By Open ID with an ID Token</a> request
+     *
+     * @param request Authorize By Open ID with an ID Token request
+     * @return the authentication location URI, including Access Token
+     */
+    Mono<String> openIdWithIdToken(AuthorizeByOpenIdWithIdTokenRequest request);
+
+    /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#with-implicit-grant">Authorize By Open ID with Implicit Grant</a> request
+     *
+     * @param request Authorize By Open ID with Implicit Grant request
+     * @return the authentication location URI, including Access Token
+     */
+    Mono<String> openIdWithImplicitGrant(AuthorizeByOpenIdWithImplicitGrantRequest request);
+
 }
