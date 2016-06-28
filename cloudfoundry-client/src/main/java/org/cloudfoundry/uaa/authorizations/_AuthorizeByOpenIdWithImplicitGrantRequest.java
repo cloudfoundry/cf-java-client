@@ -19,9 +19,9 @@ package org.cloudfoundry.uaa.authorizations;
 import org.immutables.value.Value;
 
 /**
- * The request payload for authorization with an authorization code grant operation
+ * The request payload for authorize by open id with an id token operation
  */
 @Value.Immutable
-abstract class _AuthorizeByImplicitGrantBrowserRequest extends AbstractAuthorizationRequest {
+abstract class _AuthorizeByOpenIdWithImplicitGrantRequest extends AbstractAuthorizationRequest {
 
 }

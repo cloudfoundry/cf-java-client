@@ -23,6 +23,9 @@ import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantBrowserRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByImplicitGrantBrowserRequest;
+import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithAuthorizationCodeGrantRequest;
+import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithIdTokenRequest;
+import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithImplicitGrantRequest;
 import reactor.core.publisher.Mono;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -145,6 +148,129 @@ public final class ReactorAuthorizationsTest {
         @Override
         protected Mono<String> invoke(AuthorizeByImplicitGrantBrowserRequest request) {
             return this.authorizations.implicitGrantBrowser(request);
+        }
+    }
+
+    public static final class AuthorizeByOpenIdWithAuthorizationCodeGrant extends AbstractUaaApiTest<AuthorizeByOpenIdWithAuthorizationCodeGrantRequest, String> {
+
+        private final ReactorAuthorizations authorizations = new ReactorAuthorizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/oauth/authorize?client_id=app&redirect_uri=http://localhost:8080/app/&scope=openid&response_type=code%20id_token")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(FOUND)
+                    .header("Location", "http://redirect.to/login")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected String getResponse() {
+            return "http://redirect.to/login";
+        }
+
+        @Override
+        protected AuthorizeByOpenIdWithAuthorizationCodeGrantRequest getValidRequest() throws Exception {
+            return AuthorizeByOpenIdWithAuthorizationCodeGrantRequest.builder()
+                .clientId("app")
+                .redirectUri("http://localhost:8080/app/")
+                .scope("openid")
+                .build();
+        }
+
+        @Override
+        protected Mono<String> invoke(AuthorizeByOpenIdWithAuthorizationCodeGrantRequest request) {
+            return this.authorizations.openIdWithAuthorizationCodeGrant(request);
+        }
+    }
+
+    public static final class AuthorizeByOpenIdWithToken extends AbstractUaaApiTest<AuthorizeByOpenIdWithIdTokenRequest, String> {
+
+        private final ReactorAuthorizations authorizations = new ReactorAuthorizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/oauth/authorize?client_id=app&redirect_uri=http://localhost:8080/app/&scope=openid&response_type=id_token")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(FOUND)
+                    .header("Location", "http://localhost:8080/app/#token_type=bearer" +
+                        "&id_token=eyJhbGciOiJIUzI1NiIsImtpZCI6ImxlZ2FjeS10b2tlbi1rZXkiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiIyMzkyYTMyMC00M2VlLTQ1ZTgtODdhNC1iYTkzYTIwMTZmODciLCJ1c2VyX25hbWUiOiJtYXJpc3NhIiw" +
+                        "ib3JpZ2luIjoidWFhIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3VhYS9vYXV0aC90b2tlbiIsImNsaWVudF9pZCI6ImFwcCIsImF1ZCI6WyJhcHAiXSwiemlkIjoidWFhIiwidXNlcl9pZCI6IjIzOTJhMzIwLTQzZWU" +
+                        "tNDVlOC04N2E0LWJhOTNhMjAxNmY4NyIsImF6cCI6ImFwcCIsInNjb3BlIjpbIm9wZW5pZCJdLCJleHAiOjE0NjYwNzg0OTAsImlhdCI6MTQ2NjAzNTI5MCwianRpIjoiM2NjNDg2NmYzMWRjNGIyMThkMTdiZDNhMzE4MjhmNWU" +
+                        "iLCJlbWFpbCI6Im1hcmlzc2FAdGVzdC5vcmciLCJyZXZfc2lnIjoiMzYyNzRiZmMiLCJjaWQiOiJhcHAifQ.zR0b0TVFY8VrxAXLve2VRZvwb9HWMtbD79KSHwgr1wo" +
+                        "&expires_in=43199" +
+                        "&jti=3cc4866f31dc4b218d17bd3a31828f5e")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected String getResponse() {
+            return "http://localhost:8080/app/#token_type=bearer" +
+                "&id_token=eyJhbGciOiJIUzI1NiIsImtpZCI6ImxlZ2FjeS10b2tlbi1rZXkiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiIyMzkyYTMyMC00M2VlLTQ1ZTgtODdhNC1iYTkzYTIwMTZmODciLCJ1c2VyX25hbWUiOiJtYXJpc3NhIiwib3JpZ2l" +
+                "uIjoidWFhIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3VhYS9vYXV0aC90b2tlbiIsImNsaWVudF9pZCI6ImFwcCIsImF1ZCI6WyJhcHAiXSwiemlkIjoidWFhIiwidXNlcl9pZCI6IjIzOTJhMzIwLTQzZWUtNDVlOC04N2E0LWJ" +
+                "hOTNhMjAxNmY4NyIsImF6cCI6ImFwcCIsInNjb3BlIjpbIm9wZW5pZCJdLCJleHAiOjE0NjYwNzg0OTAsImlhdCI6MTQ2NjAzNTI5MCwianRpIjoiM2NjNDg2NmYzMWRjNGIyMThkMTdiZDNhMzE4MjhmNWUiLCJlbWFpbCI6Im1hcmlzc2F" +
+                "AdGVzdC5vcmciLCJyZXZfc2lnIjoiMzYyNzRiZmMiLCJjaWQiOiJhcHAifQ.zR0b0TVFY8VrxAXLve2VRZvwb9HWMtbD79KSHwgr1wo" +
+                "&expires_in=43199" +
+                "&jti=3cc4866f31dc4b218d17bd3a31828f5e";
+        }
+
+        @Override
+        protected AuthorizeByOpenIdWithIdTokenRequest getValidRequest() throws Exception {
+            return AuthorizeByOpenIdWithIdTokenRequest.builder()
+                .clientId("app")
+                .redirectUri("http://localhost:8080/app/")
+                .scope("openid")
+                .build();
+        }
+
+        @Override
+        protected Mono<String> invoke(AuthorizeByOpenIdWithIdTokenRequest request) {
+            return this.authorizations.openIdWithIdToken(request);
+        }
+    }
+
+    public static final class AuthorizeByOpenIdWithimplicitGrant extends AbstractUaaApiTest<AuthorizeByOpenIdWithImplicitGrantRequest, String> {
+
+        private final ReactorAuthorizations authorizations = new ReactorAuthorizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/oauth/authorize?client_id=app&redirect_uri=http://localhost:8080/app/&scope=openid&response_type=token%20id_token")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(FOUND)
+                    .header("Location", "http://redirect.to/login")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected String getResponse() {
+            return "http://redirect.to/login";
+        }
+
+        @Override
+        protected AuthorizeByOpenIdWithImplicitGrantRequest getValidRequest() throws Exception {
+            return AuthorizeByOpenIdWithImplicitGrantRequest.builder()
+                .clientId("app")
+                .redirectUri("http://localhost:8080/app/")
+                .scope("openid")
+                .build();
+        }
+
+        @Override
+        protected Mono<String> invoke(AuthorizeByOpenIdWithImplicitGrantRequest request) {
+            return this.authorizations.openIdWithImplicitGrant(request);
         }
     }
 

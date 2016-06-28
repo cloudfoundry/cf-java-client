@@ -16,36 +16,12 @@
 
 package org.cloudfoundry.uaa.authorizations;
 
-import org.cloudfoundry.Nullable;
-import org.cloudfoundry.QueryParameter;
 import org.immutables.value.Value;
-
-import java.util.List;
 
 /**
  * The request payload for authorization with an authorization code grant operation
  */
 @Value.Immutable
-abstract class _AuthorizeByAuthorizationCodeGrantBrowserRequest {
-
-    /**
-     * A unique string representing the registration information provided by the client
-     */
-    @QueryParameter("client_id")
-    abstract String getClientId();
-
-    /**
-     * Redirection URI to which the authorization server will send the user-agent back once access is granted (or denied), optional if pre-registered by the client
-     */
-    @Nullable
-    @QueryParameter("redirect_uri")
-    abstract String getRedirectUri();
-
-    /**
-     * requested scopes, space-delimited
-     */
-    @Nullable
-    @QueryParameter(value = "scope", delimiter = " ")
-    abstract List<String> getScopes();
+abstract class _AuthorizeByAuthorizationCodeGrantBrowserRequest extends AbstractAuthorizationRequest {
 
 }
