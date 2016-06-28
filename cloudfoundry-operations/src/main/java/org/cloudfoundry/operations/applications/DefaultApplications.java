@@ -106,6 +106,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
@@ -310,7 +311,7 @@ public final class DefaultApplications implements Applications {
                 Mono.just(cloudFoundryClient),
                 getApplicationId(cloudFoundryClient, request.getName(), spaceId)
             )))
-            .then(function((cloudFoundryClient, applicationId) -> requestUpdateApplicationRename(cloudFoundryClient, applicationId, request.getNewName())))
+            .then(function((cloudFoundryClient, applicationId) -> requestUpdateApplicationName(cloudFoundryClient, applicationId, request.getNewName())))
             .then();
     }
 
@@ -391,7 +392,7 @@ public final class DefaultApplications implements Applications {
                 Mono.just(cloudFoundryClient),
                 getApplicationId(cloudFoundryClient, request.getName(), spaceId)
             )))
-            .then(function((cloudFoundryClient, applicationId) -> updateHealthCheck(cloudFoundryClient, applicationId, request.getType())))
+            .then(function((cloudFoundryClient, applicationId) -> requestUpdateApplicationHealthCheckType(cloudFoundryClient, applicationId, request.getType())))
             .then();
     }
 
@@ -1026,14 +1027,8 @@ public final class DefaultApplications implements Applications {
     private static Flux<RouteResource> requestRoutes(CloudFoundryClient cloudFoundryClient, String domainId, String host, String routePath) {
         ListRoutesRequest.Builder requestBuilder = ListRoutesRequest.builder()
             .domainId(domainId);
-
-        if (host != null) {
-            requestBuilder.host(host);
-        }
-
-        if (routePath != null) {
-            requestBuilder.path(routePath);
-        }
+        Optional.ofNullable(host).ifPresent(requestBuilder::host);
+        Optional.ofNullable(routePath).ifPresent(requestBuilder::path);
 
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.routes()
@@ -1116,49 +1111,36 @@ public final class DefaultApplications implements Applications {
                 .build());
     }
 
-    private static Mono<UpdateApplicationResponse> requestUpdateApplicationEnvironment(CloudFoundryClient cloudFoundryClient, String applicationId, Map<String, Object> environment) {
+    private static Mono<AbstractApplicationResource> requestUpdateApplication(CloudFoundryClient cloudFoundryClient, String applicationId, UnaryOperator<UpdateApplicationRequest.Builder> modifier) {
         return cloudFoundryClient.applicationsV2()
-            .update(UpdateApplicationRequest.builder()
-                .applicationId(applicationId)
-                .environmentJsons(environment)
-                .build());
+            .update(modifier.apply(UpdateApplicationRequest.builder()
+                .applicationId(applicationId))
+                .build())
+            .map(OperationUtils.<UpdateApplicationResponse, AbstractApplicationResource>cast());
     }
 
-    private static Mono<UpdateApplicationResponse> requestUpdateApplicationRename(CloudFoundryClient cloudFoundryClient, String applicationId, String name) {
-        return cloudFoundryClient.applicationsV2()
-            .update(UpdateApplicationRequest.builder()
-                .applicationId(applicationId)
-                .name(name)
-                .build());
+    private static Mono<AbstractApplicationResource> requestUpdateApplicationEnvironment(CloudFoundryClient cloudFoundryClient, String applicationId, Map<String, Object> environment) {
+        return requestUpdateApplication(cloudFoundryClient, applicationId, builder -> builder.environmentJsons(environment));
+    }
+
+    private static Mono<AbstractApplicationResource> requestUpdateApplicationHealthCheckType(CloudFoundryClient cloudFoundryClient, String applicationId, ApplicationHealthCheck type) {
+        return requestUpdateApplication(cloudFoundryClient, applicationId, builder -> builder.healthCheckType(type.getValue()));
+    }
+
+    private static Mono<AbstractApplicationResource> requestUpdateApplicationName(CloudFoundryClient cloudFoundryClient, String applicationId, String name) {
+        return requestUpdateApplication(cloudFoundryClient, applicationId, builder -> builder.name(name));
     }
 
     private static Mono<AbstractApplicationResource> requestUpdateApplicationScale(CloudFoundryClient cloudFoundryClient, String applicationId, Integer disk, Integer instances, Integer memory) {
-        return cloudFoundryClient.applicationsV2()
-            .update(UpdateApplicationRequest.builder()
-                .applicationId(applicationId)
-                .diskQuota(disk)
-                .instances(instances)
-                .memory(memory)
-                .build())
-            .map(OperationUtils.<UpdateApplicationResponse, AbstractApplicationResource>cast());
+        return requestUpdateApplication(cloudFoundryClient, applicationId, builder -> builder.diskQuota(disk).instances(instances).memory(memory));
     }
 
     private static Mono<AbstractApplicationResource> requestUpdateApplicationSsh(CloudFoundryClient cloudFoundryClient, String applicationId, Boolean enabled) {
-        return cloudFoundryClient.applicationsV2()
-            .update(UpdateApplicationRequest.builder()
-                .applicationId(applicationId)
-                .enableSsh(enabled)
-                .build())
-            .map(OperationUtils.<UpdateApplicationResponse, AbstractApplicationResource>cast());
+        return requestUpdateApplication(cloudFoundryClient, applicationId, builder -> builder.enableSsh(enabled));
     }
 
     private static Mono<AbstractApplicationResource> requestUpdateApplicationState(CloudFoundryClient cloudFoundryClient, String applicationId, String state) {
-        return cloudFoundryClient.applicationsV2()
-            .update(UpdateApplicationRequest.builder()
-                .applicationId(applicationId)
-                .state(state)
-                .build())
-            .map(OperationUtils.<UpdateApplicationResponse, AbstractApplicationResource>cast());
+        return requestUpdateApplication(cloudFoundryClient, applicationId, builder -> builder.state(state));
     }
 
     private static Mono<UploadApplicationResponse> requestUploadApplication(CloudFoundryClient cloudFoundryClient, String applicationId, InputStream application) {
@@ -1323,14 +1305,6 @@ public final class DefaultApplications implements Applications {
             .fromIterable(routes)
             .map(DefaultApplications::toUrl)
             .collectList();
-    }
-
-    private static Mono<UpdateApplicationResponse> updateHealthCheck(CloudFoundryClient cloudFoundryClient, String applicationId, ApplicationHealthCheck type) {
-        return cloudFoundryClient.applicationsV2()
-            .update(UpdateApplicationRequest.builder()
-                .applicationId(applicationId)
-                .healthCheckType(type.getValue())
-                .build());
     }
 
     private static Mono<Void> uploadApplicationAndWait(CloudFoundryClient cloudFoundryClient, String applicationId, InputStream application) {

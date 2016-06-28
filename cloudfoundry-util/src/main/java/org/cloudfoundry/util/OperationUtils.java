@@ -43,7 +43,7 @@ public final class OperationUtils {
      * Produces a Mono transformer that preserves the type of the source {@code Mono<IN>}.
      *
      * <p> The Mono produced expects a single element from the source, passes this to the function (as in {@code .then}) and requests an element from the resulting {@code Mono<OUT>}. When successful,
-     * the result (if any) is discarded and input value is signalled. </p>
+     * the result (if any) is discarded and the input value is signalled. </p>
      *
      * <p> <b>Summary:</b> does a {@code .then} on the new Mono but keeps the input to pass on unchanged. </p>
      *
