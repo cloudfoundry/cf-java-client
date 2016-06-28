@@ -47,6 +47,7 @@ import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
 import org.cloudfoundry.client.v2.applications.Usage;
+import org.cloudfoundry.client.v2.domains.Domain;
 import org.cloudfoundry.client.v2.events.EventEntity;
 import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
@@ -680,13 +681,12 @@ public final class DefaultApplications implements Applications {
     }
 
     private static Mono<Optional<String>> getOptionalStackId(CloudFoundryClient cloudFoundryClient, String stack) {
-        if (stack == null) {
-            return Mono.just(Optional.empty());
-        }
-        return requestStackId(cloudFoundryClient, stack)
-            .map(ResourceUtils::getId)
-            .map(Optional::of)
-            .otherwiseIfEmpty(ExceptionUtils.illegalState("Stack %s not found", stack));
+        return Optional.ofNullable(stack)
+            .map(stack1 -> requestStackId(cloudFoundryClient, stack1)
+                .map(ResourceUtils::getId)
+                .map(Optional::of)
+                .otherwiseIfEmpty(ExceptionUtils.illegalState("Stack %s not found", stack1)))
+            .orElse(Mono.just(Optional.empty()));
     }
 
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
@@ -739,9 +739,9 @@ public final class DefaultApplications implements Applications {
             .map(SummaryApplicationResponse::getRoutes);
     }
 
-    private static Mono<Tuple2<Optional<List<Route>>, String>> getRoutesAndApplicationId(CloudFoundryClient cloudFoundryClient, DeleteApplicationRequest deleteApplicationRequest, String spaceId,
+    private static Mono<Tuple2<Optional<List<Route>>, String>> getRoutesAndApplicationId(CloudFoundryClient cloudFoundryClient, DeleteApplicationRequest request, String spaceId,
                                                                                          boolean deleteRoutes) {
-        return getApplicationId(cloudFoundryClient, deleteApplicationRequest.getName(), spaceId)
+        return getApplicationId(cloudFoundryClient, request.getName(), spaceId)
             .then(applicationId -> getOptionalRoutes(cloudFoundryClient, deleteRoutes, applicationId)
                 .and(Mono.just(applicationId)));
     }
@@ -1219,15 +1219,13 @@ public final class DefaultApplications implements Applications {
             .stack(stackName)
             .timeout(response.getHealthCheckTimeout());
 
-        for (Route route : response.getRoutes()) {
-            manifestBuilder
-                .domain(route.getDomain().getName())
-                .host((route.getHost()));
+        for (Route route : Optional.ofNullable(response.getRoutes()).orElse(Collections.emptyList())) {
+            Optional.ofNullable(route.getDomain()).map(Domain::getName).ifPresent(manifestBuilder::domain);
+            Optional.ofNullable(route.getHost()).ifPresent(manifestBuilder::host);
         }
 
-        for (ServiceInstance service : response.getServices()) {
-            manifestBuilder
-                .service(service.getName());
+        for (ServiceInstance service : Optional.ofNullable(response.getServices()).orElse(Collections.emptyList())) {
+            Optional.ofNullable(service.getName()).ifPresent(manifestBuilder::service);
         }
 
         return Mono

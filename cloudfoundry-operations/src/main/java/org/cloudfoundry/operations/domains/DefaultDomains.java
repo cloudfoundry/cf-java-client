@@ -55,7 +55,7 @@ public final class DefaultDomains implements Domains {
                 Mono.just(cloudFoundryClient),
                 getOrganizationId(cloudFoundryClient, request.getOrganization())
             ))
-            .then(function((cloudFoundryClient, domainId) -> requestCreateDomain(cloudFoundryClient, request.getDomain(), domainId)))
+            .then(function((cloudFoundryClient, organizationId) -> requestCreateDomain(cloudFoundryClient, request.getDomain(), organizationId)))
             .then();
     }
 

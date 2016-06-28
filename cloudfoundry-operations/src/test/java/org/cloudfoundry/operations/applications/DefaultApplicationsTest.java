@@ -392,7 +392,7 @@ public final class DefaultApplicationsTest {
     }
 
     private static void requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId, String applicationId) {
-        requestApplications(cloudFoundryClient, application, spaceId, applicationId, StringMap.builder().entry("test-var", "test-value").build());
+        requestApplications(cloudFoundryClient, application, spaceId, applicationId, Collections.singletonMap("test-var", "test-value"));
     }
 
     private static void requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId, String applicationId, Map<String, Object> envResponse) {
@@ -848,13 +848,9 @@ public final class DefaultApplicationsTest {
 
     private static void requestRoutes(CloudFoundryClient cloudFoundryClient, String domainId, String host, String routePath, String routeId) {
         ListRoutesRequest.Builder requestBuilder = ListRoutesRequest.builder();
-        if (host != null) {
-            requestBuilder.host(host);
-        }
 
-        if (routePath != null) {
-            requestBuilder.path(routePath);
-        }
+        Optional.ofNullable(host).ifPresent(requestBuilder::host);
+        Optional.ofNullable(routePath).ifPresent(requestBuilder::path);
 
         when(cloudFoundryClient.routes()
             .list(requestBuilder
@@ -877,13 +873,9 @@ public final class DefaultApplicationsTest {
 
     private static void requestRoutesEmpty(CloudFoundryClient cloudFoundryClient, String domainId, String host, String routePath) {
         ListRoutesRequest.Builder requestBuilder = ListRoutesRequest.builder();
-        if (host != null) {
-            requestBuilder.host(host);
-        }
 
-        if (routePath != null) {
-            requestBuilder.path(routePath);
-        }
+        Optional.ofNullable(host).ifPresent(requestBuilder::host);
+        Optional.ofNullable(routePath).ifPresent(requestBuilder::path);
 
         when(cloudFoundryClient.routes()
             .list(requestBuilder

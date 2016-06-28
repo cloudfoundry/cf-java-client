@@ -89,7 +89,8 @@ public final class DefaultOrganizationAdminTest {
 
     private static void requestListOrganizationEmpty(CloudFoundryClient cloudFoundryClient, String name) {
         when(cloudFoundryClient.organizations()
-            .list(ListOrganizationsRequest.builder().name(name)
+            .list(ListOrganizationsRequest.builder()
+                .name(name)
                 .page(1)
                 .build()))
             .thenReturn(Mono
@@ -111,7 +112,8 @@ public final class DefaultOrganizationAdminTest {
 
     private static void requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient, String name) {
         when(cloudFoundryClient.organizationQuotaDefinitions()
-            .list(ListOrganizationQuotaDefinitionsRequest.builder().name(name)
+            .list(ListOrganizationQuotaDefinitionsRequest.builder()
+                .name(name)
                 .page(1)
                 .build()))
             .thenReturn(Mono
@@ -123,7 +125,8 @@ public final class DefaultOrganizationAdminTest {
 
     private static void requestListOrganizationQuotasEmpty(CloudFoundryClient cloudFoundryClient, String name) {
         when(cloudFoundryClient.organizationQuotaDefinitions()
-            .list(ListOrganizationQuotaDefinitionsRequest.builder().name(name)
+            .list(ListOrganizationQuotaDefinitionsRequest.builder()
+                .name(name)
                 .page(1)
                 .build()))
             .thenReturn(Mono
@@ -133,7 +136,8 @@ public final class DefaultOrganizationAdminTest {
 
     private static void requestListOrganizations(CloudFoundryClient cloudFoundryClient, String name) {
         when(cloudFoundryClient.organizations()
-            .list(ListOrganizationsRequest.builder().name(name)
+            .list(ListOrganizationsRequest.builder()
+                .name(name)
                 .page(1)
                 .build()))
             .thenReturn(Mono

@@ -60,7 +60,9 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.function.Supplier;
 
@@ -314,9 +316,9 @@ public final class DefaultRoutesTest {
         when(cloudFoundryClient.routes()
             .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
                 .domainId(domainId)
-                .host(host)
+                .hosts(Optional.ofNullable(host).map(Collections::singletonList).orElse(null))
                 .page(1)
-                .path(path)
+                .paths(Optional.ofNullable(path).map(Collections::singletonList).orElse(null))
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListRoutesResponse.builder())
@@ -329,9 +331,9 @@ public final class DefaultRoutesTest {
         when(cloudFoundryClient.routes()
             .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
                 .domainId(domainId)
-                .host(host)
+                .hosts(Optional.ofNullable(host).map(Collections::singletonList).orElse(null))
                 .page(1)
-                .path(path)
+                .paths(Optional.ofNullable(path).map(Collections::singletonList).orElse(null))
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListRoutesResponse.builder())
@@ -1222,6 +1224,35 @@ public final class DefaultRoutesTest {
                     .applicationName("test-application-name")
                     .domain("test-domain")
                     .host("test-host")
+                    .path("test-path")
+                    .build());
+        }
+    }
+
+    public static final class MapRouteNoHost extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
+            requestRoutesEmpty(this.cloudFoundryClient, "test-private-domain-metadata-id", null, "test-path");
+            requestCreateRoute(this.cloudFoundryClient, "test-private-domain-metadata-id", null, "test-path", TEST_SPACE_ID);
+            requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.routes
+                .map(MapRouteRequest.builder()
+                    .applicationName("test-application-name")
+                    .domain("test-domain")
                     .path("test-path")
                     .build());
         }
