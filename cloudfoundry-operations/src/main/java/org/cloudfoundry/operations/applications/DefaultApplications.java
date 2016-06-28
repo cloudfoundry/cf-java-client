@@ -1094,10 +1094,9 @@ public final class DefaultApplications implements Applications {
                 .build());
     }
 
-    private static Mono<UpdateApplicationResponse> requestUpdateApplication(CloudFoundryClient cloudFoundryClient, String applicationId, PushApplicationRequest request, String stackId) {
-        return cloudFoundryClient.applicationsV2()
-            .update(UpdateApplicationRequest.builder()
-                .applicationId(applicationId)
+    private static Mono<AbstractApplicationResource> requestUpdateApplication(CloudFoundryClient cloudFoundryClient, String applicationId, PushApplicationRequest request, String stackId) {
+        return requestUpdateApplication(cloudFoundryClient, applicationId,
+            builder -> builder
                 .buildpack(request.getBuildpack())
                 .command(request.getCommand())
                 .diskQuota(request.getDiskQuota())
@@ -1107,8 +1106,7 @@ public final class DefaultApplications implements Applications {
                 .instances(request.getInstances())
                 .memory(request.getMemory())
                 .name(request.getName())
-                .stackId(stackId)
-                .build());
+                .stackId(stackId));
     }
 
     private static Mono<AbstractApplicationResource> requestUpdateApplication(CloudFoundryClient cloudFoundryClient, String applicationId, UnaryOperator<UpdateApplicationRequest.Builder> modifier) {
