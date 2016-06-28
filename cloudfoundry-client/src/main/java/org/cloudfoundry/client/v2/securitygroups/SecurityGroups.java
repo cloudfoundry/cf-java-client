@@ -55,6 +55,14 @@ public interface SecurityGroups {
     Mono<Void> deleteStagingDefault(DeleteSecurityGroupStagingDefaultRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_groups/list_all_security_groups.html">List all Security Groups</a> request.
+     *
+     * @param request the list all security groups request
+     * @return the response from the list all security groups request
+     */
+    Mono<ListSecurityGroupsResponse> list(ListSecurityGroupsRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_group_running_defaults/return_the_security_groups_used_for_running_apps.html">List Running Security Groups</a>
      * request.
      *
