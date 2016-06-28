@@ -28,6 +28,8 @@ import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefault
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsResponse;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsResponse;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsRequest;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsResponse;
 import org.cloudfoundry.client.v2.securitygroups.RuleEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
@@ -290,6 +292,64 @@ public final class ReactorSecurityGroupsTest {
         @Override
         protected Mono<Void> invoke(DeleteSecurityGroupStagingDefaultRequest request) {
             return this.securityGroups.deleteStagingDefault(request);
+        }
+
+    }
+
+    public static final class List extends AbstractClientApiTest<ListSecurityGroupsRequest, ListSecurityGroupsResponse> {
+
+        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/security_groups?q=name%20IN%20dummy1&page=-1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/security_groups/GET_security_groups_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListSecurityGroupsResponse getResponse() {
+            return ListSecurityGroupsResponse.builder()
+                .totalPages(1)
+                .totalResults(1)
+                .resource(SecurityGroupResource.builder()
+                    .metadata(Metadata.builder()
+                        .createdAt("2016-05-12T00:45:10Z")
+                        .id("260ba675-47b6-4094-be7a-349d58e3d36a")
+                        .url("/v2/security_groups/260ba675-47b6-4094-be7a-349d58e3d36a")
+                        .build())
+                    .entity(SecurityGroupEntity.builder()
+                        .name("dummy1")
+                        .rule(RuleEntity.builder()
+                            .destination("198.41.191.47/1")
+                            .ports("8080")
+                            .protocol("udp")
+                            .build())
+                        .runningDefault(false)
+                        .stagingDefault(false)
+                        .spacesUrl("/v2/security_groups/260ba675-47b6-4094-be7a-349d58e3d36a/spaces")
+                        .build())
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListSecurityGroupsRequest getValidRequest() throws Exception {
+            return ListSecurityGroupsRequest.builder()
+                .name("dummy1")
+                .page(-1)
+                .build();
+        }
+
+        @Override
+        protected Mono<ListSecurityGroupsResponse> invoke(ListSecurityGroupsRequest request) {
+            return this.securityGroups.list(request);
         }
 
     }
