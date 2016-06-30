@@ -135,6 +135,10 @@ public abstract class AbstractIntegrationTest {
         return this.nameFactory.getName("test-space-");
     }
 
+    protected final String getUserName() {
+        return this.nameFactory.getName("test-user-");
+    }
+
     protected final String getVariableName() {
         return this.nameFactory.getName("test-variable-name-");
     }

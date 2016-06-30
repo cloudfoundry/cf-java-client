@@ -17,6 +17,7 @@
 package org.cloudfoundry.uaa.users;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.Nullable;
 
 import java.util.List;
 
@@ -35,6 +36,7 @@ public abstract class AbstractUser extends AbstractUserSummary {
      * The external id
      */
     @JsonProperty("externalId")
+    @Nullable
     public abstract String getExternalId();
 
     /**

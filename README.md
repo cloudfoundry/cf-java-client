@@ -235,7 +235,7 @@ $ ./mvnw -Pintegration-test clean test
 ```
 
 **IMPORTANT**
-Integration tests should be run against an empty Cloud Foundry instance. The integration tests are destructive, nearly everything on an instance given the chance.
+Integration tests should be run against an empty Cloud Foundry instance. The integration tests are destructive, affecting nearly everything on an instance given the chance.
 
 The integration tests require a running instance of Cloud Foundry to test against.  We recommend using [PCF Dev][i] to start a local instance to test with.  To configure the integration tests with the appropriate connection information use the following environment variables:
 
@@ -245,7 +245,8 @@ Name | Description
 `TEST_PASSWORD` | The test user's password
 `TEST_PROTECTED_DOMAIN` | A domain that will not be cleaned up
 `TEST_PROTECTED_FEATUREFLAGS` | A list of feature flags that will not be (re)set to standard values on cleanup
-`TEST_PROTECTED_ORGANIZATION` | An organization who's contents will not be cleaned up
+`TEST_PROTECTED_ORGANIZATION` | An organization whose contents will not be cleaned up
+`TEST_PROTECTED_USERS` | A list of users that will not be cleaned up. Typically includes the `TEST_USERNAME`
 `TEST_SKIPSSLVALIDATION` | Whether to skip SSL validation when connecting to the Cloud Foundry instance.  Typically `true` when connecting to a PCF Dev instance.
 `TEST_USERNAME` | The test user's username
 

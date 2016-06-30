@@ -32,20 +32,24 @@ import org.cloudfoundry.reactor.doppler.ReactorDopplerClient;
 import org.cloudfoundry.reactor.uaa.ReactorUaaClient;
 import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
 import org.cloudfoundry.uaa.UaaClient;
+import org.cloudfoundry.uaa.users.User;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.test.FailingDeserializationProblemHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.util.StringUtils;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -68,9 +72,10 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean(initMethod = "clean", destroyMethod = "clean")
-    CloudFoundryCleaner cloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, Mono<List<String>> protectedBuildpackIds, Mono<Optional<String>> protectedDomainId,
-                                            Mono<List<String>> protectedFeatureFlags, Mono<Optional<String>> protectedOrganizationId, Mono<List<String>> protectedSpaceIds) {
-        return new CloudFoundryCleaner(cloudFoundryClient, protectedBuildpackIds, protectedDomainId, protectedFeatureFlags, protectedOrganizationId, protectedSpaceIds);
+    CloudFoundryCleaner cloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, UaaClient uaaClient, Mono<List<String>> protectedBuildpackIds, Mono<Optional<String>> protectedDomainId,
+                                            Mono<List<String>> protectedFeatureFlags, Mono<Optional<String>> protectedOrganizationId, Mono<List<String>> protectedSpaceIds,
+                                            @Qualifier("protectedUserIds") Mono<List<String>> protectedUserIds) {
+        return new CloudFoundryCleaner(cloudFoundryClient, uaaClient, protectedBuildpackIds, protectedDomainId, protectedFeatureFlags, protectedOrganizationId, protectedSpaceIds, protectedUserIds);
     }
 
     @Bean
@@ -216,6 +221,24 @@ public class IntegrationTestConfiguration {
             .doOnSubscribe(s -> this.logger.debug(">> PROTECTED SPACES <<"))
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(id -> this.logger.debug("<< PROTECTED SPACES >>"))
+            .cache();
+    }
+
+    @Bean(initMethod = "block")
+    @Qualifier("protectedUserIds")
+    Mono<List<String>> protectedUserIds(UaaClient uaaClient, @Value("${test.protected.users}") String[] protectedUsers) {
+        List<String> protectedUserList = Arrays.asList(protectedUsers);
+
+        return uaaClient.users()
+            .list(org.cloudfoundry.uaa.users.ListUsersRequest.builder()
+                .build())
+            .flatMap(response -> Flux.fromIterable(response.getResources()))
+            .filter(user -> protectedUserList.contains(user.getUserName()))
+            .map(User::getId)
+            .collectList()
+            .doOnSubscribe(s -> this.logger.debug(">> PROTECTED USERS <<"))
+            .doOnError(Throwable::printStackTrace)
+            .doOnSuccess(id -> this.logger.debug("<< PROTECTED USERS >>"))
             .cache();
     }
 

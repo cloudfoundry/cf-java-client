@@ -57,7 +57,7 @@ public final class CreateUserRequestTest {
                 .familyName("test-familyName")
                 .givenName("test-givenName")
                 .build())
-            .userName("test-userName")
+            .password("test-password")
             .build();
     }
 
