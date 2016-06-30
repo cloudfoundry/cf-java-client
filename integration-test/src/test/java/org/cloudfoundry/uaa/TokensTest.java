@@ -99,7 +99,6 @@ public final class TokensTest extends AbstractIntegrationTest {
                 .clientSecret(this.clientSecret)
                 .tokenFormat(TokenFormat.OPAQUE)
                 .build())
-            .log("stream.getByClientCredentials")
             .subscribe(this.<GetTokenByClientCredentialsResponse>testSubscriber()
                 .assertThat(response -> assertEquals("bearer", response.getTokenType())));
     }

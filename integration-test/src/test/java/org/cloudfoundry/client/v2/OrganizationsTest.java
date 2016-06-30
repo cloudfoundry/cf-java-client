@@ -818,8 +818,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             )))
             .as(thenKeep(function((organizationId1, organizationId2, privateDomainId) -> requestAssociatePrivateDomain(this.cloudFoundryClient, organizationId1, privateDomainId))))
 
-            .as(thenKeep(function((organizationId1, organizationId2, privateDomainId) -> requestListOrganizationDomains(this.cloudFoundryClient, organizationId1).log("stream.doms.org1").then())))
-            .as(thenKeep(function((organizationId1, organizationId2, privateDomainId) -> requestListOrganizationDomains(this.cloudFoundryClient, organizationId2).log("stream.doms.org2").then())))
+            .as(thenKeep(function((organizationId1, organizationId2, privateDomainId) -> requestListOrganizationDomains(this.cloudFoundryClient, organizationId1).then())))
+            .as(thenKeep(function((organizationId1, organizationId2, privateDomainId) -> requestListOrganizationDomains(this.cloudFoundryClient, organizationId2).then())))
 
             .then(function((organizationId1, organizationId2, privateDomainId) -> Mono.when(
                 Mono.just(privateDomainId),
@@ -851,7 +851,6 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .then(function((organizationId, privateDomainId) -> Mono.when(
                 Mono.just(privateDomainId),
                 requestListOrganizationDomains(this.cloudFoundryClient, organizationId)
-                    .log("stream.domains.list")
                     .filter(resource -> privateDomainName.equals(ResourceUtils.getEntity(resource).getName()))
                     .single()
                     .map(ResourceUtils::getId)))

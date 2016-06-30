@@ -40,7 +40,6 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
             .authorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest.builder()
                 .clientId("ssh-proxy")
                 .build())
-            .log("stream.this")
             .subscribe(this.<String>testSubscriber()
                 .assertThat(code -> {
                     assertNotNull(code);
