@@ -354,10 +354,10 @@ public final class DefaultServices implements Services {
 
     private static Mono<Void> deleteServiceInstance(CloudFoundryClient cloudFoundryClient, UnionServiceInstanceResource serviceInstance) {
         if (isUserProvidedService(serviceInstance)) {
+            return requestDeleteUserProvidedServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance));
+        } else {
             return requestDeleteServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance))
                 .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
-        } else {
-            return requestDeleteUserProvidedServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance));
         }
     }
 
@@ -506,7 +506,7 @@ public final class DefaultServices implements Services {
     }
 
     private static boolean isUserProvidedService(UnionServiceInstanceResource serviceInstance) {
-        return ResourceUtils.getEntity(serviceInstance).getType().equals("user_provided_service_instance");
+        return ServiceInstanceType.from(ResourceUtils.getEntity(serviceInstance).getType()).equals(ServiceInstanceType.USER_PROVIDED);
     }
 
     private static Mono<BaseServiceInstanceEntity> renameServiceInstance(CloudFoundryClient cloudFoundryClient, UnionServiceInstanceResource serviceInstance, String newName) {

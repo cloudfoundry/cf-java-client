@@ -16,15 +16,35 @@
 
 package org.cloudfoundry.operations.services;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /**
  * The type of a service instance
  */
 public enum ServiceInstanceType {
 
-    MANAGED,
+    MANAGED("managed_service_instance"),
 
-    USER_PROVIDED;
+    USER_PROVIDED("user_provided_service_instance");
 
+    private final String value;
+
+    ServiceInstanceType(String value) {
+        this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+        return this.value;
+    }
+
+    @Override
+    public String toString() {
+        return this.getValue();
+    }
+
+    @JsonCreator
     static ServiceInstanceType from(String s) {
         switch (s.toLowerCase()) {
             case "managed_service_instance":
@@ -34,6 +54,7 @@ public enum ServiceInstanceType {
             default:
                 throw new IllegalArgumentException(String.format("Unknown service instance type: %s", s));
         }
+
     }
 
 }

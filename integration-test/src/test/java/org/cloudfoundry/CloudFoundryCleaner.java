@@ -129,8 +129,6 @@ final class CloudFoundryCleaner {
             .when(this.protectedBuildpackIds, this.protectedDomainId, this.protectedOrganizationId, this.protectedSpaceIds, this.protectedFeatureFlags, this.protectedUserIds)
             .flatMap(function((protectedBuildpackIds, protectedDomainId, protectedOrganizationId, protectedSpaceIds, protectedFeatureFlags, protectedUserIds) -> {
 
-                System.out.println("*** " + protectedUserIds);
-
                 Predicate<ApplicationResource> applicationV2Predicate = protectedOrganizationId
                     .map(id -> (Predicate<ApplicationResource>) r -> !protectedSpaceIds.contains(ResourceUtils.getEntity(r).getSpaceId()))
                     .orElse(r -> true);

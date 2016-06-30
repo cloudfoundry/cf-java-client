@@ -38,6 +38,7 @@ import org.cloudfoundry.client.v2.servicebindings.ListServiceBindingsResponse;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse;
+import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceKeysRequest;
@@ -226,6 +227,20 @@ public final class DefaultServicesTest {
                     .entity(fill(JobEntity.builder(), "job-entity-")
                         .build())
                     .build()));
+    }
+
+    private static void requestDeleteServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
+        when(cloudFoundryClient.serviceInstances()
+            .delete(org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest.builder()
+                .serviceInstanceId(serviceInstanceId)
+                .async(true)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(DeleteServiceInstanceResponse.builder())
+                    .entity(fill(JobEntity.builder(), "job-entity-")
+                        .build())
+                    .build()));
+
     }
 
     private static void requestDeleteServiceKey(CloudFoundryClient cloudFoundryClient, String serviceKeyId) {
@@ -476,6 +491,9 @@ public final class DefaultServicesTest {
             .thenReturn(Mono
                 .just(fill(ListSpaceServiceInstancesResponse.builder())
                     .resource(fill(UnionServiceInstanceResource.builder(), "service-instance-")
+                        .entity(fill(UnionServiceInstanceEntity.builder(), "service-instance-")
+                            .type(ServiceInstanceType.MANAGED.toString())
+                            .build())
                         .build())
                     .build()));
     }
@@ -737,24 +755,6 @@ public final class DefaultServicesTest {
                         .entity(fill(ServiceEntity.builder())
                             .description(serviceLabel2 + "-description")
                             .label(serviceLabel2)
-                            .build())
-                        .build())
-                    .build()));
-    }
-
-    private static void requestListUserProvidedServiceInstances(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
-        when(cloudFoundryClient.spaces()
-            .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
-                .page(1)
-                .spaceId(spaceId)
-                .returnUserProvidedServiceInstances(true)
-                .name(serviceName)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListSpaceServiceInstancesResponse.builder())
-                    .resource(fill(UnionServiceInstanceResource.builder(), "user-provided-service-instance-")
-                        .entity(fill(UnionServiceInstanceEntity.builder())
-                            .type("user_provided_service_instance")
                             .build())
                         .build())
                     .build()));
@@ -1096,7 +1096,7 @@ public final class DefaultServicesTest {
         @Before
         public void setUp() throws Exception {
             requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-            requestDeleteUserProvidedServiceInstance(this.cloudFoundryClient, "test-service-instance-id");
+            requestDeleteServiceInstance(this.cloudFoundryClient, "test-service-instance-id");
             requestJobSuccess(this.cloudFoundryClient, "test-id");
         }
 
@@ -1235,6 +1235,31 @@ public final class DefaultServicesTest {
                 .deleteServiceKey(DeleteServiceKeyRequest.builder()
                     .serviceInstanceName("test-service-instance-name")
                     .serviceKeyName("test-service-key-not-found")
+                    .build());
+        }
+
+    }
+
+    public static final class DeleteUserProvidedServiceInstance extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestListServiceInstancesUserProvided(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+            requestDeleteUserProvidedServiceInstance(this.cloudFoundryClient, "test-service-instance-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.services
+                .deleteInstance(DeleteServiceInstanceRequest.builder()
+                    .name("test-service-instance-name")
                     .build());
         }
 
@@ -2009,9 +2034,9 @@ public final class DefaultServicesTest {
 
         @Before
         public void setUp() throws Exception {
-            requestListUserProvidedServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID);
+            requestListServiceInstancesUserProvided(this.cloudFoundryClient, "test-service", TEST_SPACE_ID);
             requestUpdateUserProvidedServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-credential-key", "test-credential-value"), "syslog-url",
-                "test-user-provided-service-instance-id");
+                "test-service-instance-id");
         }
 
         @Override
@@ -2037,7 +2062,7 @@ public final class DefaultServicesTest {
 
         @Before
         public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-service-plan-id");
+            requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID);
         }
 
         @Override
