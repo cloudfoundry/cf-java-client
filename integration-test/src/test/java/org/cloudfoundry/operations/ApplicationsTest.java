@@ -217,7 +217,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void restartNotStarted() throws IOException {
         String applicationName = getApplicationName();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
+        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, true)
             .then(this.cloudFoundryOperations.applications()
                 .restart(RestartApplicationRequest.builder()
                     .name(applicationName)
@@ -274,7 +274,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void startNotStarted() throws IOException {
         String applicationName = getApplicationName();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
+        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, true)
             .then(this.cloudFoundryOperations.applications()
                 .start(StartApplicationRequest.builder()
                     .name(applicationName)
