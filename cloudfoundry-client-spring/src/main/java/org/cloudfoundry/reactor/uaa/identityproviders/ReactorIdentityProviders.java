@@ -21,6 +21,8 @@ import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.uaa.identityproviders.CreateIdentityProviderRequest;
 import org.cloudfoundry.uaa.identityproviders.CreateIdentityProviderResponse;
+import org.cloudfoundry.uaa.identityproviders.DeleteIdentityProviderRequest;
+import org.cloudfoundry.uaa.identityproviders.DeleteIdentityProviderResponse;
 import org.cloudfoundry.uaa.identityproviders.GetIdentityProviderRequest;
 import org.cloudfoundry.uaa.identityproviders.GetIdentityProviderResponse;
 import org.cloudfoundry.uaa.identityproviders.IdentityProviders;
@@ -51,6 +53,11 @@ public final class ReactorIdentityProviders extends AbstractUaaOperations implem
     @Override
     public Mono<CreateIdentityProviderResponse> create(CreateIdentityProviderRequest request) {
         return post(request, CreateIdentityProviderResponse.class, builder -> builder.pathSegment("identity-providers"));
+    }
+
+    @Override
+    public Mono<DeleteIdentityProviderResponse> delete(DeleteIdentityProviderRequest request) {
+        return delete(request, DeleteIdentityProviderResponse.class, builder -> builder.pathSegment("identity-providers", request.getIdentityProviderId()));
     }
 
     @Override
