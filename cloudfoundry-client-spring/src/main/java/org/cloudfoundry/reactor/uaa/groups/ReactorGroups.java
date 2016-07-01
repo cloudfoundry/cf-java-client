@@ -19,6 +19,10 @@ package org.cloudfoundry.reactor.uaa.groups;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
 import org.cloudfoundry.reactor.util.AuthorizationProvider;
+import org.cloudfoundry.uaa.groups.AddMemberRequest;
+import org.cloudfoundry.uaa.groups.AddMemberResponse;
+import org.cloudfoundry.uaa.groups.CheckMembershipRequest;
+import org.cloudfoundry.uaa.groups.CheckMembershipResponse;
 import org.cloudfoundry.uaa.groups.CreateGroupRequest;
 import org.cloudfoundry.uaa.groups.CreateGroupResponse;
 import org.cloudfoundry.uaa.groups.DeleteGroupRequest;
@@ -32,6 +36,8 @@ import org.cloudfoundry.uaa.groups.ListGroupsRequest;
 import org.cloudfoundry.uaa.groups.ListGroupsResponse;
 import org.cloudfoundry.uaa.groups.MapExternalGroupRequest;
 import org.cloudfoundry.uaa.groups.MapExternalGroupResponse;
+import org.cloudfoundry.uaa.groups.RemoveMemberRequest;
+import org.cloudfoundry.uaa.groups.RemoveMemberResponse;
 import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupDisplayNameRequest;
 import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupDisplayNameResponse;
 import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupIdRequest;
@@ -56,6 +62,16 @@ public class ReactorGroups extends AbstractUaaOperations implements Groups {
      */
     public ReactorGroups(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
         super(authorizationProvider, httpClient, objectMapper, root);
+    }
+
+    @Override
+    public Mono<AddMemberResponse> addMember(AddMemberRequest request) {
+        return post(request, AddMemberResponse.class, builder -> builder.pathSegment("Groups", request.getGroupId(), "members"));
+    }
+
+    @Override
+    public Mono<CheckMembershipResponse> checkMembership(CheckMembershipRequest request) {
+        return get(request, CheckMembershipResponse.class, builder -> builder.pathSegment("Groups", request.getGroupId(), "members", request.getMemberId()));
     }
 
     @Override
@@ -86,6 +102,11 @@ public class ReactorGroups extends AbstractUaaOperations implements Groups {
     @Override
     public Mono<MapExternalGroupResponse> mapExternalGroup(MapExternalGroupRequest request) {
         return post(request, MapExternalGroupResponse.class, builder -> builder.pathSegment("Groups", "External"));
+    }
+
+    @Override
+    public Mono<RemoveMemberResponse> removeMember(RemoveMemberRequest request) {
+        return delete(request, RemoveMemberResponse.class, builder -> builder.pathSegment("Groups", request.getGroupId(), "members", request.getMemberId()));
     }
 
     @Override

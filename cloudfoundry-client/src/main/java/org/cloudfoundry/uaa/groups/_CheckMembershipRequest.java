@@ -16,14 +16,27 @@
 
 package org.cloudfoundry.uaa.groups;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 /**
- * The payload for members in response
+ * The request payload to check a membership of a group
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _Member extends AbstractMember {
+abstract class _CheckMembershipRequest {
+
+    /**
+     * The group id
+     */
+    @JsonIgnore
+    abstract String getGroupId();
+
+    /**
+     * The member id
+     */
+    @JsonIgnore
+    abstract String getMemberId();
 
 }

@@ -21,6 +21,10 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
 import org.cloudfoundry.uaa.Metadata;
+import org.cloudfoundry.uaa.groups.AddMemberRequest;
+import org.cloudfoundry.uaa.groups.AddMemberResponse;
+import org.cloudfoundry.uaa.groups.CheckMembershipRequest;
+import org.cloudfoundry.uaa.groups.CheckMembershipResponse;
 import org.cloudfoundry.uaa.groups.CreateGroupRequest;
 import org.cloudfoundry.uaa.groups.CreateGroupResponse;
 import org.cloudfoundry.uaa.groups.DeleteGroupRequest;
@@ -37,12 +41,15 @@ import org.cloudfoundry.uaa.groups.MapExternalGroupRequest;
 import org.cloudfoundry.uaa.groups.MapExternalGroupResponse;
 import org.cloudfoundry.uaa.groups.Member;
 import org.cloudfoundry.uaa.groups.MemberType;
+import org.cloudfoundry.uaa.groups.RemoveMemberRequest;
+import org.cloudfoundry.uaa.groups.RemoveMemberResponse;
 import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupDisplayNameRequest;
 import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupDisplayNameResponse;
 import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupIdRequest;
 import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupIdResponse;
 import org.cloudfoundry.uaa.groups.UpdateGroupRequest;
 import org.cloudfoundry.uaa.groups.UpdateGroupResponse;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
@@ -55,6 +62,89 @@ import static org.cloudfoundry.uaa.SortOrder.ASCENDING;
 
 
 public final class ReactorGroupsTest {
+
+    public static final class AddMember extends AbstractUaaApiTest<AddMemberRequest, AddMemberResponse> {
+
+        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/Groups/test-group-id/members")
+                    .payload("fixtures/uaa/groups/POST_{id}_members_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/uaa/groups/POST_{id}_members_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected AddMemberResponse getResponse() {
+            return AddMemberResponse.builder()
+                .identityProviderOriginKey("uaa")
+                .type(MemberType.USER)
+                .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+                .build();
+        }
+
+        @Override
+        protected AddMemberRequest getValidRequest() throws Exception {
+            return AddMemberRequest.builder()
+                .groupId("test-group-id")
+                .identityProviderOriginKey("uaa")
+                .type(MemberType.USER)
+                .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+                .build();
+        }
+
+        @Override
+        protected Mono<AddMemberResponse> invoke(AddMemberRequest request) {
+            return this.groups.addMember(request);
+        }
+    }
+
+    public static final class CheckMember extends AbstractUaaApiTest<CheckMembershipRequest, CheckMembershipResponse> {
+
+        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/Groups/test-group-id/members/test-member-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/groups/GET_{id}_members_{id}_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected CheckMembershipResponse getResponse() {
+            return CheckMembershipResponse.builder()
+                .identityProviderOriginKey("uaa")
+                .type(MemberType.USER)
+                .memberId("test-member-id")
+                .build();
+        }
+
+        @Override
+        protected CheckMembershipRequest getValidRequest() throws Exception {
+            return CheckMembershipRequest.builder()
+                .groupId("test-group-id")
+                .memberId("test-member-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<CheckMembershipResponse> invoke(CheckMembershipRequest request) {
+            return this.groups.checkMembership(request);
+        }
+    }
 
     public static final class Create extends AbstractUaaApiTest<CreateGroupRequest, CreateGroupResponse> {
 
@@ -89,7 +179,7 @@ public final class ReactorGroupsTest {
                 .member(Member.builder()
                     .identityProviderOriginKey("uaa")
                     .type(MemberType.USER)
-                    .value("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
+                    .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
                     .build())
                 .schema("urn:scim:schemas:core:1.0")
                 .zoneId("uaa")
@@ -105,7 +195,7 @@ public final class ReactorGroupsTest {
                 .member(Member.builder()
                     .identityProviderOriginKey("uaa")
                     .type(MemberType.USER)
-                    .value("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
+                    .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
                     .build())
                 .build();
         }
@@ -148,7 +238,7 @@ public final class ReactorGroupsTest {
                 .member(Member.builder()
                     .identityProviderOriginKey("uaa")
                     .type(MemberType.USER)
-                    .value("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
+                    .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
                     .build())
                 .schema("urn:scim:schemas:core:1.0")
                 .zoneId("uaa")
@@ -200,7 +290,7 @@ public final class ReactorGroupsTest {
                 .member(Member.builder()
                     .identityProviderOriginKey("uaa")
                     .type(MemberType.USER)
-                    .value("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
+                    .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
                     .build())
                 .schema("urn:scim:schemas:core:1.0")
                 .zoneId("uaa")
@@ -254,7 +344,7 @@ public final class ReactorGroupsTest {
                     .member(Member.builder()
                         .identityProviderOriginKey("uaa")
                         .type(MemberType.USER)
-                        .value("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+                        .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
                         .build())
                     .schema("urn:scim:schemas:core:1.0")
                     .zoneId("uaa")
@@ -387,6 +477,46 @@ public final class ReactorGroupsTest {
         }
     }
 
+    public static final class RemoveMember extends AbstractUaaApiTest<RemoveMemberRequest, RemoveMemberResponse> {
+
+        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/Groups/test-group-id/members/40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/groups/DELETE_{id}_members_{id}_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected RemoveMemberResponse getResponse() {
+            return RemoveMemberResponse.builder()
+                .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+                .type(MemberType.USER)
+                .identityProviderOriginKey("uaa")
+                .build();
+        }
+
+        @Override
+        protected RemoveMemberRequest getValidRequest() throws Exception {
+            return RemoveMemberRequest.builder()
+                .groupId("test-group-id")
+                .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+                .build();
+        }
+
+        @Override
+        protected Mono<RemoveMemberResponse> invoke(RemoveMemberRequest request) {
+            return this.groups.removeMember(request);
+        }
+    }
+
     public static final class UnmapExternalGroupByGroupDisplayName extends AbstractUaaApiTest<UnmapExternalGroupByGroupDisplayNameRequest, UnmapExternalGroupByGroupDisplayNameResponse> {
 
         private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
@@ -483,7 +613,6 @@ public final class ReactorGroupsTest {
         }
     }
 
-
     public static final class Update extends AbstractUaaApiTest<UpdateGroupRequest, UpdateGroupResponse> {
 
         private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
@@ -518,7 +647,7 @@ public final class ReactorGroupsTest {
                 .member(Member.builder()
                     .identityProviderOriginKey("uaa")
                     .type(MemberType.USER)
-                    .value("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
+                    .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
                     .build())
                 .schema("urn:scim:schemas:core:1.0")
                 .zoneId("uaa")
@@ -536,7 +665,7 @@ public final class ReactorGroupsTest {
                 .member(Member.builder()
                     .identityProviderOriginKey("uaa")
                     .type(MemberType.USER)
-                    .value("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
+                    .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
                     .build())
                 .build();
         }
