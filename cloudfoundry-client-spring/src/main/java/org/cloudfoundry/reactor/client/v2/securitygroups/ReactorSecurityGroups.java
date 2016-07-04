@@ -55,6 +55,16 @@ public class ReactorSecurityGroups extends AbstractClientV2Operations implements
     }
 
     @Override
+    public Mono<CreateSecurityGroupResponse> create(CreateSecurityGroupRequest request) {
+        return post(request, CreateSecurityGroupResponse.class, builder -> builder.pathSegment("v2", "security_groups"));
+    }
+
+    @Override
+    public Mono<DeleteSecurityGroupResponse> delete(DeleteSecurityGroupRequest request) {
+        return delete(request, DeleteSecurityGroupResponse.class, builder -> builder.pathSegment("v2", "security_groups", request.getSecurityGroupId()));
+    }
+
+    @Override
     public Mono<Void> deleteRunningDefault(DeleteSecurityGroupRunningDefaultRequest request) {
         return delete(request, Void.class, builder -> builder.pathSegment("v2", "config", "running_security_groups", request.getSecurityGroupRunningDefaultId()));
     }
@@ -82,16 +92,6 @@ public class ReactorSecurityGroups extends AbstractClientV2Operations implements
     @Override
     public Mono<SetSecurityGroupStagingDefaultResponse> setStagingDefault(SetSecurityGroupStagingDefaultRequest request) {
         return put(request, SetSecurityGroupStagingDefaultResponse.class, builder -> builder.pathSegment("v2", "config", "staging_security_groups", request.getSecurityGroupStagingDefaultId()));
-    }
-
-    @Override
-    public Mono<CreateSecurityGroupResponse> create(CreateSecurityGroupRequest request) {
-        return post(request, CreateSecurityGroupResponse.class, builder -> builder.pathSegment("v2", "security_groups"));
-    }
-
-    @Override
-    public Mono<DeleteSecurityGroupResponse> delete(DeleteSecurityGroupRequest request) {
-        return delete(request, DeleteSecurityGroupResponse.class, builder -> builder.pathSegment("v2", "security_groups", request.getSecurityGroupId()));
     }
 
 }

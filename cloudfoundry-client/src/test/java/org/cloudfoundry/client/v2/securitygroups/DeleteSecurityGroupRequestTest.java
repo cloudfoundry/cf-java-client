@@ -29,7 +29,7 @@ public final class DeleteSecurityGroupRequestTest {
     @Test
     public void valid() {
         DeleteSecurityGroupRequest.builder()
-            .securityGroupId("test-security-group-default-id")
+            .securityGroupId("test-security-group-id")
             .build();
     }
 

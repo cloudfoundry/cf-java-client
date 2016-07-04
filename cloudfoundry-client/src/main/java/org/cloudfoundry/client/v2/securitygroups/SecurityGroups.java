@@ -21,6 +21,22 @@ import reactor.core.publisher.Mono;
 public interface SecurityGroups {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_groups/creating_a_security_group.html">Creating a Security Group</a> request.
+     *
+     * @param request the create security group request
+     * @return the response from the create security group request
+     */
+    Mono<CreateSecurityGroupResponse> create(CreateSecurityGroupRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_groups/delete_a_particular_security_group.html">Delete a Particular Security Group</a> request.
+     *
+     * @param request the delete security group request
+     * @return the response from the delete security group request
+     */
+    Mono<DeleteSecurityGroupResponse> delete(DeleteSecurityGroupRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_group_running_defaults/return_the_security_groups_used_for_running_apps.html">Delete Running Security Group</a>
      * request.
      *
@@ -72,20 +88,4 @@ public interface SecurityGroups {
      * @return the response from the list staging security groups request
      */
     Mono<SetSecurityGroupStagingDefaultResponse> setStagingDefault(SetSecurityGroupStagingDefaultRequest request);
-
-    /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_groups/creating_a_security_group.html">Creating a Security Group</a> request.
-     *
-     * @param request the create security group request
-     * @return the response from the create security group request
-     */
-    Mono<CreateSecurityGroupResponse> create(CreateSecurityGroupRequest request);
-
-    /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_groups/delete_a_particular_security_group.html">Delete a Particular Security Group</a> request.
-     *
-     * @param request the delete security group request
-     * @return the response from the delete security group request
-     */
-    Mono<DeleteSecurityGroupResponse> delete(DeleteSecurityGroupRequest request);
 }

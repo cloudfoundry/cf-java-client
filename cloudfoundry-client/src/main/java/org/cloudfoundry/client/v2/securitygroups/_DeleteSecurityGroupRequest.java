@@ -28,16 +28,16 @@ import org.immutables.value.Value;
 abstract class _DeleteSecurityGroupRequest {
 
     /**
-     * The security group id
-     */
-    @JsonIgnore
-    abstract String getSecurityGroupId();
-
-    /**
      * The async flag
      */
     @QueryParameter("async")
     @Nullable
     abstract Boolean getAsync();
+
+    /**
+     * The security group id
+     */
+    @JsonIgnore
+    abstract String getSecurityGroupId();
 
 }
