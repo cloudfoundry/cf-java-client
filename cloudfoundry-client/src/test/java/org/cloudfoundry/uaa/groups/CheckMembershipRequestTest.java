@@ -23,7 +23,7 @@ public final class CheckMembershipRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noGroupId() {
         CheckMembershipRequest.builder()
-            .memberId("member-id-test")
+            .memberId("test-member-id")
             .build();
     }
 
@@ -38,7 +38,7 @@ public final class CheckMembershipRequestTest {
     public void valid() {
         CheckMembershipRequest.builder()
             .groupId("test-group-id")
-            .memberId("member-id-test")
+            .memberId("test-member-id")
             .build();
     }
 

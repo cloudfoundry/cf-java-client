@@ -23,7 +23,7 @@ public final class RemoveMemberRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noGroupId() {
         RemoveMemberRequest.builder()
-            .memberId("member-id-test")
+            .memberId("test-member-id")
             .build();
     }
 
@@ -38,7 +38,7 @@ public final class RemoveMemberRequestTest {
     public void valid() {
         RemoveMemberRequest.builder()
             .groupId("test-group-id")
-            .memberId("member-id-test")
+            .memberId("test-member-id")
             .build();
     }
 

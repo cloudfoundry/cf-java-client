@@ -49,7 +49,6 @@ import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupIdRequest;
 import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupIdResponse;
 import org.cloudfoundry.uaa.groups.UpdateGroupRequest;
 import org.cloudfoundry.uaa.groups.UpdateGroupResponse;
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
@@ -84,7 +83,7 @@ public final class ReactorGroupsTest {
         @Override
         protected AddMemberResponse getResponse() {
             return AddMemberResponse.builder()
-                .identityProviderOriginKey("uaa")
+                .origin("uaa")
                 .type(MemberType.USER)
                 .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
                 .build();
@@ -94,7 +93,7 @@ public final class ReactorGroupsTest {
         protected AddMemberRequest getValidRequest() throws Exception {
             return AddMemberRequest.builder()
                 .groupId("test-group-id")
-                .identityProviderOriginKey("uaa")
+                .origin("uaa")
                 .type(MemberType.USER)
                 .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
                 .build();
@@ -126,7 +125,7 @@ public final class ReactorGroupsTest {
         @Override
         protected CheckMembershipResponse getResponse() {
             return CheckMembershipResponse.builder()
-                .identityProviderOriginKey("uaa")
+                .origin("uaa")
                 .type(MemberType.USER)
                 .memberId("test-member-id")
                 .build();
@@ -177,7 +176,7 @@ public final class ReactorGroupsTest {
                 .description("the cool group")
                 .displayName("Cool Group Name")
                 .member(Member.builder()
-                    .identityProviderOriginKey("uaa")
+                    .origin("uaa")
                     .type(MemberType.USER)
                     .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
                     .build())
@@ -193,7 +192,7 @@ public final class ReactorGroupsTest {
                 .displayName("Cool Group Name")
                 .identityZoneId("uaa")
                 .member(Member.builder()
-                    .identityProviderOriginKey("uaa")
+                    .origin("uaa")
                     .type(MemberType.USER)
                     .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
                     .build())
@@ -236,7 +235,7 @@ public final class ReactorGroupsTest {
                 .description("the cool group")
                 .displayName("Cooler Group Name for Delete")
                 .member(Member.builder()
-                    .identityProviderOriginKey("uaa")
+                    .origin("uaa")
                     .type(MemberType.USER)
                     .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
                     .build())
@@ -288,7 +287,7 @@ public final class ReactorGroupsTest {
                 .description("the cool group")
                 .displayName("Cooler Group Name for Retrieve")
                 .member(Member.builder()
-                    .identityProviderOriginKey("uaa")
+                    .origin("uaa")
                     .type(MemberType.USER)
                     .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
                     .build())
@@ -342,7 +341,7 @@ public final class ReactorGroupsTest {
                     .description("the cool group")
                     .displayName("Cooler Group Name for List")
                     .member(Member.builder()
-                        .identityProviderOriginKey("uaa")
+                        .origin("uaa")
                         .type(MemberType.USER)
                         .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
                         .build())
@@ -499,7 +498,7 @@ public final class ReactorGroupsTest {
             return RemoveMemberResponse.builder()
                 .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
                 .type(MemberType.USER)
-                .identityProviderOriginKey("uaa")
+                .origin("uaa")
                 .build();
         }
 
@@ -645,7 +644,7 @@ public final class ReactorGroupsTest {
                 .description("the cool group")
                 .displayName("Cooler Group Name for Update")
                 .member(Member.builder()
-                    .identityProviderOriginKey("uaa")
+                    .origin("uaa")
                     .type(MemberType.USER)
                     .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
                     .build())
@@ -663,7 +662,7 @@ public final class ReactorGroupsTest {
                 .description("the cool group")
                 .displayName("Cooler Group Name for Update")
                 .member(Member.builder()
-                    .identityProviderOriginKey("uaa")
+                    .origin("uaa")
                     .type(MemberType.USER)
                     .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
                     .build())
