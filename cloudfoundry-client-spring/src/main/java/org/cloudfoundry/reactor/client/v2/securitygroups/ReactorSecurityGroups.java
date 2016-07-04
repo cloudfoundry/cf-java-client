@@ -19,6 +19,8 @@ package org.cloudfoundry.reactor.client.v2.securitygroups;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupRequest;
 import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupResponse;
+import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRequest;
+import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupResponse;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRunningDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupStagingDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsRequest;
@@ -85,6 +87,11 @@ public class ReactorSecurityGroups extends AbstractClientV2Operations implements
     @Override
     public Mono<CreateSecurityGroupResponse> create(CreateSecurityGroupRequest request) {
         return post(request, CreateSecurityGroupResponse.class, builder -> builder.pathSegment("v2", "security_groups"));
+    }
+
+    @Override
+    public Mono<DeleteSecurityGroupResponse> delete(DeleteSecurityGroupRequest request) {
+        return delete(request, DeleteSecurityGroupResponse.class, builder -> builder.pathSegment("v2", "security_groups", request.getSecurityGroupId()));
     }
 
 }
