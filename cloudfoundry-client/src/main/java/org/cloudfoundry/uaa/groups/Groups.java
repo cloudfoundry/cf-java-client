@@ -24,6 +24,22 @@ import reactor.core.publisher.Mono;
 public interface Groups {
 
     /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#add-member">Add Member</a> request
+     *
+     * @param request the Add Member request
+     * @return the response from the Add Member request
+     */
+    Mono<AddMemberResponse> addMember(AddMemberRequest request);
+
+    /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#check-membership">Check Membership</a> request
+     *
+     * @param request the Check Membership request
+     * @return the response from the Check Membership request
+     */
+    Mono<CheckMembershipResponse> checkMembership(CheckMembershipRequest request);
+
+    /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#create58">Create Group</a> request
      *
      * @param request the Create Group request
@@ -70,6 +86,14 @@ public interface Groups {
      * @return the response from the Map External Group request
      */
     Mono<MapExternalGroupResponse> mapExternalGroup(MapExternalGroupRequest request);
+
+    /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#remove-member">Remove Member</a> request
+     *
+     * @param request the Remove Member request
+     * @return the response from the Remove Member request
+     */
+    Mono<RemoveMemberResponse> removeMember(RemoveMemberRequest request);
 
     /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#by-group-display-name">Unmap External Group By Group Display Name</a> request

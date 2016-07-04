@@ -16,14 +16,25 @@
 
 package org.cloudfoundry.uaa.groups;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.immutables.value.Value;
 
 /**
- * The payload for members in response
+ * The request payload for the remove member
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class _Member extends AbstractMember {
+abstract class _RemoveMemberRequest {
+
+    /**
+     * The group id
+     */
+    @JsonIgnore
+    abstract String getGroupId();
+
+    /**
+     * The member id
+     */
+    @JsonIgnore
+    abstract String getMemberId();
 
 }

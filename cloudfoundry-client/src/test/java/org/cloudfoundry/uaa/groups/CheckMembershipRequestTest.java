@@ -16,14 +16,31 @@
 
 package org.cloudfoundry.uaa.groups;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.immutables.value.Value;
+import org.junit.Test;
 
-/**
- * The payload for members in response
- */
-@JsonDeserialize
-@Value.Immutable
-abstract class _Member extends AbstractMember {
+public final class CheckMembershipRequestTest {
+
+    @Test(expected = IllegalStateException.class)
+    public void noGroupId() {
+        CheckMembershipRequest.builder()
+            .memberId("test-member-id")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noMemberId() {
+        CheckMembershipRequest.builder()
+            .groupId("test-group-id")
+            .build();
+    }
+
+    @Test
+    public void valid() {
+        CheckMembershipRequest.builder()
+            .groupId("test-group-id")
+            .memberId("test-member-id")
+            .build();
+    }
+
 
 }
