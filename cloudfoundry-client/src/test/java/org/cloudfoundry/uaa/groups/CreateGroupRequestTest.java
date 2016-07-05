@@ -23,14 +23,6 @@ public final class CreateGroupRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noDisplayName() {
         CreateGroupRequest.builder()
-            .identityZoneId("test-identity-zone-id")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noIdentityZoneId() {
-        CreateGroupRequest.builder()
-            .displayName("group-test")
             .build();
     }
 

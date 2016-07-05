@@ -17,13 +17,14 @@
 package org.cloudfoundry.uaa.groups;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.uaa.IdentityZoned;
 import org.immutables.value.Value;
 
 /**
  * The request payload for the remove member
  */
 @Value.Immutable
-abstract class _RemoveMemberRequest {
+abstract class _RemoveMemberRequest implements IdentityZoned {
 
     /**
      * The group id

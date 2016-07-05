@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.uaa.groups;
 
+import org.cloudfoundry.uaa.IdentityZoned;
 import org.cloudfoundry.uaa.PaginatedAndSortedByRequest;
 import org.immutables.value.Value;
 
@@ -23,6 +24,6 @@ import org.immutables.value.Value;
  * The request payload for the list groups operation
  */
 @Value.Immutable
-abstract class _ListGroupsRequest extends PaginatedAndSortedByRequest {
+abstract class _ListGroupsRequest extends PaginatedAndSortedByRequest implements IdentityZoned {
 
 }

@@ -20,12 +20,6 @@ import org.junit.Test;
 
 public final class ListIdentityProvidersRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noIdentityZoneId() {
-        ListIdentityProvidersRequest.builder()
-            .build();
-    }
-
     @Test
     public void valid() {
         ListIdentityProvidersRequest.builder()

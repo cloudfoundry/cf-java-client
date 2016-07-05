@@ -46,6 +46,9 @@ import org.cloudfoundry.client.v3.packages.DeletePackageRequest;
 import org.cloudfoundry.client.v3.packages.ListPackagesRequest;
 import org.cloudfoundry.client.v3.packages.Package;
 import org.cloudfoundry.uaa.UaaClient;
+import org.cloudfoundry.uaa.groups.DeleteGroupRequest;
+import org.cloudfoundry.uaa.groups.Group;
+import org.cloudfoundry.uaa.groups.ListGroupsRequest;
 import org.cloudfoundry.uaa.users.DeleteUserRequest;
 import org.cloudfoundry.uaa.users.ListUsersRequest;
 import org.cloudfoundry.uaa.users.User;
@@ -102,7 +105,8 @@ final class CloudFoundryCleaner {
             .thenMany(cleanUserProvidedServiceInstances(this.cloudFoundryClient))
             .thenMany(cleanDomains(this.cloudFoundryClient))
             .thenMany(cleanPrivateDomains(this.cloudFoundryClient))
-            .thenMany(cleanUsers(this.uaaClient))
+            .thenMany(cleanUaaGroups(this.uaaClient))
+            .thenMany(cleanUaaUsers(this.uaaClient))
             .thenMany(cleanSpaces(this.cloudFoundryClient))
             .thenMany(cleanOrganizations(this.cloudFoundryClient))
             .retry(5, t -> t instanceof SSLException)
@@ -293,21 +297,23 @@ final class CloudFoundryCleaner {
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
-    private static Flux<Void> cleanUserProvidedServiceInstances(CloudFoundryClient cloudFoundryClient) {
-        return PaginationUtils.
-            requestClientV2Resources(page -> cloudFoundryClient.userProvidedServiceInstances()
-                .list(ListUserProvidedServiceInstancesRequest.builder()
-                    .page(page)
+    private static Flux<Void> cleanUaaGroups(UaaClient uaaClient) {
+        return PaginationUtils
+            .requestUaaResources(startIndex -> uaaClient.groups()
+                .list(ListGroupsRequest.builder()
+                    .startIndex(startIndex)
                     .build()))
-            .filter(userProvidedServiceInstance -> ResourceUtils.getEntity(userProvidedServiceInstance).getName().startsWith("test-service-instance-"))
-            .map(ResourceUtils::getId)
-            .flatMap(userProvidedServiceInstanceId -> cloudFoundryClient.userProvidedServiceInstances()
-                .delete(DeleteUserProvidedServiceInstanceRequest.builder()
-                    .userProvidedServiceInstanceId(userProvidedServiceInstanceId)
-                    .build()));
+            .filter(group -> group.getDisplayName().startsWith("test-group-"))
+            .map(Group::getId)
+            .flatMap(groupId -> uaaClient.groups()
+                .delete(DeleteGroupRequest.builder()
+                    .groupId(groupId)
+                    .version("*")
+                    .build())
+                .then());
     }
 
-    private static Flux<Void> cleanUsers(UaaClient uaaClient) {
+    private static Flux<Void> cleanUaaUsers(UaaClient uaaClient) {
         return PaginationUtils
             .requestUaaResources(startIndex -> uaaClient.users()
                 .list(ListUsersRequest.builder()
@@ -321,6 +327,20 @@ final class CloudFoundryCleaner {
                     .version("*")
                     .build())
                 .then());
+    }
+
+    private static Flux<Void> cleanUserProvidedServiceInstances(CloudFoundryClient cloudFoundryClient) {
+        return PaginationUtils.
+            requestClientV2Resources(page -> cloudFoundryClient.userProvidedServiceInstances()
+                .list(ListUserProvidedServiceInstancesRequest.builder()
+                    .page(page)
+                    .build()))
+            .filter(userProvidedServiceInstance -> ResourceUtils.getEntity(userProvidedServiceInstance).getName().startsWith("test-service-instance-"))
+            .map(ResourceUtils::getId)
+            .flatMap(userProvidedServiceInstanceId -> cloudFoundryClient.userProvidedServiceInstances()
+                .delete(DeleteUserProvidedServiceInstanceRequest.builder()
+                    .userProvidedServiceInstanceId(userProvidedServiceInstanceId)
+                    .build()));
     }
 
     private static Flux<Void> removeServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId) {

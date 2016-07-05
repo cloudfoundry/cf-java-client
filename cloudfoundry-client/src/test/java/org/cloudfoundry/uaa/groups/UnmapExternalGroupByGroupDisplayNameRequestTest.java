@@ -24,7 +24,7 @@ public final class UnmapExternalGroupByGroupDisplayNameRequestTest {
     public void noExternalGroup() {
         UnmapExternalGroupByGroupDisplayNameRequest.builder()
             .groupDisplayName("test-group-display-name")
-            .originKey("test-origin")
+            .origin("test-origin")
             .build();
     }
 
@@ -32,12 +32,12 @@ public final class UnmapExternalGroupByGroupDisplayNameRequestTest {
     public void noGroupDisplayName() {
         UnmapExternalGroupByGroupDisplayNameRequest.builder()
             .externalGroup("test-external-group")
-            .originKey("test-origin")
+            .origin("test-origin")
             .build();
     }
 
     @Test(expected = IllegalStateException.class)
-    public void noOriginKey() {
+    public void noOrigin() {
         UnmapExternalGroupByGroupDisplayNameRequest.builder()
             .groupDisplayName("test-group-display-name")
             .externalGroup("test-external-group")
@@ -49,7 +49,7 @@ public final class UnmapExternalGroupByGroupDisplayNameRequestTest {
         UnmapExternalGroupByGroupDisplayNameRequest.builder()
             .groupDisplayName("test-group-display-name")
             .externalGroup("test-external-group")
-            .originKey("test-origin")
+            .origin("test-origin")
             .build();
     }
 

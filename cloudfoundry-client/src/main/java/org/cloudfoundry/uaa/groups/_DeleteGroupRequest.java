@@ -17,6 +17,7 @@
 package org.cloudfoundry.uaa.groups;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.uaa.IdentityZoned;
 import org.cloudfoundry.uaa.Versioned;
 import org.immutables.value.Value;
 
@@ -24,7 +25,7 @@ import org.immutables.value.Value;
  * The request payload for the delete group
  */
 @Value.Immutable
-abstract class _DeleteGroupRequest implements Versioned {
+abstract class _DeleteGroupRequest implements Versioned, IdentityZoned {
 
     /**
      * The group id

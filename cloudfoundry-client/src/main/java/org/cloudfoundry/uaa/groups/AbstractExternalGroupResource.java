@@ -16,15 +16,31 @@
 
 package org.cloudfoundry.uaa.groups;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.uaa.users.AbstractUser;
-import org.immutables.value.Value;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * The resource in the list members response
- */
-@JsonDeserialize
-@Value.Immutable
-abstract class _MemberUser extends AbstractUser implements Entity {
+abstract class AbstractExternalGroupResource {
 
+    /**
+     * The group's displayed name
+     */
+    @JsonProperty("displayName")
+    abstract String getDisplayName();
+
+    /**
+     * The identifier for the group in external identity provider that needs to be mapped to internal UAA groups
+     */
+    @JsonProperty("externalGroup")
+    abstract String getExternalGroup();
+
+    /**
+     * The group unique ID
+     */
+    @JsonProperty("groupId")
+    abstract String getGroupId();
+
+    /**
+     * Unique alias of the identity provider
+     */
+    @JsonProperty("origin")
+    abstract String getOrigin();
 }

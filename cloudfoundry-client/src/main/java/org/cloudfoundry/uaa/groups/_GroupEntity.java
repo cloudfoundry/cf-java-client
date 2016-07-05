@@ -20,10 +20,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 /**
- * The resource in the list members response
+ * A group that is a {@link Member} of a {@link Group}
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _MemberGroup extends AbstractGroup implements Entity {
+abstract class _GroupEntity extends AbstractGroup implements Entity {
 
 }

@@ -14,25 +14,16 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.identityproviders;
+package org.cloudfoundry.uaa.groups;
 
-import org.junit.Test;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
-public final class DeleteIdentityProviderRequestTest {
-
-    @Test(expected = IllegalStateException.class)
-    public void noIdentityProviderId() {
-        DeleteIdentityProviderRequest.builder()
-            .identityZoneId("test-identity-zone-id")
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        DeleteIdentityProviderRequest.builder()
-            .identityProviderId("test-identity-provider-id")
-            .identityZoneId("test-identity-zone-id")
-            .build();
-    }
+/**
+ * The resource in the list external group mappings response
+ */
+@JsonDeserialize
+@Value.Immutable
+abstract class _ExternalGroupResource extends AbstractExternalGroupResource {
 
 }

@@ -21,18 +21,6 @@ import org.junit.Test;
 public final class CreateIdentityProviderRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void noIdentityZoneId() {
-        CreateIdentityProviderRequest.builder()
-            .configuration(SamlConfiguration.builder()
-                .metaDataLocation("test-metadata-location")
-                .build())
-            .name("test-name")
-            .originKey("test-origin-key")
-            .type(Type.SAML)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
     public void noName() {
         CreateIdentityProviderRequest.builder()
             .configuration(SamlConfiguration.builder()

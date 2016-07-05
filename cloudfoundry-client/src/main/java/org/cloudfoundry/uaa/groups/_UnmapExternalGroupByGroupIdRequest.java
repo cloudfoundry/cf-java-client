@@ -17,13 +17,14 @@
 package org.cloudfoundry.uaa.groups;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.uaa.IdentityZoned;
 import org.immutables.value.Value;
 
 /**
  * The request payload for the unmap external group by group id request
  */
 @Value.Immutable
-abstract class _UnmapExternalGroupByGroupIdRequest {
+abstract class _UnmapExternalGroupByGroupIdRequest implements IdentityZoned {
 
     /**
      * The identifier for the group in external identity provider that needs to be unmapped to internal UAA groups
@@ -41,6 +42,6 @@ abstract class _UnmapExternalGroupByGroupIdRequest {
      * Unique alias of the identity provider
      */
     @JsonIgnore
-    abstract String getOriginKey();
+    abstract String getOrigin();
 
 }

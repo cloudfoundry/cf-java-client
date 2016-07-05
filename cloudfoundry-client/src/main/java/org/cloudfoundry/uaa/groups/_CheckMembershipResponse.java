@@ -24,6 +24,6 @@ import org.immutables.value.Value;
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _CheckMembershipResponse extends AbstractMemberSummary {
+abstract class _CheckMembershipResponse extends AbstractMember {
 
 }
