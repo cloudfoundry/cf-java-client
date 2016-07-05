@@ -47,12 +47,12 @@
     </modules>
 
     <properties>
-        <immutables.version>2.2.7</immutables.version>
-        <jackson.version>2.7.5</jackson.version>
+        <immutables.version>2.2.10</immutables.version>
+        <jackson.version>2.8.0</jackson.version>
         <java-semver.version>0.9.0</java-semver.version>
         <jjwt.version>0.6.0</jjwt.version>
         <lombok.version>1.16.8</lombok.version>
-        <netty.version>4.1.1.Final</netty.version>
+        <netty.version>4.1.2.Final</netty.version>
         <okhttp.version>3.3.1</okhttp.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <reactor-core.version>2.5.0.M4</reactor-core.version>
@@ -165,7 +165,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.0.1</version>
                     <executions>
                         <execution>
                             <id>attach-sources</id>
