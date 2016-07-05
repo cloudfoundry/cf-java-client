@@ -24,7 +24,7 @@ import org.immutables.value.Value;
 import java.util.List;
 
 /**
- * The entity response payload for the Route resource
+ * The entity response payload for the Security Group resource
  */
 @JsonDeserialize
 @Value.Immutable
