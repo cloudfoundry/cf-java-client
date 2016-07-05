@@ -42,7 +42,7 @@ abstract class _UpdateIdentityZoneRequest {
     abstract String getDescription();
 
     /**
-     * The id of the identity zone. When not provided, an identifier will be generated.
+     * The id of the identity zone
      */
     @JsonIgnore
     abstract String getIdentityZoneId();

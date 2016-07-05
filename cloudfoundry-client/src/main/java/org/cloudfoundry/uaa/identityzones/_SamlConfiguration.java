@@ -38,6 +38,7 @@ abstract class _SamlConfiguration {
     /**
      * The lifetime of a SAML assertion in seconds.
      */
+    @Nullable
     @JsonProperty("assertionTimeToLiveSeconds")
     abstract Integer getAssertionTimeToLive();
 
