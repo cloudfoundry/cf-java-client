@@ -22,11 +22,11 @@ import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * The payload for the oauth2 identity provider configuration
+ * The payload for the OAuth2 identity provider configuration
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _Oauth2Configuration extends AbstractAuthenticationConfiguration {
+abstract class _OAuth2Configuration extends AbstractAuthenticationConfiguration {
 
     /**
      * The OAuth check token endpoint URL. Reserved for future OAuth use.

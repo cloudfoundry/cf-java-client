@@ -54,7 +54,7 @@ public final class ReactorIdentityZonesTest {
 
     public static final class Create extends AbstractUaaApiTest<CreateIdentityZoneRequest, CreateIdentityZoneResponse> {
 
-        private final ReactorIdentityZones identityZoneManagement = new ReactorIdentityZones(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorIdentityZones identityZones = new ReactorIdentityZones(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -186,13 +186,13 @@ public final class ReactorIdentityZonesTest {
 
         @Override
         protected Mono<CreateIdentityZoneResponse> invoke(CreateIdentityZoneRequest request) {
-            return this.identityZoneManagement.create(request);
+            return this.identityZones.create(request);
         }
     }
 
     public static final class Delete extends AbstractUaaApiTest<DeleteIdentityZoneRequest, DeleteIdentityZoneResponse> {
 
-        private final ReactorIdentityZones identityZoneManagement = new ReactorIdentityZones(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorIdentityZones identityZones = new ReactorIdentityZones(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -272,13 +272,13 @@ public final class ReactorIdentityZonesTest {
 
         @Override
         protected Mono<DeleteIdentityZoneResponse> invoke(DeleteIdentityZoneRequest request) {
-            return this.identityZoneManagement.delete(request);
+            return this.identityZones.delete(request);
         }
     }
 
     public static final class Get extends AbstractUaaApiTest<GetIdentityZoneRequest, GetIdentityZoneResponse> {
 
-        private final ReactorIdentityZones identityZoneManagement = new ReactorIdentityZones(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorIdentityZones identityZones = new ReactorIdentityZones(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -357,13 +357,13 @@ public final class ReactorIdentityZonesTest {
 
         @Override
         protected Mono<GetIdentityZoneResponse> invoke(GetIdentityZoneRequest request) {
-            return this.identityZoneManagement.get(request);
+            return this.identityZones.get(request);
         }
     }
 
     public static final class List extends AbstractUaaApiTest<ListIdentityZonesRequest, ListIdentityZonesResponse> {
 
-        private final ReactorIdentityZones identityZoneManagement = new ReactorIdentityZones(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorIdentityZones identityZones = new ReactorIdentityZones(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -495,13 +495,13 @@ public final class ReactorIdentityZonesTest {
 
         @Override
         protected Mono<ListIdentityZonesResponse> invoke(ListIdentityZonesRequest request) {
-            return this.identityZoneManagement.list(request);
+            return this.identityZones.list(request);
         }
     }
 
     public static final class Update extends AbstractUaaApiTest<UpdateIdentityZoneRequest, UpdateIdentityZoneResponse> {
 
-        private final ReactorIdentityZones identityZoneManagement = new ReactorIdentityZones(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorIdentityZones identityZones = new ReactorIdentityZones(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -633,7 +633,7 @@ public final class ReactorIdentityZonesTest {
 
         @Override
         protected Mono<UpdateIdentityZoneResponse> invoke(UpdateIdentityZoneRequest request) {
-            return this.identityZoneManagement.update(request);
+            return this.identityZones.update(request);
         }
     }
 

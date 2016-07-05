@@ -18,11 +18,11 @@ package org.cloudfoundry.uaa.identityproviders;
 
 import org.junit.Test;
 
-public final class Oauth2ConfigurationTest {
+public final class OAuth2ConfigurationTest {
 
     @Test(expected = IllegalStateException.class)
     public void noAuthUrl() {
-        Oauth2Configuration.builder()
+        OAuth2Configuration.builder()
             .tokenUrl("test-token-url")
             .relyingPartyId("test-relying-party-id")
             .relyingPartySecret("test-relying-party-secret")
@@ -31,7 +31,7 @@ public final class Oauth2ConfigurationTest {
 
     @Test(expected = IllegalStateException.class)
     public void noRelyingPartyId() {
-        Oauth2Configuration.builder()
+        OAuth2Configuration.builder()
             .authUrl("test-auth-url")
             .tokenUrl("test-token-url")
             .relyingPartySecret("test-relying-party-secret")
@@ -40,7 +40,7 @@ public final class Oauth2ConfigurationTest {
 
     @Test(expected = IllegalStateException.class)
     public void noRelyingPartySecret() {
-        Oauth2Configuration.builder()
+        OAuth2Configuration.builder()
             .authUrl("test-auth-url")
             .tokenUrl("test-token-url")
             .relyingPartyId("test-relying-party-id")
@@ -49,7 +49,7 @@ public final class Oauth2ConfigurationTest {
 
     @Test(expected = IllegalStateException.class)
     public void noTokenUrl() {
-        Oauth2Configuration.builder()
+        OAuth2Configuration.builder()
             .authUrl("test-auth-url")
             .relyingPartyId("test-relying-party-id")
             .relyingPartySecret("test-relying-party-secret")
@@ -58,7 +58,7 @@ public final class Oauth2ConfigurationTest {
 
     @Test
     public void valid() {
-        Oauth2Configuration.builder()
+        OAuth2Configuration.builder()
             .authUrl("test-auth-url")
             .tokenUrl("test-token-url")
             .relyingPartyId("test-relying-party-id")

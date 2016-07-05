@@ -37,7 +37,7 @@ import org.cloudfoundry.uaa.identityproviders.LdapProfileFile;
 import org.cloudfoundry.uaa.identityproviders.ListIdentityProvidersRequest;
 import org.cloudfoundry.uaa.identityproviders.ListIdentityProvidersResponse;
 import org.cloudfoundry.uaa.identityproviders.LockoutPolicy;
-import org.cloudfoundry.uaa.identityproviders.Oauth2Configuration;
+import org.cloudfoundry.uaa.identityproviders.OAuth2Configuration;
 import org.cloudfoundry.uaa.identityproviders.SamlConfiguration;
 import org.cloudfoundry.uaa.identityproviders.Type;
 import org.cloudfoundry.uaa.identityproviders.UpdateIdentityProviderRequest;
@@ -57,7 +57,7 @@ public final class ReactorIdentityProvidersTest {
 
     public static final class CreateLdap extends AbstractUaaApiTest<CreateIdentityProviderRequest, CreateIdentityProviderResponse> {
 
-        private final ReactorIdentityProviders identityProviderManagement = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -128,13 +128,13 @@ public final class ReactorIdentityProvidersTest {
 
         @Override
         protected Mono<CreateIdentityProviderResponse> invoke(CreateIdentityProviderRequest request) {
-            return this.identityProviderManagement.create(request);
+            return this.identityProviders.create(request);
         }
     }
 
     public static final class CreateOauth extends AbstractUaaApiTest<CreateIdentityProviderRequest, CreateIdentityProviderResponse> {
 
-        private final ReactorIdentityProviders identityProviderManagement = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -156,7 +156,7 @@ public final class ReactorIdentityProvidersTest {
             return CreateIdentityProviderResponse.builder()
                 .active(true)
                 .createdAt(1465001966855L)
-                .configuration(Oauth2Configuration.builder()
+                .configuration(OAuth2Configuration.builder()
                     .attributeMappings(AttributeMappings.builder()
                         .build())
                     .authUrl("http://auth.url")
@@ -183,7 +183,7 @@ public final class ReactorIdentityProvidersTest {
         protected CreateIdentityProviderRequest getValidRequest() throws Exception {
             return CreateIdentityProviderRequest.builder()
                 .active(true)
-                .configuration(Oauth2Configuration.builder()
+                .configuration(OAuth2Configuration.builder()
                     .attributeMappings(AttributeMappings.builder()
                         .build())
                     .authUrl("http://auth.url")
@@ -204,13 +204,13 @@ public final class ReactorIdentityProvidersTest {
 
         @Override
         protected Mono<CreateIdentityProviderResponse> invoke(CreateIdentityProviderRequest request) {
-            return this.identityProviderManagement.create(request);
+            return this.identityProviders.create(request);
         }
     }
 
     public static final class CreateSaml extends AbstractUaaApiTest<CreateIdentityProviderRequest, CreateIdentityProviderResponse> {
 
-        private final ReactorIdentityProviders identityProviderManagement = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -310,13 +310,13 @@ public final class ReactorIdentityProvidersTest {
 
         @Override
         protected Mono<CreateIdentityProviderResponse> invoke(CreateIdentityProviderRequest request) {
-            return this.identityProviderManagement.create(request);
+            return this.identityProviders.create(request);
         }
     }
 
     public static final class Delete extends AbstractUaaApiTest<DeleteIdentityProviderRequest, DeleteIdentityProviderResponse> {
 
-        private final ReactorIdentityProviders identityProviderManagement = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -386,13 +386,13 @@ public final class ReactorIdentityProvidersTest {
 
         @Override
         protected Mono<DeleteIdentityProviderResponse> invoke(DeleteIdentityProviderRequest request) {
-            return this.identityProviderManagement.delete(request);
+            return this.identityProviders.delete(request);
         }
     }
 
     public static final class Get extends AbstractUaaApiTest<GetIdentityProviderRequest, GetIdentityProviderResponse> {
 
-        private final ReactorIdentityProviders identityProviderManagement = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -462,13 +462,13 @@ public final class ReactorIdentityProvidersTest {
 
         @Override
         protected Mono<GetIdentityProviderResponse> invoke(GetIdentityProviderRequest request) {
-            return this.identityProviderManagement.get(request);
+            return this.identityProviders.get(request);
         }
     }
 
     public static final class List extends AbstractUaaApiTest<ListIdentityProvidersRequest, ListIdentityProvidersResponse> {
 
-        private final ReactorIdentityProviders identityProviderManagement = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -552,7 +552,7 @@ public final class ReactorIdentityProvidersTest {
                 .identityProvider(IdentityProvider.builder()
                     .active(true)
                     .createdAt(1465001966855L)
-                    .configuration(Oauth2Configuration.builder()
+                    .configuration(OAuth2Configuration.builder()
                         .attributeMappings(AttributeMappings.builder()
                             .build())
                         .authUrl("http://auth.url")
@@ -596,13 +596,13 @@ public final class ReactorIdentityProvidersTest {
 
         @Override
         protected Mono<ListIdentityProvidersResponse> invoke(ListIdentityProvidersRequest request) {
-            return this.identityProviderManagement.list(request);
+            return this.identityProviders.list(request);
         }
     }
 
     public static final class Update extends AbstractUaaApiTest<UpdateIdentityProviderRequest, UpdateIdentityProviderResponse> {
 
-        private final ReactorIdentityProviders identityProviderManagement = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -665,7 +665,7 @@ public final class ReactorIdentityProvidersTest {
 
         @Override
         protected Mono<UpdateIdentityProviderResponse> invoke(UpdateIdentityProviderRequest request) {
-            return this.identityProviderManagement.update(request);
+            return this.identityProviders.update(request);
         }
     }
 

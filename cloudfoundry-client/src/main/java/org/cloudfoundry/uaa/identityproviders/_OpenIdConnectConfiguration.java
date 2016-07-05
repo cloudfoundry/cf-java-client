@@ -29,7 +29,7 @@ import org.immutables.value.Value;
 abstract class _OpenIdConnectConfiguration extends AbstractAuthenticationConfiguration {
 
     /**
-     * The Open Id user info endpoint URL. Reserved for future OIDC  use.
+     * The Open Id user info endpoint URL. Reserved for future OIDC use.
      */
     @JsonProperty("userInfoUrl")
     @Nullable

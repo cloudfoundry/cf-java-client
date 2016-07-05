@@ -40,7 +40,7 @@ abstract class AbstractIdentityProvider {
     @JsonSubTypes({
         @JsonSubTypes.Type(name = "keystone", value = KeystoneConfiguration.class),
         @JsonSubTypes.Type(name = "ldap", value = LdapConfiguration.class),
-        @JsonSubTypes.Type(name = "oauth2.0", value = Oauth2Configuration.class),
+        @JsonSubTypes.Type(name = "oauth2.0", value = OAuth2Configuration.class),
         @JsonSubTypes.Type(name = "oidc1.0", value = OpenIdConnectConfiguration.class),
         @JsonSubTypes.Type(name = "saml", value = SamlConfiguration.class),
         @JsonSubTypes.Type(name = "uaa", value = InternalConfiguration.class)
