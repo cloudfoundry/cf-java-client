@@ -86,10 +86,11 @@ public final class DefaultSpaces implements Spaces {
     public Mono<Void> allowSsh(AllowSpaceSshRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.organizationId)
-            .then(function((cloudFoundryClient, organizationId) -> Mono.when(
-                Mono.just(cloudFoundryClient),
-                getOrganizationSpaceIdWhere(cloudFoundryClient, organizationId, request.getName(), sshEnabled(false))
-            )))
+            .then(function((cloudFoundryClient, organizationId) -> Mono
+                .when(
+                    Mono.just(cloudFoundryClient),
+                    getOrganizationSpaceIdWhere(cloudFoundryClient, organizationId, request.getName(), sshEnabled(false))
+                )))
             .then(function((cloudFoundryClient, spaceId) -> requestUpdateSpaceSsh(cloudFoundryClient, spaceId, true)))
             .then();
     }
@@ -98,32 +99,36 @@ public final class DefaultSpaces implements Spaces {
     public Mono<Void> create(CreateSpaceRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.username)
-            .then(function((cloudFoundryClient, username) -> Mono.when(
-                Mono.just(cloudFoundryClient),
-                Mono.just(username),
-                getOrganizationOrDefault(cloudFoundryClient, request, this.organizationId)
-            )))
-            .then(function((cloudFoundryClient, username, organizationId) -> Mono.when(
-                Mono.just(cloudFoundryClient),
-                Mono.just(username),
-                Mono.just(organizationId),
-                getOptionalSpaceQuotaId(cloudFoundryClient, organizationId, request.getSpaceQuota())
-            )))
-            .then(function((cloudFoundryClient, username, organizationId, spaceQuotaId) -> Mono.when(
-                Mono.just(cloudFoundryClient),
-                Mono.just(organizationId),
-                requestCreateSpace(cloudFoundryClient, organizationId, request.getName(), spaceQuotaId.orElse(null))
-                    .map(ResourceUtils::getId),
-                Mono.just(username)
-            )))
+            .then(function((cloudFoundryClient, username) -> Mono
+                .when(
+                    Mono.just(cloudFoundryClient),
+                    Mono.just(username),
+                    getOrganizationIdOrDefault(cloudFoundryClient, request.getOrganization(), this.organizationId)
+                )))
+            .then(function((cloudFoundryClient, username, organizationId) -> Mono
+                .when(
+                    Mono.just(cloudFoundryClient),
+                    Mono.just(username),
+                    Mono.just(organizationId),
+                    getOptionalSpaceQuotaId(cloudFoundryClient, organizationId, request.getSpaceQuota())
+                )))
+            .then(function((cloudFoundryClient, username, organizationId, spaceQuotaId) -> Mono
+                .when(
+                    Mono.just(cloudFoundryClient),
+                    Mono.just(organizationId),
+                    requestCreateSpace(cloudFoundryClient, organizationId, request.getName(), spaceQuotaId.orElse(null))
+                        .map(ResourceUtils::getId),
+                    Mono.just(username)
+                )))
             .then(function((cloudFoundryClient, organizationId, spaceId, username) -> {
                 return requestAssociateOrganizationUserByUsername(cloudFoundryClient, organizationId, username)
                     .then(Mono.just(Tuple.of(cloudFoundryClient, organizationId, spaceId, username)));
             }))
-            .then(function((cloudFoundryClient, organizationId, spaceId, username) -> Mono.when(
-                requestAssociateSpaceManagerByUsername(cloudFoundryClient, spaceId, username),
-                requestAssociateSpaceDeveloperByUsername(cloudFoundryClient, spaceId, username)
-            )))
+            .then(function((cloudFoundryClient, organizationId, spaceId, username) -> Mono
+                .when(
+                    requestAssociateSpaceManagerByUsername(cloudFoundryClient, spaceId, username),
+                    requestAssociateSpaceDeveloperByUsername(cloudFoundryClient, spaceId, username)
+                )))
             .then();
     }
 
@@ -131,10 +136,11 @@ public final class DefaultSpaces implements Spaces {
     public Mono<Void> delete(DeleteSpaceRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.organizationId)
-            .then(function((cloudFoundryClient, organizationId) -> Mono.when(
-                Mono.just(cloudFoundryClient),
-                getOrganizationSpaceId(cloudFoundryClient, organizationId, request.getName())
-            )))
+            .then(function((cloudFoundryClient, organizationId) -> Mono
+                .when(
+                    Mono.just(cloudFoundryClient),
+                    getOrganizationSpaceId(cloudFoundryClient, organizationId, request.getName())
+                )))
             .then(function(DefaultSpaces::deleteSpace));
     }
 
@@ -142,10 +148,11 @@ public final class DefaultSpaces implements Spaces {
     public Mono<Void> disallowSsh(DisallowSpaceSshRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.organizationId)
-            .then(function((cloudFoundryClient, organizationId) -> Mono.when(
-                Mono.just(cloudFoundryClient),
-                getOrganizationSpaceIdWhere(cloudFoundryClient, organizationId, request.getName(), sshEnabled(true))
-            )))
+            .then(function((cloudFoundryClient, organizationId) -> Mono
+                .when(
+                    Mono.just(cloudFoundryClient),
+                    getOrganizationSpaceIdWhere(cloudFoundryClient, organizationId, request.getName(), sshEnabled(true))
+                )))
             .then(function((cloudFoundryClient, spaceId) -> requestUpdateSpaceSsh(cloudFoundryClient, spaceId, false)))
             .then();
     }
@@ -154,10 +161,11 @@ public final class DefaultSpaces implements Spaces {
     public Mono<SpaceDetail> get(GetSpaceRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.organizationId)
-            .then(function((cloudFoundryClient, organizationId) -> Mono.when(
-                Mono.just(cloudFoundryClient),
-                getOrganizationSpace(cloudFoundryClient, organizationId, request.getName())
-            )))
+            .then(function((cloudFoundryClient, organizationId) -> Mono
+                .when(
+                    Mono.just(cloudFoundryClient),
+                    getOrganizationSpace(cloudFoundryClient, organizationId, request.getName())
+                )))
             .then(function((cloudFoundryClient, resource) -> getSpaceDetail(cloudFoundryClient, resource, request)));
     }
 
@@ -173,10 +181,11 @@ public final class DefaultSpaces implements Spaces {
     public Mono<Void> rename(RenameSpaceRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.organizationId)
-            .then(function((cloudFoundryClient, organizationId) -> Mono.when(
-                Mono.just(cloudFoundryClient),
-                getOrganizationSpaceId(cloudFoundryClient, organizationId, request.getName())
-            )))
+            .then(function((cloudFoundryClient, organizationId) -> Mono
+                .when(
+                    Mono.just(cloudFoundryClient),
+                    getOrganizationSpaceId(cloudFoundryClient, organizationId, request.getName())
+                )))
             .then(function((cloudFoundryClient, spaceId) -> requestUpdateSpace(cloudFoundryClient, spaceId, request.getNewName())))
             .then();
     }
@@ -239,17 +248,15 @@ public final class DefaultSpaces implements Spaces {
             .map(ResourceUtils::getId);
     }
 
+    private static Mono<String> getOrganizationIdOrDefault(CloudFoundryClient cloudFoundryClient, String organizationName, Mono<String> organizationId) {
+        return Optional.ofNullable(organizationName)
+            .map(organization -> getOrganizationId(cloudFoundryClient, organization))
+            .orElse(organizationId);
+    }
+
     private static Mono<String> getOrganizationName(CloudFoundryClient cloudFoundryClient, SpaceResource resource) {
         return requestOrganization(cloudFoundryClient, ResourceUtils.getEntity(resource).getOrganizationId())
             .map(response -> ResourceUtils.getEntity(response).getName());
-    }
-
-    private static Mono<String> getOrganizationOrDefault(CloudFoundryClient cloudFoundryClient, CreateSpaceRequest request, Mono<String> organizationId) {
-        if (request.getOrganization() != null) {
-            return getOrganizationId(cloudFoundryClient, request.getOrganization());
-        } else {
-            return organizationId;
-        }
     }
 
     private static Mono<SpaceResource> getOrganizationSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {

@@ -24,6 +24,8 @@ public final class MapRouteRequestTest {
     public void noApplicationName() {
         MapRouteRequest.builder()
             .domain("test-domain")
+            .host("test-host")
+            .path("test-path")
             .build();
     }
 
@@ -31,11 +33,23 @@ public final class MapRouteRequestTest {
     public void noDomain() {
         MapRouteRequest.builder()
             .applicationName("test-applicationName")
+            .host("test-host")
+            .path("test-path")
             .build();
     }
 
     @Test
-    public void valid() {
+    public void validMax() {
+        MapRouteRequest.builder()
+            .applicationName("test-applicationName")
+            .domain("test-domain")
+            .host("test-host")
+            .path("test-path")
+            .build();
+    }
+
+    @Test
+    public void validMin() {
         MapRouteRequest.builder()
             .applicationName("test-applicationName")
             .domain("test-domain")

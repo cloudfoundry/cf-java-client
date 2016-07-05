@@ -53,6 +53,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
@@ -75,10 +76,11 @@ public final class DefaultRoutes implements Routes {
     public Mono<Boolean> check(CheckRouteRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.organizationId)
-            .then(function((cloudFoundryClient, organizationId) -> Mono.when(
-                Mono.just(cloudFoundryClient),
-                getOptionalDomainId(cloudFoundryClient, organizationId, request.getDomain())
-            )))
+            .then(function((cloudFoundryClient, organizationId) -> Mono
+                .when(
+                    Mono.just(cloudFoundryClient),
+                    getOptionalDomainId(cloudFoundryClient, organizationId, request.getDomain())
+                )))
             .then(function((cloudFoundryClient, domainId) -> requestRouteExists(cloudFoundryClient, domainId, request.getHost(), request.getPath())))
             .defaultIfEmpty(false);
     }
@@ -87,11 +89,12 @@ public final class DefaultRoutes implements Routes {
     public Mono<Void> create(CreateRouteRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.organizationId)
-            .then(function((cloudFoundryClient, organizationId) -> Mono.when(
-                Mono.just(cloudFoundryClient),
-                getSpaceId(cloudFoundryClient, organizationId, request.getSpace()),
-                getDomainId(cloudFoundryClient, organizationId, request.getDomain())
-            )))
+            .then(function((cloudFoundryClient, organizationId) -> Mono
+                .when(
+                    Mono.just(cloudFoundryClient),
+                    getSpaceId(cloudFoundryClient, organizationId, request.getSpace()),
+                    getDomainId(cloudFoundryClient, organizationId, request.getDomain())
+                )))
             .then(function((cloudFoundryClient, spaceId, domainId) -> requestCreateRoute(cloudFoundryClient, domainId, request.getHost(), request.getPath(), spaceId)))
             .then();
     }
@@ -100,14 +103,16 @@ public final class DefaultRoutes implements Routes {
     public Mono<Void> delete(DeleteRouteRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.organizationId)
-            .then(function((cloudFoundryClient, organizationId) -> Mono.when(
-                Mono.just(cloudFoundryClient),
-                getDomainId(cloudFoundryClient, organizationId, request.getDomain())
-            )))
-            .then(function((cloudFoundryClient, domainId) -> Mono.when(
-                Mono.just(cloudFoundryClient),
-                getRouteId(cloudFoundryClient, request.getHost(), request.getDomain(), domainId, request.getPath())
-            )))
+            .then(function((cloudFoundryClient, organizationId) -> Mono
+                .when(
+                    Mono.just(cloudFoundryClient),
+                    getDomainId(cloudFoundryClient, organizationId, request.getDomain())
+                )))
+            .then(function((cloudFoundryClient, domainId) -> Mono
+                .when(
+                    Mono.just(cloudFoundryClient),
+                    getRouteId(cloudFoundryClient, request.getHost(), request.getDomain(), domainId, request.getPath())
+                )))
             .then(function(DefaultRoutes::deleteRoute));
     }
 
@@ -130,12 +135,13 @@ public final class DefaultRoutes implements Routes {
         return this.cloudFoundryClient
             .flatMap(cloudFoundryClient -> getRoutes(cloudFoundryClient, request, this.organizationId, this.spaceId)
                 .map(resource -> Tuple.of(cloudFoundryClient, resource)))
-            .flatMap(function((cloudFoundryClient, resource) -> Mono.when(
-                getApplicationNames(cloudFoundryClient, resource),
-                getDomainName(cloudFoundryClient, resource),
-                Mono.just(resource),
-                getSpaceName(cloudFoundryClient, ResourceUtils.getEntity(resource).getSpaceId())
-            )))
+            .flatMap(function((cloudFoundryClient, resource) -> Mono
+                .when(
+                    getApplicationNames(cloudFoundryClient, ResourceUtils.getId(resource)),
+                    getDomainName(cloudFoundryClient, ResourceUtils.getEntity(resource).getDomainId()),
+                    Mono.just(resource),
+                    getSpaceName(cloudFoundryClient, ResourceUtils.getEntity(resource).getSpaceId())
+                )))
             .map(function(DefaultRoutes::toRoute));
     }
 
@@ -143,11 +149,12 @@ public final class DefaultRoutes implements Routes {
     public Mono<Void> map(MapRouteRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId, this.organizationId)
-            .then(function((cloudFoundryClient, spaceId, organizationId) -> Mono.when(
-                Mono.just(cloudFoundryClient),
-                getOrCreateRoute(cloudFoundryClient, organizationId, spaceId, request.getDomain(), request.getHost(), request.getPath()),
-                getApplicationId(cloudFoundryClient, request.getApplicationName(), spaceId)
-            )))
+            .then(function((cloudFoundryClient, spaceId, organizationId) -> Mono
+                .when(
+                    Mono.just(cloudFoundryClient),
+                    getOrCreateRoute(cloudFoundryClient, organizationId, spaceId, request.getDomain(), request.getHost(), request.getPath()),
+                    getApplicationId(cloudFoundryClient, request.getApplicationName(), spaceId)
+                )))
             .then(function((cloudFoundryClient, routeId, applicationId) -> requestAssociateRoute(cloudFoundryClient, applicationId, routeId)))
             .then();
     }
@@ -156,12 +163,13 @@ public final class DefaultRoutes implements Routes {
     public Mono<Void> unmap(UnmapRouteRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.organizationId, this.spaceId)
-            .then(function((cloudFoundryClient, organizationId, spaceId) -> Mono.when(
-                Mono.just(cloudFoundryClient),
-                getApplicationId(cloudFoundryClient, request.getApplicationName(), spaceId),
-                getDomainId(cloudFoundryClient, organizationId, request.getDomain())
-                    .then(domainId -> getRouteId(cloudFoundryClient, request.getHost(), request.getDomain(), domainId, request.getPath()))
-            )))
+            .then(function((cloudFoundryClient, organizationId, spaceId) -> Mono
+                .when(
+                    Mono.just(cloudFoundryClient),
+                    getApplicationId(cloudFoundryClient, request.getApplicationName(), spaceId),
+                    getDomainId(cloudFoundryClient, organizationId, request.getDomain())
+                        .then(domainId -> getRouteId(cloudFoundryClient, request.getHost(), request.getDomain(), domainId, request.getPath()))
+                )))
             .then(function(DefaultRoutes::requestRemoveApplication));
     }
 
@@ -181,8 +189,8 @@ public final class DefaultRoutes implements Routes {
             .map(ResourceUtils::getId);
     }
 
-    private static Mono<List<String>> getApplicationNames(CloudFoundryClient cloudFoundryClient, RouteResource routeResource) {
-        return requestApplications(cloudFoundryClient, ResourceUtils.getId(routeResource))
+    private static Mono<List<String>> getApplicationNames(CloudFoundryClient cloudFoundryClient, String routeId) {
+        return requestApplications(cloudFoundryClient, routeId)
             .map(resource -> ResourceUtils.getEntity(resource).getName())
             .collectList();
     }
@@ -203,8 +211,8 @@ public final class DefaultRoutes implements Routes {
             .map(ResourceUtils::getId);
     }
 
-    private static Mono<String> getDomainName(CloudFoundryClient cloudFoundryClient, RouteResource resource) {
-        return requestDomain(cloudFoundryClient, ResourceUtils.getEntity(resource).getDomainId())
+    private static Mono<String> getDomainName(CloudFoundryClient cloudFoundryClient, String domainId) {
+        return requestDomain(cloudFoundryClient, domainId)
             .map(response -> ResourceUtils.getEntity(response).getName());
     }
 
@@ -244,7 +252,7 @@ public final class DefaultRoutes implements Routes {
     private static Flux<RouteResource> getRoutes(CloudFoundryClient cloudFoundryClient, ListRoutesRequest request, Mono<String> organizationId, Mono<String> spaceId) {
         if (Level.ORGANIZATION == request.getLevel()) {
             return organizationId
-                .flatMap(organizationId1 -> requestOrganizationRoutes(cloudFoundryClient, organizationId1));
+                .flatMap(organizationId1 -> requestRoutes(cloudFoundryClient, builder -> builder.organizationId(organizationId1)));
         } else {
             return spaceId
                 .flatMap(spaceId1 -> requestSpaceRoutes(cloudFoundryClient, spaceId1));
@@ -323,15 +331,6 @@ public final class DefaultRoutes implements Routes {
                 .build());
     }
 
-    private static Flux<RouteResource> requestOrganizationRoutes(CloudFoundryClient cloudFoundryClient, String organizationId) {
-        return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.routes()
-                .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
-                    .organizationId(organizationId)
-                    .page(page)
-                    .build()));
-    }
-
     private static Flux<PrivateDomainResource> requestPrivateDomains(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.organizations()
@@ -359,15 +358,23 @@ public final class DefaultRoutes implements Routes {
                 .build());
     }
 
-    private static Flux<RouteResource> requestRoutes(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
-        return PaginationUtils.
-            requestResources(page -> cloudFoundryClient.routes()
-                .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
-                    .domainId(domainId)
-                    .host(host)
+    private static Flux<RouteResource> requestRoutes(CloudFoundryClient cloudFoundryClient, UnaryOperator<org.cloudfoundry.client.v2.routes.ListRoutesRequest.Builder> modifier) {
+
+        org.cloudfoundry.client.v2.routes.ListRoutesRequest.Builder listBuilder = modifier.apply(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder());
+
+        return PaginationUtils
+            .requestResources(page -> cloudFoundryClient.routes()
+                .list(listBuilder
                     .page(page)
-                    .paths(Optional.ofNullable(path).map(Collections::singletonList).orElse(null))
                     .build()));
+    }
+
+    private static Flux<RouteResource> requestRoutes(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
+        return requestRoutes(cloudFoundryClient, builder -> builder
+            .domainId(domainId)
+            .hosts(Optional.ofNullable(host).map(Collections::singletonList).orElse(null))
+            .paths(Optional.ofNullable(path).map(Collections::singletonList).orElse(null))
+        );
     }
 
     private static Flux<SharedDomainResource> requestSharedDomains(CloudFoundryClient cloudFoundryClient, String domain) {
