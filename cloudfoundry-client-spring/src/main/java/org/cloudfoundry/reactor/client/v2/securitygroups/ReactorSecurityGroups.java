@@ -27,6 +27,8 @@ import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefault
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsResponse;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsResponse;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsRequest;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsResponse;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroups;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultResponse;
@@ -75,6 +77,11 @@ public class ReactorSecurityGroups extends AbstractClientV2Operations implements
     }
 
     @Override
+    public Mono<ListSecurityGroupsResponse> list(ListSecurityGroupsRequest request) {
+        return get(request, ListSecurityGroupsResponse.class, builder -> builder.pathSegment("v2", "security_groups"));
+    }
+
+    @Override
     public Mono<ListSecurityGroupRunningDefaultsResponse> listRunningDefaults(ListSecurityGroupRunningDefaultsRequest request) {
         return get(request, ListSecurityGroupRunningDefaultsResponse.class, builder -> builder.pathSegment("v2", "config", "running_security_groups"));
     }
@@ -93,5 +100,4 @@ public class ReactorSecurityGroups extends AbstractClientV2Operations implements
     public Mono<SetSecurityGroupStagingDefaultResponse> setStagingDefault(SetSecurityGroupStagingDefaultRequest request) {
         return put(request, SetSecurityGroupStagingDefaultResponse.class, builder -> builder.pathSegment("v2", "config", "staging_security_groups", request.getSecurityGroupStagingDefaultId()));
     }
-
 }
