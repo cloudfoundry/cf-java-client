@@ -16,14 +16,9 @@
 
 package org.cloudfoundry.uaa.groups;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.immutables.value.Value;
-
 /**
- * The response payload from the check a membership of a group request
+ * An interface that indicates that a UAA entity may be a member
  */
-@JsonDeserialize
-@Value.Immutable
-abstract class _CheckMembershipResponse extends AbstractMemberSummary {
+public interface GroupMembered {
 
 }

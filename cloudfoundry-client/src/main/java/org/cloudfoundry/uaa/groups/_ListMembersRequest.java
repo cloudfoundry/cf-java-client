@@ -16,14 +16,29 @@
 
 package org.cloudfoundry.uaa.groups;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.QueryParameter;
 import org.immutables.value.Value;
 
 /**
- * The response payload from the check a membership of a group request
+ * The request payload for the list members operation
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class _CheckMembershipResponse extends AbstractMemberSummary {
+abstract class _ListMembersRequest {
+
+    /**
+     * The group id
+     */
+    @JsonIgnore
+    abstract String getGroupId();
+
+    /**
+     * Set to true to return the SCIM entities which have membership in the group
+     */
+    @JsonIgnore
+    @Nullable
+    @QueryParameter("returnEntities")
+    abstract Boolean getReturnEntities();
 
 }

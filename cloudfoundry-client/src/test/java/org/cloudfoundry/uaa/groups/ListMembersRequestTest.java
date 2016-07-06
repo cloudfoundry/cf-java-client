@@ -16,14 +16,21 @@
 
 package org.cloudfoundry.uaa.groups;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.immutables.value.Value;
+import org.junit.Test;
 
-/**
- * The response payload from the check a membership of a group request
- */
-@JsonDeserialize
-@Value.Immutable
-abstract class _CheckMembershipResponse extends AbstractMemberSummary {
+public final class ListMembersRequestTest {
+
+    @Test(expected = IllegalStateException.class)
+    public void noId() {
+        ListMembersRequest.builder()
+            .build();
+    }
+
+    @Test
+    public void valid() {
+        ListMembersRequest.builder()
+            .groupId("test-group-id")
+            .build();
+    }
 
 }

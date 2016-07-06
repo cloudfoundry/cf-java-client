@@ -37,10 +37,14 @@ import org.cloudfoundry.uaa.groups.ListExternalGroupMappingsRequest;
 import org.cloudfoundry.uaa.groups.ListExternalGroupMappingsResponse;
 import org.cloudfoundry.uaa.groups.ListGroupsRequest;
 import org.cloudfoundry.uaa.groups.ListGroupsResponse;
+import org.cloudfoundry.uaa.groups.ListMembersRequest;
+import org.cloudfoundry.uaa.groups.ListMembersResponse;
 import org.cloudfoundry.uaa.groups.MapExternalGroupRequest;
 import org.cloudfoundry.uaa.groups.MapExternalGroupResponse;
 import org.cloudfoundry.uaa.groups.Member;
+import org.cloudfoundry.uaa.groups.MemberSummary;
 import org.cloudfoundry.uaa.groups.MemberType;
+import org.cloudfoundry.uaa.groups.MemberUser;
 import org.cloudfoundry.uaa.groups.RemoveMemberRequest;
 import org.cloudfoundry.uaa.groups.RemoveMemberResponse;
 import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupDisplayNameRequest;
@@ -49,6 +53,9 @@ import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupIdRequest;
 import org.cloudfoundry.uaa.groups.UnmapExternalGroupByGroupIdResponse;
 import org.cloudfoundry.uaa.groups.UpdateGroupRequest;
 import org.cloudfoundry.uaa.groups.UpdateGroupResponse;
+import org.cloudfoundry.uaa.users.Email;
+import org.cloudfoundry.uaa.users.Meta;
+import org.cloudfoundry.uaa.users.Name;
 import reactor.core.publisher.Mono;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
@@ -175,7 +182,7 @@ public final class ReactorGroupsTest {
                     .build())
                 .description("the cool group")
                 .displayName("Cool Group Name")
-                .member(Member.builder()
+                .member(MemberSummary.builder()
                     .origin("uaa")
                     .type(MemberType.USER)
                     .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
@@ -191,7 +198,7 @@ public final class ReactorGroupsTest {
                 .description("the cool group")
                 .displayName("Cool Group Name")
                 .identityZoneId("uaa")
-                .member(Member.builder()
+                .member(MemberSummary.builder()
                     .origin("uaa")
                     .type(MemberType.USER)
                     .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
@@ -234,7 +241,7 @@ public final class ReactorGroupsTest {
                     .build())
                 .description("the cool group")
                 .displayName("Cooler Group Name for Delete")
-                .member(Member.builder()
+                .member(MemberSummary.builder()
                     .origin("uaa")
                     .type(MemberType.USER)
                     .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
@@ -286,7 +293,7 @@ public final class ReactorGroupsTest {
                     .build())
                 .description("the cool group")
                 .displayName("Cooler Group Name for Retrieve")
-                .member(Member.builder()
+                .member(MemberSummary.builder()
                     .origin("uaa")
                     .type(MemberType.USER)
                     .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
@@ -340,7 +347,7 @@ public final class ReactorGroupsTest {
                         .build())
                     .description("the cool group")
                     .displayName("Cooler Group Name for List")
-                    .member(Member.builder()
+                    .member(MemberSummary.builder()
                         .origin("uaa")
                         .type(MemberType.USER)
                         .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
@@ -425,6 +432,74 @@ public final class ReactorGroupsTest {
         @Override
         protected Mono<ListExternalGroupMappingsResponse> invoke(ListExternalGroupMappingsRequest request) {
             return this.groups.listExternalGroupMappings(request);
+        }
+    }
+
+    public static final class ListMembers extends AbstractUaaApiTest<ListMembersRequest, ListMembersResponse> {
+
+        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET)
+                    .path("/Groups/f87c557a-8ddc-43d3-98fb-e420ebc7f0f1/members?returnEntities=true")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/groups/GET_members_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListMembersResponse getResponse() {
+            return ListMembersResponse.builder()
+                .member(Member.builder()
+                    .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+                    .type(MemberType.USER)
+                    .origin("uaa")
+                    .entity(MemberUser.builder()
+                        .id("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+                        .externalId("test-user")
+                        .meta(Meta.builder()
+                            .version(0)
+                            .created("2016-06-16T00:01:41.665Z")
+                            .lastModified("2016-06-16T00:01:41.665Z")
+                            .build())
+                        .userName("40HfKc")
+                        .name(Name.builder()
+                            .familyName("cool-familyName")
+                            .givenName("cool-name")
+                            .build())
+                        .email(Email.builder()
+                            .value("cool@chill.com")
+                            .primary(false)
+                            .build())
+                        .active(true)
+                        .verified(true)
+                        .origin("uaa")
+                        .zoneId("uaa")
+                        .passwordLastModified("2016-06-16T00:01:41.000Z")
+                        .schema("urn:scim:schemas:core:1.0")
+                        .build()
+                    )
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListMembersRequest getValidRequest() throws Exception {
+            return ListMembersRequest.builder()
+                .groupId("f87c557a-8ddc-43d3-98fb-e420ebc7f0f1")
+                .returnEntities(true)
+                .build();
+        }
+
+        @Override
+        protected Mono<ListMembersResponse> invoke(ListMembersRequest request) {
+            return this.groups.listMembers(request);
         }
     }
 
@@ -643,7 +718,7 @@ public final class ReactorGroupsTest {
                     .build())
                 .description("the cool group")
                 .displayName("Cooler Group Name for Update")
-                .member(Member.builder()
+                .member(MemberSummary.builder()
                     .origin("uaa")
                     .type(MemberType.USER)
                     .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
@@ -661,7 +736,7 @@ public final class ReactorGroupsTest {
                 .version("0")
                 .description("the cool group")
                 .displayName("Cooler Group Name for Update")
-                .member(Member.builder()
+                .member(MemberSummary.builder()
                     .origin("uaa")
                     .type(MemberType.USER)
                     .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
