@@ -14,36 +14,31 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.users;
+package org.cloudfoundry.uaa.groups;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.Nullable;
-
-import java.util.List;
+import org.cloudfoundry.QueryParameter;
+import org.immutables.value.Value;
 
 /**
- * The entity response payload for User
+ * The request payload for the list members operation
  */
-public abstract class AbstractUser extends AbstractUserSummary {
+@Value.Immutable
+abstract class _ListMembersRequest {
 
     /**
-     * The approvals for the user
+     * The group id
      */
-    @JsonProperty("approvals")
-    public abstract List<Approval> getApprovals();
+    @JsonIgnore
+    abstract String getGroupId();
 
     /**
-     * The external id
+     * Set to true to return the SCIM entities which have membership in the group
      */
-    @JsonProperty("externalId")
+    @JsonIgnore
     @Nullable
-    public abstract String getExternalId();
-
-    /**
-     * The groups for the user
-     */
-    @JsonProperty("groups")
-    //TODO: Remove explicit reference subject to resolution of https://github.com/immutables/immutables/issues/390)
-    public abstract List<org.cloudfoundry.uaa.users.Group> getGroups();
+    @QueryParameter("returnEntities")
+    abstract Boolean getReturnEntities();
 
 }

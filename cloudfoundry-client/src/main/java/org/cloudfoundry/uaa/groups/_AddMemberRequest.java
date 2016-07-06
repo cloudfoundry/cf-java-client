@@ -25,7 +25,7 @@ import org.immutables.value.Value;
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _AddMemberRequest extends AbstractMember {
+abstract class _AddMemberRequest extends AbstractMemberSummary {
 
     /**
      * The group id

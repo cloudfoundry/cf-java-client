@@ -14,36 +14,34 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.users;
+package org.cloudfoundry.uaa.groups;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
 
-import java.util.List;
-
 /**
- * The entity response payload for User
+ * The payload for Group member
  */
-public abstract class AbstractUser extends AbstractUserSummary {
+abstract class AbstractMemberSummary {
 
     /**
-     * The approvals for the user
+     * The alias of the identity provider that authenticated this user. "uaa" is an internal UAA user.
      */
-    @JsonProperty("approvals")
-    public abstract List<Approval> getApprovals();
-
-    /**
-     * The external id
-     */
-    @JsonProperty("externalId")
+    @JsonProperty("origin")
     @Nullable
-    public abstract String getExternalId();
+    abstract String getOrigin();
 
     /**
-     * The groups for the user
+     * Globally unique identifier of the member, either a user ID or another group ID
      */
-    @JsonProperty("groups")
-    //TODO: Remove explicit reference subject to resolution of https://github.com/immutables/immutables/issues/390)
-    public abstract List<org.cloudfoundry.uaa.users.Group> getGroups();
+    @JsonProperty("value")
+    abstract String getMemberId();
+
+    /**
+     * The member type
+     */
+    @JsonProperty("type")
+    @Nullable
+    abstract MemberType getType();
 
 }
