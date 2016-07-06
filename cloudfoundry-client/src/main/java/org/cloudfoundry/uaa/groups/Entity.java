@@ -19,6 +19,6 @@ package org.cloudfoundry.uaa.groups;
 /**
  * An interface that indicates that a UAA entity may be a member
  */
-public interface GroupMembered {
+public interface Entity {
 
 }

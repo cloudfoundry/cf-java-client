@@ -30,7 +30,7 @@ public abstract class AbstractUser extends AbstractUserSummary {
      * The approvals for the user
      */
     @JsonProperty("approvals")
-    public abstract List<Approval> getApproval();
+    public abstract List<Approval> getApprovals();
 
     /**
      * The external id
@@ -43,6 +43,7 @@ public abstract class AbstractUser extends AbstractUserSummary {
      * The groups for the user
      */
     @JsonProperty("groups")
-    public abstract List<Group> getGroup();
+    //TODO: Remove explicit reference subject to resolution of https://github.com/immutables/immutables/issues/390)
+    public abstract List<org.cloudfoundry.uaa.users.Group> getGroups();
 
 }

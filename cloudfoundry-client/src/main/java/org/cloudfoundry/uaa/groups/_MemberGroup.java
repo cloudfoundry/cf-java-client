@@ -24,6 +24,6 @@ import org.immutables.value.Value;
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _MemberGroup extends AbstractGroup implements GroupMembered {
+abstract class _MemberGroup extends AbstractGroup implements Entity {
 
 }

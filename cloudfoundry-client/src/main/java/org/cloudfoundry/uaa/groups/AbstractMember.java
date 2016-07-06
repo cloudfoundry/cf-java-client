@@ -36,6 +36,6 @@ abstract class AbstractMember extends AbstractMemberSummary {
     })
     @JsonProperty("entity")
     @Nullable
-    abstract GroupMembered getEntity();
+    abstract Entity getEntity();
 
 }

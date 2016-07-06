@@ -17,7 +17,6 @@
 package org.cloudfoundry.uaa.groups;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.uaa.groups.GroupMembered;
 import org.cloudfoundry.uaa.users.AbstractUser;
 import org.immutables.value.Value;
 
@@ -26,6 +25,6 @@ import org.immutables.value.Value;
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _MemberUser extends AbstractUser implements GroupMembered {
+abstract class _MemberUser extends AbstractUser implements Entity {
 
 }
