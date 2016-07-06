@@ -23,11 +23,20 @@ public final class DeleteSecurityGroupRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noSecurityGroupId() {
         DeleteSecurityGroupRequest.builder()
+            .async(true)
             .build();
     }
 
     @Test
-    public void valid() {
+    public void validMax() {
+        DeleteSecurityGroupRequest.builder()
+            .securityGroupId("test-security-group-id")
+            .async(true)
+            .build();
+    }
+
+    @Test
+    public void validMin() {
         DeleteSecurityGroupRequest.builder()
             .securityGroupId("test-security-group-id")
             .build();

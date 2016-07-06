@@ -16,24 +16,32 @@
 
 package org.cloudfoundry.client.v2.securitygroups;
 
-
 import org.junit.Test;
 
 public class CreateSecurityGroupRequestTest {
 
-
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
+    @Test
+    public void isValidMax() {
         CreateSecurityGroupRequest.builder()
+            .name("test-security-group-name")
+            .rule(RuleEntity.builder().build())
+            .spaceId("test-space-id")
             .build();
     }
 
     @Test
-    public void isValid() {
+    public void isValidMin() {
         CreateSecurityGroupRequest.builder()
-            .name("my_super_sec_group")
+            .name("test-security-group-name")
             .build();
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        CreateSecurityGroupRequest.builder()
+            .rule(RuleEntity.builder().build())
+            .spaceId("test-space-id")
+            .build();
+    }
 
 }
