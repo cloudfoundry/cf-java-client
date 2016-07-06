@@ -28,6 +28,8 @@ import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefault
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsResponse;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsResponse;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsRequest;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsResponse;
 import org.cloudfoundry.client.v2.securitygroups.RuleEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
@@ -290,6 +292,125 @@ public final class ReactorSecurityGroupsTest {
         @Override
         protected Mono<Void> invoke(DeleteSecurityGroupStagingDefaultRequest request) {
             return this.securityGroups.deleteStagingDefault(request);
+        }
+
+    }
+
+    public static final class List extends AbstractClientApiTest<ListSecurityGroupsRequest, ListSecurityGroupsResponse> {
+
+        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/security_groups")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/security_groups/GET_security_groups_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListSecurityGroupsResponse getResponse() {
+            return ListSecurityGroupsResponse.builder()
+                .totalResults(5)
+                .totalPages(1)
+                .resource(SecurityGroupResource.builder()
+                    .metadata(Metadata.builder()
+                        .id("1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
+                        .url("/v2/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
+                        .createdAt("2016-06-08T16:41:21Z")
+                        .build())
+                    .entity(SecurityGroupEntity.builder()
+                        .name("dummy1")
+                        .rule()
+                        .runningDefault(false)
+                        .stagingDefault(false)
+                        .spacesUrl("/v2/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159/spaces")
+                        .build())
+                    .build())
+                .resource(SecurityGroupResource.builder()
+                    .metadata(Metadata.builder()
+                        .id("61a3df25-f372-4554-9b77-811aaa5374c1")
+                        .url("/v2/security_groups/61a3df25-f372-4554-9b77-811aaa5374c1")
+                        .createdAt("2016-06-08T16:41:21Z")
+                        .build())
+                    .entity(SecurityGroupEntity.builder()
+                        .name("dummy2")
+                        .rule()
+                        .runningDefault(false)
+                        .stagingDefault(false)
+                        .spacesUrl("/v2/security_groups/61a3df25-f372-4554-9b77-811aaa5374c1/spaces")
+                        .build())
+                    .build())
+                .resource(SecurityGroupResource.builder()
+                    .metadata(Metadata.builder()
+                        .id("26bdad19-b077-4542-aac0-f7e4c53c344d")
+                        .url("/v2/security_groups/26bdad19-b077-4542-aac0-f7e4c53c344d")
+                        .createdAt("2016-06-08T16:41:22Z")
+                        .build())
+                    .entity(SecurityGroupEntity.builder()
+                        .name("name-67")
+                        .rule(RuleEntity.builder()
+                            .protocol("udp")
+                            .ports("8080")
+                            .destination("198.41.191.47/1")
+                            .build())
+                        .runningDefault(false)
+                        .stagingDefault(false)
+                        .spacesUrl("/v2/security_groups/26bdad19-b077-4542-aac0-f7e4c53c344d/spaces")
+                        .build())
+                    .build())
+                .resource(SecurityGroupResource.builder()
+                    .metadata(Metadata.builder()
+                        .id("0a2b8908-66f5-4bef-80f3-ca21ed86fbb3")
+                        .url("/v2/security_groups/0a2b8908-66f5-4bef-80f3-ca21ed86fbb3")
+                        .createdAt("2016-06-08T16:41:22Z")
+                        .build())
+                    .entity(SecurityGroupEntity.builder()
+                        .name("name-68")
+                        .rule(RuleEntity.builder()
+                            .protocol("udp")
+                            .ports("8080")
+                            .destination("198.41.191.47/1")
+                            .build())
+                        .runningDefault(false)
+                        .stagingDefault(false)
+                        .spacesUrl("/v2/security_groups/0a2b8908-66f5-4bef-80f3-ca21ed86fbb3/spaces")
+                        .build())
+                    .build())
+                .resource(SecurityGroupResource.builder()
+                    .metadata(Metadata.builder()
+                        .id("f5b93b76-cd25-4fed-bed6-0d9d0acff542")
+                        .url("/v2/security_groups/f5b93b76-cd25-4fed-bed6-0d9d0acff542")
+                        .createdAt("2016-06-08T16:41:22Z")
+                        .build())
+                    .entity(SecurityGroupEntity.builder()
+                        .name("name-69")
+                        .rule(RuleEntity.builder()
+                            .protocol("udp")
+                            .ports("8080")
+                            .destination("198.41.191.47/1")
+                            .build())
+                        .runningDefault(false)
+                        .stagingDefault(false)
+                        .spacesUrl("/v2/security_groups/f5b93b76-cd25-4fed-bed6-0d9d0acff542/spaces")
+                        .build())
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListSecurityGroupsRequest getValidRequest() throws Exception {
+            return ListSecurityGroupsRequest.builder().build();
+        }
+
+        @Override
+        protected Mono<ListSecurityGroupsResponse> invoke(ListSecurityGroupsRequest request) {
+            return this.securityGroups.list(request);
         }
 
     }

@@ -16,53 +16,24 @@
 
 package org.cloudfoundry.client.v2.securitygroups;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
 import java.util.List;
 
 /**
- * The entity response payload for the Security Group resource
+ * The request payload for the List all Security Groups operation
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class _SecurityGroupEntity {
+abstract class _ListSecurityGroupsRequest extends PaginatedRequest {
 
     /**
-     * The name
+     * The names
      */
-    @JsonProperty("name")
+    @InFilterParameter("name")
     @Nullable
-    abstract String getName();
-
-    /**
-     * The rules
-     */
-    @JsonProperty("rules")
-    @Nullable
-    abstract List<RuleEntity> getRules();
-
-    /**
-     * The running default
-     */
-    @JsonProperty("running_default")
-    @Nullable
-    abstract Boolean getRunningDefault();
-
-    /**
-     * The spaces url
-     */
-    @JsonProperty("spaces_url")
-    @Nullable
-    abstract String getSpacesUrl();
-
-    /**
-     * The staging default
-     */
-    @JsonProperty("staging_default")
-    @Nullable
-    abstract Boolean getStagingDefault();
+    abstract List<String> getNames();
 
 }
