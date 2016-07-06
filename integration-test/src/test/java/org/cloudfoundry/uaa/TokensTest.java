@@ -52,10 +52,10 @@ import static org.junit.Assert.assertNotNull;
 public final class TokensTest extends AbstractIntegrationTest {
 
     @Autowired
-    private String clientId;
+    private String testClientId;
 
     @Autowired
-    private String clientSecret;
+    private String testClientSecret;
 
     @Autowired
     private SpringCloudFoundryClient cloudFoundryClient;
@@ -69,8 +69,8 @@ public final class TokensTest extends AbstractIntegrationTest {
             .then(token -> this.uaaClient.tokens()
                 .check(CheckTokenRequest.builder()
                     .token(token)
-                    .clientId(this.clientId)
-                    .clientSecret(this.clientSecret)
+                    .clientId(this.testClientId)
+                    .clientSecret(this.testClientSecret)
                     .scope("password.write")
                     .scope("scim.userids")
                     .build()))
@@ -84,8 +84,8 @@ public final class TokensTest extends AbstractIntegrationTest {
         this.uaaClient.tokens()
             .getByAuthorizationCode(GetTokenByAuthorizationCodeRequest.builder()
                 .authorizationCode("some auth code")
-                .clientId(this.clientId)
-                .clientSecret(this.clientSecret)
+                .clientId(this.testClientId)
+                .clientSecret(this.testClientSecret)
                 .build())
             .subscribe(this.<GetTokenByAuthorizationCodeResponse>testSubscriber()
                 .assertCount(1));
@@ -95,8 +95,8 @@ public final class TokensTest extends AbstractIntegrationTest {
     public void getTokenByClientCredentials() {
         this.uaaClient.tokens()
             .getByClientCredentials(GetTokenByClientCredentialsRequest.builder()
-                .clientId(this.clientId)
-                .clientSecret(this.clientSecret)
+                .clientId(this.testClientId)
+                .clientSecret(this.testClientSecret)
                 .tokenFormat(TokenFormat.OPAQUE)
                 .build())
             .subscribe(this.<GetTokenByClientCredentialsResponse>testSubscriber()
@@ -109,8 +109,8 @@ public final class TokensTest extends AbstractIntegrationTest {
         this.uaaClient.tokens()
             .getByOneTimePasscode(GetTokenByOneTimePasscodeRequest.builder()
                 .passcode("Some passcode")
-                .clientId(this.clientId)
-                .clientSecret(this.clientSecret)
+                .clientId(this.testClientId)
+                .clientSecret(this.testClientSecret)
                 .tokenFormat(TokenFormat.OPAQUE)
                 .build())
             .subscribe(this.<GetTokenByOneTimePasscodeResponse>testSubscriber()
@@ -123,8 +123,8 @@ public final class TokensTest extends AbstractIntegrationTest {
         this.uaaClient.tokens()
             .getByOpenId(GetTokenByOpenIdRequest.builder()
                 .authorizationCode("Some authorization code")
-                .clientId(this.clientId)
-                .clientSecret(this.clientSecret)
+                .clientId(this.testClientId)
+                .clientSecret(this.testClientSecret)
                 .tokenFormat(TokenFormat.OPAQUE)
                 .build())
             .subscribe(this.<GetTokenByOpenIdResponse>testSubscriber()
@@ -138,8 +138,8 @@ public final class TokensTest extends AbstractIntegrationTest {
             .getByPassword(GetTokenByPasswordRequest.builder()
                 .password("a-password")
                 .username("a-username")
-                .clientId(this.clientId)
-                .clientSecret(this.clientSecret)
+                .clientId(this.testClientId)
+                .clientSecret(this.testClientSecret)
                 .tokenFormat(TokenFormat.OPAQUE)
                 .build())
             .subscribe(this.<GetTokenByPasswordResponse>testSubscriber()
@@ -183,8 +183,8 @@ public final class TokensTest extends AbstractIntegrationTest {
         this.uaaClient.tokens()
             .refresh(RefreshTokenRequest.builder()
                 .tokenFormat(TokenFormat.OPAQUE)
-                .clientId(this.clientId)
-                .clientSecret(this.clientSecret)
+                .clientId(this.testClientId)
+                .clientSecret(this.testClientSecret)
                 .refreshToken("a-refresh-token")
                 .build())
             .subscribe(this.<RefreshTokenResponse>testSubscriber()

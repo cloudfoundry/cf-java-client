@@ -62,13 +62,15 @@ public class IntegrationTestConfiguration {
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.test");
 
     @Bean
-    String clientId(@Value("${test.client.id:}") String clientId) {
-        return clientId;
+    // Required for TokensTest uaa integration test
+    String testClientId(@Value("${test.client.id:}") String testClientId) {
+        return testClientId;
     }
 
     @Bean
-    String clientSecret(@Value("${test.client.secret:}") String clientSecret) {
-        return clientSecret;
+    // Required for TokensTest uaa integration test
+    String testClientSecret(@Value("${test.client.secret:}") String testClientSecret) {
+        return testClientSecret;
     }
 
     @Bean(initMethod = "clean", destroyMethod = "clean")
@@ -87,7 +89,7 @@ public class IntegrationTestConfiguration {
                                                 @Value("${test.proxyPassword:}") String proxyPassword,
                                                 @Value("${test.proxyPort:}") Integer proxyPort,
                                                 @Value("${test.proxyUsername:}") String proxyUsername) {
-
+        
         return SpringCloudFoundryClient.builder()
             .host(host)
             .username(username)
