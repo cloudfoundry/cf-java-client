@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.cloudfoundry.reactor.util.DefaultSslCertificateTruster;
 import org.cloudfoundry.reactor.util.JsonCodec;
+import org.cloudfoundry.reactor.util.NetworkLogging;
 import org.cloudfoundry.reactor.util.SslCertificateTruster;
 import org.cloudfoundry.reactor.util.StaticTrustManagerFactory;
 import org.cloudfoundry.util.test.FailingDeserializationProblemHandler;
@@ -118,7 +119,10 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     Mono<Map<String, String>> getInfo() {
         return getRoot()
             .map(uri -> UriComponentsBuilder.fromUriString(uri).pathSegment("v2", "info").build().toUriString())
-            .then(getHttpClient()::get)
+            .then(uri -> getHttpClient()
+                .get(uri)
+                .doOnSubscribe(NetworkLogging.get(uri))
+                .compose(NetworkLogging.response(uri)))
             .then(inbound -> inbound.receive().aggregate().toInputStream())
             .map(JsonCodec.decode(getObjectMapper(), Map.class))
             .map(m -> (Map<String, String>) m)

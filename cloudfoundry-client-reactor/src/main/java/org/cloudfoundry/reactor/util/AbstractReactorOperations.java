@@ -21,17 +21,12 @@ import io.netty.buffer.ByteBuf;
 import io.netty.util.AsciiString;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClientRequest;
 import reactor.io.netty.http.HttpClientResponse;
-import reactor.io.netty.http.HttpException;
 import reactor.io.netty.http.HttpOutbound;
 
-import java.util.List;
 import java.util.function.Function;
 
 public abstract class AbstractReactorOperations {
@@ -46,13 +41,7 @@ public abstract class AbstractReactorOperations {
 
     protected static final AsciiString CONTENT_TYPE = new AsciiString("Content-Type");
 
-    private static final String CF_WARNINGS = "X-Cf-Warnings";
-
     private final ConnectionContext connectionContext;
-
-    private final Logger requestLogger = LoggerFactory.getLogger("cloudfoundry-client.request");
-
-    private final Logger responseLogger = LoggerFactory.getLogger("cloudfoundry-client.response");
 
     private final Mono<String> root;
 
@@ -72,8 +61,8 @@ public abstract class AbstractReactorOperations {
                 .delete(uri, outbound -> addAuthorization(outbound, this.connectionContext, this.tokenProvider)
                     .map(requestTransformer)
                     .then(o -> o.send(serializedRequest(o, request))))
-                .doOnSubscribe(s -> this.requestLogger.debug("DELETE {}", uri))
-                .compose(logResponse(uri)))
+                .doOnSubscribe(NetworkLogging.delete(uri))
+                .compose(NetworkLogging.response(uri)))
             .compose(deserializedResponse(responseType));
     }
 
@@ -89,8 +78,8 @@ public abstract class AbstractReactorOperations {
                 .get(uri, outbound -> addAuthorization(outbound, this.connectionContext, this.tokenProvider)
                     .map(requestTransformer)
                     .then(HttpClientRequest::sendHeaders))
-                .doOnSubscribe(s -> this.requestLogger.debug("GET    {}", uri))
-                .compose(logResponse(uri)));
+                .doOnSubscribe(NetworkLogging.get(uri))
+                .compose(NetworkLogging.response(uri)));
     }
 
     protected final <T> Mono<T> doPatch(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
@@ -101,8 +90,8 @@ public abstract class AbstractReactorOperations {
                 .patch(uri, outbound -> addAuthorization(outbound, this.connectionContext, this.tokenProvider)
                     .map(requestTransformer)
                     .then(o -> o.send(serializedRequest(o, request))))
-                .doOnSubscribe(s -> this.requestLogger.debug("PATCH  {}", uri))
-                .compose(logResponse(uri)))
+                .doOnSubscribe(NetworkLogging.patch(uri))
+                .compose(NetworkLogging.response(uri)))
             .compose(deserializedResponse(responseType));
     }
 
@@ -119,8 +108,8 @@ public abstract class AbstractReactorOperations {
             .then(uri -> this.connectionContext.getHttpClient()
                 .post(uri, outbound -> addAuthorization(outbound, this.connectionContext, this.tokenProvider)
                     .then(requestTransformer))
-                .doOnSubscribe(s -> this.requestLogger.debug("POST   {}", uri))
-                .compose(logResponse(uri)))
+                .doOnSubscribe(NetworkLogging.post(uri))
+                .compose(NetworkLogging.response(uri)))
             .compose(deserializedResponse(responseType));
     }
 
@@ -132,8 +121,8 @@ public abstract class AbstractReactorOperations {
                 .put(uri, outbound -> addAuthorization(outbound, this.connectionContext, this.tokenProvider)
                     .map(requestTransformer)
                     .then(o -> o.send(serializedRequest(o, request))))
-                .doOnSubscribe(s -> this.requestLogger.debug("PUT    {}", uri))
-                .compose(logResponse(uri)))
+                .doOnSubscribe(NetworkLogging.put(uri))
+                .compose(NetworkLogging.response(uri)))
             .compose(deserializedResponse(responseType));
     }
 
@@ -143,8 +132,8 @@ public abstract class AbstractReactorOperations {
             .then(uri -> this.connectionContext.getHttpClient()
                 .put(uri, outbound -> addAuthorization(outbound, this.connectionContext, this.tokenProvider)
                     .then(requestTransformer))
-                .doOnSubscribe(s -> this.requestLogger.debug("PUT    {}", uri))
-                .compose(logResponse(uri)))
+                .doOnSubscribe(NetworkLogging.put(uri))
+                .compose(NetworkLogging.response(uri)))
             .compose(deserializedResponse(responseType));
     }
 
@@ -155,8 +144,8 @@ public abstract class AbstractReactorOperations {
                 .get(uri, outbound -> addAuthorization(outbound, this.connectionContext, this.tokenProvider)
                     .map(requestTransformer)
                     .then(HttpClientRequest::upgradeToTextWebsocket))
-                .doOnSubscribe(s -> this.requestLogger.debug("WS     {}", uri))
-                .compose(logResponse(uri)));
+                .doOnSubscribe(NetworkLogging.ws(uri))
+                .compose(NetworkLogging.response(uri)));
     }
 
     private static <T extends HttpOutbound> Mono<T> addAuthorization(T outbound, ConnectionContext connectionContext, TokenProvider tokenProvider) {
@@ -177,25 +166,7 @@ public abstract class AbstractReactorOperations {
         return inbound -> inbound
             .then(i -> i.receive().aggregate().toInputStream())
             .map(JsonCodec.decode(this.connectionContext.getObjectMapper(), responseType))
-            .doOnError(JsonParsingException.class, e -> this.responseLogger.debug("\n{}", e.getPayload()));
-    }
-
-    private Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> logResponse(String uri) {
-        return inbound -> inbound
-            .doOnSuccess(i -> {
-                List<String> warnings = i.responseHeaders().getAll(CF_WARNINGS);
-
-                if (warnings.isEmpty()) {
-                    this.responseLogger.debug("{}    {}", i.status().code(), uri);
-                } else {
-                    this.responseLogger.warn("{}    {} ({})", i.status().code(), uri, StringUtils.collectionToCommaDelimitedString(warnings));
-                }
-            })
-            .doOnError(t -> {
-                if (t instanceof HttpException) {
-                    this.responseLogger.debug("{}    {}", ((HttpException) t).getResponseStatus().code(), uri);
-                }
-            });
+            .doOnError(JsonParsingException.class, e -> NetworkLogging.RESPONSE_LOGGER.debug("\n{}", e.getPayload()));
     }
 
     private Mono<ByteBuf> serializedRequest(HttpClientRequest outbound, Object request) {
