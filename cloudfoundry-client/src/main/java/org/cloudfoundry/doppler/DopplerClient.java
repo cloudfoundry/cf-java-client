@@ -29,7 +29,7 @@ public interface DopplerClient {
      * @param request the Container Metrics request
      * @return the container metrics
      */
-    Flux<ContainerMetric> containerMetrics(ContainerMetricsRequest request);
+    Flux<Envelope> containerMetrics(ContainerMetricsRequest request);
 
     /**
      * Makes the <a href="https://github.com/cloudfoundry/loggregator/tree/develop/src/trafficcontroller#endpoints">Firehose</a> request
@@ -37,7 +37,7 @@ public interface DopplerClient {
      * @param request the Firehose request
      * @return the events from the firehose
      */
-    Flux<Event> firehose(FirehoseRequest request);
+    Flux<Envelope> firehose(FirehoseRequest request);
 
     /**
      * Makes the <a href="https://github.com/cloudfoundry/loggregator/tree/develop/src/trafficcontroller#endpoints">Recent Logs</a> request
@@ -45,7 +45,7 @@ public interface DopplerClient {
      * @param request the Recent Logs request
      * @return the events from the recent logs
      */
-    Flux<LogMessage> recentLogs(RecentLogsRequest request);
+    Flux<Envelope> recentLogs(RecentLogsRequest request);
 
     /**
      * Makes the <a href="https://github.com/cloudfoundry/loggregator/tree/develop/src/trafficcontroller#endpoints">Stream</a> request
@@ -53,6 +53,6 @@ public interface DopplerClient {
      * @param request the Stream request
      * @return the events from the stream
      */
-    Flux<Event> stream(StreamRequest request);
+    Flux<Envelope> stream(StreamRequest request);
 
 }

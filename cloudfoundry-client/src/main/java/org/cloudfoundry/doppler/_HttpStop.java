@@ -26,7 +26,7 @@ import java.util.UUID;
  * The event emitted when a client receives a response to its request (or when a server completes its handling and returns a response)
  */
 @Value.Immutable
-abstract class _HttpStop implements Event {
+abstract class _HttpStop {
 
     public static HttpStop from(org.cloudfoundry.dropsonde.events.HttpStop dropsonde) {
         Objects.requireNonNull(dropsonde, "dropsonde");

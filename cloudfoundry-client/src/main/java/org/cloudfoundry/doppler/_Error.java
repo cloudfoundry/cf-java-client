@@ -24,7 +24,7 @@ import java.util.Objects;
  * An Error event represents an error in the originating process
  */
 @Value.Immutable
-abstract class _Error implements Event {
+abstract class _Error {
 
     public static Error from(org.cloudfoundry.dropsonde.events.Error dropsonde) {
         Objects.requireNonNull(dropsonde, "dropsonde");

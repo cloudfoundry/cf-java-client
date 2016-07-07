@@ -95,6 +95,8 @@ import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksResponse;
 import org.cloudfoundry.client.v2.stacks.StackEntity;
 import org.cloudfoundry.doppler.DopplerClient;
+import org.cloudfoundry.doppler.Envelope;
+import org.cloudfoundry.doppler.EventType;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
@@ -695,7 +697,11 @@ public final class DefaultApplicationsTest {
                 .applicationId(applicationId)
                 .build()))
             .thenReturn(Flux
-                .just(fill(LogMessage.builder(), "log-message-")
+                .just(Envelope.builder()
+                    .eventType(EventType.LOG_MESSAGE)
+                    .logMessage(fill(LogMessage.builder(), "log-message-")
+                        .build())
+                    .origin("rsp")
                     .build()));
     }
 
@@ -705,7 +711,11 @@ public final class DefaultApplicationsTest {
                 .applicationId(applicationId)
                 .build()))
             .thenReturn(Flux
-                .just(fill(LogMessage.builder(), "log-message-")
+                .just(Envelope.builder()
+                    .eventType(EventType.LOG_MESSAGE)
+                    .logMessage(fill(LogMessage.builder(), "log-message-")
+                        .build())
+                    .origin("rsp")
                     .build()));
     }
 
@@ -2491,7 +2501,7 @@ public final class DefaultApplicationsTest {
 
     public static final class PushDomainNotFound extends AbstractOperationsApiTest<Void> {
 
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
+        private final InputStream applicationBits = new ByteArrayInputStream("test-application" .getBytes());
 
         private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
@@ -2526,7 +2536,7 @@ public final class DefaultApplicationsTest {
 
     public static final class PushExistingApplication extends AbstractOperationsApiTest<Void> {
 
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
+        private final InputStream applicationBits = new ByteArrayInputStream("test-application" .getBytes());
 
         private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
@@ -2568,7 +2578,7 @@ public final class DefaultApplicationsTest {
 
     public static final class PushExistingRouteWithHost extends AbstractOperationsApiTest<Void> {
 
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
+        private final InputStream applicationBits = new ByteArrayInputStream("test-application" .getBytes());
 
         private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
@@ -2610,7 +2620,7 @@ public final class DefaultApplicationsTest {
 
     public static final class PushExistingRouteWithNoHost extends AbstractOperationsApiTest<Void> {
 
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
+        private final InputStream applicationBits = new ByteArrayInputStream("test-application" .getBytes());
 
         private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
@@ -2652,7 +2662,7 @@ public final class DefaultApplicationsTest {
 
     public static final class PushInvalidStack extends AbstractOperationsApiTest<Void> {
 
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
+        private final InputStream applicationBits = new ByteArrayInputStream("test-application" .getBytes());
 
         private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
@@ -2681,7 +2691,7 @@ public final class DefaultApplicationsTest {
 
     public static final class PushNewApplication extends AbstractOperationsApiTest<Void> {
 
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
+        private final InputStream applicationBits = new ByteArrayInputStream("test-application" .getBytes());
 
         private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
@@ -2723,7 +2733,7 @@ public final class DefaultApplicationsTest {
 
     public static final class PushNewRouteWithHost extends AbstractOperationsApiTest<Void> {
 
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
+        private final InputStream applicationBits = new ByteArrayInputStream("test-application" .getBytes());
 
         private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
@@ -2766,7 +2776,7 @@ public final class DefaultApplicationsTest {
 
     public static final class PushNewRouteWithNoHost extends AbstractOperationsApiTest<Void> {
 
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
+        private final InputStream applicationBits = new ByteArrayInputStream("test-application" .getBytes());
 
         private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
@@ -2809,7 +2819,7 @@ public final class DefaultApplicationsTest {
 
     public static final class PushNoDomainNoneFound extends AbstractOperationsApiTest<Void> {
 
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
+        private final InputStream applicationBits = new ByteArrayInputStream("test-application" .getBytes());
 
         private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
@@ -2844,7 +2854,7 @@ public final class DefaultApplicationsTest {
 
     public static final class PushNoDomainPrivate extends AbstractOperationsApiTest<Void> {
 
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
+        private final InputStream applicationBits = new ByteArrayInputStream("test-application" .getBytes());
 
         private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
@@ -2887,7 +2897,7 @@ public final class DefaultApplicationsTest {
 
     public static final class PushNoDomainShared extends AbstractOperationsApiTest<Void> {
 
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
+        private final InputStream applicationBits = new ByteArrayInputStream("test-application" .getBytes());
 
         private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
@@ -2929,7 +2939,7 @@ public final class DefaultApplicationsTest {
 
     public static final class PushNoRoute extends AbstractOperationsApiTest<Void> {
 
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
+        private final InputStream applicationBits = new ByteArrayInputStream("test-application" .getBytes());
 
         private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
@@ -2969,7 +2979,7 @@ public final class DefaultApplicationsTest {
 
     public static final class PushNoStart extends AbstractOperationsApiTest<Void> {
 
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
+        private final InputStream applicationBits = new ByteArrayInputStream("test-application" .getBytes());
 
         private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
@@ -3009,7 +3019,7 @@ public final class DefaultApplicationsTest {
 
     public static final class PushRandomRoute extends AbstractOperationsApiTest<Void> {
 
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
+        private final InputStream applicationBits = new ByteArrayInputStream("test-application" .getBytes());
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
             .application(this.applicationBits)
@@ -3055,7 +3065,7 @@ public final class DefaultApplicationsTest {
 
     public static final class PushSharedDomain extends AbstractOperationsApiTest<Void> {
 
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
+        private final InputStream applicationBits = new ByteArrayInputStream("test-application" .getBytes());
 
         private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
@@ -3098,7 +3108,7 @@ public final class DefaultApplicationsTest {
 
     public static final class PushStartFailsRunning extends AbstractOperationsApiTest<Void> {
 
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
+        private final InputStream applicationBits = new ByteArrayInputStream("test-application" .getBytes());
 
         private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
@@ -3141,7 +3151,7 @@ public final class DefaultApplicationsTest {
 
     public static final class PushStartFailsStaging extends AbstractOperationsApiTest<Void> {
 
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
+        private final InputStream applicationBits = new ByteArrayInputStream("test-application" .getBytes());
 
         private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
@@ -3183,7 +3193,7 @@ public final class DefaultApplicationsTest {
 
     public static final class PushUploadFails extends AbstractOperationsApiTest<Void> {
 
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
+        private final InputStream applicationBits = new ByteArrayInputStream("test-application" .getBytes());
 
         private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 

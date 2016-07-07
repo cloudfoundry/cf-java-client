@@ -25,7 +25,7 @@ import java.util.Objects;
  * Represents the increment of a counter. It contains only the change in the value; it is the responsibility of downstream consumers to maintain the value of the counter.
  */
 @Value.Immutable
-abstract class _CounterEvent implements Event {
+abstract class _CounterEvent {
 
     public static CounterEvent from(org.cloudfoundry.dropsonde.events.CounterEvent dropsonde) {
         Objects.requireNonNull(dropsonde, "dropsonde");

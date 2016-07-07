@@ -19,6 +19,7 @@ package org.cloudfoundry.doppler;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -26,7 +27,7 @@ import java.util.UUID;
  * This event represents the whole lifecycle of an HTTP request.
  */
 @Value.Immutable
-abstract class _HttpStartStop implements Event {
+abstract class _HttpStartStop {
 
     public static HttpStartStop from(org.cloudfoundry.dropsonde.events.HttpStartStop dropsonde) {
         Objects.requireNonNull(dropsonde, "dropsonde");
@@ -34,6 +35,7 @@ abstract class _HttpStartStop implements Event {
         return HttpStartStop.builder()
             .applicationId(UuidUtils.from(dropsonde.applicationId))
             .contentLength(dropsonde.contentLength)
+            .forwarded(dropsonde.forwarded)
             .instanceId(dropsonde.instanceId)
             .instanceIndex(dropsonde.instanceIndex)
             .method(Method.from(dropsonde.method))
@@ -58,6 +60,11 @@ abstract class _HttpStartStop implements Event {
      * The length of the response in bytes
      */
     abstract Long getContentLength();
+
+    /**
+     * The http forwarded-for [x-forwarded-for] header from the request
+     */
+    abstract List<String> getForwarded();
 
     /**
      * The ID of the application instance
