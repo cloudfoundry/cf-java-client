@@ -17,56 +17,41 @@
 package org.cloudfoundry.client.v2.jobs;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
 /**
  * Job entity in response payloads
  */
-@Data
-public final class JobEntity {
+@JsonDeserialize
+@Value.Immutable
+abstract class _JobEntity {
 
     /**
      * The error
-     *
-     * @param error the error
-     * @return the error
      */
-    private final String error;
+    @JsonProperty("error")
+    @Nullable
+    abstract String getError();
 
     /**
      * The error details
-     *
-     * @param errorDetails the error details
-     * @return the error details
      */
-    private final ErrorDetails errorDetails;
+    @JsonProperty("error_details")
+    @Nullable
+    abstract ErrorDetails getErrorDetails();
 
     /**
      * The id
-     *
-     * @param id the id
-     * @return the id
      */
-    private final String id;
+    @JsonProperty("guid")
+    abstract String getId();
 
     /**
      * The status
-     *
-     * @param status the status
-     * @return the status
      */
-    private final String status;
-
-    @Builder
-    JobEntity(@JsonProperty("error") String error,
-              @JsonProperty("error_details") ErrorDetails errorDetails,
-              @JsonProperty("guid") String id,
-              @JsonProperty("status") String status) {
-        this.error = error;
-        this.errorDetails = errorDetails;
-        this.id = id;
-        this.status = status;
-    }
+    @JsonProperty("status")
+    abstract String getStatus();
 
 }
