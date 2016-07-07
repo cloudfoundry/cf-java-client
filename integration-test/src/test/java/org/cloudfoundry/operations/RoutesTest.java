@@ -238,6 +238,34 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void mapNoHost() {
+        String applicationName = getApplicationName();
+        String domainName = getDomainName();
+        String hostName = null;
+        String path = getPath();
+
+        Mono
+            .when(
+                createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
+                createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, true)
+            )
+            .then(this.cloudFoundryOperations.routes()
+                .map(MapRouteRequest.builder()
+                    .applicationName(applicationName)
+                    .domain(domainName)
+                    .host(hostName)
+                    .path(path)
+                    .build()))
+            .thenMany(this.cloudFoundryOperations.routes()
+                .list(ListRoutesRequest.builder()
+                    .level(SPACE)
+                    .build()))
+            .filter(filterRoutes(domainName, hostName, path, applicationName))
+            .subscribe(testSubscriber()
+                .assertCount(1));
+    }
+
+    @Test
     public void mapNoPath() {
         String applicationName = getApplicationName();
         String domainName = getDomainName();
