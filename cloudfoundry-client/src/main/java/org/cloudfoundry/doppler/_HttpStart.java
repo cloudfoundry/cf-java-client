@@ -26,7 +26,7 @@ import java.util.UUID;
  * The event emitted when a client sends a request (or immediately when a server receives the request).
  */
 @Value.Immutable
-abstract class _HttpStart implements Event {
+abstract class _HttpStart {
 
     public static HttpStart from(org.cloudfoundry.dropsonde.events.HttpStart dropsonde) {
         Objects.requireNonNull(dropsonde, "dropsonde");

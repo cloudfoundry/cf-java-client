@@ -24,7 +24,7 @@ import java.util.Objects;
  * Records resource usage of an application in a container
  */
 @Value.Immutable
-abstract class _ContainerMetric implements Event {
+abstract class _ContainerMetric {
 
     public static ContainerMetric from(org.cloudfoundry.dropsonde.events.ContainerMetric dropsonde) {
         Objects.requireNonNull(dropsonde, "dropsonde");

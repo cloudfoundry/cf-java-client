@@ -24,7 +24,7 @@ import java.util.Objects;
  * Indicates the value of a metric at an instant in time
  */
 @Value.Immutable
-abstract class _ValueMetric implements Event {
+abstract class _ValueMetric {
 
     public static ValueMetric from(org.cloudfoundry.dropsonde.events.ValueMetric dropsonde) {
         Objects.requireNonNull(dropsonde, "dropsonde");

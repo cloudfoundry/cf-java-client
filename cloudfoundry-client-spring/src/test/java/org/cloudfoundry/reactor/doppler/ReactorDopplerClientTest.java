@@ -18,6 +18,8 @@ package org.cloudfoundry.reactor.doppler;
 
 import org.cloudfoundry.doppler.ContainerMetric;
 import org.cloudfoundry.doppler.ContainerMetricsRequest;
+import org.cloudfoundry.doppler.Envelope;
+import org.cloudfoundry.doppler.EventType;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.MessageType;
 import org.cloudfoundry.doppler.RecentLogsRequest;
@@ -32,7 +34,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorDopplerClientTest {
 
-    public static final class ContainerMetrics extends AbstractDopplerApiTest<ContainerMetricsRequest, ContainerMetric> {
+    public static final class ContainerMetrics extends AbstractDopplerApiTest<ContainerMetricsRequest, Envelope> {
 
         private final ReactorDopplerClient dopplerClient = new ReactorDopplerClient(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
@@ -51,26 +53,44 @@ public final class ReactorDopplerClientTest {
         }
 
         @Override
-        protected ContainerMetric getResponse() {
+        protected Envelope getResponse() {
             return null;
         }
 
         @Override
-        protected Flux<ContainerMetric> getResponses() {
+        protected Flux<Envelope> getResponses() {
             return Flux.just(
-                ContainerMetric.builder()
-                    .applicationId("1a95eadc-95c6-4675-aa07-8c02f80ea8a4")
-                    .cpuPercentage(0.09530591690894699)
-                    .diskBytes(154005504L)
-                    .instanceIndex(2)
-                    .memoryBytes(385896448L)
+                Envelope.builder()
+                    .containerMetric(ContainerMetric.builder()
+                        .applicationId("1a95eadc-95c6-4675-aa07-8c02f80ea8a4")
+                        .cpuPercentage(0.09530591690894699)
+                        .diskBytes(154005504L)
+                        .instanceIndex(2)
+                        .memoryBytes(385896448L)
+                        .build())
+                    .deployment("cf-cfapps-io2-diego")
+                    .eventType(EventType.CONTAINER_METRIC)
+                    .index("17")
+                    .ip("10.10.115.52")
+                    .job("cell_z2")
+                    .origin("rep")
+                    .timestamp(1460991824620929073L)
                     .build(),
-                ContainerMetric.builder()
-                    .applicationId("1a95eadc-95c6-4675-aa07-8c02f80ea8a4")
-                    .cpuPercentage(0.070504789909887)
-                    .diskBytes(154005504L)
-                    .instanceIndex(0)
-                    .memoryBytes(371363840L)
+                Envelope.builder()
+                    .containerMetric(ContainerMetric.builder()
+                        .applicationId("1a95eadc-95c6-4675-aa07-8c02f80ea8a4")
+                        .cpuPercentage(0.070504789909887)
+                        .diskBytes(154005504L)
+                        .instanceIndex(0)
+                        .memoryBytes(371363840L)
+                        .build())
+                    .deployment("cf-cfapps-io2-diego")
+                    .eventType(EventType.CONTAINER_METRIC)
+                    .index("55")
+                    .ip("10.10.115.90")
+                    .job("cell_z2")
+                    .origin("rep")
+                    .timestamp(1460991826249611682L)
                     .build());
         }
 
@@ -82,13 +102,13 @@ public final class ReactorDopplerClientTest {
         }
 
         @Override
-        protected Flux<ContainerMetric> invoke(ContainerMetricsRequest request) {
+        protected Flux<Envelope> invoke(ContainerMetricsRequest request) {
             return this.dopplerClient.containerMetrics(request);
         }
 
     }
 
-    public static final class RecentLogs extends AbstractDopplerApiTest<RecentLogsRequest, LogMessage> {
+    public static final class RecentLogs extends AbstractDopplerApiTest<RecentLogsRequest, Envelope> {
 
         private final ReactorDopplerClient dopplerClient = new ReactorDopplerClient(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
 
@@ -107,29 +127,47 @@ public final class ReactorDopplerClientTest {
         }
 
         @Override
-        protected LogMessage getResponse() {
+        protected Envelope getResponse() {
             return null;
         }
 
         @Override
-        protected Publisher<LogMessage> getResponses() {
+        protected Publisher<Envelope> getResponses() {
             return Flux.just(
-                LogMessage.builder()
-                    .applicationId("1a95eadc-95c6-4675-aa07-8c02f80ea8a4")
-                    .message("2016-04-21 22:36:28.035  INFO 24 --- [           main] o.s.j.e.a.AnnotationMBeanExporter        : Located managed bean 'rabbitConnectionFactory': registering with JMX " +
-                        "server as MBean [org.springframework.amqp.rabbit.connection:name=rabbitConnectionFactory,type=CachingConnectionFactory]")
-                    .messageType(MessageType.OUT)
-                    .sourceInstance("0")
-                    .sourceType("APP")
-                    .timestamp(1461278188035928339L)
+                Envelope.builder()
+                    .deployment("cf-cfapps-io2-diego")
+                    .eventType(EventType.LOG_MESSAGE)
+                    .index("33")
+                    .ip("10.10.115.68")
+                    .job("cell_z2")
+                    .logMessage(LogMessage.builder()
+                        .applicationId("1a95eadc-95c6-4675-aa07-8c02f80ea8a4")
+                        .message("2016-04-21 22:36:28.035  INFO 24 --- [           main] o.s.j.e.a.AnnotationMBeanExporter        : Located managed bean 'rabbitConnectionFactory': registering with " +
+                            "JMX server as MBean [org.springframework.amqp.rabbit.connection:name=rabbitConnectionFactory,type=CachingConnectionFactory]")
+                        .messageType(MessageType.OUT)
+                        .sourceInstance("0")
+                        .sourceType("APP")
+                        .timestamp(1461278188035928339L)
+                        .build())
+                    .origin("rep")
+                    .timestamp(1461278188035930425L)
                     .build(),
-                LogMessage.builder()
-                    .applicationId("1a95eadc-95c6-4675-aa07-8c02f80ea8a4")
-                    .message("Container became healthy")
-                    .messageType(MessageType.OUT)
-                    .sourceInstance("0")
-                    .sourceType("CELL")
-                    .timestamp(1461278188715651492L)
+                Envelope.builder()
+                    .deployment("cf-cfapps-io2-diego")
+                    .eventType(EventType.LOG_MESSAGE)
+                    .index("33")
+                    .ip("10.10.115.68")
+                    .job("cell_z2")
+                    .logMessage(LogMessage.builder()
+                        .applicationId("1a95eadc-95c6-4675-aa07-8c02f80ea8a4")
+                        .message("Container became healthy")
+                        .messageType(MessageType.OUT)
+                        .sourceInstance("0")
+                        .sourceType("CELL")
+                        .timestamp(1461278188715651492L)
+                        .build())
+                    .origin("rep")
+                    .timestamp(1461278188715653514L)
                     .build());
         }
 
@@ -141,7 +179,7 @@ public final class ReactorDopplerClientTest {
         }
 
         @Override
-        protected Publisher<LogMessage> invoke(RecentLogsRequest request) {
+        protected Publisher<Envelope> invoke(RecentLogsRequest request) {
             return this.dopplerClient.recentLogs(request);
         }
 

@@ -78,7 +78,8 @@ import org.cloudfoundry.client.v2.stacks.GetStackResponse;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.stacks.StackResource;
 import org.cloudfoundry.doppler.DopplerClient;
-import org.cloudfoundry.doppler.Event;
+import org.cloudfoundry.doppler.Envelope;
+import org.cloudfoundry.doppler.EventType;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
@@ -651,12 +652,14 @@ public final class DefaultApplications implements Applications {
     private static Flux<LogMessage> getLogs(Mono<DopplerClient> dopplerClient, String applicationId, Boolean recent) {
         if (Optional.ofNullable(recent).orElse(false)) {
             return requestLogsRecent(dopplerClient, applicationId)
+                .filter(e -> EventType.LOG_MESSAGE == e.getEventType())
+                .map(Envelope::getLogMessage)
                 .collectSortedList((a, b) -> a.getTimestamp().compareTo(b.getTimestamp()))
                 .flatMapIterable(d -> d);
         } else {
             return requestLogsStream(dopplerClient, applicationId)
-                .filter(e -> LogMessage.class.isAssignableFrom(e.getClass()))
-                .cast(LogMessage.class);
+                .filter(e -> EventType.LOG_MESSAGE == e.getEventType())
+                .map(Envelope::getLogMessage);
         }
     }
 
@@ -955,7 +958,7 @@ public final class DefaultApplications implements Applications {
                     .build()));
     }
 
-    private static Flux<LogMessage> requestLogsRecent(Mono<DopplerClient> dopplerClient, String applicationId) {
+    private static Flux<Envelope> requestLogsRecent(Mono<DopplerClient> dopplerClient, String applicationId) {
         return dopplerClient
             .flatMap(client -> client
                 .recentLogs(RecentLogsRequest.builder()
@@ -963,7 +966,7 @@ public final class DefaultApplications implements Applications {
                     .build()));
     }
 
-    private static Flux<Event> requestLogsStream(Mono<DopplerClient> dopplerClient, String applicationId) {
+    private static Flux<Envelope> requestLogsStream(Mono<DopplerClient> dopplerClient, String applicationId) {
         return dopplerClient
             .flatMap(client -> client
                 .stream(StreamRequest.builder()

@@ -25,7 +25,7 @@ import java.util.Objects;
  * Contains a "log line" and associated metadata.
  */
 @Value.Immutable
-abstract class _LogMessage implements Event {
+abstract class _LogMessage {
 
     public static LogMessage from(org.cloudfoundry.dropsonde.events.LogMessage dropsonde) {
         Objects.requireNonNull(dropsonde, "dropsonde");
