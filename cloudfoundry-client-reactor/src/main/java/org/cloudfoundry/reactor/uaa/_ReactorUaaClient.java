@@ -18,16 +18,18 @@ package org.cloudfoundry.reactor.uaa;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.reactor.ConnectionContext;
+import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.uaa.authorizations.ReactorAuthorizations;
+import org.cloudfoundry.reactor.uaa.clients.ReactorClients;
 import org.cloudfoundry.reactor.uaa.groups.ReactorGroups;
 import org.cloudfoundry.reactor.uaa.identityproviders.ReactorIdentityProviders;
 import org.cloudfoundry.reactor.uaa.identityzones.ReactorIdentityZones;
 import org.cloudfoundry.reactor.uaa.tokens.ReactorTokens;
 import org.cloudfoundry.reactor.uaa.users.ReactorUsers;
-import org.cloudfoundry.reactor.ConnectionContext;
-import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.authorizations.Authorizations;
+import org.cloudfoundry.uaa.clients.Clients;
 import org.cloudfoundry.uaa.groups.Groups;
 import org.cloudfoundry.uaa.identityproviders.IdentityProviders;
 import org.cloudfoundry.uaa.identityzones.IdentityZones;
@@ -47,6 +49,12 @@ abstract class _ReactorUaaClient implements UaaClient {
     @Value.Derived
     public Authorizations authorizations() {
         return new ReactorAuthorizations(getConnectionContext(), getRoot(), getTokenProvider());
+    }
+
+    @Override
+    @Value.Derived
+    public Clients clients() {
+        return new ReactorClients(getConnectionContext(), getRoot(), getTokenProvider());
     }
 
     @Override
