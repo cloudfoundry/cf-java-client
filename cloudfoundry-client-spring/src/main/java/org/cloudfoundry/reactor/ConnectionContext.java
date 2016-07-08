@@ -14,22 +14,37 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.util.network;
+package org.cloudfoundry.reactor;
 
-import org.springframework.security.oauth2.client.OAuth2RestOperations;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import reactor.core.publisher.Mono;
+import reactor.io.netty.http.HttpClient;
 
-public final class OAuth2RestOperationsOAuth2TokenProvider implements OAuth2TokenProvider {
+/**
+ * Common, reusable, connection context
+ */
+public interface ConnectionContext {
 
-    private final OAuth2RestOperations restOperations;
+    /**
+     * The {@link HttpClient} to use
+     */
+    HttpClient getHttpClient();
 
-    public OAuth2RestOperationsOAuth2TokenProvider(OAuth2RestOperations restOperations) {
-        this.restOperations = restOperations;
-    }
+    /**
+     * The {@link ObjectMapper} to use
+     */
+    ObjectMapper getObjectMapper();
 
-    @Override
-    public Mono<String> getToken() {
-        return Mono.defer(() -> Mono.just(this.restOperations.getAccessToken().getValue()));
-    }
+    /**
+     * The normalized API root
+     */
+    Mono<String> getRoot();
+
+    /**
+     * The normalized root for a given key
+     *
+     * @param key the key to look up root from
+     */
+    Mono<String> getRoot(String key);
 
 }

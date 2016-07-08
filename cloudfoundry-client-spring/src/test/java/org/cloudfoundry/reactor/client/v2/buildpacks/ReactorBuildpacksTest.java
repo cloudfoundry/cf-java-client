@@ -54,7 +54,7 @@ public final class ReactorBuildpacksTest {
 
     public static final class Create extends AbstractClientApiTest<CreateBuildpackRequest, CreateBuildpackResponse> {
 
-        private ReactorBuildpacks buildpacks = new ReactorBuildpacks(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private ReactorBuildpacks buildpacks = new ReactorBuildpacks(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -104,7 +104,7 @@ public final class ReactorBuildpacksTest {
 
     public static final class Delete extends AbstractClientApiTest<DeleteBuildpackRequest, DeleteBuildpackResponse> {
 
-        private ReactorBuildpacks buildpacks = new ReactorBuildpacks(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private ReactorBuildpacks buildpacks = new ReactorBuildpacks(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -151,7 +151,7 @@ public final class ReactorBuildpacksTest {
 
     public static final class Get extends AbstractClientApiTest<GetBuildpackRequest, GetBuildpackResponse> {
 
-        private ReactorBuildpacks buildpacks = new ReactorBuildpacks(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private ReactorBuildpacks buildpacks = new ReactorBuildpacks(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -200,7 +200,7 @@ public final class ReactorBuildpacksTest {
 
     public static final class List extends AbstractClientApiTest<ListBuildpacksRequest, ListBuildpacksResponse> {
 
-        private ReactorBuildpacks buildpacks = new ReactorBuildpacks(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private ReactorBuildpacks buildpacks = new ReactorBuildpacks(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -282,7 +282,7 @@ public final class ReactorBuildpacksTest {
 
     public static final class Update extends AbstractClientApiTest<UpdateBuildpackRequest, UpdateBuildpackResponse> {
 
-        private ReactorBuildpacks buildpacks = new ReactorBuildpacks(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private ReactorBuildpacks buildpacks = new ReactorBuildpacks(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -333,7 +333,7 @@ public final class ReactorBuildpacksTest {
 
     public static final class Upload extends AbstractClientApiTest<UploadBuildpackRequest, UploadBuildpackResponse> {
 
-        private ReactorBuildpacks buildpacks = new ReactorBuildpacks(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private ReactorBuildpacks buildpacks = new ReactorBuildpacks(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {

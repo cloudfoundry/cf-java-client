@@ -51,7 +51,7 @@ public final class ReactorDomainsTest {
 
     public static final class Create extends AbstractClientApiTest<CreateDomainRequest, CreateDomainResponse> {
 
-        private final ReactorDomains domains = new ReactorDomains(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorDomains domains = new ReactorDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -102,7 +102,7 @@ public final class ReactorDomainsTest {
 
     public static final class Delete extends AbstractClientApiTest<DeleteDomainRequest, DeleteDomainResponse> {
 
-        private final ReactorDomains domains = new ReactorDomains(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorDomains domains = new ReactorDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -136,7 +136,7 @@ public final class ReactorDomainsTest {
 
     public static final class DeleteAsync extends AbstractClientApiTest<DeleteDomainRequest, DeleteDomainResponse> {
 
-        private final ReactorDomains domains = new ReactorDomains(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorDomains domains = new ReactorDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -182,7 +182,7 @@ public final class ReactorDomainsTest {
 
     public static final class Get extends AbstractClientApiTest<GetDomainRequest, GetDomainResponse> {
 
-        private final ReactorDomains domains = new ReactorDomains(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorDomains domains = new ReactorDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -227,7 +227,7 @@ public final class ReactorDomainsTest {
 
     public static final class ListDomains extends AbstractClientApiTest<ListDomainsRequest, ListDomainsResponse> {
 
-        private final ReactorDomains domains = new ReactorDomains(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorDomains domains = new ReactorDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -308,7 +308,7 @@ public final class ReactorDomainsTest {
 
     public static final class ListSpaces extends AbstractClientApiTest<ListDomainSpacesRequest, ListDomainSpacesResponse> {
 
-        private final ReactorDomains domains = new ReactorDomains(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorDomains domains = new ReactorDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {

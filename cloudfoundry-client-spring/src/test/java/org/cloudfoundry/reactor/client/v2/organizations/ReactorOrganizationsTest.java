@@ -119,7 +119,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class AssociateOrganizationAuditor extends AbstractClientApiTest<AssociateOrganizationAuditorRequest, AssociateOrganizationAuditorResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -178,7 +178,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class AssociateOrganizationAuditorByUsername extends AbstractClientApiTest<AssociateOrganizationAuditorByUsernameRequest, AssociateOrganizationAuditorByUsernameResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -238,7 +238,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class AssociateOrganizationBillingManager extends AbstractClientApiTest<AssociateOrganizationBillingManagerRequest, AssociateOrganizationBillingManagerResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -298,7 +298,7 @@ public final class ReactorOrganizationsTest {
     public static final class AssociateOrganizationBillingManagerByUsername
         extends AbstractClientApiTest<AssociateOrganizationBillingManagerByUsernameRequest, AssociateOrganizationBillingManagerByUsernameResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -358,7 +358,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class AssociateOrganizationManager extends AbstractClientApiTest<AssociateOrganizationManagerRequest, AssociateOrganizationManagerResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -417,7 +417,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class AssociateOrganizationManagerByUsername extends AbstractClientApiTest<AssociateOrganizationManagerByUsernameRequest, AssociateOrganizationManagerByUsernameResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -477,7 +477,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class AssociateOrganizationUser extends AbstractClientApiTest<AssociateOrganizationUserRequest, AssociateOrganizationUserResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -536,7 +536,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class AssociateOrganizationUserByUsername extends AbstractClientApiTest<AssociateOrganizationUserByUsernameRequest, AssociateOrganizationUserByUsernameResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -596,7 +596,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class AssociatePrivateDomain extends AbstractClientApiTest<AssociateOrganizationPrivateDomainRequest, AssociateOrganizationPrivateDomainResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -655,7 +655,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class Create extends AbstractClientApiTest<CreateOrganizationRequest, CreateOrganizationResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -715,7 +715,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class Delete extends AbstractClientApiTest<DeleteOrganizationRequest, DeleteOrganizationResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -750,7 +750,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class DeleteAsync extends AbstractClientApiTest<DeleteOrganizationRequest, DeleteOrganizationResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -797,7 +797,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class Get extends AbstractClientApiTest<GetOrganizationRequest, GetOrganizationResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -855,7 +855,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class GetInstanceUsage extends AbstractClientApiTest<GetOrganizationInstanceUsageRequest, GetOrganizationInstanceUsageResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -893,7 +893,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class GetMemoryUsage extends AbstractClientApiTest<GetOrganizationMemoryUsageRequest, GetOrganizationMemoryUsageResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -931,7 +931,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class GetUserRoles extends AbstractClientApiTest<GetOrganizationUserRolesRequest, GetOrganizationUserRolesResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -996,7 +996,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class List extends AbstractClientApiTest<ListOrganizationsRequest, ListOrganizationsResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1059,7 +1059,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class ListAuditors extends AbstractClientApiTest<ListOrganizationAuditorsRequest, ListOrganizationAuditorsResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1119,7 +1119,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class ListBillingManagers extends AbstractClientApiTest<ListOrganizationBillingManagersRequest, ListOrganizationBillingManagersResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1179,7 +1179,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class ListDomains extends AbstractClientApiTest<ListOrganizationDomainsRequest, ListOrganizationDomainsResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1239,7 +1239,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class ListManagers extends AbstractClientApiTest<ListOrganizationManagersRequest, ListOrganizationManagersResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1318,7 +1318,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class ListPrivateDomains extends AbstractClientApiTest<ListOrganizationPrivateDomainsRequest, ListOrganizationPrivateDomainsResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1372,7 +1372,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class ListServices extends AbstractClientApiTest<ListOrganizationServicesRequest, ListOrganizationServicesResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1431,7 +1431,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class ListSpaceQuotaDefinitions extends AbstractClientApiTest<ListOrganizationSpaceQuotaDefinitionsRequest, ListOrganizationSpaceQuotaDefinitionsResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1489,7 +1489,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class ListSpaces extends AbstractClientApiTest<ListOrganizationSpacesRequest, ListOrganizationSpacesResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1553,7 +1553,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class ListUsers extends AbstractClientApiTest<ListOrganizationUsersRequest, ListOrganizationUsersResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1613,7 +1613,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class RemoveAuditor extends AbstractClientApiTest<RemoveOrganizationAuditorRequest, Void> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1649,7 +1649,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class RemoveAuditorByUsername extends AbstractClientApiTest<RemoveOrganizationAuditorByUsernameRequest, Void> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1686,7 +1686,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class RemoveBillingManager extends AbstractClientApiTest<RemoveOrganizationBillingManagerRequest, Void> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1722,7 +1722,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class RemoveManager extends AbstractClientApiTest<RemoveOrganizationManagerRequest, Void> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1758,7 +1758,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class RemoveOrganizationBillingManagerByUsername extends AbstractClientApiTest<RemoveOrganizationBillingManagerByUsernameRequest, Void> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1795,7 +1795,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class RemoveOrganizationManagerByUsername extends AbstractClientApiTest<RemoveOrganizationManagerByUsernameRequest, Void> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1832,7 +1832,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class RemovePrivateDomain extends AbstractClientApiTest<RemoveOrganizationPrivateDomainRequest, Void> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1867,7 +1867,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class RemoveUser extends AbstractClientApiTest<RemoveOrganizationUserRequest, Void> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1902,7 +1902,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class RemoveUserByUsername extends AbstractClientApiTest<RemoveOrganizationUserByUsernameRequest, Void> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1939,7 +1939,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class Summary extends AbstractClientApiTest<SummaryOrganizationRequest, SummaryOrganizationResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1987,7 +1987,7 @@ public final class ReactorOrganizationsTest {
 
     public static final class Update extends AbstractClientApiTest<UpdateOrganizationRequest, UpdateOrganizationResponse> {
 
-        private final ReactorOrganizations organizations = new ReactorOrganizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {

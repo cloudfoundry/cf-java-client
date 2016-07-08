@@ -28,13 +28,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Function;
 
-final class JsonCodec {
+public final class JsonCodec {
 
     private static final AsciiString APPLICATION_JSON = new AsciiString("application/json; charset=utf-8");
 
     private static final AsciiString CONTENT_TYPE = new AsciiString("Content-Type");
 
-    static <T> Function<InputStream, T> decode(ObjectMapper objectMapper, Class<T> type) {
+    public static <T> Function<InputStream, T> decode(ObjectMapper objectMapper, Class<T> type) {
         return inputStream -> {
             try (InputStream in = inputStream) {
                 return objectMapper.readValue(in, type);

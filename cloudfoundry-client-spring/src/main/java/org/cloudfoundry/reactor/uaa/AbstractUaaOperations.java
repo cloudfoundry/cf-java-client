@@ -16,13 +16,12 @@
 
 package org.cloudfoundry.reactor.uaa;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.cloudfoundry.reactor.ConnectionContext;
+import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
-import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.io.netty.http.HttpClient;
 import reactor.io.netty.http.HttpClientRequest;
 import reactor.io.netty.http.HttpClientResponse;
 
@@ -30,8 +29,8 @@ import java.util.function.Function;
 
 public abstract class AbstractUaaOperations extends AbstractReactorOperations {
 
-    protected AbstractUaaOperations(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
-        super(authorizationProvider, httpClient, objectMapper, root);
+    protected AbstractUaaOperations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
+        super(connectionContext, root, tokenProvider);
     }
 
     protected static Function<UriComponentsBuilder, UriComponentsBuilder> getUriAugmenter(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
@@ -58,6 +57,15 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
         return doGet(getUriAugmenter(request, uriTransformer), getRequestTransformer(request));
     }
 
+    protected final Mono<HttpClientResponse> get(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+                                                 Function<HttpClientRequest, HttpClientRequest> requestTransformer) {
+
+        return doGet(getUriAugmenter(request, uriTransformer), outbound -> {
+            getRequestTransformer(request).apply(outbound);
+            return requestTransformer.apply(outbound);
+        });
+    }
+
     protected final <T> Mono<T> get(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doGet(responseType, getUriAugmenter(request, uriTransformer), getRequestTransformer(request));
     }
@@ -69,10 +77,6 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
             getRequestTransformer(request).apply(outbound);
             return requestTransformer.apply(outbound);
         });
-    }
-
-    protected final Mono<HttpClientResponse> getNoAuth(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doGetNoAuth(getUriAugmenter(request, uriTransformer), getRequestTransformer(request));
     }
 
     protected final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,

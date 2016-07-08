@@ -22,7 +22,7 @@ import java.time.Duration;
 /**
  * A utility that trusts certificates provided by connections
  */
-interface SslCertificateTruster extends X509TrustManager {
+public interface SslCertificateTruster extends X509TrustManager {
 
     /**
      * Trust the certificate provided by a connection

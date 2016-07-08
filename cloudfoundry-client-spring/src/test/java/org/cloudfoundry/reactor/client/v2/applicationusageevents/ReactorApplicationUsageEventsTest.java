@@ -39,7 +39,7 @@ public final class ReactorApplicationUsageEventsTest {
 
     public static final class Get extends AbstractClientApiTest<GetApplicationUsageEventRequest, GetApplicationUsageEventResponse> {
 
-        private final ReactorApplicationUsageEvents applicationUsageEvents = new ReactorApplicationUsageEvents(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationUsageEvents applicationUsageEvents = new ReactorApplicationUsageEvents(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -94,7 +94,7 @@ public final class ReactorApplicationUsageEventsTest {
 
     public static final class List extends AbstractClientApiTest<ListApplicationUsageEventsRequest, ListApplicationUsageEventsResponse> {
 
-        private final ReactorApplicationUsageEvents applicationUsageEvents = new ReactorApplicationUsageEvents(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationUsageEvents applicationUsageEvents = new ReactorApplicationUsageEvents(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -155,7 +155,7 @@ public final class ReactorApplicationUsageEventsTest {
 
     public static final class PurgeAndReseed extends AbstractClientApiTest<PurgeAndReseedApplicationUsageEventsRequest, Void> {
 
-        private final ReactorApplicationUsageEvents applicationUsageEvents = new ReactorApplicationUsageEvents(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationUsageEvents applicationUsageEvents = new ReactorApplicationUsageEvents(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {

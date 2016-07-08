@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.util;
+package org.cloudfoundry.reactor.client;
 
 import com.github.zafarkhaja.semver.Version;
 import org.cloudfoundry.client.CloudFoundryClient;
@@ -26,18 +26,17 @@ import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 
-public final class CloudFoundryClientCompatibilityChecker implements CompatibilityChecker {
+final class CloudFoundryClientCompatibilityChecker {
 
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.compatibility");
 
     private final Info info;
 
-    public CloudFoundryClientCompatibilityChecker(Info info) {
+    CloudFoundryClientCompatibilityChecker(Info info) {
         this.info = info;
     }
 
-    @Override
-    public void check() {
+    void check() {
         this.info
             .get(GetInfoRequest.builder()
                 .build())

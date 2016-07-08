@@ -53,7 +53,7 @@ public final class ReactorServicePlansTest {
 
     public static final class Delete extends AbstractClientApiTest<DeleteServicePlanRequest, DeleteServicePlanResponse> {
 
-        private final ReactorServicePlans servicePlans = new ReactorServicePlans(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServicePlans servicePlans = new ReactorServicePlans(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -88,7 +88,7 @@ public final class ReactorServicePlansTest {
 
     public static final class DeleteAsync extends AbstractClientApiTest<DeleteServicePlanRequest, DeleteServicePlanResponse> {
 
-        private final ReactorServicePlans servicePlans = new ReactorServicePlans(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServicePlans servicePlans = new ReactorServicePlans(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -135,7 +135,7 @@ public final class ReactorServicePlansTest {
 
     public static final class Get extends AbstractClientApiTest<GetServicePlanRequest, GetServicePlanResponse> {
 
-        private final ReactorServicePlans servicePlans = new ReactorServicePlans(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServicePlans servicePlans = new ReactorServicePlans(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -187,7 +187,7 @@ public final class ReactorServicePlansTest {
 
     public static final class List extends AbstractClientApiTest<ListServicePlansRequest, ListServicePlansResponse> {
 
-        private final ReactorServicePlans servicePlans = new ReactorServicePlans(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServicePlans servicePlans = new ReactorServicePlans(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -244,7 +244,7 @@ public final class ReactorServicePlansTest {
 
     public static final class ListServiceInstances extends AbstractClientApiTest<ListServicePlanServiceInstancesRequest, ListServicePlanServiceInstancesResponse> {
 
-        private final ReactorServicePlans servicePlans = new ReactorServicePlans(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServicePlans servicePlans = new ReactorServicePlans(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -304,7 +304,7 @@ public final class ReactorServicePlansTest {
 
     public static final class Update extends AbstractClientApiTest<UpdateServicePlanRequest, UpdateServicePlanResponse> {
 
-        private final ReactorServicePlans servicePlans = new ReactorServicePlans(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServicePlans servicePlans = new ReactorServicePlans(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {

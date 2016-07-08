@@ -14,23 +14,34 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.util;
+package org.cloudfoundry.reactor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.cloudfoundry.Nullable;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import org.cloudfoundry.reactor.util.DefaultSslCertificateTruster;
+import org.cloudfoundry.reactor.util.JsonCodec;
+import org.cloudfoundry.reactor.util.SslCertificateTruster;
+import org.cloudfoundry.reactor.util.StaticTrustManagerFactory;
+import org.cloudfoundry.util.test.FailingDeserializationProblemHandler;
 import org.immutables.value.Value;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
+import reactor.io.netty.config.ClientOptions;
 import reactor.io.netty.config.HttpClientOptions;
 import reactor.io.netty.http.HttpClient;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static reactor.io.netty.common.NettyHandlerNames.SslHandler;
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 
+/**
+ * The default implementation of the {@link ConnectionContext} interface.  This is the implementation that should be used for most non-testing cases.
+ */
 @Value.Immutable
 abstract class _DefaultConnectionContext implements ConnectionContext {
 
@@ -42,37 +53,42 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
 
     private static final int UNDEFINED_PORT = -1;
 
-    public abstract AuthorizationProvider getAuthorizationProvider();
-
+    @Override
     @Value.Default
-    public String getClientId() {
-        return "cf";
-    }
-
-    @Value.Default
-    public String getClientSecret() {
-        return "";
-    }
-
-    @Value.Derived
     public HttpClient getHttpClient() {
-        return HttpClient.create(HttpClientOptions.create()
+        ClientOptions options = HttpClientOptions.create()
             .sslSupport()
             .sndbuf(SEND_BUFFER_SIZE)
-            .rcvbuf(RECEIVE_BUFFER_SIZE)
-            .pipelineConfigurer(pipeline -> getProxyContext().getHttpProxyHandler().ifPresent(handler -> pipeline.addBefore(SslHandler, null, handler)))
-            .sslConfigurer(ssl -> getSslCertificateTruster().ifPresent(trustManager -> ssl.trustManager(new StaticTrustManagerFactory(trustManager)))));
+            .rcvbuf(RECEIVE_BUFFER_SIZE);
+
+        getProxyConfiguration().ifPresent(c -> options.proxy(ClientOptions.Proxy.HTTP, c.getHost(), c.getPort().orElse(null), c.getUsername().orElse(null), u -> c.getPassword().orElse(null)));
+        getSslCertificateTruster().ifPresent(trustManager -> options.ssl().trustManager(new StaticTrustManagerFactory(trustManager)));
+
+        return HttpClient.create(options);
+    }
+
+    @Override
+    @Value.Default
+    public ObjectMapper getObjectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper()
+            .disable(FAIL_ON_UNKNOWN_PROPERTIES)
+            .registerModule(new Jdk8Module())
+            .setSerializationInclusion(NON_NULL);
+
+        getProblemHandlers().forEach(objectMapper::addHandler);
+
+        return objectMapper;
     }
 
     @Value.Default
-    public ObjectMapper getObjectMapper() {
-        return new ObjectMapper();
+    public Integer getPort() {
+        return DEFAULT_PORT;
     }
 
     @Value.Derived
     public Mono<String> getRoot() {
         Integer port = getPort();
-        UriComponentsBuilder builder = UriComponentsBuilder.newInstance().scheme("https").host(getHost());
+        UriComponentsBuilder builder = UriComponentsBuilder.newInstance().scheme("https").host(getApiHost());
         if (port != null) {
             builder.port(port);
         }
@@ -92,7 +108,10 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             .cache();
     }
 
-    abstract String getHost();
+    /**
+     * The hostname of the API root.  Typically something like {@code api.run.pivotal.io}.
+     */
+    abstract String getApiHost();
 
     @SuppressWarnings("unchecked")
     @Value.Derived
@@ -106,42 +125,29 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             .cache();
     }
 
-    @Nullable
-    abstract Integer getPort();
+    /**
+     * Jackson deserialization problem handlers.  Typically only used for testing.
+     */
+    abstract List<FailingDeserializationProblemHandler> getProblemHandlers();
 
-    @Value.Derived
-    ProxyContext getProxyContext() {
-        return ProxyContext.builder()
-            .host(getProxyHost())
-            .password(getProxyPassword())
-            .port(getProxyPort())
-            .username(getProxyUsername())
-            .build();
-    }
+    /**
+     * The (optional) proxy configuration
+     */
+    abstract Optional<ProxyConfiguration> getProxyConfiguration();
 
-    @Nullable
-    abstract String getProxyHost();
-
-    @Nullable
-    abstract String getProxyPassword();
-
-    @Nullable
-    abstract Integer getProxyPort();
-
-    @Nullable
-    abstract String getProxyUsername();
+    /**
+     * Whether to skip SSL certificate validation for all hosts reachable from the API host.  Defaults to {@code false}.
+     */
+    abstract Optional<Boolean> getSkipSslValidation();
 
     @Value.Derived
     Optional<SslCertificateTruster> getSslCertificateTruster() {
-        if (Optional.ofNullable(getTrustCertificates()).orElse(false)) {
-            return Optional.of(new DefaultSslCertificateTruster(getProxyContext()));
+        if (getSkipSslValidation().orElse(false)) {
+            return Optional.of(new DefaultSslCertificateTruster(getProxyConfiguration()));
         } else {
             return Optional.empty();
         }
     }
-
-    @Nullable
-    abstract Boolean getTrustCertificates();
 
     private static UriComponents normalize(UriComponentsBuilder builder) {
         UriComponents components = builder.build();

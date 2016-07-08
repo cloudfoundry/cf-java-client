@@ -38,7 +38,7 @@ public final class ReactorEventsTest {
 
     public static final class Get extends AbstractClientApiTest<GetEventRequest, GetEventResponse> {
 
-        private final ReactorEvents events = new ReactorEvents(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorEvents events = new ReactorEvents(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -93,7 +93,7 @@ public final class ReactorEventsTest {
 
     public static final class List extends AbstractClientApiTest<ListEventsRequest, ListEventsResponse> {
 
-        private final ReactorEvents events = new ReactorEvents(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorEvents events = new ReactorEvents(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {

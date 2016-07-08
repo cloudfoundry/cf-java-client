@@ -16,66 +16,49 @@
 
 package org.cloudfoundry.reactor.doppler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Builder;
 import org.cloudfoundry.doppler.ContainerMetricsRequest;
-import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.doppler.Envelope;
 import org.cloudfoundry.doppler.FirehoseRequest;
 import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
-import org.cloudfoundry.reactor.util.AuthorizationProvider;
-import org.cloudfoundry.reactor.util.ConnectionContextSupplier;
+import org.cloudfoundry.reactor.ConnectionContext;
+import org.cloudfoundry.reactor.TokenProvider;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.util.Exceptions;
-import reactor.io.netty.http.HttpClient;
 import reactor.io.netty.http.HttpClientResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * The Reactor-based implementation of {@link DopplerClient}
- */
-public final class ReactorDopplerClient extends AbstractDopplerOperations implements DopplerClient {
+final class ReactorDopplerEndpoints extends AbstractDopplerOperations {
 
-    @Builder
-    ReactorDopplerClient(ConnectionContextSupplier cloudFoundryClient) {
-        this(cloudFoundryClient.getConnectionContext().getAuthorizationProvider(), cloudFoundryClient.getConnectionContext().getHttpClient(),
-            cloudFoundryClient.getConnectionContext().getObjectMapper(), cloudFoundryClient.getConnectionContext().getRoot("doppler_logging_endpoint"));
+    ReactorDopplerEndpoints(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
+        super(connectionContext, root, tokenProvider);
     }
 
-    ReactorDopplerClient(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
-        super(authorizationProvider, httpClient, objectMapper, root);
-    }
-
-    @Override
-    public Flux<Envelope> containerMetrics(ContainerMetricsRequest request) {
+    Flux<Envelope> containerMetrics(ContainerMetricsRequest request) {
         return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "containermetrics"))
             .flatMap(inbound -> inbound.receiveMultipart().receiveInputStream())
-            .map(ReactorDopplerClient::toEnvelope);
+            .map(ReactorDopplerEndpoints::toEnvelope);
     }
 
-    @Override
-    public Flux<Envelope> firehose(FirehoseRequest request) {
+    Flux<Envelope> firehose(FirehoseRequest request) {
         return ws(builder -> builder.pathSegment("firehose", request.getSubscriptionId()))
             .flatMap(HttpClientResponse::receiveInputStream)
-            .map(ReactorDopplerClient::toEnvelope);
+            .map(ReactorDopplerEndpoints::toEnvelope);
     }
 
-    @Override
-    public Flux<Envelope> recentLogs(RecentLogsRequest request) {
+    Flux<Envelope> recentLogs(RecentLogsRequest request) {
         return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "recentlogs"))
             .flatMap(inbound -> inbound.receiveMultipart().receiveInputStream())
-            .map(ReactorDopplerClient::toEnvelope);
+            .map(ReactorDopplerEndpoints::toEnvelope);
     }
 
-    @Override
-    public Flux<Envelope> stream(StreamRequest request) {
+    Flux<Envelope> stream(StreamRequest request) {
         return ws(builder -> builder.pathSegment("apps", request.getApplicationId(), "stream"))
             .flatMap(HttpClientResponse::receiveInputStream)
-            .map(ReactorDopplerClient::toEnvelope);
+            .map(ReactorDopplerEndpoints::toEnvelope);
     }
 
     private static Envelope toEnvelope(InputStream inputStream) {

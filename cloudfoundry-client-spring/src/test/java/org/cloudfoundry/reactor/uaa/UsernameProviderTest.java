@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations;
+package org.cloudfoundry.reactor.uaa;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.Base64Codec;
-import org.cloudfoundry.uaa.UaaClient;
+import org.cloudfoundry.reactor.ConnectionContext;
+import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyResponse;
+import org.cloudfoundry.uaa.tokens.Tokens;
+import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
 
@@ -30,20 +33,27 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.time.Duration;
 
 import static org.cloudfoundry.util.test.TestObjects.fill;
-import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public final class UsernameBuilderTest extends AbstractOperationsTest {
+public final class UsernameProviderTest {
 
     private static final Base64Codec BASE64 = new Base64Codec();
+
+    private final ConnectionContext connectionContext = mock(ConnectionContext.class);
 
     private final String publicKey;
 
     private final String token;
 
-    public UsernameBuilderTest() throws NoSuchAlgorithmException {
+    private final TokenProvider tokenProvider = mock(TokenProvider.class);
+
+    private final Tokens tokens = mock(Tokens.class);
+
+    public UsernameProviderTest() throws NoSuchAlgorithmException {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(1024);
 
@@ -54,17 +64,18 @@ public final class UsernameBuilderTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void test() {
-        when(this.cloudFoundryClient.getAccessToken()).thenReturn(Mono.just(this.token));
-        requestTokenKey(this.uaaClient, this.publicKey);
+    public void test() throws InterruptedException {
+        requestTokenKey(this.tokens, this.publicKey);
+        when(this.tokenProvider.getToken(this.connectionContext)).thenReturn(Mono.just(this.token));
 
-        String username = new UsernameBuilder()
-            .cloudFoundryClient(this.cloudFoundryClient)
-            .uaaClient(this.uaaClient)
-            .build()
-            .block();
+        TestSubscriber<String> testSubscriber = new TestSubscriber<>();
 
-        assertEquals("test-username", username);
+        new UsernameProvider(this.connectionContext, this.tokenProvider, this.tokens)
+            .get()
+            .subscribe(testSubscriber
+                .assertEquals("test-username"));
+
+        testSubscriber.verify(Duration.ofSeconds(1));
     }
 
     private static String getPublicKey(PublicKey publicKey) {
@@ -79,8 +90,8 @@ public final class UsernameBuilderTest extends AbstractOperationsTest {
             .compact();
     }
 
-    private static void requestTokenKey(UaaClient uaaClient, String key) {
-        when(uaaClient.tokens()
+    private static void requestTokenKey(Tokens tokens, String key) {
+        when(tokens
             .getKey(GetTokenKeyRequest.builder()
                 .build()))
             .thenReturn(Mono

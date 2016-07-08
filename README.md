@@ -110,38 +110,99 @@ repositories {
 ## Usage
 Both the `cloudfoundry-operations` and `cloudfoundry-client` projects follow a ["Reactive"][r] design pattern and expose their responses with [Project Reactor][p] `Monos`s and `Flux`s.
 
-### `CloudFoundryClient` and `CloudFoundryOperations` Builders
+### `CloudFoundryClient`, `DopplerClient`, `UaaClient` Builders
 
-The lowest-level building block of the API is a `CloudFoundryClient`.  This is only an interface and the default implementation of this is the `SpringCloudFoundryClient`.  To instantiate one, you configure it with a builder:
+The lowest-level building blocks of the API are `ConnectionContext` and `TokenProvider`.  These types are intended to be shared between instances of the clients, and come with out of the box implementations.  To instantiate them, you configure them with builders:
 
 ```java
-SpringCloudFoundryClient.builder()
-    .host("api.run.pivotal.io")
-    .username("example-username")
-    .password("example-password")
+DefaultConnectionContext.builder()
+    .apiHost(apiHost)
+    .build();
+
+PasswordGrantTokenProvider.builder()
+    .password(password)
+    .username(username)
     .build();
 ```
 
-In Spring-based applications, you'll want to encapsulate this in a bean definition:
+In Spring-based applications, you'll want to encapsulate them in bean definitions:
 
 ```java
 @Bean
-CloudFoundryClient cloudFoundryClient(@Value("${cf.host}") String host,
-                                      @Value("${cf.username}") String username,
-                                      @Value("${cf.password}") String password) {
-    return SpringCloudFoundryClient.builder()
-            .host(host)
-            .username(username)
-            .password(password)
-            .build();
+DefaultConnectionContext connectionContext(@Value("${cf.apiHost}") String apiHost) {
+    return DefaultConnectionContext.builder()
+        .apiHost(apiHost)
+        .build();
+}
+
+@Bean
+PasswordGrantTokenProvider tokenProvider(@Value("${cf.username}") String username,
+                                         @Value("${cf.password}") String password) {
+    return PasswordGrantTokenProvider.builder()
+        .password(password)
+        .username(username)
+        .build();
 }
 ```
 
-The `CloudFoundryClient` provides direct access to the raw REST APIs.  This level of abstraction provides the most detailed and powerful access to the Cloud Foundry instance, but also requires users to perform quite a lot of orchestration on their own.  Most users will instead want to work at the `CloudFoundryOperations` layer.  Once again this is only an interface and the default implementation of this is the `DefaultCloudFoundryOperations`.  To instantiate one, you configure it with a builder:
+`CloudFoundryClient`, `DopplerClient`, and `UaaClient` are only interfaces.  Each has a [Reactor][p]-based implementation.  To instantiate them, you configure them with builders:
+
+```
+ReactorCloudFoundryClient.builder()
+    .connectionContext(connectionContext)
+    .tokenProvider(tokenProvider)
+    .build();
+
+ReactorDopplerClient.builder()
+    .connectionContext(connectionContext)
+    .tokenProvider(tokenProvider)
+    .build();
+
+ReactorUaaClient.builder()
+    .connectionContext(connectionContext)
+    .tokenProvider(tokenProvider)
+    .build();
+```
+
+In Spring-based applications, you'll want to encapsulate them in bean definitions:
+
+```
+@Bean
+ReactorCloudFoundryClient cloudFoundryClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
+    return ReactorCloudFoundryClient.builder()
+        .connectionContext(connectionContext)
+        .tokenProvider(tokenProvider)
+        .build();
+}
+
+@Bean
+ReactorDopplerClient dopplerClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
+    return ReactorDopplerClient.builder()
+        .connectionContext(connectionContext)
+        .tokenProvider(tokenProvider)
+        .build();
+}
+
+@Bean
+ReactorUaaClient uaaClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
+    return ReactorUaaClient.builder()
+        .connectionContext(connectionContext)
+        .tokenProvider(tokenProvider)
+        .build();
+}
+```
+
+### `CloudFoundryOperations` Builder
+
+The `CloudFoundryClient`, `DopplerClient`, and `UaaClient`s provide direct access to the raw REST APIs.  This level of abstraction provides the most detailed and powerful access to the Cloud Foundry instance, but also requires users to perform quite a lot of orchestration on their own.  Most users will instead want to work at the `CloudFoundryOperations` layer.  Once again this is only an interface and the default implementation of this is the `DefaultCloudFoundryOperations`.  To instantiate one, you configure it with a builder:
+
+**NOTE:** The `DefaultCloudfoundryOperations` type does not require all clients in order to run.  Since not all operations touch all kinds of clients, you can selectively configure the minimum needed.  If a client is missing, the first invocation of a method that requires that client will return an error.
 
 ```java
 DefaultCloudFoundryOperations.builder()
     .cloudFoundryClient(cloudFoundryClient)
+    .dopplerClient(dopplerClient)
+    .uaaClient(uaaClient)
     .organization("example-organization")
     .space("example-space")
     .build();
@@ -151,11 +212,15 @@ In Spring-based applications, you'll want to encapsulate this in a bean definiti
 
 ```java
 @Bean
-CloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient,
-                                              @Value("${cf.organization}") String organization,
-                                              @Value("${cf.space}") String space) {
+DefaultCloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient,
+                                                     DopplerClient dopplerClient,
+                                                     UaaClient uaaClient,
+                                                     @Value("${cf.organization}") String organization,
+                                                     @Value("${cf.space}") String space) {
     return DefaultCloudFoundryOperations.builder()
             .cloudFoundryClient(cloudFoundryClient)
+            .dopplerClient(dopplerClient)
+            .uaaClient(uaaClient)
             .organization(organization)
             .space(space)
             .build();
@@ -241,14 +306,17 @@ The integration tests require a running instance of Cloud Foundry to test agains
 
 Name | Description
 ---- | -----------
-`TEST_HOST` | The host of Cloud Foundry instance.  Typically something like `api.local.pcfdev.io`.
+`TEST_APIHOST` | The host of Cloud Foundry instance.  Typically something like `api.local.pcfdev.io`.
 `TEST_PASSWORD` | The test user's password
 `TEST_PROTECTED_DOMAIN` | A domain that will not be cleaned up
 `TEST_PROTECTED_FEATUREFLAGS` | A list of feature flags that will not be (re)set to standard values on cleanup
 `TEST_PROTECTED_ORGANIZATION` | An organization whose contents will not be cleaned up
 `TEST_PROTECTED_USERS` | A list of users that will not be cleaned up. Typically includes the `TEST_USERNAME`
 `TEST_SKIPSSLVALIDATION` | Whether to skip SSL validation when connecting to the Cloud Foundry instance.  Typically `true` when connecting to a PCF Dev instance.
+`TEST_UAA_CLIENTID` | The client id to use for testing the UAA APIs
+`TEST_UAA_CLIENTSECRET` | The client secret to use for testing the UAA APIs
 `TEST_USERNAME` | The test user's username
+
 
 ## Contributing
 [Pull requests][u] and [Issues][e] are welcome.

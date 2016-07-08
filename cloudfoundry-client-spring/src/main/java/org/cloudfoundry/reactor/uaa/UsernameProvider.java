@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations;
+package org.cloudfoundry.reactor.uaa;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.impl.Base64Codec;
-import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.uaa.UaaClient;
+import org.cloudfoundry.reactor.ConnectionContext;
+import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyResponse;
+import org.cloudfoundry.uaa.tokens.Tokens;
 import reactor.core.publisher.Mono;
 
 import java.security.GeneralSecurityException;
@@ -33,7 +34,7 @@ import java.security.spec.X509EncodedKeySpec;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
-final class UsernameBuilder {
+final class UsernameProvider {
 
     private static final Base64Codec BASE64 = new Base64Codec();
 
@@ -41,27 +42,24 @@ final class UsernameBuilder {
 
     private static final String END = "-----END PUBLIC KEY-----";
 
-    private CloudFoundryClient cloudFoundryClient;
+    private final ConnectionContext connectionContext;
 
-    private UaaClient uaaClient;
+    private final TokenProvider tokenProvider;
 
-    Mono<String> build() {
+    private final Tokens tokens;
+
+    UsernameProvider(ConnectionContext connectionContext, TokenProvider tokenProvider, Tokens tokens) {
+        this.connectionContext = connectionContext;
+        this.tokenProvider = tokenProvider;
+        this.tokens = tokens;
+    }
+
+    Mono<String> get() {
         return Mono
             .when(
-                getSigningKey(this.uaaClient),
-                this.cloudFoundryClient.getAccessToken()
-            )
-            .map(function(UsernameBuilder::getUsername));
-    }
-
-    UsernameBuilder cloudFoundryClient(CloudFoundryClient cloudFoundryClient) {
-        this.cloudFoundryClient = cloudFoundryClient;
-        return this;
-    }
-
-    UsernameBuilder uaaClient(UaaClient uaaClient) {
-        this.uaaClient = uaaClient;
-        return this;
+                getSigningKey(this.tokens),
+                this.tokenProvider.getToken(this.connectionContext))
+            .map(function(UsernameProvider::getUsername));
     }
 
     private static PublicKey generateKey(String pem) {
@@ -74,11 +72,11 @@ final class UsernameBuilder {
         }
     }
 
-    private static Mono<PublicKey> getSigningKey(UaaClient uaaClient) {
-        return requestTokenKey(uaaClient)
+    private static Mono<PublicKey> getSigningKey(Tokens tokens) {
+        return requestTokenKey(tokens)
             .map(GetTokenKeyResponse::getValue)
             .map(pem -> pem.replace(BEGIN, "").replace(END, "").trim())
-            .map(UsernameBuilder::generateKey);
+            .map(UsernameProvider::generateKey);
     }
 
     private static String getUsername(PublicKey publicKey, String token) {
@@ -86,8 +84,8 @@ final class UsernameBuilder {
         return jws.getBody().get("user_name", String.class);
     }
 
-    private static Mono<GetTokenKeyResponse> requestTokenKey(UaaClient uaaClient) {
-        return uaaClient.tokens()
+    private static Mono<GetTokenKeyResponse> requestTokenKey(Tokens tokens) {
+        return tokens
             .getKey(GetTokenKeyRequest.builder()
                 .build());
     }

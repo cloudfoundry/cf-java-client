@@ -58,8 +58,6 @@ import reactor.core.publisher.Mono;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 /**
  * The default implementation of the {@link CloudFoundryOperations} interface
  */
@@ -210,12 +208,8 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
 
     @Value.Derived
     Mono<String> getUsername() {
-        return Mono
-            .when(getCloudFoundryClientPublisher(), getUaaClientPublisher())
-            .then(function((cloudFoundryClient, uaaClient) -> new UsernameBuilder()
-                .cloudFoundryClient(cloudFoundryClient)
-                .uaaClient(uaaClient)
-                .build()));
+        return getUaaClientPublisher()
+            .then(UaaClient::getUsername);
     }
 
     private static Mono<OrganizationResource> getOrganization(Mono<CloudFoundryClient> cloudFoundryClient, String organization) {

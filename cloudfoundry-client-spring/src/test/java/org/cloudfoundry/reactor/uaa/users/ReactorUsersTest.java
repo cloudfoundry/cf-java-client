@@ -65,7 +65,7 @@ public final class ReactorUsersTest {
 
     public static final class ChangePassword extends AbstractUaaApiTest<ChangeUserPasswordRequest, ChangeUserPasswordResponse> {
 
-        private final ReactorUsers users = new ReactorUsers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorUsers users = new ReactorUsers(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -107,7 +107,7 @@ public final class ReactorUsersTest {
 
     public static final class Create extends AbstractUaaApiTest<CreateUserRequest, CreateUserResponse> {
 
-        private final ReactorUsers users = new ReactorUsers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorUsers users = new ReactorUsers(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -245,7 +245,7 @@ public final class ReactorUsersTest {
 
     public static final class Delete extends AbstractUaaApiTest<DeleteUserRequest, DeleteUserResponse> {
 
-        private final ReactorUsers users = new ReactorUsers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorUsers users = new ReactorUsers(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -387,7 +387,7 @@ public final class ReactorUsersTest {
 
     public static final class GetVerificationLink extends AbstractUaaApiTest<GetUserVerificationLinkRequest, GetUserVerificationLinkResponse> {
 
-        private final ReactorUsers users = new ReactorUsers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorUsers users = new ReactorUsers(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -426,7 +426,7 @@ public final class ReactorUsersTest {
 
     public static final class InviteUsers extends AbstractUaaApiTest<InviteUsersRequest, InviteUsersResponse> {
 
-        private final ReactorUsers users = new ReactorUsers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorUsers users = new ReactorUsers(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -481,7 +481,7 @@ public final class ReactorUsersTest {
 
     public static final class List extends AbstractUaaApiTest<ListUsersRequest, ListUsersResponse> {
 
-        private final ReactorUsers users = new ReactorUsers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorUsers users = new ReactorUsers(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -624,7 +624,7 @@ public final class ReactorUsersTest {
 
     public static final class Lookup extends AbstractUaaApiTest<LookupUserIdsRequest, LookupUserIdsResponse> {
 
-        private final ReactorUsers users = new ReactorUsers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorUsers users = new ReactorUsers(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -681,7 +681,7 @@ public final class ReactorUsersTest {
 
     public static final class Update extends AbstractUaaApiTest<UpdateUserRequest, UpdateUserResponse> {
 
-        private final ReactorUsers users = new ReactorUsers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorUsers users = new ReactorUsers(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -786,7 +786,7 @@ public final class ReactorUsersTest {
 
     public static final class Verify extends AbstractUaaApiTest<VerifyUserRequest, VerifyUserResponse> {
 
-        private final ReactorUsers users = new ReactorUsers(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorUsers users = new ReactorUsers(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {

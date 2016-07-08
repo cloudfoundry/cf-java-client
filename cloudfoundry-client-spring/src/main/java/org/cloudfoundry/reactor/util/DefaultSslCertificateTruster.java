@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.util;
 
+import org.cloudfoundry.reactor.ProxyConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.tuple.Tuple2;
@@ -33,24 +34,23 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static reactor.io.netty.common.NettyHandlerNames.SslHandler;
-
-final class DefaultSslCertificateTruster implements SslCertificateTruster {
+public final class DefaultSslCertificateTruster implements SslCertificateTruster {
 
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.trust");
 
     private final AtomicReference<X509TrustManager> delegate;
 
-    private final ProxyContext proxyContext;
+    private final Optional<ProxyConfiguration> proxyConfiguration;
 
     private final Set<Tuple2<String, Integer>> trustedHostsAndPorts;
 
-    DefaultSslCertificateTruster(ProxyContext proxyContext) {
-        this.proxyContext = proxyContext;
+    public DefaultSslCertificateTruster(Optional<ProxyConfiguration> proxyConfiguration) {
+        this.proxyConfiguration = proxyConfiguration;
         this.delegate = new AtomicReference<>(getTrustManager(getTrustManagerFactory(null)));
         this.trustedHostsAndPorts = Collections.newSetFromMap(new ConcurrentHashMap<>());
     }
@@ -80,7 +80,7 @@ final class DefaultSslCertificateTruster implements SslCertificateTruster {
         this.logger.warn("Trusting SSL Certificate for {}:{}", host, port);
 
         X509TrustManager trustManager = this.delegate.get();
-        X509Certificate[] untrustedCertificates = getUntrustedCertificates(duration, host, port, this.proxyContext, trustManager);
+        X509Certificate[] untrustedCertificates = getUntrustedCertificates(duration, host, port, this.proxyConfiguration, trustManager);
 
         if (untrustedCertificates != null) {
             KeyStore trustStore = addToTrustStore(untrustedCertificates, trustManager);
@@ -109,11 +109,14 @@ final class DefaultSslCertificateTruster implements SslCertificateTruster {
         }
     }
 
-    private static TcpClient getTcpClient(ProxyContext proxyContext, CertificateCollectingTrustManager collector, String host, int port) {
-        return TcpClient.create(ClientOptions.to(host, port)
+    private static TcpClient getTcpClient(Optional<ProxyConfiguration> proxyConfiguration, CertificateCollectingTrustManager collector, String host, int port) {
+        ClientOptions options = ClientOptions.to(host, port)
             .sslSupport()
-            .pipelineConfigurer(pipeline -> proxyContext.getHttpProxyHandler().ifPresent(handler -> pipeline.addBefore(SslHandler, null, handler)))
-            .sslConfigurer(ssl -> ssl.trustManager(new StaticTrustManagerFactory(collector))));
+            .sslConfigurer(ssl -> ssl.trustManager(new StaticTrustManagerFactory(collector)));
+
+        proxyConfiguration.ifPresent(c -> options.proxy(ClientOptions.Proxy.HTTP, c.getHost(), c.getPort().orElse(null), c.getUsername().orElse(null), u -> c.getPassword().orElse(null)));
+
+        return TcpClient.create(options);
     }
 
     private static X509TrustManager getTrustManager(TrustManagerFactory trustManagerFactory) {
@@ -137,10 +140,10 @@ final class DefaultSslCertificateTruster implements SslCertificateTruster {
         }
     }
 
-    private static X509Certificate[] getUntrustedCertificates(Duration duration, String host, int port, ProxyContext proxyContext, X509TrustManager delegate) {
+    private static X509Certificate[] getUntrustedCertificates(Duration duration, String host, int port, Optional<ProxyConfiguration> proxyConfiguration, X509TrustManager delegate) {
         CertificateCollectingTrustManager collector = new CertificateCollectingTrustManager(delegate);
 
-        getTcpClient(proxyContext, collector, host, port)
+        getTcpClient(proxyConfiguration, collector, host, port)
             .start(channel -> channel.receive().then())
             .block(duration);
 

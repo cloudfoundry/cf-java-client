@@ -57,7 +57,7 @@ public final class ReactorIdentityProvidersTest {
 
     public static final class CreateLdap extends AbstractUaaApiTest<CreateIdentityProviderRequest, CreateIdentityProviderResponse> {
 
-        private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -134,7 +134,7 @@ public final class ReactorIdentityProvidersTest {
 
     public static final class CreateOauth extends AbstractUaaApiTest<CreateIdentityProviderRequest, CreateIdentityProviderResponse> {
 
-        private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -210,7 +210,7 @@ public final class ReactorIdentityProvidersTest {
 
     public static final class CreateSaml extends AbstractUaaApiTest<CreateIdentityProviderRequest, CreateIdentityProviderResponse> {
 
-        private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -316,7 +316,7 @@ public final class ReactorIdentityProvidersTest {
 
     public static final class Delete extends AbstractUaaApiTest<DeleteIdentityProviderRequest, DeleteIdentityProviderResponse> {
 
-        private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -392,7 +392,7 @@ public final class ReactorIdentityProvidersTest {
 
     public static final class Get extends AbstractUaaApiTest<GetIdentityProviderRequest, GetIdentityProviderResponse> {
 
-        private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -468,7 +468,7 @@ public final class ReactorIdentityProvidersTest {
 
     public static final class List extends AbstractUaaApiTest<ListIdentityProvidersRequest, ListIdentityProvidersResponse> {
 
-        private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -602,7 +602,7 @@ public final class ReactorIdentityProvidersTest {
 
     public static final class Update extends AbstractUaaApiTest<UpdateIdentityProviderRequest, UpdateIdentityProviderResponse> {
 
-        private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {

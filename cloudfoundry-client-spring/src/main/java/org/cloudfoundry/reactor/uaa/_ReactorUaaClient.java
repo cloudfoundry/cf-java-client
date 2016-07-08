@@ -17,15 +17,15 @@
 package org.cloudfoundry.reactor.uaa;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Builder;
+import org.cloudfoundry.Nullable;
 import org.cloudfoundry.reactor.uaa.authorizations.ReactorAuthorizations;
 import org.cloudfoundry.reactor.uaa.groups.ReactorGroups;
 import org.cloudfoundry.reactor.uaa.identityproviders.ReactorIdentityProviders;
 import org.cloudfoundry.reactor.uaa.identityzones.ReactorIdentityZones;
 import org.cloudfoundry.reactor.uaa.tokens.ReactorTokens;
 import org.cloudfoundry.reactor.uaa.users.ReactorUsers;
-import org.cloudfoundry.reactor.util.AuthorizationProvider;
-import org.cloudfoundry.reactor.util.ConnectionContextSupplier;
+import org.cloudfoundry.reactor.ConnectionContext;
+import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.authorizations.Authorizations;
 import org.cloudfoundry.uaa.groups.Groups;
@@ -33,69 +33,81 @@ import org.cloudfoundry.uaa.identityproviders.IdentityProviders;
 import org.cloudfoundry.uaa.identityzones.IdentityZones;
 import org.cloudfoundry.uaa.tokens.Tokens;
 import org.cloudfoundry.uaa.users.Users;
+import org.immutables.value.Value;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpClient;
 
 /**
  * The Reactor-based implementation of {@link UaaClient}
  */
-public final class ReactorUaaClient implements UaaClient {
-
-    private final Authorizations authorizations;
-
-    private final Groups groups;
-
-    private final IdentityProviders identityProviders;
-
-    private final IdentityZones identityZones;
-
-    private final Tokens tokens;
-
-    private final Users users;
-
-    @Builder
-    ReactorUaaClient(ConnectionContextSupplier cloudFoundryClient) {
-        this(cloudFoundryClient.getConnectionContext().getAuthorizationProvider(), cloudFoundryClient.getConnectionContext().getHttpClient(),
-            cloudFoundryClient.getConnectionContext().getObjectMapper(), cloudFoundryClient.getConnectionContext().getRoot("token_endpoint"));
-    }
-
-    ReactorUaaClient(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
-        this.authorizations = new ReactorAuthorizations(authorizationProvider, httpClient, objectMapper, root);
-        this.groups = new ReactorGroups(authorizationProvider, httpClient, objectMapper, root);
-        this.identityProviders = new ReactorIdentityProviders(authorizationProvider, httpClient, objectMapper, root);
-        this.identityZones = new ReactorIdentityZones(authorizationProvider, httpClient, objectMapper, root);
-        this.tokens = new ReactorTokens(authorizationProvider, httpClient, objectMapper, root);
-        this.users = new ReactorUsers(authorizationProvider, httpClient, objectMapper, root);
-    }
+@Value.Immutable
+abstract class _ReactorUaaClient implements UaaClient {
 
     @Override
+    @Value.Derived
     public Authorizations authorizations() {
-        return this.authorizations;
+        return new ReactorAuthorizations(getConnectionContext(), getRoot(), getTokenProvider());
     }
 
     @Override
+    @Value.Derived
+    public Mono<String> getUsername() {
+        return getUsernameProvider().get();
+    }
+
+    @Override
+    @Value.Derived
     public Groups groups() {
-        return this.groups;
+        return new ReactorGroups(getConnectionContext(), getRoot(), getTokenProvider());
     }
 
     @Override
+    @Value.Derived
     public IdentityProviders identityProviders() {
-        return this.identityProviders;
+        return new ReactorIdentityProviders(getConnectionContext(), getRoot(), getTokenProvider());
     }
 
     @Override
+    @Value.Derived
     public IdentityZones identityZones() {
-        return this.identityZones;
+        return new ReactorIdentityZones(getConnectionContext(), getRoot(), getTokenProvider());
     }
 
     @Override
+    @Value.Derived
     public Tokens tokens() {
-        return this.tokens;
+        return new ReactorTokens(getConnectionContext(), getRoot(), getTokenProvider());
     }
 
     @Override
+    @Value.Derived
     public Users users() {
-        return this.users;
+        return new ReactorUsers(getConnectionContext(), getRoot(), getTokenProvider());
+    }
+
+    @Nullable
+    abstract ConnectionContext getConnectionContext();
+
+    @Value.Default
+    HttpClient getHttpClient() {
+        return getConnectionContext().getHttpClient();
+    }
+
+    @Value.Default
+    ObjectMapper getObjectMapper() {
+        return getConnectionContext().getObjectMapper();
+    }
+
+    @Value.Default
+    Mono<String> getRoot() {
+        return getConnectionContext().getRoot("token_endpoint");
+    }
+
+    abstract TokenProvider getTokenProvider();
+
+    @Value.Default
+    UsernameProvider getUsernameProvider() {
+        return new UsernameProvider(getConnectionContext(), getTokenProvider(), tokens());
     }
 
 }

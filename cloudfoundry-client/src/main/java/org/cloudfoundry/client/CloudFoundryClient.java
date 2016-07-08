@@ -51,7 +51,6 @@ import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
 import org.cloudfoundry.client.v3.servicebindings.ServiceBindingsV3;
 import org.cloudfoundry.client.v3.tasks.Tasks;
-import reactor.core.publisher.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Client API
@@ -125,13 +124,6 @@ public interface CloudFoundryClient {
      * @return the Cloud Foundry Application Feature Flags Client API
      */
     FeatureFlags featureFlags();
-
-    /**
-     * Returns the current OAuth2 access token
-     *
-     * @return the current OAuth2 access token
-     */
-    Mono<String> getAccessToken();
 
     /**
      * Main entry point to the Cloud Foundry Info Client API

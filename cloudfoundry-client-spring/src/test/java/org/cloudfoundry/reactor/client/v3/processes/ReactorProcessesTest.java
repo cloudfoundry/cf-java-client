@@ -55,7 +55,7 @@ public final class ReactorProcessesTest {
 
     public static final class DeleteInstance extends AbstractClientApiTest<TerminateProcessInstanceRequest, Void> {
 
-        private final ReactorProcesses processes = new ReactorProcesses(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorProcesses processes = new ReactorProcesses(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -91,7 +91,7 @@ public final class ReactorProcessesTest {
 
     public static final class Get extends AbstractClientApiTest<GetProcessRequest, GetProcessResponse> {
 
-        private final ReactorProcesses processes = new ReactorProcesses(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorProcesses processes = new ReactorProcesses(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -155,7 +155,7 @@ public final class ReactorProcessesTest {
 
     public static final class GetProcessStatistics extends AbstractClientApiTest<GetProcessStatisticsRequest, GetProcessStatisticsResponse> {
 
-        private final ReactorProcesses processes = new ReactorProcesses(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorProcesses processes = new ReactorProcesses(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -212,7 +212,7 @@ public final class ReactorProcessesTest {
 
     public static final class List extends AbstractClientApiTest<ListProcessesRequest, ListProcessesResponse> {
 
-        private final ReactorProcesses processes = new ReactorProcesses(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorProcesses processes = new ReactorProcesses(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -320,7 +320,7 @@ public final class ReactorProcessesTest {
 
     public static final class Scale extends AbstractClientApiTest<ScaleProcessRequest, ScaleProcessResponse> {
 
-        private final ReactorProcesses processes = new ReactorProcesses(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorProcesses processes = new ReactorProcesses(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -387,7 +387,7 @@ public final class ReactorProcessesTest {
 
     public static final class Update extends AbstractClientApiTest<UpdateProcessRequest, UpdateProcessResponse> {
 
-        private final ReactorProcesses processes = new ReactorProcesses(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorProcesses processes = new ReactorProcesses(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {

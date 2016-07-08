@@ -126,7 +126,7 @@ public final class ReactorSpacesTest {
 
     public static final class AssociateAuditor extends AbstractClientApiTest<AssociateSpaceAuditorRequest, AssociateSpaceAuditorResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -185,7 +185,7 @@ public final class ReactorSpacesTest {
 
     public static final class AssociateAuditorByUsername extends AbstractClientApiTest<AssociateSpaceAuditorByUsernameRequest, AssociateSpaceAuditorByUsernameResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -245,7 +245,7 @@ public final class ReactorSpacesTest {
 
     public static final class AssociateDeveloper extends AbstractClientApiTest<AssociateSpaceDeveloperRequest, AssociateSpaceDeveloperResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -304,7 +304,7 @@ public final class ReactorSpacesTest {
 
     public static final class AssociateManager extends AbstractClientApiTest<AssociateSpaceManagerRequest, AssociateSpaceManagerResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -363,7 +363,7 @@ public final class ReactorSpacesTest {
 
     public static final class AssociateSecurityGroup extends AbstractClientApiTest<AssociateSpaceSecurityGroupRequest, AssociateSpaceSecurityGroupResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -422,7 +422,7 @@ public final class ReactorSpacesTest {
 
     public static final class AssociateSpaceDeveloperByUsername extends AbstractClientApiTest<AssociateSpaceDeveloperByUsernameRequest, AssociateSpaceDeveloperByUsernameResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -482,7 +482,7 @@ public final class ReactorSpacesTest {
 
     public static final class AssociateSpaceManagerByUsername extends AbstractClientApiTest<AssociateSpaceManagerByUsernameRequest, AssociateSpaceManagerByUsernameResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -542,7 +542,7 @@ public final class ReactorSpacesTest {
 
     public static final class Create extends AbstractClientApiTest<CreateSpaceRequest, CreateSpaceResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -602,7 +602,7 @@ public final class ReactorSpacesTest {
 
     public static final class Delete extends AbstractClientApiTest<DeleteSpaceRequest, DeleteSpaceResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -637,7 +637,7 @@ public final class ReactorSpacesTest {
 
     public static final class DeleteAsync extends AbstractClientApiTest<DeleteSpaceRequest, DeleteSpaceResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -684,7 +684,7 @@ public final class ReactorSpacesTest {
 
     public static final class Get extends AbstractClientApiTest<GetSpaceRequest, GetSpaceResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -742,7 +742,7 @@ public final class ReactorSpacesTest {
 
     public static final class GetSummary extends AbstractClientApiTest<GetSpaceSummaryRequest, GetSpaceSummaryResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -837,7 +837,7 @@ public final class ReactorSpacesTest {
 
     public static final class List extends AbstractClientApiTest<ListSpacesRequest, ListSpacesResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -900,7 +900,7 @@ public final class ReactorSpacesTest {
 
     public static final class ListApplications extends AbstractClientApiTest<ListSpaceApplicationsRequest, ListSpaceApplicationsResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -975,7 +975,7 @@ public final class ReactorSpacesTest {
 
     public static final class ListAuditors extends AbstractClientApiTest<ListSpaceAuditorsRequest, ListSpaceAuditorsResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1034,7 +1034,7 @@ public final class ReactorSpacesTest {
 
     public static final class ListDevelopers extends AbstractClientApiTest<ListSpaceDevelopersRequest, ListSpaceDevelopersResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1094,7 +1094,7 @@ public final class ReactorSpacesTest {
 
     public static final class ListDomains extends AbstractClientApiTest<ListSpaceDomainsRequest, ListSpaceDomainsResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1153,7 +1153,7 @@ public final class ReactorSpacesTest {
 
     public static final class ListEvents extends AbstractClientApiTest<ListSpaceEventsRequest, ListSpaceEventsResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1215,7 +1215,7 @@ public final class ReactorSpacesTest {
 
     public static final class ListManagers extends AbstractClientApiTest<ListSpaceManagersRequest, ListSpaceManagersResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1275,7 +1275,7 @@ public final class ReactorSpacesTest {
 
     public static final class ListRoutes extends AbstractClientApiTest<ListSpaceRoutesRequest, ListSpaceRoutesResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1333,7 +1333,7 @@ public final class ReactorSpacesTest {
 
     public static final class ListSecurityGroups extends AbstractClientApiTest<ListSpaceSecurityGroupsRequest, ListSpaceSecurityGroupsResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1391,7 +1391,7 @@ public final class ReactorSpacesTest {
 
     public static final class ListServiceInstances extends AbstractClientApiTest<ListSpaceServiceInstancesRequest, ListSpaceServiceInstancesResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1453,7 +1453,7 @@ public final class ReactorSpacesTest {
 
     public static final class ListServices extends AbstractClientApiTest<ListSpaceServicesRequest, ListSpaceServicesResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1512,7 +1512,7 @@ public final class ReactorSpacesTest {
 
     public static final class ListUserRoles extends AbstractClientApiTest<ListSpaceUserRolesRequest, ListSpaceUserRolesResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1575,7 +1575,7 @@ public final class ReactorSpacesTest {
 
     public static final class RemoveAuditor extends AbstractClientApiTest<RemoveSpaceAuditorRequest, Void> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1611,7 +1611,7 @@ public final class ReactorSpacesTest {
 
     public static final class RemoveAuditorByUsername extends AbstractClientApiTest<RemoveSpaceAuditorByUsernameRequest, RemoveSpaceAuditorByUsernameResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1671,7 +1671,7 @@ public final class ReactorSpacesTest {
 
     public static final class RemoveDeveloper extends AbstractClientApiTest<RemoveSpaceDeveloperRequest, Void> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1706,7 +1706,7 @@ public final class ReactorSpacesTest {
 
     public static final class RemoveDeveloperByUsername extends AbstractClientApiTest<RemoveSpaceDeveloperByUsernameRequest, RemoveSpaceDeveloperByUsernameResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1766,7 +1766,7 @@ public final class ReactorSpacesTest {
 
     public static final class RemoveManager extends AbstractClientApiTest<RemoveSpaceManagerRequest, Void> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1802,7 +1802,7 @@ public final class ReactorSpacesTest {
 
     public static final class RemoveManagerByUsername extends AbstractClientApiTest<RemoveSpaceManagerByUsernameRequest, RemoveSpaceManagerByUsernameResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1862,7 +1862,7 @@ public final class ReactorSpacesTest {
 
     public static final class RemoveSecurityGroup extends AbstractClientApiTest<RemoveSpaceSecurityGroupRequest, Void> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1898,7 +1898,7 @@ public final class ReactorSpacesTest {
 
     public static final class Update extends AbstractClientApiTest<UpdateSpaceRequest, UpdateSpaceResponse> {
 
-        private final ReactorSpaces spaces = new ReactorSpaces(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {

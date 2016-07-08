@@ -64,7 +64,7 @@ public final class ReactorServiceInstancesTest {
 
     public static final class BindToRoute extends AbstractClientApiTest<BindServiceInstanceToRouteRequest, BindServiceInstanceToRouteResponse> {
 
-        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -122,7 +122,7 @@ public final class ReactorServiceInstancesTest {
 
     public static final class Create extends AbstractClientApiTest<CreateServiceInstanceRequest, CreateServiceInstanceResponse> {
 
-        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -191,7 +191,7 @@ public final class ReactorServiceInstancesTest {
 
     public static final class Delete extends AbstractClientApiTest<DeleteServiceInstanceRequest, DeleteServiceInstanceResponse> {
 
-        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -228,7 +228,7 @@ public final class ReactorServiceInstancesTest {
 
     public static final class DeleteAsync extends AbstractClientApiTest<DeleteServiceInstanceRequest, DeleteServiceInstanceResponse> {
 
-        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -277,7 +277,7 @@ public final class ReactorServiceInstancesTest {
 
     public static final class Get extends AbstractClientApiTest<GetServiceInstanceRequest, GetServiceInstanceResponse> {
 
-        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -341,7 +341,7 @@ public final class ReactorServiceInstancesTest {
 
     public static final class GetPermissions extends AbstractClientApiTest<GetServiceInstancePermissionsRequest, GetServiceInstancePermissionsResponse> {
 
-        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -379,7 +379,7 @@ public final class ReactorServiceInstancesTest {
 
     public static final class List extends AbstractClientApiTest<ListServiceInstancesRequest, ListServiceInstancesResponse> {
 
-        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -448,7 +448,7 @@ public final class ReactorServiceInstancesTest {
 
     public static final class ListServiceBindings extends AbstractClientApiTest<ListServiceInstanceServiceBindingsRequest, ListServiceInstanceServiceBindingsResponse> {
 
-        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -505,7 +505,7 @@ public final class ReactorServiceInstancesTest {
 
     public static final class ListServiceKeys extends AbstractClientApiTest<ListServiceInstanceServiceKeysRequest, ListServiceInstanceServiceKeysResponse> {
 
-        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -558,7 +558,7 @@ public final class ReactorServiceInstancesTest {
 
     public static final class Update extends AbstractClientApiTest<UpdateServiceInstanceRequest, UpdateServiceInstanceResponse> {
 
-        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
