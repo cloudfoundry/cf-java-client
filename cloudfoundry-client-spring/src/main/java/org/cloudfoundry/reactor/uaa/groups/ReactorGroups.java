@@ -52,7 +52,7 @@ import reactor.io.netty.http.HttpClient;
 /**
  * The Reactor-based implementation of {@link Groups}
  */
-public class ReactorGroups extends AbstractUaaOperations implements Groups {
+public final class ReactorGroups extends AbstractUaaOperations implements Groups {
 
     /**
      * Creates an instance

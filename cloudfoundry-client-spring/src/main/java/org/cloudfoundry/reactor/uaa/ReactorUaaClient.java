@@ -19,6 +19,7 @@ package org.cloudfoundry.reactor.uaa;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
 import org.cloudfoundry.reactor.uaa.authorizations.ReactorAuthorizations;
+import org.cloudfoundry.reactor.uaa.clients.ReactorClients;
 import org.cloudfoundry.reactor.uaa.groups.ReactorGroups;
 import org.cloudfoundry.reactor.uaa.identityproviders.ReactorIdentityProviders;
 import org.cloudfoundry.reactor.uaa.identityzones.ReactorIdentityZones;
@@ -28,6 +29,7 @@ import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.reactor.util.ConnectionContextSupplier;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.authorizations.Authorizations;
+import org.cloudfoundry.uaa.clients.Clients;
 import org.cloudfoundry.uaa.groups.Groups;
 import org.cloudfoundry.uaa.identityproviders.IdentityProviders;
 import org.cloudfoundry.uaa.identityzones.IdentityZones;
@@ -42,6 +44,8 @@ import reactor.io.netty.http.HttpClient;
 public final class ReactorUaaClient implements UaaClient {
 
     private final Authorizations authorizations;
+
+    private final Clients clients;
 
     private final Groups groups;
 
@@ -61,6 +65,7 @@ public final class ReactorUaaClient implements UaaClient {
 
     ReactorUaaClient(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
         this.authorizations = new ReactorAuthorizations(authorizationProvider, httpClient, objectMapper, root);
+        this.clients = new ReactorClients(authorizationProvider, httpClient, objectMapper, root);
         this.groups = new ReactorGroups(authorizationProvider, httpClient, objectMapper, root);
         this.identityProviders = new ReactorIdentityProviders(authorizationProvider, httpClient, objectMapper, root);
         this.identityZones = new ReactorIdentityZones(authorizationProvider, httpClient, objectMapper, root);
@@ -71,6 +76,11 @@ public final class ReactorUaaClient implements UaaClient {
     @Override
     public Authorizations authorizations() {
         return this.authorizations;
+    }
+
+    @Override
+    public Clients clients() {
+        return this.clients;
     }
 
     @Override

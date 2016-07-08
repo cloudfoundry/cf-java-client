@@ -17,6 +17,7 @@
 package org.cloudfoundry.uaa;
 
 import org.cloudfoundry.uaa.authorizations.Authorizations;
+import org.cloudfoundry.uaa.clients.Clients;
 import org.cloudfoundry.uaa.groups.Groups;
 import org.cloudfoundry.uaa.identityproviders.IdentityProviders;
 import org.cloudfoundry.uaa.identityzones.IdentityZones;
@@ -39,6 +40,13 @@ public interface UaaClient {
      * @return the UAA Authorizations Client API
      */
     Authorizations authorizations();
+
+    /**
+     * Main entry point to the UAA Clients API
+     *
+     * @return the UAA Clients API
+     */
+    Clients clients();
 
     /**
      * Main entry point to the UAA Group Client API

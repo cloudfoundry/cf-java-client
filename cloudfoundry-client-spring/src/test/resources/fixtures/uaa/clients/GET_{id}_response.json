@@ -1,0 +1,32 @@
+{
+  "scope": [
+    "clients.read",
+    "clients.write"
+  ],
+  "client_id": "RoXWdB",
+  "resource_ids": [
+    "none"
+  ],
+  "authorized_grant_types": [
+    "client_credentials"
+  ],
+  "redirect_uri": [
+    "http*://ant.path.wildcard/**/passback/*",
+    "http://test1.example.com"
+  ],
+  "autoapprove": [
+    "true"
+  ],
+  "authorities": [
+    "clients.read",
+    "clients.write"
+  ],
+  "token_salt": "nNUNmH",
+  "allowedproviders": [
+    "uaa",
+    "ldap",
+    "my-saml-provider"
+  ],
+  "name": "My Client Name",
+  "lastModified": 1467059560412
+}
