@@ -17,48 +17,39 @@
 package org.cloudfoundry;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingRequest;
-import org.cloudfoundry.client.v2.buildpacks.BuildpackResource;
 import org.cloudfoundry.client.v2.buildpacks.DeleteBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
 import org.cloudfoundry.client.v2.domains.DeleteDomainRequest;
-import org.cloudfoundry.client.v2.domains.DomainResource;
+import org.cloudfoundry.client.v2.domains.GetDomainRequest;
 import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
-import org.cloudfoundry.client.v2.featureflags.FeatureFlagEntity;
 import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsRequest;
 import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsResponse;
 import org.cloudfoundry.client.v2.featureflags.SetFeatureFlagRequest;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
-import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.privatedomains.DeletePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsRequest;
-import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
-import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
-import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
-import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
-import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceResource;
 import org.cloudfoundry.client.v3.applications.Application;
 import org.cloudfoundry.client.v3.packages.DeletePackageRequest;
 import org.cloudfoundry.client.v3.packages.ListPackagesRequest;
 import org.cloudfoundry.client.v3.packages.Package;
-import org.cloudfoundry.client.v3.packages.PackageResource;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.users.DeleteUserRequest;
 import org.cloudfoundry.uaa.users.ListUsersRequest;
 import org.cloudfoundry.uaa.users.User;
+import org.cloudfoundry.util.FluentMap;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
@@ -69,115 +60,51 @@ import reactor.core.publisher.Mono;
 
 import javax.net.ssl.SSLException;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.Predicate;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
+import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
 
 final class CloudFoundryCleaner {
 
-    private static final Map<String, Boolean> standardFeatureFlags = new HashMap<>();
-
-    static {
-        standardFeatureFlags.put("app_bits_upload", true);
-        standardFeatureFlags.put("app_scaling", true);
-        standardFeatureFlags.put("diego_docker", true);
-        standardFeatureFlags.put("private_domain_creation", true);
-        standardFeatureFlags.put("route_creation", true);
-        standardFeatureFlags.put("service_instance_creation", true);
-        standardFeatureFlags.put("set_roles_by_username", true);
-        standardFeatureFlags.put("unset_roles_by_username", true);
-        standardFeatureFlags.put("user_org_creation", false);
-    }
+    private static final Map<String, Boolean> STANDARD_FEATURE_FLAGS = FluentMap.<String, Boolean>builder()
+        .entry("app_bits_upload", true)
+        .entry("app_scaling", true)
+        .entry("diego_docker", true)
+        .entry("private_domain_creation", true)
+        .entry("route_creation", true)
+        .entry("service_instance_creation", true)
+        .entry("set_roles_by_username", true)
+        .entry("unset_roles_by_username", true)
+        .entry("user_org_creation", false)
+        .build();
 
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.test");
 
     private final CloudFoundryClient cloudFoundryClient;
 
-    private final Mono<List<String>> protectedBuildpackIds;
-
-    private final Mono<Optional<String>> protectedDomainId;
-
-    private final Mono<List<String>> protectedFeatureFlags;
-
-    private final Mono<Optional<String>> protectedOrganizationId;
-
-    private final Mono<List<String>> protectedSpaceIds;
-
-    private final Mono<List<String>> protectedUserIds;
-
     private final UaaClient uaaClient;
 
-    CloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, UaaClient uaaClient, Mono<List<String>> protectedBuildpackIds, Mono<Optional<String>> protectedDomainId,
-                        Mono<List<String>> protectedFeatureFlags, Mono<Optional<String>> protectedOrganizationId, Mono<List<String>> protectedSpaceIds, Mono<List<String>> protectedUserIds) {
-
+    CloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, UaaClient uaaClient) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.uaaClient = uaaClient;
-        this.protectedBuildpackIds = protectedBuildpackIds;
-        this.protectedDomainId = protectedDomainId;
-        this.protectedFeatureFlags = protectedFeatureFlags;
-        this.protectedOrganizationId = protectedOrganizationId;
-        this.protectedSpaceIds = protectedSpaceIds;
-        this.protectedUserIds = protectedUserIds;
     }
 
     void clean() {
-        Mono
-            .when(this.protectedBuildpackIds, this.protectedDomainId, this.protectedOrganizationId, this.protectedSpaceIds, this.protectedFeatureFlags, this.protectedUserIds)
-            .flatMap(function((protectedBuildpackIds, protectedDomainId, protectedOrganizationId, protectedSpaceIds, protectedFeatureFlags, protectedUserIds) -> {
-
-                Predicate<ApplicationResource> applicationV2Predicate = protectedOrganizationId
-                    .map(id -> (Predicate<ApplicationResource>) r -> !protectedSpaceIds.contains(ResourceUtils.getEntity(r).getSpaceId()))
-                    .orElse(r -> true);
-
-                Predicate<org.cloudfoundry.client.v3.applications.ApplicationResource> applicationsV3Predicate = r -> true;  // TODO: Filter out interesting organizations
-
-                Predicate<BuildpackResource> buildpackPredicate = r -> !protectedBuildpackIds.contains(ResourceUtils.getId(r));
-
-                Predicate<PackageResource> packagePredicate = r -> true;  // TODO: Filter out interesting organizations
-
-                Predicate<ServiceInstanceResource> serviceInstancePredicate = r -> !protectedSpaceIds.contains(ResourceUtils.getEntity(r).getSpaceId());
-
-                Predicate<UserProvidedServiceInstanceResource> userProvidedServiceInstancePredicate = r -> !protectedSpaceIds.contains(ResourceUtils.getEntity(r).getSpaceId());
-
-                Predicate<FeatureFlagEntity> featureFlagPredicate = f -> !protectedFeatureFlags.contains(f.getName());
-
-                Predicate<RouteResource> routePredicate = r -> true;  // TODO: Filter out interesting organizations
-
-                Predicate<DomainResource> domainPredicate = protectedDomainId
-                    .map(id -> (Predicate<DomainResource>) r -> !ResourceUtils.getId(r).equals(id))
-                    .orElse(r -> true);
-
-                Predicate<PrivateDomainResource> privateDomainPredicate = r -> true;
-
-                Predicate<SpaceResource> spacePredicate = protectedOrganizationId
-                    .map(id -> (Predicate<SpaceResource>) r -> !ResourceUtils.getEntity(r).getOrganizationId().equals(id))
-                    .orElse(r -> true);
-
-                Predicate<OrganizationResource> organizationPredicate = protectedOrganizationId
-                    .map(id -> (Predicate<OrganizationResource>) r -> !ResourceUtils.getId(r).equals(id))
-                    .orElse(r -> true);
-
-                Predicate<User> userPredicate = r -> !protectedUserIds.contains(r.getId());
-
-                return Flux.empty()
-                    .thenMany(cleanBuildpacks(this.cloudFoundryClient, buildpackPredicate))
-                    .thenMany(cleanFeatureFlags(this.cloudFoundryClient, featureFlagPredicate))
-                    .thenMany(cleanRoutes(this.cloudFoundryClient, routePredicate))
-                    .thenMany(cleanApplicationsV2(this.cloudFoundryClient, applicationV2Predicate))
-                    .thenMany(cleanApplicationsV3(this.cloudFoundryClient, applicationsV3Predicate))
-                    .thenMany(cleanPackages(this.cloudFoundryClient, packagePredicate))
-                    .thenMany(cleanServiceInstances(this.cloudFoundryClient, serviceInstancePredicate))
-                    .thenMany(cleanUserProvidedServiceInstances(this.cloudFoundryClient, userProvidedServiceInstancePredicate))
-                    .thenMany(cleanDomains(this.cloudFoundryClient, domainPredicate))
-                    .thenMany(cleanPrivateDomains(this.cloudFoundryClient, privateDomainPredicate))
-                    .thenMany(cleanUsers(this.uaaClient, userPredicate))
-                    .thenMany(cleanSpaces(this.cloudFoundryClient, spacePredicate))
-                    .thenMany(cleanOrganizations(this.cloudFoundryClient, organizationPredicate));
-            }))
+        Flux.empty()
+            .thenMany(cleanBuildpacks(this.cloudFoundryClient))
+            .thenMany(cleanFeatureFlags(this.cloudFoundryClient))
+            .thenMany(cleanRoutes(this.cloudFoundryClient))
+            .thenMany(cleanApplicationsV2(this.cloudFoundryClient))
+            .thenMany(cleanApplicationsV3(this.cloudFoundryClient))
+            .thenMany(cleanPackages(this.cloudFoundryClient))
+            .thenMany(cleanServiceInstances(this.cloudFoundryClient))
+            .thenMany(cleanUserProvidedServiceInstances(this.cloudFoundryClient))
+            .thenMany(cleanDomains(this.cloudFoundryClient))
+            .thenMany(cleanPrivateDomains(this.cloudFoundryClient))
+            .thenMany(cleanUsers(this.uaaClient))
+            .thenMany(cleanSpaces(this.cloudFoundryClient))
+            .thenMany(cleanOrganizations(this.cloudFoundryClient))
             .retry(5, t -> t instanceof SSLException)
             .doOnSubscribe(s -> this.logger.debug(">> CLEANUP <<"))
             .doOnError(Throwable::printStackTrace)
@@ -186,13 +113,13 @@ final class CloudFoundryCleaner {
             .block(Duration.ofMinutes(10));
     }
 
-    private static Flux<Void> cleanApplicationsV2(CloudFoundryClient cloudFoundryClient, Predicate<ApplicationResource> predicate) {
+    private static Flux<Void> cleanApplicationsV2(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils.
             requestResources(page -> cloudFoundryClient.applicationsV2()
                 .list(ListApplicationsRequest.builder()
                     .page(page)
                     .build()))
-            .filter(predicate)
+            .filter(application -> ResourceUtils.getEntity(application).getName().startsWith("test-application-"))
             .map(ResourceUtils::getId)
             .flatMap(applicationId -> removeServiceBindings(cloudFoundryClient, applicationId)
                 .thenMany(Flux.just(applicationId)))
@@ -202,14 +129,14 @@ final class CloudFoundryCleaner {
                     .build()));
     }
 
-    private static Flux<Void> cleanApplicationsV3(CloudFoundryClient cloudFoundryClient, Predicate<org.cloudfoundry.client.v3.applications.ApplicationResource> predicate) {
+    private static Flux<Void> cleanApplicationsV3(CloudFoundryClient cloudFoundryClient) {
         return cloudFoundryClient.applicationsV3()  // TODO: Handle pagination properly
             .list(org.cloudfoundry.client.v3.applications.ListApplicationsRequest.builder()
                 .page(1)
                 .perPage(5_000)
                 .build())
             .flatMap(response -> Flux.fromIterable(response.getResources()))
-            .filter(predicate)
+            .filter(application -> application.getName().startsWith("test-application-"))
             .map(Application::getId)
             .flatMap(applicationId -> cloudFoundryClient.applicationsV3()
                 .delete(org.cloudfoundry.client.v3.applications.DeleteApplicationRequest.builder()
@@ -217,13 +144,13 @@ final class CloudFoundryCleaner {
                     .build()));
     }
 
-    private static Flux<Void> cleanBuildpacks(CloudFoundryClient cloudFoundryClient, Predicate<BuildpackResource> predicate) {
+    private static Flux<Void> cleanBuildpacks(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.buildpacks()
                 .list(ListBuildpacksRequest.builder()
                     .page(page)
                     .build()))
-            .filter(predicate)
+            .filter(buildpack -> ResourceUtils.getEntity(buildpack).getName().startsWith("test-buildpack-"))
             .map(ResourceUtils::getId)
             .flatMap(buildpackId -> cloudFoundryClient.buildpacks()
                 .delete(DeleteBuildpackRequest.builder()
@@ -233,13 +160,13 @@ final class CloudFoundryCleaner {
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
-    private static Flux<Void> cleanDomains(CloudFoundryClient cloudFoundryClient, Predicate<DomainResource> predicate) {
+    private static Flux<Void> cleanDomains(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils.
             requestResources(page -> cloudFoundryClient.domains()
                 .list(ListDomainsRequest.builder()
                     .page(page)
                     .build()))
-            .filter(predicate)
+            .filter(domain -> ResourceUtils.getEntity(domain).getName().startsWith("test.domain."))
             .map(ResourceUtils::getId)
             .flatMap(domainId -> cloudFoundryClient.domains()
                 .delete(DeleteDomainRequest.builder()
@@ -249,33 +176,28 @@ final class CloudFoundryCleaner {
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
-    private static Flux<Void> cleanFeatureFlags(CloudFoundryClient cloudFoundryClient, Predicate<FeatureFlagEntity> predicate) {
+    private static Flux<Void> cleanFeatureFlags(CloudFoundryClient cloudFoundryClient) {
         return cloudFoundryClient.featureFlags()
             .list(ListFeatureFlagsRequest.builder()
                 .build())
             .flatMapIterable(ListFeatureFlagsResponse::getFeatureFlags)
-            .filter(predicate)
-            .flatMap(flagEntity -> {
-                if (standardFeatureFlags.containsKey(flagEntity.getName())
-                    && !standardFeatureFlags.get(flagEntity.getName()).equals(flagEntity.getEnabled())) {
-                    return cloudFoundryClient.featureFlags()
-                        .set(SetFeatureFlagRequest.builder()
-                            .name(flagEntity.getName())
-                            .enabled(standardFeatureFlags.get(flagEntity.getName()))
-                            .build())
-                        .then();
-                }
-                return Mono.empty();
-            });
+            .filter(featureFlag -> STANDARD_FEATURE_FLAGS.containsKey(featureFlag.getName()))
+            .filter(featureFlag -> STANDARD_FEATURE_FLAGS.get(featureFlag.getName()) != featureFlag.getEnabled())
+            .flatMap(featureFlag -> cloudFoundryClient.featureFlags()
+                .set(SetFeatureFlagRequest.builder()
+                    .name(featureFlag.getName())
+                    .enabled(STANDARD_FEATURE_FLAGS.get(featureFlag.getName()))
+                    .build())
+                .then());
     }
 
-    private static Flux<Void> cleanOrganizations(CloudFoundryClient cloudFoundryClient, Predicate<OrganizationResource> predicate) {
+    private static Flux<Void> cleanOrganizations(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils.
             requestResources(page -> cloudFoundryClient.organizations()
                 .list(ListOrganizationsRequest.builder()
                     .page(page)
                     .build()))
-            .filter(predicate)
+            .filter(organization -> ResourceUtils.getEntity(organization).getName().startsWith("test-organization-"))
             .map(ResourceUtils::getId)
             .flatMap(organizationId -> cloudFoundryClient.organizations()
                 .delete(DeleteOrganizationRequest.builder()
@@ -285,14 +207,14 @@ final class CloudFoundryCleaner {
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
-    private static Flux<Void> cleanPackages(CloudFoundryClient cloudFoundryClient, Predicate<PackageResource> predicate) {
+    private static Flux<Void> cleanPackages(CloudFoundryClient cloudFoundryClient) {
         return cloudFoundryClient.packages()  // TODO: Handle pagination properly
             .list(ListPackagesRequest.builder()
                 .page(1)
                 .perPage(5_000)
                 .build())
             .flatMap(response -> Flux.fromIterable(response.getResources()))
-            .filter(predicate)
+            .filter(package1 -> true)
             .map(Package::getId)
             .flatMap(packageId -> cloudFoundryClient.packages()
                 .delete(DeletePackageRequest.builder()
@@ -300,13 +222,13 @@ final class CloudFoundryCleaner {
                     .build()));
     }
 
-    private static Flux<Void> cleanPrivateDomains(CloudFoundryClient cloudFoundryClient, Predicate<PrivateDomainResource> predicate) {
+    private static Flux<Void> cleanPrivateDomains(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils.
             requestResources(page -> cloudFoundryClient.privateDomains()
                 .list(ListPrivateDomainsRequest.builder()
                     .page(page)
                     .build()))
-            .filter(predicate)
+            .filter(domain -> ResourceUtils.getEntity(domain).getName().startsWith("test.domain."))
             .map(ResourceUtils::getId)
             .flatMap(privateDomainId -> cloudFoundryClient.privateDomains()
                 .delete(DeletePrivateDomainRequest.builder()
@@ -316,14 +238,21 @@ final class CloudFoundryCleaner {
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
-    private static Flux<Void> cleanRoutes(CloudFoundryClient cloudFoundryClient, Predicate<RouteResource> predicate) {
+    private static Flux<Void> cleanRoutes(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils.
             requestResources(page -> cloudFoundryClient.routes()
                 .list(ListRoutesRequest.builder()
                     .page(page)
                     .build()))
-            .filter(predicate)
-            .map(ResourceUtils::getId)
+            .flatMap(route -> Mono.when(
+                Mono.just(route),
+                cloudFoundryClient.domains()
+                    .get(GetDomainRequest.builder()
+                        .domainId(ResourceUtils.getEntity(route).getDomainId())
+                        .build())
+            ))
+            .filter(predicate((route, domain) -> ResourceUtils.getEntity(domain).getName().startsWith("test.domain.")))
+            .map(function((route, domain) -> ResourceUtils.getId(route)))
             .flatMap(routeId -> cloudFoundryClient.routes()
                 .delete(DeleteRouteRequest.builder()
                     .async(true)
@@ -332,13 +261,13 @@ final class CloudFoundryCleaner {
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
-    private static Flux<Void> cleanServiceInstances(CloudFoundryClient cloudFoundryClient, Predicate<ServiceInstanceResource> predicate) {
+    private static Flux<Void> cleanServiceInstances(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils.
             requestResources(page -> cloudFoundryClient.serviceInstances()
                 .list(ListServiceInstancesRequest.builder()
                     .page(page)
                     .build()))
-            .filter(predicate)
+            .filter(serviceInstance -> ResourceUtils.getEntity(serviceInstance).getName().startsWith("test-service-instance-"))
             .map(ResourceUtils::getId)
             .flatMap(serviceInstanceId -> cloudFoundryClient.serviceInstances()
                 .delete(DeleteServiceInstanceRequest.builder()
@@ -348,13 +277,13 @@ final class CloudFoundryCleaner {
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
-    private static Flux<Void> cleanSpaces(CloudFoundryClient cloudFoundryClient, Predicate<SpaceResource> predicate) {
+    private static Flux<Void> cleanSpaces(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils.
             requestResources(page -> cloudFoundryClient.spaces()
                 .list(ListSpacesRequest.builder()
                     .page(page)
                     .build()))
-            .filter(predicate)
+            .filter(space -> ResourceUtils.getEntity(space).getName().startsWith("test-space-"))
             .map(ResourceUtils::getId)
             .flatMap(spaceId -> cloudFoundryClient.spaces()
                 .delete(DeleteSpaceRequest.builder()
@@ -364,13 +293,13 @@ final class CloudFoundryCleaner {
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
-    private static Flux<Void> cleanUserProvidedServiceInstances(CloudFoundryClient cloudFoundryClient, Predicate<UserProvidedServiceInstanceResource> predicate) {
+    private static Flux<Void> cleanUserProvidedServiceInstances(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils.
             requestResources(page -> cloudFoundryClient.userProvidedServiceInstances()
                 .list(ListUserProvidedServiceInstancesRequest.builder()
                     .page(page)
                     .build()))
-            .filter(predicate)
+            .filter(userProvidedServiceInstance -> ResourceUtils.getEntity(userProvidedServiceInstance).getName().startsWith("test-service-instance-"))
             .map(ResourceUtils::getId)
             .flatMap(userProvidedServiceInstanceId -> cloudFoundryClient.userProvidedServiceInstances()
                 .delete(DeleteUserProvidedServiceInstanceRequest.builder()
@@ -378,13 +307,13 @@ final class CloudFoundryCleaner {
                     .build()));
     }
 
-    private static Flux<Void> cleanUsers(UaaClient uaaClient, Predicate<User> predicate) {
+    private static Flux<Void> cleanUsers(UaaClient uaaClient) {
         return uaaClient.users()
             .list(ListUsersRequest.builder()
                 .count(5_000)
                 .build())
             .flatMap(response -> Flux.fromIterable(response.getResources()))
-            .filter(predicate)
+            .filter(user -> user.getUserName().startsWith("test-user-"))
             .map(User::getId)
             .flatMap(userId -> uaaClient.users()
                 .delete(DeleteUserRequest.builder()

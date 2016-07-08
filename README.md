@@ -308,10 +308,6 @@ Name | Description
 ---- | -----------
 `TEST_APIHOST` | The host of Cloud Foundry instance.  Typically something like `api.local.pcfdev.io`.
 `TEST_PASSWORD` | The test user's password
-`TEST_PROTECTED_DOMAIN` | A domain that will not be cleaned up
-`TEST_PROTECTED_FEATUREFLAGS` | A list of feature flags that will not be (re)set to standard values on cleanup
-`TEST_PROTECTED_ORGANIZATION` | An organization whose contents will not be cleaned up
-`TEST_PROTECTED_USERS` | A list of users that will not be cleaned up. Typically includes the `TEST_USERNAME`
 `TEST_SKIPSSLVALIDATION` | Whether to skip SSL validation when connecting to the Cloud Foundry instance.  Typically `true` when connecting to a PCF Dev instance.
 `TEST_UAA_CLIENTID` | The client id to use for testing the UAA APIs
 `TEST_UAA_CLIENTSECRET` | The client secret to use for testing the UAA APIs

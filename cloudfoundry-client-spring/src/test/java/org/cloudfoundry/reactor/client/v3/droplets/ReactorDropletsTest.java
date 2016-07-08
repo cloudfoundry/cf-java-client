@@ -35,7 +35,7 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.cloudfoundry.util.StringMap;
+import org.cloudfoundry.util.FluentMap;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -123,8 +123,8 @@ public final class ReactorDropletsTest {
                     .stack("cflinuxfs2")
                     .build())
                 .environmentVariable("CF_STACK", "cflinuxfs2")
-                .environmentVariable("VCAP_APPLICATION", StringMap.builder()
-                    .entry("limits", StringMap.builder()
+                .environmentVariable("VCAP_APPLICATION", FluentMap.builder()
+                    .entry("limits", FluentMap.builder()
                         .entry("mem", 1_024)
                         .entry("disk", 4_096)
                         .entry("fds", 16_384)

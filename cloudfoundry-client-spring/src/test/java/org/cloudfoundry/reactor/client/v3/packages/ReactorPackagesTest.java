@@ -45,7 +45,7 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.cloudfoundry.util.StringMap;
+import org.cloudfoundry.util.FluentMap;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.reactivestreams.Publisher;
 import org.springframework.core.io.ClassPathResource;
@@ -451,8 +451,8 @@ public final class ReactorPackagesTest {
                 .stagingMemoryInMb(1024)
                 .stagingDiskInMb(4096)
                 .environmentVariable("CUSTOM_ENV_VAR", "hello")
-                .environmentVariable("VCAP_APPLICATION", StringMap.builder()
-                    .entry("limits", StringMap.builder()
+                .environmentVariable("VCAP_APPLICATION", FluentMap.builder()
+                    .entry("limits", FluentMap.builder()
                         .entry("mem", 1_024)
                         .entry("disk", 4_096)
                         .entry("fds", 16_384)

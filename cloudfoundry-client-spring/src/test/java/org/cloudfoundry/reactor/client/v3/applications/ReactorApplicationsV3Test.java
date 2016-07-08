@@ -80,7 +80,7 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.cloudfoundry.util.StringMap;
+import org.cloudfoundry.util.FluentMap;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -568,8 +568,8 @@ public final class ReactorApplicationsV3Test {
                 .environmentVariable("SOME_KEY", "some_val")
                 .stagingEnvironmentVariable("STAGING_ENV", "staging_value")
                 .runningEnvironmentVariable("RUNNING_ENV", "running_value")
-                .applicationEnvironmentVariable("VCAP_APPLICATION", StringMap.builder()
-                    .entry("limits", StringMap.builder()
+                .applicationEnvironmentVariable("VCAP_APPLICATION", FluentMap.builder()
+                    .entry("limits", FluentMap.builder()
                         .entry("fds", 16384)
                         .build())
                     .entry("application_name", "app_name")

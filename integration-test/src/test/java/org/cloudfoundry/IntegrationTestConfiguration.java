@@ -17,12 +17,8 @@
 package org.cloudfoundry;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
-import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
-import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
-import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.doppler.DopplerClient;
@@ -36,7 +32,6 @@ import org.cloudfoundry.reactor.doppler.ReactorDopplerClient;
 import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.cloudfoundry.reactor.uaa.ReactorUaaClient;
 import org.cloudfoundry.uaa.UaaClient;
-import org.cloudfoundry.uaa.users.User;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.test.FailingDeserializationProblemHandler;
@@ -47,15 +42,9 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.util.StringUtils;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 @Configuration
@@ -65,16 +54,9 @@ public class IntegrationTestConfiguration {
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.test");
 
     @Bean(initMethod = "clean", destroyMethod = "clean")
-    CloudFoundryCleaner cloudFoundryCleaner(CloudFoundryClient cloudFoundryClient,
-                                            UaaClient uaaClient,
-                                            Mono<List<String>> protectedBuildpackIds,
-                                            Mono<Optional<String>> protectedDomainId,
-                                            Mono<List<String>> protectedFeatureFlags,
-                                            Mono<Optional<String>> protectedOrganizationId,
-                                            Mono<List<String>> protectedSpaceIds,
-                                            Mono<List<String>> protectedUserIds) {
+    CloudFoundryCleaner cloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, UaaClient uaaClient) {
 
-        return new CloudFoundryCleaner(cloudFoundryClient, uaaClient, protectedBuildpackIds, protectedDomainId, protectedFeatureFlags, protectedOrganizationId, protectedSpaceIds, protectedUserIds);
+        return new CloudFoundryCleaner(cloudFoundryClient, uaaClient);
     }
 
     @Bean(initMethod = "checkCompatibility")
@@ -147,104 +129,6 @@ public class IntegrationTestConfiguration {
     @Bean
     String organizationName(NameFactory nameFactory) {
         return nameFactory.getName("test-organization-");
-    }
-
-    @Bean
-    Mono<List<String>> protectedBuildpackIds(CloudFoundryClient cloudFoundryClient) {
-        return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.buildpacks()
-                .list(ListBuildpacksRequest.builder()
-                    .page(page)
-                    .build()))
-            .map(ResourceUtils::getId)
-            .collectList()
-            .doOnSubscribe(s -> this.logger.debug(">> PROTECTED BUILDPACKS <<"))
-            .doOnError(Throwable::printStackTrace)
-            .doOnSuccess(id -> this.logger.debug("<< PROTECTED BUILDPACKS >>"))
-            .cache();
-    }
-
-    @Bean(initMethod = "block")
-    Mono<Optional<String>> protectedDomainId(CloudFoundryClient cloudFoundryClient, @Value("${test.protected.domain:}") String protectedDomain) {
-        return Mono
-            .just(protectedDomain)
-            .filter(StringUtils::hasText)
-            .flatMap(protectedDomain1 -> PaginationUtils
-                .requestResources(page -> cloudFoundryClient.domains()
-                    .list(ListDomainsRequest.builder()
-                        .name(protectedDomain1)
-                        .page(page)
-                        .build())))
-            .singleOrEmpty()
-            .map(ResourceUtils::getId)
-            .map(Optional::of)
-            .otherwiseIfEmpty(Mono.just(Optional.empty()))
-            .doOnSubscribe(s -> this.logger.debug(">> PROTECTED DOMAIN <<"))
-            .doOnError(Throwable::printStackTrace)
-            .doOnSuccess(id -> this.logger.debug("<< PROTECTED DOMAIN >>"))
-            .cache();
-    }
-
-    @Bean(initMethod = "block")
-    Mono<List<String>> protectedFeatureFlags(@Value("${test.protected.featureflags:}") List<String> protectedFlags) {
-        return Mono.just(protectedFlags);
-    }
-
-    @Bean(initMethod = "block")
-    Mono<Optional<String>> protectedOrganizationId(CloudFoundryClient cloudFoundryClient, @Value("${test.protected.organization:}") String protectedOrganization) {
-        return Mono
-            .just(protectedOrganization)
-            .filter(StringUtils::hasText)
-            .flatMap(protectedOrganization1 -> PaginationUtils
-                .requestResources(page -> cloudFoundryClient.organizations()
-                    .list(ListOrganizationsRequest.builder()
-                        .name(protectedOrganization1)
-                        .page(page)
-                        .build())))
-            .singleOrEmpty()
-            .map(ResourceUtils::getId)
-            .map(Optional::of)
-            .otherwiseIfEmpty(Mono.just(Optional.empty()))
-            .doOnSubscribe(s -> this.logger.debug(">> PROTECTED ORGANIZATION <<"))
-            .doOnError(Throwable::printStackTrace)
-            .doOnSuccess(id -> this.logger.debug("<< PROTECTED ORGANIZATION >>"))
-            .cache();
-    }
-
-    @Bean(initMethod = "block")
-    Mono<List<String>> protectedSpaceIds(CloudFoundryClient cloudFoundryClient, Mono<Optional<String>> protectedOrganizationId) {
-        return protectedOrganizationId
-            .then(protectedOrganizationId1 -> protectedOrganizationId1
-                .map(id -> PaginationUtils
-                    .requestResources(page -> cloudFoundryClient.spaces()
-                        .list(ListSpacesRequest.builder()
-                            .organizationId(id)
-                            .page(page)
-                            .build()))
-                    .map(ResourceUtils::getId)
-                    .collectList())
-                .orElse(Mono.just(Collections.emptyList())))
-            .doOnSubscribe(s -> this.logger.debug(">> PROTECTED SPACES <<"))
-            .doOnError(Throwable::printStackTrace)
-            .doOnSuccess(id -> this.logger.debug("<< PROTECTED SPACES >>"))
-            .cache();
-    }
-
-    @Bean(initMethod = "block")
-    Mono<List<String>> protectedUserIds(UaaClient uaaClient, @Value("${test.protected.users}") String[] protectedUsers) {
-        List<String> protectedUserList = Arrays.asList(protectedUsers);
-
-        return uaaClient.users()
-            .list(org.cloudfoundry.uaa.users.ListUsersRequest.builder()
-                .build())
-            .flatMap(response -> Flux.fromIterable(response.getResources()))
-            .filter(user -> protectedUserList.contains(user.getUserName()))
-            .map(User::getId)
-            .collectList()
-            .doOnSubscribe(s -> this.logger.debug(">> PROTECTED USERS <<"))
-            .doOnError(Throwable::printStackTrace)
-            .doOnSuccess(id -> this.logger.debug("<< PROTECTED USERS >>"))
-            .cache();
     }
 
     @Bean

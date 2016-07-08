@@ -22,26 +22,26 @@ import java.util.Map;
 /**
  * Utility for building maps for Json responses
  */
-public final class StringMap {
+public final class FluentMap {
 
-    public static Builder builder() {
-        return new Builder();
+    public static <K, V> Builder<K, V> builder() {
+        return new Builder<>();
     }
 
-    public static final class Builder {
+    public static final class Builder<K, V> {
 
-        private final Map<String, Object> entries = new HashMap<>();
+        private final Map<K, V> entries = new HashMap<>();
 
-        public Map<String, Object> build() {
+        public Map<K, V> build() {
             return this.entries;
         }
 
-        public Builder entries(Map<String, Object> entries) {
+        public Builder<K, V> entries(Map<K, V> entries) {
             this.entries.putAll(entries);
             return this;
         }
 
-        public Builder entry(String key, Object value) {
+        public Builder<K, V> entry(K key, V value) {
             this.entries.put(key, value);
             return this;
         }

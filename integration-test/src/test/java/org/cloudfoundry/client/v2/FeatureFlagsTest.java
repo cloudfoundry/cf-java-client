@@ -146,4 +146,5 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
             .map(FeatureFlagEntity::getName)
             .collect(Collectors.toSet());
     }
+
 }

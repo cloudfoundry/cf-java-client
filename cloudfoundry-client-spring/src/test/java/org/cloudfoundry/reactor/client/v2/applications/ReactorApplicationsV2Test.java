@@ -71,7 +71,7 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.cloudfoundry.util.StringMap;
+import org.cloudfoundry.util.FluentMap;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.reactivestreams.Publisher;
 import org.springframework.core.io.ClassPathResource;
@@ -433,8 +433,8 @@ public final class ReactorApplicationsV2Test {
                 .runningEnvironmentJson("RUNNING_ENV", "running_value")
                 .environmentJson("env_var", "env_val")
                 .systemEnvironmentJson("VCAP_SERVICES", Collections.emptyMap())
-                .applicationEnvironmentJson("VCAP_APPLICATION", StringMap.builder()
-                    .entry("limits", StringMap.builder()
+                .applicationEnvironmentJson("VCAP_APPLICATION", FluentMap.builder()
+                    .entry("limits", FluentMap.builder()
                         .entry("mem", 1024)
                         .entry("disk", 1024)
                         .entry("fds", 16384)

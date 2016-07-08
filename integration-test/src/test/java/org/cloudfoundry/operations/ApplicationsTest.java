@@ -32,7 +32,7 @@ import org.cloudfoundry.operations.applications.UnsetEnvironmentVariableApplicat
 import org.cloudfoundry.operations.domains.CreateDomainRequest;
 import org.cloudfoundry.operations.services.BindServiceInstanceRequest;
 import org.cloudfoundry.operations.services.CreateUserProvidedServiceInstanceRequest;
-import org.cloudfoundry.util.StringMap;
+import org.cloudfoundry.util.FluentMap;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -264,7 +264,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build()))
             .map(ApplicationEnvironments::getUserProvided)
             .subscribe(testSubscriber()
-                .assertEquals(StringMap.builder()
+                .assertEquals(FluentMap.builder()
                     .entry(variableName1, variableValue1)
                     .entry(variableName2, variableValue2)
                     .build()));

@@ -107,7 +107,7 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.cloudfoundry.util.StringMap;
+import org.cloudfoundry.util.FluentMap;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -1188,7 +1188,7 @@ public final class ReactorSpacesTest {
                         .acteeType("space")
                         .acteeName("name-56")
                         .timestamp("2015-07-27T22:43:07Z")
-                        .metadata("request", Optional.of(StringMap.builder()
+                        .metadata("request", Optional.of(FluentMap.builder()
                             .entry("name", "new_name")
                             .build()))
                         .spaceId("33d44b03-6203-47a7-b71c-9bf6fcaeb54a")

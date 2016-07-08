@@ -86,11 +86,11 @@ import org.cloudfoundry.doppler.StreamRequest;
 import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.DelayTimeoutException;
 import org.cloudfoundry.util.ExceptionUtils;
+import org.cloudfoundry.util.FluentMap;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.OperationUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.cloudfoundry.util.StringMap;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.tuple.Tuple;
@@ -444,7 +444,7 @@ public final class DefaultApplications implements Applications {
     }
 
     private static Map<String, Object> addToEnvironment(Map<String, Object> environment, String variableName, Object variableValue) {
-        return StringMap.builder()
+        return FluentMap.<String, Object>builder()
             .entries(environment)
             .entry(variableName, variableValue)
             .build();
