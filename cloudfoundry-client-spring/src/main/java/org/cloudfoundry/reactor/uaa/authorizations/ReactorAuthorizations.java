@@ -16,10 +16,10 @@
 
 package org.cloudfoundry.reactor.uaa.authorizations;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.util.AsciiString;
+import org.cloudfoundry.reactor.ConnectionContext;
+import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
-import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.uaa.ResponseType;
 import org.cloudfoundry.uaa.authorizations.Authorizations;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
@@ -31,7 +31,6 @@ import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithImplicitGrantReq
 import org.cloudfoundry.util.ExceptionUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.io.netty.http.HttpClient;
 
 import java.util.Optional;
 
@@ -45,13 +44,12 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
     /**
      * Creates an instance
      *
-     * @param authorizationProvider the {@link AuthorizationProvider} to use when communicating with the server
-     * @param httpClient            the {@link HttpClient} to use when communicating with the server
-     * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
-     * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
+     * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
+     * @param root              the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
+     * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      */
-    public ReactorAuthorizations(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
-        super(authorizationProvider, httpClient, objectMapper, root);
+    public ReactorAuthorizations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
+        super(connectionContext, root, tokenProvider);
     }
 
     @Override
@@ -63,19 +61,31 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
 
     @Override
     public Mono<String> authorizationCodeGrantBrowser(AuthorizeByAuthorizationCodeGrantBrowserRequest request) {
-        return getNoAuth(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE))
+        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE),
+            outbound -> {
+                outbound.headers().remove(AUTHORIZATION);
+                return outbound;
+            })
             .map(inbound -> inbound.responseHeaders().get(LOCATION));
     }
 
     @Override
     public Mono<String> implicitGrantBrowser(AuthorizeByImplicitGrantBrowserRequest request) {
-        return getNoAuth(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.TOKEN))
+        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.TOKEN),
+            outbound -> {
+                outbound.headers().remove(AUTHORIZATION);
+                return outbound;
+            })
             .map(inbound -> inbound.responseHeaders().get(LOCATION));
     }
 
     @Override
     public Mono<String> openIdWithAuthorizationCodeGrant(AuthorizeByOpenIdWithAuthorizationCodeGrantRequest request) {
-        return getNoAuth(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.ID_TOKEN_CODE))
+        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.ID_TOKEN_CODE),
+            outbound -> {
+                outbound.headers().remove(AUTHORIZATION);
+                return outbound;
+            })
             .map(inbound -> inbound.responseHeaders().get(LOCATION));
     }
 

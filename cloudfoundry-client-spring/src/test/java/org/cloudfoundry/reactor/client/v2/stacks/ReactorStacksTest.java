@@ -36,7 +36,7 @@ public final class ReactorStacksTest {
 
     public static final class Get extends AbstractClientApiTest<GetStackRequest, GetStackResponse> {
 
-        private final ReactorStacks stacks = new ReactorStacks(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorStacks stacks = new ReactorStacks(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -82,7 +82,7 @@ public final class ReactorStacksTest {
 
     public static final class List extends AbstractClientApiTest<ListStacksRequest, ListStacksResponse> {
 
-        private final ReactorStacks stacks = new ReactorStacks(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorStacks stacks = new ReactorStacks(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {

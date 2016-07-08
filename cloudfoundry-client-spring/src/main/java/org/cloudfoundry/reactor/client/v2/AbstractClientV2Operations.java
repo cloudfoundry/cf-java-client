@@ -16,15 +16,14 @@
 
 package org.cloudfoundry.reactor.client.v2;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.cloudfoundry.reactor.ConnectionContext;
+import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.CloudFoundryExceptionBuilder;
 import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
-import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.reactor.util.MultipartHttpClientRequest;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.io.netty.http.HttpClient;
 import reactor.io.netty.http.HttpClientRequest;
 import reactor.io.netty.http.HttpClientResponse;
 import reactor.io.netty.http.HttpException;
@@ -33,11 +32,11 @@ import java.util.function.Function;
 
 public abstract class AbstractClientV2Operations extends AbstractReactorOperations {
 
-    private final ObjectMapper objectMapper;
+    private final ConnectionContext connectionContext;
 
-    protected AbstractClientV2Operations(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
-        super(authorizationProvider, httpClient, objectMapper, root);
-        this.objectMapper = objectMapper;
+    protected AbstractClientV2Operations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
+        super(connectionContext, root, tokenProvider);
+        this.connectionContext = connectionContext;
     }
 
     protected final <T> Mono<T> delete(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
@@ -70,7 +69,7 @@ public abstract class AbstractClientV2Operations extends AbstractReactorOperatio
                                      Function<MultipartHttpClientRequest, Mono<Void>> requestTransformer) {
 
         return doPost(responseType, getUriAugmenter(request, uriTransformer),
-            outbound -> requestTransformer.apply(new MultipartHttpClientRequest(this.objectMapper, outbound)))
+            outbound -> requestTransformer.apply(new MultipartHttpClientRequest(this.connectionContext.getObjectMapper(), outbound)))
             .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
     }
 
@@ -83,7 +82,7 @@ public abstract class AbstractClientV2Operations extends AbstractReactorOperatio
                                     Function<MultipartHttpClientRequest, Mono<Void>> requestTransformer) {
 
         return doPut(responseType, getUriAugmenter(request, uriTransformer),
-            outbound -> requestTransformer.apply(new MultipartHttpClientRequest(this.objectMapper, outbound)))
+            outbound -> requestTransformer.apply(new MultipartHttpClientRequest(this.connectionContext.getObjectMapper(), outbound)))
             .otherwise(HttpException.class, CloudFoundryExceptionBuilder::build);
     }
 

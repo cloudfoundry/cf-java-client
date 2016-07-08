@@ -57,7 +57,7 @@ public final class ReactorRoutesTest {
 
     public static final class AssociateApplication extends AbstractClientApiTest<AssociateRouteApplicationRequest, AssociateRouteApplicationResponse> {
 
-        private final ReactorRoutes routes = new ReactorRoutes(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorRoutes routes = new ReactorRoutes(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -111,7 +111,7 @@ public final class ReactorRoutesTest {
 
     public static final class Create extends AbstractClientApiTest<CreateRouteRequest, CreateRouteResponse> {
 
-        private final ReactorRoutes routes = new ReactorRoutes(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorRoutes routes = new ReactorRoutes(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -167,7 +167,7 @@ public final class ReactorRoutesTest {
 
     public static final class Delete extends AbstractClientApiTest<DeleteRouteRequest, DeleteRouteResponse> {
 
-        private final ReactorRoutes routes = new ReactorRoutes(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorRoutes routes = new ReactorRoutes(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -202,7 +202,7 @@ public final class ReactorRoutesTest {
 
     public static final class DeleteAsync extends AbstractClientApiTest<DeleteRouteRequest, DeleteRouteResponse> {
 
-        private final ReactorRoutes routes = new ReactorRoutes(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorRoutes routes = new ReactorRoutes(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -249,7 +249,7 @@ public final class ReactorRoutesTest {
 
     public static final class Exists extends AbstractClientApiTest<RouteExistsRequest, Boolean> {
 
-        private final ReactorRoutes routes = new ReactorRoutes(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorRoutes routes = new ReactorRoutes(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -285,7 +285,7 @@ public final class ReactorRoutesTest {
 
     public static final class Get extends AbstractClientApiTest<GetRouteRequest, GetRouteResponse> {
 
-        private final ReactorRoutes routes = new ReactorRoutes(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorRoutes routes = new ReactorRoutes(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -340,7 +340,7 @@ public final class ReactorRoutesTest {
 
     public static final class List extends AbstractClientApiTest<ListRoutesRequest, ListRoutesResponse> {
 
-        private final ReactorRoutes routes = new ReactorRoutes(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorRoutes routes = new ReactorRoutes(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -399,7 +399,7 @@ public final class ReactorRoutesTest {
 
     public static final class ListApplications extends AbstractClientApiTest<ListRouteApplicationsRequest, ListRouteApplicationsResponse> {
 
-        private final ReactorRoutes routes = new ReactorRoutes(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorRoutes routes = new ReactorRoutes(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -473,7 +473,7 @@ public final class ReactorRoutesTest {
 
     public static final class RemoveApplication extends AbstractClientApiTest<RemoveRouteApplicationRequest, Void> {
 
-        private final ReactorRoutes routes = new ReactorRoutes(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorRoutes routes = new ReactorRoutes(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -509,7 +509,7 @@ public final class ReactorRoutesTest {
 
     public static final class Update extends AbstractClientApiTest<UpdateRouteRequest, UpdateRouteResponse> {
 
-        private final ReactorRoutes routes = new ReactorRoutes(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorRoutes routes = new ReactorRoutes(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {

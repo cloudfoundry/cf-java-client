@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.reactor.client.v2.domains;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v2.domains.CreateDomainResponse;
 import org.cloudfoundry.client.v2.domains.DeleteDomainRequest;
@@ -28,10 +27,10 @@ import org.cloudfoundry.client.v2.domains.ListDomainSpacesRequest;
 import org.cloudfoundry.client.v2.domains.ListDomainSpacesResponse;
 import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v2.domains.ListDomainsResponse;
+import org.cloudfoundry.reactor.ConnectionContext;
+import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
-import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
-import reactor.io.netty.http.HttpClient;
 
 /**
  * The Reactor-based implementation of {@link Domains}
@@ -41,13 +40,12 @@ public final class ReactorDomains extends AbstractClientV2Operations implements 
     /**
      * Creates an instance
      *
-     * @param authorizationProvider the {@link AuthorizationProvider} to use when communicating with the server
-     * @param httpClient            the {@link HttpClient} to use when communicating with the server
-     * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
-     * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
+     * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
+     * @param root              the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
+     * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      */
-    public ReactorDomains(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
-        super(authorizationProvider, httpClient, objectMapper, root);
+    public ReactorDomains(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
+        super(connectionContext, root, tokenProvider);
     }
 
     @Override

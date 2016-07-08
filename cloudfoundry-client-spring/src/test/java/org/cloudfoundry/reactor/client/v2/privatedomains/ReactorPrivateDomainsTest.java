@@ -45,7 +45,7 @@ public final class ReactorPrivateDomainsTest {
 
     public static final class Create extends AbstractClientApiTest<CreatePrivateDomainRequest, CreatePrivateDomainResponse> {
 
-        private final ReactorPrivateDomains privateDomains = new ReactorPrivateDomains(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorPrivateDomains privateDomains = new ReactorPrivateDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -94,7 +94,7 @@ public final class ReactorPrivateDomainsTest {
 
     public static final class Delete extends AbstractClientApiTest<DeletePrivateDomainRequest, DeletePrivateDomainResponse> {
 
-        private final ReactorPrivateDomains privateDomains = new ReactorPrivateDomains(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorPrivateDomains privateDomains = new ReactorPrivateDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -129,7 +129,7 @@ public final class ReactorPrivateDomainsTest {
 
     public static final class DeleteAsync extends AbstractClientApiTest<DeletePrivateDomainRequest, DeletePrivateDomainResponse> {
 
-        private final ReactorPrivateDomains privateDomains = new ReactorPrivateDomains(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorPrivateDomains privateDomains = new ReactorPrivateDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -176,7 +176,7 @@ public final class ReactorPrivateDomainsTest {
 
     public static final class Get extends AbstractClientApiTest<GetPrivateDomainRequest, GetPrivateDomainResponse> {
 
-        private final ReactorPrivateDomains privateDomains = new ReactorPrivateDomains(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorPrivateDomains privateDomains = new ReactorPrivateDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -224,7 +224,7 @@ public final class ReactorPrivateDomainsTest {
 
     public static final class List extends AbstractClientApiTest<ListPrivateDomainsRequest, ListPrivateDomainsResponse> {
 
-        private final ReactorPrivateDomains privateDomains = new ReactorPrivateDomains(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorPrivateDomains privateDomains = new ReactorPrivateDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {

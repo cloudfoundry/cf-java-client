@@ -68,7 +68,7 @@ public final class ReactorPackagesTest {
 
     public static final class Copy extends AbstractClientApiTest<CopyPackageRequest, CopyPackageResponse> {
 
-        private final ReactorPackages packages = new ReactorPackages(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorPackages packages = new ReactorPackages(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -123,7 +123,7 @@ public final class ReactorPackagesTest {
 
     public static final class Create extends AbstractClientApiTest<CreatePackageRequest, CreatePackageResponse> {
 
-        private final ReactorPackages packages = new ReactorPackages(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorPackages packages = new ReactorPackages(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -182,7 +182,7 @@ public final class ReactorPackagesTest {
 
     public static final class Delete extends AbstractClientApiTest<DeletePackageRequest, Void> {
 
-        private final ReactorPackages packages = new ReactorPackages(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorPackages packages = new ReactorPackages(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -217,7 +217,7 @@ public final class ReactorPackagesTest {
 
     public static final class Download extends AbstractClientApiTest<DownloadPackageRequest, byte[]> {
 
-        private final ReactorPackages packages = new ReactorPackages(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorPackages packages = new ReactorPackages(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected void assertions(TestSubscriber<byte[]> testSubscriber, Publisher<byte[]> expected) {
@@ -260,7 +260,7 @@ public final class ReactorPackagesTest {
 
     public static final class Get extends AbstractClientApiTest<GetPackageRequest, GetPackageResponse> {
 
-        private final ReactorPackages packages = new ReactorPackages(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorPackages packages = new ReactorPackages(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -324,7 +324,7 @@ public final class ReactorPackagesTest {
 
     public static final class List extends AbstractClientApiTest<ListPackagesRequest, ListPackagesResponse> {
 
-        private final ReactorPackages packages = new ReactorPackages(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorPackages packages = new ReactorPackages(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -420,7 +420,7 @@ public final class ReactorPackagesTest {
 
     public static final class Stage extends AbstractClientApiTest<StagePackageRequest, StagePackageResponse> {
 
-        private final ReactorPackages packages = new ReactorPackages(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorPackages packages = new ReactorPackages(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -511,7 +511,7 @@ public final class ReactorPackagesTest {
 
     public static final class Upload extends AbstractClientApiTest<UploadPackageRequest, UploadPackageResponse> {
 
-        private final ReactorPackages packages = new ReactorPackages(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorPackages packages = new ReactorPackages(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {

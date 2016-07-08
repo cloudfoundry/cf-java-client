@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.util.network;
+package org.cloudfoundry.reactor;
 
 import reactor.core.publisher.Mono;
 
-public final class StubOAuth2TokenProvider implements OAuth2TokenProvider {
+/**
+ * A provider that adds the {@code Authorization} header to requests
+ */
+public interface TokenProvider {
 
-    private final Mono<String> token;
-
-    public StubOAuth2TokenProvider(String token) {
-        this.token = Mono.just(token);
-    }
-
-    @Override
-    public Mono<String> getToken() {
-        return this.token;
-    }
+    /**
+     * Provides an OAuth token to be used by requests
+     *
+     * @return an OAuth token
+     */
+    Mono<String> getToken(ConnectionContext connectionContext);
 
 }

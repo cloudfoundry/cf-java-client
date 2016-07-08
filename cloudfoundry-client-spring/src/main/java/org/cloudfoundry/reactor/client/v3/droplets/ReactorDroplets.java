@@ -16,17 +16,16 @@
 
 package org.cloudfoundry.reactor.client.v3.droplets;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v3.droplets.DeleteDropletRequest;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.droplets.GetDropletRequest;
 import org.cloudfoundry.client.v3.droplets.GetDropletResponse;
 import org.cloudfoundry.client.v3.droplets.ListDropletsRequest;
 import org.cloudfoundry.client.v3.droplets.ListDropletsResponse;
+import org.cloudfoundry.reactor.ConnectionContext;
+import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
-import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
-import reactor.io.netty.http.HttpClient;
 
 /**
  * The Reactor-based implementation of {@link Droplets}
@@ -36,13 +35,12 @@ public final class ReactorDroplets extends AbstractClientV3Operations implements
     /**
      * Creates an instance
      *
-     * @param authorizationProvider the {@link AuthorizationProvider} to use when communicating with the server
-     * @param httpClient            the {@link HttpClient} to use when communicating with the server
-     * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
-     * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
+     * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
+     * @param root              the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
+     * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      */
-    public ReactorDroplets(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
-        super(authorizationProvider, httpClient, objectMapper, root);
+    public ReactorDroplets(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
+        super(connectionContext, root, tokenProvider);
     }
 
     @Override

@@ -14,12 +14,36 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.util.network;
+package org.cloudfoundry.reactor;
 
-import reactor.core.publisher.Mono;
+import org.immutables.value.Value;
 
-public interface OAuth2TokenProvider {
+import java.util.Optional;
 
-    Mono<String> getToken();
+/**
+ * Proxy configuration
+ */
+@Value.Immutable
+abstract class _ProxyConfiguration {
+
+    /**
+     * The proxy host
+     */
+    abstract String getHost();
+
+    /**
+     * The proxy password
+     */
+    abstract Optional<String> getPassword();
+
+    /**
+     * The proxy port
+     */
+    abstract Optional<Integer> getPort();
+
+    /**
+     * The proxy username
+     */
+    abstract Optional<String> getUsername();
 
 }

@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.reactor.client.v2.servicebindings;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingRequest;
@@ -26,10 +25,10 @@ import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.ListServiceBindingsRequest;
 import org.cloudfoundry.client.v2.servicebindings.ListServiceBindingsResponse;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingsV2;
+import org.cloudfoundry.reactor.ConnectionContext;
+import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
-import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
-import reactor.io.netty.http.HttpClient;
 
 /**
  * The Reactor-based implementation of {@link ServiceBindingsV2}
@@ -39,13 +38,12 @@ public final class ReactorServiceBindingsV2 extends AbstractClientV2Operations i
     /**
      * Creates an instance
      *
-     * @param authorizationProvider the {@link AuthorizationProvider} to use when communicating with the server
-     * @param httpClient            the {@link HttpClient} to use when communicating with the server
-     * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
-     * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
+     * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
+     * @param root              the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
+     * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      */
-    public ReactorServiceBindingsV2(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
-        super(authorizationProvider, httpClient, objectMapper, root);
+    public ReactorServiceBindingsV2(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
+        super(connectionContext, root, tokenProvider);
     }
 
     @Override

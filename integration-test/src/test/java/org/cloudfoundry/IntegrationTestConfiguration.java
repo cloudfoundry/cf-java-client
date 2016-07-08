@@ -26,11 +26,15 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.doppler.DopplerClient;
-import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
+import org.cloudfoundry.reactor.ConnectionContext;
+import org.cloudfoundry.reactor.DefaultConnectionContext;
+import org.cloudfoundry.reactor.ProxyConfiguration;
+import org.cloudfoundry.reactor.TokenProvider;
+import org.cloudfoundry.reactor.client.ReactorCloudFoundryClient;
 import org.cloudfoundry.reactor.doppler.ReactorDopplerClient;
+import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.cloudfoundry.reactor.uaa.ReactorUaaClient;
-import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.users.User;
 import org.cloudfoundry.util.PaginationUtils;
@@ -38,7 +42,6 @@ import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.test.FailingDeserializationProblemHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -61,50 +64,29 @@ public class IntegrationTestConfiguration {
 
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.test");
 
-    @Bean
-    // Required for TokensTest uaa integration test
-    String testClientId(@Value("${test.client.id:}") String testClientId) {
-        return testClientId;
-    }
-
-    @Bean
-    // Required for TokensTest uaa integration test
-    String testClientSecret(@Value("${test.client.secret:}") String testClientSecret) {
-        return testClientSecret;
-    }
-
     @Bean(initMethod = "clean", destroyMethod = "clean")
-    CloudFoundryCleaner cloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, UaaClient uaaClient, Mono<List<String>> protectedBuildpackIds, Mono<Optional<String>> protectedDomainId,
-                                            Mono<List<String>> protectedFeatureFlags, Mono<Optional<String>> protectedOrganizationId, Mono<List<String>> protectedSpaceIds,
-                                            @Qualifier("protectedUserIds") Mono<List<String>> protectedUserIds) {
+    CloudFoundryCleaner cloudFoundryCleaner(CloudFoundryClient cloudFoundryClient,
+                                            UaaClient uaaClient,
+                                            Mono<List<String>> protectedBuildpackIds,
+                                            Mono<Optional<String>> protectedDomainId,
+                                            Mono<List<String>> protectedFeatureFlags,
+                                            Mono<Optional<String>> protectedOrganizationId,
+                                            Mono<List<String>> protectedSpaceIds,
+                                            Mono<List<String>> protectedUserIds) {
+
         return new CloudFoundryCleaner(cloudFoundryClient, uaaClient, protectedBuildpackIds, protectedDomainId, protectedFeatureFlags, protectedOrganizationId, protectedSpaceIds, protectedUserIds);
     }
 
-    @Bean
-    SpringCloudFoundryClient cloudFoundryClient(@Value("${test.host}") String host,
-                                                @Value("${test.username}") String username,
-                                                @Value("${test.password}") String password,
-                                                @Value("${test.skipSslValidation:false}") Boolean skipSslValidation,
-                                                @Value("${test.proxyHost:}") String proxyHost,
-                                                @Value("${test.proxyPassword:}") String proxyPassword,
-                                                @Value("${test.proxyPort:}") Integer proxyPort,
-                                                @Value("${test.proxyUsername:}") String proxyUsername) {
-        
-        return SpringCloudFoundryClient.builder()
-            .host(host)
-            .username(username)
-            .password(password)
-            .skipSslValidation(skipSslValidation)
-            .proxyHost(proxyHost)
-            .proxyPassword(proxyPassword)
-            .proxyPort(proxyPort)
-            .proxyUsername(proxyUsername)
-            .problemHandler(new FailingDeserializationProblemHandler())  // Test-only problem handler
+    @Bean(initMethod = "checkCompatibility")
+    ReactorCloudFoundryClient cloudFoundryClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
+        return ReactorCloudFoundryClient.builder()
+            .connectionContext(connectionContext)
+            .tokenProvider(tokenProvider)
             .build();
     }
 
     @Bean
-    CloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient, DopplerClient dopplerClient, UaaClient uaaClient, String organizationName, String spaceName) {
+    DefaultCloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient, DopplerClient dopplerClient, UaaClient uaaClient, String organizationName, String spaceName) {
         return DefaultCloudFoundryOperations.builder()
             .cloudFoundryClient(cloudFoundryClient)
             .dopplerClient(dopplerClient)
@@ -115,9 +97,31 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    DopplerClient loggingClient(SpringCloudFoundryClient cloudFoundryClient) {
+    DefaultConnectionContext connectionContext(@Value("${test.apiHost}") String apiHost,
+                                               @Value("${test.proxy.host:}") String proxyHost,
+                                               @Value("${test.proxy.password:}") String proxyPassword,
+                                               @Value("${test.proxy.port:8080}") Integer proxyPort,
+                                               @Value("${test.proxy.username:}") String proxyUsername,
+                                               @Value("${test.skipSslValidation:false}") Boolean skipSslValidation) {
+
+        return DefaultConnectionContext.builder()
+            .apiHost(apiHost)
+            .problemHandler(new FailingDeserializationProblemHandler())  // Test-only problem handler
+            .proxyConfiguration(ProxyConfiguration.builder()
+                .host(proxyHost)
+                .password(proxyPassword)
+                .port(proxyPort)
+                .username(proxyUsername)
+                .build())
+            .skipSslValidation(skipSslValidation)
+            .build();
+    }
+
+    @Bean
+    DopplerClient dopplerClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
         return ReactorDopplerClient.builder()
-            .cloudFoundryClient(cloudFoundryClient)
+            .connectionContext(connectionContext)
+            .tokenProvider(tokenProvider)
             .build();
     }
 
@@ -227,7 +231,6 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean(initMethod = "block")
-    @Qualifier("protectedUserIds")
     Mono<List<String>> protectedUserIds(UaaClient uaaClient, @Value("${test.protected.users}") String[] protectedUsers) {
         List<String> protectedUserList = Arrays.asList(protectedUsers);
 
@@ -293,10 +296,42 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    ReactorUaaClient uaaClient(SpringCloudFoundryClient cloudFoundryClient) {
-        return ReactorUaaClient.builder()
-            .cloudFoundryClient(cloudFoundryClient)
+    PasswordGrantTokenProvider tokenProvider(@Value("${test.username}") String username,
+                                             @Value("${test.password}") String password) {
+
+        return PasswordGrantTokenProvider.builder()
+            .password(password)
+            .username(username)
             .build();
+    }
+
+    @Bean
+    ReactorUaaClient uaaClient(ConnectionContext connectionContext,
+                               @Value("${test.username}") String username,
+                               @Value("${test.password}") String password,
+                               String uaaClientId,
+                               String uaaClientSecret) {
+
+        return ReactorUaaClient.builder()
+            .connectionContext(connectionContext)
+            .tokenProvider(PasswordGrantTokenProvider.builder()
+// TODO: Use a better client id and secret
+//                .clientId(uaaClientId)
+//                .clientSecret(uaaClientSecret)
+                .password(password)
+                .username(username)
+                .build())
+            .build();
+    }
+
+    @Bean
+    String uaaClientId(@Value("${test.uaa.clientId:}") String testClientId) {
+        return testClientId;
+    }
+
+    @Bean
+    String uaaClientSecret(@Value("${test.uaa.clientSecret:}") String testClientSecret) {
+        return testClientSecret;
     }
 
     @Bean(initMethod = "block")

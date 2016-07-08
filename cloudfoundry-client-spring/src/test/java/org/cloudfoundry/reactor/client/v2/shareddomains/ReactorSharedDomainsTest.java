@@ -37,7 +37,7 @@ public final class ReactorSharedDomainsTest {
 
     public static final class Create extends AbstractClientApiTest<CreateSharedDomainRequest, CreateSharedDomainResponse> {
 
-        private final ReactorSharedDomains sharedDomains = new ReactorSharedDomains(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSharedDomains sharedDomains = new ReactorSharedDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -86,7 +86,7 @@ public final class ReactorSharedDomainsTest {
 
     public static final class ListSharedDomains extends AbstractClientApiTest<ListSharedDomainsRequest, ListSharedDomainsResponse> {
 
-        private final ReactorSharedDomains sharedDomains = new ReactorSharedDomains(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSharedDomains sharedDomains = new ReactorSharedDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {

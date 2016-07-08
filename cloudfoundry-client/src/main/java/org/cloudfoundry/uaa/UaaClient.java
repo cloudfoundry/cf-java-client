@@ -22,6 +22,7 @@ import org.cloudfoundry.uaa.identityproviders.IdentityProviders;
 import org.cloudfoundry.uaa.identityzones.IdentityZones;
 import org.cloudfoundry.uaa.tokens.Tokens;
 import org.cloudfoundry.uaa.users.Users;
+import reactor.core.publisher.Mono;
 
 /**
  * Main entry point to the UAA Client API
@@ -39,6 +40,13 @@ public interface UaaClient {
      * @return the UAA Authorizations Client API
      */
     Authorizations authorizations();
+
+    /**
+     * Returns the username of the current user
+     *
+     * @return the username of the current user
+     */
+    Mono<String> getUsername();
 
     /**
      * Main entry point to the UAA Group Client API

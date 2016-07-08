@@ -16,17 +16,16 @@
 
 package org.cloudfoundry.reactor.client.v2.applicationusageevents;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEvents;
 import org.cloudfoundry.client.v2.applicationusageevents.GetApplicationUsageEventRequest;
 import org.cloudfoundry.client.v2.applicationusageevents.GetApplicationUsageEventResponse;
 import org.cloudfoundry.client.v2.applicationusageevents.ListApplicationUsageEventsRequest;
 import org.cloudfoundry.client.v2.applicationusageevents.ListApplicationUsageEventsResponse;
 import org.cloudfoundry.client.v2.applicationusageevents.PurgeAndReseedApplicationUsageEventsRequest;
+import org.cloudfoundry.reactor.ConnectionContext;
+import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
-import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
-import reactor.io.netty.http.HttpClient;
 
 /**
  * The Reactor-based implementation of {@link ApplicationUsageEvents}
@@ -36,13 +35,12 @@ public final class ReactorApplicationUsageEvents extends AbstractClientV2Operati
     /**
      * Creates an instance
      *
-     * @param authorizationProvider the {@link AuthorizationProvider} to use when communicating with the server
-     * @param httpClient            the {@link HttpClient} to use when communicating with the server
-     * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
-     * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
+     * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
+     * @param root              the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
+     * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      */
-    public ReactorApplicationUsageEvents(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
-        super(authorizationProvider, httpClient, objectMapper, root);
+    public ReactorApplicationUsageEvents(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
+        super(connectionContext, root, tokenProvider);
     }
 
     @Override

@@ -22,7 +22,6 @@ import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
-import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.util.test.FailingDeserializationProblemHandler;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -34,17 +33,16 @@ import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractRestTest {
 
-    protected static final AuthorizationProvider AUTHORIZATION_PROVIDER = outbound -> {
-        outbound.addHeader("Authorization", "test-authorization");
-        return Mono.just(outbound);
-    };
+    protected static final ConnectionContext CONNECTION_CONTEXT = DefaultConnectionContext.builder()
+        .apiHost("localhost")
+        .httpClient(HttpClient.create())
+        .objectMapper(new ObjectMapper()
+            .addHandler(new FailingDeserializationProblemHandler())
+            .registerModule(new Jdk8Module())
+            .setSerializationInclusion(NON_NULL))
+        .build();
 
-    protected static final HttpClient HTTP_CLIENT = HttpClient.create();
-
-    protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
-        .addHandler(new FailingDeserializationProblemHandler())
-        .registerModule(new Jdk8Module())
-        .setSerializationInclusion(NON_NULL);
+    protected static final TokenProvider TOKEN_PROVIDER = connectionContext -> Mono.just("test-authorization");
 
     static {
         SLF4JBridgeHandler.removeHandlersForRootLogger();

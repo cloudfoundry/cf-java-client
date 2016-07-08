@@ -35,7 +35,7 @@ public final class ReactorAuthorizationsTest {
 
     public static final class AuthorizeByAuthorizationCodeGrantApi extends AbstractUaaApiTest<AuthorizeByAuthorizationCodeGrantApiRequest, String> {
 
-        private final ReactorAuthorizations authorizations = new ReactorAuthorizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorAuthorizations authorizations = new ReactorAuthorizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -72,7 +72,7 @@ public final class ReactorAuthorizationsTest {
 
     public static final class AuthorizeByAuthorizationCodeGrantBrowser extends AbstractUaaApiTest<AuthorizeByAuthorizationCodeGrantBrowserRequest, String> {
 
-        private final ReactorAuthorizations authorizations = new ReactorAuthorizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorAuthorizations authorizations = new ReactorAuthorizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -110,7 +110,7 @@ public final class ReactorAuthorizationsTest {
 
     public static final class AuthorizeByImplicitGrantBrowser extends AbstractUaaApiTest<AuthorizeByImplicitGrantBrowserRequest, String> {
 
-        private final ReactorAuthorizations authorizations = new ReactorAuthorizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorAuthorizations authorizations = new ReactorAuthorizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -153,7 +153,7 @@ public final class ReactorAuthorizationsTest {
 
     public static final class AuthorizeByOpenIdWithAuthorizationCodeGrant extends AbstractUaaApiTest<AuthorizeByOpenIdWithAuthorizationCodeGrantRequest, String> {
 
-        private final ReactorAuthorizations authorizations = new ReactorAuthorizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorAuthorizations authorizations = new ReactorAuthorizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -190,7 +190,7 @@ public final class ReactorAuthorizationsTest {
 
     public static final class AuthorizeByOpenIdWithToken extends AbstractUaaApiTest<AuthorizeByOpenIdWithIdTokenRequest, String> {
 
-        private final ReactorAuthorizations authorizations = new ReactorAuthorizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorAuthorizations authorizations = new ReactorAuthorizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -239,7 +239,7 @@ public final class ReactorAuthorizationsTest {
 
     public static final class AuthorizeByOpenIdWithimplicitGrant extends AbstractUaaApiTest<AuthorizeByOpenIdWithImplicitGrantRequest, String> {
 
-        private final ReactorAuthorizations authorizations = new ReactorAuthorizations(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorAuthorizations authorizations = new ReactorAuthorizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {

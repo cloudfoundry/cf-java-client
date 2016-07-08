@@ -17,48 +17,39 @@
 package org.cloudfoundry.reactor;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.Singular;
 import okhttp3.mockwebserver.MockResponse;
 import okio.Buffer;
+import org.immutables.value.Value;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
-@Data
-public final class TestResponse {
+@Value.Immutable
+abstract class _TestResponse {
 
-    private final Optional<String> contentType;
+    abstract Optional<String> getContentType();
 
-    private final Map<String, String> headers;
-
-    private final Optional<Buffer> payload;
-
-    private final HttpResponseStatus status;
-
-    @Builder
-    TestResponse(String contentType, @Singular Map<String, String> headers, String payload, @NonNull HttpResponseStatus status) {
-        this.contentType = Optional.ofNullable(contentType);
-        this.headers = headers;
-        this.payload = Optional.ofNullable(payload).map(TestResponse::getBuffer);
-        this.status = status;
-    }
+    abstract Map<String, String> getHeaders();
 
     MockResponse getMockResponse() {
-        MockResponse response = new MockResponse().setResponseCode(this.status.code());
+        MockResponse response = new MockResponse().setResponseCode(getStatus().code());
 
-        this.headers.forEach(response::addHeader);
+        getHeaders().forEach(response::addHeader);
 
-        this.payload.ifPresent(buffer -> response
-            .setHeader("Content-Type", this.contentType.orElse("application/json"))
-            .setBody(buffer));
+        getPayload()
+            .map(_TestResponse::getBuffer)
+            .ifPresent(buffer -> response
+                .setHeader("Content-Type", getContentType().orElse("application/json"))
+                .setBody(buffer));
 
         return response;
     }
+
+    abstract Optional<String> getPayload();
+
+    abstract HttpResponseStatus getStatus();
 
     private static Buffer getBuffer(String path) {
         try {

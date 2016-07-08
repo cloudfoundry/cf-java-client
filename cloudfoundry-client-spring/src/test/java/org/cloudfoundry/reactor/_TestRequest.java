@@ -16,15 +16,12 @@
 
 package org.cloudfoundry.reactor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.handler.codec.http.HttpMethod;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.Singular;
 import okhttp3.Headers;
 import okhttp3.mockwebserver.RecordedRequest;
 import okio.Buffer;
-import org.codehaus.jackson.map.ObjectMapper;
+import org.immutables.value.Value;
 import org.junit.Assert;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.tuple.Tuple;
@@ -37,46 +34,47 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Data
-public final class TestRequest {
+import static org.junit.Assert.assertNull;
+
+@Value.Immutable
+abstract class _TestRequest {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private static final Pattern PATH_PATTERN = Pattern.compile("[A-Z]+ (.*) [A-Z0-9\\./]+");
 
-    private final Optional<Consumer<Tuple2<Headers, Buffer>>> contents;
-
-    private final Map<String, String> headers;
-
-    private final HttpMethod method;
-
-    private final String path;
-
-    private final Optional<Buffer> payload;
-
-    @Builder
-    TestRequest(Consumer<Tuple2<Headers, Buffer>> contents, @Singular Map<String, String> headers, @NonNull HttpMethod method, @NonNull String path, String payload) {
-        this.contents = Optional.ofNullable(contents);
-        this.headers = headers;
-        this.method = method;
-        this.path = path;
-        this.payload = Optional.ofNullable(payload).map(TestRequest::getBuffer);
-    }
+    public static final String EMPTY_HEADER = "EMPTY-HEADER";
 
     public void assertEquals(RecordedRequest request) {
-        Assert.assertEquals(this.method.toString(), request.getMethod());
-        Assert.assertEquals(this.path, extractPath(request));
+        Assert.assertEquals(getMethod().toString(), request.getMethod());
+        Assert.assertEquals(getPath(), extractPath(request));
 
-        this.headers.forEach((key, value) -> Assert.assertEquals(value, request.getHeader(key)));
+        getHeaders().forEach((key, value) -> {
+            if (EMPTY_HEADER == value) {
+                assertNull(request.getHeader(key));
+            } else {
+                Assert.assertEquals(value, request.getHeader(key));
+            }
+        });
 
-        if (this.payload.isPresent()) {
-            assertBodyEquals(this.payload.get(), request.getBody());
-        } else if (this.contents.isPresent()) {
-            this.contents.get().accept(Tuple.of(request.getHeaders(), request.getBody()));
+        if (getPayload().isPresent()) {
+            assertBodyEquals(getPayload().map(_TestRequest::getBuffer).get(), request.getBody());
+        } else if (getContents().isPresent()) {
+            getContents().get().accept(Tuple.of(request.getHeaders(), request.getBody()));
         } else {
             Assert.assertEquals("Invalid request body: " + request.getBody().readUtf8(), 0, request.getBodySize());
         }
     }
+
+    abstract Optional<Consumer<Tuple2<Headers, Buffer>>> getContents();
+
+    abstract Map<String, String> getHeaders();
+
+    abstract HttpMethod getMethod();
+
+    abstract String getPath();
+
+    abstract Optional<String> getPayload();
 
     private static void assertBodyEquals(Buffer expectedBuffer, Buffer actualBuffer) {
         try {

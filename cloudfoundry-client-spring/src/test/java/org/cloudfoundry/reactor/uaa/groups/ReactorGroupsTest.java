@@ -71,7 +71,7 @@ public final class ReactorGroupsTest {
 
     public static final class AddMember extends AbstractUaaApiTest<AddMemberRequest, AddMemberResponse> {
 
-        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorGroups groups = new ReactorGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -114,7 +114,7 @@ public final class ReactorGroupsTest {
 
     public static final class CheckMember extends AbstractUaaApiTest<CheckMembershipRequest, CheckMembershipResponse> {
 
-        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorGroups groups = new ReactorGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -154,7 +154,7 @@ public final class ReactorGroupsTest {
 
     public static final class Create extends AbstractUaaApiTest<CreateGroupRequest, CreateGroupResponse> {
 
-        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorGroups groups = new ReactorGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -214,7 +214,7 @@ public final class ReactorGroupsTest {
 
     public static final class Delete extends AbstractUaaApiTest<DeleteGroupRequest, DeleteGroupResponse> {
 
-        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorGroups groups = new ReactorGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -267,7 +267,7 @@ public final class ReactorGroupsTest {
 
     public static final class Get extends AbstractUaaApiTest<GetGroupRequest, GetGroupResponse> {
 
-        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorGroups groups = new ReactorGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -318,7 +318,7 @@ public final class ReactorGroupsTest {
 
     public static final class List extends AbstractUaaApiTest<ListGroupsRequest, ListGroupsResponse> {
 
-        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorGroups groups = new ReactorGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -382,7 +382,7 @@ public final class ReactorGroupsTest {
 
     public static final class ListExternalGroupMappings extends AbstractUaaApiTest<ListExternalGroupMappingsRequest, ListExternalGroupMappingsResponse> {
 
-        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorGroups groups = new ReactorGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -437,7 +437,7 @@ public final class ReactorGroupsTest {
 
     public static final class ListMembers extends AbstractUaaApiTest<ListMembersRequest, ListMembersResponse> {
 
-        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorGroups groups = new ReactorGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -505,7 +505,7 @@ public final class ReactorGroupsTest {
 
     public static final class MapExternalGroup extends AbstractUaaApiTest<MapExternalGroupRequest, MapExternalGroupResponse> {
 
-        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorGroups groups = new ReactorGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -553,7 +553,7 @@ public final class ReactorGroupsTest {
 
     public static final class RemoveMember extends AbstractUaaApiTest<RemoveMemberRequest, RemoveMemberResponse> {
 
-        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorGroups groups = new ReactorGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -593,7 +593,7 @@ public final class ReactorGroupsTest {
 
     public static final class UnmapExternalGroupByGroupDisplayName extends AbstractUaaApiTest<UnmapExternalGroupByGroupDisplayNameRequest, UnmapExternalGroupByGroupDisplayNameResponse> {
 
-        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorGroups groups = new ReactorGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -641,7 +641,7 @@ public final class ReactorGroupsTest {
 
     public static final class UnmapExternalGroupByGroupId extends AbstractUaaApiTest<UnmapExternalGroupByGroupIdRequest, UnmapExternalGroupByGroupIdResponse> {
 
-        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorGroups groups = new ReactorGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -689,7 +689,7 @@ public final class ReactorGroupsTest {
 
     public static final class Update extends AbstractUaaApiTest<UpdateGroupRequest, UpdateGroupResponse> {
 
-        private final ReactorGroups groups = new ReactorGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorGroups groups = new ReactorGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {

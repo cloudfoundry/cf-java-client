@@ -51,7 +51,7 @@ public final class ReactorServicePlanVisibilitiesTest {
 
     public static final class Create extends AbstractClientApiTest<CreateServicePlanVisibilityRequest, CreateServicePlanVisibilityResponse> {
 
-        private final ServicePlanVisibilities servicePlanVisibilities = new ReactorServicePlanVisibilities(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ServicePlanVisibilities servicePlanVisibilities = new ReactorServicePlanVisibilities(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -100,7 +100,7 @@ public final class ReactorServicePlanVisibilitiesTest {
 
     public static final class Delete extends AbstractClientApiTest<DeleteServicePlanVisibilityRequest, DeleteServicePlanVisibilityResponse> {
 
-        private final ServicePlanVisibilities servicePlanVisibilities = new ReactorServicePlanVisibilities(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ServicePlanVisibilities servicePlanVisibilities = new ReactorServicePlanVisibilities(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -134,7 +134,7 @@ public final class ReactorServicePlanVisibilitiesTest {
 
     public static final class DeleteAsync extends AbstractClientApiTest<DeleteServicePlanVisibilityRequest, DeleteServicePlanVisibilityResponse> {
 
-        private final ServicePlanVisibilities servicePlanVisibilities = new ReactorServicePlanVisibilities(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ServicePlanVisibilities servicePlanVisibilities = new ReactorServicePlanVisibilities(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -180,7 +180,7 @@ public final class ReactorServicePlanVisibilitiesTest {
 
     public static final class Get extends AbstractClientApiTest<GetServicePlanVisibilityRequest, GetServicePlanVisibilityResponse> {
 
-        private final ServicePlanVisibilities servicePlanVisibilities = new ReactorServicePlanVisibilities(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ServicePlanVisibilities servicePlanVisibilities = new ReactorServicePlanVisibilities(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -227,7 +227,7 @@ public final class ReactorServicePlanVisibilitiesTest {
 
     public static final class List extends AbstractClientApiTest<ListServicePlanVisibilitiesRequest, ListServicePlanVisibilitiesResponse> {
 
-        private final ServicePlanVisibilities servicePlanVisibilities = new ReactorServicePlanVisibilities(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ServicePlanVisibilities servicePlanVisibilities = new ReactorServicePlanVisibilities(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -279,7 +279,7 @@ public final class ReactorServicePlanVisibilitiesTest {
 
     public static final class Update extends AbstractClientApiTest<UpdateServicePlanVisibilityRequest, UpdateServicePlanVisibilityResponse> {
 
-        private final ServicePlanVisibilities servicePlanVisibilities = new ReactorServicePlanVisibilities(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ServicePlanVisibilities servicePlanVisibilities = new ReactorServicePlanVisibilities(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {

@@ -55,7 +55,7 @@ public final class ReactorSecurityGroupsTest {
 
     public static final class Create extends AbstractClientApiTest<CreateSecurityGroupRequest, CreateSecurityGroupResponse> {
 
-        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -146,7 +146,7 @@ public final class ReactorSecurityGroupsTest {
 
     public static final class Delete extends AbstractClientApiTest<DeleteSecurityGroupRequest, DeleteSecurityGroupResponse> {
 
-        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -181,7 +181,7 @@ public final class ReactorSecurityGroupsTest {
 
     public static final class DeleteAsync extends AbstractClientApiTest<DeleteSecurityGroupRequest, DeleteSecurityGroupResponse> {
 
-        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -228,7 +228,7 @@ public final class ReactorSecurityGroupsTest {
 
     public static final class DeleteRunning extends AbstractClientApiTest<DeleteSecurityGroupRunningDefaultRequest, Void> {
 
-        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -263,7 +263,7 @@ public final class ReactorSecurityGroupsTest {
 
     public static final class DeleteStaging extends AbstractClientApiTest<DeleteSecurityGroupStagingDefaultRequest, Void> {
 
-        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -298,7 +298,7 @@ public final class ReactorSecurityGroupsTest {
 
     public static final class List extends AbstractClientApiTest<ListSecurityGroupsRequest, ListSecurityGroupsResponse> {
 
-        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -417,7 +417,7 @@ public final class ReactorSecurityGroupsTest {
 
     public static final class ListRunning extends AbstractClientApiTest<ListSecurityGroupRunningDefaultsRequest, ListSecurityGroupRunningDefaultsResponse> {
 
-        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -471,7 +471,7 @@ public final class ReactorSecurityGroupsTest {
 
     public static final class ListStaging extends AbstractClientApiTest<ListSecurityGroupStagingDefaultsRequest, ListSecurityGroupStagingDefaultsResponse> {
 
-        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -525,7 +525,7 @@ public final class ReactorSecurityGroupsTest {
 
     public static final class SetRunning extends AbstractClientApiTest<SetSecurityGroupRunningDefaultRequest, SetSecurityGroupRunningDefaultResponse> {
 
-        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -578,7 +578,7 @@ public final class ReactorSecurityGroupsTest {
 
     public static final class SetStaging extends AbstractClientApiTest<SetSecurityGroupStagingDefaultRequest, SetSecurityGroupStagingDefaultResponse> {
 
-        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {

@@ -22,11 +22,11 @@ import javax.net.ssl.ManagerFactoryParameters;
 import javax.net.ssl.TrustManager;
 import java.security.KeyStore;
 
-final class StaticTrustManagerFactory extends SimpleTrustManagerFactory {
+public final class StaticTrustManagerFactory extends SimpleTrustManagerFactory {
 
     private final TrustManager[] trustManagers;
 
-    StaticTrustManagerFactory(TrustManager... trustManager) {
+    public StaticTrustManagerFactory(TrustManager... trustManager) {
         this.trustManagers = trustManager;
     }
 

@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.spring.client;
+package org.cloudfoundry.reactor.client;
 
-import org.cloudfoundry.spring.AbstractRestTest;
+import org.cloudfoundry.reactor.AbstractRestTest;
 import org.junit.Test;
 
-import java.util.Collections;
-
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public final class SpringCloudFoundryClientTest extends AbstractRestTest {
+public final class ReactorCloudFoundryClientTest extends AbstractRestTest {
 
-    private final SpringCloudFoundryClient client = new SpringCloudFoundryClient("test-host", null, null, null, null, null, null, this.tokenProvider,
-        Collections.emptyList(), null, null);
+    private final ReactorCloudFoundryClient client = ReactorCloudFoundryClient.builder()
+        .connectionContext(CONNECTION_CONTEXT)
+        .root(this.root)
+        .tokenProvider(TOKEN_PROVIDER)
+        .build();
 
     @Test
     public void applicationUsageEvents() {
@@ -72,11 +72,6 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
     @Test
     public void featureFlags() {
         assertNotNull(this.client.featureFlags());
-    }
-
-    @Test
-    public void getAccessToken() {
-        assertEquals(this.tokenProvider.getToken(), this.client.getAccessToken());
     }
 
     @Test

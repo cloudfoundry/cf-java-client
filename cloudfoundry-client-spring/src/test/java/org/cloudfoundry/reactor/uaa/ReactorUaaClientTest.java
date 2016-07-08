@@ -23,7 +23,11 @@ import static org.junit.Assert.assertNotNull;
 
 public final class ReactorUaaClientTest extends AbstractRestTest {
 
-    private final ReactorUaaClient client = new ReactorUaaClient(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+    private final ReactorUaaClient client = ReactorUaaClient.builder()
+        .connectionContext(CONNECTION_CONTEXT)
+        .root(this.root)
+        .tokenProvider(TOKEN_PROVIDER)
+        .build();
 
     @Test
     public void authorizations() {

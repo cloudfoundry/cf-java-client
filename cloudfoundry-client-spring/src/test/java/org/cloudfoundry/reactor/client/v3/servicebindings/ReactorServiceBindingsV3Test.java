@@ -48,7 +48,7 @@ public final class ReactorServiceBindingsV3Test {
 
     public static final class Create extends AbstractClientApiTest<CreateServiceBindingRequest, CreateServiceBindingResponse> {
 
-        private final ReactorServiceBindingsV3 serviceBindings = new ReactorServiceBindingsV3(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceBindingsV3 serviceBindings = new ReactorServiceBindingsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -113,7 +113,7 @@ public final class ReactorServiceBindingsV3Test {
 
     public static final class Delete extends AbstractClientApiTest<DeleteServiceBindingRequest, Void> {
 
-        private final ReactorServiceBindingsV3 serviceBindings = new ReactorServiceBindingsV3(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceBindingsV3 serviceBindings = new ReactorServiceBindingsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -148,7 +148,7 @@ public final class ReactorServiceBindingsV3Test {
 
     public static final class Get extends AbstractClientApiTest<GetServiceBindingRequest, GetServiceBindingResponse> {
 
-        private final ReactorServiceBindingsV3 serviceBindings = new ReactorServiceBindingsV3(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceBindingsV3 serviceBindings = new ReactorServiceBindingsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -201,7 +201,7 @@ public final class ReactorServiceBindingsV3Test {
 
     public static final class List extends AbstractClientApiTest<ListServiceBindingsRequest, ListServiceBindingsResponse> {
 
-        private final ReactorServiceBindingsV3 serviceBindings = new ReactorServiceBindingsV3(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorServiceBindingsV3 serviceBindings = new ReactorServiceBindingsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {

@@ -16,9 +16,9 @@
 
 package org.cloudfoundry.reactor.uaa.identityzones;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.cloudfoundry.reactor.ConnectionContext;
+import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
-import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import org.cloudfoundry.uaa.identityzones.CreateIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzones.CreateIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzones.DeleteIdentityZoneRequest;
@@ -31,7 +31,6 @@ import org.cloudfoundry.uaa.identityzones.ListIdentityZonesResponse;
 import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneResponse;
 import reactor.core.publisher.Mono;
-import reactor.io.netty.http.HttpClient;
 
 /**
  * The Reactor-based implementation of {@link IdentityZones}
@@ -41,13 +40,12 @@ public final class ReactorIdentityZones extends AbstractUaaOperations implements
     /**
      * Creates an instance
      *
-     * @param authorizationProvider the {@link AuthorizationProvider} to use when communicating with the server
-     * @param httpClient            the {@link HttpClient} to use when communicating with the server
-     * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
-     * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
+     * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
+     * @param root              the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
+     * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      */
-    public ReactorIdentityZones(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
-        super(authorizationProvider, httpClient, objectMapper, root);
+    public ReactorIdentityZones(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
+        super(connectionContext, root, tokenProvider);
     }
 
     @Override

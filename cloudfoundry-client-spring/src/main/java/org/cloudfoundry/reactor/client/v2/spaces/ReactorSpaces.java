@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.reactor.client.v2.spaces;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorByUsernameResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
@@ -76,10 +75,10 @@ import org.cloudfoundry.client.v2.spaces.RemoveSpaceSecurityGroupRequest;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceResponse;
+import org.cloudfoundry.reactor.ConnectionContext;
+import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
-import org.cloudfoundry.reactor.util.AuthorizationProvider;
 import reactor.core.publisher.Mono;
-import reactor.io.netty.http.HttpClient;
 
 /**
  * The Reactor-based implementation of {@link Spaces}
@@ -89,13 +88,12 @@ public final class ReactorSpaces extends AbstractClientV2Operations implements S
     /**
      * Creates an instance
      *
-     * @param authorizationProvider the {@link AuthorizationProvider} to use when communicating with the server
-     * @param httpClient            the {@link HttpClient} to use when communicating with the server
-     * @param objectMapper          the {@link ObjectMapper} to use when communicating with the server
-     * @param root                  the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
+     * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
+     * @param root              the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
+     * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      */
-    public ReactorSpaces(AuthorizationProvider authorizationProvider, HttpClient httpClient, ObjectMapper objectMapper, Mono<String> root) {
-        super(authorizationProvider, httpClient, objectMapper, root);
+    public ReactorSpaces(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
+        super(connectionContext, root, tokenProvider);
     }
 
     @Override

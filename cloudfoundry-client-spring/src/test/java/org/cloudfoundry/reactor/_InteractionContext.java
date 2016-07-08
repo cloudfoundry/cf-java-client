@@ -16,36 +16,37 @@
 
 package org.cloudfoundry.reactor;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
+import org.immutables.value.Value;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.UNPROCESSABLE_ENTITY;
 
-@Data
-public final class InteractionContext {
+@Value.Immutable
+abstract class _InteractionContext {
 
     private static final TestResponse ERROR_RESPONSE = TestResponse.builder()
         .status(UNPROCESSABLE_ENTITY)
         .payload("fixtures/client/v2/error_response.json")
         .build();
 
-    private final TestRequest request;
-
-    private final TestResponse response;
-
+    @SuppressWarnings("immutables")
     private volatile boolean done = false;
 
-    @Builder(toBuilder = true)
-    InteractionContext(@NonNull TestRequest request, TestResponse response) {
-        this.request = request;
-        this.response = response;
-    }
-
     public InteractionContext getErrorResponse() {
-        return this.toBuilder()
+        return InteractionContext.builder().from(this)
             .response(ERROR_RESPONSE)
             .build();
+    }
+
+    abstract TestRequest getRequest();
+
+    abstract TestResponse getResponse();
+
+    final boolean isDone() {
+        return this.done;
+    }
+
+    final void setDone(boolean done) {
+        this.done = done;
     }
 
 }

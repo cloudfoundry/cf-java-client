@@ -22,7 +22,7 @@ import reactor.io.netty.http.HttpClientRequest;
 
 import java.util.Base64;
 
-final class BasicAuthorizationBuilder {
+public final class BasicAuthorizationBuilder {
 
     private static final AsciiString AUTHORIZATION = new AsciiString("Authorization");
 
@@ -30,7 +30,7 @@ final class BasicAuthorizationBuilder {
 
     private BasicAuthorizationBuilder(){}
 
-    static void augment(HttpClientRequest outbound, Object request) {
+    public static void augment(HttpClientRequest outbound, Object request) {
         if(request instanceof BasicAuthorized) {
             BasicAuthorized basicAuthorized = (BasicAuthorized)request;
             String encoded = Base64.getEncoder().encodeToString(new AsciiString(basicAuthorized.getClientId()).concat(":").concat(basicAuthorized.getClientSecret()).toByteArray());

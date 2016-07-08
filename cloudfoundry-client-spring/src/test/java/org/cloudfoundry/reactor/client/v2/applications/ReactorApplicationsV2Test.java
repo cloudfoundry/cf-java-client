@@ -97,7 +97,7 @@ public final class ReactorApplicationsV2Test {
 
     public static final class AssociateRoute extends AbstractClientApiTest<AssociateApplicationRouteRequest, AssociateApplicationRouteResponse> {
 
-        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -169,7 +169,7 @@ public final class ReactorApplicationsV2Test {
 
     public static final class Copy extends AbstractClientApiTest<CopyApplicationRequest, CopyApplicationResponse> {
 
-        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -216,7 +216,7 @@ public final class ReactorApplicationsV2Test {
 
     public static final class Create extends AbstractClientApiTest<CreateApplicationRequest, CreateApplicationResponse> {
 
-        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -290,7 +290,7 @@ public final class ReactorApplicationsV2Test {
 
     public static final class Delete extends AbstractClientApiTest<DeleteApplicationRequest, Void> {
 
-        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -325,7 +325,7 @@ public final class ReactorApplicationsV2Test {
 
     public static final class Download extends AbstractClientApiTest<DownloadApplicationRequest, byte[]> {
 
-        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected void assertions(TestSubscriber<byte[]> testSubscriber, Publisher<byte[]> expected) {
@@ -368,7 +368,7 @@ public final class ReactorApplicationsV2Test {
 
     public static final class DownloadDroplet extends AbstractClientApiTest<DownloadApplicationDropletRequest, byte[]> {
 
-        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected void assertions(TestSubscriber<byte[]> testSubscriber, Publisher<byte[]> expected) {
@@ -411,7 +411,7 @@ public final class ReactorApplicationsV2Test {
 
     public static final class Environment extends AbstractClientApiTest<ApplicationEnvironmentRequest, ApplicationEnvironmentResponse> {
 
-        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -469,7 +469,7 @@ public final class ReactorApplicationsV2Test {
 
     public static final class Get extends AbstractClientApiTest<GetApplicationRequest, GetApplicationResponse> {
 
-        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -538,7 +538,7 @@ public final class ReactorApplicationsV2Test {
 
     public static final class Instances extends AbstractClientApiTest<ApplicationInstancesRequest, ApplicationInstancesResponse> {
 
-        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -579,7 +579,7 @@ public final class ReactorApplicationsV2Test {
 
     public static final class List extends AbstractClientApiTest<ListApplicationsRequest, ListApplicationsResponse> {
 
-        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -722,7 +722,7 @@ public final class ReactorApplicationsV2Test {
 
     public static final class ListRoutes extends AbstractClientApiTest<ListApplicationRoutesRequest, ListApplicationRoutesResponse> {
 
-        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -780,7 +780,7 @@ public final class ReactorApplicationsV2Test {
 
     public static final class ListServiceBindings extends AbstractClientApiTest<ListApplicationServiceBindingsRequest, ListApplicationServiceBindingsResponse> {
 
-        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -837,7 +837,7 @@ public final class ReactorApplicationsV2Test {
 
     public static final class RemoveRoute extends AbstractClientApiTest<RemoveApplicationRouteRequest, Void> {
 
-        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -873,7 +873,7 @@ public final class ReactorApplicationsV2Test {
 
     public static final class RemoveServiceBinding extends AbstractClientApiTest<RemoveApplicationServiceBindingRequest, Void> {
 
-        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -908,7 +908,7 @@ public final class ReactorApplicationsV2Test {
 
     public static final class Restage extends AbstractClientApiTest<RestageApplicationRequest, RestageApplicationResponse> {
 
-        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -973,7 +973,7 @@ public final class ReactorApplicationsV2Test {
 
     public static final class Statistics extends AbstractClientApiTest<ApplicationStatisticsRequest, ApplicationStatisticsResponse> {
 
-        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1029,7 +1029,7 @@ public final class ReactorApplicationsV2Test {
 
     public static final class Summary extends AbstractClientApiTest<SummaryApplicationRequest, SummaryApplicationResponse> {
 
-        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1122,7 +1122,7 @@ public final class ReactorApplicationsV2Test {
 
     public static final class TerminateInstance extends AbstractClientApiTest<TerminateApplicationInstanceRequest, Void> {
 
-        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1158,7 +1158,7 @@ public final class ReactorApplicationsV2Test {
 
     public static final class Update extends AbstractClientApiTest<UpdateApplicationRequest, UpdateApplicationResponse> {
 
-        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -1232,7 +1232,7 @@ public final class ReactorApplicationsV2Test {
 
     public static final class Upload extends AbstractClientApiTest<UploadApplicationRequest, UploadApplicationResponse> {
 
-        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
