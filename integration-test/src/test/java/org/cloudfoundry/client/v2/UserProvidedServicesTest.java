@@ -109,7 +109,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
         this.spaceId
             .then(spaceId -> requestCreateUserProvidedServiceInstance(this.cloudFoundryClient, instanceName, spaceId))
             .flatMap(ignore -> PaginationUtils
-                .requestResources(page -> this.cloudFoundryClient.userProvidedServiceInstances()
+                .requestClientV2Resources(page -> this.cloudFoundryClient.userProvidedServiceInstances()
                     .list(ListUserProvidedServiceInstancesRequest.builder()
                         .name(instanceName)
                         .page(page)
@@ -140,7 +140,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                     Mono.just(applicationId),
                     Mono.just(instanceId),
                     PaginationUtils
-                        .requestResources(page -> this.cloudFoundryClient.userProvidedServiceInstances()
+                        .requestClientV2Resources(page -> this.cloudFoundryClient.userProvidedServiceInstances()
                             .listServiceBindings(ListUserProvidedServiceInstanceServiceBindingsRequest.builder()
                                 .applicationId(applicationId)
                                 .page(page)
@@ -215,7 +215,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
 
     private static Flux<UserProvidedServiceInstanceResource> requestListUserProvidedServiceInstances(CloudFoundryClient cloudFoundryClient, String instanceName) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.userProvidedServiceInstances()
+            .requestClientV2Resources(page -> cloudFoundryClient.userProvidedServiceInstances()
                 .list(ListUserProvidedServiceInstancesRequest.builder()
                     .name(instanceName)
                     .page(page)

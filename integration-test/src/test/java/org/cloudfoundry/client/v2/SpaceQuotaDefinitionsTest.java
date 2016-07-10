@@ -53,7 +53,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
     @Test
     public void list() {
         PaginationUtils
-            .requestResources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
+            .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
                 .list(ListSpaceQuotaDefinitionsRequest.builder()
                     .page(page)
                     .build()))

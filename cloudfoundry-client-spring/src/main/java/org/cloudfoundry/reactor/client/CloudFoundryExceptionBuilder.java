@@ -18,7 +18,6 @@ package org.cloudfoundry.reactor.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v2.CloudFoundryException;
-import org.springframework.web.client.HttpStatusCodeException;
 import reactor.core.publisher.Mono;
 import reactor.core.util.Exceptions;
 import reactor.io.netty.http.HttpException;
@@ -31,26 +30,6 @@ public final class CloudFoundryExceptionBuilder {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private CloudFoundryExceptionBuilder() {
-    }
-
-    /**
-     * Build a {@link CloudFoundryException} from an {@link HttpStatusCodeException}
-     *
-     * @param cause the cause
-     * @return a properly configured {@link CloudFoundryException}
-     */
-    @SuppressWarnings("unchecked")
-    public static CloudFoundryException build(HttpStatusCodeException cause) {  // TODO: Remove once Reactor migration complete
-        try {
-            Map<String, ?> response = OBJECT_MAPPER.readValue(cause.getResponseBodyAsString(), Map.class);
-            Integer code = (Integer) response.get("code");
-            String description = (String) response.get("description");
-            String errorCode = (String) response.get("error_code");
-
-            return new CloudFoundryException(code, description, errorCode, cause);
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
-        }
     }
 
     /**

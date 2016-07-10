@@ -145,7 +145,7 @@ public final class DefaultDomains implements Domains {
 
     private static Flux<PrivateDomainResource> requestListPrivateDomains(CloudFoundryClient cloudFoundryClient, String domain) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.privateDomains()
+            .requestClientV2Resources(page -> cloudFoundryClient.privateDomains()
                 .list(ListPrivateDomainsRequest.builder()
                     .name(domain)
                     .page(page)
@@ -154,7 +154,7 @@ public final class DefaultDomains implements Domains {
 
     private static Flux<PrivateDomainResource> requestListPrivateDomains(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.privateDomains()
+            .requestClientV2Resources(page -> cloudFoundryClient.privateDomains()
                 .list(ListPrivateDomainsRequest.builder()
                     .page(page)
                     .build()));
@@ -162,7 +162,7 @@ public final class DefaultDomains implements Domains {
 
     private static Flux<SharedDomainResource> requestListSharedDomains(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.sharedDomains()
+            .requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
                 .list(ListSharedDomainsRequest.builder()
                     .page(page)
                     .build()));
@@ -170,7 +170,7 @@ public final class DefaultDomains implements Domains {
 
     private static Flux<OrganizationResource> requestOrganizations(CloudFoundryClient cloudFoundryClient, String organization) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizations().list(
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations().list(
                 ListOrganizationsRequest.builder()
                     .name(organization)
                     .page(page)

@@ -16,15 +16,14 @@
 
 package org.cloudfoundry.util;
 
-import org.cloudfoundry.client.v2.PaginatedResponse;
-import org.cloudfoundry.client.v2.Resource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * A utility class to provide functions for handling {@link PaginatedResponse}s and those containing lists of {@link Resource}s.
+ * A utility class to provide functions for handling {@link org.cloudfoundry.client.v2.PaginatedResponse}s and those containing lists of {@link org.cloudfoundry.client.v2.Resource}s.
  */
 public final class PaginationUtils {
 
@@ -32,40 +31,82 @@ public final class PaginationUtils {
     }
 
     /**
-     * Generate the stream of responses starting from page 1 of an initial paginated response.
+     * Generate the stream of resources accumulated from a series of responses obtained from the page supplier.
      *
-     * @param pageSupplier a function from integers to {@link Mono}s of {@link PaginatedResponse}s.
-     * @param <U>          the type of {@link PaginatedResponse}.
-     * @return a stream of <code>U</code> objects.
+     * @param pageSupplier a function from integers to {@link Mono}s of {@link org.cloudfoundry.client.v2.PaginatedResponse}s.
+     * @param <T>          the type of resource in the list on each {@link org.cloudfoundry.client.v2.PaginatedResponse}.
+     * @param <U>          the type of {@link org.cloudfoundry.client.v2.PaginatedResponse}.
+     * @return a stream of <code>T</code> objects.
      */
-    public static <U extends PaginatedResponse<?>> Flux<U> requestPages(Function<Integer, Mono<U>> pageSupplier) {
+    public static <T extends org.cloudfoundry.client.v2.Resource<?>, U extends org.cloudfoundry.client.v2.PaginatedResponse<T>> Flux<T> requestClientV2Resources(
+        Function<Integer, Mono<U>> pageSupplier) {
+
         return pageSupplier
             .apply(1)
-            .flatMap(requestAdditionalPages(pageSupplier));
+            .flatMap(requestClientV2AdditionalPages(pageSupplier))
+            .flatMap(ResourceUtils::getResources);
     }
 
     /**
      * Generate the stream of resources accumulated from a series of responses obtained from the page supplier.
      *
-     * @param pageSupplier a function from integers to {@link Mono}s of {@link PaginatedResponse}s.
-     * @param <R>          the type of resource in the list on each {@link PaginatedResponse}.
-     * @param <U>          the type of {@link PaginatedResponse}.
-     * @return a stream of <code>R</code> objects.
+     * @param pageSupplier a function from integers to {@link Mono}s of {@link org.cloudfoundry.client.v3.PaginatedResponse}s.
+     * @param <T>          the type of resource in the list on each {@link org.cloudfoundry.client.v3.PaginatedResponse}.
+     * @param <U>          the type of {@link org.cloudfoundry.client.v3.PaginatedResponse}.
+     * @return a stream of <code>T</code> objects.
      */
-    public static <R extends Resource<?>, U extends PaginatedResponse<R>> Flux<R> requestResources(Function<Integer, Mono<U>> pageSupplier) {
-        return requestPages(pageSupplier)
-            .flatMap(ResourceUtils::getResources);
+    @SuppressWarnings("rawtypes")
+    public static <T, U extends org.cloudfoundry.client.v3.PaginatedResponse<T>> Flux<T> requestClientV3Resources(Function<Integer, Mono<U>> pageSupplier) {
+        return pageSupplier
+            .apply(1)
+            .flatMap(requestClientV3AdditionalPages(pageSupplier))
+            .flatMapIterable(org.cloudfoundry.client.v3.PaginatedResponse::getResources);
     }
 
-    private static <U extends PaginatedResponse<?>> Function<U, Flux<U>> requestAdditionalPages(Function<Integer, Mono<U>> pageSupplier) {
+    /**
+     * Generate the stream of resources accumulated from a series of responses obtained from the page supplier.
+     *
+     * @param pageSupplier a function from integers to {@link Mono}s of {@link org.cloudfoundry.uaa.PaginatedResponse}s.
+     * @param <T>          the type of resource in the list on each {@link org.cloudfoundry.uaa.PaginatedResponse}.
+     * @param <U>          the type of {@link org.cloudfoundry.uaa.PaginatedResponse}.
+     * @return a stream of <code>T</code> objects.
+     */
+    @SuppressWarnings("rawtypes")
+    public static <T, U extends org.cloudfoundry.uaa.PaginatedResponse<T>> Flux<T> requestUaaResources(Function<Integer, Mono<U>> pageSupplier) {
+        return pageSupplier
+            .apply(1)
+            .flatMap(requestUaaAdditionalPages(pageSupplier))
+            .flatMapIterable(org.cloudfoundry.uaa.PaginatedResponse::getResources);
+    }
+
+    private static <T> Function<T, Flux<T>> requestAdditionalPages(Function<Integer, Mono<T>> pageSupplier, Function<T, Integer> totalPagesSupplier) {
         return response -> {
-            Integer totalPages = response.getTotalPages();
-            if (totalPages == null) {
-                throw new IllegalStateException(String.format("Page response (class %s) has no total pages set", response.getClass().getCanonicalName()));
-            }
+            Integer totalPages = Optional.ofNullable(totalPagesSupplier.apply(response)).orElse(1);
 
             return Flux
                 .range(2, totalPages - 1)
+                .flatMap(pageSupplier)
+                .startWith(response)
+                .buffer()
+                .flatMapIterable(d -> d);
+        };
+    }
+
+    private static <T extends org.cloudfoundry.client.v2.PaginatedResponse<?>> Function<T, Flux<T>> requestClientV2AdditionalPages(Function<Integer, Mono<T>> pageSupplier) {
+        return requestAdditionalPages(pageSupplier, response -> response.getTotalPages());
+    }
+
+    private static <T extends org.cloudfoundry.client.v3.PaginatedResponse<?>> Function<T, Flux<T>> requestClientV3AdditionalPages(Function<Integer, Mono<T>> pageSupplier) {
+        return requestAdditionalPages(pageSupplier, response -> response.getPagination().getTotalPages());
+    }
+
+    private static <T extends org.cloudfoundry.uaa.PaginatedResponse<?>> Function<T, Flux<T>> requestUaaAdditionalPages(Function<Integer, Mono<T>> pageSupplier) {
+        return response -> {
+            Integer totalPages = (response.getTotalResults() - 1) / response.getItemsPerPage() + 1;
+
+            return Flux
+                .range(1, totalPages - 1)
+                .map(page -> 1 + (page * response.getItemsPerPage()))
                 .flatMap(pageSupplier)
                 .startWith(response)
                 .buffer()

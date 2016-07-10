@@ -162,7 +162,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
 
     private static Flux<OrganizationQuotaDefinitionResource> requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizationQuotaDefinitions()
+            .requestClientV2Resources(page -> cloudFoundryClient.organizationQuotaDefinitions()
                 .list(ListOrganizationQuotaDefinitionsRequest.builder()
                     .page(page)
                     .build()));
@@ -170,7 +170,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
 
     private static Flux<OrganizationQuotaDefinitionResource> requestListOrganizationQuotas(CloudFoundryClient cloudFoundryClient, String name) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizationQuotaDefinitions()
+            .requestClientV2Resources(page -> cloudFoundryClient.organizationQuotaDefinitions()
                 .list(ListOrganizationQuotaDefinitionsRequest.builder()
                     .name(name)
                     .page(page)
@@ -179,7 +179,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
 
     private static Flux<OrganizationResource> requestListOrganizations(CloudFoundryClient cloudFoundryClient, String name) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizations()
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
                 .list(ListOrganizationsRequest.builder()
                     .name(name)
                     .page(page)

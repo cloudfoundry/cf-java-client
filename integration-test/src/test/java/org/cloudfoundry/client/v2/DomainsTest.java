@@ -415,7 +415,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     private static Flux<SpaceResource> requestListDomainSpaces(CloudFoundryClient cloudFoundryClient, String domainId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.domains()
+            .requestClientV2Resources(page -> cloudFoundryClient.domains()
                 .listSpaces(ListDomainSpacesRequest.builder()
                     .domainId(domainId)
                     .page(page)
@@ -424,7 +424,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     private static Flux<SpaceResource> requestListDomainSpacesByApplicationId(CloudFoundryClient cloudFoundryClient, String applicationId, String domainId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.domains()
+            .requestClientV2Resources(page -> cloudFoundryClient.domains()
                 .listSpaces(ListDomainSpacesRequest.builder()
                     .page(page)
                     .applicationId(applicationId)
@@ -435,7 +435,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     private static Flux<SpaceResource> requestListDomainSpacesByOrganizationId(CloudFoundryClient cloudFoundryClient, String domainId, String organizationId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.domains()
+            .requestClientV2Resources(page -> cloudFoundryClient.domains()
                 .listSpaces(ListDomainSpacesRequest.builder()
                     .domainId(domainId)
                     .organizationId(organizationId)
@@ -445,7 +445,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     private static Flux<SpaceResource> requestListDomainSpacesBySpaceName(CloudFoundryClient cloudFoundryClient, String domainId, String spaceName) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.domains()
+            .requestClientV2Resources(page -> cloudFoundryClient.domains()
                 .listSpaces(ListDomainSpacesRequest.builder()
                     .domainId(domainId)
                     .name(spaceName)
@@ -455,7 +455,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     private static Flux<DomainResource> requestListDomains(CloudFoundryClient cloudFoundryClient, String domainName) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.domains()
+            .requestClientV2Resources(page -> cloudFoundryClient.domains()
                 .list(ListDomainsRequest.builder()
                     .name(domainName)
                     .page(page)
@@ -464,7 +464,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     private static Flux<DomainResource> requestListDomains(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.domains()
+            .requestClientV2Resources(page -> cloudFoundryClient.domains()
                 .list(ListDomainsRequest.builder()
                     .page(page)
                     .build()));
@@ -472,7 +472,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     private static Flux<DomainResource> requestListDomainsByOwningOrganization(CloudFoundryClient cloudFoundryClient, String organizationId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.domains()
+            .requestClientV2Resources(page -> cloudFoundryClient.domains()
                 .list(ListDomainsRequest.builder()
                     .owningOrganizationId(organizationId)
                     .page(page)
@@ -481,7 +481,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     private static Flux<SpaceResource> requestListSpaceDevelopers(CloudFoundryClient cloudFoundryClient, String domainId, String userId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.domains()
+            .requestClientV2Resources(page -> cloudFoundryClient.domains()
                 .listSpaces(ListDomainSpacesRequest.builder()
                     .page(page)
                     .developerId(userId)

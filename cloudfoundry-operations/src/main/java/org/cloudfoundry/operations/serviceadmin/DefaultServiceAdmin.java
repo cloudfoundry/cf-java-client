@@ -101,7 +101,7 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
 
     private static Flux<ServiceBrokerResource> requestListServiceBrokers(CloudFoundryClient cloudFoundryClient, String serviceBrokerName) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.serviceBrokers()
+            .requestClientV2Resources(page -> cloudFoundryClient.serviceBrokers()
                 .list(ListServiceBrokersRequest.builder()
                     .name(serviceBrokerName)
                     .page(page)
@@ -110,7 +110,7 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
 
     private static Flux<ServiceBrokerResource> requestServiceBrokers(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.serviceBrokers()
+            .requestClientV2Resources(page -> cloudFoundryClient.serviceBrokers()
                 .list(ListServiceBrokersRequest.builder()
                     .page(page)
                     .build()));

@@ -161,7 +161,7 @@ public class IntegrationTestConfiguration {
     @DependsOn("cloudFoundryCleaner")
     Mono<String> stackId(CloudFoundryClient cloudFoundryClient, String stackName) throws InterruptedException {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.stacks()
+            .requestClientV2Resources(page -> cloudFoundryClient.stacks()
                 .list(ListStacksRequest.builder()
                     .name(stackName)
                     .page(page)
@@ -222,7 +222,7 @@ public class IntegrationTestConfiguration {
     @DependsOn("cloudFoundryCleaner")
     Mono<String> userId(CloudFoundryClient cloudFoundryClient, String userName) {  // TODO: Create new user when APIs available
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.users()
+            .requestClientV2Resources(page -> cloudFoundryClient.users()
                 .list(ListUsersRequest.builder()
                     .page(page)
                     .build()))

@@ -134,7 +134,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
 
     private static Flux<PrivateDomainResource> listPrivateDomains(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.privateDomains()
+            .requestClientV2Resources(page -> cloudFoundryClient.privateDomains()
                 .list(ListPrivateDomainsRequest.builder()
                     .page(page)
                     .build()));
@@ -142,7 +142,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
 
     private static Flux<PrivateDomainResource> listPrivateDomains(CloudFoundryClient cloudFoundryClient, String privateDomainName) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.privateDomains()
+            .requestClientV2Resources(page -> cloudFoundryClient.privateDomains()
                 .list(ListPrivateDomainsRequest.builder()
                     .page(page)
                     .name(privateDomainName)

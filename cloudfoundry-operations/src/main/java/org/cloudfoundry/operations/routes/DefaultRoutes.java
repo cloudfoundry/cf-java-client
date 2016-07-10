@@ -281,7 +281,7 @@ public final class DefaultRoutes implements Routes {
 
     private static Flux<ApplicationResource> requestApplications(CloudFoundryClient cloudFoundryClient, String routeId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.routes()
+            .requestClientV2Resources(page -> cloudFoundryClient.routes()
                 .listApplications(ListRouteApplicationsRequest.builder()
                     .routeId(routeId)
                     .page(page)
@@ -290,7 +290,7 @@ public final class DefaultRoutes implements Routes {
 
     private static Flux<ApplicationResource> requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.spaces()
+            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .listApplications(ListSpaceApplicationsRequest.builder()
                     .name(application)
                     .page(page)
@@ -333,7 +333,7 @@ public final class DefaultRoutes implements Routes {
 
     private static Flux<PrivateDomainResource> requestPrivateDomains(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizations()
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
                 .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
                     .organizationId(organizationId)
                     .name(domain)
@@ -363,7 +363,7 @@ public final class DefaultRoutes implements Routes {
         org.cloudfoundry.client.v2.routes.ListRoutesRequest.Builder listBuilder = modifier.apply(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder());
 
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.routes()
+            .requestClientV2Resources(page -> cloudFoundryClient.routes()
                 .list(listBuilder
                     .page(page)
                     .build()));
@@ -379,7 +379,7 @@ public final class DefaultRoutes implements Routes {
 
     private static Flux<SharedDomainResource> requestSharedDomains(CloudFoundryClient cloudFoundryClient, String domain) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.sharedDomains()
+            .requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
                 .list(ListSharedDomainsRequest.builder()
                     .name(domain)
                     .page(page)
@@ -395,7 +395,7 @@ public final class DefaultRoutes implements Routes {
 
     private static Flux<RouteResource> requestSpaceRoutes(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.spaces()
+            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .listRoutes(ListSpaceRoutesRequest.builder()
                     .spaceId(spaceId)
                     .page(page)
@@ -404,7 +404,7 @@ public final class DefaultRoutes implements Routes {
 
     private static Flux<SpaceResource> requestSpaces(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizations()
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
                 .listSpaces(ListOrganizationSpacesRequest.builder()
                     .organizationId(organizationId)
                     .name(space)

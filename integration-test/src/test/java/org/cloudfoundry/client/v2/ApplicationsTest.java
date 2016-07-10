@@ -243,7 +243,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .then(applicationId -> Mono.when(
                 Mono.just(applicationId),
                 PaginationUtils
-                    .requestResources(page -> this.cloudFoundryClient.applicationsV2()
+                    .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
                         .list(ListApplicationsRequest.builder()
                             .page(page)
                             .build()))
@@ -264,7 +264,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .then(applicationId -> Mono.when(
                 Mono.just(applicationId),
                 PaginationUtils
-                    .requestResources(page -> this.cloudFoundryClient.applicationsV2()
+                    .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
                         .list(ListApplicationsRequest.builder()
                             .diego(true)
                             .page(page)
@@ -286,7 +286,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .then(applicationId -> Mono.when(
                 Mono.just(applicationId),
                 PaginationUtils
-                    .requestResources(page -> this.cloudFoundryClient.applicationsV2()
+                    .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
                         .list(ListApplicationsRequest.builder()
                             .name(applicationName)
                             .page(page)
@@ -312,7 +312,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .then(function((organizationId, applicationId) -> Mono.when(
                 Mono.just(applicationId),
                 PaginationUtils
-                    .requestResources(page -> this.cloudFoundryClient.applicationsV2()
+                    .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
                         .list(ListApplicationsRequest.builder()
                             .organizationId(organizationId)
                             .page(page)
@@ -337,7 +337,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .then(function((spaceId, applicationId) -> Mono.when(
                 Mono.just(applicationId),
                 PaginationUtils
-                    .requestResources(page -> this.cloudFoundryClient.applicationsV2()
+                    .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
                         .list(ListApplicationsRequest.builder()
                             .spaceId(spaceId)
                             .page(page)
@@ -363,7 +363,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .then(function((stackId, applicationId) -> Mono.when(
                 Mono.just(applicationId),
                 PaginationUtils
-                    .requestResources(page -> this.cloudFoundryClient.applicationsV2()
+                    .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
                         .list(ListApplicationsRequest.builder()
                             .stackId(stackId)
                             .page(page)
@@ -395,7 +395,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .then(function((applicationId, routeResponse) -> Mono.when(
                 Mono.just(ResourceUtils.getId(routeResponse)),
                 PaginationUtils
-                    .requestResources(page -> this.cloudFoundryClient.applicationsV2()
+                    .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
                         .listRoutes(ListApplicationRoutesRequest.builder()
                             .applicationId(applicationId)
                             .page(page)
@@ -426,7 +426,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .then(function((applicationId, routeResponse) -> Mono.when(
                 Mono.just(ResourceUtils.getId(routeResponse)),
                 PaginationUtils
-                    .requestResources(page -> this.cloudFoundryClient.applicationsV2()
+                    .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
                         .listRoutes(ListApplicationRoutesRequest.builder()
                             .applicationId(applicationId)
                             .domainId(ResourceUtils.getEntity(routeResponse).getDomainId())
@@ -458,7 +458,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .then(function((applicationId, routeResponse) -> Mono.when(
                 Mono.just(ResourceUtils.getId(routeResponse)),
                 PaginationUtils
-                    .requestResources(page -> this.cloudFoundryClient.applicationsV2()
+                    .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
                         .listRoutes(ListApplicationRoutesRequest.builder()
                             .applicationId(applicationId)
                             .host(ResourceUtils.getEntity(routeResponse).getHost())
@@ -490,7 +490,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .then(function((applicationId, routeResponse) -> Mono.when(
                 Mono.just(ResourceUtils.getId(routeResponse)),
                 PaginationUtils
-                    .requestResources(page -> this.cloudFoundryClient.applicationsV2()
+                    .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
                         .listRoutes(ListApplicationRoutesRequest.builder()
                             .applicationId(applicationId)
                             .path(ResourceUtils.getEntity(routeResponse).getPath())
@@ -522,7 +522,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .then(function((applicationId, routeResponse) -> Mono.when(
                 Mono.just(ResourceUtils.getId(routeResponse)),
                 PaginationUtils
-                    .requestResources(page -> {
+                    .requestClientV2Resources(page -> {
                         ListApplicationRoutesRequest.Builder builder = ListApplicationRoutesRequest.builder()
                             .applicationId(applicationId)
                             .page(page);
@@ -577,7 +577,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .then(function((applicationId, serviceInstanceId, serviceBindingId) -> Mono.when(
                 Mono.just(serviceBindingId),
                 PaginationUtils
-                    .requestResources(page -> this.cloudFoundryClient.applicationsV2()
+                    .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
                         .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
                             .applicationId(applicationId)
                             .serviceInstanceId(serviceInstanceId)
@@ -926,7 +926,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     private static Flux<RouteResource> requestRoutes(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return PaginationUtils.requestResources(page -> cloudFoundryClient.applicationsV2()
+        return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.applicationsV2()
             .listRoutes(ListApplicationRoutesRequest.builder()
                 .page(page)
                 .applicationId(applicationId)
@@ -935,7 +935,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     private static Flux<ServiceBindingResource> requestServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.applicationsV2()
+            .requestClientV2Resources(page -> cloudFoundryClient.applicationsV2()
                 .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
                     .applicationId(applicationId)
                     .page(page)

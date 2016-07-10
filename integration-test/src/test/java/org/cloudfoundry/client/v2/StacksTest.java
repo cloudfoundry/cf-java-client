@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static org.cloudfoundry.util.PaginationUtils.requestResources;
+import static org.cloudfoundry.util.PaginationUtils.requestClientV2Resources;
 
 public final class StacksTest extends AbstractIntegrationTest {
 
@@ -55,7 +55,7 @@ public final class StacksTest extends AbstractIntegrationTest {
         getStackId(this.cloudFoundryClient, this.stackName)
             .flatMap(stackId ->
                 PaginationUtils
-                    .requestResources(page -> this.cloudFoundryClient.stacks()
+                    .requestClientV2Resources(page -> this.cloudFoundryClient.stacks()
                         .list(ListStacksRequest.builder()
                             .page(page)
                             .build()))
@@ -67,7 +67,7 @@ public final class StacksTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByName() {
-        requestResources(page -> this.cloudFoundryClient.stacks()
+        requestClientV2Resources(page -> this.cloudFoundryClient.stacks()
             .list(ListStacksRequest.builder()
                 .name(this.stackName)
                 .page(page)
@@ -85,7 +85,7 @@ public final class StacksTest extends AbstractIntegrationTest {
 
     private static Flux<StackResource> requestListStacks(CloudFoundryClient cloudFoundryClient, String stackName) {
         return
-            requestResources(page -> cloudFoundryClient.stacks()
+            requestClientV2Resources(page -> cloudFoundryClient.stacks()
                 .list(ListStacksRequest.builder()
                     .name(stackName)
                     .page(page)

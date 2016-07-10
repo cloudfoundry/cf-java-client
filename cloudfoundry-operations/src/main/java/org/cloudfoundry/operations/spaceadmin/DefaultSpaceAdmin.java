@@ -66,7 +66,7 @@ public final class DefaultSpaceAdmin implements SpaceAdmin {
 
     private static Flux<SpaceQuotaDefinitionResource> requestSpaceQuotaDefinitions(CloudFoundryClient cloudFoundryClient, String organizationId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizations()
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
                 .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
                     .organizationId(organizationId)
                     .page(page)

@@ -53,7 +53,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
     @Test
     public void list() {
         PaginationUtils
-            .requestResources(page -> this.cloudFoundryClient.organizationQuotaDefinitions()
+            .requestClientV2Resources(page -> this.cloudFoundryClient.organizationQuotaDefinitions()
                 .list(ListOrganizationQuotaDefinitionsRequest.builder()
                     .page(page)
                     .build()))

@@ -61,7 +61,7 @@ public final class DefaultBuildpacks implements Buildpacks {
 
     private static Flux<BuildpackResource> requestBuildpacks(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.buildpacks()
+            .requestClientV2Resources(page -> cloudFoundryClient.buildpacks()
                 .list(ListBuildpacksRequest.builder()
                     .page(page)
                     .build()));

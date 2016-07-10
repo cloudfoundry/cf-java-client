@@ -645,7 +645,7 @@ public final class DefaultServices implements Services {
 
     private static Flux<ApplicationResource> requestListApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.spaces()
+            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .listApplications(ListSpaceApplicationsRequest.builder()
                     .name(application)
                     .spaceId(spaceId)
@@ -655,7 +655,7 @@ public final class DefaultServices implements Services {
 
     private static Flux<ServiceBindingResource> requestListServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.applicationsV2()
+            .requestClientV2Resources(page -> cloudFoundryClient.applicationsV2()
                 .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
                     .page(page)
                     .applicationId(applicationId)
@@ -665,7 +665,7 @@ public final class DefaultServices implements Services {
 
     private static Flux<ServiceBindingResource> requestListServiceBindings(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.serviceBindingsV2()
+            .requestClientV2Resources(page -> cloudFoundryClient.serviceBindingsV2()
                 .list(ListServiceBindingsRequest.builder()
                     .page(page)
                     .serviceInstanceId(serviceInstanceId)
@@ -674,7 +674,7 @@ public final class DefaultServices implements Services {
 
     private static Flux<ServiceKeyResource> requestListServiceInstanceServiceKeys(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKey) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.serviceInstances()
+            .requestClientV2Resources(page -> cloudFoundryClient.serviceInstances()
                 .listServiceKeys(ListServiceInstanceServiceKeysRequest.builder()
                     .serviceInstanceId(serviceInstanceId)
                     .name(serviceKey)
@@ -684,7 +684,7 @@ public final class DefaultServices implements Services {
 
     private static Flux<ServiceKeyResource> requestListServiceInstanceServiceKeys(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.serviceInstances()
+            .requestClientV2Resources(page -> cloudFoundryClient.serviceInstances()
                 .listServiceKeys(ListServiceInstanceServiceKeysRequest.builder()
                     .page(page)
                     .serviceInstanceId(serviceInstanceId)
@@ -693,7 +693,7 @@ public final class DefaultServices implements Services {
 
     private static Flux<UnionServiceInstanceResource> requestListServiceInstances(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.spaces()
+            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
                     .page(page)
                     .returnUserProvidedServiceInstances(true)
@@ -703,7 +703,7 @@ public final class DefaultServices implements Services {
 
     private static Flux<UnionServiceInstanceResource> requestListServiceInstances(CloudFoundryClient cloudFoundryClient, String spaceId, String serviceInstanceName) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.spaces()
+            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
                     .page(page)
                     .returnUserProvidedServiceInstances(true)
@@ -714,7 +714,7 @@ public final class DefaultServices implements Services {
 
     private static Flux<ServicePlanVisibilityResource> requestListServicePlanVisibilities(CloudFoundryClient cloudFoundryClient, String organizationId, String servicePlanId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.servicePlanVisibilities()
+            .requestClientV2Resources(page -> cloudFoundryClient.servicePlanVisibilities()
                 .list(ListServicePlanVisibilitiesRequest.builder()
                     .organizationId(organizationId)
                     .page(page)
@@ -724,7 +724,7 @@ public final class DefaultServices implements Services {
 
     private static Flux<ServicePlanResource> requestListServicePlans(CloudFoundryClient cloudFoundryClient, String serviceId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.servicePlans()
+            .requestClientV2Resources(page -> cloudFoundryClient.servicePlans()
                 .list(ListServicePlansRequest.builder()
                     .page(page)
                     .serviceId(serviceId)
@@ -733,7 +733,7 @@ public final class DefaultServices implements Services {
 
     private static Flux<ServiceResource> requestListServices(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.spaces()
+            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .listServices(ListSpaceServicesRequest.builder()
                     .page(page)
                     .spaceId(spaceId)
@@ -742,7 +742,7 @@ public final class DefaultServices implements Services {
 
     private static Flux<ServiceResource> requestListServices(CloudFoundryClient cloudFoundryClient, String spaceId, String serviceName) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.spaces()
+            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .listServices(ListSpaceServicesRequest.builder()
                     .label(serviceName)
                     .page(page)

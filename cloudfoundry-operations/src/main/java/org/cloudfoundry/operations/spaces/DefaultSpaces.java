@@ -370,7 +370,7 @@ public final class DefaultSpaces implements Spaces {
 
     private static Flux<SpaceQuotaDefinitionResource> requestOrganizationSpaceQuotas(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceQuota) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizations()
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
                 .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
                     .page(page)
                     .organizationId(organizationId)
@@ -380,7 +380,7 @@ public final class DefaultSpaces implements Spaces {
 
     private static Flux<SpaceResource> requestOrganizationSpaces(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizations()
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
                 .listSpaces(ListOrganizationSpacesRequest.builder()
                     .name(space)
                     .organizationId(organizationId)
@@ -390,7 +390,7 @@ public final class DefaultSpaces implements Spaces {
 
     private static Flux<OrganizationResource> requestOrganizations(CloudFoundryClient cloudFoundryClient, String organizationName) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizations()
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
                 .list(ListOrganizationsRequest.builder()
                     .name(organizationName)
                     .page(page)
@@ -399,7 +399,7 @@ public final class DefaultSpaces implements Spaces {
 
     private static Flux<ApplicationResource> requestSpaceApplications(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.spaces()
+            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .listApplications(ListSpaceApplicationsRequest.builder()
                     .page(page)
                     .spaceId(spaceId)
@@ -408,7 +408,7 @@ public final class DefaultSpaces implements Spaces {
 
     private static Flux<DomainResource> requestSpaceDomains(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.spaces()
+            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .listDomains(ListSpaceDomainsRequest.builder()
                     .page(page)
                     .spaceId(spaceId)
@@ -424,7 +424,7 @@ public final class DefaultSpaces implements Spaces {
 
     private static Flux<SecurityGroupResource> requestSpaceSecurityGroups(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.spaces()
+            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .listSecurityGroups(ListSpaceSecurityGroupsRequest.builder()
                     .spaceId(spaceId)
                     .page(page)
@@ -433,7 +433,7 @@ public final class DefaultSpaces implements Spaces {
 
     private static Flux<ServiceResource> requestSpaceServices(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.spaces()
+            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .listServices(ListSpaceServicesRequest.builder()
                     .page(page)
                     .spaceId(spaceId)
@@ -442,7 +442,7 @@ public final class DefaultSpaces implements Spaces {
 
     private static Flux<SpaceResource> requestSpaces(CloudFoundryClient cloudFoundryClient, String organizationId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.spaces()
+            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .list(ListSpacesRequest.builder()
                     .organizationId(organizationId)
                     .page(page)

@@ -227,7 +227,7 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
     private static Flux<OrganizationResource> requestOrganizations(Mono<CloudFoundryClient> cloudFoundryClientPublisher, String organization) {
         return cloudFoundryClientPublisher
             .flatMap(cloudFoundryClient -> PaginationUtils
-                .requestResources(page -> cloudFoundryClient.organizations()
+                .requestClientV2Resources(page -> cloudFoundryClient.organizations()
                     .list(ListOrganizationsRequest.builder()
                         .name(organization)
                         .page(page)
@@ -237,7 +237,7 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
     private static Flux<SpaceResource> requestSpaces(Mono<CloudFoundryClient> cloudFoundryClientPublisher, String organizationId, String space) {
         return cloudFoundryClientPublisher
             .flatMap(cloudFoundryClient -> PaginationUtils
-                .requestResources(page -> cloudFoundryClient.spaces()
+                .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                     .list(ListSpacesRequest.builder()
                         .organizationId(organizationId)
                         .name(space)

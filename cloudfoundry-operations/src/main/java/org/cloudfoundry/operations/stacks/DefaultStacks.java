@@ -57,7 +57,7 @@ public final class DefaultStacks implements Stacks {
 
     private static Flux<StackResource> requestStack(CloudFoundryClient cloudFoundryClient, String stack) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.stacks().list(
+            .requestClientV2Resources(page -> cloudFoundryClient.stacks().list(
                 ListStacksRequest.builder()
                     .name(stack)
                     .page(page)
@@ -66,7 +66,7 @@ public final class DefaultStacks implements Stacks {
 
     private static Flux<StackResource> requestStacks(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.stacks().list(
+            .requestClientV2Resources(page -> cloudFoundryClient.stacks().list(
                 ListStacksRequest.builder()
                     .page(page)
                     .build()));

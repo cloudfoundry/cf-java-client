@@ -863,7 +863,7 @@ public final class DefaultApplications implements Applications {
 
     private static Flux<AbstractApplicationResource> requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.spaces()
+            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .listApplications(ListSpaceApplicationsRequest.builder()
                     .name(application)
                     .spaceId(spaceId)
@@ -932,7 +932,7 @@ public final class DefaultApplications implements Applications {
 
     private static Flux<EventResource> requestEvents(String applicationId, CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.events()
+            .requestClientV2Resources(page -> cloudFoundryClient.events()
                 .list(ListEventsRequest.builder()
                     .actee(applicationId)
                     .orderDirection(OrderDirection.DESCENDING)
@@ -951,7 +951,7 @@ public final class DefaultApplications implements Applications {
 
     private static Flux<ServiceBindingResource> requestListServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.applicationsV2()
+            .requestClientV2Resources(page -> cloudFoundryClient.applicationsV2()
                 .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
                     .applicationId(applicationId)
                     .page(page)
@@ -976,7 +976,7 @@ public final class DefaultApplications implements Applications {
 
     private static Flux<SpaceResource> requestOrganizationSpacesByName(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizations()
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
                 .listSpaces(ListOrganizationSpacesRequest.builder()
                     .page(page)
                     .organizationId(organizationId)
@@ -986,7 +986,7 @@ public final class DefaultApplications implements Applications {
 
     private static Flux<OrganizationResource> requestOrganizations(CloudFoundryClient cloudFoundryClient, String organization) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizations()
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
                 .list(ListOrganizationsRequest.builder()
                     .page(page)
                     .name(organization)
@@ -995,7 +995,7 @@ public final class DefaultApplications implements Applications {
 
     private static Flux<PrivateDomainResource> requestPrivateDomain(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizations()
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
                 .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
                     .name(domain)
                     .organizationId(organizationId)
@@ -1005,7 +1005,7 @@ public final class DefaultApplications implements Applications {
 
     private static Flux<PrivateDomainResource> requestPrivateDomains(CloudFoundryClient cloudFoundryClient, String organizationId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizations()
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
                 .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
                     .organizationId(organizationId)
                     .page(page)
@@ -1034,7 +1034,7 @@ public final class DefaultApplications implements Applications {
         Optional.ofNullable(routePath).ifPresent(requestBuilder::path);
 
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.routes()
+            .requestClientV2Resources(page -> cloudFoundryClient.routes()
                 .list(requestBuilder
                     .page(page)
                     .build()));
@@ -1042,7 +1042,7 @@ public final class DefaultApplications implements Applications {
 
     private static Flux<SharedDomainResource> requestSharedDomain(CloudFoundryClient cloudFoundryClient, String domain) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.sharedDomains()
+            .requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
                 .list(ListSharedDomainsRequest.builder()
                     .name(domain)
                     .page(page)
@@ -1051,7 +1051,7 @@ public final class DefaultApplications implements Applications {
 
     private static Flux<SharedDomainResource> requestSharedDomains(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.sharedDomains()
+            .requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
                 .list(ListSharedDomainsRequest.builder()
                     .page(page)
                     .build()));
@@ -1080,7 +1080,7 @@ public final class DefaultApplications implements Applications {
 
     private static Mono<StackResource> requestStackId(CloudFoundryClient cloudFoundryClient, String stack) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.stacks()
+            .requestClientV2Resources(page -> cloudFoundryClient.stacks()
                 .list(ListStacksRequest.builder()
                     .page(page)
                     .name(stack)

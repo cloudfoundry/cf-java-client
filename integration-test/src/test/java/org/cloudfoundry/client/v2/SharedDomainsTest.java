@@ -99,7 +99,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
     // TODO: awaiting story https://www.pivotaltracker.com/story/show/101527362 to re-implement with get()
     private static Mono<SharedDomainResource> getSharedDomainResource(CloudFoundryClient cloudFoundryClient, String sharedDomainId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.sharedDomains()
+            .requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
                 .list((ListSharedDomainsRequest.builder()
                     .page(page)
                     .build())))
@@ -118,7 +118,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
         ListSharedDomainsRequest.Builder requestBuilder = ListSharedDomainsRequest.builder();
         Optional.ofNullable(sharedDomainName).ifPresent(requestBuilder::name);
 
-        return PaginationUtils.requestResources(page -> cloudFoundryClient.sharedDomains()
+        return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
             .list(requestBuilder
                 .page(page)
                 .build()));

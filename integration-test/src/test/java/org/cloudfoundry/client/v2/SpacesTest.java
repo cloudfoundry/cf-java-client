@@ -141,7 +141,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .username(this.userName)
                     .build()))))
             .flatMap(function((userId, spaceId) -> PaginationUtils
-                .requestResources(page -> this.cloudFoundryClient.spaces()
+                .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
                     .listAuditors(ListSpaceAuditorsRequest.builder()
                         .page(page)
                         .spaceId(spaceId)
@@ -183,7 +183,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .username(this.userName)
                     .build()))))
             .flatMap(function((userId, spaceId) -> PaginationUtils
-                .requestResources(page -> this.cloudFoundryClient.spaces()
+                .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
                     .listDevelopers(ListSpaceDevelopersRequest.builder()
                         .page(page)
                         .spaceId(spaceId)
@@ -419,7 +419,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .then(spaceId -> Mono.when(
                 Mono.just(spaceId),
                 PaginationUtils
-                    .requestResources(page -> this.cloudFoundryClient.stacks()
+                    .requestClientV2Resources(page -> this.cloudFoundryClient.stacks()
                         .list(ListStacksRequest.builder()
                             .name(this.stackName)
                             .page(page)
@@ -446,7 +446,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .auditorId(userId)
                     .build()))))
             .flatMap(function((userId, spaceId) -> PaginationUtils
-                .requestResources(page -> this.cloudFoundryClient.spaces()
+                .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
                     .listAuditors(ListSpaceAuditorsRequest.builder()
                         .page(page)
                         .spaceId(spaceId)
@@ -469,7 +469,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .developerId(userId)
                     .build()))))
             .flatMap(function((userId, spaceId) -> PaginationUtils
-                .requestResources(page -> this.cloudFoundryClient.spaces()
+                .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
                     .listDevelopers(ListSpaceDevelopersRequest.builder()
                         .page(page)
                         .spaceId(spaceId)
@@ -989,7 +989,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
             .flatMap(function((userId, spaceId) -> PaginationUtils
-                .requestResources(page -> this.cloudFoundryClient.spaces()
+                .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
                     .listUserRoles(ListSpaceUserRolesRequest.builder()
                         .page(page)
                         .spaceId(spaceId)
@@ -1015,7 +1015,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .auditorId(userId)
                     .build()))))
             .flatMap(function((userId, spaceId) -> PaginationUtils
-                .requestResources(page -> this.cloudFoundryClient.spaces()
+                .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
                     .listAuditors(ListSpaceAuditorsRequest.builder()
                         .page(page)
                         .spaceId(spaceId)
@@ -1036,7 +1036,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .username(this.userName)
                     .build()))))
             .flatMap(function((userId, spaceId) -> PaginationUtils
-                .requestResources(page -> this.cloudFoundryClient.spaces()
+                .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
                     .listAuditors(ListSpaceAuditorsRequest.builder()
                         .page(page)
                         .spaceId(spaceId)
@@ -1061,7 +1061,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .developerId(userId)
                     .build()))))
             .flatMap(function((userId, spaceId) -> PaginationUtils
-                .requestResources(page -> this.cloudFoundryClient.spaces()
+                .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
                     .listDevelopers(ListSpaceDevelopersRequest.builder()
                         .page(page)
                         .spaceId(spaceId)
@@ -1086,7 +1086,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .username(this.userName)
                     .build()))))
             .flatMap(function((userId, spaceId) -> PaginationUtils
-                .requestResources(page -> this.cloudFoundryClient.spaces()
+                .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
                     .listDevelopers(ListSpaceDevelopersRequest.builder()
                         .page(page)
                         .spaceId(spaceId)
@@ -1234,7 +1234,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .username(username)
                 .build())
             .then(PaginationUtils
-                .requestResources(page -> cloudFoundryClient.users()
+                .requestClientV2Resources(page -> cloudFoundryClient.users()
                     .list(ListUsersRequest.builder()
                         .organizationId(organizationId)
                         .page(page)
@@ -1316,7 +1316,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     private static Flux<ApplicationResource> requestListSpaceApplications(CloudFoundryClient cloudFoundryClient, String spaceId, UnaryOperator<ListSpaceApplicationsRequest.Builder> transformer) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.spaces()
+            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .listApplications(transformer.apply(ListSpaceApplicationsRequest.builder())
                     .page(page)
                     .spaceId(spaceId)
@@ -1329,7 +1329,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     private static Flux<DomainResource> requestListSpaceDomains(CloudFoundryClient cloudFoundryClient, String spaceId, UnaryOperator<ListSpaceDomainsRequest.Builder> transformer) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.spaces()
+            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .listDomains(transformer.apply(ListSpaceDomainsRequest.builder())
                     .spaceId(spaceId)
                     .page(page)
@@ -1342,7 +1342,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     private static Flux<EventResource> requestListSpaceEvents(CloudFoundryClient cloudFoundryClient, String spaceId, UnaryOperator<ListSpaceEventsRequest.Builder> transformer) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.spaces()
+            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .listEvents(transformer.apply(ListSpaceEventsRequest.builder())
                     .page(page)
                     .spaceId(spaceId)
@@ -1356,7 +1356,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     private static Flux<UserResource> requestListSpaceManagers(CloudFoundryClient cloudFoundryClient, String spaceId, Function<ListSpaceManagersRequest.Builder, ListSpaceManagersRequest.Builder>
         transformer) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.spaces()
+            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .listManagers(transformer.apply(ListSpaceManagersRequest.builder())
                     .page(page)
                     .spaceId(spaceId)
@@ -1369,7 +1369,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     private static Flux<RouteResource> requestListSpaceRoutes(CloudFoundryClient cloudFoundryClient, String spaceId, UnaryOperator<ListSpaceRoutesRequest.Builder> transformer) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.spaces()
+            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .listRoutes(transformer.apply(ListSpaceRoutesRequest.builder())
                     .spaceId(spaceId)
                     .build()));
@@ -1381,7 +1381,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     private static Flux<SpaceResource> requestListSpaces(CloudFoundryClient cloudFoundryClient, UnaryOperator<ListSpacesRequest.Builder> transformer) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.spaces()
+            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .list(transformer.apply(ListSpacesRequest.builder())
                     .page(page)
                     .build()));

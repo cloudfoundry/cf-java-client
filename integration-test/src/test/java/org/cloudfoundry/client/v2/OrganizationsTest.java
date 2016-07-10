@@ -101,7 +101,7 @@ import reactor.core.tuple.Tuple2;
 import java.util.function.UnaryOperator;
 
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
-import static org.cloudfoundry.util.PaginationUtils.requestResources;
+import static org.cloudfoundry.util.PaginationUtils.requestClientV2Resources;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.junit.Assert.fail;
 
@@ -388,7 +388,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> requestResources(page -> this.cloudFoundryClient.organizations()
+            .flatMap(organizationId -> requestClientV2Resources(page -> this.cloudFoundryClient.organizations()
                 .getUserRoles(GetOrganizationUserRolesRequest.builder()
                     .organizationId(organizationId)
                     .page(page)
@@ -1249,7 +1249,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> requestResources(page -> this.cloudFoundryClient.organizations()
+            .flatMap(organizationId -> requestClientV2Resources(page -> this.cloudFoundryClient.organizations()
                 .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
                     .organizationId(organizationId)
                     .page(page)
@@ -1899,7 +1899,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     private static Flux<UserResource> requestListOrganizationAuditors(CloudFoundryClient cloudFoundryClient, String organizationId,
                                                                       UnaryOperator<ListOrganizationAuditorsRequest.Builder> transformer) {
-        return requestResources(page -> cloudFoundryClient.organizations()
+        return requestClientV2Resources(page -> cloudFoundryClient.organizations()
             .listAuditors(transformer.apply(ListOrganizationAuditorsRequest.builder())
                 .page(page)
                 .organizationId(organizationId)
@@ -1912,7 +1912,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     private static Flux<UserResource> requestListOrganizationBillingManagers(CloudFoundryClient cloudFoundryClient, String organizationId,
                                                                              UnaryOperator<ListOrganizationBillingManagersRequest.Builder> transformer) {
-        return requestResources(page -> cloudFoundryClient.organizations()
+        return requestClientV2Resources(page -> cloudFoundryClient.organizations()
             .listBillingManagers(transformer.apply(ListOrganizationBillingManagersRequest.builder())
                 .page(page)
                 .organizationId(organizationId)
@@ -1925,7 +1925,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     private static Flux<DomainResource> requestListOrganizationDomains(CloudFoundryClient cloudFoundryClient, String organizationId,
                                                                        UnaryOperator<ListOrganizationDomainsRequest.Builder> transformer) {
-        return requestResources(page -> cloudFoundryClient.organizations()
+        return requestClientV2Resources(page -> cloudFoundryClient.organizations()
             .listDomains(transformer.apply(ListOrganizationDomainsRequest.builder())
                 .page(page)
                 .organizationId(organizationId)
@@ -1938,7 +1938,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     private static Flux<UserResource> requestListOrganizationManagers(CloudFoundryClient cloudFoundryClient, String organizationId,
                                                                       UnaryOperator<ListOrganizationManagersRequest.Builder> transformer) {
-        return requestResources(page -> cloudFoundryClient.organizations()
+        return requestClientV2Resources(page -> cloudFoundryClient.organizations()
             .listManagers(transformer.apply(ListOrganizationManagersRequest.builder())
                 .page(page)
                 .organizationId(organizationId)
@@ -1951,7 +1951,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     private static Flux<PrivateDomainResource> requestListOrganizationPrivateDomains(CloudFoundryClient cloudFoundryClient, String organizationId,
                                                                                      UnaryOperator<ListOrganizationPrivateDomainsRequest.Builder> transformer) {
-        return requestResources(page -> cloudFoundryClient.organizations()
+        return requestClientV2Resources(page -> cloudFoundryClient.organizations()
             .listPrivateDomains(transformer.apply(ListOrganizationPrivateDomainsRequest.builder())
                 .page(page)
                 .organizationId(organizationId)
@@ -1965,7 +1965,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     private static Flux<ServiceResource> requestListOrganizationServices(CloudFoundryClient cloudFoundryClient, String organizationId,
                                                                          UnaryOperator<ListOrganizationServicesRequest.Builder> transformer) {
         return
-            requestResources(page -> cloudFoundryClient.organizations()
+            requestClientV2Resources(page -> cloudFoundryClient.organizations()
                 .listServices(transformer.apply(ListOrganizationServicesRequest.builder())
                     .organizationId(organizationId)
                     .page(page)
@@ -1977,7 +1977,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     }
 
     private static Flux<SpaceResource> requestListOrganizationSpaces(CloudFoundryClient cloudFoundryClient, String organizationId, UnaryOperator<ListOrganizationSpacesRequest.Builder> transformer) {
-        return requestResources(page -> cloudFoundryClient.organizations()
+        return requestClientV2Resources(page -> cloudFoundryClient.organizations()
             .listSpaces(transformer.apply(ListOrganizationSpacesRequest.builder())
                 .organizationId(organizationId)
                 .page(page)
@@ -1989,7 +1989,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     }
 
     private static Flux<UserResource> requestListOrganizationUsers(CloudFoundryClient cloudFoundryClient, String organizationId, UnaryOperator<ListOrganizationUsersRequest.Builder> transformer) {
-        return requestResources(page -> cloudFoundryClient.organizations()
+        return requestClientV2Resources(page -> cloudFoundryClient.organizations()
             .listUsers(transformer.apply(ListOrganizationUsersRequest.builder())
                 .page(page)
                 .organizationId(organizationId)
@@ -2002,7 +2002,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     private static Flux<OrganizationResource> requestListOrganizations(CloudFoundryClient cloudFoundryClient, UnaryOperator<ListOrganizationsRequest.Builder> transformer) {
         return
-            requestResources(page -> cloudFoundryClient.organizations()
+            requestClientV2Resources(page -> cloudFoundryClient.organizations()
                 .list(transformer.apply(ListOrganizationsRequest.builder())
                     .page(page)
                     .build()));
@@ -2010,14 +2010,14 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     private static Flux<ServiceResource> requestListServices(CloudFoundryClient cloudFoundryClient) {
         return
-            requestResources(page -> cloudFoundryClient.services()
+            requestClientV2Resources(page -> cloudFoundryClient.services()
                 .list(ListServicesRequest.builder()
                     .build()));
     }
 
     private static Flux<UserResource> requestListUsers(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.users()
+            .requestClientV2Resources(page -> cloudFoundryClient.users()
                 .list(ListUsersRequest.builder()
                     .page(page)
                     .build()));

@@ -262,7 +262,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
         Optional.ofNullable(serviceInstanceId).map(builder::serviceInstanceId);
 
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.serviceBindingsV2()
+            .requestClientV2Resources(page -> cloudFoundryClient.serviceBindingsV2()
                 .list(builder
                     .page(page)
                     .build()));

@@ -16,77 +16,248 @@
 
 package org.cloudfoundry.util;
 
-import org.cloudfoundry.client.v2.Metadata;
+import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
+import org.cloudfoundry.client.v2.spaces.Spaces;
+import org.cloudfoundry.client.v3.Pagination;
+import org.cloudfoundry.client.v3.packages.ListPackagesRequest;
+import org.cloudfoundry.client.v3.packages.ListPackagesResponse;
+import org.cloudfoundry.client.v3.packages.PackageResource;
+import org.cloudfoundry.client.v3.packages.Packages;
+import org.cloudfoundry.uaa.users.ListUsersRequest;
+import org.cloudfoundry.uaa.users.ListUsersResponse;
+import org.cloudfoundry.uaa.users.Meta;
+import org.cloudfoundry.uaa.users.Name;
+import org.cloudfoundry.uaa.users.User;
+import org.cloudfoundry.uaa.users.Users;
+import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Test;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
-import java.util.List;
+import java.time.Duration;
+import java.util.Collections;
 
-import static org.cloudfoundry.util.test.TestObjects.fill;
-import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.RETURNS_SMART_NULLS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public final class PaginationUtilsTest {
 
     @Test
-    public void pageStream() {
-        List<SpaceResource> expected = Arrays.asList(testSpaceResource(1), testSpaceResource(2), testSpaceResource(3));
+    public void requestClientV2Resources() throws InterruptedException {
+        Spaces spaces = mock(Spaces.class, RETURNS_SMART_NULLS);
+        TestSubscriber<SpaceResource> testSubscriber = new TestSubscriber<>();
 
-        List<SpaceResource> actual = PaginationUtils
-            .requestPages(i -> testPaginatedResponsePublisher(i, 3))
-            .flatMap(response -> Flux.fromIterable(response.getResources()))
-            .collectList()
-            .block();
+        requestListSpaces(spaces, 1, 3);
+        requestListSpaces(spaces, 2, 3);
+        requestListSpaces(spaces, 3, 3);
 
-        assertEquals(expected, actual);
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void pageStreamNoTotalPages() {
         PaginationUtils
-            .requestPages(page -> Mono
-                .just(ListSpacesResponse.builder()
-                    .resource(testSpaceResource(0))
+            .requestClientV2Resources(page -> spaces
+                .list(ListSpacesRequest.builder()
+                    .page(page)
                     .build()))
-            .collectList()
-            .block();
+            .subscribe(testSubscriber
+                .assertCount(3));
+
+        testSubscriber.verify(Duration.ofSeconds(1));
     }
 
     @Test
-    public void resourceStream() {
-        List<SpaceResource> expected = Arrays.asList(testSpaceResource(0), testSpaceResource(1), testSpaceResource(2));
+    public void requestClientV2ResourcesEmpty() throws InterruptedException {
+        Spaces spaces = mock(Spaces.class, RETURNS_SMART_NULLS);
+        TestSubscriber<SpaceResource> testSubscriber = new TestSubscriber<>();
 
-        List<SpaceResource> actual = PaginationUtils
-            .requestResources(i -> testPaginatedResponsePublisher(i - 1, 3))
-            .collectList()
-            .block();
+        requestListSpacesEmpty(spaces);
 
-        assertEquals(expected, actual);
+        PaginationUtils
+            .requestClientV2Resources(page -> spaces
+                .list(ListSpacesRequest.builder()
+                    .page(page)
+                    .build()))
+            .subscribe(testSubscriber
+                .assertCount(0));
+
+        testSubscriber.verify(Duration.ofSeconds(1));
     }
 
-    private static Mono<ListSpacesResponse> testPaginatedResponsePublisher(int i, int totalNumber) {
-        ListSpacesResponse response = ListSpacesResponse.builder()
-            .totalPages(totalNumber)
-            .totalResults(1)
-            .resource(testSpaceResource(i))
-            .build();
+    @Test
+    public void requestClientV3Empty() throws InterruptedException {
+        Packages packages = mock(Packages.class, RETURNS_SMART_NULLS);
+        TestSubscriber<PackageResource> testSubscriber = new TestSubscriber<>();
 
-        return Mono.just(response);
+        requestListPackagesEmpty(packages);
+
+        PaginationUtils
+            .requestClientV3Resources(page -> packages
+                .list(ListPackagesRequest.builder()
+                    .page(page)
+                    .build()))
+            .subscribe(testSubscriber
+                .assertCount(0));
+
+        testSubscriber.verify(Duration.ofSeconds(1));
     }
 
-    private static SpaceResource testSpaceResource(int i) {
-        return SpaceResource.builder()
-            .metadata(fill(Metadata.builder())
-                .id("test-id-" + i)
-                .build())
-            .entity(fill(SpaceEntity.builder())
-                .name("name-" + i)
-                .build())
-            .build();
+    @Test
+    public void requestClientV3Resources() throws InterruptedException {
+        Packages packages = mock(Packages.class, RETURNS_SMART_NULLS);
+        TestSubscriber<PackageResource> testSubscriber = new TestSubscriber<>();
+
+        requestListPackages(packages, 1, 3);
+        requestListPackages(packages, 2, 3);
+        requestListPackages(packages, 3, 3);
+
+        PaginationUtils
+            .requestClientV3Resources(page -> packages
+                .list(ListPackagesRequest.builder()
+                    .page(page)
+                    .build()))
+            .subscribe(testSubscriber
+                .assertCount(3));
+
+        testSubscriber.verify(Duration.ofSeconds(1));
+    }
+
+    @Test
+    public void requestUaaResources() throws InterruptedException {
+        Users users = mock(Users.class, RETURNS_SMART_NULLS);
+        TestSubscriber<User> testSubscriber = new TestSubscriber<>();
+
+        requestListUsers(users, 1, 100, 250);
+        requestListUsers(users, 101, 100, 250);
+        requestListUsers(users, 201, 100, 250);
+
+        PaginationUtils
+            .requestUaaResources(startIndex -> users
+                .list(ListUsersRequest.builder()
+                    .startIndex(startIndex)
+                    .build()))
+            .subscribe(testSubscriber
+                .assertCount(3));
+
+        testSubscriber.verify(Duration.ofSeconds(1));
+    }
+
+    @Test
+    public void requestUaaResourcesEmpty() throws InterruptedException {
+        Users users = mock(Users.class, RETURNS_SMART_NULLS);
+        TestSubscriber<User> testSubscriber = new TestSubscriber<>();
+
+        requestListUsersEmpty(users, 1, 100);
+
+        PaginationUtils
+            .requestUaaResources(startIndex -> users
+                .list(ListUsersRequest.builder()
+                    .startIndex(startIndex)
+                    .build()))
+            .subscribe(testSubscriber
+                .assertCount(0));
+
+        testSubscriber.verify(Duration.ofSeconds(1));
+    }
+
+    private static void requestListPackages(Packages packages, Integer page, Integer totalPages) {
+        when(packages
+            .list(ListPackagesRequest.builder()
+                .page(page)
+                .build()))
+            .thenReturn(Mono
+                .just(ListPackagesResponse.builder()
+                    .resource(PackageResource.builder()
+                        .id(page.toString())
+                        .build())
+                    .pagination(Pagination.builder()
+                        .totalPages(totalPages)
+                        .build())
+                    .build()));
+    }
+
+    private static void requestListPackagesEmpty(Packages packages) {
+        when(packages
+            .list(ListPackagesRequest.builder()
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(ListPackagesResponse.builder()
+                    .resources(Collections.emptyList())
+                    .pagination(Pagination.builder()
+                        .totalPages(1)
+                        .build())
+                    .build()));
+    }
+
+    private static void requestListSpaces(Spaces spaces, Integer page, Integer totalPages) {
+        when(spaces
+            .list(ListSpacesRequest.builder()
+                .page(page)
+                .build()))
+            .thenReturn(Mono
+                .just(ListSpacesResponse.builder()
+                    .resource(SpaceResource.builder()
+                        .entity(SpaceEntity.builder()
+                            .name(page.toString())
+                            .build())
+                        .build())
+                    .totalPages(totalPages)
+                    .build()));
+    }
+
+    private static void requestListSpacesEmpty(Spaces spaces) {
+        when(spaces
+            .list(ListSpacesRequest.builder()
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(ListSpacesResponse.builder()
+                    .resources(Collections.emptyList())
+                    .totalPages(1)
+                    .build()));
+    }
+
+    private static void requestListUsers(Users users, Integer startIndex, Integer itemsPerPage, Integer totalResults) {
+        when(users
+            .list(ListUsersRequest.builder()
+                .startIndex(startIndex)
+                .build()))
+            .thenReturn(Mono
+                .just(ListUsersResponse.builder()
+                    .resource(User.builder()
+                        .active(true)
+                        .meta(Meta.builder()
+                            .created("test-created")
+                            .lastModified("test-last-modified")
+                            .version(0)
+                            .build())
+                        .id(startIndex.toString())
+                        .name(Name.builder()
+                            .build())
+                        .origin("test-origin")
+                        .passwordLastModified("test-password-last-modified")
+                        .verified(true)
+                        .userName("test-user-name")
+                        .zoneId("test-zone-id")
+                        .build())
+                    .itemsPerPage(itemsPerPage)
+                    .startIndex(startIndex)
+                    .totalResults(totalResults)
+                    .build()));
+    }
+
+    private static void requestListUsersEmpty(Users users, Integer startIndex, Integer itemsPerPage) {
+        when(users
+            .list(ListUsersRequest.builder()
+                .startIndex(startIndex)
+                .build()))
+            .thenReturn(Mono
+                .just(ListUsersResponse.builder()
+                    .resources(Collections.emptyList())
+                    .itemsPerPage(itemsPerPage)
+                    .startIndex(startIndex)
+                    .totalResults(0)
+                    .build()));
     }
 
 }

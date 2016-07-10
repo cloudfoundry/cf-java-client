@@ -115,7 +115,7 @@ final class CloudFoundryCleaner {
 
     private static Flux<Void> cleanApplicationsV2(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils.
-            requestResources(page -> cloudFoundryClient.applicationsV2()
+            requestClientV2Resources(page -> cloudFoundryClient.applicationsV2()
                 .list(ListApplicationsRequest.builder()
                     .page(page)
                     .build()))
@@ -130,12 +130,11 @@ final class CloudFoundryCleaner {
     }
 
     private static Flux<Void> cleanApplicationsV3(CloudFoundryClient cloudFoundryClient) {
-        return cloudFoundryClient.applicationsV3()  // TODO: Handle pagination properly
-            .list(org.cloudfoundry.client.v3.applications.ListApplicationsRequest.builder()
-                .page(1)
-                .perPage(5_000)
-                .build())
-            .flatMap(response -> Flux.fromIterable(response.getResources()))
+        return PaginationUtils
+            .requestClientV3Resources(page -> cloudFoundryClient.applicationsV3()
+                .list(org.cloudfoundry.client.v3.applications.ListApplicationsRequest.builder()
+                    .page(page)
+                    .build()))
             .filter(application -> application.getName().startsWith("test-application-"))
             .map(Application::getId)
             .flatMap(applicationId -> cloudFoundryClient.applicationsV3()
@@ -146,7 +145,7 @@ final class CloudFoundryCleaner {
 
     private static Flux<Void> cleanBuildpacks(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.buildpacks()
+            .requestClientV2Resources(page -> cloudFoundryClient.buildpacks()
                 .list(ListBuildpacksRequest.builder()
                     .page(page)
                     .build()))
@@ -162,7 +161,7 @@ final class CloudFoundryCleaner {
 
     private static Flux<Void> cleanDomains(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils.
-            requestResources(page -> cloudFoundryClient.domains()
+            requestClientV2Resources(page -> cloudFoundryClient.domains()
                 .list(ListDomainsRequest.builder()
                     .page(page)
                     .build()))
@@ -193,7 +192,7 @@ final class CloudFoundryCleaner {
 
     private static Flux<Void> cleanOrganizations(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils.
-            requestResources(page -> cloudFoundryClient.organizations()
+            requestClientV2Resources(page -> cloudFoundryClient.organizations()
                 .list(ListOrganizationsRequest.builder()
                     .page(page)
                     .build()))
@@ -208,12 +207,11 @@ final class CloudFoundryCleaner {
     }
 
     private static Flux<Void> cleanPackages(CloudFoundryClient cloudFoundryClient) {
-        return cloudFoundryClient.packages()  // TODO: Handle pagination properly
-            .list(ListPackagesRequest.builder()
-                .page(1)
-                .perPage(5_000)
-                .build())
-            .flatMap(response -> Flux.fromIterable(response.getResources()))
+        return PaginationUtils
+            .requestClientV3Resources(page -> cloudFoundryClient.packages()
+                .list(ListPackagesRequest.builder()
+                    .page(page)
+                    .build()))
             .filter(package1 -> true)
             .map(Package::getId)
             .flatMap(packageId -> cloudFoundryClient.packages()
@@ -224,7 +222,7 @@ final class CloudFoundryCleaner {
 
     private static Flux<Void> cleanPrivateDomains(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils.
-            requestResources(page -> cloudFoundryClient.privateDomains()
+            requestClientV2Resources(page -> cloudFoundryClient.privateDomains()
                 .list(ListPrivateDomainsRequest.builder()
                     .page(page)
                     .build()))
@@ -240,7 +238,7 @@ final class CloudFoundryCleaner {
 
     private static Flux<Void> cleanRoutes(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils.
-            requestResources(page -> cloudFoundryClient.routes()
+            requestClientV2Resources(page -> cloudFoundryClient.routes()
                 .list(ListRoutesRequest.builder()
                     .page(page)
                     .build()))
@@ -263,7 +261,7 @@ final class CloudFoundryCleaner {
 
     private static Flux<Void> cleanServiceInstances(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils.
-            requestResources(page -> cloudFoundryClient.serviceInstances()
+            requestClientV2Resources(page -> cloudFoundryClient.serviceInstances()
                 .list(ListServiceInstancesRequest.builder()
                     .page(page)
                     .build()))
@@ -279,7 +277,7 @@ final class CloudFoundryCleaner {
 
     private static Flux<Void> cleanSpaces(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils.
-            requestResources(page -> cloudFoundryClient.spaces()
+            requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .list(ListSpacesRequest.builder()
                     .page(page)
                     .build()))
@@ -295,7 +293,7 @@ final class CloudFoundryCleaner {
 
     private static Flux<Void> cleanUserProvidedServiceInstances(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils.
-            requestResources(page -> cloudFoundryClient.userProvidedServiceInstances()
+            requestClientV2Resources(page -> cloudFoundryClient.userProvidedServiceInstances()
                 .list(ListUserProvidedServiceInstancesRequest.builder()
                     .page(page)
                     .build()))
@@ -308,11 +306,11 @@ final class CloudFoundryCleaner {
     }
 
     private static Flux<Void> cleanUsers(UaaClient uaaClient) {
-        return uaaClient.users()
-            .list(ListUsersRequest.builder()
-                .count(5_000)
-                .build())
-            .flatMap(response -> Flux.fromIterable(response.getResources()))
+        return PaginationUtils
+            .requestUaaResources(startIndex -> uaaClient.users()
+                .list(ListUsersRequest.builder()
+                    .startIndex(startIndex)
+                    .build()))
             .filter(user -> user.getUserName().startsWith("test-user-"))
             .map(User::getId)
             .flatMap(userId -> uaaClient.users()
@@ -325,7 +323,7 @@ final class CloudFoundryCleaner {
 
     private static Flux<Void> removeServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return PaginationUtils.
-            requestResources(page -> cloudFoundryClient.applicationsV2()
+            requestClientV2Resources(page -> cloudFoundryClient.applicationsV2()
                 .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
                     .page(page)
                     .applicationId(applicationId)

@@ -236,7 +236,7 @@ public final class DefaultOrganizations implements Organizations {
 
     private static Flux<DomainResource> requestDomains(CloudFoundryClient cloudFoundryClient, String organizationId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizations()
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
                 .listDomains(ListOrganizationDomainsRequest.builder()
                     .page(page)
                     .organizationId(organizationId)
@@ -259,7 +259,7 @@ public final class DefaultOrganizations implements Organizations {
 
     private static Flux<OrganizationQuotaDefinitionResource> requestOrganizationQuotaDefinitions(CloudFoundryClient cloudFoundryClient, String organizationQuotaDefinition) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizationQuotaDefinitions()
+            .requestClientV2Resources(page -> cloudFoundryClient.organizationQuotaDefinitions()
                 .list(ListOrganizationQuotaDefinitionsRequest.builder()
                     .name(organizationQuotaDefinition)
                     .page(page)
@@ -268,7 +268,7 @@ public final class DefaultOrganizations implements Organizations {
 
     private static Flux<OrganizationResource> requestOrganizations(CloudFoundryClient cloudFoundryClient, String organizationName) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizations()
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
                 .list(ListOrganizationsRequest.builder()
                     .name(organizationName)
                     .page(page)
@@ -277,7 +277,7 @@ public final class DefaultOrganizations implements Organizations {
 
     private static Flux<OrganizationResource> requestOrganizations(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizations()
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
                 .list(ListOrganizationsRequest.builder()
                     .page(page)
                     .build()));
@@ -285,7 +285,7 @@ public final class DefaultOrganizations implements Organizations {
 
     private static Flux<SpaceQuotaDefinitionResource> requestSpaceQuotaDefinitions(CloudFoundryClient cloudFoundryClient, String organizationId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizations()
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
                 .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
                     .page(page)
                     .organizationId(organizationId)
@@ -294,7 +294,7 @@ public final class DefaultOrganizations implements Organizations {
 
     private static Flux<SpaceResource> requestSpaces(CloudFoundryClient cloudFoundryClient, String organizationId) {
         return PaginationUtils
-            .requestResources(page -> cloudFoundryClient.organizations()
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
                 .listSpaces(ListOrganizationSpacesRequest.builder()
                     .page(page)
                     .organizationId(organizationId)
