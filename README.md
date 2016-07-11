@@ -2,7 +2,7 @@
 The `cf-java-client` project is a Java language binding for interacting with a Cloud Foundry instance.  The project is broken up into a number of components which expose different levels of abstraction depending on need.
 
 * `cloudfoundry-client` – Interfaces, request, and response objects mapping to the [Cloud Foundry REST APIs][a].  This project has no implementation and therefore cannot connect a Cloud Foundry instance on its own.
-* `cloudfoundry-client-spring` – The default implementation of the `cloudfoundry-client` project.  This implementation is based on the Spring Framework [`RestTemplate`][t].
+* `cloudfoundry-client-reactor` – The default implementation of the `cloudfoundry-client` project.  This implementation is based on the Reactor Netty [`HttpClient`][h].
 * `cloudfoundry-operations` – An API and implementation that corresponds to the [Cloud Foundry CLI][c] operations.  This project builds on the `cloudfoundry-cli` and therefore has a single implementation.
 * `cloudfoundry-maven-plugin` / `cloudfoundry-gradle-plugin` – Build plugins for [Maven][m] and [Gradle][g].  These projects build on `cloudfoundry-operations` and therefore have single implementations.
 
@@ -12,7 +12,7 @@ Most projects will need two dependencies; the Operations API and an implementati
 <dependencies>
     <dependency>
         <groupId>org.cloudfoundry</groupId>
-        <artifactId>cloudfoundry-client-spring</artifactId>
+        <artifactId>cloudfoundry-client-reactor</artifactId>
         <version>2.0.0.BUILD-SNAPSHOT</version>
     </dependency>
     <dependency>
@@ -76,7 +76,7 @@ For Gradle, the dependencies would be defined like this:
 
 ```groovy
 dependencies {
-    compile 'org.cloudfoundry:cloudfoundry-client-spring:2.0.0.BUILD-SNAPSHOT'
+    compile 'org.cloudfoundry:cloudfoundry-client-reactor:2.0.0.BUILD-SNAPSHOT'
     compile 'org.cloudfoundry:cloudfoundry-operations:2.0.0.BUILD-SNAPSHOT'
     compile 'io.projectreactor:reactor-core:2.5.0.BUILD-SNAPSHOT'
     compile 'io.projectreactor:reactor-netty:2.5.0.BUILD-SNAPSHOT'
@@ -282,7 +282,7 @@ TODO: Document once implemented
 API Documentation for each module can be found at the following locations:
 
 * `cloudfoundry-client` – [`release`](http://cloudfoundry.github.io/cf-java-client/api/latest-release/cloudfoundry-client), [`milestone`](http://cloudfoundry.github.io/cf-java-client/api/latest-milestone/cloudfoundry-client), [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/latest-snapshot/cloudfoundry-client)
-* `cloudfoundry-client-spring` – [`release`](http://cloudfoundry.github.io/cf-java-client/api/latest-release/cloudfoundry-client-spring), [`milestone`](http://cloudfoundry.github.io/cf-java-client/api/latest-milestone/cloudfoundry-client-spring), [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/latest-snapshot/cloudfoundry-client-spring)
+* `cloudfoundry-client-reactor` – [`release`](http://cloudfoundry.github.io/cf-java-client/api/latest-release/cloudfoundry-client-reactor), [`milestone`](http://cloudfoundry.github.io/cf-java-client/api/latest-milestone/cloudfoundry-client-reactor), [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/latest-snapshot/cloudfoundry-client-reactor)
 * `cloudfoundry-operations` – [`release`](http://cloudfoundry.github.io/cf-java-client/api/latest-release/cloudfoundry-operations), [`milestone`](http://cloudfoundry.github.io/cf-java-client/api/latest-milestone/cloudfoundry-operations), [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/latest-snapshot/cloudfoundry-operations)
 * `cloudfoundry-util` – [`release`](http://cloudfoundry.github.io/cf-java-client/api/latest-release/cloudfoundry-util), [`milestone`](http://cloudfoundry.github.io/cf-java-client/api/latest-milestone/cloudfoundry-util), [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/latest-snapshot/cloudfoundry-util)
 
@@ -324,10 +324,10 @@ This project is released under version 2.0 of the [Apache License][l].
 [c]: https://github.com/cloudfoundry/cli
 [e]: https://github.com/cloudfoundry/cf-java-client/issues
 [g]: https://gradle.org
+[h]: http://projectreactor.io/io/docs/api/reactor/io/netty/http/HttpClient.html
 [i]: https://github.com/pivotal-cf/micropcf
 [l]: https://www.apache.org/licenses/LICENSE-2.0
 [m]: https://maven.apache.org
 [p]: https://projectreactor.io
 [r]: http://reactivex.io
-[t]: https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html
 [u]: https://help.github.com/articles/using-pull-requests

@@ -24,6 +24,7 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="cloudfoundry-client" />
+        <module name="cloudfoundry-client-reactor" />
         <module name="cloudfoundry-client-spring" />
         <module name="cloudfoundry-gradle-plugin" />
         <module name="cloudfoundry-maven-plugin" />
@@ -34,6 +35,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="cloudfoundry-client" target="1.8" />
+      <module name="cloudfoundry-client-reactor" target="1.8" />
       <module name="cloudfoundry-client-spring" target="1.8" />
       <module name="cloudfoundry-gradle-plugin" target="1.8" />
       <module name="cloudfoundry-java-client" target="1.6" />

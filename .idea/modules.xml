@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/cloudfoundry-client/cloudfoundry-client.iml" filepath="$PROJECT_DIR$/cloudfoundry-client/cloudfoundry-client.iml" />
-      <module fileurl="file://$PROJECT_DIR$/cloudfoundry-client-spring/cloudfoundry-client-spring.iml" filepath="$PROJECT_DIR$/cloudfoundry-client-spring/cloudfoundry-client-spring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cloudfoundry-client-reactor/cloudfoundry-client-reactor.iml" filepath="$PROJECT_DIR$/cloudfoundry-client-reactor/cloudfoundry-client-reactor.iml" />
       <module fileurl="file://$PROJECT_DIR$/cloudfoundry-gradle-plugin/cloudfoundry-gradle-plugin.iml" filepath="$PROJECT_DIR$/cloudfoundry-gradle-plugin/cloudfoundry-gradle-plugin.iml" />
       <module fileurl="file://$PROJECT_DIR$/cloudfoundry-java-client.iml" filepath="$PROJECT_DIR$/cloudfoundry-java-client.iml" />
       <module fileurl="file://$PROJECT_DIR$/cloudfoundry-maven-plugin/cloudfoundry-maven-plugin.iml" filepath="$PROJECT_DIR$/cloudfoundry-maven-plugin/cloudfoundry-maven-plugin.iml" />

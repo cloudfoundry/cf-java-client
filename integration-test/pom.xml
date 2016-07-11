@@ -56,7 +56,7 @@
         </dependency>
         <dependency>
             <groupId>org.cloudfoundry</groupId>
-            <artifactId>cloudfoundry-client-spring</artifactId>
+            <artifactId>cloudfoundry-client-reactor</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
