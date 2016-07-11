@@ -249,7 +249,9 @@ final class CloudFoundryCleaner {
                         .domainId(ResourceUtils.getEntity(route).getDomainId())
                         .build())
             ))
-            .filter(predicate((route, domain) -> ResourceUtils.getEntity(domain).getName().startsWith("test.domain.")))
+            .filter(predicate((route, domain) -> ResourceUtils.getEntity(domain).getName().startsWith("test.domain.") ||
+                ResourceUtils.getEntity(route).getHost().startsWith("test-application-") ||
+                ResourceUtils.getEntity(route).getHost().startsWith("test-host-")))
             .map(function((route, domain) -> ResourceUtils.getId(route)))
             .flatMap(routeId -> cloudFoundryClient.routes()
                 .delete(DeleteRouteRequest.builder()
@@ -282,6 +284,7 @@ final class CloudFoundryCleaner {
                     .page(page)
                     .build()))
             .filter(space -> ResourceUtils.getEntity(space).getName().startsWith("test-space-"))
+            .log("stream.deleteSpace")
             .map(ResourceUtils::getId)
             .flatMap(spaceId -> cloudFoundryClient.spaces()
                 .delete(DeleteSpaceRequest.builder()
