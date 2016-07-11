@@ -4,7 +4,7 @@ set -e
 
 PROJECTS=" \
   cloudfoundry-client \
-  cloudfoundry-client-spring \
+  cloudfoundry-client-reactor \
   cloudfoundry-operations \
   cloudfoundry-util"
 
