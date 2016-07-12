@@ -27,10 +27,10 @@
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.0" level="project" />
     <orderEntry type="library" name="Maven: com.github.zafarkhaja:java-semver:0.9.0" level="project" />
     <orderEntry type="library" name="Maven: io.jsonwebtoken:jjwt:0.6.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.squareup.okhttp3:mockwebserver:3.3.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.squareup.okhttp3:okhttp:3.3.1" level="project" />
-    <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.8.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.squareup.okhttp3:okhttp-ws:3.3.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.squareup.okhttp3:mockwebserver:3.4.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.squareup.okhttp3:okhttp:3.4.1" level="project" />
+    <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.9.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.squareup.okhttp3:okhttp-ws:3.4.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.bouncycastle:bcprov-jdk15on:1.50" level="project" />
     <orderEntry type="library" name="Maven: io.projectreactor:reactor-netty:2.5.0.BUILD-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: io.projectreactor:reactor-ipc:2.5.0.BUILD-SNAPSHOT" level="project" />
