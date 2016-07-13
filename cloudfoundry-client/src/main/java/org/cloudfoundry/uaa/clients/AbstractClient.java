@@ -40,10 +40,10 @@ abstract class AbstractClient {
     abstract Boolean getApprovalsDeleted();
 
     /**
-     * Scopes which the client is able to grant when creating a client
+     * Scopes that the client is able to grant when creating a client
      */
     @JsonProperty("authorities")
-    abstract List<String> getAuthorityScopes();
+    abstract List<String> getAuthorities();
 
     /**
      * List of grant types that can be used to obtain a token with this client. Can include authorization_code, password, implicit, and/or client_credentials.
@@ -80,7 +80,6 @@ abstract class AbstractClient {
      * A human readable name for the client
      */
     @JsonProperty("name")
-    @Nullable
     abstract String getName();
 
     /**
@@ -105,7 +104,6 @@ abstract class AbstractClient {
      * A random string used to generate the client’s revokation key. Change this value to revoke all active tokens for the client
      */
     @JsonProperty("token_salt")
-    @Nullable
     abstract String getTokenSalt();
 
 }

@@ -3,7 +3,7 @@
     "clients.read",
     "clients.write"
   ],
-  "client_id": "RoXWdB",
+  "client_id": "4Z3t1r",
   "resource_ids": [
     "none"
   ],
@@ -12,7 +12,7 @@
   ],
   "redirect_uri": [
     "http*://ant.path.wildcard/**/passback/*",
-    "http://test1.example.com"
+    "http://test1.com"
   ],
   "autoapprove": [
     "true"
@@ -21,12 +21,12 @@
     "clients.read",
     "clients.write"
   ],
-  "token_salt": "nNUNmH",
+  "token_salt": "mr80UZ",
   "allowedproviders": [
     "uaa",
     "ldap",
     "my-saml-provider"
   ],
   "name": "My Client Name",
-  "lastModified": 1467059560412
+  "lastModified": 1468364445592
 }

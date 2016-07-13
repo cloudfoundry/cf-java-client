@@ -31,7 +31,7 @@ public final class ReactorClientsTest {
 
     public static final class Get extends AbstractUaaApiTest<GetClientRequest, GetClientResponse> {
 
-        private final ReactorClients clients = new ReactorClients(AUTHORIZATION_PROVIDER, HTTP_CLIENT, OBJECT_MAPPER, this.root);
+        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
         protected InteractionContext getInteractionContext() {
@@ -52,19 +52,19 @@ public final class ReactorClientsTest {
                 .allowedProvider("uaa")
                 .allowedProvider("ldap")
                 .allowedProvider("my-saml-provider")
-                .authorityScope("clients.read")
-                .authorityScope("clients.write")
+                .authority("clients.read")
+                .authority("clients.write")
                 .authorizedGrantType("client_credentials")
                 .autoApprove("true")
-                .clientId("RoXWdB")
-                .lastModified(1467059560412L)
+                .clientId("4Z3t1r")
+                .lastModified(1468364445592L)
                 .name("My Client Name")
                 .redirectUriPattern("http*://ant.path.wildcard/**/passback/*")
-                .redirectUriPattern("http://test1.example.com")
+                .redirectUriPattern("http://test1.com")
                 .resourceId("none")
                 .scope("clients.read")
                 .scope("clients.write")
-                .tokenSalt("nNUNmH")
+                .tokenSalt("mr80UZ")
                 .build();
         }
 

@@ -17,13 +17,14 @@
 package org.cloudfoundry.uaa.clients;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.uaa.IdentityZoned;
 import org.immutables.value.Value;
 
 /**
  * The request payload for the retrieve client
  */
 @Value.Immutable
-abstract class _GetClientRequest {
+abstract class _GetClientRequest implements IdentityZoned {
 
     /**
      * The client id
