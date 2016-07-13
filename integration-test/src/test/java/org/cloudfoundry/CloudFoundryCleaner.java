@@ -110,7 +110,7 @@ final class CloudFoundryCleaner {
             .doOnError(Throwable::printStackTrace)
             .doOnComplete(() -> this.logger.debug("<< CLEANUP >>"))
             .then()
-            .block(Duration.ofMinutes(10));
+            .block(Duration.ofMinutes(30));
     }
 
     private static Flux<Void> cleanApplicationsV2(CloudFoundryClient cloudFoundryClient) {
@@ -284,7 +284,6 @@ final class CloudFoundryCleaner {
                     .page(page)
                     .build()))
             .filter(space -> ResourceUtils.getEntity(space).getName().startsWith("test-space-"))
-            .log("stream.deleteSpace")
             .map(ResourceUtils::getId)
             .flatMap(spaceId -> cloudFoundryClient.spaces()
                 .delete(DeleteSpaceRequest.builder()
