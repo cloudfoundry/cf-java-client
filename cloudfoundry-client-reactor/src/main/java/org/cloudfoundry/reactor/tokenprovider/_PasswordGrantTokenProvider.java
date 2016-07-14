@@ -27,12 +27,16 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * The OAuth Password Grant implementation of {@link TokenProvider}
  */
 @Value.Immutable
 abstract class _PasswordGrantTokenProvider implements BasicAuthorized, TokenProvider {
+
+    private final ConcurrentMap<ConnectionContext, Mono<String>> tokens = new ConcurrentHashMap<>(1);
 
     /**
      * The client id.  Defaults to {@code cf}.
@@ -51,9 +55,9 @@ abstract class _PasswordGrantTokenProvider implements BasicAuthorized, TokenProv
     }
 
     @Override
-    @Value.Derived
     public final Mono<String> getToken(ConnectionContext connectionContext) {
-        return connectionContext.getRoot("authorization_endpoint")
+        return this.tokens.computeIfAbsent(connectionContext, context -> context
+            .getRoot("authorization_endpoint")
             .map(this::getTokenUri)
             .then(uri -> connectionContext.getHttpClient()
                 .post(uri, outbound -> {
@@ -69,7 +73,7 @@ abstract class _PasswordGrantTokenProvider implements BasicAuthorized, TokenProv
             .map(JsonCodec.decode(connectionContext.getObjectMapper(), Map.class))
             .map(r -> r.get("access_token"))
             .cast(String.class)
-            .cache();
+            .cache());
     }
 
     /**
