@@ -93,9 +93,9 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuple6;
+import reactor.util.function.Tuples;
 
 import java.io.InputStream;
 import java.time.Duration;
@@ -157,7 +157,7 @@ public final class DefaultApplications implements Applications {
                 getApplicationIdFromOrgSpace(cloudFoundryClient, request.getTargetName(), spaceId, request.getTargetOrganization(), request.getTargetSpace())
             )))
             .then(function((cloudFoundryClient, sourceApplicationId, targetApplicationId) -> copyBits(cloudFoundryClient, sourceApplicationId, targetApplicationId)
-                .then(Mono.just(Tuple.of(cloudFoundryClient, targetApplicationId)))))
+                .then(Mono.just(Tuples.of(cloudFoundryClient, targetApplicationId)))))
             .filter(predicate((cloudFoundryClient, targetApplicationId) -> Optional.ofNullable(request.getRestart()).orElse(false)))
             .then(function((cloudFoundryClient, targetApplicationId) -> restartApplication(cloudFoundryClient, request.getTargetName(), targetApplicationId, request.getStagingTimeout(),
                 request.getStartupTimeout())));
@@ -168,11 +168,11 @@ public final class DefaultApplications implements Applications {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
             .then(function((cloudFoundryClient, spaceId) -> getRoutesAndApplicationId(cloudFoundryClient, request, spaceId, Optional.ofNullable(request.getDeleteRoutes()).orElse(false))
-                .map(function((routes, applicationId) -> Tuple.of(cloudFoundryClient, routes, applicationId)))))
+                .map(function((routes, applicationId) -> Tuples.of(cloudFoundryClient, routes, applicationId)))))
             .then(function((cloudFoundryClient, routes, applicationId) -> deleteRoutes(cloudFoundryClient, routes)
-                .then(Mono.just(Tuple.of(cloudFoundryClient, applicationId)))))
+                .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId)))))
             .then(function((cloudFoundryClient, applicationId) -> removeServiceBindings(cloudFoundryClient, applicationId)
-                .then(Mono.just(Tuple.of(cloudFoundryClient, applicationId)))))
+                .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId)))))
             .then(function(DefaultApplications::requestDeleteApplication));
     }
 
@@ -295,11 +295,11 @@ public final class DefaultApplications implements Applications {
                 Mono.just(spaceId)
             )))
             .then(function((cloudFoundryClient, applicationId, spaceId) -> prepareDomainsAndRoutes(cloudFoundryClient, request, applicationId, spaceId, this.randomWords)
-                .then(Mono.just(Tuple.of(cloudFoundryClient, applicationId)))))
+                .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId)))))
             .then(function((cloudFoundryClient, applicationId) -> uploadApplicationAndWait(cloudFoundryClient, applicationId, request.getApplication())
-                .then(Mono.just(Tuple.of(cloudFoundryClient, applicationId)))))
+                .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId)))))
             .then(function((cloudFoundryClient, applicationId) -> stopApplication(cloudFoundryClient, applicationId)
-                .then(Mono.just(Tuple.of(cloudFoundryClient, applicationId)))))
+                .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId)))))
             .filter(predicate((cloudFoundryClient, applicationId) -> !Optional.ofNullable(request.getNoStart()).orElse(false)))
             .then(function((cloudFoundryClient, applicationId) -> startApplicationAndWait(cloudFoundryClient, request.getName(), applicationId, request.getStagingTimeout(),
                 request.getStartupTimeout())));

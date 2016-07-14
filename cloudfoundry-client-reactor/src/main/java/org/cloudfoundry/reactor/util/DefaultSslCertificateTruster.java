@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import reactor.io.netty.config.ClientOptions;
 import reactor.io.netty.tcp.TcpClient;
 import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -72,7 +73,7 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
 
     @Override
     public void trust(String host, int port, Duration duration) {
-        Tuple2<String, Integer> hostAndPort = Tuple2.of(host, port);
+        Tuple2<String, Integer> hostAndPort = Tuples.of(host, port);
         if (this.trustedHostsAndPorts.contains(hostAndPort)) {
             return;
         }

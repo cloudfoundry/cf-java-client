@@ -68,7 +68,7 @@ import org.cloudfoundry.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.Exceptions;
-import reactor.util.function.Tuple;
+import reactor.util.function.Tuples;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -232,7 +232,7 @@ public final class DefaultServices implements Services {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
             .flatMap(function((cloudFoundryClient, spaceId) -> requestListServiceInstances(cloudFoundryClient, spaceId)
-                .map(resource -> Tuple.of(cloudFoundryClient, resource))
+                .map(resource -> Tuples.of(cloudFoundryClient, resource))
             ))
             .flatMap(function((cloudFoundryClient, resource) -> Mono
                 .when(
@@ -271,7 +271,7 @@ public final class DefaultServices implements Services {
                 .ofNullable(request.getServiceName())
                 .map(serviceName -> getSpaceService(cloudFoundryClient, spaceId, serviceName).flux())
                 .orElse(requestListServices(cloudFoundryClient, spaceId))
-                .map(resource -> Tuple.of(cloudFoundryClient, resource))
+                .map(resource -> Tuples.of(cloudFoundryClient, resource))
             ))
             .flatMap(function((cloudFoundryClient, resource) -> Mono
                 .when(

@@ -47,7 +47,7 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple;
+import reactor.util.function.Tuples;
 
 import java.util.Collections;
 import java.util.List;
@@ -122,9 +122,9 @@ public final class DefaultRoutes implements Routes {
             .when(this.cloudFoundryClient, this.spaceId)
             .flatMap(function((cloudFoundryClient, spaceId) -> requestSpaceRoutes(cloudFoundryClient, spaceId)
                 .map(ResourceUtils::getId)
-                .map(routeId -> Tuple.of(cloudFoundryClient, routeId))))
+                .map(routeId -> Tuples.of(cloudFoundryClient, routeId))))
             .flatMap(function((cloudFoundryClient, routeId) -> getApplications(cloudFoundryClient, routeId)
-                .map(applicationResources -> Tuple.of(cloudFoundryClient, applicationResources, routeId))))
+                .map(applicationResources -> Tuples.of(cloudFoundryClient, applicationResources, routeId))))
             .filter(predicate((cloudFoundryClient, applicationResources, routeId) -> isOrphan(applicationResources)))
             .flatMap(function((cloudFoundryClient, applicationResources, routeId) -> deleteRoute(cloudFoundryClient, routeId)))
             .then();
@@ -134,7 +134,7 @@ public final class DefaultRoutes implements Routes {
     public Flux<Route> list(ListRoutesRequest request) {
         return this.cloudFoundryClient
             .flatMap(cloudFoundryClient -> getRoutes(cloudFoundryClient, request, this.organizationId, this.spaceId)
-                .map(resource -> Tuple.of(cloudFoundryClient, resource)))
+                .map(resource -> Tuples.of(cloudFoundryClient, resource)))
             .flatMap(function((cloudFoundryClient, resource) -> Mono
                 .when(
                     getApplicationNames(cloudFoundryClient, ResourceUtils.getId(resource)),

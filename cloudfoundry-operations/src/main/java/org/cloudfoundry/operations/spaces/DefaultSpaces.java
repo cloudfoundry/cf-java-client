@@ -57,7 +57,7 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple;
+import reactor.util.function.Tuples;
 
 import java.util.Collections;
 import java.util.List;
@@ -122,7 +122,7 @@ public final class DefaultSpaces implements Spaces {
                 )))
             .then(function((cloudFoundryClient, organizationId, spaceId, username) -> {
                 return requestAssociateOrganizationUserByUsername(cloudFoundryClient, organizationId, username)
-                    .then(Mono.just(Tuple.of(cloudFoundryClient, organizationId, spaceId, username)));
+                    .then(Mono.just(Tuples.of(cloudFoundryClient, organizationId, spaceId, username)));
             }))
             .then(function((cloudFoundryClient, organizationId, spaceId, username) -> Mono
                 .when(

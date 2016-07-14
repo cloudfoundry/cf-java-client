@@ -31,6 +31,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuple3;
+import reactor.util.function.Tuples;
 
 import java.util.Arrays;
 import java.util.List;
@@ -66,7 +67,7 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
                 .get(GetFeatureFlagRequest.builder()
                     .name(flagName)
                     .build())
-                .map(response -> Tuple2.of(flagName, response)))
+                .map(response -> Tuples.of(flagName, response)))
             .collectList()
             .subscribe(this.<List<Tuple2<String, GetFeatureFlagResponse>>>testSubscriber()
                 .assertThat(getFlagList -> {

@@ -17,6 +17,7 @@
 package org.cloudfoundry.client;
 
 import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -94,11 +95,11 @@ public final class CompareZips {
     private static Map<String, Tuple2<ZipEntry, byte[]>> zipAddEntryToMap(Map<String, Tuple2<ZipEntry, byte[]>> zMap, ZipEntry zipEntry, String rootPath, InputStream entryInputStream)
         throws IOException {
         if (zipEntry.isDirectory()) {
-            zMap.put(rootPath + zipEntry.getName(), Tuple2.of(zipEntry, new byte[0]));
+            zMap.put(rootPath + zipEntry.getName(), Tuples.of(zipEntry, new byte[0]));
         } else if (zipSuffix(zipEntry.getName().toLowerCase())) {
             zMap = zipAddInputStreamToMap(zMap, rootPath + zipEntry.getName() + "/", new ZipInputStream(entryInputStream));
         } else {
-            zMap.put(rootPath + zipEntry.getName(), Tuple2.of(zipEntry, getContentFrom(entryInputStream)));
+            zMap.put(rootPath + zipEntry.getName(), Tuples.of(zipEntry, getContentFrom(entryInputStream)));
         }
         return zMap;
     }

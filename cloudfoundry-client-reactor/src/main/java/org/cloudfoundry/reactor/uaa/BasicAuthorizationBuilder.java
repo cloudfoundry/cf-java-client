@@ -28,11 +28,12 @@ public final class BasicAuthorizationBuilder {
 
     private static final AsciiString BASIC_PREAMBLE = new AsciiString("Basic ");
 
-    private BasicAuthorizationBuilder(){}
+    private BasicAuthorizationBuilder() {
+    }
 
     public static void augment(HttpClientRequest outbound, Object request) {
-        if(request instanceof BasicAuthorized) {
-            BasicAuthorized basicAuthorized = (BasicAuthorized)request;
+        if (request instanceof BasicAuthorized) {
+            BasicAuthorized basicAuthorized = (BasicAuthorized) request;
             String encoded = Base64.getEncoder().encodeToString(new AsciiString(basicAuthorized.getClientId()).concat(":").concat(basicAuthorized.getClientSecret()).toByteArray());
             outbound.headers().set(AUTHORIZATION, BASIC_PREAMBLE + encoded);
         }

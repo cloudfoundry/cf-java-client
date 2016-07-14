@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.util.Exceptions;
 import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -160,7 +161,7 @@ public final class TestSubscriber<T> implements Subscriber<T> {
         }
 
         if (this.performanceCallback != null) {
-            this.performanceCallback.accept(Tuple2.of(this.startTime, System.currentTimeMillis()));
+            this.performanceCallback.accept(Tuples.of(this.startTime, System.currentTimeMillis()));
         }
 
         verifyError();

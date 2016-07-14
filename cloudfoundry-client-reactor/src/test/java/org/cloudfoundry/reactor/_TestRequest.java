@@ -24,8 +24,8 @@ import okio.Buffer;
 import org.immutables.value.Value;
 import org.junit.Assert;
 import org.springframework.core.io.ClassPathResource;
-import reactor.util.function.Tuple;
 import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 import java.io.IOException;
 import java.util.Map;
@@ -60,7 +60,7 @@ abstract class _TestRequest {
         if (getPayload().isPresent()) {
             assertBodyEquals(getPayload().map(_TestRequest::getBuffer).get(), request.getBody());
         } else if (getContents().isPresent()) {
-            getContents().get().accept(Tuple.of(request.getHeaders(), request.getBody()));
+            getContents().get().accept(Tuples.of(request.getHeaders(), request.getBody()));
         } else {
             Assert.assertEquals("Invalid request body: " + request.getBody().readUtf8(), 0, request.getBodySize());
         }
