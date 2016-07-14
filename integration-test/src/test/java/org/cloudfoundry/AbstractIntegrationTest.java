@@ -29,8 +29,8 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.tuple.Tuple2;
-import reactor.core.util.Exceptions;
+import reactor.util.Exceptions;
+import reactor.util.function.Tuple2;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -51,7 +51,6 @@ public abstract class AbstractIntegrationTest {
     public final TestName testName = new TestName();
 
     private final TestSubscriber<?> testSubscriber = new TestSubscriber<>()
-        .setScanningLoggerName(this::getTestName)
         .setPerformanceLoggerName(this::getTestName);
 
     @Autowired

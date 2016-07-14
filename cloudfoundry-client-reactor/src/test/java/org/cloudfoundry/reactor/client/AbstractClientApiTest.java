@@ -22,7 +22,7 @@ import org.cloudfoundry.reactor.AbstractApiTest;
 import org.junit.Test;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.util.Exceptions;
+import reactor.util.Exceptions;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

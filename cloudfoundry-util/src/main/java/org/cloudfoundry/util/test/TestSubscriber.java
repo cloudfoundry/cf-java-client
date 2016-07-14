@@ -22,9 +22,8 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.core.tuple.Tuple2;
-import reactor.core.util.Exceptions;
-import reactor.core.util.ReactiveStateUtils;
+import reactor.util.Exceptions;
+import reactor.util.function.Tuple2;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -59,8 +58,6 @@ public final class TestSubscriber<T> implements Subscriber<T> {
     private Consumer<? super Throwable> errorExpectation;
 
     private Consumer<Tuple2<Long, Long>> performanceCallback;
-
-    private Consumer<Subscription> scanningCallback;
 
     private long startTime;
 
@@ -127,10 +124,6 @@ public final class TestSubscriber<T> implements Subscriber<T> {
     @Override
     public void onNext(T t) {
         this.actuals.add(t);
-
-        if (this.scanningCallback != null) {
-            this.scanningCallback.accept(this.subscription);
-        }
     }
 
     @Override
@@ -155,21 +148,6 @@ public final class TestSubscriber<T> implements Subscriber<T> {
                 logger.debug("{} ms", finishTime - startTime);
             }
         }));
-    }
-
-    public TestSubscriber<T> setScanningCallback(Consumer<Subscription> scanningCallback) {
-        this.scanningCallback = scanningCallback;
-        return this;
-    }
-
-    public TestSubscriber<T> setScanningLoggerName(Supplier<String> name) {
-        return setScanningCallback(subscription -> {
-            Logger logger = LoggerFactory.getLogger(String.format("cloudfoundry-client.scan.%s", name.get()));
-
-            if (logger.isDebugEnabled()) {
-                logger.debug(ReactiveStateUtils.scan(subscription).toString());
-            }
-        });
     }
 
     public void verify(Duration duration) throws InterruptedException {

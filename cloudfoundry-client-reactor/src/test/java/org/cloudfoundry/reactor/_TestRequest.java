@@ -24,8 +24,8 @@ import okio.Buffer;
 import org.immutables.value.Value;
 import org.junit.Assert;
 import org.springframework.core.io.ClassPathResource;
-import reactor.core.tuple.Tuple;
-import reactor.core.tuple.Tuple2;
+import reactor.util.function.Tuple;
+import reactor.util.function.Tuple2;
 
 import java.io.IOException;
 import java.util.Map;

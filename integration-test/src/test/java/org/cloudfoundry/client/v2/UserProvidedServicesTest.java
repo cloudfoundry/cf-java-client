@@ -38,8 +38,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.tuple.Tuple2;
-import reactor.core.tuple.Tuple3;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuple3;
 
 import java.util.Collections;
 import java.util.function.Consumer;

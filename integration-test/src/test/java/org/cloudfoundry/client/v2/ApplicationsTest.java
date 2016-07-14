@@ -69,8 +69,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.tuple.Tuple2;
-import reactor.core.util.Exceptions;
+import reactor.util.Exceptions;
+import reactor.util.function.Tuple2;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

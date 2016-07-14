@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client;
 
-import reactor.core.tuple.Tuple2;
+import reactor.util.function.Tuple2;
 
 import java.io.IOException;
 import java.io.InputStream;

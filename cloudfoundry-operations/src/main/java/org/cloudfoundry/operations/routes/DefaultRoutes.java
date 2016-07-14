@@ -47,7 +47,7 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.tuple.Tuple;
+import reactor.util.function.Tuple;
 
 import java.util.Collections;
 import java.util.List;

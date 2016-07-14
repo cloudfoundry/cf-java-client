@@ -24,8 +24,8 @@ import io.netty.handler.codec.http.DefaultHttpHeaders;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.util.AsciiString;
 import reactor.core.publisher.Mono;
-import reactor.core.util.Exceptions;
 import reactor.io.netty.http.HttpClientRequest;
+import reactor.util.Exceptions;
 
 import java.io.IOException;
 import java.io.InputStream;
