@@ -19,9 +19,9 @@ package org.cloudfoundry.reactor.util;
 import org.cloudfoundry.reactor.ProxyConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.core.tuple.Tuple2;
 import reactor.io.netty.config.ClientOptions;
 import reactor.io.netty.tcp.TcpClient;
+import reactor.util.function.Tuple2;
 
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;

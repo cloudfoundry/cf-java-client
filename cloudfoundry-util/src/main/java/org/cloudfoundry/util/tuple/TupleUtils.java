@@ -16,13 +16,13 @@
 
 package org.cloudfoundry.util.tuple;
 
-import reactor.core.tuple.Tuple2;
-import reactor.core.tuple.Tuple3;
-import reactor.core.tuple.Tuple4;
-import reactor.core.tuple.Tuple5;
-import reactor.core.tuple.Tuple6;
-import reactor.core.tuple.Tuple7;
-import reactor.core.tuple.Tuple8;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuple3;
+import reactor.util.function.Tuple4;
+import reactor.util.function.Tuple5;
+import reactor.util.function.Tuple6;
+import reactor.util.function.Tuple7;
+import reactor.util.function.Tuple8;
 
 import java.util.function.Consumer;
 import java.util.function.Function;

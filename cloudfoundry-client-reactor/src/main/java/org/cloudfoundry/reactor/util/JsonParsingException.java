@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.reactor.util;
 
-import reactor.core.util.Exceptions;
+import reactor.util.Exceptions;
 
 import java.io.IOException;
 import java.io.InputStream;

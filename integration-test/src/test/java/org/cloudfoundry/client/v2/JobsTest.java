@@ -26,7 +26,7 @@ import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
-import reactor.core.tuple.Tuple2;
+import reactor.util.function.Tuple2;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
 

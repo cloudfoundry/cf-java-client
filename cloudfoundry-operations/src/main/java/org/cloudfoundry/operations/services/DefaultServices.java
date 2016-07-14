@@ -67,8 +67,8 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.tuple.Tuple;
-import reactor.core.util.Exceptions;
+import reactor.util.Exceptions;
+import reactor.util.function.Tuple;
 
 import java.io.IOException;
 import java.time.Duration;

@@ -81,7 +81,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.tuple.Tuple2;
+import reactor.util.function.Tuple2;
 
 import java.time.Instant;
 import java.util.Collections;

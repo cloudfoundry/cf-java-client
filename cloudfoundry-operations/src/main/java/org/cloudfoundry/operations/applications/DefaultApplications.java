@@ -93,9 +93,9 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.tuple.Tuple;
-import reactor.core.tuple.Tuple2;
-import reactor.core.tuple.Tuple6;
+import reactor.util.function.Tuple;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuple6;
 
 import java.io.InputStream;
 import java.time.Duration;
