@@ -55,7 +55,6 @@ public class IntegrationTestConfiguration {
 
     @Bean(initMethod = "clean", destroyMethod = "clean")
     CloudFoundryCleaner cloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, UaaClient uaaClient) {
-
         return new CloudFoundryCleaner(cloudFoundryClient, uaaClient);
     }
 
