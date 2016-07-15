@@ -16,27 +16,14 @@
 
 package org.cloudfoundry.uaa.clients;
 
-import reactor.core.publisher.Mono;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
 /**
- * Main entry point to the UAA Clients API
+ * The response from the create client request
  */
-public interface Clients {
-
-    /**
-     * Makes the <a href="">Create Client</a> request
-     *
-     * @param request Create Client request
-     * @return the Response to the Create Client Request
-     */
-    Mono<CreateClientResponse> create(CreateClientRequest request);
-
-    /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#retrieve77">Retrieve Client</a> request
-     *
-     * @param request Retrieve Client request
-     * @return the Response to the Retrieve Client Request
-     */
-    Mono<GetClientResponse> get(GetClientRequest request);
+@JsonDeserialize
+@Value.Immutable
+abstract class _CreateClientResponse extends AbstractClient {
 
 }

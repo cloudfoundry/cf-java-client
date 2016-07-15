@@ -16,27 +16,21 @@
 
 package org.cloudfoundry.uaa.clients;
 
-import reactor.core.publisher.Mono;
+import org.junit.Test;
 
-/**
- * Main entry point to the UAA Clients API
- */
-public interface Clients {
+public final class CreateClientRequestTest {
 
-    /**
-     * Makes the <a href="">Create Client</a> request
-     *
-     * @param request Create Client request
-     * @return the Response to the Create Client Request
-     */
-    Mono<CreateClientResponse> create(CreateClientRequest request);
+    @Test(expected = IllegalStateException.class)
+    public void noId() {
+        CreateClientRequest.builder()
+            .build();
+    }
 
-    /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#retrieve77">Retrieve Client</a> request
-     *
-     * @param request Retrieve Client request
-     * @return the Response to the Retrieve Client Request
-     */
-    Mono<GetClientResponse> get(GetClientRequest request);
+    @Test
+    public void valid() {
+        CreateClientRequest.builder()
+            .clientId("test-client-id")
+            .build();
+    }
 
 }
