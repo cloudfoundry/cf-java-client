@@ -26,6 +26,7 @@ public interface TokenProvider {
     /**
      * Provides an OAuth token to be used by requests
      *
+     * @param connectionContext A {@link ConnectionContext} to be used if a token needs to be retrieved via a network request
      * @return an OAuth token
      */
     Mono<String> getToken(ConnectionContext connectionContext);
