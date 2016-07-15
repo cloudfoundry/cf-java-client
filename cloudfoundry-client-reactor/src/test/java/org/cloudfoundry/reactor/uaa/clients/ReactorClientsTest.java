@@ -20,14 +20,85 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
+import org.cloudfoundry.uaa.clients.CreateClientRequest;
+import org.cloudfoundry.uaa.clients.CreateClientResponse;
 import org.cloudfoundry.uaa.clients.GetClientRequest;
 import org.cloudfoundry.uaa.clients.GetClientResponse;
 import reactor.core.publisher.Mono;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorClientsTest {
+
+    public static final class Create extends AbstractUaaApiTest<CreateClientRequest, CreateClientResponse> {
+
+        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/oauth/clients")
+                    .payload("fixtures/uaa/clients/POST_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/uaa/clients/POST_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected CreateClientResponse getResponse() {
+            return CreateClientResponse.builder()
+                .allowedProvider("uaa")
+                .allowedProvider("ldap")
+                .allowedProvider("my-saml-provider")
+                .authority("clients.read")
+                .authority("clients.write")
+                .authorizedGrantType("client_credentials")
+                .autoApprove("true")
+                .clientId("aPq3I1")
+                .lastModified(1468364445109L)
+                .name("My Client Name")
+                .redirectUriPattern("http*://ant.path.wildcard/**/passback/*")
+                .redirectUriPattern("http://test1.com")
+                .resourceId("none")
+                .scope("clients.read")
+                .scope("clients.write")
+                .tokenSalt("hRZ21X")
+                .build();
+        }
+
+        @Override
+        protected CreateClientRequest getValidRequest() throws Exception {
+            return CreateClientRequest.builder()
+                .allowedProvider("uaa")
+                .allowedProvider("ldap")
+                .allowedProvider("my-saml-provider")
+                .authority("clients.read")
+                .authority("clients.write")
+                .authorizedGrantType("client_credentials")
+                .autoApprove("true")
+                .clientId("aPq3I1")
+                .clientSecret("secret")
+                .name("My Client Name")
+                .redirectUriPattern("http://test1.com")
+                .redirectUriPattern("http*://ant.path.wildcard/**/passback/*")
+                .scope("clients.read")
+                .scope("clients.write")
+                .tokenSalt("hRZ21X")
+                .build();
+        }
+
+        @Override
+        protected Mono<CreateClientResponse> invoke(CreateClientRequest request) {
+            return this.clients.create(request);
+        }
+    }
 
     public static final class Get extends AbstractUaaApiTest<GetClientRequest, GetClientResponse> {
 

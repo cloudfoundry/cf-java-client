@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 /**
- * The response from the get group request
+ * The response from the get client request
  */
 @JsonDeserialize
 @Value.Immutable
