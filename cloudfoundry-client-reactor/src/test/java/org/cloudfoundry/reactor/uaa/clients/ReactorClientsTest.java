@@ -22,9 +22,12 @@ import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
 import org.cloudfoundry.uaa.clients.GetClientRequest;
 import org.cloudfoundry.uaa.clients.GetClientResponse;
+import org.cloudfoundry.uaa.clients.UpdateClientRequest;
+import org.cloudfoundry.uaa.clients.UpdateClientResponse;
 import reactor.core.publisher.Mono;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorClientsTest {
@@ -78,6 +81,57 @@ public final class ReactorClientsTest {
         @Override
         protected Mono<GetClientResponse> invoke(GetClientRequest request) {
             return this.clients.get(request);
+        }
+    }
+
+    public static final class Update extends AbstractUaaApiTest<UpdateClientRequest, UpdateClientResponse> {
+
+        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/oauth/clients/55pTMX")
+                    .payload("fixtures/uaa/clients/PUT_{id}_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/clients/PUT_{id}_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected UpdateClientResponse getResponse() {
+            return UpdateClientResponse.builder()
+                .allowedProvider("uaa", "ldap", "my-saml-provider")
+                .authority("clients.read", "clients.write")
+                .authorizedGrantType("client_credentials")
+                .autoApprove("clients.autoapprove")
+                .clientId("55pTMX")
+                .lastModified(1468364443857L)
+                .name("My Client Name")
+                .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                .resourceId("none")
+                .scope("clients.new", "clients.autoapprove")
+                .tokenSalt("8mwCEy")
+                .build();
+        }
+
+        @Override
+        protected UpdateClientRequest getValidRequest() throws Exception {
+            return UpdateClientRequest.builder()
+                .authorizedGrantType("client_credentials")
+                .autoApprove("clients.autoapprove")
+                .clientId("55pTMX")
+                .scope("clients.new", "clients.autoapprove")
+                .build();
+        }
+
+        @Override
+        protected Mono<UpdateClientResponse> invoke(UpdateClientRequest request) {
+            return this.clients.update(request);
         }
     }
 

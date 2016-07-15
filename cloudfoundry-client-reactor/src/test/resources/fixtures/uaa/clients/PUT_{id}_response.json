@@ -1,0 +1,32 @@
+{
+  "scope": [
+    "clients.new",
+    "clients.autoapprove"
+  ],
+  "client_id": "55pTMX",
+  "resource_ids": [
+    "none"
+  ],
+  "authorized_grant_types": [
+    "client_credentials"
+  ],
+  "redirect_uri": [
+    "http*://ant.path.wildcard/**/passback/*",
+    "http://test1.com"
+  ],
+  "autoapprove": [
+    "clients.autoapprove"
+  ],
+  "authorities": [
+    "clients.read",
+    "clients.write"
+  ],
+  "token_salt": "8mwCEy",
+  "allowedproviders": [
+    "uaa",
+    "ldap",
+    "my-saml-provider"
+  ],
+  "name": "My Client Name",
+  "lastModified": 1468364443857
+}

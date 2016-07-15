@@ -16,14 +16,21 @@
 
 package org.cloudfoundry.uaa.clients;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.immutables.value.Value;
+import org.junit.Test;
 
-/**
- * The response from the Get Client request
- */
-@JsonDeserialize
-@Value.Immutable
-abstract class _GetClientResponse extends AbstractClient {
+public final class UpdateClientRequestTest {
+
+    @Test(expected = IllegalStateException.class)
+    public void noId() {
+        UpdateClientRequest.builder()
+            .build();
+    }
+
+    @Test
+    public void valid() {
+        UpdateClientRequest.builder()
+            .clientId("test-client-id")
+            .build();
+    }
 
 }

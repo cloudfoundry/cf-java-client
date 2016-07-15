@@ -1,0 +1,13 @@
+{
+  "scope": [
+    "clients.new",
+    "clients.autoapprove"
+  ],
+  "client_id": "55pTMX",
+  "authorized_grant_types": [
+    "client_credentials"
+  ],
+  "autoapprove": [
+    "clients.autoapprove"
+  ]
+}

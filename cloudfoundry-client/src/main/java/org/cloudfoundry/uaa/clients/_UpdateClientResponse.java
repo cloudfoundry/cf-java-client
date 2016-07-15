@@ -20,10 +20,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 /**
- * The response from the Get Client request
+ * The response from the Update Client request
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _GetClientResponse extends AbstractClient {
+abstract class _UpdateClientResponse extends AbstractClient {
 
 }
