@@ -108,14 +108,14 @@ public final class SpacesTest extends AbstractIntegrationTest {
     private String stackName;
 
     @Autowired
-    private String userName;
+    private String username;
 
     @Test
     public void associateAuditor() {
         String organizationName = getOrganizationName();
         String spaceName = getSpaceName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
+        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .then(function((userId, spaceId) -> Mono.when(
                 Mono.just(spaceId),
                 this.cloudFoundryClient.spaces()
@@ -134,11 +134,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
         String spaceName = getSpaceName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
+        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .associateAuditorByUsername(AssociateSpaceAuditorByUsernameRequest.builder()
                     .spaceId(spaceId)
-                    .username(this.userName)
+                    .username(this.username)
                     .build()))))
             .flatMap(function((userId, spaceId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
@@ -149,7 +149,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
             .subscribe(this.testSubscriber()
-                .assertEquals(this.userName));
+                .assertEquals(this.username));
     }
 
     @Test
@@ -157,7 +157,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
         String spaceName = getSpaceName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
+        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .then(function((userId, spaceId) -> Mono.when(
                 Mono.just(spaceId),
                 this.cloudFoundryClient.spaces()
@@ -176,11 +176,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
         String spaceName = getSpaceName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
+        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .associateDeveloperByUsername(AssociateSpaceDeveloperByUsernameRequest.builder()
                     .spaceId(spaceId)
-                    .username(this.userName)
+                    .username(this.username)
                     .build()))))
             .flatMap(function((userId, spaceId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
@@ -191,7 +191,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
             .subscribe(this.testSubscriber()
-                .assertEquals(this.userName));
+                .assertEquals(this.username));
     }
 
     @Test
@@ -199,7 +199,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
         String spaceName = getSpaceName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
+        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .then(function((userId, spaceId) -> Mono.when(
                 Mono.just(spaceId),
                 this.cloudFoundryClient.spaces()
@@ -218,17 +218,17 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
         String spaceName = getSpaceName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
+        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .associateManagerByUsername(AssociateSpaceManagerByUsernameRequest.builder()
                     .spaceId(spaceId)
-                    .username(this.userName)
+                    .username(this.username)
                     .build()))))
             .flatMap(function((userId, spaceId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId)
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
             .subscribe(this.testSubscriber()
-                .assertEquals(this.userName));
+                .assertEquals(this.username));
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656")
@@ -439,7 +439,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
         String spaceName = getSpaceName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
+        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .associateAuditor(AssociateSpaceAuditorRequest.builder()
                     .spaceId(spaceId)
@@ -454,7 +454,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getEntity)
             .map(UserEntity::getUsername)
             .subscribe(this.testSubscriber()
-                .assertEquals(this.userName));
+                .assertEquals(this.username));
     }
 
     @Test
@@ -462,7 +462,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
         String spaceName = getSpaceName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
+        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .associateDeveloper(AssociateSpaceDeveloperRequest.builder()
                     .spaceId(spaceId)
@@ -477,7 +477,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getEntity)
             .map(UserEntity::getUsername)
             .subscribe(this.testSubscriber()
-                .assertEquals(this.userName));
+                .assertEquals(this.username));
     }
 
     @Test
@@ -669,13 +669,13 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
         String spaceName = getSpaceName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
+        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
             .flatMap(function((userId, spaceId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId)
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
             .subscribe(this.testSubscriber()
-                .assertEquals(this.userName));
+                .assertEquals(this.username));
     }
 
     @Test
@@ -685,7 +685,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
-                createUserId(this.cloudFoundryClient, organizationId, this.userName),
+                createUserId(this.cloudFoundryClient, organizationId, this.username),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 Mono.just(organizationId)
             ))
@@ -700,7 +700,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
             .subscribe(this.testSubscriber()
-                .assertEquals(this.userName));
+                .assertEquals(this.username));
     }
 
     @Test
@@ -708,7 +708,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
         String spaceName = getSpaceName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
+        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> Mono.when(
                 requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId),
                 requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId)
@@ -717,7 +717,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
             .subscribe(this.testSubscriber()
-                .assertEquals(this.userName));
+                .assertEquals(this.username));
     }
 
     @Test
@@ -727,7 +727,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
-                createUserId(this.cloudFoundryClient, organizationId, this.userName),
+                createUserId(this.cloudFoundryClient, organizationId, this.username),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 Mono.just(organizationId)
             ))
@@ -756,7 +756,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
-                createUserId(this.cloudFoundryClient, organizationId, this.userName),
+                createUserId(this.cloudFoundryClient, organizationId, this.username),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 Mono.just(organizationId)
             ))
@@ -783,13 +783,13 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
         String spaceName = getSpaceName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
+        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
             .flatMap(function((userId, spaceId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId, builder -> builder.managedSpaceId(spaceId))
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
             .subscribe(this.testSubscriber()
-                .assertEquals(this.userName));
+                .assertEquals(this.username));
     }
 
     @Test
@@ -799,7 +799,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
-                createUserId(this.cloudFoundryClient, organizationId, this.userName),
+                createUserId(this.cloudFoundryClient, organizationId, this.username),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 Mono.just(organizationId)
             ))
@@ -986,7 +986,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
         String spaceName = getSpaceName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
+        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
             .flatMap(function((userId, spaceId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
@@ -997,7 +997,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getEntity)))
             .subscribe(this.<UserSpaceRoleEntity>testSubscriber()
                 .assertThat(userSpaceRoleEntity -> {
-                    assertEquals(this.userName, userSpaceRoleEntity.getUsername());
+                    assertEquals(this.username, userSpaceRoleEntity.getUsername());
                     assertEquals(Collections.singletonList("space_manager"), userSpaceRoleEntity.getSpaceRoles());
                 }));
     }
@@ -1007,7 +1007,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
         String spaceName = getSpaceName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
+        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId))))
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .removeAuditor(RemoveSpaceAuditorRequest.builder()
@@ -1028,12 +1028,12 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
         String spaceName = getSpaceName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
+        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId))))
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .removeAuditorByUsername(RemoveSpaceAuditorByUsernameRequest.builder()
                     .spaceId(spaceId)
-                    .username(this.userName)
+                    .username(this.username)
                     .build()))))
             .flatMap(function((userId, spaceId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
@@ -1049,7 +1049,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
         String spaceName = getSpaceName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
+        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .associateDeveloper(AssociateSpaceDeveloperRequest.builder()
                     .spaceId(spaceId)
@@ -1074,7 +1074,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
         String spaceName = getSpaceName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
+        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .associateDeveloper(AssociateSpaceDeveloperRequest.builder()
                     .spaceId(spaceId)
@@ -1083,7 +1083,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .removeDeveloperByUsername(RemoveSpaceDeveloperByUsernameRequest.builder()
                     .spaceId(spaceId)
-                    .username(this.userName)
+                    .username(this.username)
                     .build()))))
             .flatMap(function((userId, spaceId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
@@ -1099,7 +1099,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
         String spaceName = getSpaceName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
+        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .removeManager(RemoveSpaceManagerRequest.builder()
@@ -1118,12 +1118,12 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
         String spaceName = getSpaceName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
+        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .removeManagerByUsername(RemoveSpaceManagerByUsernameRequest.builder()
                     .spaceId(spaceId)
-                    .username(this.userName)
+                    .username(this.username)
                     .build()))))
             .flatMap(function((userId, spaceId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId)
                 .map(ResourceUtils::getEntity)
@@ -1163,7 +1163,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String organizationName = getOrganizationName();
         String spaceName = getSpaceName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.userName)
+        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .update(UpdateSpaceRequest.builder()

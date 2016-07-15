@@ -114,7 +114,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     private Mono<String> userId;
 
     @Autowired
-    private String userName;
+    private String username;
 
     @Test
     public void associateAuditor() {
@@ -144,7 +144,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 this.cloudFoundryClient.organizations()
                     .associateAuditorByUsername(AssociateOrganizationAuditorByUsernameRequest.builder()
                         .organizationId(organizationId)
-                        .username(this.userName)
+                        .username(this.username)
                         .build())
                     .map(ResourceUtils::getId)
             ))
@@ -184,7 +184,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 this.cloudFoundryClient.organizations()
                     .associateBillingManagerByUsername(AssociateOrganizationBillingManagerByUsernameRequest.builder()
                         .organizationId(organizationId)
-                        .username(this.userName)
+                        .username(this.username)
                         .build())
                     .map(ResourceUtils::getId)
             ))
@@ -224,7 +224,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 this.cloudFoundryClient.organizations()
                     .associateManagerByUsername(AssociateOrganizationManagerByUsernameRequest.builder()
                         .organizationId(organizationId)
-                        .username(this.userName)
+                        .username(this.username)
                         .build())
                     .map(ResourceUtils::getId)
             ))
@@ -287,7 +287,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 this.cloudFoundryClient.organizations()
                     .associateUserByUsername(AssociateOrganizationUserByUsernameRequest.builder()
                         .organizationId(organizationId)
-                        .username(this.userName)
+                        .username(this.username)
                         .build())
                     .map(ResourceUtils::getId)
             ))
@@ -1560,7 +1560,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .as(thenKeep(function((organizationId, userId) -> requestAssociateAuditor(this.cloudFoundryClient, organizationId, userId))))
             .as(thenKeep(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
                 .removeAuditorByUsername(RemoveOrganizationAuditorByUsernameRequest.builder()
-                    .username(this.userName)
+                    .username(this.username)
                     .organizationId(organizationId)
                     .build()))))
             .flatMap(function((organizationId, userId) -> requestListOrganizationAuditors(this.cloudFoundryClient, organizationId)))
@@ -1600,7 +1600,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .as(thenKeep(function((organizationId, userId) -> requestAssociateBillingManager(this.cloudFoundryClient, organizationId, userId))))
             .as(thenKeep(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
                 .removeBillingManagerByUsername(RemoveOrganizationBillingManagerByUsernameRequest.builder()
-                    .username(this.userName)
+                    .username(this.username)
                     .organizationId(organizationId)
                     .build()))))
             .flatMap(function((organizationId, userId) -> requestListOrganizationBillingManagers(this.cloudFoundryClient, organizationId)))
@@ -1640,7 +1640,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .as(thenKeep(function((organizationId, userId) -> requestAssociateManager(this.cloudFoundryClient, organizationId, userId))))
             .as(thenKeep(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
                 .removeManagerByUsername(RemoveOrganizationManagerByUsernameRequest.builder()
-                    .username(this.userName)
+                    .username(this.username)
                     .organizationId(organizationId)
                     .build()))))
             .flatMap(function((organizationId, userId) -> requestListOrganizationManagers(this.cloudFoundryClient, organizationId)))
@@ -1706,7 +1706,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .as(thenKeep(function((organizationId, userId) -> requestAssociateUser(this.cloudFoundryClient, organizationId, userId))))
             .as(thenKeep(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
                 .removeUserByUsername(RemoveOrganizationUserByUsernameRequest.builder()
-                    .username(this.userName)
+                    .username(this.username)
                     .organizationId(organizationId)
                     .build()))))
             .flatMap(function((organizationId, userId) -> requestListOrganizationUsers(this.cloudFoundryClient, organizationId)))

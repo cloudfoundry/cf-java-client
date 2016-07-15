@@ -17,12 +17,12 @@
       <value defaultName="singleModule" />
     </option>
     <envs>
-      <env name="TEST_UAA_CLIENTID" value="admin" />
-      <env name="TEST_UAA_CLIENTSECRET" value="admin-client-secret" />
+      <env name="TEST_ADMIN_CLIENTID" value="admin" />
+      <env name="TEST_ADMIN_CLIENTSECRET" value="admin-client-secret" />
       <env name="TEST_APIHOST" value="api.local.pcfdev.io" />
-      <env name="TEST_PASSWORD" value="admin" />
       <env name="TEST_SKIPSSLVALIDATION" value="true" />
-      <env name="TEST_USERNAME" value="admin" />
+      <env name="TEST_ADMIN_USERNAME" value="admin" />
+      <env name="TEST_ADMIN_PASSWORD" value="admin" />
     </envs>
     <patterns />
     <method />

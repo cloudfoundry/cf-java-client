@@ -53,6 +53,12 @@ import static org.junit.Assert.assertNotNull;
 public final class TokensTest extends AbstractIntegrationTest {
 
     @Autowired
+    private String clientId;
+
+    @Autowired
+    private String clientSecret;
+
+    @Autowired
     private ConnectionContext connectionContext;
 
     @Autowired
@@ -61,20 +67,14 @@ public final class TokensTest extends AbstractIntegrationTest {
     @Autowired
     private UaaClient uaaClient;
 
-    @Autowired
-    private String uaaClientId;
-
-    @Autowired
-    private String uaaClientSecret;
-
     @Test
     public void checkTokenNotAuthorized() {
         this.tokenProvider.getToken(this.connectionContext)
             .then(token -> this.uaaClient.tokens()
                 .check(CheckTokenRequest.builder()
                     .token(token)
-                    .clientId(this.uaaClientId)
-                    .clientSecret(this.uaaClientSecret)
+                    .clientId(this.clientId)
+                    .clientSecret(this.clientSecret)
                     .scope("password.write")
                     .scope("scim.userids")
                     .build()))
@@ -88,8 +88,8 @@ public final class TokensTest extends AbstractIntegrationTest {
         this.uaaClient.tokens()
             .getByAuthorizationCode(GetTokenByAuthorizationCodeRequest.builder()
                 .authorizationCode("some auth code")
-                .clientId(this.uaaClientId)
-                .clientSecret(this.uaaClientSecret)
+                .clientId(this.clientId)
+                .clientSecret(this.clientSecret)
                 .build())
             .subscribe(this.<GetTokenByAuthorizationCodeResponse>testSubscriber()
                 .assertCount(1));
@@ -99,8 +99,8 @@ public final class TokensTest extends AbstractIntegrationTest {
     public void getTokenByClientCredentials() {
         this.uaaClient.tokens()
             .getByClientCredentials(GetTokenByClientCredentialsRequest.builder()
-                .clientId(this.uaaClientId)
-                .clientSecret(this.uaaClientSecret)
+                .clientId(this.clientId)
+                .clientSecret(this.clientSecret)
                 .tokenFormat(TokenFormat.OPAQUE)
                 .build())
             .subscribe(this.<GetTokenByClientCredentialsResponse>testSubscriber()
@@ -113,8 +113,8 @@ public final class TokensTest extends AbstractIntegrationTest {
         this.uaaClient.tokens()
             .getByOneTimePasscode(GetTokenByOneTimePasscodeRequest.builder()
                 .passcode("Some passcode")
-                .clientId(this.uaaClientId)
-                .clientSecret(this.uaaClientSecret)
+                .clientId(this.clientId)
+                .clientSecret(this.clientSecret)
                 .tokenFormat(TokenFormat.OPAQUE)
                 .build())
             .subscribe(this.<GetTokenByOneTimePasscodeResponse>testSubscriber()
@@ -127,8 +127,8 @@ public final class TokensTest extends AbstractIntegrationTest {
         this.uaaClient.tokens()
             .getByOpenId(GetTokenByOpenIdRequest.builder()
                 .authorizationCode("Some authorization code")
-                .clientId(this.uaaClientId)
-                .clientSecret(this.uaaClientSecret)
+                .clientId(this.clientId)
+                .clientSecret(this.clientSecret)
                 .tokenFormat(TokenFormat.OPAQUE)
                 .build())
             .subscribe(this.<GetTokenByOpenIdResponse>testSubscriber()
@@ -142,8 +142,8 @@ public final class TokensTest extends AbstractIntegrationTest {
             .getByPassword(GetTokenByPasswordRequest.builder()
                 .password("a-password")
                 .username("a-username")
-                .clientId(this.uaaClientId)
-                .clientSecret(this.uaaClientSecret)
+                .clientId(this.clientId)
+                .clientSecret(this.clientSecret)
                 .tokenFormat(TokenFormat.OPAQUE)
                 .build())
             .subscribe(this.<GetTokenByPasswordResponse>testSubscriber()
@@ -187,8 +187,8 @@ public final class TokensTest extends AbstractIntegrationTest {
         this.uaaClient.tokens()
             .refresh(RefreshTokenRequest.builder()
                 .tokenFormat(TokenFormat.OPAQUE)
-                .clientId(this.uaaClientId)
-                .clientSecret(this.uaaClientSecret)
+                .clientId(this.clientId)
+                .clientSecret(this.clientSecret)
                 .refreshToken("a-refresh-token")
                 .build())
             .subscribe(this.<RefreshTokenResponse>testSubscriber()

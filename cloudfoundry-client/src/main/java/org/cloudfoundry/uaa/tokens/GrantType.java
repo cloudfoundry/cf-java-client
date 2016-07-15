@@ -43,7 +43,7 @@ public enum GrantType {
      * The password grant type
      */
     PASSWORD("password"),
-    
+
     /**
      * The refresh token grant type
      */
@@ -55,18 +55,8 @@ public enum GrantType {
         this.value = value;
     }
 
-    @JsonValue
-    public String getValue() {
-        return this.value;
-    }
-
-    @Override
-    public String toString() {
-        return getValue();
-    }
-
     @JsonCreator
-    static GrantType from(String s) {
+    public static GrantType from(String s) {
         switch (s.toLowerCase()) {
             case "authorization_code":
                 return AUTHORIZATION_CODE;
@@ -81,5 +71,15 @@ public enum GrantType {
             default:
                 throw new IllegalArgumentException(String.format("Unknown grant type: %s", s));
         }
+    }
+
+    @JsonValue
+    public String getValue() {
+        return this.value;
+    }
+
+    @Override
+    public String toString() {
+        return getValue();
     }
 }

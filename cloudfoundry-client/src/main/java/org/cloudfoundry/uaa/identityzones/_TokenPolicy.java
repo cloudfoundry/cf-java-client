@@ -45,18 +45,18 @@ abstract class _TokenPolicy {
     abstract String getActiveKeyId();
 
     /**
-     *
+     * Whether the JWT token is revocable
      */
     @JsonProperty("jwtRevocable")
     @Nullable
-    abstract Boolean getJwtRevokable();
+    abstract Boolean getJwtRevocable();
 
     /**
      * The keys of the token policy
      */
     @JsonProperty("keys")
     @Nullable
-    abstract Map<String, KeyInformation> getKeys();
+    abstract Map<String, Object> getKeys();
 
     /**
      * Time in seconds between when a refresh token is issued and when it expires

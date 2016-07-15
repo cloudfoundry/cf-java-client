@@ -20,7 +20,6 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
-import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
 import org.cloudfoundry.reactor.ConnectionContext;
@@ -29,35 +28,128 @@ import org.cloudfoundry.reactor.ProxyConfiguration;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.ReactorCloudFoundryClient;
 import org.cloudfoundry.reactor.doppler.ReactorDopplerClient;
+import org.cloudfoundry.reactor.tokenprovider.ClientCredentialsGrantTokenProvider;
 import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.cloudfoundry.reactor.uaa.ReactorUaaClient;
 import org.cloudfoundry.uaa.UaaClient;
+import org.cloudfoundry.uaa.clients.CreateClientRequest;
+import org.cloudfoundry.uaa.groups.AddMemberRequest;
+import org.cloudfoundry.uaa.groups.Group;
+import org.cloudfoundry.uaa.groups.ListGroupsRequest;
+import org.cloudfoundry.uaa.groups.ListGroupsResponse;
+import org.cloudfoundry.uaa.groups.MemberType;
+import org.cloudfoundry.uaa.users.CreateUserRequest;
+import org.cloudfoundry.uaa.users.CreateUserResponse;
+import org.cloudfoundry.uaa.users.Email;
+import org.cloudfoundry.uaa.users.Name;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.test.FailingDeserializationProblemHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.util.StringUtils;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 import java.security.SecureRandom;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
+
+import static org.cloudfoundry.uaa.tokens.GrantType.AUTHORIZATION_CODE;
+import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
+import static org.cloudfoundry.uaa.tokens.GrantType.PASSWORD;
+import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
 
 @Configuration
 @EnableAutoConfiguration
 public class IntegrationTestConfiguration {
 
+    private static final List<String> GROUPS = Arrays.asList(
+        "cloud_controller.admin",
+        "scim.read",
+        "scim.write",
+        "zones.read",
+        "zones.write");
+
+    private static final List<String> SCOPES = Arrays.asList(
+        "cloud_controller.admin",
+        "cloud_controller.read",
+        "cloud_controller.write",
+        "scim.read",
+        "scim.write",
+        "uaa.user",
+        "zones.read",
+        "zones.write");
+
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.test");
 
+    @Bean
+    @Qualifier("admin")
+    ReactorCloudFoundryClient adminCloudFoundryClient(ConnectionContext connectionContext,
+                                                      @Value("${test.admin.password}") String adminPassword,
+                                                      @Value("${test.admin.username}") String adminUsername) {
+        return ReactorCloudFoundryClient.builder()
+            .connectionContext(connectionContext)
+            .tokenProvider(PasswordGrantTokenProvider.builder()
+                .password(adminPassword)
+                .username(adminUsername)
+                .build())
+            .build();
+    }
+
+    @Bean
+    @Qualifier("admin")
+    ReactorUaaClient adminUaaClient(ConnectionContext connectionContext, @Value("${test.admin.clientId}") String adminClientId, @Value("${test.admin.clientSecret}") String adminClientSecret) {
+        return ReactorUaaClient.builder()
+            .connectionContext(connectionContext)
+            .tokenProvider(ClientCredentialsGrantTokenProvider.builder()
+                .clientId(adminClientId)
+                .clientSecret(adminClientSecret)
+                .build())
+            .build();
+    }
+
+    @Bean(initMethod = "block")
+    @DependsOn("cloudFoundryCleaner")
+    Mono<Tuple2<String, String>> client(@Qualifier("admin") UaaClient adminUaaClient, String clientId, String clientSecret) {
+        return adminUaaClient.clients()
+            .create(CreateClientRequest.builder()
+                .authorizedGrantType(AUTHORIZATION_CODE, CLIENT_CREDENTIALS, PASSWORD, REFRESH_TOKEN)
+                .autoApprove(String.valueOf(true))
+                .clientId(clientId)
+                .clientSecret(clientSecret)
+                .redirectUriPattern("/login")
+                .scopes(SCOPES)
+                .build())
+            .then(Mono.just(Tuples.of(clientId, clientSecret)))
+            .doOnSubscribe(s -> this.logger.debug(">> CLIENT ({}/{}) <<", clientId, clientSecret))
+            .doOnError(Throwable::printStackTrace)
+            .doOnSuccess(r -> this.logger.debug("<< CLIENT ({})>>", clientId));
+    }
+
+    @Bean
+    String clientId(NameFactory nameFactory) {
+        return nameFactory.getName("test-client-id-");
+    }
+
+    @Bean
+    String clientSecret(NameFactory nameFactory) {
+        return nameFactory.getName("test-client-secret-");
+    }
+
     @Bean(initMethod = "clean", destroyMethod = "clean")
-    CloudFoundryCleaner cloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, UaaClient uaaClient) {
-        return new CloudFoundryCleaner(cloudFoundryClient, uaaClient);
+    CloudFoundryCleaner cloudFoundryCleaner(@Qualifier("admin") CloudFoundryClient adminCloudFoundryClient, @Qualifier("admin") UaaClient adminUaaClient) {
+        return new CloudFoundryCleaner(adminCloudFoundryClient, adminUaaClient);
     }
 
     @Bean(initMethod = "checkCompatibility")
@@ -131,15 +223,20 @@ public class IntegrationTestConfiguration {
                 .name(organizationName)
                 .build())
             .map(ResourceUtils::getId)
-            .doOnSubscribe(s -> this.logger.debug(">> ORGANIZATION name({}) <<", organizationName))
+            .doOnSubscribe(s -> this.logger.debug(">> ORGANIZATION ({}) <<", organizationName))
             .doOnError(Throwable::printStackTrace)
-            .doOnSuccess(id -> this.logger.debug("<< ORGANIZATION id({}) >>", id))
+            .doOnSuccess(id -> this.logger.debug("<< ORGANIZATION ({}) >>", id))
             .cache();
     }
 
     @Bean
     String organizationName(NameFactory nameFactory) {
         return nameFactory.getName("test-organization-");
+    }
+
+    @Bean
+    String password(NameFactory nameFactory) {
+        return nameFactory.getName("test-password-");
     }
 
     @Bean
@@ -157,9 +254,9 @@ public class IntegrationTestConfiguration {
                     .organizationId(orgId)
                     .build()))
             .map(ResourceUtils::getId)
-            .doOnSubscribe(s -> this.logger.debug(">> SPACE name({}) <<", spaceName))
+            .doOnSubscribe(s -> this.logger.debug(">> SPACE ({}) <<", spaceName))
             .doOnError(Throwable::printStackTrace)
-            .doOnSuccess(id -> this.logger.debug("<< SPACE id({}) >>", id))
+            .doOnSuccess(id -> this.logger.debug("<< SPACE ({}) >>", id))
             .cache();
     }
 
@@ -179,9 +276,9 @@ public class IntegrationTestConfiguration {
                     .build()))
             .single()
             .map(ResourceUtils::getId)
-            .doOnSubscribe(s -> this.logger.debug(">> STACK name({}) <<", stackName))
+            .doOnSubscribe(s -> this.logger.debug(">> STACK ({}) <<", stackName))
             .doOnError(Throwable::printStackTrace)
-            .doOnSuccess(id -> this.logger.debug("<< STACK >>"))
+            .doOnSuccess(id -> this.logger.debug("<< STACK ({})>>", id))
             .cache();
     }
 
@@ -191,64 +288,72 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    PasswordGrantTokenProvider tokenProvider(@Value("${test.username}") String username,
-                                             @Value("${test.password}") String password) {
-
+    @DependsOn({"client", "userId"})
+    PasswordGrantTokenProvider tokenProvider(String clientId, String clientSecret, String password, String username) {
         return PasswordGrantTokenProvider.builder()
+            .clientId(clientId)
+            .clientSecret(clientSecret)
             .password(password)
             .username(username)
             .build();
     }
 
     @Bean
-    ReactorUaaClient uaaClient(ConnectionContext connectionContext,
-                               @Value("${test.username}") String username,
-                               @Value("${test.password}") String password,
-                               String uaaClientId,
-                               String uaaClientSecret) {
-
+    ReactorUaaClient uaaClient(ConnectionContext connectionContext, String clientId, String clientSecret, String password, String username) {
         return ReactorUaaClient.builder()
             .connectionContext(connectionContext)
             .tokenProvider(PasswordGrantTokenProvider.builder()
-// TODO: Use a better client id and secret
-//                .clientId(uaaClientId)
-//                .clientSecret(uaaClientSecret)
+                .clientId(clientId)
+                .clientSecret(clientSecret)
                 .password(password)
                 .username(username)
                 .build())
             .build();
     }
 
-    @Bean
-    String uaaClientId(@Value("${test.uaa.clientId:}") String testClientId) {
-        return testClientId;
-    }
-
-    @Bean
-    String uaaClientSecret(@Value("${test.uaa.clientSecret:}") String testClientSecret) {
-        return testClientSecret;
-    }
-
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
-    Mono<String> userId(CloudFoundryClient cloudFoundryClient, String userName) {  // TODO: Create new user when APIs available
-        return PaginationUtils
-            .requestClientV2Resources(page -> cloudFoundryClient.users()
-                .list(ListUsersRequest.builder()
-                    .page(page)
-                    .build()))
-            .filter(resource -> userName.equals(ResourceUtils.getEntity(resource).getUsername()))
-            .map(ResourceUtils::getId)
-            .single()
-            .doOnSubscribe(s -> this.logger.debug(">> USER name({}) <<", userName))
+    Mono<String> userId(@Qualifier("admin") UaaClient adminUaaClient, String password, String username) {
+        return adminUaaClient.users()
+            .create(CreateUserRequest.builder()
+                .email(Email.builder()
+                    .primary(true)
+                    .value(String.format("%s@%s.com", username, username))
+                    .build())
+                .name(Name.builder()
+                    .givenName("Test")
+                    .familyName("User")
+                    .build())
+                .password(password)
+                .userName(username)
+                .build())
+            .map(CreateUserResponse::getId)
+            .then(userId -> Flux.fromIterable(GROUPS)
+                .flatMap(group -> adminUaaClient.groups()
+                    .list(ListGroupsRequest.builder()
+                        .filter(String.format("displayName eq \"%s\"", group))
+                        .build())
+                    .flatMapIterable(ListGroupsResponse::getResources)
+                    .single()
+                    .map(Group::getId)
+                    .then(groupId -> adminUaaClient.groups()
+                        .addMember(AddMemberRequest.builder()
+                            .groupId(groupId)
+                            .memberId(userId)
+                            .origin("uaa")
+                            .type(MemberType.USER)
+                            .build())))
+                .then()
+                .then(Mono.just(userId)))
+            .doOnSubscribe(s -> this.logger.debug(">> USER ({}/{}) <<", username, password))
             .doOnError(Throwable::printStackTrace)
-            .doOnSuccess(id -> this.logger.debug("<< USER >>"))
+            .doOnSuccess(id -> this.logger.debug("<< USER ({})>>", id))
             .cache();
     }
 
     @Bean
-    String userName(@Value("${test.username}") String username) {
-        return username;
+    String username(NameFactory nameFactory) {
+        return nameFactory.getName("test-user-");
     }
 
 }

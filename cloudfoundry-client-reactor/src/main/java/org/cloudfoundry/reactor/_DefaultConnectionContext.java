@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.cloudfoundry.reactor.util.DefaultSslCertificateTruster;
@@ -75,6 +76,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     public ObjectMapper getObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper()
             .disable(FAIL_ON_UNKNOWN_PROPERTIES)
+            .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
             .registerModule(new Jdk8Module())
             .setSerializationInclusion(NON_NULL);
 

@@ -46,6 +46,9 @@ import org.cloudfoundry.client.v3.packages.DeletePackageRequest;
 import org.cloudfoundry.client.v3.packages.ListPackagesRequest;
 import org.cloudfoundry.client.v3.packages.Package;
 import org.cloudfoundry.uaa.UaaClient;
+import org.cloudfoundry.uaa.clients.Client;
+import org.cloudfoundry.uaa.clients.DeleteClientRequest;
+import org.cloudfoundry.uaa.clients.ListClientsRequest;
 import org.cloudfoundry.uaa.groups.DeleteGroupRequest;
 import org.cloudfoundry.uaa.groups.Group;
 import org.cloudfoundry.uaa.groups.ListGroupsRequest;
@@ -86,11 +89,11 @@ final class CloudFoundryCleaner {
 
     private final CloudFoundryClient cloudFoundryClient;
 
-    private final UaaClient uaaClient;
+    private final UaaClient uaaAdminClient;
 
-    CloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, UaaClient uaaClient) {
+    CloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, UaaClient uaaAdminClient) {
         this.cloudFoundryClient = cloudFoundryClient;
-        this.uaaClient = uaaClient;
+        this.uaaAdminClient = uaaAdminClient;
     }
 
     void clean() {
@@ -105,8 +108,9 @@ final class CloudFoundryCleaner {
             .thenMany(cleanUserProvidedServiceInstances(this.cloudFoundryClient))
             .thenMany(cleanDomains(this.cloudFoundryClient))
             .thenMany(cleanPrivateDomains(this.cloudFoundryClient))
-            .thenMany(cleanUaaGroups(this.uaaClient))
-            .thenMany(cleanUaaUsers(this.uaaClient))
+            .thenMany(cleanUaaGroups(this.uaaAdminClient))
+            .thenMany(cleanUaaUsers(this.uaaAdminClient))
+            .thenMany(cleanUaaClients(this.uaaAdminClient))
             .thenMany(cleanSpaces(this.cloudFoundryClient))
             .thenMany(cleanOrganizations(this.cloudFoundryClient))
             .retry(5, t -> t instanceof SSLException)
@@ -295,6 +299,21 @@ final class CloudFoundryCleaner {
                     .spaceId(spaceId)
                     .build()))
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+    }
+
+    private static Flux<Void> cleanUaaClients(UaaClient uaaAdminClient) {
+        return PaginationUtils
+            .requestUaaResources(startIndex -> uaaAdminClient.clients()
+                .list(ListClientsRequest.builder()
+                    .startIndex(startIndex)
+                    .build()))
+            .filter(client -> client.getClientId().startsWith("test-client-id-"))
+            .map(Client::getClientId)
+            .flatMap(clientId -> uaaAdminClient.clients()
+                .delete(DeleteClientRequest.builder()
+                    .clientId(clientId)
+                    .build())
+                .then());
     }
 
     private static Flux<Void> cleanUaaGroups(UaaClient uaaClient) {

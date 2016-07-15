@@ -115,11 +115,15 @@ public abstract class AbstractIntegrationTest {
     }
 
     protected final String getGroupName() {
-        return this.nameFactory.getName("test-display-name-");
+        return this.nameFactory.getName("test-group-");
     }
 
     protected final String getHostName() {
         return this.nameFactory.getName("test-host-");
+    }
+
+    protected final String getIdentityZoneName() {
+        return this.nameFactory.getName("test-identity-zone-");
     }
 
     protected final String getOrganizationName() {

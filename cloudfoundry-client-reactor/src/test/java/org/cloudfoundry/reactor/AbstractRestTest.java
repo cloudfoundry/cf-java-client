@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import okhttp3.mockwebserver.Dispatcher;
@@ -38,6 +39,7 @@ public abstract class AbstractRestTest {
         .httpClient(HttpClient.create())
         .objectMapper(new ObjectMapper()
             .addHandler(new FailingDeserializationProblemHandler())
+            .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
             .registerModule(new Jdk8Module())
             .setSerializationInclusion(NON_NULL))
         .build();
