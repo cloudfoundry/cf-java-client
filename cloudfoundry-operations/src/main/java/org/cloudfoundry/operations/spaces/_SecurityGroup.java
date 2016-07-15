@@ -30,8 +30,6 @@ abstract class _SecurityGroup {
 
     /**
      * The rules
-     *
-     * @return
      */
     abstract List<Rule> getRules();
 
