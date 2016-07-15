@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.uaa.groups;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
@@ -24,14 +25,14 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum MemberType {
 
     /**
-     * The user type
-     */
-    USER("USER"),
-
-    /**
      * The group type
      */
-    GROUP("GROUP");
+    GROUP("GROUP"),
+
+    /**
+     * The user type
+     */
+    USER("USER");
 
     private final String value;
 
@@ -47,6 +48,18 @@ public enum MemberType {
     @Override
     public String toString() {
         return getValue();
+    }
+
+    @JsonCreator
+    static MemberType from(String s) {
+        switch (s.toLowerCase()) {
+            case "group":
+                return GROUP;
+            case "user":
+                return USER;
+            default:
+                throw new IllegalArgumentException(String.format("Unknown member type: %s", s));
+        }
     }
 
 }

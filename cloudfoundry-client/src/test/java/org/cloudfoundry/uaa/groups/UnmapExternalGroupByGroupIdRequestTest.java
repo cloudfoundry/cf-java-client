@@ -24,7 +24,7 @@ public final class UnmapExternalGroupByGroupIdRequestTest {
     public void noExternalGroup() {
         UnmapExternalGroupByGroupIdRequest.builder()
             .groupId("test-group-id")
-            .originKey("test-origin")
+            .origin("test-origin")
             .build();
     }
 
@@ -32,12 +32,12 @@ public final class UnmapExternalGroupByGroupIdRequestTest {
     public void noGroupId() {
         UnmapExternalGroupByGroupIdRequest.builder()
             .externalGroup("test-external-group")
-            .originKey("test-origin")
+            .origin("test-origin")
             .build();
     }
 
     @Test(expected = IllegalStateException.class)
-    public void noOriginKey() {
+    public void noOrigin() {
         UnmapExternalGroupByGroupIdRequest.builder()
             .groupId("test-group-id")
             .externalGroup("test-external-group")
@@ -49,7 +49,7 @@ public final class UnmapExternalGroupByGroupIdRequestTest {
         UnmapExternalGroupByGroupIdRequest.builder()
             .groupId("test-group-id")
             .externalGroup("test-external-group")
-            .originKey("test-origin")
+            .origin("test-origin")
             .build();
     }
 

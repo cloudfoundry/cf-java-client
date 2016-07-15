@@ -25,6 +25,6 @@ import org.immutables.value.Value;
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _ListExternalGroupMappingsResponse extends PaginatedResponse<ExternalGroupMapping> {
+abstract class _ListExternalGroupMappingsResponse extends PaginatedResponse<ExternalGroupResource> {
 
 }

@@ -24,37 +24,13 @@ import java.util.List;
 /**
  * The entity response payload for External Group
  */
-abstract class AbstractExternalGroupMapping {
-
-    /**
-     * The identifier for the group in external identity provider that needs to be mapped to internal UAA groups
-     */
-    @JsonProperty("externalGroup")
-    abstract String getExternalGroup();
-
-    /**
-     * The group's displayed name
-     */
-    @JsonProperty("displayName")
-    abstract String getGroupDisplayName();
-
-    /**
-     * The group unique ID
-     */
-    @JsonProperty("groupId")
-    abstract String getGroupId();
+abstract class AbstractExternalGroupMapping extends AbstractExternalGroupResource {
 
     /**
      * The group's metadata
      */
     @JsonProperty("meta")
     abstract Metadata getMetadata();
-
-    /**
-     * Unique alias of the identity provider
-     */
-    @JsonProperty("origin")
-    abstract String getOriginKey();
 
     /**
      * The group's schemas

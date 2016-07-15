@@ -119,7 +119,7 @@ public class ReactorGroups extends AbstractUaaOperations implements Groups {
         return delete(
             request,
             UnmapExternalGroupByGroupDisplayNameResponse.class,
-            builder -> builder.pathSegment("Groups", "External", "displayName", request.getGroupDisplayName(), "externalGroup", request.getExternalGroup(), "origin", request.getOriginKey()));
+            builder -> builder.pathSegment("Groups", "External", "displayName", request.getGroupDisplayName(), "externalGroup", request.getExternalGroup(), "origin", request.getOrigin()));
     }
 
     @Override
@@ -127,7 +127,7 @@ public class ReactorGroups extends AbstractUaaOperations implements Groups {
         return delete(
             request,
             UnmapExternalGroupByGroupIdResponse.class,
-            builder -> builder.pathSegment("Groups", "External", "groupId", request.getGroupId(), "externalGroup", request.getExternalGroup(), "origin", request.getOriginKey()));
+            builder -> builder.pathSegment("Groups", "External", "groupId", request.getGroupId(), "externalGroup", request.getExternalGroup(), "origin", request.getOrigin()));
     }
 
     @Override

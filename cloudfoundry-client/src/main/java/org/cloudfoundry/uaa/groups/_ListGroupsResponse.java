@@ -19,7 +19,6 @@ package org.cloudfoundry.uaa.groups;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.uaa.PaginatedResponse;
-import org.cloudfoundry.uaa.users.User;
 import org.immutables.value.Value;
 
 /**

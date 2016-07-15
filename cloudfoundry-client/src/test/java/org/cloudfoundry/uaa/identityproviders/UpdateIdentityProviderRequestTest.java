@@ -34,19 +34,6 @@ public final class UpdateIdentityProviderRequestTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void noIdentityZoneId() {
-        UpdateIdentityProviderRequest.builder()
-            .configuration(InternalConfiguration.builder()
-                .build())
-            .identityProviderId("test-identity-provider-id")
-            .name("test-name")
-            .originKey("test-origin-key")
-            .type(Type.INTERNAL)
-            .version(0)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
     public void noName() {
         UpdateIdentityProviderRequest.builder()
             .configuration(InternalConfiguration.builder()

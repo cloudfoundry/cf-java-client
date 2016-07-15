@@ -57,7 +57,7 @@ abstract class _SamlConfiguration extends AbstractExternalIdentityProviderConfig
     abstract String getIconUrl();
 
     /**
-     * This will be set to originKey by system
+     * This will be set to origin by system
      */
     @JsonProperty("idpEntityAlias")
     @Nullable

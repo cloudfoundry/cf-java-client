@@ -27,13 +27,6 @@ public final class GetIdentityProviderRequestTest {
             .build();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noIdentityZoneId() {
-        GetIdentityProviderRequest.builder()
-            .identityProviderId("test-identity-provider-id")
-            .build();
-    }
-
     @Test
     public void valid() {
         GetIdentityProviderRequest.builder()

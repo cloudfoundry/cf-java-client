@@ -18,6 +18,7 @@ package org.cloudfoundry.uaa.groups;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.uaa.IdentityZoned;
 import org.immutables.value.Value;
 
 /**
@@ -25,7 +26,7 @@ import org.immutables.value.Value;
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _AddMemberRequest extends AbstractMemberSummary {
+abstract class _AddMemberRequest extends AbstractMember implements IdentityZoned {
 
     /**
      * The group id

@@ -19,6 +19,8 @@ package org.cloudfoundry.reactor.uaa;
 import org.cloudfoundry.uaa.IdentityZoned;
 import reactor.io.netty.http.HttpClientRequest;
 
+import java.util.Optional;
+
 final class IdentityZoneBuilder {
 
     private IdentityZoneBuilder() {
@@ -27,7 +29,7 @@ final class IdentityZoneBuilder {
     static void augment(HttpClientRequest outbound, Object request) {
         if (request instanceof IdentityZoned) {
             IdentityZoned identityZoned = (IdentityZoned) request;
-            outbound.addHeader("X-Identity-Zone-Id", identityZoned.getIdentityZoneId());
+            Optional.ofNullable(identityZoned.getIdentityZoneId()).ifPresent(identityZoneId -> outbound.addHeader("X-Identity-Zone-Id", identityZoneId));
         }
     }
 
