@@ -18,30 +18,35 @@ package org.cloudfoundry.uaa.clients;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.uaa.IdentityZoned;
+import org.immutables.value.Value;
 
 import java.util.List;
 
 /**
- * The payload for Client responses
+ * The request payload for Update Client
  */
-abstract class AbstractClient {
+@Value.Immutable
+abstract class _UpdateClientRequest implements IdentityZoned {
 
     /**
      * A list of origin keys (alias) for identity providers the client is limited to. Null implies any identity provider is allowed.
      */
+    @Nullable
     @JsonProperty("allowedproviders")
     abstract List<String> getAllowedProviders();
 
     /**
      * Were the approvals deleted for the client, and an audit event sent
      */
-    @JsonProperty("approvals_deleted")
     @Nullable
+    @JsonProperty("approvals_deleted")
     abstract Boolean getApprovalsDeleted();
 
     /**
      * Scopes that the client is able to grant when creating a client
      */
+    @Nullable
     @JsonProperty("authorities")
     abstract List<String> getAuthorities();
 
@@ -54,6 +59,7 @@ abstract class AbstractClient {
     /**
      * Scopes that do not require user approval
      */
+    @Nullable
     @JsonProperty("autoapprove")
     abstract List<String> getAutoApproves();
 
@@ -66,43 +72,42 @@ abstract class AbstractClient {
     /**
      * What scope the bearer token had when client was created
      */
-    @JsonProperty("createdwith")
     @Nullable
+    @JsonProperty("createdwith")
     abstract String getCreatedWith();
-
-    /**
-     * Epoch of the moment the client information was last altered
-     */
-    @JsonProperty("lastModified")
-    abstract Long getLastModified();
 
     /**
      * A human readable name for the client
      */
+    @Nullable
     @JsonProperty("name")
     abstract String getName();
 
     /**
      * Allowed URI pattern for redirect during authorization
      */
+    @Nullable
     @JsonProperty("redirect_uri")
     abstract List<String> getRedirectUriPatterns();
 
     /**
      * Resources the client is allowed access to
      */
+    @Nullable
     @JsonProperty("resource_ids")
     abstract List<String> getResourceIds();
 
     /**
      * Scopes allowed for the client
      */
+    @Nullable
     @JsonProperty("scope")
     abstract List<String> getScopes();
 
     /**
      * A random string used to generate the client’s revokation key. Change this value to revoke all active tokens for the client
      */
+    @Nullable
     @JsonProperty("token_salt")
     abstract String getTokenSalt();
 

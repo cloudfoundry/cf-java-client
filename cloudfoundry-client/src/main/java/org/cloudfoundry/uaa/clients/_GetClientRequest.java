@@ -21,7 +21,7 @@ import org.cloudfoundry.uaa.IdentityZoned;
 import org.immutables.value.Value;
 
 /**
- * The request payload for the retrieve client
+ * The request payload for Get Client
  */
 @Value.Immutable
 abstract class _GetClientRequest implements IdentityZoned {
