@@ -1,0 +1,32 @@
+{
+  "scope": [
+    "clients.read",
+    "clients.write"
+  ],
+  "client_id": "4Z3t1r",
+  "resource_ids": [
+    "none"
+  ],
+  "authorized_grant_types": [
+    "client_credentials"
+  ],
+  "redirect_uri": [
+    "http*://ant.path.wildcard/**/passback/*",
+    "http://test1.com"
+  ],
+  "autoapprove": [
+    "true"
+  ],
+  "authorities": [
+    "clients.read",
+    "clients.write"
+  ],
+  "token_salt": "mr80UZ",
+  "allowedproviders": [
+    "uaa",
+    "ldap",
+    "my-saml-provider"
+  ],
+  "name": "My Client Name",
+  "lastModified": 1468364445592
+}

@@ -35,6 +35,11 @@ public final class ReactorUaaClientTest extends AbstractRestTest {
     }
 
     @Test
+    public void clients() {
+        assertNotNull(this.client.clients());
+    }
+
+    @Test
     public void groups() {
         assertNotNull(this.client.groups());
     }
