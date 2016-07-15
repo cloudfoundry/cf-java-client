@@ -20,6 +20,8 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
 import org.cloudfoundry.uaa.clients.Clients;
+import org.cloudfoundry.uaa.clients.CreateClientRequest;
+import org.cloudfoundry.uaa.clients.CreateClientResponse;
 import org.cloudfoundry.uaa.clients.GetClientRequest;
 import org.cloudfoundry.uaa.clients.GetClientResponse;
 import org.cloudfoundry.uaa.clients.UpdateClientRequest;
@@ -40,6 +42,11 @@ public final class ReactorClients extends AbstractUaaOperations implements Clien
      */
     public ReactorClients(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider);
+    }
+
+    @Override
+    public Mono<CreateClientResponse> create(CreateClientRequest request) {
+        return post(request, CreateClientResponse.class, builder -> builder.pathSegment("oauth", "clients"));
     }
 
     @Override
