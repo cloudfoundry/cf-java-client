@@ -2475,7 +2475,6 @@ public final class DefaultApplicationsTest {
 
         private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
 
-
         @Before
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");

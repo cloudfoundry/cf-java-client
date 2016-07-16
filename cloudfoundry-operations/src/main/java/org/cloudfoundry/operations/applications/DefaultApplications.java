@@ -91,6 +91,7 @@ import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.OperationUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
+import org.cloudfoundry.util.SortingUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
@@ -100,6 +101,7 @@ import reactor.util.function.Tuples;
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -121,6 +123,10 @@ public final class DefaultApplications implements Applications {
     private static final int CF_INSTANCES_ERROR = 220001;
 
     private static final int CF_STAGING_NOT_FINISHED = 170002;
+
+    private static final Comparator<LogMessage> LOG_MESSAGE_COMPARATOR = (a, b) -> a.getTimestamp().compareTo(b.getTimestamp());
+
+    private static final Duration LOG_MESSAGE_TIMESPAN = Duration.ofMillis(500);
 
     private static final int MAX_NUMBER_OF_RECENT_EVENTS = 50;
 
@@ -654,12 +660,13 @@ public final class DefaultApplications implements Applications {
             return requestLogsRecent(dopplerClient, applicationId)
                 .filter(e -> EventType.LOG_MESSAGE == e.getEventType())
                 .map(Envelope::getLogMessage)
-                .collectSortedList((a, b) -> a.getTimestamp().compareTo(b.getTimestamp()))
+                .collectSortedList(LOG_MESSAGE_COMPARATOR)
                 .flatMapIterable(d -> d);
         } else {
             return requestLogsStream(dopplerClient, applicationId)
                 .filter(e -> EventType.LOG_MESSAGE == e.getEventType())
-                .map(Envelope::getLogMessage);
+                .map(Envelope::getLogMessage)
+                .compose(SortingUtils.timespan(LOG_MESSAGE_COMPARATOR, LOG_MESSAGE_TIMESPAN));
         }
     }
 
