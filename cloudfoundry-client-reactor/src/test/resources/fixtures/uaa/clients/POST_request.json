@@ -1,0 +1,30 @@
+{
+  "allowedproviders": [
+    "uaa",
+    "ldap",
+    "my-saml-provider"
+  ],
+  "authorities": [
+    "clients.read",
+    "clients.write"
+  ],
+  "authorized_grant_types": [
+    "client_credentials"
+  ],
+  "autoapprove": [
+    "true"
+  ],
+  "client_id": "aPq3I1",
+  "client_secret": "secret",
+  "name": "My Client Name",
+  "redirect_uri": [
+    "http://test1.com",
+    "http*://ant.path.wildcard/**/passback/*"
+  ],
+  "resource_ids": [],
+  "scope": [
+    "clients.read",
+    "clients.write"
+  ],
+  "token_salt": "hRZ21X"
+}
