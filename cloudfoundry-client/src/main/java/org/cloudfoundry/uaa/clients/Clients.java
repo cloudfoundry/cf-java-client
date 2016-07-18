@@ -32,6 +32,14 @@ public interface Clients {
     Mono<CreateClientResponse> create(CreateClientRequest request);
 
     /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#delete79">Delete Client</a> request
+     *
+     * @param request Delete Client request
+     * @return the Response to the Delete Client Request
+     */
+    Mono<DeleteClientResponse> delete(DeleteClientRequest request);
+
+    /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#retrieve77">Retrieve Client</a> request
      *
      * @param request Retrieve Client request
@@ -42,8 +50,8 @@ public interface Clients {
     /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#update78">Update Client</a> request
      *
-     * @param request Retrieve Client request
-     * @return the Response to the Retrieve Client Request
+     * @param request Update Client request
+     * @return the Response to the Update Client Request
      */
     Mono<UpdateClientResponse> update(UpdateClientRequest request);
 
