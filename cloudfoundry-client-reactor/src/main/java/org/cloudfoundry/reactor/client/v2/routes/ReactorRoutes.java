@@ -39,6 +39,8 @@ import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
 import org.cloudfoundry.util.ExceptionUtils;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
+
 /**
  * The Reactor-based implementation of {@link Routes}
  */
@@ -74,7 +76,12 @@ public final class ReactorRoutes extends AbstractClientV2Operations implements R
 
     @Override
     public Mono<Boolean> exists(RouteExistsRequest request) {
-        return get(request, Boolean.class, builder -> builder.pathSegment("v2", "routes", "reserved", "domain", request.getDomainId(), "host", request.getHost()))
+        return get(request, Boolean.class,
+            builder -> {
+                builder.pathSegment("v2", "routes", "reserved", "domain", request.getDomainId());
+                Optional.ofNullable(request.getHost()).ifPresent(host -> builder.pathSegment("host", host));
+                return builder;
+            })
             .defaultIfEmpty(true)
             .otherwise(ExceptionUtils.statusCode(CF_NOT_FOUND), t -> Mono.just(false));
     }

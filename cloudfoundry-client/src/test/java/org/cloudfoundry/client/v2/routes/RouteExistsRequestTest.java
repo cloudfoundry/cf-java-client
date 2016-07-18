@@ -23,14 +23,6 @@ public final class RouteExistsRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noDomainId() {
         RouteExistsRequest.builder()
-            .host("test-host")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noHost() {
-        RouteExistsRequest.builder()
-            .domainId("test-domain-id")
             .build();
     }
 
@@ -38,7 +30,6 @@ public final class RouteExistsRequestTest {
     public void valid() {
         RouteExistsRequest.builder()
             .domainId("test-domain-id")
-            .host("test-host")
             .build();
     }
 
