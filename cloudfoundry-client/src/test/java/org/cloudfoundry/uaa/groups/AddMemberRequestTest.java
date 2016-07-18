@@ -23,7 +23,9 @@ public final class AddMemberRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noGroupId() {
         AddMemberRequest.builder()
+            .origin("test-origin")
             .memberId("test-member-id")
+            .type(MemberType.USER)
             .build();
     }
 
@@ -31,6 +33,26 @@ public final class AddMemberRequestTest {
     public void noMemberId() {
         AddMemberRequest.builder()
             .groupId("test-group-id")
+            .origin("test-origin")
+            .type(MemberType.USER)
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noOrigin() {
+        AddMemberRequest.builder()
+            .groupId("test-group-id")
+            .memberId("test-member-id")
+            .type(MemberType.USER)
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noType() {
+        AddMemberRequest.builder()
+            .groupId("test-group-id")
+            .memberId("test-member-id")
+            .origin("test-origin")
             .build();
     }
 
@@ -39,6 +61,8 @@ public final class AddMemberRequestTest {
         AddMemberRequest.builder()
             .groupId("test-group-id")
             .memberId("test-member-id")
+            .origin("test-origin")
+            .type(MemberType.USER)
             .build();
     }
 
