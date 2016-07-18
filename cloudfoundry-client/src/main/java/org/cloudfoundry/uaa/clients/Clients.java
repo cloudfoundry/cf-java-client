@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface Clients {
 
     /**
-     * Makes the <a href="">Create Client</a> request
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#create76">Create Client</a> request
      *
      * @param request Create Client request
      * @return the Response to the Create Client Request
