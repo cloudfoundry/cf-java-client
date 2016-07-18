@@ -29,8 +29,8 @@ import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
-import reactor.util.Exceptions;
 
 import java.io.IOException;
 

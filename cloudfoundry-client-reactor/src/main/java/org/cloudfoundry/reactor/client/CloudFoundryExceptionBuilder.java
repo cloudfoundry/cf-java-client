@@ -18,9 +18,9 @@ package org.cloudfoundry.reactor.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v2.CloudFoundryException;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import reactor.io.netty.http.HttpException;
-import reactor.util.Exceptions;
 
 import java.io.IOException;
 import java.util.Map;

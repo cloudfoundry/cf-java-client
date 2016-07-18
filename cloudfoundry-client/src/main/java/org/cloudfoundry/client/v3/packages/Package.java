@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Link;
-import reactor.util.Exceptions;
+import reactor.core.Exceptions;
 
 import java.io.IOException;
 import java.util.Map;

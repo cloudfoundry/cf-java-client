@@ -22,7 +22,7 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.util.Exceptions;
+import reactor.core.Exceptions;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
