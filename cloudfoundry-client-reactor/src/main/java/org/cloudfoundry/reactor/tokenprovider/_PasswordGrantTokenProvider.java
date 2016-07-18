@@ -92,7 +92,7 @@ abstract class _PasswordGrantTokenProvider implements BasicAuthorized, TokenProv
             .queryParam("grant_type", "password")
             .queryParam("username", getUsername())
             .queryParam("password", getPassword())
-            .build().encode().toUriString();
+            .build().toUriString();
     }
 
 }
