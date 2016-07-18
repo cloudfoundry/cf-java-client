@@ -22,12 +22,15 @@ import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
 import org.cloudfoundry.uaa.clients.CreateClientRequest;
 import org.cloudfoundry.uaa.clients.CreateClientResponse;
+import org.cloudfoundry.uaa.clients.DeleteClientRequest;
+import org.cloudfoundry.uaa.clients.DeleteClientResponse;
 import org.cloudfoundry.uaa.clients.GetClientRequest;
 import org.cloudfoundry.uaa.clients.GetClientResponse;
 import org.cloudfoundry.uaa.clients.UpdateClientRequest;
 import org.cloudfoundry.uaa.clients.UpdateClientResponse;
 import reactor.core.publisher.Mono;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
@@ -90,6 +93,53 @@ public final class ReactorClientsTest {
         @Override
         protected Mono<CreateClientResponse> invoke(CreateClientRequest request) {
             return this.clients.create(request);
+        }
+    }
+
+    public static final class Delete extends AbstractUaaApiTest<DeleteClientRequest, DeleteClientResponse> {
+
+        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/oauth/clients/test-client-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/clients/DELETE_{id}_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected DeleteClientResponse getResponse() {
+            return DeleteClientResponse.builder()
+                .allowedProvider("uaa", "ldap", "my-saml-provider")
+                .authority("clients.read", "clients.write")
+                .authorizedGrantType("client_credentials")
+                .autoApprove("true")
+                .clientId("Gieovr")
+                .lastModified(1468364443957L)
+                .name("My Client Name")
+                .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                .resourceId("none")
+                .scope("clients.read", "clients.write")
+                .tokenSalt("a4mzKu")
+                .build();
+        }
+
+        @Override
+        protected DeleteClientRequest getValidRequest() throws Exception {
+            return DeleteClientRequest.builder()
+                .clientId("test-client-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<DeleteClientResponse> invoke(DeleteClientRequest request) {
+            return this.clients.delete(request);
         }
     }
 
