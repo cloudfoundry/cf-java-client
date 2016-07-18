@@ -21,8 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.util.AsciiString;
+import reactor.core.Exceptions;
 import reactor.io.netty.http.HttpClientRequest;
-import reactor.util.Exceptions;
 
 import java.io.IOException;
 import java.io.InputStream;

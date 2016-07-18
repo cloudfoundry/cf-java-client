@@ -27,9 +27,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.Exceptions;
 import reactor.util.function.Tuple2;
 
 import java.io.ByteArrayOutputStream;
@@ -110,12 +110,12 @@ public abstract class AbstractIntegrationTest {
         return this.nameFactory.getName("test-buildpack-");
     }
 
-    protected final String getGroupName() {
-        return this.nameFactory.getName("test-display-name-");
-    }
-
     protected final String getDomainName() {
         return this.nameFactory.getName("test.domain.");
+    }
+
+    protected final String getGroupName() {
+        return this.nameFactory.getName("test-display-name-");
     }
 
     protected final String getHostName() {
