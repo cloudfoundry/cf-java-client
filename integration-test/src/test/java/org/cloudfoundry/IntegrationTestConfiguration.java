@@ -42,6 +42,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.security.SecureRandom;
@@ -85,17 +86,26 @@ public class IntegrationTestConfiguration {
                                                @Value("${test.proxy.username:}") String proxyUsername,
                                                @Value("${test.skipSslValidation:false}") Boolean skipSslValidation) {
 
-        return DefaultConnectionContext.builder()
+        DefaultConnectionContext.Builder connectionContext = DefaultConnectionContext.builder()
             .apiHost(apiHost)
             .problemHandler(new FailingDeserializationProblemHandler())  // Test-only problem handler
-            .proxyConfiguration(ProxyConfiguration.builder()
+            .skipSslValidation(skipSslValidation);
+
+        if (StringUtils.hasText(proxyHost)) {
+            ProxyConfiguration.Builder proxyConfiguration = ProxyConfiguration.builder()
                 .host(proxyHost)
-                .password(proxyPassword)
-                .port(proxyPort)
-                .username(proxyUsername)
-                .build())
-            .skipSslValidation(skipSslValidation)
-            .build();
+                .port(proxyPort);
+
+            if (StringUtils.hasText(proxyUsername)) {
+                proxyConfiguration
+                    .password(proxyPassword)
+                    .username(proxyUsername);
+            }
+
+            connectionContext.proxyConfiguration(proxyConfiguration.build());
+        }
+
+        return connectionContext.build();
     }
 
     @Bean
