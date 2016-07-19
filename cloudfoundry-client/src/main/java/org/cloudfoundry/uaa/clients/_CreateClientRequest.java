@@ -52,7 +52,7 @@ abstract class _CreateClientRequest implements IdentityZoned {
      * List of grant types that can be used to obtain a token with this client. Can include authorization_code, password, implicit, and/or client_credentials.
      */
     @JsonProperty("authorized_grant_types")
-    abstract List<String> getAuthorizedGrantTypes();
+    abstract List<AuthorizedGrantType> getAuthorizedGrantTypes();
 
     /**
      * Scopes that do not require user approval
