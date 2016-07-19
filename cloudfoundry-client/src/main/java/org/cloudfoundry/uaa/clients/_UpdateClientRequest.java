@@ -30,38 +30,46 @@ import java.util.List;
 @Value.Immutable
 abstract class _UpdateClientRequest implements IdentityZoned {
 
+    @Value.Check
+    void checkAuthorizedGrantType() {
+        if (this.getAuthorizedGrantTypes() == null) {
+            throw new IllegalStateException("authorizedGrantTypes must be set");
+        }
+    }
+
     /**
      * A list of origin keys (alias) for identity providers the client is limited to. Null implies any identity provider is allowed.
      */
-    @Nullable
     @JsonProperty("allowedproviders")
+    @Nullable
     abstract List<String> getAllowedProviders();
 
     /**
      * Were the approvals deleted for the client, and an audit event sent
      */
-    @Nullable
     @JsonProperty("approvals_deleted")
+    @Nullable
     abstract Boolean getApprovalsDeleted();
 
     /**
      * Scopes that the client is able to grant when creating a client
      */
-    @Nullable
     @JsonProperty("authorities")
+    @Nullable
     abstract List<String> getAuthorities();
 
     /**
      * List of grant types that can be used to obtain a token with this client. Can include authorization_code, password, implicit, and/or client_credentials.
      */
     @JsonProperty("authorized_grant_types")
+    @Nullable
     abstract List<GrantType> getAuthorizedGrantTypes();
 
     /**
      * Scopes that do not require user approval
      */
-    @Nullable
     @JsonProperty("autoapprove")
+    @Nullable
     abstract List<String> getAutoApproves();
 
     /**
@@ -73,43 +81,43 @@ abstract class _UpdateClientRequest implements IdentityZoned {
     /**
      * What scope the bearer token had when client was created
      */
-    @Nullable
     @JsonProperty("createdwith")
+    @Nullable
     abstract String getCreatedWith();
 
     /**
      * A human readable name for the client
      */
-    @Nullable
     @JsonProperty("name")
+    @Nullable
     abstract String getName();
 
     /**
      * Allowed URI pattern for redirect during authorization
      */
-    @Nullable
     @JsonProperty("redirect_uri")
+    @Nullable
     abstract List<String> getRedirectUriPatterns();
 
     /**
      * Resources the client is allowed access to
      */
-    @Nullable
     @JsonProperty("resource_ids")
+    @Nullable
     abstract List<String> getResourceIds();
 
     /**
      * Scopes allowed for the client
      */
-    @Nullable
     @JsonProperty("scope")
+    @Nullable
     abstract List<String> getScopes();
 
     /**
      * A random string used to generate the client’s revokation key. Change this value to revoke all active tokens for the client
      */
-    @Nullable
     @JsonProperty("token_salt")
+    @Nullable
     abstract String getTokenSalt();
 
 }
