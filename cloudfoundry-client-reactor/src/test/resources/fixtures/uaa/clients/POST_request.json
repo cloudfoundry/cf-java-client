@@ -21,7 +21,6 @@
     "http://test1.com",
     "http*://ant.path.wildcard/**/passback/*"
   ],
-  "resource_ids": [],
   "scope": [
     "clients.read",
     "clients.write"
