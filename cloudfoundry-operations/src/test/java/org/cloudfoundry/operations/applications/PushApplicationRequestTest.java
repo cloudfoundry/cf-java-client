@@ -18,12 +18,9 @@ package org.cloudfoundry.operations.applications;
 
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.nio.file.Paths;
 
 public final class PushApplicationRequestTest {
-
-    private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
     @Test(expected = IllegalStateException.class)
     public void noApplication() {
@@ -35,14 +32,14 @@ public final class PushApplicationRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noName() {
         PushApplicationRequest.builder()
-            .application(this.applicationBits)
+            .application(Paths.get("test-application"))
             .build();
     }
 
     @Test
     public void valid() {
         PushApplicationRequest.builder()
-            .application(this.applicationBits)
+            .application(Paths.get("test-application"))
             .name("test-name")
             .build();
     }

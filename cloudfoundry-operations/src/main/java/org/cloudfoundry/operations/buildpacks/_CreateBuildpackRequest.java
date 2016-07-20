@@ -19,7 +19,7 @@ package org.cloudfoundry.operations.buildpacks;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
-import java.io.InputStream;
+import java.nio.file.Path;
 
 /**
  * The request options for the create buildpack operation
@@ -28,9 +28,9 @@ import java.io.InputStream;
 abstract class _CreateBuildpackRequest {
 
     /**
-     * The buildpack file stream
+     * The path to the buildpack
      */
-    abstract InputStream getBuildpack();
+    abstract Path getBuildpack();
 
     /**
      * Enables the buildpack to be used for staging

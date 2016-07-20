@@ -36,10 +36,11 @@ import org.cloudfoundry.util.FluentMap;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Collections;
 
 public final class ApplicationsTest extends AbstractIntegrationTest {
@@ -54,7 +55,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void deleteApplication() throws IOException {
         String applicationName = getApplicationName();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
+        createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
             .then(this.cloudFoundryOperations.applications()
                 .delete(DeleteApplicationRequest.builder()
                     .name(applicationName)
@@ -66,7 +67,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void deleteApplicationAndRoutes() throws IOException {
         String applicationName = getApplicationName();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
+        createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
             .then(this.cloudFoundryOperations.applications()
                 .delete(DeleteApplicationRequest.builder()
                     .name(applicationName)
@@ -81,7 +82,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String serviceInstanceName = getServiceInstanceName();
 
         Mono.empty()
-            .then(createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false))
+            .then(createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false))
             .then(bindServiceToApplication(this.cloudFoundryOperations, applicationName, serviceInstanceName))
             .then(this.cloudFoundryOperations.applications()
                 .delete(DeleteApplicationRequest.builder()
@@ -94,7 +95,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void get() {
         String applicationName = getApplicationName();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
+        createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
             .then(this.cloudFoundryOperations.applications()
                 .get(GetApplicationRequest.builder()
                     .name(applicationName)
@@ -108,7 +109,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void getHealthCheck() throws IOException {
         String applicationName = getApplicationName();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, true)
+        createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, true)
             .then(this.cloudFoundryOperations.applications()
                 .getHealthCheck(GetApplicationHealthCheckRequest.builder()
                     .name(applicationName)
@@ -121,7 +122,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void getStopped() {
         String applicationName = getApplicationName();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, true)
+        createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, true)
             .then(this.cloudFoundryOperations.applications()
                 .get(GetApplicationRequest.builder()
                     .name(applicationName)
@@ -138,7 +139,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.cloudFoundryOperations.applications()
             .push(PushApplicationRequest.builder()
-                .application(getApplicationBits())
+                .application(getApplicationPath())
                 .buildpack("staticfile_buildpack")
                 .domain(domainName)
                 .diskQuota(512)
@@ -153,10 +154,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void pushExisting() {
         String applicationName = getApplicationName();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
+        createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
             .then(this.cloudFoundryOperations.applications()
                 .push(PushApplicationRequest.builder()
-                    .application(getApplicationBits())
+                    .application(getApplicationPath())
                     .buildpack("staticfile_buildpack")
                     .diskQuota(512)
                     .memory(64)
@@ -169,7 +170,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void pushNew() {
         String applicationName = getApplicationName();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
+        createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
             .subscribe(testSubscriber());
     }
 
@@ -185,7 +186,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .build())
             .then(this.cloudFoundryOperations.applications()
                 .push(PushApplicationRequest.builder()
-                    .application(getApplicationBits())
+                    .application(getApplicationPath())
                     .buildpack("staticfile_buildpack")
                     .diskQuota(512)
                     .domain(domainName)
@@ -202,7 +203,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.cloudFoundryOperations.applications()
             .push(PushApplicationRequest.builder()
-                .application(getApplicationBits())
+                .application(getApplicationPath())
                 .buildpack("staticfile_buildpack")
                 .diskQuota(512)
                 .healthCheckType(ApplicationHealthCheck.PORT)
@@ -217,7 +218,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void restartNotStarted() throws IOException {
         String applicationName = getApplicationName();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, true)
+        createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, true)
             .then(this.cloudFoundryOperations.applications()
                 .restart(RestartApplicationRequest.builder()
                     .name(applicationName)
@@ -229,7 +230,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void restartStarted() throws IOException {
         String applicationName = getApplicationName();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
+        createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
             .then(this.cloudFoundryOperations.applications()
                 .restart(RestartApplicationRequest.builder()
                     .name(applicationName)
@@ -245,7 +246,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String variableValue1 = getVariableValue();
         String variableValue2 = getVariableValue();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
+        createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
             .then(this.cloudFoundryOperations.applications()
                 .setEnvironmentVariable(SetEnvironmentVariableApplicationRequest.builder()
                     .name(applicationName)
@@ -274,7 +275,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void startNotStarted() throws IOException {
         String applicationName = getApplicationName();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, true)
+        createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, true)
             .then(this.cloudFoundryOperations.applications()
                 .start(StartApplicationRequest.builder()
                     .name(applicationName)
@@ -286,7 +287,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void startStarted() throws IOException {
         String applicationName = getApplicationName();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
+        createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
             .then(this.cloudFoundryOperations.applications()
                 .start(StartApplicationRequest.builder()
                     .name(applicationName)
@@ -302,7 +303,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String variableValue1 = getVariableValue();
         String variableValue2 = getVariableValue();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
+        createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
             .then(this.cloudFoundryOperations.applications()
                 .setEnvironmentVariable(SetEnvironmentVariableApplicationRequest.builder()
                     .name(applicationName)
@@ -342,7 +343,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String variableValue1 = getVariableValue();
         String variableValue2 = getVariableValue();
 
-        createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, false)
+        createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
             .then(this.cloudFoundryOperations.applications()
                 .setEnvironmentVariable(SetEnvironmentVariableApplicationRequest.builder()
                     .name(applicationName)
@@ -381,10 +382,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build()));
     }
 
-    private static Mono<Void> createApplication(CloudFoundryOperations cloudFoundryOperations, InputStream applicationBits, String name, Boolean noStart) {
+    private static Mono<Void> createApplication(CloudFoundryOperations cloudFoundryOperations, Path application, String name, Boolean noStart) {
         return cloudFoundryOperations.applications()
             .push(PushApplicationRequest.builder()
-                .application(applicationBits)
+                .application(application)
                 .healthCheckType(ApplicationHealthCheck.PORT)
                 .buildpack("staticfile_buildpack")
                 .diskQuota(512)
@@ -394,14 +395,12 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .build());
     }
 
-    private static InputStream getApplicationBits() {
+    private static Path getApplicationPath() {
         try {
-            return new ClassPathResource("test-application.zip").getInputStream();
+            return new ClassPathResource("test-application.zip").getFile().toPath();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw Exceptions.propagate(e);
         }
-
-        return null;
     }
 
 }

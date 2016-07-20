@@ -21,9 +21,10 @@ import org.cloudfoundry.operations.buildpacks.CreateBuildpackRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import reactor.core.Exceptions;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.file.Path;
 
 public final class BuildpacksTest extends AbstractIntegrationTest {
 
@@ -36,7 +37,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
 
         this.cloudFoundryOperations.buildpacks()
             .create(CreateBuildpackRequest.builder()
-                .buildpack(getBuildpackBits())
+                .buildpack(getBuildpackPath())
                 .fileName("test-buildpack.zip")
                 .name(buildpackName)
                 .position(Integer.MAX_VALUE)
@@ -49,14 +50,12 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
 
     }
 
-    private static InputStream getBuildpackBits() {
+    private static Path getBuildpackPath() {
         try {
-            return new ClassPathResource("test-buildpack.zip").getInputStream();
+            return new ClassPathResource("test-buildpack.zip").getFile().toPath();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw Exceptions.propagate(e);
         }
-
-        return null;
     }
 
 }

@@ -111,6 +111,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
@@ -2502,10 +2503,11 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
+            new WordListRandomWords());
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(this.applicationBits)
+            .application(Paths.get("test-application"))
             .domain("test-domain")
             .name("test-name")
             .build();
@@ -2537,10 +2539,11 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
+            new WordListRandomWords());
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(this.applicationBits)
+            .application(Paths.get("test-application"))
             .domain("test-domain")
             .name("test-name")
             .build();
@@ -2579,10 +2582,11 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
+            new WordListRandomWords());
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(this.applicationBits)
+            .application(Paths.get("test-application"))
             .domain("test-domain")
             .host("test-host")
             .name("test-name")
@@ -2621,10 +2625,11 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
+            new WordListRandomWords());
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(this.applicationBits)
+            .application(Paths.get("test-application"))
             .domain("test-domain")
             .noHostname(true)
             .name("test-name")
@@ -2663,7 +2668,8 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
+            new WordListRandomWords());
 
         @Before
         public void setUp() throws Exception {
@@ -2680,7 +2686,7 @@ public final class DefaultApplicationsTest {
         protected Mono<Void> invoke() {
             return this.applications
                 .push(PushApplicationRequest.builder()
-                    .application(this.applicationBits)
+                    .application(Paths.get("test-application"))
                     .name("test-name")
                     .stack("invalid-stack")
                     .build());
@@ -2692,10 +2698,11 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
+            new WordListRandomWords());
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(this.applicationBits)
+            .application(Paths.get("test-application"))
             .domain("test-domain")
             .name("test-name")
             .build();
@@ -2734,10 +2741,11 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
+            new WordListRandomWords());
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(this.applicationBits)
+            .application(Paths.get("test-application"))
             .domain("test-domain")
             .host("test-host")
             .name("test-name")
@@ -2777,10 +2785,11 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
+            new WordListRandomWords());
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(this.applicationBits)
+            .application(Paths.get("test-application"))
             .domain("test-domain")
             .noHostname(true)
             .name("test-name")
@@ -2820,10 +2829,11 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
+            new WordListRandomWords());
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(this.applicationBits)
+            .application(Paths.get("test-application"))
             .name("test-name")
             .build();
 
@@ -2855,10 +2865,11 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
+            new WordListRandomWords());
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(this.applicationBits)
+            .application(Paths.get("test-application"))
             .name("test-name")
             .build();
 
@@ -2898,10 +2909,11 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
+            new WordListRandomWords());
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(this.applicationBits)
+            .application(Paths.get("test-application"))
             .name("test-name")
             .build();
 
@@ -2940,10 +2952,11 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
+            new WordListRandomWords());
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(this.applicationBits)
+            .application(Paths.get("test-application"))
             .noRoute(true)
             .name("test-name")
             .build();
@@ -2980,10 +2993,11 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
+            new WordListRandomWords());
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(this.applicationBits)
+            .application(Paths.get("test-application"))
             .name("test-name")
             .noStart(true)
             .build();
@@ -3021,7 +3035,7 @@ public final class DefaultApplicationsTest {
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(this.applicationBits)
+            .application(Paths.get("test-application"))
             .domain("test-domain")
             .name("test-name")
             .randomRoute(true)
@@ -3029,7 +3043,8 @@ public final class DefaultApplicationsTest {
 
         private final RandomWords randomWords = mock(RandomWords.class, RETURNS_SMART_NULLS);
 
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID), this.randomWords);
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
+            this.randomWords);
 
         @Before
         public void setUp() throws Exception {
@@ -3066,10 +3081,11 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
+            new WordListRandomWords());
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(this.applicationBits)
+            .application(Paths.get("test-application"))
             .domain("test-domain")
             .name("test-name")
             .build();
@@ -3109,10 +3125,11 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
+            new WordListRandomWords());
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(this.applicationBits)
+            .application(Paths.get("test-application"))
             .domain("test-domain")
             .name("test-name")
             .build();
@@ -3152,10 +3169,11 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
+            new WordListRandomWords());
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(this.applicationBits)
+            .application(Paths.get("test-application"))
             .domain("test-domain")
             .name("test-name")
             .build();
@@ -3194,10 +3212,11 @@ public final class DefaultApplicationsTest {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
 
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
+            new WordListRandomWords());
 
         private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(this.applicationBits)
+            .application(Paths.get("test-application"))
             .domain("test-domain")
             .name("test-name")
             .build();

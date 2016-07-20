@@ -30,6 +30,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.file.Paths;
 
 import static org.cloudfoundry.util.test.TestObjects.fill;
 import static org.mockito.Mockito.when;
@@ -86,7 +87,7 @@ public final class DefaultBuildpacksTest {
 
         private static final Integer POSITION = 1;
 
-        private final DefaultBuildpacks buildpacks = new DefaultBuildpacks(Mono.just(this.cloudFoundryClient));
+        private final DefaultBuildpacks buildpacks = new DefaultBuildpacks(Mono.just(this.cloudFoundryClient), p -> EMPTY_STREAM);
 
         @Before
         public void setUp() throws Exception {
@@ -103,7 +104,7 @@ public final class DefaultBuildpacksTest {
         protected Publisher<Void> invoke() {
             return this.buildpacks
                 .create(CreateBuildpackRequest.builder()
-                    .buildpack(EMPTY_STREAM)
+                    .buildpack(Paths.get("test-buildpack"))
                     .fileName(FILE_NAME)
                     .name(BUILDPACK_NAME)
                     .enable(ENABLE)
@@ -115,7 +116,7 @@ public final class DefaultBuildpacksTest {
 
     public static final class List extends AbstractOperationsApiTest<Buildpack> {
 
-        private final DefaultBuildpacks buildpacks = new DefaultBuildpacks(Mono.just(this.cloudFoundryClient));
+        private final DefaultBuildpacks buildpacks = new DefaultBuildpacks(Mono.just(this.cloudFoundryClient), p -> null);
 
         @Before
         public void setUp() throws Exception {

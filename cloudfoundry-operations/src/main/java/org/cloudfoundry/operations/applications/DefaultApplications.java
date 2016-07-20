@@ -86,6 +86,7 @@ import org.cloudfoundry.doppler.StreamRequest;
 import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.DelayTimeoutException;
 import org.cloudfoundry.util.ExceptionUtils;
+import org.cloudfoundry.util.FileUtils;
 import org.cloudfoundry.util.FluentMap;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.OperationUtils;
@@ -99,6 +100,7 @@ import reactor.util.function.Tuple6;
 import reactor.util.function.Tuples;
 
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Comparator;
@@ -109,6 +111,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
@@ -138,17 +141,20 @@ public final class DefaultApplications implements Applications {
 
     private final Mono<DopplerClient> dopplerClient;
 
+    private final Function<Path, InputStream> pathTransformer;
+
     private final RandomWords randomWords;
 
     private final Mono<String> spaceId;
 
     public DefaultApplications(Mono<CloudFoundryClient> cloudFoundryClient, Mono<DopplerClient> dopplerClient, Mono<String> spaceId) {
-        this(cloudFoundryClient, dopplerClient, spaceId, new WordListRandomWords());
+        this(cloudFoundryClient, dopplerClient, FileUtils::toInputStream, spaceId, new WordListRandomWords());
     }
 
-    DefaultApplications(Mono<CloudFoundryClient> cloudFoundryClient, Mono<DopplerClient> dopplerClient, Mono<String> spaceId, RandomWords randomWords) {
+    DefaultApplications(Mono<CloudFoundryClient> cloudFoundryClient, Mono<DopplerClient> dopplerClient, Function<Path, InputStream> pathTransformer, Mono<String> spaceId, RandomWords randomWords) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.dopplerClient = dopplerClient;
+        this.pathTransformer = pathTransformer;
         this.spaceId = spaceId;
         this.randomWords = randomWords;
     }
@@ -298,11 +304,12 @@ public final class DefaultApplications implements Applications {
             .then(function((cloudFoundryClient, spaceId, stackId) -> Mono.when(
                 Mono.just(cloudFoundryClient),
                 getApplicationId(cloudFoundryClient, request, spaceId, stackId.orElse(null)),
+                Mono.just(this.pathTransformer.apply(request.getApplication())),
                 Mono.just(spaceId)
             )))
-            .then(function((cloudFoundryClient, applicationId, spaceId) -> prepareDomainsAndRoutes(cloudFoundryClient, request, applicationId, spaceId, this.randomWords)
-                .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId)))))
-            .then(function((cloudFoundryClient, applicationId) -> uploadApplicationAndWait(cloudFoundryClient, applicationId, request.getApplication())
+            .then(function((cloudFoundryClient, applicationId, inputStream, spaceId) -> prepareDomainsAndRoutes(cloudFoundryClient, request, applicationId, spaceId, this.randomWords)
+                .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId, inputStream)))))
+            .then(function((cloudFoundryClient, applicationId, inputStream) -> uploadApplicationAndWait(cloudFoundryClient, applicationId, inputStream)
                 .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId)))))
             .then(function((cloudFoundryClient, applicationId) -> stopApplication(cloudFoundryClient, applicationId)
                 .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId)))))
