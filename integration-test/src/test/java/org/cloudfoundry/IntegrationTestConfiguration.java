@@ -46,6 +46,7 @@ import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.util.Random;
 
 @Configuration
@@ -89,7 +90,8 @@ public class IntegrationTestConfiguration {
         DefaultConnectionContext.Builder connectionContext = DefaultConnectionContext.builder()
             .apiHost(apiHost)
             .problemHandler(new FailingDeserializationProblemHandler())  // Test-only problem handler
-            .skipSslValidation(skipSslValidation);
+            .skipSslValidation(skipSslValidation)
+            .sslHandshakeTimeout(Duration.ofSeconds(30));
 
         if (StringUtils.hasText(proxyHost)) {
             ProxyConfiguration.Builder proxyConfiguration = ProxyConfiguration.builder()

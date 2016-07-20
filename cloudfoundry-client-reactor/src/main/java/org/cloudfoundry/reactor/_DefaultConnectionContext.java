@@ -63,7 +63,9 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             .rcvbuf(RECEIVE_BUFFER_SIZE);
 
         getProxyConfiguration().ifPresent(c -> options.proxy(ClientOptions.Proxy.HTTP, c.getHost(), c.getPort().orElse(null), c.getUsername().orElse(null), u -> c.getPassword().orElse(null)));
+        getSocketTimeout().ifPresent(options::timeout);
         getSslCertificateTruster().ifPresent(trustManager -> options.ssl().trustManager(new StaticTrustManagerFactory(trustManager)));
+        getSslHandshakeTimeout().ifPresent(options::sslHandshakeTimeout);
 
         return HttpClient.create(options);
     }
@@ -144,6 +146,11 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
      */
     abstract Optional<Boolean> getSkipSslValidation();
 
+    /**
+     * The {@code SO_TIMEOUT} value
+     */
+    abstract Optional<Duration> getSocketTimeout();
+
     @Value.Derived
     Optional<SslCertificateTruster> getSslCertificateTruster() {
         if (getSkipSslValidation().orElse(false)) {
@@ -152,6 +159,11 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             return Optional.empty();
         }
     }
+
+    /**
+     * The timeout for the SSL handshake negotiation
+     */
+    abstract Optional<Duration> getSslHandshakeTimeout();
 
     private static UriComponents normalize(UriComponentsBuilder builder) {
         UriComponents components = builder.build();
