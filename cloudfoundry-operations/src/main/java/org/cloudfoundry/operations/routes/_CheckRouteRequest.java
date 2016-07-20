@@ -33,6 +33,7 @@ abstract class _CheckRouteRequest {
     /**
      * The host of the route
      */
+    @Nullable
     abstract String getHost();
 
     /**
