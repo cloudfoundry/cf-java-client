@@ -17,6 +17,7 @@
 package org.cloudfoundry.uaa.groups;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.uaa.IdentityZoned;
 import org.immutables.value.Value;
@@ -26,12 +27,30 @@ import org.immutables.value.Value;
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _AddMemberRequest extends AbstractMember implements IdentityZoned {
+abstract class _AddMemberRequest implements IdentityZoned {
 
     /**
      * The group id
      */
     @JsonIgnore
     abstract String getGroupId();
+
+    /**
+     * Globally unique identifier of the member, either a user ID or another group ID
+     */
+    @JsonProperty("value")
+    abstract String getMemberId();
+
+    /**
+     * The alias of the identity provider that authenticated this user. "uaa" is an internal UAA user.
+     */
+    @JsonProperty("origin")
+    abstract String getOrigin();
+
+    /**
+     * The member type
+     */
+    @JsonProperty("type")
+    abstract MemberType getType();
 
 }
