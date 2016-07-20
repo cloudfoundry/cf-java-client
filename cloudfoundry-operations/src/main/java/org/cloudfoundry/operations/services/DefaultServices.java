@@ -811,6 +811,7 @@ public final class DefaultServices implements Services {
             .description(entity.getDescription())
             .id(ResourceUtils.getId(resource))
             .label(entity.getLabel())
+            .tags(entity.getTags())
             .servicePlans(toServicePlans(servicePlans))
             .build();
     }

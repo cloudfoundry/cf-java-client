@@ -42,6 +42,11 @@ abstract class _ServiceOffering {
     abstract String getLabel();
 
     /**
+     * The tags
+     */
+    abstract List<String> getTags();
+    
+    /**
      * The service plans
      */
     abstract List<ServicePlan> getServicePlans();
