@@ -23,12 +23,12 @@ Most projects will need two dependencies; the Operations API and an implementati
     <dependency>
         <groupId>io.projectreactor</groupId>
         <artifactId>reactor-core</artifactId>
-        <version>3.0.0.BUILD-SNAPSHOT</version>
+        <version>3.0.0.RC1</version>
     </dependency>
     <dependency>
         <groupId>io.projectreactor</groupId>
         <artifactId>reactor-netty</artifactId>
-        <version>0.5.0.BUILD-SNAPSHOT</version>
+        <version>0.5.0.M1</version>
     </dependency>
     ...
 </dependencies>
