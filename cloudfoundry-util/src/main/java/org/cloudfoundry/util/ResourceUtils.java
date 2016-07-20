@@ -20,6 +20,9 @@ import org.cloudfoundry.client.v2.PaginatedResponse;
 import org.cloudfoundry.client.v2.Resource;
 import reactor.core.publisher.Flux;
 
+/**
+ * Utilities for dealing with {@link Resource}s
+ */
 public final class ResourceUtils {
 
     private ResourceUtils() {
