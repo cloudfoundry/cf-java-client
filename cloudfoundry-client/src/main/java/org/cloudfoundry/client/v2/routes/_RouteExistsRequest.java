@@ -36,6 +36,7 @@ abstract class _RouteExistsRequest {
     /**
      * The host
      */
+    @Nullable
     @JsonIgnore
     abstract String getHost();
 

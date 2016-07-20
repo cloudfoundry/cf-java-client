@@ -20,6 +20,7 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.operations.applications.ApplicationHealthCheck;
 import org.cloudfoundry.operations.applications.PushApplicationRequest;
 import org.cloudfoundry.operations.domains.CreateDomainRequest;
+import org.cloudfoundry.operations.domains.CreateSharedDomainRequest;
 import org.cloudfoundry.operations.routes.CheckRouteRequest;
 import org.cloudfoundry.operations.routes.CreateRouteRequest;
 import org.cloudfoundry.operations.routes.DeleteRouteRequest;
@@ -27,6 +28,7 @@ import org.cloudfoundry.operations.routes.ListRoutesRequest;
 import org.cloudfoundry.operations.routes.MapRouteRequest;
 import org.cloudfoundry.operations.routes.Route;
 import org.cloudfoundry.operations.routes.UnmapRouteRequest;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -68,13 +70,30 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .assertEquals(false));
     }
 
+    @Ignore("Awaiting resolution of https://github.com/cloudfoundry/cloud_controller_ng/issues/650")
     @Test
-    public void checkTrue() {
+    public void checkTruePrivateDomainNoHost() {
         String domainName = getDomainName();
         String hostName = getHostName();
         String path = getPath();
 
-        createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
+        createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
+            .then(this.cloudFoundryOperations.routes()
+                .check(CheckRouteRequest.builder()
+                    .domain(domainName)
+                    .path(path)
+                    .build()))
+            .subscribe(testSubscriber()
+                .assertEquals(true));
+    }
+
+    @Test
+    public void checkTrueSharedDomain() {
+        String domainName = getDomainName();
+        String hostName = getHostName();
+        String path = getPath();
+
+        createSharedDomainAndRoute(this.cloudFoundryOperations, this.spaceName, domainName, hostName, path)
             .then(this.cloudFoundryOperations.routes()
                 .check(CheckRouteRequest.builder()
                     .domain(domainName)
@@ -91,7 +110,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = getHostName();
         String path = getPath();
 
-        createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
+        createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
             .then(this.cloudFoundryOperations.routes()
                 .check(CheckRouteRequest.builder()
                     .domain(domainName)
@@ -125,7 +144,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = getHostName();
         String path = getPath();
 
-        createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
+        createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
             .then(this.cloudFoundryOperations.routes()
                 .delete(DeleteRouteRequest.builder()
                     .domain(domainName)
@@ -164,7 +183,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = getHostName();
         String path = getPath();
 
-        createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
+        createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
             .then(this.cloudFoundryOperations.routes()
                 .deleteOrphanedRoutes())
             .then(this.cloudFoundryOperations.routes()
@@ -183,7 +202,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = getHostName();
         String path = getPath();
 
-        createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
+        createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
             .thenMany(this.cloudFoundryOperations.routes()
                 .list(ListRoutesRequest.builder()
                     .level(ORGANIZATION)
@@ -199,7 +218,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = getHostName();
         String path = getPath();
 
-        createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
+        createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
             .thenMany(this.cloudFoundryOperations.routes()
                 .list(ListRoutesRequest.builder()
                     .level(SPACE)
@@ -218,7 +237,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
         Mono
             .when(
-                createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
+                createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
                 createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, true)
             )
             .then(this.cloudFoundryOperations.routes()
@@ -246,7 +265,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
         Mono
             .when(
-                createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
+                createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
                 createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, true)
             )
             .then(this.cloudFoundryOperations.routes()
@@ -274,7 +293,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
         Mono
             .when(
-                createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
+                createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
                 createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, true)
             )
             .then(this.cloudFoundryOperations.routes()
@@ -302,7 +321,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
         Mono
             .when(
-                createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
+                createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
                 createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, true)
             )
             .then(this.cloudFoundryOperations.routes()
@@ -336,7 +355,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
         Mono
             .when(
-                createRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
+                createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
                 createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, true)
             )
             .then(this.cloudFoundryOperations.routes()
@@ -374,19 +393,39 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .build());
     }
 
-    private static Mono<Void> createRoute(CloudFoundryOperations cloudFoundryOperations, String organizationName, String spaceName, String domainName, String hostName, String path) {
+    private static Mono<Void> createDomain(CloudFoundryOperations cloudFoundryOperations, String organizationName, String domainName) {
         return cloudFoundryOperations.domains()
             .create(CreateDomainRequest.builder()
                 .domain(domainName)
                 .organization(organizationName)
-                .build())
-            .then(cloudFoundryOperations.routes()
-                .create(CreateRouteRequest.builder()
-                    .domain(domainName)
-                    .host(hostName)
-                    .path(path)
-                    .space(spaceName)
-                    .build()));
+                .build());
+    }
+
+    private static Mono<Void> createSharedDomain(CloudFoundryOperations cloudFoundryOperations, String domainName) {
+        return cloudFoundryOperations.domains()
+            .createShared(CreateSharedDomainRequest.builder()
+                .domain(domainName)
+                .build());
+    }
+
+    private static Mono<Void> createDomainAndRoute(CloudFoundryOperations cloudFoundryOperations, String organizationName, String spaceName, String domainName, String hostName, String path) {
+        return createDomain(cloudFoundryOperations, organizationName, domainName)
+            .then(createRoute(cloudFoundryOperations, spaceName, domainName, hostName, path));
+    }
+
+    private static Mono<Void> createSharedDomainAndRoute(CloudFoundryOperations cloudFoundryOperations, String spaceName, String domainName, String hostName, String path) {
+        return createSharedDomain(cloudFoundryOperations, domainName)
+            .then(createRoute(cloudFoundryOperations, spaceName, domainName, hostName, path));
+    }
+
+    private static Mono<Void> createRoute(CloudFoundryOperations cloudFoundryOperations, String spaceName, String domainName, String hostName, String path) {
+        return cloudFoundryOperations.routes()
+            .create(CreateRouteRequest.builder()
+                .domain(domainName)
+                .host(hostName)
+                .path(path)
+                .space(spaceName)
+                .build());
     }
 
     private static Predicate<Route> filterRoutes(String domainName, String host, String path, String applicationName) {

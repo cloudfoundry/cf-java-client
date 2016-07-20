@@ -23,14 +23,6 @@ public final class CheckRouteRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noDomain() {
         CheckRouteRequest.builder()
-            .host("test-host")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noHost() {
-        CheckRouteRequest.builder()
-            .domain("test-domain")
             .build();
     }
 
@@ -38,7 +30,6 @@ public final class CheckRouteRequestTest {
     public void valid() {
         CheckRouteRequest.builder()
             .domain("test-domain")
-            .host("test-host")
             .build();
     }
 
