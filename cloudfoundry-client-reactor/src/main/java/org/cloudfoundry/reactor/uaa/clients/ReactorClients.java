@@ -24,6 +24,8 @@ import org.cloudfoundry.uaa.clients.CreateClientRequest;
 import org.cloudfoundry.uaa.clients.CreateClientResponse;
 import org.cloudfoundry.uaa.clients.GetClientRequest;
 import org.cloudfoundry.uaa.clients.GetClientResponse;
+import org.cloudfoundry.uaa.clients.ListClientsRequest;
+import org.cloudfoundry.uaa.clients.ListClientsResponse;
 import org.cloudfoundry.uaa.clients.UpdateClientRequest;
 import org.cloudfoundry.uaa.clients.UpdateClientResponse;
 import reactor.core.publisher.Mono;
@@ -52,6 +54,11 @@ public final class ReactorClients extends AbstractUaaOperations implements Clien
     @Override
     public Mono<GetClientResponse> get(GetClientRequest request) {
         return get(request, GetClientResponse.class, builder -> builder.pathSegment("oauth", "clients", request.getClientId()));
+    }
+
+    @Override
+    public Mono<ListClientsResponse> list(ListClientsRequest request) {
+        return get(request, ListClientsResponse.class, builder -> builder.pathSegment("oauth", "clients"));
     }
 
     @Override
