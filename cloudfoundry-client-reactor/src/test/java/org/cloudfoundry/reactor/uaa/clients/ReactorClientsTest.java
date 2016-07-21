@@ -239,9 +239,9 @@ public final class ReactorClientsTest {
             return ListClientsRequest.builder()
                 .count(10)
                 .filter("client_id+eq+\"EGgNW3\"")
-                .startIndex(1)
                 .sortBy("client_id")
                 .sortOrder(SortOrder.DESCENDING)
+                .startIndex(1)
                 .build();
         }
 

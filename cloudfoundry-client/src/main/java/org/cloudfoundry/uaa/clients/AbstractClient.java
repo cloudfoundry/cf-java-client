@@ -101,7 +101,7 @@ abstract class AbstractClient {
     abstract List<String> getScopes();
 
     /**
-     * A random string used to generate the client’s revokation key. Change this value to revoke all active tokens for the client
+     * A random string used to generate the client’s revocation key. Change this value to revoke all active tokens for the client
      */
     @JsonProperty("token_salt")
     abstract String getTokenSalt();
