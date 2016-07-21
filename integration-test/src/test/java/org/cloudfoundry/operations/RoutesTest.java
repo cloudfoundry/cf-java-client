@@ -32,10 +32,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -238,7 +239,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Mono
             .when(
                 createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
-                createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, true)
+                createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, true)
             )
             .then(this.cloudFoundryOperations.routes()
                 .map(MapRouteRequest.builder()
@@ -266,7 +267,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Mono
             .when(
                 createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
-                createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, true)
+                createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, true)
             )
             .then(this.cloudFoundryOperations.routes()
                 .map(MapRouteRequest.builder()
@@ -294,7 +295,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Mono
             .when(
                 createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
-                createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, true)
+                createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, true)
             )
             .then(this.cloudFoundryOperations.routes()
                 .map(MapRouteRequest.builder()
@@ -322,7 +323,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Mono
             .when(
                 createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
-                createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, true)
+                createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, true)
             )
             .then(this.cloudFoundryOperations.routes()
                 .map(MapRouteRequest.builder()
@@ -356,7 +357,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Mono
             .when(
                 createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
-                createApplication(this.cloudFoundryOperations, getApplicationBits(), applicationName, true)
+                createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, true)
             )
             .then(this.cloudFoundryOperations.routes()
                 .map(MapRouteRequest.builder()
@@ -380,10 +381,10 @@ public final class RoutesTest extends AbstractIntegrationTest {
             .subscribe(testSubscriber()); // expect no results
     }
 
-    private static Mono<Void> createApplication(CloudFoundryOperations cloudFoundryOperations, InputStream applicationBits, String name, Boolean noStart) {
+    private static Mono<Void> createApplication(CloudFoundryOperations cloudFoundryOperations, Path application, String name, Boolean noStart) {
         return cloudFoundryOperations.applications()
             .push(PushApplicationRequest.builder()
-                .application(applicationBits)
+                .application(application)
                 .healthCheckType(ApplicationHealthCheck.PORT)
                 .buildpack("staticfile_buildpack")
                 .diskQuota(512)
@@ -401,20 +402,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .build());
     }
 
-    private static Mono<Void> createSharedDomain(CloudFoundryOperations cloudFoundryOperations, String domainName) {
-        return cloudFoundryOperations.domains()
-            .createShared(CreateSharedDomainRequest.builder()
-                .domain(domainName)
-                .build());
-    }
-
     private static Mono<Void> createDomainAndRoute(CloudFoundryOperations cloudFoundryOperations, String organizationName, String spaceName, String domainName, String hostName, String path) {
         return createDomain(cloudFoundryOperations, organizationName, domainName)
-            .then(createRoute(cloudFoundryOperations, spaceName, domainName, hostName, path));
-    }
-
-    private static Mono<Void> createSharedDomainAndRoute(CloudFoundryOperations cloudFoundryOperations, String spaceName, String domainName, String hostName, String path) {
-        return createSharedDomain(cloudFoundryOperations, domainName)
             .then(createRoute(cloudFoundryOperations, spaceName, domainName, hostName, path));
     }
 
@@ -428,6 +417,18 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .build());
     }
 
+    private static Mono<Void> createSharedDomain(CloudFoundryOperations cloudFoundryOperations, String domainName) {
+        return cloudFoundryOperations.domains()
+            .createShared(CreateSharedDomainRequest.builder()
+                .domain(domainName)
+                .build());
+    }
+
+    private static Mono<Void> createSharedDomainAndRoute(CloudFoundryOperations cloudFoundryOperations, String spaceName, String domainName, String hostName, String path) {
+        return createSharedDomain(cloudFoundryOperations, domainName)
+            .then(createRoute(cloudFoundryOperations, spaceName, domainName, hostName, path));
+    }
+
     private static Predicate<Route> filterRoutes(String domainName, String host, String path, String applicationName) {
         return route -> Optional.ofNullable(domainName).map(route.getDomain()::equals).orElse(true)
             && Optional.ofNullable(host).map(route.getHost()::equals).orElse(true)
@@ -435,14 +436,12 @@ public final class RoutesTest extends AbstractIntegrationTest {
             && Optional.ofNullable(path).map(route.getPath()::equals).orElse(true);
     }
 
-    private static InputStream getApplicationBits() {
+    private static Path getApplicationPath() {
         try {
-            return new ClassPathResource("test-application.zip").getInputStream();
+            return new ClassPathResource("test-application.zip").getFile().toPath();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw Exceptions.propagate(e);
         }
-
-        return null;
     }
 
 }

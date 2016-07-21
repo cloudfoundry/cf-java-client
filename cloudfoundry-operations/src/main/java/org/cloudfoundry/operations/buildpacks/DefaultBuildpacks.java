@@ -23,13 +23,16 @@ import org.cloudfoundry.client.v2.buildpacks.CreateBuildpackResponse;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
 import org.cloudfoundry.client.v2.buildpacks.UploadBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.UploadBuildpackResponse;
+import org.cloudfoundry.util.FileUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -37,8 +40,15 @@ public final class DefaultBuildpacks implements Buildpacks {
 
     private final Mono<CloudFoundryClient> cloudFoundryClient;
 
+    private final Function<Path, InputStream> pathTransformer;
+
     public DefaultBuildpacks(Mono<CloudFoundryClient> cloudFoundryClient) {
+        this(cloudFoundryClient, FileUtils::toInputStream);
+    }
+
+    DefaultBuildpacks(Mono<CloudFoundryClient> cloudFoundryClient, Function<Path, InputStream> pathTransformer) {
         this.cloudFoundryClient = cloudFoundryClient;
+        this.pathTransformer = pathTransformer;
     }
 
     @Override
@@ -46,9 +56,10 @@ public final class DefaultBuildpacks implements Buildpacks {
         return this.cloudFoundryClient
             .then(cloudFoundryClient -> Mono.when(
                 Mono.just(cloudFoundryClient),
-                requestCreateBuildpack(cloudFoundryClient, request.getName(), request.getPosition(), request.getEnable())
+                requestCreateBuildpack(cloudFoundryClient, request.getName(), request.getPosition(), request.getEnable()),
+                Mono.just(this.pathTransformer.apply(request.getBuildpack()))
             ))
-            .then(function((cloudFoundryClient, response) -> requestUploadBuildpackBits(cloudFoundryClient, ResourceUtils.getId(response), request.getFileName(), request.getBuildpack())))
+            .then(function((cloudFoundryClient, response, inputStream) -> requestUploadBuildpackBits(cloudFoundryClient, ResourceUtils.getId(response), request.getFileName(), inputStream)))
             .then();
     }
 

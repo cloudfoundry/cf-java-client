@@ -19,7 +19,7 @@ package org.cloudfoundry.operations.applications;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
-import java.io.InputStream;
+import java.nio.file.Path;
 import java.time.Duration;
 
 /**
@@ -29,9 +29,9 @@ import java.time.Duration;
 abstract class _PushApplicationRequest {
 
     /**
-     * The bits for the application
+     * The path to the application
      */
-    abstract InputStream getApplication();
+    abstract Path getApplication();
 
     /**
      * The buildpack for the application
