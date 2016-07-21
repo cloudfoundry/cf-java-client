@@ -20,12 +20,16 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
+import org.cloudfoundry.uaa.SortOrder;
+import org.cloudfoundry.uaa.clients.Client;
 import org.cloudfoundry.uaa.clients.CreateClientRequest;
 import org.cloudfoundry.uaa.clients.CreateClientResponse;
 import org.cloudfoundry.uaa.clients.DeleteClientRequest;
 import org.cloudfoundry.uaa.clients.DeleteClientResponse;
 import org.cloudfoundry.uaa.clients.GetClientRequest;
 import org.cloudfoundry.uaa.clients.GetClientResponse;
+import org.cloudfoundry.uaa.clients.ListClientsRequest;
+import org.cloudfoundry.uaa.clients.ListClientsResponse;
 import org.cloudfoundry.uaa.clients.UpdateClientRequest;
 import org.cloudfoundry.uaa.clients.UpdateClientResponse;
 import reactor.core.publisher.Mono;
@@ -187,6 +191,63 @@ public final class ReactorClientsTest {
         @Override
         protected Mono<GetClientResponse> invoke(GetClientRequest request) {
             return this.clients.get(request);
+        }
+    }
+
+    public static final class List extends AbstractUaaApiTest<ListClientsRequest, ListClientsResponse> {
+
+        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/oauth/clients?count=10&filter=client_id%2Beq%2B%22EGgNW3%22&sortBy=client_id&sortOrder=descending&startIndex=1")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/clients/GET_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListClientsResponse getResponse() {
+            return ListClientsResponse.builder()
+                .resource(Client.builder()
+                    .allowedProvider("uaa", "ldap", "my-saml-provider")
+                    .authority("clients.read", "clients.write")
+                    .authorizedGrantType("client_credentials")
+                    .autoApprove("true")
+                    .clientId("EGgNW3")
+                    .lastModified(1468364445334L)
+                    .name("My Client Name")
+                    .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                    .resourceId("none")
+                    .scope("clients.read", "clients.write")
+                    .tokenSalt("7uDPJX")
+                    .build())
+                .startIndex(1)
+                .itemsPerPage(1)
+                .totalResults(1)
+                .schema("http://cloudfoundry.org/schema/scim/oauth-clients-1.0")
+                .build();
+        }
+
+        @Override
+        protected ListClientsRequest getValidRequest() throws Exception {
+            return ListClientsRequest.builder()
+                .count(10)
+                .filter("client_id+eq+\"EGgNW3\"")
+                .startIndex(1)
+                .sortBy("client_id")
+                .sortOrder(SortOrder.DESCENDING)
+                .build();
+        }
+
+        @Override
+        protected Mono<ListClientsResponse> invoke(ListClientsRequest request) {
+            return this.clients.list(request);
         }
     }
 

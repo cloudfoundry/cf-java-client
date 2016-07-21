@@ -48,6 +48,14 @@ public interface Clients {
     Mono<GetClientResponse> get(GetClientRequest request);
 
     /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#list81">List Clients</a> request
+     *
+     * @param request List Clients request
+     * @return the Response to the List Clients Request
+     */
+    Mono<ListClientsResponse> list(ListClientsRequest request);
+
+    /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#update78">Update Client</a> request
      *
      * @param request Update Client request
