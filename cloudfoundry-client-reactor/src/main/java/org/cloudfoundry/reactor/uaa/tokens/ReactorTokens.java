@@ -41,6 +41,11 @@ import org.cloudfoundry.uaa.tokens.RefreshTokenResponse;
 import org.cloudfoundry.uaa.tokens.Tokens;
 import reactor.core.publisher.Mono;
 
+import static org.cloudfoundry.uaa.tokens.GrantType.AUTHORIZATION_CODE;
+import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
+import static org.cloudfoundry.uaa.tokens.GrantType.PASSWORD;
+import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
+
 
 public final class ReactorTokens extends AbstractUaaOperations implements Tokens {
 
@@ -63,31 +68,31 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
     @Override
     public Mono<GetTokenByAuthorizationCodeResponse> getByAuthorizationCode(GetTokenByAuthorizationCodeRequest request) {
         return postForm(request, GetTokenByAuthorizationCodeResponse.class,
-            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "authorization_code").queryParam("response_type", ResponseType.TOKEN));
+            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", AUTHORIZATION_CODE).queryParam("response_type", ResponseType.TOKEN));
     }
 
     @Override
     public Mono<GetTokenByClientCredentialsResponse> getByClientCredentials(GetTokenByClientCredentialsRequest request) {
         return postForm(request, GetTokenByClientCredentialsResponse.class,
-            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "client_credentials").queryParam("response_type", ResponseType.TOKEN));
+            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", CLIENT_CREDENTIALS).queryParam("response_type", ResponseType.TOKEN));
     }
 
     @Override
     public Mono<GetTokenByOneTimePasscodeResponse> getByOneTimePasscode(GetTokenByOneTimePasscodeRequest request) {
         return postForm(request, GetTokenByOneTimePasscodeResponse.class,
-            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "password").queryParam("response_type", ResponseType.TOKEN));
+            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", PASSWORD).queryParam("response_type", ResponseType.TOKEN));
     }
 
     @Override
     public Mono<GetTokenByOpenIdResponse> getByOpenId(GetTokenByOpenIdRequest request) {
         return postForm(request, GetTokenByOpenIdResponse.class,
-            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "authorization_code").queryParam("response_type", ResponseType.ID_TOKEN));
+            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", AUTHORIZATION_CODE).queryParam("response_type", ResponseType.ID_TOKEN));
     }
 
     @Override
     public Mono<GetTokenByPasswordResponse> getByPassword(GetTokenByPasswordRequest request) {
         return postForm(request, GetTokenByPasswordResponse.class,
-            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "password").queryParam("response_type", ResponseType.TOKEN));
+            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", PASSWORD).queryParam("response_type", ResponseType.TOKEN));
     }
 
     @Override
@@ -102,7 +107,7 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
 
     @Override
     public Mono<RefreshTokenResponse> refresh(RefreshTokenRequest request) {
-        return postForm(request, RefreshTokenResponse.class, builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", "refresh_token"));
+        return postForm(request, RefreshTokenResponse.class, builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", REFRESH_TOKEN));
     }
 
 }

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.clients;
+package org.cloudfoundry.uaa.tokens;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * The grant types that can be used to obtain a token with this client.
+ * The grant types that can be used to obtain a token.
  */
-public enum AuthorizedGrantType {
+public enum GrantType {
 
     /**
      * The authorization code grant type
@@ -42,11 +42,16 @@ public enum AuthorizedGrantType {
     /**
      * The password grant type
      */
-    PASSWORD("password");
+    PASSWORD("password"),
+    
+    /**
+     * The refresh token grant type
+     */
+    REFRESH_TOKEN("refresh_token");
 
     private final String value;
 
-    AuthorizedGrantType(String value) {
+    GrantType(String value) {
         this.value = value;
     }
 
@@ -61,7 +66,7 @@ public enum AuthorizedGrantType {
     }
 
     @JsonCreator
-    static AuthorizedGrantType from(String s) {
+    static GrantType from(String s) {
         switch (s.toLowerCase()) {
             case "authorization_code":
                 return AUTHORIZATION_CODE;
@@ -71,8 +76,10 @@ public enum AuthorizedGrantType {
                 return IMPLICIT;
             case "password":
                 return PASSWORD;
+            case "refresh_token":
+                return REFRESH_TOKEN;
             default:
-                throw new IllegalArgumentException(String.format("Unknown authorized grant type: %s", s));
+                throw new IllegalArgumentException(String.format("Unknown grant type: %s", s));
         }
     }
 }

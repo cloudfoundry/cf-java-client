@@ -21,7 +21,6 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
 import org.cloudfoundry.uaa.SortOrder;
-import org.cloudfoundry.uaa.clients.AuthorizedGrantType;
 import org.cloudfoundry.uaa.clients.Client;
 import org.cloudfoundry.uaa.clients.CreateClientRequest;
 import org.cloudfoundry.uaa.clients.CreateClientResponse;
@@ -41,6 +40,7 @@ import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
 
 public final class ReactorClientsTest {
 
@@ -67,7 +67,7 @@ public final class ReactorClientsTest {
             return CreateClientResponse.builder()
                 .allowedProvider("uaa", "ldap", "my-saml-provider")
                 .authority("clients.read", "clients.write")
-                .authorizedGrantType(AuthorizedGrantType.CLIENT_CREDENTIALS)
+                .authorizedGrantType(CLIENT_CREDENTIALS)
                 .autoApprove("true")
                 .clientId("aPq3I1")
                 .lastModified(1468364445109L)
@@ -84,7 +84,7 @@ public final class ReactorClientsTest {
             return CreateClientRequest.builder()
                 .allowedProvider("uaa", "ldap", "my-saml-provider")
                 .authority("clients.read", "clients.write")
-                .authorizedGrantType(AuthorizedGrantType.CLIENT_CREDENTIALS)
+                .authorizedGrantType(CLIENT_CREDENTIALS)
                 .autoApprove("true")
                 .clientId("aPq3I1")
                 .clientSecret("secret")
@@ -123,7 +123,7 @@ public final class ReactorClientsTest {
             return DeleteClientResponse.builder()
                 .allowedProvider("uaa", "ldap", "my-saml-provider")
                 .authority("clients.read", "clients.write")
-                .authorizedGrantType(AuthorizedGrantType.CLIENT_CREDENTIALS)
+                .authorizedGrantType(CLIENT_CREDENTIALS)
                 .autoApprove("true")
                 .clientId("Gieovr")
                 .lastModified(1468364443957L)
@@ -170,7 +170,7 @@ public final class ReactorClientsTest {
             return GetClientResponse.builder()
                 .allowedProvider("uaa", "ldap", "my-saml-provider")
                 .authority("clients.read", "clients.write")
-                .authorizedGrantType(AuthorizedGrantType.CLIENT_CREDENTIALS)
+                .authorizedGrantType(CLIENT_CREDENTIALS)
                 .autoApprove("true")
                 .clientId("4Z3t1r")
                 .lastModified(1468364445592L)
@@ -218,7 +218,7 @@ public final class ReactorClientsTest {
                 .resource(Client.builder()
                     .allowedProvider("uaa", "ldap", "my-saml-provider")
                     .authority("clients.read", "clients.write")
-                    .authorizedGrantType(AuthorizedGrantType.CLIENT_CREDENTIALS)
+                    .authorizedGrantType(CLIENT_CREDENTIALS)
                     .autoApprove("true")
                     .clientId("EGgNW3")
                     .lastModified(1468364445334L)
@@ -256,12 +256,12 @@ public final class ReactorClientsTest {
 
         private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
-            @Override
-            protected InteractionContext getInteractionContext() {
-                return InteractionContext.builder()
-                    .request(TestRequest.builder()
-                        .method(PUT).path("/oauth/clients/55pTMX")
-                        .payload("fixtures/uaa/clients/PUT_{id}_request.json")
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/oauth/clients/55pTMX")
+                    .payload("fixtures/uaa/clients/PUT_{id}_request.json")
                     .build())
                 .response(TestResponse.builder()
                     .status(OK)
@@ -275,7 +275,7 @@ public final class ReactorClientsTest {
             return UpdateClientResponse.builder()
                 .allowedProvider("uaa", "ldap", "my-saml-provider")
                 .authority("clients.read", "clients.write")
-                .authorizedGrantType(AuthorizedGrantType.CLIENT_CREDENTIALS)
+                .authorizedGrantType(CLIENT_CREDENTIALS)
                 .autoApprove("clients.autoapprove")
                 .clientId("55pTMX")
                 .lastModified(1468364443857L)
@@ -290,7 +290,7 @@ public final class ReactorClientsTest {
         @Override
         protected UpdateClientRequest getValidRequest() throws Exception {
             return UpdateClientRequest.builder()
-                .authorizedGrantType(AuthorizedGrantType.CLIENT_CREDENTIALS)
+                .authorizedGrantType(CLIENT_CREDENTIALS)
                 .autoApprove("clients.autoapprove")
                 .clientId("55pTMX")
                 .scope("clients.new", "clients.autoapprove")

@@ -19,6 +19,7 @@ package org.cloudfoundry.uaa.clients;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.uaa.IdentityZoned;
+import org.cloudfoundry.uaa.tokens.GrantType;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -54,7 +55,7 @@ abstract class _UpdateClientRequest implements IdentityZoned {
      * List of grant types that can be used to obtain a token with this client. Can include authorization_code, password, implicit, and/or client_credentials.
      */
     @JsonProperty("authorized_grant_types")
-    abstract List<AuthorizedGrantType> getAuthorizedGrantTypes();
+    abstract List<GrantType> getAuthorizedGrantTypes();
 
     /**
      * Scopes that do not require user approval
