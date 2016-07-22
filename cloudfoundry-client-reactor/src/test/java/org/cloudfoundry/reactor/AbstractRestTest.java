@@ -26,7 +26,7 @@ import org.cloudfoundry.util.test.FailingDeserializationProblemHandler;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.io.netty.http.HttpClient;
+import reactor.ipc.netty.http.HttpClient;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static org.junit.Assert.assertTrue;

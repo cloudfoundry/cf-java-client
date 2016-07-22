@@ -18,7 +18,7 @@ package org.cloudfoundry.reactor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import reactor.core.publisher.Mono;
-import reactor.io.netty.http.HttpClient;
+import reactor.ipc.netty.http.HttpClient;
 
 /**
  * Common, reusable, connection context

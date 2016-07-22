@@ -43,7 +43,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.io.netty.http.HttpException;
+import reactor.ipc.netty.http.HttpException;
 import reactor.util.function.Tuple2;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;

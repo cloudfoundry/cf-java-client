@@ -21,8 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
-import reactor.io.netty.http.HttpClientResponse;
-import reactor.io.netty.http.HttpException;
+import reactor.ipc.netty.http.HttpClientResponse;
+import reactor.ipc.netty.http.HttpException;
 
 import java.util.List;
 import java.util.function.Consumer;

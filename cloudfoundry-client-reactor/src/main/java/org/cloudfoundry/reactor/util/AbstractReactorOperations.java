@@ -23,9 +23,9 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.io.netty.http.HttpClientRequest;
-import reactor.io.netty.http.HttpClientResponse;
-import reactor.io.netty.http.HttpOutbound;
+import reactor.ipc.netty.http.HttpClientRequest;
+import reactor.ipc.netty.http.HttpClientResponse;
+import reactor.ipc.netty.http.HttpOutbound;
 
 import java.util.function.Function;
 

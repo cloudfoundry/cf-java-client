@@ -26,7 +26,7 @@ import org.cloudfoundry.reactor.TokenProvider;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.io.netty.http.HttpClientResponse;
+import reactor.ipc.netty.http.HttpClientResponse;
 
 import java.io.IOException;
 import java.io.InputStream;

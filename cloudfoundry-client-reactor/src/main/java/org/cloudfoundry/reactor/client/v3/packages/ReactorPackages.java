@@ -36,7 +36,7 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.io.netty.http.HttpClientResponse;
+import reactor.ipc.netty.http.HttpClientResponse;
 
 /**
  * The Reactor-based implementation of {@link Packages}

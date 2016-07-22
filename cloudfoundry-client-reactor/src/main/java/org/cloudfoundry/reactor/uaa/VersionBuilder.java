@@ -17,7 +17,7 @@
 package org.cloudfoundry.reactor.uaa;
 
 import org.cloudfoundry.uaa.Versioned;
-import reactor.io.netty.http.HttpClientRequest;
+import reactor.ipc.netty.http.HttpClientRequest;
 
 final class VersionBuilder {
 

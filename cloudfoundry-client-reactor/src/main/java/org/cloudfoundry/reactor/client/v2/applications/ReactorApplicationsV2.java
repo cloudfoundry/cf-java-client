@@ -56,8 +56,8 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.io.netty.http.HttpClientRequest;
-import reactor.io.netty.http.HttpClientResponse;
+import reactor.ipc.netty.http.HttpClientRequest;
+import reactor.ipc.netty.http.HttpClientResponse;
 
 /**
  * The Reactor-based implementation of {@link ApplicationsV2}

@@ -28,9 +28,9 @@ import org.immutables.value.Value;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.io.netty.config.ClientOptions;
-import reactor.io.netty.config.HttpClientOptions;
-import reactor.io.netty.http.HttpClient;
+import reactor.ipc.netty.config.ClientOptions;
+import reactor.ipc.netty.config.HttpClientOptions;
+import reactor.ipc.netty.http.HttpClient;
 
 import java.time.Duration;
 import java.util.List;

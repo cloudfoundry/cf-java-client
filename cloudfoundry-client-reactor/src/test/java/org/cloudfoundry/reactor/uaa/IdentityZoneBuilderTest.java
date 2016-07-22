@@ -18,7 +18,7 @@ package org.cloudfoundry.reactor.uaa;
 
 import org.cloudfoundry.uaa.IdentityZoned;
 import org.junit.Test;
-import reactor.io.netty.http.HttpClientRequest;
+import reactor.ipc.netty.http.HttpClientRequest;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;

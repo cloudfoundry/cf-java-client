@@ -22,7 +22,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.util.AsciiString;
 import reactor.core.Exceptions;
-import reactor.io.netty.http.HttpClientRequest;
+import reactor.ipc.netty.http.HttpClientRequest;
 
 import java.io.IOException;
 import java.io.InputStream;

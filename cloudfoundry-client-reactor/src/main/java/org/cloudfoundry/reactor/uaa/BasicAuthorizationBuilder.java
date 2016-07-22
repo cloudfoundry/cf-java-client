@@ -18,7 +18,7 @@ package org.cloudfoundry.reactor.uaa;
 
 import io.netty.util.AsciiString;
 import org.cloudfoundry.uaa.BasicAuthorized;
-import reactor.io.netty.http.HttpClientRequest;
+import reactor.ipc.netty.http.HttpClientRequest;
 
 import java.util.Base64;
 

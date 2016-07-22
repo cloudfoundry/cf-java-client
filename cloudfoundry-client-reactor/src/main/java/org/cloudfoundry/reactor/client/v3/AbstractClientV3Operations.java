@@ -24,8 +24,8 @@ import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.cloudfoundry.reactor.util.MultipartHttpClientRequest;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.io.netty.http.HttpClientResponse;
-import reactor.io.netty.http.HttpException;
+import reactor.ipc.netty.http.HttpClientResponse;
+import reactor.ipc.netty.http.HttpException;
 
 import java.util.function.Function;
 

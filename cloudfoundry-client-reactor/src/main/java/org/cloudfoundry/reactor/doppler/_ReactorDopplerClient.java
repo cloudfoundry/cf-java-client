@@ -29,7 +29,7 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.immutables.value.Value;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.io.netty.http.HttpClient;
+import reactor.ipc.netty.http.HttpClient;
 
 /**
  * The Reactor-based implementation of {@link DopplerClient}
