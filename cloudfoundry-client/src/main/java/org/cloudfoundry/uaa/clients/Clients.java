@@ -56,6 +56,14 @@ public interface Clients {
     Mono<ListClientsResponse> list(ListClientsRequest request);
 
     /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#list89">List Metadatas</a> request
+     *
+     * @param request List Metadatas request
+     * @return the Response to the List Metadatas Request
+     */
+    Mono<ListMetadatasResponse> listMetadatas(ListMetadatasRequest request);
+
+    /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#update78">Update Client</a> request
      *
      * @param request Update Client request
