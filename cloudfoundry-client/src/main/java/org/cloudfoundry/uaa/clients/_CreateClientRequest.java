@@ -30,10 +30,18 @@ import java.util.List;
 @Value.Immutable
 abstract class _CreateClientRequest implements IdentityZoned {
 
+    @Value.Check
+    void checkAuthorizedGrantTypes() {
+        if (this.getAuthorizedGrantTypes() == null) {
+            throw new IllegalStateException("Cannot build CreateClientRequest, required attribute authorizedGrantTypes is not set");
+        }
+    }
+
     /**
      * A list of origin keys (alias) for identity providers the client is limited to. Null implies any identity provider is allowed.
      */
     @JsonProperty("allowedproviders")
+    @Nullable
     abstract List<String> getAllowedProviders();
 
     /**
@@ -47,18 +55,21 @@ abstract class _CreateClientRequest implements IdentityZoned {
      * Scopes that the client is able to grant when creating a client
      */
     @JsonProperty("authorities")
+    @Nullable
     abstract List<String> getAuthorities();
 
     /**
      * List of grant types that can be used to obtain a token with this client. Can include authorization_code, password, implicit, and/or client_credentials.
      */
     @JsonProperty("authorized_grant_types")
+    @Nullable
     abstract List<GrantType> getAuthorizedGrantTypes();
 
     /**
      * Scopes that do not require user approval
      */
     @JsonProperty("autoapprove")
+    @Nullable
     abstract List<String> getAutoApproves();
 
     /**
@@ -92,18 +103,21 @@ abstract class _CreateClientRequest implements IdentityZoned {
      * Allowed URI pattern for redirect during authorization
      */
     @JsonProperty("redirect_uri")
+    @Nullable
     abstract List<String> getRedirectUriPatterns();
 
     /**
      * Resources the client is allowed access to
      */
     @JsonProperty("resource_ids")
+    @Nullable
     abstract List<String> getResourceIds();
 
     /**
      * Scopes allowed for the client
      */
     @JsonProperty("scope")
+    @Nullable
     abstract List<String> getScopes();
 
     /**

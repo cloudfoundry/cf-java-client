@@ -83,11 +83,11 @@ abstract class _CreateUserRequest {
     @Value.Check
     void check() {
         if (getName().getFamilyName() == null || getName().getFamilyName().isEmpty()) {
-            throw new IllegalStateException("Family name must be provided");
+            throw new IllegalStateException("Cannot build CreateUserRequest, required attribute familyName is not set, or is empty");
         }
 
         if (getName().getGivenName() == null || getName().getGivenName().isEmpty()) {
-            throw new IllegalStateException("Given name must be provided");
+            throw new IllegalStateException("Cannot build CreateUserRequest, required attribute givenName is not set, or is empty");
         }
     }
 
