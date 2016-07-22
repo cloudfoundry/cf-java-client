@@ -61,7 +61,7 @@
             <scope>test</scope>
         </dependency>
          <dependency>
-             <groupId>io.projectreactor</groupId>
+             <groupId>io.projectreactor.ipc</groupId>
              <artifactId>reactor-netty</artifactId>
          </dependency>
         <dependency>

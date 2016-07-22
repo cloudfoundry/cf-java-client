@@ -26,9 +26,9 @@ Most projects will need two dependencies; the Operations API and an implementati
         <version>3.0.0.RC1</version>
     </dependency>
     <dependency>
-        <groupId>io.projectreactor</groupId>
+        <groupId>io.projectreactor.ipc</groupId>
         <artifactId>reactor-netty</artifactId>
-        <version>0.5.0.M1</version>
+        <version>0.5.0.BUILD-SNAPSHOT</version>
     </dependency>
     ...
 </dependencies>
@@ -79,7 +79,7 @@ dependencies {
     compile 'org.cloudfoundry:cloudfoundry-client-reactor:2.0.0.BUILD-SNAPSHOT'
     compile 'org.cloudfoundry:cloudfoundry-operations:2.0.0.BUILD-SNAPSHOT'
     compile 'io.projectreactor:reactor-core:3.0.0.BUILD-SNAPSHOT'
-    compile 'io.projectreactor:reactor-netty:0.5.0.BUILD-SNAPSHOT'
+    compile 'io.projectreactor.ipc:reactor-netty:0.5.0.BUILD-SNAPSHOT'
     ...
 }
 ```

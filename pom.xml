@@ -55,7 +55,7 @@
         <okhttp.version>3.4.1</okhttp.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <reactor-core.version>3.0.0.RC1</reactor-core.version>
-        <reactor-netty.version>0.5.0.M1</reactor-netty.version>
+        <reactor-netty.version>0.5.0.BUILD-SNAPSHOT</reactor-netty.version>
         <wire.version>2.2.0</wire.version>
     </properties>
 
@@ -92,7 +92,7 @@
                 <version>${reactor-core.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.projectreactor</groupId>
+                <groupId>io.projectreactor.ipc</groupId>
                 <artifactId>reactor-netty</artifactId>
                 <version>${reactor-netty.version}</version>
             </dependency>
