@@ -18,6 +18,8 @@ package org.cloudfoundry.uaa.clients;
 
 import org.junit.Test;
 
+import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
+
 public final class UpdateClientRequestTest {
 
     @Test(expected = IllegalStateException.class)
@@ -30,14 +32,14 @@ public final class UpdateClientRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noClientId() {
         UpdateClientRequest.builder()
-            .authorizedGrantType("clean_credentials")
+            .authorizedGrantType(CLIENT_CREDENTIALS)
             .build();
     }
 
     @Test
     public void valid() {
         UpdateClientRequest.builder()
-            .authorizedGrantType("clean_credentials")
+            .authorizedGrantType(CLIENT_CREDENTIALS)
             .clientId("test-client-id")
             .build();
     }

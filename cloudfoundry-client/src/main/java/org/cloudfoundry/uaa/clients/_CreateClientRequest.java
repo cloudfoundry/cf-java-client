@@ -31,9 +31,9 @@ import java.util.List;
 abstract class _CreateClientRequest implements IdentityZoned {
 
     @Value.Check
-    void checkAuthorizedGrantType() {
+    void checkAuthorizedGrantTypes() {
         if (this.getAuthorizedGrantTypes() == null) {
-            throw new IllegalStateException("authorizedGrantTypes must be set");
+            throw new IllegalStateException("Cannot build CreateClientRequest, required attribute authorizedGrantTypes is not set");
         }
     }
 

@@ -51,7 +51,7 @@ abstract class _InviteUsersRequest {
     @Value.Check
     void check() {
         if (getEmails().isEmpty()) {
-            throw new IllegalStateException("At least one email must be provided");
+            throw new IllegalStateException("Cannot build InviteUsersRequest, at least one email must be provided");
         }
     }
 

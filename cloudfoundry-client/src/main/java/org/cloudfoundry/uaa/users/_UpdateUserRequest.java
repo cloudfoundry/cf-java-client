@@ -40,11 +40,11 @@ abstract class _UpdateUserRequest implements Versioned {
     @Value.Check
     void check() {
         if (getName().getFamilyName() == null || getName().getFamilyName().isEmpty()) {
-            throw new IllegalStateException("Family name must be provided");
+            throw new IllegalStateException("Cannot build UpdateUserRequest, required attribute familyName is not set, or is empty");
         }
 
         if (getName().getGivenName() == null || getName().getGivenName().isEmpty()) {
-            throw new IllegalStateException("Given name must be provided");
+            throw new IllegalStateException("Cannot build UpdateUserRequest, required attribute givenName is not set, or is empty");
         }
     }
 

@@ -33,7 +33,7 @@ abstract class _UpdateClientRequest implements IdentityZoned {
     @Value.Check
     void checkAuthorizedGrantType() {
         if (this.getAuthorizedGrantTypes() == null) {
-            throw new IllegalStateException("authorizedGrantTypes must be set");
+            throw new IllegalStateException("Cannot build UpdateClientRequest, required attribute authorizedGrantTypes is not set");
         }
     }
 
