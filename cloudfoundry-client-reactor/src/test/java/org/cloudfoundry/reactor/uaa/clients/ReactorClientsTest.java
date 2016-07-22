@@ -30,6 +30,9 @@ import org.cloudfoundry.uaa.clients.GetClientRequest;
 import org.cloudfoundry.uaa.clients.GetClientResponse;
 import org.cloudfoundry.uaa.clients.ListClientsRequest;
 import org.cloudfoundry.uaa.clients.ListClientsResponse;
+import org.cloudfoundry.uaa.clients.ListMetadatasRequest;
+import org.cloudfoundry.uaa.clients.ListMetadatasResponse;
+import org.cloudfoundry.uaa.clients.Metadata;
 import org.cloudfoundry.uaa.clients.UpdateClientRequest;
 import org.cloudfoundry.uaa.clients.UpdateClientResponse;
 import reactor.core.publisher.Mono;
@@ -249,6 +252,65 @@ public final class ReactorClientsTest {
         @Override
         protected Mono<ListClientsResponse> invoke(ListClientsRequest request) {
             return this.clients.list(request);
+        }
+    }
+
+    public static final class ListMetadatas extends AbstractUaaApiTest<ListMetadatasRequest, ListMetadatasResponse> {
+
+        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/oauth/clients/meta")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/clients/GET_meta_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListMetadatasResponse getResponse() {
+            return ListMetadatasResponse.builder()
+                .metadata(Metadata.builder()
+                    .appIcon("Y2xpZW50IDMgaWNvbg==")
+                    .appLaunchUrl("http://client3.com/app")
+                    .clientId("9134O7y4")
+                    .showOnHomePage(true)
+                .build())
+                .metadata(Metadata.builder()
+                    .appIcon("")
+                    .appLaunchUrl("http://changed.app.launch/url")
+                    .clientId("RpFRZpY3")
+                    .showOnHomePage(false)
+                    .build())
+                .metadata(Metadata.builder()
+                    .appIcon("aWNvbiBmb3IgY2xpZW50IDQ=")
+                    .appLaunchUrl("http://client4.com/app")
+                    .clientId("ewegZo0R")
+                    .showOnHomePage(false)
+                    .build())
+                .metadata(Metadata.builder()
+                    .appIcon("aWNvbiBmb3IgY2xpZW50IDQ=")
+                    .appLaunchUrl("http://myloginpage.com")
+                    .clientId("lqhK1n8q")
+                    .showOnHomePage(true)
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListMetadatasRequest getValidRequest() throws Exception {
+            return ListMetadatasRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected Mono<ListMetadatasResponse> invoke(ListMetadatasRequest request) {
+            return this.clients.listMetadatas(request);
         }
     }
 
