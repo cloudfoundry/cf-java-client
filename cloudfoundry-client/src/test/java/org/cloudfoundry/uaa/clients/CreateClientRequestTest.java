@@ -16,13 +16,22 @@
 
 package org.cloudfoundry.uaa.clients;
 
+import org.cloudfoundry.uaa.tokens.GrantType;
 import org.junit.Test;
 
 public final class CreateClientRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void noId() {
+    public void noAuthorizedGrantType() {
         CreateClientRequest.builder()
+            .clientId("test-client-id")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noClientId() {
+        CreateClientRequest.builder()
+            .authorizedGrantType(GrantType.CLIENT_CREDENTIALS)
             .build();
     }
 
@@ -30,6 +39,7 @@ public final class CreateClientRequestTest {
     public void valid() {
         CreateClientRequest.builder()
             .clientId("test-client-id")
+            .authorizedGrantType(GrantType.CLIENT_CREDENTIALS)
             .build();
     }
 
