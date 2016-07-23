@@ -31,6 +31,7 @@
     <orderEntry type="library" name="Maven: io.projectreactor:reactor-core:3.0.0.RC1" level="project" />
     <orderEntry type="library" name="Maven: org.reactivestreams:reactive-streams:1.0.0" level="project" />
     <orderEntry type="module" module-name="cloudfoundry-util" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-compress:1.12" level="project" />
     <orderEntry type="library" name="Maven: org.atteo:evo-inflector:1.1" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-core:4.2.7.RELEASE" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.immutables:value:2.2.10" level="project" />

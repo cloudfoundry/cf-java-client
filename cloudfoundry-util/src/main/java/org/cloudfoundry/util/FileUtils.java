@@ -16,8 +16,8 @@
 
 package org.cloudfoundry.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import reactor.core.Exceptions;
 
 import java.io.IOException;
@@ -26,18 +26,45 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.PosixFileAttributes;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 /**
  * Utilities for {@link FileSystem}s
  */
 public final class FileUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileUtils.class);
+    private static final Integer DEFAULT_PERMISSIONS = 0744;
+
+    private static final Map<PosixFilePermission, Integer> PERMISSION_MODES = FluentMap.<PosixFilePermission, Integer>builder()
+        .entry(PosixFilePermission.OWNER_READ, 0100)
+        .entry(PosixFilePermission.OWNER_WRITE, 0200)
+        .entry(PosixFilePermission.OWNER_EXECUTE, 0400)
+        .entry(PosixFilePermission.GROUP_READ, 0010)
+        .entry(PosixFilePermission.GROUP_WRITE, 0020)
+        .entry(PosixFilePermission.GROUP_EXECUTE, 0040)
+        .entry(PosixFilePermission.OTHERS_READ, 0001)
+        .entry(PosixFilePermission.OTHERS_WRITE, 0002)
+        .entry(PosixFilePermission.OTHERS_EXECUTE, 0004)
+        .build();
 
     private FileUtils() {
+    }
+
+    /**
+     * Returns a relative and normalized name for a {@link Path}.  This method ensures that directories have a single trailing slash in their name
+     *
+     * @param root the root {@link Path} to relativize against
+     * @param path the {@link Path} to get the name for
+     * @return The relative and normalized name
+     */
+    public static String getRelativePathName(Path root, Path path) {
+        Path relative = root.relativize(path);
+        return Files.isDirectory(relative) && !relative.toString().endsWith("/") ? String.format("%s/", relative.toString()) : relative.toString();
     }
 
     /**
@@ -63,13 +90,27 @@ public final class FileUtils {
      * @return a {@link InputStream} containing the compressed contents of the {@code path}
      */
     public static InputStream toInputStream(Path path) {
+        return toInputStream(path, p -> true);
+    }
+
+    /**
+     * Converts a the contents of a {@link Path} to a {@link InputStream}.  If the {@link Path} is a directory, compresses the full contents of the directory into the stream.  If the {@link Path}
+     * is a file, the contents of the file are examined using {@link FileSystems#newFileSystem} starting at the root.  This allows both exploded and compressed artifacts to be used interchangeably.
+     *
+     * @param path   a {@link Path} representing either a compressed <i>or</i> exploded artifact
+     * @param filter a {@link Predicate} to filter the {@link Path}s that will be added to the {@link InputStream}
+     * @return a {@link InputStream} containing the compressed contents of the {@code path}
+     */
+    public static InputStream toInputStream(Path path, Predicate<Path> filter) {
         Path root = normalize(path);
 
         try {
             Path staging = Files.createTempFile(null, null);
 
-            try (Stream<Path> contents = Files.walk(root); ZipOutputStream out = new ZipOutputStream(Files.newOutputStream(staging))) {
-                contents.forEach(p -> write(root, p, out));
+            try (Stream<Path> contents = Files.walk(root); ZipArchiveOutputStream out = new ZipArchiveOutputStream(staging.toFile())) {
+                contents
+                    .filter(filter)
+                    .forEach(p -> write(root, p, out));
             }
 
             return Files.newInputStream(staging);
@@ -78,25 +119,36 @@ public final class FileUtils {
         }
     }
 
-    private static String getName(Path path) {
-        return Files.isDirectory(path) && !path.toString().endsWith("/") ? String.format("%s/", path.toString()) : path.toString();
+    private static int getUnixMode(Path path) throws IOException {
+        System.out.println(path);
+
+        PosixFileAttributes attributes = Files.readAttributes(path, PosixFileAttributes.class);
+
+        if (attributes == null) {
+            return DEFAULT_PERMISSIONS;
+        } else {
+            return attributes.permissions().stream()
+                .map(PERMISSION_MODES::get)
+                .collect(Collectors.summingInt(i -> i));
+        }
     }
 
-    private static void write(Path root, Path path, ZipOutputStream out) {
+    private static void write(Path root, Path path, ZipArchiveOutputStream out) {
         try {
             if (Files.isSameFile(root, path)) {
                 return;
             }
 
-            ZipEntry entry = new ZipEntry(getName(root.relativize(path)));
+            ZipArchiveEntry entry = new ZipArchiveEntry(getRelativePathName(root, path));
+            entry.setUnixMode(getUnixMode(path));
             entry.setLastModifiedTime(Files.getLastModifiedTime(path));
-            out.putNextEntry(entry);
+            out.putArchiveEntry(entry);
 
             if (Files.isRegularFile(path)) {
                 Files.copy(path, out);
             }
 
-            out.closeEntry();
+            out.closeArchiveEntry();
         } catch (IOException e) {
             throw Exceptions.propagate(e);
         }
