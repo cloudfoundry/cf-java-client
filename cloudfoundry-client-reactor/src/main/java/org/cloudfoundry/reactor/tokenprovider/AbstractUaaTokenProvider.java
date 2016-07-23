@@ -65,8 +65,8 @@ abstract class AbstractUaaTokenProvider implements TokenProvider {
 
     protected abstract UriComponentsBuilder getAccessTokenUri(UriComponentsBuilder builder);
 
-    private static Duration getRefreshDelay(Map r) {
-        return Duration.ofSeconds((int) r.get("expires_in")).minus(REFRESH_MARGIN);
+    private static Duration getRefreshDelay(Map<String, Integer> r) {
+        return Duration.ofSeconds(r.get("expires_in")).minus(REFRESH_MARGIN);
     }
 
     private UriComponentsBuilder getRefreshTokenUri(UriComponentsBuilder builder, String refreshToken) {
@@ -77,6 +77,7 @@ abstract class AbstractUaaTokenProvider implements TokenProvider {
             .queryParam("refresh_token", refreshToken);
     }
 
+    @SuppressWarnings("unchecked")
     private Mono<String> getTokenFlow(ConnectionContext connectionContext) {
         return connectionContext
             .getRoot("authorization_endpoint")
