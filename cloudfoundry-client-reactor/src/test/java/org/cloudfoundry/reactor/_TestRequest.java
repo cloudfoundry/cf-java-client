@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.handler.codec.http.HttpMethod;
 import okhttp3.Headers;
@@ -24,10 +25,12 @@ import okio.Buffer;
 import org.immutables.value.Value;
 import org.junit.Assert;
 import org.springframework.core.io.ClassPathResource;
+import reactor.core.Exceptions;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -39,11 +42,11 @@ import static org.junit.Assert.assertNull;
 @Value.Immutable
 abstract class _TestRequest {
 
+    public static final String EMPTY_HEADER = "EMPTY-HEADER";
+
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private static final Pattern PATH_PATTERN = Pattern.compile("[A-Z]+ (.*) [A-Z0-9\\./]+");
-
-    public static final String EMPTY_HEADER = "EMPTY-HEADER";
 
     public void assertEquals(RecordedRequest request) {
         Assert.assertEquals(getMethod().toString(), request.getMethod());
@@ -77,13 +80,7 @@ abstract class _TestRequest {
     abstract Optional<String> getPayload();
 
     private static void assertBodyEquals(Buffer expectedBuffer, Buffer actualBuffer) {
-        try {
-            Map<?, ?> expected = OBJECT_MAPPER.readValue(expectedBuffer.readByteArray(), Map.class);
-            Map<?, ?> actual = OBJECT_MAPPER.readValue(actualBuffer.readByteArray(), Map.class);
-            Assert.assertEquals(expected, actual);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Assert.assertEquals(getValue(expectedBuffer), getValue(actualBuffer));
     }
 
     private static Buffer getBuffer(String path) {
@@ -91,6 +88,15 @@ abstract class _TestRequest {
             return new Buffer().readFrom(new ClassPathResource(path).getInputStream());
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static Object getValue(Buffer buffer) {
+        try {
+            JsonNode root = OBJECT_MAPPER.readTree(buffer.readByteArray());
+            return root.isArray() ? OBJECT_MAPPER.treeToValue(root, List.class) : OBJECT_MAPPER.treeToValue(root, Map.class);
+        } catch (IOException e) {
+            throw Exceptions.propagate(e);
         }
     }
 

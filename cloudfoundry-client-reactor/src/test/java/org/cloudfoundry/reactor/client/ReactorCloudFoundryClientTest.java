@@ -110,6 +110,11 @@ public final class ReactorCloudFoundryClientTest extends AbstractRestTest {
     }
 
     @Test
+    public void resourceMatch() throws Exception {
+        assertNotNull(this.client.resourceMatch());
+    }
+
+    @Test
     public void routeMappings() {
         assertNotNull(this.client.routeMappings());
     }

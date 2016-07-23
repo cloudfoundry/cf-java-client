@@ -33,7 +33,6 @@ import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-
 public final class ReactorFeatureFlagsTest {
 
     public static final class GetAppScaling extends AbstractClientApiTest<GetFeatureFlagRequest, GetFeatureFlagResponse> {
