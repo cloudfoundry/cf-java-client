@@ -16,64 +16,24 @@
 
 package org.cloudfoundry.reactor.tokenprovider;
 
-import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
-import org.cloudfoundry.reactor.uaa.BasicAuthorizationBuilder;
-import org.cloudfoundry.reactor.util.JsonCodec;
-import org.cloudfoundry.reactor.util.NetworkLogging;
-import org.cloudfoundry.uaa.BasicAuthorized;
 import org.immutables.value.Value;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.publisher.Mono;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * The OAuth Password Grant implementation of {@link TokenProvider}
  */
 @Value.Immutable
-abstract class _PasswordGrantTokenProvider implements BasicAuthorized, TokenProvider {
-
-    private final ConcurrentMap<ConnectionContext, Mono<String>> tokens = new ConcurrentHashMap<>(1);
-
-    /**
-     * The client id.  Defaults to {@code cf}.
-     */
-    @Value.Default
-    public String getClientId() {
-        return "cf";
-    }
-
-    /**
-     * The client secret Defaults to {@code ""}.
-     */
-    @Value.Default
-    public String getClientSecret() {
-        return "";
-    }
+abstract class _PasswordGrantTokenProvider extends AbstractUaaTokenProvider {
 
     @Override
-    public final Mono<String> getToken(ConnectionContext connectionContext) {
-        return this.tokens.computeIfAbsent(connectionContext, context -> context
-            .getRoot("authorization_endpoint")
-            .map(this::getTokenUri)
-            .then(uri -> connectionContext.getHttpClient()
-                .post(uri, outbound -> {
-                    BasicAuthorizationBuilder.augment(outbound, this);
-                    return outbound
-                        .addHeader("Content-Length", "0")
-                        .removeTransferEncodingChunked()
-                        .sendHeaders();
-                })
-                .doOnSubscribe(NetworkLogging.get(uri))
-                .compose(NetworkLogging.response(uri)))
-            .then(i -> i.receive().aggregate().toInputStream())
-            .map(JsonCodec.decode(connectionContext.getObjectMapper(), Map.class))
-            .map(r -> r.get("access_token"))
-            .cast(String.class)
-            .cache());
+    protected UriComponentsBuilder getAccessTokenUri(UriComponentsBuilder builder) {
+        return builder
+            .queryParam("grant_type", "password")
+            .queryParam("client_id", getClientId())
+            .queryParam("client_secret", getClientSecret())
+            .queryParam("username", getUsername())
+            .queryParam("password", getPassword());
     }
 
     /**
@@ -85,14 +45,5 @@ abstract class _PasswordGrantTokenProvider implements BasicAuthorized, TokenProv
      * The username
      */
     abstract String getUsername();
-
-    private String getTokenUri(String root) {
-        return UriComponentsBuilder.fromUriString(root)
-            .pathSegment("oauth", "token")
-            .queryParam("grant_type", "password")
-            .queryParam("username", getUsername())
-            .queryParam("password", getPassword())
-            .build().encode().toUriString();
-    }
 
 }
