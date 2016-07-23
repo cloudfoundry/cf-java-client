@@ -31,6 +31,7 @@ import org.cloudfoundry.client.v2.jobs.Jobs;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitions;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomains;
+import org.cloudfoundry.client.v2.resourcematch.ResourceMatch;
 import org.cloudfoundry.client.v2.routemappings.RouteMappings;
 import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroups;
@@ -68,6 +69,7 @@ import org.cloudfoundry.reactor.client.v2.jobs.ReactorJobs;
 import org.cloudfoundry.reactor.client.v2.organizationquotadefinitions.ReactorOrganizationQuotaDefinitions;
 import org.cloudfoundry.reactor.client.v2.organizations.ReactorOrganizations;
 import org.cloudfoundry.reactor.client.v2.privatedomains.ReactorPrivateDomains;
+import org.cloudfoundry.reactor.client.v2.resourcematch.ReactorResourceMatch;
 import org.cloudfoundry.reactor.client.v2.routemappings.ReactorRouteMappings;
 import org.cloudfoundry.reactor.client.v2.routes.ReactorRoutes;
 import org.cloudfoundry.reactor.client.v2.securitygroups.ReactorSecurityGroups;
@@ -199,6 +201,12 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Value.Derived
     public Processes processes() {
         return new ReactorProcesses(getConnectionContext(), getRoot(), getTokenProvider());
+    }
+
+    @Override
+    @Value.Derived
+    public ResourceMatch resourceMatch() {
+        return new ReactorResourceMatch(getConnectionContext(), getRoot(), getTokenProvider());
     }
 
     @Override

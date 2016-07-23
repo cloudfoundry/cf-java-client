@@ -37,57 +37,41 @@ public interface UaaClient {
 
     /**
      * Main entry point to the UAA Authorizations Client API
-     *
-     * @return the UAA Authorizations Client API
      */
     Authorizations authorizations();
 
     /**
      * Main entry point to the UAA Clients API
-     *
-     * @return the UAA Clients API
      */
     Clients clients();
 
     /**
      * Returns the username of the current user
-     *
-     * @return the username of the current user
      */
     Mono<String> getUsername();
 
     /**
      * Main entry point to the UAA Group Client API
-     *
-     * @return the UAA Group Client API
      */
     Groups groups();
 
     /**
      * Main entry point to the UAA Identity Provider Client API
-     *
-     * @return the UAA Identity Provider Client API
      */
     IdentityProviders identityProviders();
 
     /**
      * Main entry point to the UAA Identity Zone Client API
-     *
-     * @return the UAA Identity Zone Client API
      */
     IdentityZones identityZones();
 
     /**
      * Main entry point to the UAA Token Client API
-     *
-     * @return the UAA Token Client API
      */
     Tokens tokens();
 
     /**
      * Main entry point to the UAA User Client API
-     *
-     * @return the UAA User Client API
      */
     Users users();
 

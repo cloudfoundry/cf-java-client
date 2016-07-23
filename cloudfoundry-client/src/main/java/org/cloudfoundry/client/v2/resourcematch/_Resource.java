@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.applications;
+package org.cloudfoundry.client.v2.resourcematch;
+
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -22,7 +23,7 @@ import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * The request payload for the resources
+ * A resource used for matching or has been matched
  */
 @JsonDeserialize
 @Value.Immutable
@@ -35,6 +36,7 @@ abstract class _Resource {
     @Nullable
     abstract String getHash();
 
+
     /**
      * The POSIX file mode in an octal representation
      */
@@ -43,17 +45,9 @@ abstract class _Resource {
     abstract String getMode();
 
     /**
-     * The path
-     */
-    @JsonProperty("fn")
-    @Nullable
-    abstract String getPath();
-
-    /**
      * The size
      */
     @JsonProperty("size")
     @Nullable
     abstract Integer getSize();
-
 }

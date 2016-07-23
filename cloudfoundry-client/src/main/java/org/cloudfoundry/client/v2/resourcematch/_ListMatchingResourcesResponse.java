@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.featureflags;
+package org.cloudfoundry.client.v2.resourcematch;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -27,29 +27,29 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * The response payload for the List Feature Flags operation
+ * The response payload for the List Matching Resources operation
  */
-@JsonDeserialize(using = _ListFeatureFlagsResponse.ListFeatureFlagsResponseDeserializer.class)
+@JsonDeserialize(using = _ListMatchingResourcesResponse.ListMatchingResourcesResponseDeserializer.class)
 @Value.Immutable
-abstract class _ListFeatureFlagsResponse {
+abstract class _ListMatchingResourcesResponse {
 
     /**
-     * The feature flags
+     * The resources
      */
-    abstract List<FeatureFlagEntity> getFeatureFlags();
+    abstract List<Resource> getResources();
 
-    static final class ListFeatureFlagsResponseDeserializer extends StdDeserializer<ListFeatureFlagsResponse> {
+    static final class ListMatchingResourcesResponseDeserializer extends StdDeserializer<ListMatchingResourcesResponse> {
 
-        private static final long serialVersionUID = -7140658514147017528L;
+        private static final long serialVersionUID = 3925746088156597950L;
 
-        ListFeatureFlagsResponseDeserializer() {
-            super(ListFeatureFlagsResponse.class);
+        ListMatchingResourcesResponseDeserializer() {
+            super(ListMatchingResourcesResponse.class);
         }
 
         @Override
-        public ListFeatureFlagsResponse deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-            return ListFeatureFlagsResponse.builder()
-                .featureFlags(p.readValueAs(new TypeReference<List<FeatureFlagEntity>>() {
+        public ListMatchingResourcesResponse deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+            return ListMatchingResourcesResponse.builder()
+                .resources(p.readValueAs(new TypeReference<List<Resource>>() {
 
                 }))
                 .build();
