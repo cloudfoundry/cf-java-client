@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -120,17 +121,11 @@ public final class FileUtils {
     }
 
     private static int getUnixMode(Path path) throws IOException {
-        System.out.println(path);
-
-        PosixFileAttributes attributes = Files.readAttributes(path, PosixFileAttributes.class);
-
-        if (attributes == null) {
-            return DEFAULT_PERMISSIONS;
-        } else {
-            return attributes.permissions().stream()
+        return Optional.ofNullable(Files.readAttributes(path, PosixFileAttributes.class))
+            .map(attributes -> attributes.permissions().stream()
                 .map(PERMISSION_MODES::get)
-                .collect(Collectors.summingInt(i -> i));
-        }
+                .collect(Collectors.summingInt(i -> i)))
+            .orElse(DEFAULT_PERMISSIONS);
     }
 
     private static void write(Path root, Path path, ZipArchiveOutputStream out) {
