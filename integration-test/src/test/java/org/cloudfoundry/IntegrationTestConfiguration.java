@@ -76,7 +76,10 @@ public class IntegrationTestConfiguration {
 
     private static final List<String> GROUPS = Arrays.asList(
         "cloud_controller.admin",
+        "scim.create",
+        "scim.invite",
         "scim.read",
+        "scim.userids",
         "scim.write",
         "zones.read",
         "zones.write");
@@ -85,7 +88,11 @@ public class IntegrationTestConfiguration {
         "cloud_controller.admin",
         "cloud_controller.read",
         "cloud_controller.write",
+        "password.write",
+        "scim.create",
+        "scim.invite",
         "scim.read",
+        "scim.userids",
         "scim.write",
         "uaa.user",
         "zones.read",

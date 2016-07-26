@@ -18,47 +18,61 @@ package org.cloudfoundry.uaa;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.uaa.users.ChangeUserPasswordRequest;
+import org.cloudfoundry.uaa.users.ChangeUserPasswordResponse;
 import org.cloudfoundry.uaa.users.CreateUserRequest;
 import org.cloudfoundry.uaa.users.CreateUserResponse;
 import org.cloudfoundry.uaa.users.DeleteUserRequest;
 import org.cloudfoundry.uaa.users.DeleteUserResponse;
 import org.cloudfoundry.uaa.users.Email;
 import org.cloudfoundry.uaa.users.GetUserVerificationLinkRequest;
+import org.cloudfoundry.uaa.users.GetUserVerificationLinkResponse;
+import org.cloudfoundry.uaa.users.Invite;
 import org.cloudfoundry.uaa.users.InviteUsersRequest;
+import org.cloudfoundry.uaa.users.InviteUsersResponse;
 import org.cloudfoundry.uaa.users.ListUsersRequest;
 import org.cloudfoundry.uaa.users.ListUsersResponse;
 import org.cloudfoundry.uaa.users.LookupUserIdsRequest;
+import org.cloudfoundry.uaa.users.LookupUserIdsResponse;
 import org.cloudfoundry.uaa.users.Name;
 import org.cloudfoundry.uaa.users.UpdateUserRequest;
 import org.cloudfoundry.uaa.users.User;
+import org.cloudfoundry.uaa.users.UserId;
 import org.cloudfoundry.uaa.users.VerifyUserRequest;
 import org.cloudfoundry.uaa.users.VerifyUserResponse;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public final class UsersTest extends AbstractIntegrationTest {
 
     @Autowired
+    private String password;
+
+    @Autowired
     private UaaClient uaaClient;
 
-    @Ignore("TODO: finish story https://www.pivotaltracker.com/projects/816799/stories/122457091 to grant password.write scope")
+    @Autowired
+    private String username;
+
     @Test
     public void changePassword() {
-        String userName = getUserName();
 
-        createUserId(this.uaaClient, userName)
+        getUserIdByUsername(this.uaaClient, this.username)
             .then(userId -> this.uaaClient.users()
                 .changePassword(ChangeUserPasswordRequest.builder()
-                    .oldPassword("test-password")
+                    .oldPassword(this.password)
                     .password("test-new-password")
                     .userId(userId)
                     .build()))
-            .subscribe(this.testSubscriber());
+            .subscribe(this.<ChangeUserPasswordResponse>testSubscriber()
+                .assertThat(response -> {
+                    assertEquals("password updated", response.getMessage());
+                    assertEquals("ok", response.getStatus());
+                }));
     }
 
     @Test
@@ -102,7 +116,6 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .assertEquals(0));
     }
 
-    @Ignore("TODO: finish story https://www.pivotaltracker.com/projects/816799/stories/122457091 to grant scim.create, zones.uaa.admin scopes")
     @Test
     public void getVerificationLink() {
         String userName = getUserName();
@@ -113,10 +126,11 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .redirectUri("test-redirect-uri")
                     .userId(userId)
                     .build()))
-            .subscribe(this.testSubscriber());
+            .map(GetUserVerificationLinkResponse::getVerifyLink)
+            .subscribe(this.<String>testSubscriber()
+                .assertThat(location -> assertTrue(location.contains("/verify_user?code="))));
     }
 
-    @Ignore("TODO: finish story https://www.pivotaltracker.com/projects/816799/stories/122457091 to grant scim.invite scope")
     @Test
     public void invite() {
         this.uaaClient.users()
@@ -124,7 +138,13 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .email("test-email-address")
                 .redirectUri("test-redirect-uri")
                 .build())
-            .subscribe(this.testSubscriber());
+            .flatMapIterable(InviteUsersResponse::getFailedInvites)
+            .single()
+            .subscribe(this.<Invite>testSubscriber()
+                .assertThat(invite -> {
+                    assertEquals("test-email-address", invite.getEmail());
+                    assertEquals("provider.ambiguous", invite.getErrorCode());
+                }));
     }
 
     @Test
@@ -136,14 +156,12 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .list(ListUsersRequest.builder()
                     .filter(String.format("id eq \"%s\"", userId))
                     .build()))
-            .map(ListUsersResponse::getResources)
-            .flatMap(Flux::fromIterable)
+            .flatMapIterable(ListUsersResponse::getResources)
             .map(User::getUserName)
             .subscribe(this.testSubscriber()
                 .assertEquals(userName));
     }
 
-    @Ignore("TODO: finish story https://www.pivotaltracker.com/projects/816799/stories/122457091 to grant scim.userids scope")
     @Test
     public void lookup() {
         String userName = getUserName();
@@ -153,7 +171,10 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .lookup(LookupUserIdsRequest.builder()
                     .filter(String.format("id eq \"%s\"", userId))
                     .build()))
-            .subscribe(this.testSubscriber());
+            .flatMapIterable(LookupUserIdsResponse::getResources)
+            .map(UserId::getUserName)
+            .subscribe(this.testSubscriber()
+                .assertEquals(userName));
     }
 
     @Test
@@ -200,6 +221,13 @@ public final class UsersTest extends AbstractIntegrationTest {
             .map(CreateUserResponse::getId);
     }
 
+    private static Mono<String> getUserIdByUsername(UaaClient uaaClient, String username) {
+        return requestLookupByUsername(uaaClient, username)
+            .flatMapIterable(LookupUserIdsResponse::getResources)
+            .map(UserId::getId)
+            .single();
+    }
+
     private static Mono<CreateUserResponse> requestCreateUser(UaaClient uaaClient, String userName) {
         return uaaClient.users()
             .create(CreateUserRequest.builder()
@@ -212,6 +240,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .givenName("test-given-name")
                     .build())
                 .password("test-password")
+                .verified(false)
                 .userName(userName)
                 .build());
     }
@@ -220,6 +249,13 @@ public final class UsersTest extends AbstractIntegrationTest {
         return uaaClient.users()
             .list(ListUsersRequest.builder()
                 .filter(String.format("id eq \"%s\"", userId))
+                .build());
+    }
+
+    private static Mono<LookupUserIdsResponse> requestLookupByUsername(UaaClient uaaClient, String username) {
+        return uaaClient.users()
+            .lookup(LookupUserIdsRequest.builder()
+                .filter(String.format("userName eq \"%s\"", username))
                 .build());
     }
 

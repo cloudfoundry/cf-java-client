@@ -52,12 +52,14 @@ abstract class _Invite {
      * The invite link
      */
     @JsonProperty("inviteLink")
+    @Nullable
     abstract String getInviteLink();
 
     /**
      * The origin
      */
     @JsonProperty("origin")
+    @Nullable
     abstract String getOrigin();
 
     /**
@@ -70,6 +72,7 @@ abstract class _Invite {
      * The user id
      */
     @JsonProperty("userId")
+    @Nullable
     abstract String getUserId();
 
 }
