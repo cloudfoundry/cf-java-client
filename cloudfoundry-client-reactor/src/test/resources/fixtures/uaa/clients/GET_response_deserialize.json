@@ -1,0 +1,57 @@
+{
+  "resources": [
+    {
+      "action": "none",
+      "authorities": [
+        "uaa.none"
+      ],
+      "authorized_grant_types": [
+        "authorization_code",
+        "refresh_token"
+      ],
+      "autoapprove": true,
+      "client_id": "ssh-proxy",
+      "lastModified": 1469112324000,
+      "redirect_uri": [
+        "/login"
+      ],
+      "resource_ids": [
+        "none"
+      ],
+      "scope": [
+        "openid",
+        "cloud_controller.read",
+        "cloud_controller.write"
+      ]
+    },
+    {
+      "action": "none",
+      "authorities": [
+        "routing.routes.write",
+        "routing.routes.read"
+      ],
+      "authorized_grant_types": [
+        "client_credentials",
+        "refresh_token"
+      ],
+      "autoapprove": [
+        "routing.routes.write",
+        "routing.routes.read"
+      ],
+      "client_id": "tcp_emitter",
+      "lastModified": 1469112324000,
+      "resource_ids": [
+        "none"
+      ],
+      "scope": [
+        "uaa.none"
+      ]
+    }
+  ],
+  "startIndex": 1,
+  "itemsPerPage": 2,
+  "totalResults": 2,
+  "schemas": [
+    "http://cloudfoundry.org/schema/scim/oauth-clients-1.0"
+  ]
+}

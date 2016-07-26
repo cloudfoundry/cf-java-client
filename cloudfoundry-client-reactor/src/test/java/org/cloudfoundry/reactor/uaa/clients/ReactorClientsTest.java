@@ -40,7 +40,9 @@ import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.cloudfoundry.uaa.tokens.GrantType.AUTHORIZATION_CODE;
 import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
+import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
 
 public final class ReactorClientsTest {
 
@@ -145,6 +147,66 @@ public final class ReactorClientsTest {
         @Override
         protected Mono<DeleteClientResponse> invoke(DeleteClientRequest request) {
             return this.clients.delete(request);
+        }
+    }
+
+    public static final class Deserialize extends AbstractUaaApiTest<ListClientsRequest, ListClientsResponse> {
+
+        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/oauth/clients")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/clients/GET_response_deserialize.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListClientsResponse getResponse() {
+            return ListClientsResponse.builder()
+                .resource(Client.builder()
+                    .action("none")
+                    .authority("uaa.none")
+                    .authorizedGrantType(AUTHORIZATION_CODE, REFRESH_TOKEN)
+                    .autoApprove("true")
+                    .clientId("ssh-proxy")
+                    .lastModified(1469112324000L)
+                    .redirectUriPattern("/login")
+                    .resourceId("none")
+                    .scope("openid", "cloud_controller.read", "cloud_controller.write")
+                    .build())
+                .resource(Client.builder()
+                    .action("none")
+                    .authority("routing.routes.write", "routing.routes.read")
+                    .authorizedGrantType(CLIENT_CREDENTIALS, REFRESH_TOKEN)
+                    .autoApprove("routing.routes.write", "routing.routes.read")
+                    .clientId("tcp_emitter")
+                    .lastModified(1469112324000L)
+                    .resourceId("none")
+                    .scope("uaa.none")
+                    .build())
+                .startIndex(1)
+                .itemsPerPage(2)
+                .totalResults(2)
+                .schema("http://cloudfoundry.org/schema/scim/oauth-clients-1.0")
+                .build();
+        }
+
+        @Override
+        protected ListClientsRequest getValidRequest() throws Exception {
+            return ListClientsRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected Mono<ListClientsResponse> invoke(ListClientsRequest request) {
+            return this.clients.list(request);
         }
     }
 

@@ -31,6 +31,7 @@ import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Optional;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -81,7 +82,9 @@ final class UsernameProvider {
 
     private static String getUsername(PublicKey publicKey, String token) {
         Jws<Claims> jws = Jwts.parser().setSigningKey(publicKey).parseClaimsJws(token);
-        return jws.getBody().get("user_name", String.class);
+        return Optional
+            .ofNullable(jws.getBody().get("user_name", String.class))
+            .orElseThrow(() -> new IllegalStateException("Unable to retrieve username from token"));
     }
 
     private static Mono<GetTokenKeyResponse> requestTokenKey(Tokens tokens) {

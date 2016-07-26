@@ -29,11 +29,11 @@ abstract class _PasswordGrantTokenProvider extends AbstractUaaTokenProvider {
     @Override
     protected UriComponentsBuilder getAccessTokenUri(UriComponentsBuilder builder) {
         return builder
-            .queryParam("grant_type", "password")
             .queryParam("client_id", getClientId())
             .queryParam("client_secret", getClientSecret())
-            .queryParam("username", getUsername())
-            .queryParam("password", getPassword());
+            .queryParam("grant_type", "password")
+            .queryParam("password", getPassword())
+            .queryParam("username", getUsername());
     }
 
     /**

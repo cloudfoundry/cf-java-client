@@ -28,9 +28,24 @@ import java.util.List;
 abstract class AbstractClient {
 
     /**
+     * The access token validity
+     */
+    @JsonProperty("access_token_validity")
+    @Nullable
+    abstract Long getAccessTokenValidity();
+
+    /**
+     * The action
+     */
+    @JsonProperty("action")
+    @Nullable
+    abstract String getAction();
+
+    /**
      * A list of origin keys (alias) for identity providers the client is limited to. Null implies any identity provider is allowed.
      */
     @JsonProperty("allowedproviders")
+    @Nullable
     abstract List<String> getAllowedProviders();
 
     /**
@@ -81,13 +96,22 @@ abstract class AbstractClient {
      * A human readable name for the client
      */
     @JsonProperty("name")
+    @Nullable
     abstract String getName();
 
     /**
      * Allowed URI pattern for redirect during authorization
      */
     @JsonProperty("redirect_uri")
+    @Nullable
     abstract List<String> getRedirectUriPatterns();
+
+    /**
+     * The refresh token validity
+     */
+    @JsonProperty("refresh_token_validity")
+    @Nullable
+    abstract Long getRefreshTokenValidity();
 
     /**
      * Resources the client is allowed access to
@@ -105,6 +129,7 @@ abstract class AbstractClient {
      * A random string used to generate the client’s revocation key. Change this value to revoke all active tokens for the client
      */
     @JsonProperty("token_salt")
+    @Nullable
     abstract String getTokenSalt();
 
 }

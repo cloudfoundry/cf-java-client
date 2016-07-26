@@ -23,6 +23,8 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.util.JsonCodec;
 import org.cloudfoundry.reactor.util.NetworkLogging;
 import org.immutables.value.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -33,6 +35,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 abstract class AbstractUaaTokenProvider implements TokenProvider {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger("cloudfoundry-client.token");
 
     private static final Duration REFRESH_MARGIN = Duration.ofSeconds(10);
 
@@ -103,6 +107,7 @@ abstract class AbstractUaaTokenProvider implements TokenProvider {
             ))
             .repeat()
             .cast(String.class)
+            .doOnNext(token -> LOGGER.debug("JWT Token: {}", token))
             .cache(1)
             .next();
     }

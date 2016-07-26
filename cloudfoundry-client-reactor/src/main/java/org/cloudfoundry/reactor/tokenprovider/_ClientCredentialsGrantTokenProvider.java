@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.identityzones;
+package org.cloudfoundry.reactor.tokenprovider;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
+import org.cloudfoundry.reactor.TokenProvider;
 import org.immutables.value.Value;
+import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * The payload for the token policy keys
+ * The Client Credentials Grant implementation of {@link TokenProvider}
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class _KeyInformation {
+abstract class _ClientCredentialsGrantTokenProvider extends AbstractUaaTokenProvider {
 
-    /**
-     * The Signing key
-     */
-    @JsonProperty("signingKey")
-    @Nullable
-    abstract String getSigningKey();
+    @Override
+    protected UriComponentsBuilder getAccessTokenUri(UriComponentsBuilder builder) {
+        return builder
+            .queryParam("client_id", getClientId())
+            .queryParam("client_secret", getClientSecret())
+            .queryParam("grant_type", "client_credentials")
+            .queryParam("response_type", "token");
+    }
 
 }

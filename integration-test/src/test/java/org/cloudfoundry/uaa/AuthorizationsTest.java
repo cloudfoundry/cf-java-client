@@ -32,13 +32,16 @@ import static org.junit.Assert.assertTrue;
 public final class AuthorizationsTest extends AbstractIntegrationTest {
 
     @Autowired
+    private String clientId;
+
+    @Autowired
     private UaaClient uaaClient;
 
     @Test
     public void authorizeByAuthorizationCodeGrantApi() {
         this.uaaClient.authorizations()
             .authorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest.builder()
-                .clientId("ssh-proxy")
+                .clientId(this.clientId)
                 .build())
             .subscribe(this.<String>testSubscriber()
                 .assertThat(code -> {
@@ -51,7 +54,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
     public void authorizeByAuthorizationCodeGrantBrowser() {
         this.uaaClient.authorizations()
             .authorizationCodeGrantBrowser(AuthorizeByAuthorizationCodeGrantBrowserRequest.builder()
-                .clientId("ssh-proxy")
+                .clientId(this.clientId)
                 .redirectUri("http://redirect.to/app")
                 .build())
             .subscribe(this.<String>testSubscriber()
@@ -62,7 +65,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
     public void authorizeByImplicitGrantBrowser() {
         this.uaaClient.authorizations()
             .implicitGrantBrowser(AuthorizeByImplicitGrantBrowserRequest.builder()
-                .clientId("ssh-proxy")
+                .clientId(this.clientId)
                 .redirectUri("http://redirect.to/app")
                 .build())
             .subscribe(this.<String>testSubscriber()
