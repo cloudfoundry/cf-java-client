@@ -32,4 +32,9 @@ final class RandomNameFactory implements NameFactory {
         return String.format("%s%s", prefix, new BigInteger(25, this.random).toString(32));
     }
 
+    @Override
+    public boolean isName(String prefix, String candidate) {
+        return candidate.startsWith(prefix);
+    }
+
 }

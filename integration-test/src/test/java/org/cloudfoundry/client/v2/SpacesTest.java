@@ -112,8 +112,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void associateAuditor() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .then(function((userId, spaceId) -> Mono.when(
@@ -131,8 +131,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void associateAuditorByUsername() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
@@ -154,8 +154,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void associateDeveloper() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .then(function((userId, spaceId) -> Mono.when(
@@ -173,8 +173,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void associateDeveloperByUsername() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
@@ -196,8 +196,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void associateManager() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .then(function((userId, spaceId) -> Mono.when(
@@ -215,8 +215,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void associateManagerByUsername() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
@@ -239,7 +239,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void create() {
-        String spaceName = getSpaceName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .then(organizationId -> this.cloudFoundryClient.spaces()
@@ -255,7 +255,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void delete() {
-        String spaceName = getSpaceName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -274,7 +274,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void deleteAsyncFalse() {
-        String spaceName = getSpaceName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -291,7 +291,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void get() {
-        String spaceName = getSpaceName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -307,7 +307,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void getSummary() {
-        String spaceName = getSpaceName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -322,8 +322,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void list() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createOrganizationIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName)
             .then(function((organizationId, spaceId) -> Mono.when(
@@ -339,8 +339,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listApplications() {
-        String applicationName = getApplicationName();
-        String spaceName = getSpaceName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -355,8 +355,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listApplicationsFilterByDiego() {
-        String applicationName = getApplicationName();
-        String spaceName = getSpaceName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -371,8 +371,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listApplicationsFilterByName() {
-        String applicationName = getApplicationName();
-        String spaceName = getSpaceName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -392,8 +392,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listApplicationsFilterByOrganizationId() {
-        String applicationName = getApplicationName();
-        String spaceName = getSpaceName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .then(organizationId -> Mono.when(
@@ -410,8 +410,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listApplicationsFilterByStackId() {
-        String applicationName = getApplicationName();
-        String spaceName = getSpaceName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -436,8 +436,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listAuditors() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
@@ -459,8 +459,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listDevelopers() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
@@ -482,8 +482,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listDomains() {
-        String domainName = getDomainName();
-        String spaceName = getSpaceName();
+        String domainName = this.nameFactory.getDomainName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .then(organizationId -> createSpaceIdWithDomain(this.cloudFoundryClient, organizationId, spaceName, domainName))
@@ -499,8 +499,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listDomainsFilterByName() {
-        String domainName = getDomainName();
-        String spaceName = getSpaceName();
+        String domainName = this.nameFactory.getDomainName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .then(organizationId -> createSpaceIdWithDomain(this.cloudFoundryClient, organizationId, spaceName, domainName))
@@ -514,10 +514,10 @@ public final class SpacesTest extends AbstractIntegrationTest {
     @Ignore("Filter parameter not honoured: see https://github.com/cloudfoundry/cloud_controller_ng/issues/584")
     @Test
     public void listDomainsFilterByOwningOrganizationId() {
-        String domainName = getDomainName();
-        String spaceOrganizationName = getOrganizationName();
-        String domainOrganizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String domainName = this.nameFactory.getDomainName();
+        String spaceOrganizationName = this.nameFactory.getOrganizationName();
+        String domainOrganizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         Mono
             .when(
@@ -550,7 +550,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listEvents() {
-        String spaceName = getSpaceName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -563,7 +563,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listEventsFilterByActee() {
-        String spaceName = getSpaceName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -576,7 +576,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listEventsFilterByTimestamp() {
-        String spaceName = getSpaceName();
+        String spaceName = this.nameFactory.getSpaceName();
         String timestamp = getPastTimestamp();
 
         this.organizationId
@@ -590,7 +590,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listEventsFilterByType() {
-        String spaceName = getSpaceName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -607,8 +607,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByApplicationId() {
-        String applicationName = getApplicationName();
-        String spaceName = getSpaceName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -634,7 +634,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByName() {
-        String spaceName = getSpaceName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -650,8 +650,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByOrganizationId() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createOrganizationIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName)
             .then(function((organizationId, spaceId) -> Mono.when(
@@ -666,8 +666,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listManagers() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
@@ -680,8 +680,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listManagersFilterByAuditedOrganizationId() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
@@ -705,8 +705,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listManagersFilterByAuditedSpaceId() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> Mono.when(
@@ -722,8 +722,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listManagersFilterByBillingManagedOrganizationId() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
@@ -751,8 +751,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listManagersFilterByManagedOrganizationId() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
@@ -780,8 +780,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listManagersFilterByManagedSpaceId() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
@@ -794,8 +794,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listManagersFilterByOrganizationId() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
@@ -816,9 +816,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listRoutes() {
-        String domainName = getDomainName();
-        String hostName = getHostName();
-        String spaceName = getSpaceName();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .then(organizationId -> createSpaceIdWithDomain(this.cloudFoundryClient, organizationId, spaceName, domainName))
@@ -838,9 +838,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listRoutesFilterByDomainId() {
-        String domainName = getDomainName();
-        String hostName = getHostName();
-        String spaceName = getSpaceName();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .then(organizationId -> createSpaceIdWithDomain(this.cloudFoundryClient, organizationId, spaceName, domainName))
@@ -861,9 +861,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listRoutesFilterByHost() {
-        String domainName = getDomainName();
-        String hostName = getHostName();
-        String spaceName = getSpaceName();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .then(organizationId -> createSpaceIdWithDomain(this.cloudFoundryClient, organizationId, spaceName, domainName))
@@ -883,9 +883,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listRoutesFilterByPath() {
-        String domainName = getDomainName();
-        String hostName = getHostName();
-        String spaceName = getSpaceName();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .then(organizationId -> createSpaceIdWithDomain(this.cloudFoundryClient, organizationId, spaceName, domainName))
@@ -983,8 +983,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listUserRoles() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
@@ -1004,8 +1004,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void removeAuditor() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId))))
@@ -1025,8 +1025,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void removeAuditorByUsername() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId))))
@@ -1046,8 +1046,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void removeDeveloper() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
@@ -1071,8 +1071,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void removeDeveloperByUsername() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
@@ -1096,8 +1096,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void removeManager() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
@@ -1115,8 +1115,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void removeManagerByUsername() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
@@ -1139,8 +1139,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void update() {
-        String spaceName = getSpaceName();
-        String spaceName2 = getSpaceName();
+        String spaceName = this.nameFactory.getSpaceName();
+        String spaceName2 = this.nameFactory.getSpaceName();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -1160,8 +1160,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void updateEmptyManagers() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))

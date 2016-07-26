@@ -74,7 +74,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void create() {
-        String domainName = getDomainName();
+        String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
             .then(organizationId -> Mono.when(
@@ -87,7 +87,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void delete() {
-        String domainName = getDomainName();
+        String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
             .then(organizationId -> createDomainId(this.cloudFoundryClient, domainName, organizationId))
@@ -100,7 +100,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void deleteNotAsync() {
-        String domainName = getDomainName();
+        String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
             .then(organizationId -> createDomainId(this.cloudFoundryClient, domainName, organizationId))
@@ -112,7 +112,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void get() {
-        String domainName = getDomainName();
+        String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
             .then(organizationId -> Mono.when(
@@ -129,7 +129,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void list() {
-        String domainName = getDomainName();
+        String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
             .then(organizationId -> Mono.when(
@@ -149,7 +149,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void listDomainSpaces() {
-        String domainName = getDomainName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(this.organizationId, this.spaceId)
@@ -170,8 +170,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void listDomainSpacesFilterByApplicationId() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
             .then(organizationId -> createDomainId(this.cloudFoundryClient, domainName, organizationId))
@@ -197,7 +197,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void listDomainSpacesFilterByDeveloperId() {
-        String domainName = getDomainName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(this.spaceId, this.organizationId, this.userId)
@@ -220,7 +220,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void listDomainSpacesFilterByName() {
-        String domainName = getDomainName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(this.organizationId, this.spaceId)
@@ -243,7 +243,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void listDomainSpacesFilterByOrganizationId() {
-        String domainName = getDomainName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(this.organizationId, this.spaceId)
@@ -265,7 +265,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByName() {
-        String domainName = getDomainName();
+        String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
             .then(organizationId -> Mono.when(
@@ -285,7 +285,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByOwningOrganizationId() {
-        String domainName = getDomainName();
+        String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
             .then(organizationId -> Mono.when(

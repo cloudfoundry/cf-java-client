@@ -48,7 +48,7 @@ public final class PackagesTest extends AbstractIntegrationTest {
 
     @Test
     public void upload() {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
             .then(spaceId -> this.cloudFoundryClient.applicationsV3()

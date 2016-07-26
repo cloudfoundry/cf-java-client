@@ -36,7 +36,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void create() {
-        String domainName = getDomainName();
+        String domainName = this.nameFactory.getDomainName();
 
         this.cloudFoundryOperations.domains()
             .create(CreateDomainRequest.builder()
@@ -59,8 +59,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void share() {
-        String domainName = getDomainName();
-        String targetOrganizationName = getOrganizationName();
+        String domainName = this.nameFactory.getDomainName();
+        String targetOrganizationName = this.nameFactory.getOrganizationName();
 
         requestCreateOrganization(this.cloudFoundryOperations, targetOrganizationName)
             .then(requestCreateDomain(this.cloudFoundryOperations, domainName, this.organizationName))
@@ -74,8 +74,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void unshare() {
-        String domainName = getDomainName();
-        String targetOrganizationName = getOrganizationName();
+        String domainName = this.nameFactory.getDomainName();
+        String targetOrganizationName = this.nameFactory.getOrganizationName();
 
         requestCreateOrganization(this.cloudFoundryOperations, targetOrganizationName)
             .then(requestCreateDomain(this.cloudFoundryOperations, domainName, this.organizationName))

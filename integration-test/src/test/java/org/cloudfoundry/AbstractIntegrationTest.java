@@ -54,7 +54,7 @@ public abstract class AbstractIntegrationTest {
         .setPerformanceLoggerName(this::getTestName);
 
     @Autowired
-    private NameFactory nameFactory;
+    protected NameFactory nameFactory;
 
     @Before
     public void testEntry() {
@@ -100,58 +100,6 @@ public abstract class AbstractIntegrationTest {
         T actual = tuple.t2;
 
         assertEquals("tuple components not equal", expected, actual);
-    }
-
-    protected final String getApplicationName() {
-        return this.nameFactory.getName("test-application-");
-    }
-
-    protected final String getBuildpackName() {
-        return this.nameFactory.getName("test-buildpack-");
-    }
-
-    protected final String getDomainName() {
-        return this.nameFactory.getName("test.domain.");
-    }
-
-    protected final String getGroupName() {
-        return this.nameFactory.getName("test-group-");
-    }
-
-    protected final String getHostName() {
-        return this.nameFactory.getName("test-host-");
-    }
-
-    protected final String getIdentityZoneName() {
-        return this.nameFactory.getName("test-identity-zone-");
-    }
-
-    protected final String getOrganizationName() {
-        return this.nameFactory.getName("test-organization-");
-    }
-
-    protected final String getPath() {
-        return this.nameFactory.getName("/test-path-");
-    }
-
-    protected final String getServiceInstanceName() {
-        return this.nameFactory.getName("test-service-instance-");
-    }
-
-    protected final String getSpaceName() {
-        return this.nameFactory.getName("test-space-");
-    }
-
-    protected final String getUserName() {
-        return this.nameFactory.getName("test-user-");
-    }
-
-    protected final String getVariableName() {
-        return this.nameFactory.getName("test-variable-name-");
-    }
-
-    protected final String getVariableValue() {
-        return this.nameFactory.getName("test-variable-value-");
     }
 
     @SuppressWarnings("unchecked")

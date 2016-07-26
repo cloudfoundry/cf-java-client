@@ -57,9 +57,9 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
 
     @Test
     public void createSharedDomain() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
-        String hostName = getHostName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
 
         Mono
             .when(
@@ -87,9 +87,9 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
 
     @Test
     public void deleteAsyncFalse() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
-        String hostName = getHostName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
 
         this.spaceId
             .then(spaceId -> getRouteMappingId(this.cloudFoundryClient, applicationName, domainName, hostName, spaceId))
@@ -105,9 +105,9 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
 
     @Test
     public void deleteAsyncTrue() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
-        String hostName = getHostName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
 
         this.spaceId
             .then(spaceId -> getRouteMappingId(this.cloudFoundryClient, applicationName, domainName, hostName, spaceId))
@@ -124,9 +124,9 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
 
     @Test
     public void get() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
-        String hostName = getHostName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
 
         this.spaceId
             .then(spaceId -> getRouteMappingId(this.cloudFoundryClient, applicationName, domainName, hostName, spaceId))
@@ -144,9 +144,9 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByApplicationId() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
-        String hostName = getHostName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
 
         this.spaceId
             .then(spaceId -> Mono.when(
@@ -173,9 +173,9 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByRouteId() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
-        String hostName = getHostName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
 
         this.spaceId
             .then(spaceId -> Mono.when(

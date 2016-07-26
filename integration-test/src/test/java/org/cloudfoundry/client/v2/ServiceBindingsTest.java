@@ -58,8 +58,8 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
 
     @Test
     public void create() {
-        String applicationName = getApplicationName();
-        String serviceInstanceName = getServiceInstanceName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
             .then(function((serviceInstanceId, applicationId) -> Mono
@@ -74,8 +74,8 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
 
     @Test
     public void delete() {
-        String applicationName = getApplicationName();
-        String serviceInstanceName = getServiceInstanceName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
             .then(function((serviceInstanceId, applicationId) -> Mono
@@ -92,8 +92,8 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
 
     @Test
     public void get() {
-        String applicationName = getApplicationName();
-        String serviceInstanceName = getServiceInstanceName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
             .then(function((serviceInstanceId, applicationId) -> Mono
@@ -114,8 +114,8 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
 
     @Test
     public void list() {
-        String applicationName = getApplicationName();
-        String serviceInstanceName = getServiceInstanceName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
             .then(function((serviceInstanceId, applicationId) -> Mono
@@ -138,8 +138,8 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByApplicationId() {
-        String applicationName = getApplicationName();
-        String serviceInstanceName = getServiceInstanceName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
             .then(function((serviceInstanceId, applicationId) -> Mono
@@ -162,8 +162,8 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByServiceInstanceId() {
-        String applicationName = getApplicationName();
-        String serviceInstanceName = getServiceInstanceName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
             .then(function((serviceInstanceId, applicationId) -> Mono

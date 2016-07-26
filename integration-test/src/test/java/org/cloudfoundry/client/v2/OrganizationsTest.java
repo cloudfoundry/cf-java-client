@@ -118,7 +118,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void associateAuditor() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -136,7 +136,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void associateAuditorByUsername() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
@@ -154,7 +154,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void associateBillingManager() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -176,7 +176,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void associateBillingManagerByUsername() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
@@ -194,7 +194,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void associateManager() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -216,7 +216,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void associateManagerByUsername() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
@@ -234,8 +234,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void associatePrivateDomain() {
-        String domainName = getDomainName();
-        String organizationName = getOrganizationName();
+        String domainName = this.nameFactory.getDomainName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
@@ -257,7 +257,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void associateUser() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -279,7 +279,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void associateUserByUsername() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
@@ -297,7 +297,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void create() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         this.cloudFoundryClient.organizations()
             .create(CreateOrganizationRequest.builder()
@@ -311,7 +311,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void delete() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .as(thenKeep(organizationId -> this.cloudFoundryClient.organizations()
@@ -327,7 +327,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void deleteAsyncFalse() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .as(thenKeep(organizationId -> this.cloudFoundryClient.organizations()
@@ -342,7 +342,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void get() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> this.cloudFoundryClient.organizations()
@@ -357,7 +357,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void getInstanceUsage() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> this.cloudFoundryClient.organizations()
@@ -371,7 +371,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void getMemoryUsage() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> this.cloudFoundryClient.organizations()
@@ -385,7 +385,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void getUserRoles() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .flatMap(organizationId -> requestClientV2Resources(page -> this.cloudFoundryClient.organizations()
@@ -398,7 +398,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void list() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .flatMap(organizationId -> requestListOrganizations(this.cloudFoundryClient)
@@ -410,7 +410,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listAuditors() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -430,8 +430,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listAuditorsFilterByAuditedOrganizationId() {
-        String organizationName1 = getOrganizationName();
-        String organizationName2 = getOrganizationName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -455,9 +455,9 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listAuditorsFilterByAuditedSpaceId() {
-        String organizationName1 = getOrganizationName();
-        String organizationName2 = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         Mono
             .when(
@@ -487,8 +487,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listAuditorsFilterByBillingManagedOrganizationId() {
-        String organizationName1 = getOrganizationName();
-        String organizationName2 = getOrganizationName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -512,8 +512,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listAuditorsFilterByManagedOrganizationId() {
-        String organizationName1 = getOrganizationName();
-        String organizationName2 = getOrganizationName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -537,9 +537,9 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listAuditorsFilterByManagedSpaceId() {
-        String organizationName1 = getOrganizationName();
-        String organizationName2 = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         Mono
             .when(
@@ -570,7 +570,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     @Ignore("TODO: wait for resolution of issue https://github.com/cloudfoundry/cloud_controller_ng/issues/594, and then possibly create user APIs")
     @Test
     public void listAuditorsFilterBySpaceId() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -595,7 +595,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listBillingManagers() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -615,8 +615,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listBillingManagersFilterByAuditedOrganizationId() {
-        String organizationName1 = getOrganizationName();
-        String organizationName2 = getOrganizationName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -640,9 +640,9 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listBillingManagersFilterByAuditedSpaceId() {
-        String organizationName1 = getOrganizationName();
-        String organizationName2 = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         Mono
             .when(
@@ -672,8 +672,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listBillingManagersFilterByBillingManagedOrganizationId() {
-        String organizationName1 = getOrganizationName();
-        String organizationName2 = getOrganizationName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -697,8 +697,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listBillingManagersFilterByManagedOrganizationId() {
-        String organizationName1 = getOrganizationName();
-        String organizationName2 = getOrganizationName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -722,9 +722,9 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listBillingManagersFilterByManagedSpaceId() {
-        String organizationName1 = getOrganizationName();
-        String organizationName2 = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         Mono
             .when(
@@ -760,8 +760,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listDomains() {
-        String organizationName = getOrganizationName();
-        String sharedDomainName = getDomainName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String sharedDomainName = this.nameFactory.getDomainName();
 
         Mono
             .when(
@@ -781,8 +781,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listDomainsFilterByName() {
-        String organizationName = getOrganizationName();
-        String sharedDomainName = getDomainName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String sharedDomainName = this.nameFactory.getDomainName();
 
         Mono
             .when(
@@ -802,9 +802,9 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     @Ignore("TODO: await resolution of issue https://github.com/cloudfoundry/cloud_controller_ng/issues/595")
     @Test
     public void listDomainsFilterByOwningOrganizationId() {
-        String organizationName1 = getOrganizationName();
-        String organizationName2 = getOrganizationName();
-        String privateDomainName = getDomainName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
+        String privateDomainName = this.nameFactory.getDomainName();
 
         Mono
             .when(
@@ -834,9 +834,9 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     @Ignore("TODO: await resolution of issue https://github.com/cloudfoundry/cloud_controller_ng/issues/595")
     @Test
     public void listDomainsWithAssociatedPrivateDomain() {
-        String organizationName1 = getOrganizationName();
-        String organizationName2 = getOrganizationName();
-        String privateDomainName = getDomainName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
+        String privateDomainName = this.nameFactory.getDomainName();
 
         Mono
             .when(
@@ -861,7 +861,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByAuditorId() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -878,7 +878,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByBillingManagerId() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -895,7 +895,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByManagerId() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -912,7 +912,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByName() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         requestCreateOrganization(this.cloudFoundryClient, organizationName)
             .flatMap(ignore -> requestListOrganizations(this.cloudFoundryClient, builder -> builder.name(organizationName)))
@@ -922,8 +922,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterBySpaceId() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
@@ -943,7 +943,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     @Ignore("TODO: find a valid status other than 'active' and re-instate this test")
     @Test
     public void listFilterByStatus() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
         String organizationStatus = "inactive";   // TODO: find a valid status other than "active" and re-instate this test
 
         requestCreateOrganization(this.cloudFoundryClient, organizationName, builder -> builder.status(organizationStatus))
@@ -958,7 +958,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByUserId() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -975,7 +975,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listManagers() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -995,8 +995,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listManagersFilterByAuditedOrganizationId() {
-        String organizationName1 = getOrganizationName();
-        String organizationName2 = getOrganizationName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -1020,9 +1020,9 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listManagersFilterByAuditedSpaceId() {
-        String organizationName1 = getOrganizationName();
-        String organizationName2 = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         Mono
             .when(
@@ -1052,8 +1052,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listManagersFilterByBillingManagedOrganizationId() {
-        String organizationName1 = getOrganizationName();
-        String organizationName2 = getOrganizationName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -1077,8 +1077,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listManagersFilterByManagedOrganizationId() {
-        String organizationName1 = getOrganizationName();
-        String organizationName2 = getOrganizationName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -1102,9 +1102,9 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listManagersFilterByManagedSpaceId() {
-        String organizationName1 = getOrganizationName();
-        String organizationName2 = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         Mono
             .when(
@@ -1135,7 +1135,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     @Ignore("TODO: wait for resolution of issue https://github.com/cloudfoundry/cloud_controller_ng/issues/594, and then possibly create user APIs")
     @Test
     public void listManagersFilterBySpaceId() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -1160,9 +1160,9 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listPrivateDomains() {
-        String domainName = getDomainName();
-        String defaultOrganizationName = getOrganizationName();
-        String organizationName = getOrganizationName();
+        String domainName = this.nameFactory.getDomainName();
+        String defaultOrganizationName = this.nameFactory.getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -1186,8 +1186,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listPrivateDomainsFilterByName() {
-        String organizationName = getOrganizationName();
-        String privateDomainName = getDomainName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String privateDomainName = this.nameFactory.getDomainName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
@@ -1207,7 +1207,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     @Ignore("TODO: rework this test when managed services are available")
     @Test
     public void listServices() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -1246,7 +1246,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listSpaceQuotaDefinitions() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .flatMap(organizationId -> requestClientV2Resources(page -> this.cloudFoundryClient.organizations()
@@ -1260,8 +1260,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listSpaces() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .as(thenKeep(organizationId -> requestCreateSpace(this.cloudFoundryClient, organizationId, spaceName)))
@@ -1272,9 +1272,9 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listSpacesFilterByApplicationId() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
-        String applicationName = getApplicationName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
@@ -1298,8 +1298,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listSpacesFilterByDeveloperId() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         Mono
             .when(
@@ -1325,8 +1325,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listSpacesFilterByName() {
-        String organizationName = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
@@ -1345,7 +1345,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listUsers() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -1365,8 +1365,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listUsersFilterByAuditedOrganizationId() {
-        String organizationName1 = getOrganizationName();
-        String organizationName2 = getOrganizationName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -1390,9 +1390,9 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listUsersFilterByAuditedSpaceId() {
-        String organizationName1 = getOrganizationName();
-        String organizationName2 = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         Mono
             .when(
@@ -1422,8 +1422,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listUsersFilterByBillingManagedOrganizationId() {
-        String organizationName1 = getOrganizationName();
-        String organizationName2 = getOrganizationName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -1447,8 +1447,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listUsersFilterByManagedOrganizationId() {
-        String organizationName1 = getOrganizationName();
-        String organizationName2 = getOrganizationName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -1472,9 +1472,9 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listUsersFilterByManagedSpaceId() {
-        String organizationName1 = getOrganizationName();
-        String organizationName2 = getOrganizationName();
-        String spaceName = getSpaceName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         Mono
             .when(
@@ -1505,7 +1505,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     @Ignore("TODO: wait for resolution of issue https://github.com/cloudfoundry/cloud_controller_ng/issues/594, and then possibly create user APIs")
     @Test
     public void listUsersFilterBySpaceId() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -1530,7 +1530,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void removeAuditor() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -1550,7 +1550,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void removeAuditorByUsername() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -1570,7 +1570,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void removeBillingManager() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -1590,7 +1590,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void removeBillingManagerByUsername() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -1610,7 +1610,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void removeManager() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -1630,7 +1630,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void removeManagerByUsername() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -1650,9 +1650,9 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void removePrivateDomain() {
-        String domainName = getDomainName();
-        String defaultOrganizationName = getOrganizationName();
-        String organizationName = getOrganizationName();
+        String domainName = this.nameFactory.getDomainName();
+        String defaultOrganizationName = this.nameFactory.getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -1676,7 +1676,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void removeUser() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -1696,7 +1696,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void removeUserByUsername() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         Mono
             .when(
@@ -1716,7 +1716,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void summary() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> this.cloudFoundryClient.organizations()
@@ -1730,8 +1730,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void update() {
-        String organizationName = getOrganizationName();
-        String organizationName2 = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .as(thenKeep(organizationId -> this.cloudFoundryClient.organizations()

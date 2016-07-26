@@ -59,7 +59,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
 
     @Test
     public void create() {
-        String instanceName = getServiceInstanceName();
+        String instanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
             .then(spaceId -> this.cloudFoundryClient.userProvidedServiceInstances()
@@ -74,7 +74,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
 
     @Test
     public void delete() {
-        String instanceName = getServiceInstanceName();
+        String instanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
             .then(spaceId -> getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))
@@ -89,7 +89,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
 
     @Test
     public void get() {
-        String instanceName = getServiceInstanceName();
+        String instanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
             .then(spaceId -> getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))
@@ -104,7 +104,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
 
     @Test
     public void list() {
-        String instanceName = getServiceInstanceName();
+        String instanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
             .then(spaceId -> requestCreateUserProvidedServiceInstance(this.cloudFoundryClient, instanceName, spaceId))
@@ -122,8 +122,8 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
 
     @Test
     public void listServiceBindings() {
-        String applicationName = getApplicationName();
-        String instanceName = getServiceInstanceName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String instanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
             .then(spaceId -> Mono.when(
@@ -153,8 +153,8 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
 
     @Test
     public void update() {
-        String instanceName = getServiceInstanceName();
-        String newInstanceName = getServiceInstanceName();
+        String instanceName = this.nameFactory.getServiceInstanceName();
+        String newInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
             .then(spaceId -> getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))

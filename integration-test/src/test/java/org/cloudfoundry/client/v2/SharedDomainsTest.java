@@ -44,7 +44,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void create() {
-        String domainName = getDomainName();
+        String domainName = this.nameFactory.getDomainName();
 
         this.cloudFoundryClient.sharedDomains()
             .create(CreateSharedDomainRequest.builder()
@@ -70,7 +70,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void list() {
-        String domainName = getDomainName();
+        String domainName = this.nameFactory.getDomainName();
 
         requestCreateSharedDomain(this.cloudFoundryClient, domainName)
             .map(ResourceUtils::getId)
@@ -83,7 +83,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByName() {
-        String domainName = getDomainName();
+        String domainName = this.nameFactory.getDomainName();
 
         requestCreateSharedDomain(this.cloudFoundryClient, domainName)
             .map(ResourceUtils::getId)

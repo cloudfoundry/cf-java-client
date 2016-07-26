@@ -33,7 +33,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
 
     @Test
     public void createBuildpack() throws Exception {
-        String buildpackName = getBuildpackName();
+        String buildpackName = this.nameFactory.getBuildpackName();
 
         this.cloudFoundryOperations.buildpacks()
             .create(CreateBuildpackRequest.builder()

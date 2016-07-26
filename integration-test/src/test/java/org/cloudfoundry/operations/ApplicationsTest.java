@@ -53,7 +53,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void deleteApplication() throws IOException {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
             .then(this.cloudFoundryOperations.applications()
@@ -65,7 +65,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void deleteApplicationAndRoutes() throws IOException {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
             .then(this.cloudFoundryOperations.applications()
@@ -78,8 +78,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void deleteApplicationWithServiceBindings() throws IOException {
-        String applicationName = getApplicationName();
-        String serviceInstanceName = getServiceInstanceName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         Mono.empty()
             .then(createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false))
@@ -93,7 +93,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void get() {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
             .then(this.cloudFoundryOperations.applications()
@@ -107,7 +107,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void getHealthCheck() throws IOException {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, true)
             .then(this.cloudFoundryOperations.applications()
@@ -120,7 +120,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void getStopped() {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, true)
             .then(this.cloudFoundryOperations.applications()
@@ -134,8 +134,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void pushDomainNotFound() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
 
         this.cloudFoundryOperations.applications()
             .push(PushApplicationRequest.builder()
@@ -152,7 +152,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void pushExisting() {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
             .then(this.cloudFoundryOperations.applications()
@@ -168,7 +168,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void pushNew() {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
             .subscribe(testSubscriber());
@@ -176,8 +176,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void pushPrivateDomain() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
 
         this.cloudFoundryOperations.domains()
             .create(CreateDomainRequest.builder()
@@ -198,8 +198,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void pushWithHost() {
-        String applicationName = getApplicationName();
-        String host = getHostName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String host = this.nameFactory.getHostName();
 
         this.cloudFoundryOperations.applications()
             .push(PushApplicationRequest.builder()
@@ -216,7 +216,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void restartNotStarted() throws IOException {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, true)
             .then(this.cloudFoundryOperations.applications()
@@ -228,7 +228,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void restartStarted() throws IOException {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
             .then(this.cloudFoundryOperations.applications()
@@ -240,11 +240,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void setEnvironmentVariable() throws IOException {
-        String applicationName = getApplicationName();
-        String variableName1 = getVariableName();
-        String variableName2 = getVariableName();
-        String variableValue1 = getVariableValue();
-        String variableValue2 = getVariableValue();
+        String applicationName = this.nameFactory.getApplicationName();
+        String variableName1 = this.nameFactory.getVariableName();
+        String variableName2 = this.nameFactory.getVariableName();
+        String variableValue1 = this.nameFactory.getVariableValue();
+        String variableValue2 = this.nameFactory.getVariableValue();
 
         createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
             .then(this.cloudFoundryOperations.applications()
@@ -273,7 +273,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void startNotStarted() throws IOException {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, true)
             .then(this.cloudFoundryOperations.applications()
@@ -285,7 +285,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void startStarted() throws IOException {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
             .then(this.cloudFoundryOperations.applications()
@@ -297,11 +297,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void unsetEnvironmentVariableComplete() throws IOException {
-        String applicationName = getApplicationName();
-        String variableName1 = getVariableName();
-        String variableName2 = getVariableName();
-        String variableValue1 = getVariableValue();
-        String variableValue2 = getVariableValue();
+        String applicationName = this.nameFactory.getApplicationName();
+        String variableName1 = this.nameFactory.getVariableName();
+        String variableName2 = this.nameFactory.getVariableName();
+        String variableValue1 = this.nameFactory.getVariableValue();
+        String variableValue2 = this.nameFactory.getVariableValue();
 
         createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
             .then(this.cloudFoundryOperations.applications()
@@ -337,11 +337,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void unsetEnvironmentVariablePartial() throws IOException {
-        String applicationName = getApplicationName();
-        String variableName1 = getVariableName();
-        String variableName2 = getVariableName();
-        String variableValue1 = getVariableValue();
-        String variableValue2 = getVariableValue();
+        String applicationName = this.nameFactory.getApplicationName();
+        String variableName1 = this.nameFactory.getVariableName();
+        String variableName2 = this.nameFactory.getVariableName();
+        String variableValue1 = this.nameFactory.getVariableValue();
+        String variableValue2 = this.nameFactory.getVariableValue();
 
         createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
             .then(this.cloudFoundryOperations.applications()

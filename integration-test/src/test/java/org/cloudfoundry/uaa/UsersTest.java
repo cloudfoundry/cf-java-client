@@ -77,7 +77,7 @@ public final class UsersTest extends AbstractIntegrationTest {
 
     @Test
     public void create() {
-        String userName = getUserName();
+        String userName = this.nameFactory.getUserName();
 
         this.uaaClient.users()
             .create(CreateUserRequest.builder()
@@ -102,7 +102,7 @@ public final class UsersTest extends AbstractIntegrationTest {
 
     @Test
     public void delete() {
-        String userName = getUserName();
+        String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
             .then(userId -> this.uaaClient.users()
@@ -118,7 +118,7 @@ public final class UsersTest extends AbstractIntegrationTest {
 
     @Test
     public void getVerificationLink() {
-        String userName = getUserName();
+        String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
             .then(userId -> this.uaaClient.users()
@@ -149,7 +149,7 @@ public final class UsersTest extends AbstractIntegrationTest {
 
     @Test
     public void list() {
-        String userName = getUserName();
+        String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
             .then(userId -> this.uaaClient.users()
@@ -164,7 +164,7 @@ public final class UsersTest extends AbstractIntegrationTest {
 
     @Test
     public void lookup() {
-        String userName = getUserName();
+        String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
             .then(userId -> this.uaaClient.users()
@@ -179,7 +179,7 @@ public final class UsersTest extends AbstractIntegrationTest {
 
     @Test
     public void update() {
-        String userName = getUserName();
+        String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
             .then(userId -> this.uaaClient.users()
@@ -204,7 +204,7 @@ public final class UsersTest extends AbstractIntegrationTest {
 
     @Test
     public void verifyUser() {
-        String userName = getUserName();
+        String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
             .then(userId -> this.uaaClient.users()

@@ -32,7 +32,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
     @Ignore("Needs marketplace feature to derive planName and serviceName - https://www.pivotaltracker.com/story/show/106155472")
     @Test
     public void getManagedService() {
-        String serviceInstanceName = getServiceInstanceName();
+        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.cloudFoundryOperations.services()
             .createInstance(CreateServiceInstanceRequest.builder()

@@ -57,9 +57,9 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void checkFalse() {
-        String domainName = getDomainName();
-        String host = getHostName();
-        String path = getPath();
+        String domainName = this.nameFactory.getDomainName();
+        String host = this.nameFactory.getHostName();
+        String path = this.nameFactory.getPath();
 
         this.cloudFoundryOperations.routes()
             .check(CheckRouteRequest.builder()
@@ -74,9 +74,9 @@ public final class RoutesTest extends AbstractIntegrationTest {
     @Ignore("Awaiting resolution of https://github.com/cloudfoundry/cloud_controller_ng/issues/650")
     @Test
     public void checkTruePrivateDomainNoHost() {
-        String domainName = getDomainName();
-        String hostName = getHostName();
-        String path = getPath();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
+        String path = this.nameFactory.getPath();
 
         createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
             .then(this.cloudFoundryOperations.routes()
@@ -90,9 +90,9 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void checkTrueSharedDomain() {
-        String domainName = getDomainName();
-        String hostName = getHostName();
-        String path = getPath();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
+        String path = this.nameFactory.getPath();
 
         createSharedDomainAndRoute(this.cloudFoundryOperations, this.spaceName, domainName, hostName, path)
             .then(this.cloudFoundryOperations.routes()
@@ -107,9 +107,9 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void create() {
-        String domainName = getDomainName();
-        String hostName = getHostName();
-        String path = getPath();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
+        String path = this.nameFactory.getPath();
 
         createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
             .then(this.cloudFoundryOperations.routes()
@@ -124,9 +124,9 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void createRouteWithNonExistentDomain() {
-        String domainName = getDomainName();
-        String hostName = getHostName();
-        String path = getPath();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
+        String path = this.nameFactory.getPath();
 
         this.cloudFoundryOperations.routes()
             .create(CreateRouteRequest.builder()
@@ -141,9 +141,9 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void delete() {
-        String domainName = getDomainName();
-        String hostName = getHostName();
-        String path = getPath();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
+        String path = this.nameFactory.getPath();
 
         createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
             .then(this.cloudFoundryOperations.routes()
@@ -164,9 +164,9 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void deleteInvalidDomain() {
-        String domainName = getDomainName();
-        String hostName = getHostName();
-        String path = getPath();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
+        String path = this.nameFactory.getPath();
 
         this.cloudFoundryOperations.routes()
             .delete(DeleteRouteRequest.builder()
@@ -180,9 +180,9 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void deleteOrphanedRoutes() {
-        String domainName = getDomainName();
-        String hostName = getHostName();
-        String path = getPath();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
+        String path = this.nameFactory.getPath();
 
         createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
             .then(this.cloudFoundryOperations.routes()
@@ -199,9 +199,9 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void listWithOrganizationLevel() {
-        String domainName = getDomainName();
-        String hostName = getHostName();
-        String path = getPath();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
+        String path = this.nameFactory.getPath();
 
         createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
             .thenMany(this.cloudFoundryOperations.routes()
@@ -215,9 +215,9 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void listWithSpaceLevel() {
-        String domainName = getDomainName();
-        String hostName = getHostName();
-        String path = getPath();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
+        String path = this.nameFactory.getPath();
 
         createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
             .thenMany(this.cloudFoundryOperations.routes()
@@ -231,10 +231,10 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void map() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
-        String hostName = getHostName();
-        String path = getPath();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
+        String path = this.nameFactory.getPath();
 
         Mono
             .when(
@@ -259,10 +259,10 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void mapNoHost() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
         String hostName = null;
-        String path = getPath();
+        String path = this.nameFactory.getPath();
 
         Mono
             .when(
@@ -287,9 +287,9 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void mapNoPath() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
-        String hostName = getHostName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
         String path = null;
 
         Mono
@@ -315,10 +315,10 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void unmap() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
-        String hostName = getHostName();
-        String path = getPath();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
+        String path = this.nameFactory.getPath();
 
         Mono
             .when(
@@ -349,9 +349,9 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void unmapNoPath() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
-        String hostName = getHostName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
         String path = null;
 
         Mono

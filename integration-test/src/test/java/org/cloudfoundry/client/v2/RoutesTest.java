@@ -64,8 +64,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void associateApplication() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(
@@ -90,7 +90,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void create() {
-        String domainName = getDomainName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(
@@ -114,7 +114,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void delete() {
-        String domainName = getDomainName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(
@@ -136,7 +136,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void deleteAsyncFalse() {
-        String domainName = getDomainName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(
@@ -157,8 +157,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void exists() {
-        String domainName = getDomainName();
-        String hostName = getHostName();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
 
         Mono
             .when(
@@ -183,9 +183,9 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void existsDoesNotExist() {
-        String domainName = getDomainName();
-        String hostName1 = getHostName();
-        String hostName2 = getHostName();
+        String domainName = this.nameFactory.getDomainName();
+        String hostName1 = this.nameFactory.getHostName();
+        String hostName2 = this.nameFactory.getHostName();
 
         Mono
             .when(
@@ -210,7 +210,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void get() {
-        String domainName = getDomainName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(
@@ -240,8 +240,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void listApplications() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(
@@ -266,8 +266,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void listApplicationsFilterByDiego() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(
@@ -293,8 +293,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void listApplicationsFilterByName() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(
@@ -320,8 +320,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void listApplicationsFilterByOrganizationId() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
             .then(organizationId -> Mono
@@ -350,8 +350,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void listApplicationsFilterBySpaceId() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(
@@ -378,8 +378,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void listApplicationsFilterByStackId() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(
@@ -409,7 +409,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByDomainId() {
-        String domainName = getDomainName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(
@@ -430,8 +430,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByHost() {
-        String domainName = getDomainName();
-        String host = getHostName();
+        String domainName = this.nameFactory.getDomainName();
+        String host = this.nameFactory.getHostName();
 
         Mono
             .when(
@@ -457,7 +457,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByOrganizationId() {
-        String domainName = getDomainName();
+        String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
             .then(organizationId -> Mono
@@ -480,8 +480,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByPath() {
-        String domainName = getDomainName();
-        String path = getPath();
+        String domainName = this.nameFactory.getDomainName();
+        String path = this.nameFactory.getPath();
 
         Mono
             .when(
@@ -507,8 +507,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void removeApplication() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(
@@ -538,7 +538,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void update() {
-        String domainName = getDomainName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(

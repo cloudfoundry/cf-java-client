@@ -52,7 +52,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void create() {
-        String privateDomainName = getDomainName();
+        String privateDomainName = this.nameFactory.getDomainName();
 
         this.organizationId
             .then(organizationId -> Mono.when(
@@ -65,7 +65,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void delete() {
-        String privateDomainName = getDomainName();
+        String privateDomainName = this.nameFactory.getDomainName();
 
         this.organizationId
             .then(organizationId -> requestCreatePrivateDomain(this.cloudFoundryClient, organizationId, privateDomainName))
@@ -79,7 +79,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void get() {
-        String privateDomainName = getDomainName();
+        String privateDomainName = this.nameFactory.getDomainName();
 
         this.organizationId
             .then(organizationId -> Mono.when(
@@ -96,7 +96,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void list() {
-        String privateDomainName = getDomainName();
+        String privateDomainName = this.nameFactory.getDomainName();
 
         this.organizationId
             .then(organizationId -> Mono.when(
@@ -115,7 +115,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByName() {
-        String privateDomainName = getDomainName();
+        String privateDomainName = this.nameFactory.getDomainName();
 
         this.organizationId
             .then(organizationId -> Mono.when(

@@ -89,30 +89,33 @@ final class CloudFoundryCleaner {
 
     private final CloudFoundryClient cloudFoundryClient;
 
+    private final NameFactory nameFactory;
+
     private final UaaClient uaaAdminClient;
 
-    CloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, UaaClient uaaAdminClient) {
+    CloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory, UaaClient uaaAdminClient) {
         this.cloudFoundryClient = cloudFoundryClient;
+        this.nameFactory = nameFactory;
         this.uaaAdminClient = uaaAdminClient;
     }
 
     void clean() {
         Flux.empty()
-            .thenMany(cleanBuildpacks(this.cloudFoundryClient))
+            .thenMany(cleanBuildpacks(this.cloudFoundryClient, this.nameFactory))
             .thenMany(cleanFeatureFlags(this.cloudFoundryClient))
-            .thenMany(cleanRoutes(this.cloudFoundryClient))
-            .thenMany(cleanApplicationsV2(this.cloudFoundryClient))
-            .thenMany(cleanApplicationsV3(this.cloudFoundryClient))
+            .thenMany(cleanRoutes(this.cloudFoundryClient, this.nameFactory))
+            .thenMany(cleanApplicationsV2(this.cloudFoundryClient, this.nameFactory))
+            .thenMany(cleanApplicationsV3(this.cloudFoundryClient, this.nameFactory))
             .thenMany(cleanPackages(this.cloudFoundryClient))
-            .thenMany(cleanServiceInstances(this.cloudFoundryClient))
-            .thenMany(cleanUserProvidedServiceInstances(this.cloudFoundryClient))
-            .thenMany(cleanDomains(this.cloudFoundryClient))
-            .thenMany(cleanPrivateDomains(this.cloudFoundryClient))
-            .thenMany(cleanUaaGroups(this.uaaAdminClient))
-            .thenMany(cleanUaaUsers(this.uaaAdminClient))
-            .thenMany(cleanUaaClients(this.uaaAdminClient))
-            .thenMany(cleanSpaces(this.cloudFoundryClient))
-            .thenMany(cleanOrganizations(this.cloudFoundryClient))
+            .thenMany(cleanServiceInstances(this.cloudFoundryClient, this.nameFactory))
+            .thenMany(cleanUserProvidedServiceInstances(this.cloudFoundryClient, this.nameFactory))
+            .thenMany(cleanDomains(this.cloudFoundryClient, this.nameFactory))
+            .thenMany(cleanPrivateDomains(this.cloudFoundryClient, this.nameFactory))
+            .thenMany(cleanUaaGroups(this.uaaAdminClient, this.nameFactory))
+            .thenMany(cleanUaaUsers(this.uaaAdminClient, this.nameFactory))
+            .thenMany(cleanUaaClients(this.uaaAdminClient, this.nameFactory))
+            .thenMany(cleanSpaces(this.cloudFoundryClient, this.nameFactory))
+            .thenMany(cleanOrganizations(this.cloudFoundryClient, this.nameFactory))
             .retry(5, t -> t instanceof SSLException)
             .doOnSubscribe(s -> this.logger.debug(">> CLEANUP <<"))
             .doOnError(Throwable::printStackTrace)
@@ -121,13 +124,13 @@ final class CloudFoundryCleaner {
             .block(Duration.ofMinutes(30));
     }
 
-    private static Flux<Void> cleanApplicationsV2(CloudFoundryClient cloudFoundryClient) {
+    private static Flux<Void> cleanApplicationsV2(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
         return PaginationUtils.
             requestClientV2Resources(page -> cloudFoundryClient.applicationsV2()
                 .list(ListApplicationsRequest.builder()
                     .page(page)
                     .build()))
-            .filter(application -> ResourceUtils.getEntity(application).getName().startsWith("test-application-"))
+            .filter(application -> nameFactory.isApplicationName(ResourceUtils.getEntity(application).getName()))
             .map(ResourceUtils::getId)
             .flatMap(applicationId -> removeServiceBindings(cloudFoundryClient, applicationId)
                 .thenMany(Flux.just(applicationId)))
@@ -137,13 +140,13 @@ final class CloudFoundryCleaner {
                     .build()));
     }
 
-    private static Flux<Void> cleanApplicationsV3(CloudFoundryClient cloudFoundryClient) {
+    private static Flux<Void> cleanApplicationsV3(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
         return PaginationUtils
             .requestClientV3Resources(page -> cloudFoundryClient.applicationsV3()
                 .list(org.cloudfoundry.client.v3.applications.ListApplicationsRequest.builder()
                     .page(page)
                     .build()))
-            .filter(application -> application.getName().startsWith("test-application-"))
+            .filter(application -> nameFactory.isApplicationName(application.getName()))
             .map(Application::getId)
             .flatMap(applicationId -> cloudFoundryClient.applicationsV3()
                 .delete(org.cloudfoundry.client.v3.applications.DeleteApplicationRequest.builder()
@@ -151,13 +154,13 @@ final class CloudFoundryCleaner {
                     .build()));
     }
 
-    private static Flux<Void> cleanBuildpacks(CloudFoundryClient cloudFoundryClient) {
+    private static Flux<Void> cleanBuildpacks(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
         return PaginationUtils
             .requestClientV2Resources(page -> cloudFoundryClient.buildpacks()
                 .list(ListBuildpacksRequest.builder()
                     .page(page)
                     .build()))
-            .filter(buildpack -> ResourceUtils.getEntity(buildpack).getName().startsWith("test-buildpack-"))
+            .filter(buildpack -> nameFactory.isBuildpackName(ResourceUtils.getEntity(buildpack).getName()))
             .map(ResourceUtils::getId)
             .flatMap(buildpackId -> cloudFoundryClient.buildpacks()
                 .delete(DeleteBuildpackRequest.builder()
@@ -167,13 +170,13 @@ final class CloudFoundryCleaner {
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
-    private static Flux<Void> cleanDomains(CloudFoundryClient cloudFoundryClient) {
+    private static Flux<Void> cleanDomains(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
         return PaginationUtils.
             requestClientV2Resources(page -> cloudFoundryClient.domains()
                 .list(ListDomainsRequest.builder()
                     .page(page)
                     .build()))
-            .filter(domain -> ResourceUtils.getEntity(domain).getName().startsWith("test.domain."))
+            .filter(domain -> nameFactory.isDomainName(ResourceUtils.getEntity(domain).getName()))
             .map(ResourceUtils::getId)
             .flatMap(domainId -> cloudFoundryClient.domains()
                 .delete(DeleteDomainRequest.builder()
@@ -198,13 +201,13 @@ final class CloudFoundryCleaner {
                 .then());
     }
 
-    private static Flux<Void> cleanOrganizations(CloudFoundryClient cloudFoundryClient) {
+    private static Flux<Void> cleanOrganizations(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
         return PaginationUtils.
             requestClientV2Resources(page -> cloudFoundryClient.organizations()
                 .list(ListOrganizationsRequest.builder()
                     .page(page)
                     .build()))
-            .filter(organization -> ResourceUtils.getEntity(organization).getName().startsWith("test-organization-"))
+            .filter(organization -> nameFactory.isOrganizationName(ResourceUtils.getEntity(organization).getName()))
             .map(ResourceUtils::getId)
             .flatMap(organizationId -> cloudFoundryClient.organizations()
                 .delete(DeleteOrganizationRequest.builder()
@@ -228,13 +231,13 @@ final class CloudFoundryCleaner {
                     .build()));
     }
 
-    private static Flux<Void> cleanPrivateDomains(CloudFoundryClient cloudFoundryClient) {
+    private static Flux<Void> cleanPrivateDomains(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
         return PaginationUtils.
             requestClientV2Resources(page -> cloudFoundryClient.privateDomains()
                 .list(ListPrivateDomainsRequest.builder()
                     .page(page)
                     .build()))
-            .filter(domain -> ResourceUtils.getEntity(domain).getName().startsWith("test.domain."))
+            .filter(domain -> nameFactory.isDomainName(ResourceUtils.getEntity(domain).getName()))
             .map(ResourceUtils::getId)
             .flatMap(privateDomainId -> cloudFoundryClient.privateDomains()
                 .delete(DeletePrivateDomainRequest.builder()
@@ -244,7 +247,7 @@ final class CloudFoundryCleaner {
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
-    private static Flux<Void> cleanRoutes(CloudFoundryClient cloudFoundryClient) {
+    private static Flux<Void> cleanRoutes(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
         return PaginationUtils.
             requestClientV2Resources(page -> cloudFoundryClient.routes()
                 .list(ListRoutesRequest.builder()
@@ -257,9 +260,9 @@ final class CloudFoundryCleaner {
                         .domainId(ResourceUtils.getEntity(route).getDomainId())
                         .build())
             ))
-            .filter(predicate((route, domain) -> ResourceUtils.getEntity(domain).getName().startsWith("test.domain.") ||
-                ResourceUtils.getEntity(route).getHost().startsWith("test-application-") ||
-                ResourceUtils.getEntity(route).getHost().startsWith("test-host-")))
+            .filter(predicate((route, domain) -> nameFactory.isDomainName(ResourceUtils.getEntity(domain).getName()) ||
+                nameFactory.isApplicationName(ResourceUtils.getEntity(route).getHost()) ||
+                nameFactory.isHostName(ResourceUtils.getEntity(route).getHost())))
             .map(function((route, domain) -> ResourceUtils.getId(route)))
             .flatMap(routeId -> cloudFoundryClient.routes()
                 .delete(DeleteRouteRequest.builder()
@@ -269,13 +272,13 @@ final class CloudFoundryCleaner {
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
-    private static Flux<Void> cleanServiceInstances(CloudFoundryClient cloudFoundryClient) {
+    private static Flux<Void> cleanServiceInstances(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
         return PaginationUtils.
             requestClientV2Resources(page -> cloudFoundryClient.serviceInstances()
                 .list(ListServiceInstancesRequest.builder()
                     .page(page)
                     .build()))
-            .filter(serviceInstance -> ResourceUtils.getEntity(serviceInstance).getName().startsWith("test-service-instance-"))
+            .filter(serviceInstance -> nameFactory.isServiceInstanceName(ResourceUtils.getEntity(serviceInstance).getName()))
             .map(ResourceUtils::getId)
             .flatMap(serviceInstanceId -> cloudFoundryClient.serviceInstances()
                 .delete(DeleteServiceInstanceRequest.builder()
@@ -285,13 +288,13 @@ final class CloudFoundryCleaner {
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
-    private static Flux<Void> cleanSpaces(CloudFoundryClient cloudFoundryClient) {
+    private static Flux<Void> cleanSpaces(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
         return PaginationUtils.
             requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .list(ListSpacesRequest.builder()
                     .page(page)
                     .build()))
-            .filter(space -> ResourceUtils.getEntity(space).getName().startsWith("test-space-"))
+            .filter(space -> nameFactory.isSpaceName(ResourceUtils.getEntity(space).getName()))
             .map(ResourceUtils::getId)
             .flatMap(spaceId -> cloudFoundryClient.spaces()
                 .delete(DeleteSpaceRequest.builder()
@@ -301,13 +304,13 @@ final class CloudFoundryCleaner {
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
-    private static Flux<Void> cleanUaaClients(UaaClient uaaAdminClient) {
+    private static Flux<Void> cleanUaaClients(UaaClient uaaAdminClient, NameFactory nameFactory) {
         return PaginationUtils
             .requestUaaResources(startIndex -> uaaAdminClient.clients()
                 .list(ListClientsRequest.builder()
                     .startIndex(startIndex)
                     .build()))
-            .filter(client -> client.getClientId().startsWith("test-client-id-"))
+            .filter(client -> nameFactory.isClientId(client.getClientId()))
             .map(Client::getClientId)
             .flatMap(clientId -> uaaAdminClient.clients()
                 .delete(DeleteClientRequest.builder()
@@ -316,13 +319,13 @@ final class CloudFoundryCleaner {
                 .then());
     }
 
-    private static Flux<Void> cleanUaaGroups(UaaClient uaaClient) {
+    private static Flux<Void> cleanUaaGroups(UaaClient uaaClient, NameFactory nameFactory) {
         return PaginationUtils
             .requestUaaResources(startIndex -> uaaClient.groups()
                 .list(ListGroupsRequest.builder()
                     .startIndex(startIndex)
                     .build()))
-            .filter(group -> group.getDisplayName().startsWith("test-group-"))
+            .filter(group -> nameFactory.isGroupName(group.getDisplayName()))
             .map(Group::getId)
             .flatMap(groupId -> uaaClient.groups()
                 .delete(DeleteGroupRequest.builder()
@@ -332,13 +335,13 @@ final class CloudFoundryCleaner {
                 .then());
     }
 
-    private static Flux<Void> cleanUaaUsers(UaaClient uaaClient) {
+    private static Flux<Void> cleanUaaUsers(UaaClient uaaClient, NameFactory nameFactory) {
         return PaginationUtils
             .requestUaaResources(startIndex -> uaaClient.users()
                 .list(ListUsersRequest.builder()
                     .startIndex(startIndex)
                     .build()))
-            .filter(user -> user.getUserName().startsWith("test-user-"))
+            .filter(user -> nameFactory.isUserName(user.getUserName()))
             .map(User::getId)
             .flatMap(userId -> uaaClient.users()
                 .delete(DeleteUserRequest.builder()
@@ -348,13 +351,13 @@ final class CloudFoundryCleaner {
                 .then());
     }
 
-    private static Flux<Void> cleanUserProvidedServiceInstances(CloudFoundryClient cloudFoundryClient) {
+    private static Flux<Void> cleanUserProvidedServiceInstances(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
         return PaginationUtils.
             requestClientV2Resources(page -> cloudFoundryClient.userProvidedServiceInstances()
                 .list(ListUserProvidedServiceInstancesRequest.builder()
                     .page(page)
                     .build()))
-            .filter(userProvidedServiceInstance -> ResourceUtils.getEntity(userProvidedServiceInstance).getName().startsWith("test-service-instance-"))
+            .filter(userProvidedServiceInstance -> nameFactory.isServiceInstanceName(ResourceUtils.getEntity(userProvidedServiceInstance).getName()))
             .map(ResourceUtils::getId)
             .flatMap(userProvidedServiceInstanceId -> cloudFoundryClient.userProvidedServiceInstances()
                 .delete(DeleteUserProvidedServiceInstanceRequest.builder()

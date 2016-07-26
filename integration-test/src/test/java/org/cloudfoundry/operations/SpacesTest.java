@@ -33,7 +33,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void create() {
-        String spaceName = getSpaceName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.cloudFoundryOperations.spaces()
             .create(CreateSpaceRequest.builder()

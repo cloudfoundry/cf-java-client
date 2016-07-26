@@ -108,8 +108,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void associateRoute() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(this.organizationId, this.spaceId)
@@ -129,8 +129,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void copy() {
-        String applicationName = getApplicationName();
-        String copyApplicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String copyApplicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
             .then(spaceId -> Mono.when(
@@ -156,7 +156,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void create() {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
             .then(spaceId -> Mono.when(
@@ -173,7 +173,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void delete() {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
@@ -188,7 +188,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void downloadDroplet() {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
@@ -204,7 +204,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void environment() {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
@@ -222,7 +222,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void get() {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
@@ -236,7 +236,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void list() {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
@@ -257,7 +257,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByDiego() {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
@@ -279,7 +279,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByName() {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
@@ -301,7 +301,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByOrganizationId() {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         Mono
             .when(
@@ -327,7 +327,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterBySpaceId() {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
             .then(spaceId -> Mono.when(
@@ -352,7 +352,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByStackId() {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         Mono
             .when(
@@ -378,8 +378,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listRoutes() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(this.organizationId, this.spaceId)
@@ -409,8 +409,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listRoutesFilterByDomainId() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(this.organizationId, this.spaceId)
@@ -441,8 +441,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listRoutesFilterByHost() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(this.organizationId, this.spaceId)
@@ -473,8 +473,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listRoutesFilterByPath() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(this.organizationId, this.spaceId)
@@ -505,8 +505,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listRoutesFilterByPort() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(this.organizationId, this.spaceId)
@@ -542,8 +542,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listServiceBindings() {
-        String applicationName = getApplicationName();
-        String serviceInstanceName = getServiceInstanceName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
             .then(spaceId -> Mono.when(
@@ -561,8 +561,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listServiceBindingsFilterByServiceInstanceId() {
-        String applicationName = getApplicationName();
-        String serviceInstanceName = getServiceInstanceName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
             .then(spaceId -> Mono.when(
@@ -592,8 +592,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void removeRoute() {
-        String applicationName = getApplicationName();
-        String domainName = getDomainName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
 
         Mono
             .when(this.organizationId, this.spaceId)
@@ -617,8 +617,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void removeServiceBinding() {
-        String applicationName = getApplicationName();
-        String serviceInstanceName = getServiceInstanceName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
             .then(spaceId -> Mono.when(
@@ -640,7 +640,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void restage() {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
@@ -656,7 +656,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void statistics() {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
@@ -672,7 +672,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void summary() {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
@@ -688,7 +688,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void terminateInstance() {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
@@ -710,8 +710,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void update() {
-        String applicationName = getApplicationName();
-        String applicationName2 = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
+        String applicationName2 = this.nameFactory.getApplicationName();
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
@@ -749,7 +749,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void uploadAndDownload() {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
@@ -764,7 +764,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void uploadAndDownloadAsyncFalse() {
-        String applicationName = getApplicationName();
+        String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))

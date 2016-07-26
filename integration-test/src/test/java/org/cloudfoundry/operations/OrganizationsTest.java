@@ -33,7 +33,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void create() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         this.cloudFoundryOperations.organizations()
             .create(CreateOrganizationRequest.builder()

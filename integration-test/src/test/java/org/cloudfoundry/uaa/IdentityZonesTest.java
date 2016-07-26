@@ -36,8 +36,8 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
 
     @Test
     public void create() {
-        String identityZoneName = getIdentityZoneName();
-        String subdomainName = getDomainName();
+        String identityZoneName = this.nameFactory.getIdentityZoneName();
+        String subdomainName = this.nameFactory.getDomainName();
 
         this.uaaClient.identityZones()
             .create(CreateIdentityZoneRequest.builder()
@@ -53,8 +53,8 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
 
     @Test
     public void delete() {
-        String identityZoneName = getIdentityZoneName();
-        String subdomainName = getDomainName();
+        String identityZoneName = this.nameFactory.getIdentityZoneName();
+        String subdomainName = this.nameFactory.getDomainName();
 
         getIdentityZoneId(this.uaaClient, identityZoneName, subdomainName)
             .then(identityZoneId -> this.uaaClient.identityZones()
@@ -70,8 +70,8 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
 
     @Test
     public void get() {
-        String identityZoneName = getIdentityZoneName();
-        String subdomainName = getDomainName();
+        String identityZoneName = this.nameFactory.getIdentityZoneName();
+        String subdomainName = this.nameFactory.getDomainName();
 
         getIdentityZoneId(this.uaaClient, identityZoneName, subdomainName)
             .then(identityZoneId -> this.uaaClient.identityZones()
@@ -85,8 +85,8 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
 
     @Test
     public void list() {
-        String identityZoneName = getIdentityZoneName();
-        String subdomainName = getDomainName();
+        String identityZoneName = this.nameFactory.getIdentityZoneName();
+        String subdomainName = this.nameFactory.getDomainName();
 
         requestCreateIdentityZone(this.uaaClient, identityZoneName, subdomainName)
             .then(this.uaaClient.identityZones()
@@ -100,9 +100,9 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
 
     @Test
     public void update() {
-        String identityZoneName = getIdentityZoneName();
-        String baseSubdomainName = getDomainName();
-        String newSubdomainName = getDomainName();
+        String identityZoneName = this.nameFactory.getIdentityZoneName();
+        String baseSubdomainName = this.nameFactory.getDomainName();
+        String newSubdomainName = this.nameFactory.getDomainName();
 
         getIdentityZoneId(this.uaaClient, identityZoneName, baseSubdomainName)
             .then(identityZoneId -> this.uaaClient.identityZones()

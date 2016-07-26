@@ -37,7 +37,7 @@ public final class JobsTest extends AbstractIntegrationTest {
 
     @Test
     public void getJob() {
-        String organizationName = getOrganizationName();
+        String organizationName = this.nameFactory.getOrganizationName();
 
         this.cloudFoundryClient.organizations()
             .create(CreateOrganizationRequest.builder()

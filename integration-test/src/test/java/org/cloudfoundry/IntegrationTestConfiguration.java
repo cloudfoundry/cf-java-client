@@ -146,17 +146,17 @@ public class IntegrationTestConfiguration {
 
     @Bean
     String clientId(NameFactory nameFactory) {
-        return nameFactory.getName("test-client-id-");
+        return nameFactory.getClientId();
     }
 
     @Bean
     String clientSecret(NameFactory nameFactory) {
-        return nameFactory.getName("test-client-secret-");
+        return nameFactory.getClientSecret();
     }
 
     @Bean(initMethod = "clean", destroyMethod = "clean")
-    CloudFoundryCleaner cloudFoundryCleaner(@Qualifier("admin") CloudFoundryClient adminCloudFoundryClient, @Qualifier("admin") UaaClient adminUaaClient) {
-        return new CloudFoundryCleaner(adminCloudFoundryClient, adminUaaClient);
+    CloudFoundryCleaner cloudFoundryCleaner(@Qualifier("admin") CloudFoundryClient adminCloudFoundryClient, NameFactory nameFactory, @Qualifier("admin") UaaClient adminUaaClient) {
+        return new CloudFoundryCleaner(adminCloudFoundryClient, nameFactory, adminUaaClient);
     }
 
     @Bean(initMethod = "checkCompatibility")
@@ -238,12 +238,12 @@ public class IntegrationTestConfiguration {
 
     @Bean
     String organizationName(NameFactory nameFactory) {
-        return nameFactory.getName("test-organization-");
+        return nameFactory.getOrganizationName();
     }
 
     @Bean
     String password(NameFactory nameFactory) {
-        return nameFactory.getName("test-password-");
+        return nameFactory.getPassword();
     }
 
     @Bean
@@ -269,7 +269,7 @@ public class IntegrationTestConfiguration {
 
     @Bean
     String spaceName(NameFactory nameFactory) {
-        return nameFactory.getName("test-space-");
+        return nameFactory.getSpaceName();
     }
 
     @Bean(initMethod = "block")
@@ -360,7 +360,7 @@ public class IntegrationTestConfiguration {
 
     @Bean
     String username(NameFactory nameFactory) {
-        return nameFactory.getName("test-user-");
+        return nameFactory.getUserName();
     }
 
 }
