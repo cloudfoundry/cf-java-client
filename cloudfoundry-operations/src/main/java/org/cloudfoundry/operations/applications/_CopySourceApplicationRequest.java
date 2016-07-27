@@ -30,7 +30,7 @@ abstract class _CopySourceApplicationRequest {
     @Value.Check
     void check() {
         if (getTargetOrganization() != null && getTargetSpace() == null) {
-            throw new IllegalStateException("Cannot build CopySourceApplicationRequest, attribute targetSpace must be specified with targetOrgainzation");
+            throw new IllegalStateException("Cannot build CopySourceApplicationRequest, attribute targetSpace must be specified with targetOrganization");
         }
     }
 

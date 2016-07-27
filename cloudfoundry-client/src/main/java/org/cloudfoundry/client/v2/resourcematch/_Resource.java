@@ -36,7 +36,6 @@ abstract class _Resource {
     @Nullable
     abstract String getHash();
 
-
     /**
      * The POSIX file mode in an octal representation
      */
