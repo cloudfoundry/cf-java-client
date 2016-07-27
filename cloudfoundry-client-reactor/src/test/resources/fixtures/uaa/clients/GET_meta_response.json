@@ -1,0 +1,26 @@
+[
+  {
+    "clientId": "9134O7y4",
+    "showOnHomePage": true,
+    "appLaunchUrl": "http://client3.com/app",
+    "appIcon": "Y2xpZW50IDMgaWNvbg=="
+  },
+  {
+    "clientId": "RpFRZpY3",
+    "showOnHomePage": false,
+    "appLaunchUrl": "http://changed.app.launch/url",
+    "appIcon": ""
+  },
+  {
+    "clientId": "ewegZo0R",
+    "showOnHomePage": false,
+    "appLaunchUrl": "http://client4.com/app",
+    "appIcon": "aWNvbiBmb3IgY2xpZW50IDQ="
+  },
+  {
+    "clientId": "lqhK1n8q",
+    "showOnHomePage": true,
+    "appLaunchUrl": "http://myloginpage.com",
+    "appIcon": "aWNvbiBmb3IgY2xpZW50IDQ="
+  }
+]
