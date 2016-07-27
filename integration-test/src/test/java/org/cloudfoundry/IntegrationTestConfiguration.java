@@ -103,33 +103,33 @@ public class IntegrationTestConfiguration {
     @Bean
     @Qualifier("admin")
     ReactorCloudFoundryClient adminCloudFoundryClient(ConnectionContext connectionContext,
-                                                      @Value("${test.admin.password}") String adminPassword,
-                                                      @Value("${test.admin.username}") String adminUsername) {
+                                                      @Value("${test.admin.password}") String password,
+                                                      @Value("${test.admin.username}") String username) {
         return ReactorCloudFoundryClient.builder()
             .connectionContext(connectionContext)
             .tokenProvider(PasswordGrantTokenProvider.builder()
-                .password(adminPassword)
-                .username(adminUsername)
+                .password(password)
+                .username(username)
                 .build())
             .build();
     }
 
     @Bean
     @Qualifier("admin")
-    ReactorUaaClient adminUaaClient(ConnectionContext connectionContext, @Value("${test.admin.clientId}") String adminClientId, @Value("${test.admin.clientSecret}") String adminClientSecret) {
+    ReactorUaaClient adminUaaClient(ConnectionContext connectionContext, @Value("${test.admin.clientId}") String clientId, @Value("${test.admin.clientSecret}") String clientSecret) {
         return ReactorUaaClient.builder()
             .connectionContext(connectionContext)
             .tokenProvider(ClientCredentialsGrantTokenProvider.builder()
-                .clientId(adminClientId)
-                .clientSecret(adminClientSecret)
+                .clientId(clientId)
+                .clientSecret(clientSecret)
                 .build())
             .build();
     }
 
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
-    Mono<Tuple2<String, String>> client(@Qualifier("admin") UaaClient adminUaaClient, String clientId, String clientSecret) {
-        return adminUaaClient.clients()
+    Mono<Tuple2<String, String>> client(@Qualifier("admin") UaaClient uaaClient, String clientId, String clientSecret) {
+        return uaaClient.clients()
             .create(CreateClientRequest.builder()
                 .authorizedGrantType(AUTHORIZATION_CODE, CLIENT_CREDENTIALS, PASSWORD, REFRESH_TOKEN)
                 .autoApprove(String.valueOf(true))
@@ -155,8 +155,8 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean(initMethod = "clean", destroyMethod = "clean")
-    CloudFoundryCleaner cloudFoundryCleaner(@Qualifier("admin") CloudFoundryClient adminCloudFoundryClient, NameFactory nameFactory, @Qualifier("admin") UaaClient adminUaaClient) {
-        return new CloudFoundryCleaner(adminCloudFoundryClient, nameFactory, adminUaaClient);
+    CloudFoundryCleaner cloudFoundryCleaner(@Qualifier("admin") CloudFoundryClient cloudFoundryClient, NameFactory nameFactory, @Qualifier("admin") UaaClient uaaClient) {
+        return new CloudFoundryCleaner(cloudFoundryClient, nameFactory, uaaClient);
     }
 
     @Bean(initMethod = "checkCompatibility")
@@ -320,8 +320,8 @@ public class IntegrationTestConfiguration {
 
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
-    Mono<String> userId(@Qualifier("admin") UaaClient adminUaaClient, String password, String username) {
-        return adminUaaClient.users()
+    Mono<String> userId(@Qualifier("admin") UaaClient uaaClient, String password, String username) {
+        return uaaClient.users()
             .create(CreateUserRequest.builder()
                 .email(Email.builder()
                     .primary(true)
@@ -336,14 +336,14 @@ public class IntegrationTestConfiguration {
                 .build())
             .map(CreateUserResponse::getId)
             .then(userId -> Flux.fromIterable(GROUPS)
-                .flatMap(group -> adminUaaClient.groups()
+                .flatMap(group -> uaaClient.groups()
                     .list(ListGroupsRequest.builder()
                         .filter(String.format("displayName eq \"%s\"", group))
                         .build())
                     .flatMapIterable(ListGroupsResponse::getResources)
                     .single()
                     .map(Group::getId)
-                    .then(groupId -> adminUaaClient.groups()
+                    .then(groupId -> uaaClient.groups()
                         .addMember(AddMemberRequest.builder()
                             .groupId(groupId)
                             .memberId(userId)

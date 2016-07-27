@@ -91,12 +91,12 @@ final class CloudFoundryCleaner {
 
     private final NameFactory nameFactory;
 
-    private final UaaClient uaaAdminClient;
+    private final UaaClient uaaClient;
 
-    CloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory, UaaClient uaaAdminClient) {
+    CloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory, UaaClient uaaClient) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.nameFactory = nameFactory;
-        this.uaaAdminClient = uaaAdminClient;
+        this.uaaClient = uaaClient;
     }
 
     void clean() {
@@ -111,9 +111,9 @@ final class CloudFoundryCleaner {
             .thenMany(cleanUserProvidedServiceInstances(this.cloudFoundryClient, this.nameFactory))
             .thenMany(cleanDomains(this.cloudFoundryClient, this.nameFactory))
             .thenMany(cleanPrivateDomains(this.cloudFoundryClient, this.nameFactory))
-            .thenMany(cleanUaaGroups(this.uaaAdminClient, this.nameFactory))
-            .thenMany(cleanUaaUsers(this.uaaAdminClient, this.nameFactory))
-            .thenMany(cleanUaaClients(this.uaaAdminClient, this.nameFactory))
+            .thenMany(cleanGroups(this.uaaClient, this.nameFactory))
+            .thenMany(cleanUsers(this.uaaClient, this.nameFactory))
+            .thenMany(cleanClients(this.uaaClient, this.nameFactory))
             .thenMany(cleanSpaces(this.cloudFoundryClient, this.nameFactory))
             .thenMany(cleanOrganizations(this.cloudFoundryClient, this.nameFactory))
             .retry(5, t -> t instanceof SSLException)
@@ -170,6 +170,21 @@ final class CloudFoundryCleaner {
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
+    private static Flux<Void> cleanClients(UaaClient uaaClient, NameFactory nameFactory) {
+        return PaginationUtils
+            .requestUaaResources(startIndex -> uaaClient.clients()
+                .list(ListClientsRequest.builder()
+                    .startIndex(startIndex)
+                    .build()))
+            .filter(client -> nameFactory.isClientId(client.getClientId()))
+            .map(Client::getClientId)
+            .flatMap(clientId -> uaaClient.clients()
+                .delete(DeleteClientRequest.builder()
+                    .clientId(clientId)
+                    .build())
+                .then());
+    }
+
     private static Flux<Void> cleanDomains(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
         return PaginationUtils.
             requestClientV2Resources(page -> cloudFoundryClient.domains()
@@ -197,6 +212,22 @@ final class CloudFoundryCleaner {
                 .set(SetFeatureFlagRequest.builder()
                     .name(featureFlag.getName())
                     .enabled(STANDARD_FEATURE_FLAGS.get(featureFlag.getName()))
+                    .build())
+                .then());
+    }
+
+    private static Flux<Void> cleanGroups(UaaClient uaaClient, NameFactory nameFactory) {
+        return PaginationUtils
+            .requestUaaResources(startIndex -> uaaClient.groups()
+                .list(ListGroupsRequest.builder()
+                    .startIndex(startIndex)
+                    .build()))
+            .filter(group -> nameFactory.isGroupName(group.getDisplayName()))
+            .map(Group::getId)
+            .flatMap(groupId -> uaaClient.groups()
+                .delete(DeleteGroupRequest.builder()
+                    .groupId(groupId)
+                    .version("*")
                     .build())
                 .then());
     }
@@ -304,38 +335,21 @@ final class CloudFoundryCleaner {
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
-    private static Flux<Void> cleanUaaClients(UaaClient uaaAdminClient, NameFactory nameFactory) {
-        return PaginationUtils
-            .requestUaaResources(startIndex -> uaaAdminClient.clients()
-                .list(ListClientsRequest.builder()
-                    .startIndex(startIndex)
+    private static Flux<Void> cleanUserProvidedServiceInstances(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
+        return PaginationUtils.
+            requestClientV2Resources(page -> cloudFoundryClient.userProvidedServiceInstances()
+                .list(ListUserProvidedServiceInstancesRequest.builder()
+                    .page(page)
                     .build()))
-            .filter(client -> nameFactory.isClientId(client.getClientId()))
-            .map(Client::getClientId)
-            .flatMap(clientId -> uaaAdminClient.clients()
-                .delete(DeleteClientRequest.builder()
-                    .clientId(clientId)
-                    .build())
-                .then());
+            .filter(userProvidedServiceInstance -> nameFactory.isServiceInstanceName(ResourceUtils.getEntity(userProvidedServiceInstance).getName()))
+            .map(ResourceUtils::getId)
+            .flatMap(userProvidedServiceInstanceId -> cloudFoundryClient.userProvidedServiceInstances()
+                .delete(DeleteUserProvidedServiceInstanceRequest.builder()
+                    .userProvidedServiceInstanceId(userProvidedServiceInstanceId)
+                    .build()));
     }
 
-    private static Flux<Void> cleanUaaGroups(UaaClient uaaClient, NameFactory nameFactory) {
-        return PaginationUtils
-            .requestUaaResources(startIndex -> uaaClient.groups()
-                .list(ListGroupsRequest.builder()
-                    .startIndex(startIndex)
-                    .build()))
-            .filter(group -> nameFactory.isGroupName(group.getDisplayName()))
-            .map(Group::getId)
-            .flatMap(groupId -> uaaClient.groups()
-                .delete(DeleteGroupRequest.builder()
-                    .groupId(groupId)
-                    .version("*")
-                    .build())
-                .then());
-    }
-
-    private static Flux<Void> cleanUaaUsers(UaaClient uaaClient, NameFactory nameFactory) {
+    private static Flux<Void> cleanUsers(UaaClient uaaClient, NameFactory nameFactory) {
         return PaginationUtils
             .requestUaaResources(startIndex -> uaaClient.users()
                 .list(ListUsersRequest.builder()
@@ -349,20 +363,6 @@ final class CloudFoundryCleaner {
                     .version("*")
                     .build())
                 .then());
-    }
-
-    private static Flux<Void> cleanUserProvidedServiceInstances(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
-        return PaginationUtils.
-            requestClientV2Resources(page -> cloudFoundryClient.userProvidedServiceInstances()
-                .list(ListUserProvidedServiceInstancesRequest.builder()
-                    .page(page)
-                    .build()))
-            .filter(userProvidedServiceInstance -> nameFactory.isServiceInstanceName(ResourceUtils.getEntity(userProvidedServiceInstance).getName()))
-            .map(ResourceUtils::getId)
-            .flatMap(userProvidedServiceInstanceId -> cloudFoundryClient.userProvidedServiceInstances()
-                .delete(DeleteUserProvidedServiceInstanceRequest.builder()
-                    .userProvidedServiceInstanceId(userProvidedServiceInstanceId)
-                    .build()));
     }
 
     private static Flux<Void> removeServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId) {
