@@ -308,15 +308,10 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    ReactorUaaClient uaaClient(ConnectionContext connectionContext, String clientId, String clientSecret, String password, String username) {
+    ReactorUaaClient uaaClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
         return ReactorUaaClient.builder()
             .connectionContext(connectionContext)
-            .tokenProvider(PasswordGrantTokenProvider.builder()
-                .clientId(clientId)
-                .clientSecret(clientSecret)
-                .password(password)
-                .username(username)
-                .build())
+            .tokenProvider(tokenProvider)
             .build();
     }
 
