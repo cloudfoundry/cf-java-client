@@ -42,6 +42,8 @@ abstract class _ListMetadatasResponse {
 
     static final class ListMetadatasResponseDeserializer extends StdDeserializer<ListMetadatasResponse> {
 
+        private static final long serialVersionUID = -5354066398646521532L;
+
         ListMetadatasResponseDeserializer() {
             super(ListMetadatasResponse.class);
         }

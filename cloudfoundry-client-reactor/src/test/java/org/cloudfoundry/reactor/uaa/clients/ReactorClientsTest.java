@@ -342,7 +342,7 @@ public final class ReactorClientsTest {
                     .appLaunchUrl("http://client3.com/app")
                     .clientId("9134O7y4")
                     .showOnHomePage(true)
-                .build())
+                    .build())
                 .metadata(Metadata.builder()
                     .appIcon("")
                     .appLaunchUrl("http://changed.app.launch/url")

@@ -28,28 +28,24 @@ abstract class AbstractMetadata {
      * Base64 encoded image file
      */
     @JsonProperty("appIcon")
-    @Nullable
     abstract String getAppIcon();
 
     /**
      * URL to which the app is linked to
      */
     @JsonProperty("appLaunchUrl")
-    @Nullable
     abstract String getAppLaunchUrl();
 
     /**
      * Client identifier, unique within identity zone
      */
     @JsonProperty("clientId")
-    @Nullable
     abstract String getClientId();
 
     /**
      * Flag to control visibility on home page
      */
     @JsonProperty("showOnHomePage")
-    @Nullable
     abstract Boolean getShowOnHomePage();
 
 }
