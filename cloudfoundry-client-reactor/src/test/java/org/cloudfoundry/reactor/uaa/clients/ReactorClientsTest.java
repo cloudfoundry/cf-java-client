@@ -35,6 +35,8 @@ import org.cloudfoundry.uaa.clients.ListMetadatasResponse;
 import org.cloudfoundry.uaa.clients.Metadata;
 import org.cloudfoundry.uaa.clients.UpdateClientRequest;
 import org.cloudfoundry.uaa.clients.UpdateClientResponse;
+import org.cloudfoundry.uaa.clients.UpdateMetadataRequest;
+import org.cloudfoundry.uaa.clients.UpdateMetadataResponse;
 import reactor.core.publisher.Mono;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
@@ -424,6 +426,49 @@ public final class ReactorClientsTest {
         @Override
         protected Mono<UpdateClientResponse> invoke(UpdateClientRequest request) {
             return this.clients.update(request);
+        }
+    }
+
+    public static final class UpdateMetadata extends AbstractUaaApiTest<UpdateMetadataRequest, UpdateMetadataResponse> {
+
+        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/oauth/clients/RpFRZpY3/meta")
+                    .payload("fixtures/uaa/clients/PUT_{id}_meta_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/clients/PUT_{id}_meta_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected UpdateMetadataResponse getResponse() {
+            return UpdateMetadataResponse.builder()
+                .appLaunchUrl("http://changed.app.launch/url")
+                .appIcon("")
+                .clientId("RpFRZpY3")
+                .showOnHomePage(false)
+                .build();
+        }
+
+        @Override
+        protected UpdateMetadataRequest getValidRequest() throws Exception {
+            return UpdateMetadataRequest.builder()
+                .appLaunchUrl("http://changed.app.launch/url")
+                .clientId("RpFRZpY3")
+                .showOnHomePage(false)
+                .build();
+        }
+
+        @Override
+        protected Mono<UpdateMetadataResponse> invoke(UpdateMetadataRequest request) {
+            return this.clients.updateMetadata(request);
         }
     }
 

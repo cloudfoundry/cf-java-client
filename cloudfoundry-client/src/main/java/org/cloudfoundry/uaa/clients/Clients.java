@@ -71,4 +71,12 @@ public interface Clients {
      */
     Mono<UpdateClientResponse> update(UpdateClientRequest request);
 
+    /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#update90">Update Metadata</a> request
+     *
+     * @param request Update Metadata request
+     * @return the Response to the Update Metadata Request
+     */
+    Mono<UpdateMetadataResponse> updateMetadata(UpdateMetadataRequest request);
+
 }
