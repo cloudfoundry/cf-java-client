@@ -16,13 +16,20 @@
 
 package org.cloudfoundry.uaa;
 
+import io.netty.util.AsciiString;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.uaa.clients.GetMetadataRequest;
+import org.cloudfoundry.uaa.clients.GetMetadataResponse;
 import org.cloudfoundry.uaa.clients.ListMetadatasRequest;
 import org.cloudfoundry.uaa.clients.ListMetadatasResponse;
+import org.cloudfoundry.uaa.clients.Metadata;
 import org.cloudfoundry.uaa.clients.UpdateMetadataRequest;
-import org.junit.Ignore;
+import org.cloudfoundry.uaa.clients.UpdateMetadataResponse;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.core.publisher.Mono;
+
+import java.util.Base64;
 
 import static org.junit.Assert.assertEquals;
 
@@ -34,37 +41,75 @@ public final class ClientsTest extends AbstractIntegrationTest {
     @Autowired
     private UaaClient uaaClient;
 
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/125590231")
     @Test
-    public void listMetadatas() {
-        this.uaaClient.clients()
-            .listMetadatas(ListMetadatasRequest.builder()
-                .build())
-            .subscribe(this.testSubscriber());
+    public void getMetadata() {
+        requestUpdateMetadata(this.uaaClient, this.clientId, "http://get.test.url")
+            .then(this.uaaClient.clients()
+                .getMetadata(GetMetadataRequest.builder()
+                    .clientId(this.clientId)
+                    .build()))
+            .subscribe(this.<GetMetadataResponse>testSubscriber()
+                .assertThat(metadata -> {
+                    assertEquals("", metadata.getAppIcon());
+                    assertEquals("http://get.test.url", metadata.getAppLaunchUrl());
+                    assertEquals(this.clientId, metadata.getClientId());
+                    assertEquals(false, metadata.getShowOnHomePage());
+                }));
     }
 
     @Test
-    public void updateMetadata() {
-
-        this.uaaClient.clients()
-            .updateMetadata(UpdateMetadataRequest.builder()
-                .appLaunchUrl("http://test.app.launch.url")
-                .clientId(this.clientId)
-                .showOnHomePage(false)
-                .build())
+    public void listMetadatas() {
+        requestUpdateMetadata(this.uaaClient, this.clientId, "http://list.test.url")
             .then(this.uaaClient.clients()
                 .listMetadatas(ListMetadatasRequest.builder()
                     .build()))
             .flatMapIterable(ListMetadatasResponse::getMetadatas)
             .filter(metadata -> this.clientId.equals(metadata.getClientId()))
             .single()
-            .subscribe(this.<org.cloudfoundry.uaa.clients.Metadata>testSubscriber()
+            .subscribe(this.<Metadata>testSubscriber()
                 .assertThat(metadata -> {
                     assertEquals("", metadata.getAppIcon());
-                    assertEquals("http://test.app.launch.url", metadata.getAppLaunchUrl());
+                    assertEquals("http://list.test.url", metadata.getAppLaunchUrl());
                     assertEquals(this.clientId, metadata.getClientId());
                     assertEquals(false, metadata.getShowOnHomePage());
                 }));
+    }
+
+    @Test
+    public void updateMetadata() {
+        String appIcon = Base64.getEncoder().encodeToString(new AsciiString("test-image").toByteArray());
+
+        this.uaaClient.clients()
+            .updateMetadata(UpdateMetadataRequest.builder()
+                .appIcon(appIcon)
+                .appLaunchUrl("http://update.test.url")
+                .clientId(this.clientId)
+                .showOnHomePage(false)
+                .build())
+            .then(requestGetMetadata(this.uaaClient, this.clientId))
+            .subscribe(this.<GetMetadataResponse>testSubscriber()
+                .assertThat(metadata -> {
+                    assertEquals(appIcon, metadata.getAppIcon());
+                    assertEquals("http://update.test.url", metadata.getAppLaunchUrl());
+                    assertEquals(this.clientId, metadata.getClientId());
+                    assertEquals(false, metadata.getShowOnHomePage());
+                }));
+    }
+
+    private static Mono<GetMetadataResponse> requestGetMetadata(UaaClient uaaClient, String clientId) {
+        return uaaClient.clients()
+            .getMetadata(GetMetadataRequest.builder()
+                .clientId(clientId)
+                .build());
+    }
+
+    private static Mono<UpdateMetadataResponse> requestUpdateMetadata(UaaClient uaaClient, String clientId, String appLaunchUrl) {
+        return uaaClient.clients()
+            .updateMetadata(UpdateMetadataRequest.builder()
+                .appLaunchUrl(appLaunchUrl)
+                .clientId(clientId)
+                .showOnHomePage(false)
+                .build());
     }
 
 }

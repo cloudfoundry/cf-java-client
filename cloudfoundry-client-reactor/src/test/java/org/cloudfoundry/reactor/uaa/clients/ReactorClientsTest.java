@@ -28,6 +28,8 @@ import org.cloudfoundry.uaa.clients.DeleteClientRequest;
 import org.cloudfoundry.uaa.clients.DeleteClientResponse;
 import org.cloudfoundry.uaa.clients.GetClientRequest;
 import org.cloudfoundry.uaa.clients.GetClientResponse;
+import org.cloudfoundry.uaa.clients.GetMetadataRequest;
+import org.cloudfoundry.uaa.clients.GetMetadataResponse;
 import org.cloudfoundry.uaa.clients.ListClientsRequest;
 import org.cloudfoundry.uaa.clients.ListClientsResponse;
 import org.cloudfoundry.uaa.clients.ListMetadatasRequest;
@@ -259,6 +261,46 @@ public final class ReactorClientsTest {
         @Override
         protected Mono<GetClientResponse> invoke(GetClientRequest request) {
             return this.clients.get(request);
+        }
+    }
+
+    public static final class GetMetadata extends AbstractUaaApiTest<GetMetadataRequest, GetMetadataResponse> {
+
+        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/oauth/clients/P4vuAaSe/meta")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/clients/GET_{id}_meta_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected GetMetadataResponse getResponse() {
+            return GetMetadataResponse.builder()
+                .appIcon("aWNvbiBmb3IgY2xpZW50IDQ=")
+                .appLaunchUrl("http://myloginpage.com")
+                .clientId("P4vuAaSe")
+                .showOnHomePage(true)
+                .build();
+        }
+
+        @Override
+        protected GetMetadataRequest getValidRequest() throws Exception {
+            return GetMetadataRequest.builder()
+                .clientId("P4vuAaSe")
+                .build();
+        }
+
+        @Override
+        protected Mono<GetMetadataResponse> invoke(GetMetadataRequest request) {
+            return this.clients.getMetadata(request);
         }
     }
 

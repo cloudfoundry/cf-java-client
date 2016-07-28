@@ -26,6 +26,8 @@ import org.cloudfoundry.uaa.clients.DeleteClientRequest;
 import org.cloudfoundry.uaa.clients.DeleteClientResponse;
 import org.cloudfoundry.uaa.clients.GetClientRequest;
 import org.cloudfoundry.uaa.clients.GetClientResponse;
+import org.cloudfoundry.uaa.clients.GetMetadataRequest;
+import org.cloudfoundry.uaa.clients.GetMetadataResponse;
 import org.cloudfoundry.uaa.clients.ListClientsRequest;
 import org.cloudfoundry.uaa.clients.ListClientsResponse;
 import org.cloudfoundry.uaa.clients.ListMetadatasRequest;
@@ -65,6 +67,11 @@ public final class ReactorClients extends AbstractUaaOperations implements Clien
     @Override
     public Mono<GetClientResponse> get(GetClientRequest request) {
         return get(request, GetClientResponse.class, builder -> builder.pathSegment("oauth", "clients", request.getClientId()));
+    }
+
+    @Override
+    public Mono<GetMetadataResponse> getMetadata(GetMetadataRequest request) {
+        return get(request, GetMetadataResponse.class, builder -> builder.pathSegment("oauth", "clients", request.getClientId(), "meta"));
     }
 
     @Override
