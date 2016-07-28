@@ -75,6 +75,7 @@ import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
 public class IntegrationTestConfiguration {
 
     private static final List<String> GROUPS = Arrays.asList(
+        "clients.admin",
         "cloud_controller.admin",
         "scim.create",
         "scim.invite",
@@ -85,6 +86,7 @@ public class IntegrationTestConfiguration {
         "zones.write");
 
     private static final List<String> SCOPES = Arrays.asList(
+        "clients.admin",
         "cloud_controller.admin",
         "cloud_controller.read",
         "cloud_controller.write",

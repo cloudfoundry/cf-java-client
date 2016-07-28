@@ -35,7 +35,7 @@ abstract class _UpdateMetadataRequest implements IdentityZoned {
     abstract String getAppIcon();
 
     /**
-     * URL to which the app is linked to
+     * URL to which the app is linked
      */
     @JsonProperty("appLaunchUrl")
     abstract String getAppLaunchUrl();
