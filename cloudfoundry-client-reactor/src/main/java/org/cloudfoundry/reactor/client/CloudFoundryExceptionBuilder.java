@@ -51,7 +51,7 @@ public final class CloudFoundryExceptionBuilder {
 
                     return Mono.error(new CloudFoundryException(code, description, errorCode, cause));
                 } catch (IOException e) {
-                    throw Exceptions.propagate(e);
+                    throw Exceptions.propagate(cause);
                 }
             });
     }
