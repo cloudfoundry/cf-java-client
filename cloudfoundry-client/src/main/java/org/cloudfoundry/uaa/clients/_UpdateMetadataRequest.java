@@ -18,16 +18,20 @@ package org.cloudfoundry.uaa.clients;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.uaa.IdentityZoned;
+import org.immutables.value.Value;
 
 /**
- * The payload for Client Metadata responses
+ * The request payload for Update Metadata
  */
-abstract class AbstractMetadata {
+@Value.Immutable
+abstract class _UpdateMetadataRequest implements IdentityZoned {
 
     /**
      * Base64 encoded image file
      */
     @JsonProperty("appIcon")
+    @Nullable
     abstract String getAppIcon();
 
     /**

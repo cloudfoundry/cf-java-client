@@ -18,9 +18,13 @@ package org.cloudfoundry.uaa;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.uaa.clients.ListMetadatasRequest;
+import org.cloudfoundry.uaa.clients.ListMetadatasResponse;
+import org.cloudfoundry.uaa.clients.UpdateMetadataRequest;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import static org.junit.Assert.assertEquals;
 
 public final class ClientsTest extends AbstractIntegrationTest {
 
@@ -37,6 +41,30 @@ public final class ClientsTest extends AbstractIntegrationTest {
             .listMetadatas(ListMetadatasRequest.builder()
                 .build())
             .subscribe(this.testSubscriber());
+    }
+
+    @Test
+    public void updateMetadata() {
+
+        this.uaaClient.clients()
+            .updateMetadata(UpdateMetadataRequest.builder()
+                .appLaunchUrl("http://test.app.launch.url")
+                .clientId(this.clientId)
+                .showOnHomePage(false)
+                .build())
+            .then(this.uaaClient.clients()
+                .listMetadatas(ListMetadatasRequest.builder()
+                    .build()))
+            .flatMapIterable(ListMetadatasResponse::getMetadatas)
+            .filter(metadata -> this.clientId.equals(metadata.getClientId()))
+            .single()
+            .subscribe(this.<org.cloudfoundry.uaa.clients.Metadata>testSubscriber()
+                .assertThat(metadata -> {
+                    assertEquals("", metadata.getAppIcon());
+                    assertEquals("http://test.app.launch.url", metadata.getAppLaunchUrl());
+                    assertEquals(this.clientId, metadata.getClientId());
+                    assertEquals(false, metadata.getShowOnHomePage());
+                }));
     }
 
 }

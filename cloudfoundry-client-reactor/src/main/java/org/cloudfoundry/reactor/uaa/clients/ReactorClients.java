@@ -32,6 +32,8 @@ import org.cloudfoundry.uaa.clients.ListMetadatasRequest;
 import org.cloudfoundry.uaa.clients.ListMetadatasResponse;
 import org.cloudfoundry.uaa.clients.UpdateClientRequest;
 import org.cloudfoundry.uaa.clients.UpdateClientResponse;
+import org.cloudfoundry.uaa.clients.UpdateMetadataRequest;
+import org.cloudfoundry.uaa.clients.UpdateMetadataResponse;
 import reactor.core.publisher.Mono;
 
 /**
@@ -80,4 +82,8 @@ public final class ReactorClients extends AbstractUaaOperations implements Clien
         return put(request, UpdateClientResponse.class, builder -> builder.pathSegment("oauth", "clients", request.getClientId()));
     }
 
+    @Override
+    public Mono<UpdateMetadataResponse> updateMetadata(UpdateMetadataRequest request) {
+        return put(request, UpdateMetadataResponse.class, builder -> builder.pathSegment("oauth", "clients", request.getClientId(), "meta"));
+    }
 }
