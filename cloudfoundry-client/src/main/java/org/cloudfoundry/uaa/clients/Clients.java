@@ -42,16 +42,16 @@ public interface Clients {
     /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#retrieve77">Retrieve Client</a> request
      *
-     * @param request Retrieve Client request
-     * @return the Response to the Retrieve Client Request
+     * @param request Get Client request
+     * @return the Response to the Get Client Request
      */
     Mono<GetClientResponse> get(GetClientRequest request);
 
     /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#retrieve88">Retrieve Metadata</a> request
      *
-     * @param request Retrieve Metadata request
-     * @return the Response to the Retrieve Metadata Request
+     * @param request Get Metadata request
+     * @return the Response to the Get Metadata Request
      */
     Mono<GetMetadataResponse> getMetadata(GetMetadataRequest request);
 
