@@ -43,6 +43,13 @@ abstract class AbstractMetadata {
     abstract String getClientId();
 
     /**
+     * Client name
+     */
+    @JsonProperty("clientName")
+    @Nullable
+    abstract String getClientName();
+
+    /**
      * Flag to control visibility on home page
      */
     @JsonProperty("showOnHomePage")
