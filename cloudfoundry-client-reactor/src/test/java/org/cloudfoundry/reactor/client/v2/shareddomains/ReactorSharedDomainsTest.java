@@ -98,7 +98,7 @@ public final class ReactorSharedDomainsTest {
         protected InteractionContext getInteractionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
-                    .method(DELETE).path("/v2/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6?")
+                    .method(DELETE).path("/v2/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6")
                     .build())
                 .response(TestResponse.builder()
                     .status(NO_CONTENT)
