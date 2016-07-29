@@ -26,6 +26,8 @@ import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
 import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsRequest;
 import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsResponse;
 import org.cloudfoundry.client.v2.featureflags.SetFeatureFlagRequest;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.DeleteOrganizationQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.privatedomains.DeletePrivateDomainRequest;
@@ -117,6 +119,7 @@ final class CloudFoundryCleaner {
             .thenMany(cleanClients(this.uaaClient, this.nameFactory))
             .thenMany(cleanSpaces(this.cloudFoundryClient, this.nameFactory))
             .thenMany(cleanOrganizations(this.cloudFoundryClient, this.nameFactory))
+            .thenMany(cleanOrganizationQuotaDefinitions(this.cloudFoundryClient, this.nameFactory))
             .retry(5, t -> t instanceof SSLException)
             .doOnSubscribe(s -> this.logger.debug(">> CLEANUP <<"))
             .doOnError(Throwable::printStackTrace)
@@ -126,8 +129,8 @@ final class CloudFoundryCleaner {
     }
 
     private static Flux<Void> cleanApplicationsV2(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
-        return PaginationUtils.
-            requestClientV2Resources(page -> cloudFoundryClient.applicationsV2()
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.applicationsV2()
                 .list(ListApplicationsRequest.builder()
                     .page(page)
                     .build()))
@@ -217,9 +220,25 @@ final class CloudFoundryCleaner {
                 .then());
     }
 
+    private static Flux<Void> cleanOrganizationQuotaDefinitions(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.organizationQuotaDefinitions()
+                .list(ListOrganizationQuotaDefinitionsRequest.builder()
+                    .page(page)
+                    .build()))
+            .filter(domain -> nameFactory.isQuotaDefinitionName(ResourceUtils.getEntity(domain).getName()))
+            .map(ResourceUtils::getId)
+            .flatMap(organizationQuotaDefinitionId -> cloudFoundryClient.organizationQuotaDefinitions()
+                .delete(DeleteOrganizationQuotaDefinitionRequest.builder()
+                    .async(true)
+                    .organizationQuotaDefinitionId(organizationQuotaDefinitionId)
+                    .build()))
+            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+    }
+
     private static Flux<Void> cleanOrganizations(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
-        return PaginationUtils.
-            requestClientV2Resources(page -> cloudFoundryClient.organizations()
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
                 .list(ListOrganizationsRequest.builder()
                     .page(page)
                     .build()))
@@ -248,8 +267,8 @@ final class CloudFoundryCleaner {
     }
 
     private static Flux<Void> cleanPrivateDomains(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
-        return PaginationUtils.
-            requestClientV2Resources(page -> cloudFoundryClient.privateDomains()
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.privateDomains()
                 .list(ListPrivateDomainsRequest.builder()
                     .page(page)
                     .build()))
@@ -264,8 +283,8 @@ final class CloudFoundryCleaner {
     }
 
     private static Flux<Void> cleanRoutes(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
-        return PaginationUtils.
-            requestClientV2Resources(page -> cloudFoundryClient.routes()
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.routes()
                 .list(ListRoutesRequest.builder()
                     .page(page)
                     .build()))
@@ -286,8 +305,8 @@ final class CloudFoundryCleaner {
     }
 
     private static Flux<Void> cleanServiceInstances(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
-        return PaginationUtils.
-            requestClientV2Resources(page -> cloudFoundryClient.serviceInstances()
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.serviceInstances()
                 .list(ListServiceInstancesRequest.builder()
                     .page(page)
                     .build()))
@@ -318,8 +337,8 @@ final class CloudFoundryCleaner {
     }
 
     private static Flux<Void> cleanSpaces(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
-        return PaginationUtils.
-            requestClientV2Resources(page -> cloudFoundryClient.spaces()
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .list(ListSpacesRequest.builder()
                     .page(page)
                     .build()))
@@ -334,8 +353,8 @@ final class CloudFoundryCleaner {
     }
 
     private static Flux<Void> cleanUserProvidedServiceInstances(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
-        return PaginationUtils.
-            requestClientV2Resources(page -> cloudFoundryClient.userProvidedServiceInstances()
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.userProvidedServiceInstances()
                 .list(ListUserProvidedServiceInstancesRequest.builder()
                     .page(page)
                     .build()))
@@ -377,8 +396,8 @@ final class CloudFoundryCleaner {
     }
 
     private static Flux<Void> removeServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return PaginationUtils.
-            requestClientV2Resources(page -> cloudFoundryClient.applicationsV2()
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.applicationsV2()
                 .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
                     .page(page)
                     .applicationId(applicationId)
