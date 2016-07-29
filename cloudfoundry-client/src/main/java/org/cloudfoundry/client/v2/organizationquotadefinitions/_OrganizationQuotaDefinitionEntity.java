@@ -85,6 +85,13 @@ abstract class _OrganizationQuotaDefinitionEntity {
     abstract Integer getTotalRoutes();
 
     /**
+     * The total reserved route ports
+     */
+    @JsonProperty("total_reserved_route_ports")
+    @Nullable
+    abstract Integer getTotalReservedRoutePorts();
+
+    /**
      * The total service keys
      */
     @JsonProperty("total_service_keys")
