@@ -18,19 +18,36 @@ package org.cloudfoundry.uaa;
 
 import io.netty.util.AsciiString;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.uaa.clients.Client;
+import org.cloudfoundry.uaa.clients.CreateClientRequest;
+import org.cloudfoundry.uaa.clients.CreateClientResponse;
+import org.cloudfoundry.uaa.clients.DeleteClientRequest;
+import org.cloudfoundry.uaa.clients.GetClientRequest;
+import org.cloudfoundry.uaa.clients.GetClientResponse;
 import org.cloudfoundry.uaa.clients.GetMetadataRequest;
 import org.cloudfoundry.uaa.clients.GetMetadataResponse;
+import org.cloudfoundry.uaa.clients.ListClientsRequest;
+import org.cloudfoundry.uaa.clients.ListClientsResponse;
 import org.cloudfoundry.uaa.clients.ListMetadatasRequest;
 import org.cloudfoundry.uaa.clients.ListMetadatasResponse;
 import org.cloudfoundry.uaa.clients.Metadata;
+import org.cloudfoundry.uaa.clients.UpdateClientRequest;
 import org.cloudfoundry.uaa.clients.UpdateMetadataRequest;
 import org.cloudfoundry.uaa.clients.UpdateMetadataResponse;
+import org.cloudfoundry.util.PaginationUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
 
+import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
+import static org.cloudfoundry.uaa.tokens.GrantType.PASSWORD;
+import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
 import static org.junit.Assert.assertEquals;
 
 public final class ClientsTest extends AbstractIntegrationTest {
@@ -40,6 +57,91 @@ public final class ClientsTest extends AbstractIntegrationTest {
 
     @Autowired
     private UaaClient uaaClient;
+
+    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/125574491")
+    @Test
+    public void batchChangeSecret() {
+        //
+    }
+
+    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/125554031")
+    @Test
+    public void batchCreate() {
+        //
+    }
+
+    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/125575011")
+    @Test
+    public void batchDelete() {
+        //
+    }
+
+    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/125572281")
+    @Test
+    public void batchUpdate() {
+        //
+    }
+
+    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/125553341")
+    @Test
+    public void changeSecret() {
+        //
+    }
+
+    @Test
+    public void create() {
+        String clientId = this.nameFactory.getClientId();
+        String clientSecret = this.nameFactory.getClientSecret();
+
+        this.uaaClient.clients()
+            .create(CreateClientRequest.builder()
+                .authorizedGrantType(PASSWORD)
+                .clientId(clientId)
+                .clientSecret(clientSecret)
+                .scope("client.read", "client.write")
+                .tokenSalt("test-token-salt")
+                .build())
+            .subscribe(this.<CreateClientResponse>testSubscriber()
+                .assertThat(response -> {
+                    assertEquals(Arrays.asList(PASSWORD, REFRESH_TOKEN), response.getAuthorizedGrantTypes());
+                    assertEquals(clientId, response.getClientId());
+                    assertEquals(Arrays.asList("client.read", "client.write"), response.getScopes());
+                    assertEquals("test-token-salt", response.getTokenSalt());
+                }));
+    }
+
+    @Test
+    public void delete() {
+        String clientId = this.nameFactory.getClientId();
+        String clientSecret = this.nameFactory.getClientSecret();
+
+        requestCreateClient(this.uaaClient, clientId, clientSecret)
+            .then(this.uaaClient.clients()
+                .delete(DeleteClientRequest.builder()
+                    .clientId(clientId)
+                    .build()))
+            .flatMap(ignore -> requestListClients(this.uaaClient))
+            .filter(client -> clientId.equals(client.getClientId()))
+            .subscribe(this.testSubscriber()
+                .assertCount(0));
+    }
+
+    @Test
+    public void get() {
+        String clientId = this.nameFactory.getClientId();
+        String clientSecret = this.nameFactory.getClientSecret();
+
+        requestCreateClient(this.uaaClient, clientId, clientSecret)
+            .then(this.uaaClient.clients()
+                .get(GetClientRequest.builder()
+                    .clientId(clientId)
+                    .build()))
+            .subscribe(this.<GetClientResponse>testSubscriber()
+                .assertThat(response -> {
+                    assertEquals(Arrays.asList(PASSWORD, REFRESH_TOKEN), response.getAuthorizedGrantTypes());
+                    assertEquals(clientId, response.getClientId());
+                }));
+    }
 
     @Test
     public void getMetadata() {
@@ -56,6 +158,21 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void list() {
+        String clientId = this.nameFactory.getClientId();
+        String clientSecret = this.nameFactory.getClientSecret();
+
+        requestCreateClient(this.uaaClient, clientId, clientSecret)
+            .then(this.uaaClient.clients()
+                .list(ListClientsRequest.builder()
+                    .build()))
+            .flatMapIterable(ListClientsResponse::getResources)
+            .filter(client -> clientId.equals(client.getClientId()))
+            .subscribe(this.testSubscriber()
+                .assertCount(1));
+    }
+
+    @Test
     public void listMetadatas() {
         requestUpdateMetadata(this.uaaClient, this.clientId, "http://test.list.url")
             .then(this.uaaClient.clients()
@@ -68,6 +185,34 @@ public final class ClientsTest extends AbstractIntegrationTest {
                 .assertThat(metadata -> {
                     assertEquals("http://test.list.url", metadata.getAppLaunchUrl());
                     assertEquals(this.clientId, metadata.getClientId());
+                }));
+    }
+
+    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/125572641")
+    @Test
+    public void mixedActions() {
+        //
+    }
+
+    @Test
+    public void update() {
+        String clientId = this.nameFactory.getClientId();
+        String clientSecret = this.nameFactory.getClientSecret();
+
+        requestCreateClient(this.uaaClient, clientId, clientSecret)
+            .then(this.uaaClient.clients()
+                .update(UpdateClientRequest.builder()
+                    .authorizedGrantType(CLIENT_CREDENTIALS)
+                    .clientId(clientId)
+                    .name("test-name")
+                    .build()))
+            .flatMap(ignore -> requestListClients(this.uaaClient))
+            .filter(client -> clientId.equals(client.getClientId()))
+            .subscribe(this.<Client>testSubscriber()
+                .assertThat(client -> {
+                    assertEquals(Collections.singletonList(CLIENT_CREDENTIALS), client.getAuthorizedGrantTypes());
+                    assertEquals(clientId, client.getClientId());
+                    assertEquals("test-name", client.getName());
                 }));
     }
 
@@ -94,11 +239,29 @@ public final class ClientsTest extends AbstractIntegrationTest {
                 }));
     }
 
+    private static Mono<CreateClientResponse> requestCreateClient(UaaClient uaaClient, String clientId, String clientSecret) {
+        return uaaClient.clients()
+            .create(CreateClientRequest.builder()
+                .authorizedGrantType(PASSWORD)
+                .clientId(clientId)
+                .clientSecret(clientSecret)
+                .build());
+    }
+
     private static Mono<GetMetadataResponse> requestGetMetadata(UaaClient uaaClient, String clientId) {
         return uaaClient.clients()
             .getMetadata(GetMetadataRequest.builder()
                 .clientId(clientId)
                 .build());
+    }
+
+    private static Flux<Client> requestListClients(UaaClient uaaClient) {
+        return PaginationUtils
+            .requestUaaResources(startIndex -> uaaClient.clients()
+                .list(ListClientsRequest.builder()
+                    .startIndex(startIndex)
+                    .build()));
+
     }
 
     private static Mono<UpdateMetadataResponse> requestUpdateMetadata(UaaClient uaaClient, String clientId, String appLaunchUrl) {
