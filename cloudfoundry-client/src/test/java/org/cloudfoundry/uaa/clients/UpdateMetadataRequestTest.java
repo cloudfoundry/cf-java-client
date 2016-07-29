@@ -20,36 +20,14 @@ import org.junit.Test;
 
 public final class UpdateMetadataRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noAppLaunchUrl() {
-        UpdateMetadataRequest.builder()
-            .showOnHomePage(true)
-            .clientId("test-client-id")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noClientId() {
-        UpdateMetadataRequest.builder()
-            .appLaunchUrl("test-app-launch-url")
-            .showOnHomePage(true)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noShowOnErrorPage() {
-        UpdateMetadataRequest.builder()
-            .appLaunchUrl("test-app-launch-url")
-            .clientId("test-client-id")
-            .build();
-    }
-
     @Test
     public void valid() {
         UpdateMetadataRequest.builder()
+            .appIcon("test-icon")
             .appLaunchUrl("test-app-launch-url")
             .showOnHomePage(true)
             .clientId("test-client-id")
+            .clientName("test-client-name")
             .build();
     }
 
