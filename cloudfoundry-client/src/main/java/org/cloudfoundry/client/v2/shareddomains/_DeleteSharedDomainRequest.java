@@ -22,7 +22,7 @@ import org.cloudfoundry.QueryParameter;
 import org.immutables.value.Value;
 
 /**
- * Creates the Shared Domain Request
+ * The request payload for the Delete a Shared Domain operation
  */
 @Value.Immutable
 abstract class _DeleteSharedDomainRequest {

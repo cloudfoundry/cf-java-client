@@ -16,15 +16,21 @@
 
 package org.cloudfoundry.client.v2.shareddomains;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.client.v2.jobs.AbstractJobResource;
-import org.immutables.value.Value;
+import org.junit.Test;
 
-/**
- * The response payload for the Delete a Shared Domain operation
- */
-@JsonDeserialize
-@Value.Immutable
-abstract class _DeleteSharedDomainResponse extends AbstractJobResource {
+public final class GetSharedDomainRequestTest {
+
+    @Test(expected = IllegalStateException.class)
+    public void noId() {
+        GetSharedDomainRequest.builder()
+            .build();
+    }
+
+    @Test
+    public void valid() {
+        GetSharedDomainRequest.builder()
+            .sharedDomainId("test-shared-domain-id")
+            .build();
+    }
 
 }

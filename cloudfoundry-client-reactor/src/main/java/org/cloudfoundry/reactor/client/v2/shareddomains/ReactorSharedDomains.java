@@ -20,6 +20,8 @@ import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest;
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
 import org.cloudfoundry.client.v2.shareddomains.DeleteSharedDomainRequest;
 import org.cloudfoundry.client.v2.shareddomains.DeleteSharedDomainResponse;
+import org.cloudfoundry.client.v2.shareddomains.GetSharedDomainRequest;
+import org.cloudfoundry.client.v2.shareddomains.GetSharedDomainResponse;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
@@ -52,6 +54,12 @@ public final class ReactorSharedDomains extends AbstractClientV2Operations imple
     @Override
     public Mono<DeleteSharedDomainResponse> delete(DeleteSharedDomainRequest request) {
         return delete(request, DeleteSharedDomainResponse.class, builder -> builder.pathSegment("v2", "shared_domains", request.getSharedDomainId()));
+    }
+
+    @Override
+    public Mono<GetSharedDomainResponse> get(GetSharedDomainRequest request) {
+        return get(request, GetSharedDomainResponse.class, builder -> builder.pathSegment("v2", "shared_domains", request.getSharedDomainId()));
+
     }
 
     @Override

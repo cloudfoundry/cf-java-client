@@ -39,6 +39,16 @@ public interface SharedDomains {
      */
     Mono<DeleteSharedDomainResponse> delete(DeleteSharedDomainRequest request);
 
+
+    /**
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/shared_domains/retrieve_a_particular_shared_domain.html">Get a Shared Domain</a> request
+     *
+     * @param request the Get a Shared Domain request
+     * @return the response from the Get a Shared Domain request
+     */
+    Mono<GetSharedDomainResponse> get(GetSharedDomainRequest request);
+
+
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/shared_domains/list_all_shared_domains.html">List all Shared Domains</a> request
      *

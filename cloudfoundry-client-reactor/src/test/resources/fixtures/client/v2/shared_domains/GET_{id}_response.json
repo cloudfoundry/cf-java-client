@@ -1,0 +1,13 @@
+{
+  "metadata": {
+    "guid": "fa1385de-55ba-41d3-beb2-f83919c634d6",
+    "url": "/v2/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6",
+    "created_at": "2016-06-08T16:41:33Z",
+    "updated_at": null
+  },
+  "entity": {
+    "name": "customer-app-domain1.com",
+    "router_group_guid": null,
+    "router_group_type": null
+  }
+}

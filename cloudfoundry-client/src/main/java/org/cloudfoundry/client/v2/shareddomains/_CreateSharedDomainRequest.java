@@ -21,7 +21,7 @@ import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * Creates the Shared Domain Request
+ * The request payload for the Create a Shared Domain operation
  */
 @Value.Immutable
 abstract class _CreateSharedDomainRequest {

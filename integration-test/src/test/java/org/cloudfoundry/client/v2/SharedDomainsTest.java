@@ -21,12 +21,14 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest;
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
 import org.cloudfoundry.client.v2.shareddomains.DeleteSharedDomainRequest;
+import org.cloudfoundry.client.v2.shareddomains.GetSharedDomainRequest;
+import org.cloudfoundry.client.v2.shareddomains.GetSharedDomainResponse;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
+import org.cloudfoundry.client.v2.shareddomains.SharedDomainEntity;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
@@ -37,7 +39,6 @@ import java.util.Optional;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public final class SharedDomainsTest extends AbstractIntegrationTest {
 
@@ -54,8 +55,8 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
                 .build())
             .map(ResourceUtils::getId)
             .then(sharedDomainId -> getSharedDomainResource(this.cloudFoundryClient, sharedDomainId))
-            .subscribe(this.<SharedDomainResource>testSubscriber()
-                .assertThat(sharedDomainResource -> assertEquals(domainName, ResourceUtils.getEntity(sharedDomainResource).getName())));
+            .subscribe(this.<GetSharedDomainResponse>testSubscriber()
+                .assertThat(response -> assertEquals(domainName, ResourceUtils.getEntity(response).getName())));
     }
 
     @Test
@@ -91,10 +92,20 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
                 .assertCount(0));
     }
 
-    @Ignore("TODO: awaiting story https://www.pivotaltracker.com/story/show/101527362")
     @Test
     public void get() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/101527362");
+        String domainName = this.nameFactory.getDomainName();
+
+        getSharedDomainId(this.cloudFoundryClient, domainName)
+            .then(sharedDomainId -> this.cloudFoundryClient.sharedDomains()
+                .get(GetSharedDomainRequest.builder()
+                    .sharedDomainId(sharedDomainId)
+                    .build()))
+            .map(ResourceUtils::getEntity)
+            .map(SharedDomainEntity::getName)
+            .subscribe(this.testSubscriber()
+                .assertEquals(domainName));
+
     }
 
     @Test
@@ -128,15 +139,11 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getId);
     }
 
-    // TODO: awaiting story https://www.pivotaltracker.com/story/show/101527362 to re-implement with get()
-    private static Mono<SharedDomainResource> getSharedDomainResource(CloudFoundryClient cloudFoundryClient, String sharedDomainId) {
-        return PaginationUtils
-            .requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
-                .list((ListSharedDomainsRequest.builder()
-                    .page(page)
-                    .build())))
-            .filter(resource -> sharedDomainId.equals(ResourceUtils.getId(resource)))
-            .single();
+    private static Mono<GetSharedDomainResponse> getSharedDomainResource(CloudFoundryClient cloudFoundryClient, String sharedDomainId) {
+        return cloudFoundryClient.sharedDomains()
+            .get(GetSharedDomainRequest.builder()
+                .sharedDomainId(sharedDomainId)
+                .build());
     }
 
     private static Mono<CreateSharedDomainResponse> requestCreateSharedDomain(CloudFoundryClient cloudFoundryClient, String sharedDomainName) {

@@ -23,19 +23,20 @@ import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingRequest;
 import org.cloudfoundry.client.v2.buildpacks.DeleteBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
-import org.cloudfoundry.client.v2.domains.GetDomainRequest;
 import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsRequest;
 import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsResponse;
 import org.cloudfoundry.client.v2.featureflags.SetFeatureFlagRequest;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.privatedomains.DeletePrivateDomainRequest;
+import org.cloudfoundry.client.v2.privatedomains.GetPrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.shareddomains.DeleteSharedDomainRequest;
+import org.cloudfoundry.client.v2.shareddomains.GetSharedDomainRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
@@ -185,22 +186,6 @@ final class CloudFoundryCleaner {
                 .then());
     }
 
-    private static Flux<Void> cleanSharedDomains(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
-        return PaginationUtils.
-            requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
-                .list(ListSharedDomainsRequest.builder()
-                    .page(page)
-                    .build()))
-            .filter(domain -> nameFactory.isDomainName(ResourceUtils.getEntity(domain).getName()))
-            .map(ResourceUtils::getId)
-            .flatMap(domainId -> cloudFoundryClient.sharedDomains()
-                .delete(DeleteSharedDomainRequest.builder()
-                    .async(true)
-                    .sharedDomainId(domainId)
-                    .build()))
-            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
-    }
-
     private static Flux<Void> cleanFeatureFlags(CloudFoundryClient cloudFoundryClient) {
         return cloudFoundryClient.featureFlags()
             .list(ListFeatureFlagsRequest.builder()
@@ -286,15 +271,12 @@ final class CloudFoundryCleaner {
                     .build()))
             .flatMap(route -> Mono.when(
                 Mono.just(route),
-                cloudFoundryClient.domains()
-                    .get(GetDomainRequest.builder()
-                        .domainId(ResourceUtils.getEntity(route).getDomainId())
-                        .build())
+                getDomainName(cloudFoundryClient, ResourceUtils.getEntity(route).getDomainId())
             ))
-            .filter(predicate((route, domain) -> nameFactory.isDomainName(ResourceUtils.getEntity(domain).getName()) ||
+            .filter(predicate((route, domainName) -> nameFactory.isDomainName(domainName) ||
                 nameFactory.isApplicationName(ResourceUtils.getEntity(route).getHost()) ||
                 nameFactory.isHostName(ResourceUtils.getEntity(route).getHost())))
-            .map(function((route, domain) -> ResourceUtils.getId(route)))
+            .map(function((route, domainName) -> ResourceUtils.getId(route)))
             .flatMap(routeId -> cloudFoundryClient.routes()
                 .delete(DeleteRouteRequest.builder()
                     .async(true)
@@ -315,6 +297,22 @@ final class CloudFoundryCleaner {
                 .delete(DeleteServiceInstanceRequest.builder()
                     .async(true)
                     .serviceInstanceId(serviceInstanceId)
+                    .build()))
+            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+    }
+
+    private static Flux<Void> cleanSharedDomains(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
+        return PaginationUtils.
+            requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
+                .list(ListSharedDomainsRequest.builder()
+                    .page(page)
+                    .build()))
+            .filter(domain -> nameFactory.isDomainName(ResourceUtils.getEntity(domain).getName()))
+            .map(ResourceUtils::getId)
+            .flatMap(domainId -> cloudFoundryClient.sharedDomains()
+                .delete(DeleteSharedDomainRequest.builder()
+                    .async(true)
+                    .sharedDomainId(domainId)
                     .build()))
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
@@ -363,6 +361,19 @@ final class CloudFoundryCleaner {
                     .version("*")
                     .build())
                 .then());
+    }
+
+    private static Mono<String> getDomainName(CloudFoundryClient cloudFoundryClient, String domainId) {
+        return cloudFoundryClient.sharedDomains()
+            .get(GetSharedDomainRequest.builder()
+                .sharedDomainId(domainId)
+                .build())
+            .map(response -> response.getEntity().getName())
+            .otherwise(e -> cloudFoundryClient.privateDomains()
+                .get(GetPrivateDomainRequest.builder()
+                    .privateDomainId(domainId)
+                    .build())
+                .map(response -> response.getEntity().getName()));
     }
 
     private static Flux<Void> removeServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId) {
