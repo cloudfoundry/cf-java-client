@@ -16,15 +16,20 @@
 
 package org.cloudfoundry.client.v2.shareddomains;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.client.v2.jobs.AbstractJobResource;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.immutables.value.Value;
 
 /**
- * The response payload for the Delete a Shared Domain operation
+ * * The request payload for the Get a Shared Domain operation
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class _DeleteSharedDomainResponse extends AbstractJobResource {
+abstract class _GetSharedDomainRequest {
+
+    /**
+     * The shared domain id
+     */
+    @JsonIgnore
+    abstract String getSharedDomainId();
 
 }
+

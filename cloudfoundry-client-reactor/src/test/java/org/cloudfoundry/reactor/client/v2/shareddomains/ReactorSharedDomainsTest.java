@@ -22,6 +22,8 @@ import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest;
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
 import org.cloudfoundry.client.v2.shareddomains.DeleteSharedDomainRequest;
 import org.cloudfoundry.client.v2.shareddomains.DeleteSharedDomainResponse;
+import org.cloudfoundry.client.v2.shareddomains.GetSharedDomainRequest;
+import org.cloudfoundry.client.v2.shareddomains.GetSharedDomainResponse;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainEntity;
@@ -168,6 +170,51 @@ public final class ReactorSharedDomainsTest {
         @Override
         protected Mono<DeleteSharedDomainResponse> invoke(DeleteSharedDomainRequest request) {
             return this.sharedDomains.delete(request);
+        }
+
+    }
+
+    public static final class Get extends AbstractClientApiTest<GetSharedDomainRequest, GetSharedDomainResponse> {
+
+        private final ReactorSharedDomains sharedDomains = new ReactorSharedDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v2/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/shared_domains/GET_{id}_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected GetSharedDomainResponse getResponse() {
+            return GetSharedDomainResponse.builder()
+                .metadata(Metadata.builder()
+                    .id("fa1385de-55ba-41d3-beb2-f83919c634d6")
+                    .url("/v2/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6")
+                    .createdAt("2016-06-08T16:41:33Z")
+                    .build())
+                .entity(SharedDomainEntity.builder()
+                    .name("customer-app-domain1.com")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected GetSharedDomainRequest getValidRequest() throws Exception {
+            return GetSharedDomainRequest.builder()
+                .sharedDomainId("fa1385de-55ba-41d3-beb2-f83919c634d6")
+                .build();
+        }
+
+        @Override
+        protected Mono<GetSharedDomainResponse> invoke(GetSharedDomainRequest request) {
+            return this.sharedDomains.get(request);
         }
 
     }
