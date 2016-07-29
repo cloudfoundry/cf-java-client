@@ -20,8 +20,10 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest;
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
+import org.cloudfoundry.client.v2.shareddomains.DeleteSharedDomainRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
+import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Ignore;
@@ -56,10 +58,37 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
                 .assertThat(sharedDomainResource -> assertEquals(domainName, ResourceUtils.getEntity(sharedDomainResource).getName())));
     }
 
-    @Ignore("TODO: awaiting story https://www.pivotaltracker.com/story/show/101527356")
     @Test
-    public void delete() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/101527356");
+    public void deleteAsyncFalse() {
+        String domainName = this.nameFactory.getDomainName();
+
+        getSharedDomainId(this.cloudFoundryClient, domainName)
+            .then(sharedDomainId -> this.cloudFoundryClient.sharedDomains()
+                .delete(DeleteSharedDomainRequest.builder()
+                    .async(false)
+                    .sharedDomainId(sharedDomainId)
+                    .build()))
+            .then(requestListSharedDomains(this.cloudFoundryClient, domainName)
+                .singleOrEmpty())
+            .subscribe(this.testSubscriber()
+                .assertCount(0));
+    }
+
+    @Test
+    public void deleteAsyncTrue() {
+        String domainName = this.nameFactory.getDomainName();
+
+        getSharedDomainId(this.cloudFoundryClient, domainName)
+            .then(sharedDomainId -> this.cloudFoundryClient.sharedDomains()
+                .delete(DeleteSharedDomainRequest.builder()
+                    .async(true)
+                    .sharedDomainId(sharedDomainId)
+                    .build())
+                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job)))
+            .then(requestListSharedDomains(this.cloudFoundryClient, domainName)
+                .singleOrEmpty())
+            .subscribe(this.testSubscriber()
+                .assertCount(0));
     }
 
     @Ignore("TODO: awaiting story https://www.pivotaltracker.com/story/show/101527362")
@@ -72,8 +101,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
     public void list() {
         String domainName = this.nameFactory.getDomainName();
 
-        requestCreateSharedDomain(this.cloudFoundryClient, domainName)
-            .map(ResourceUtils::getId)
+        getSharedDomainId(this.cloudFoundryClient, domainName)
             .then(sharedDomainId -> requestListSharedDomains(this.cloudFoundryClient, null)
                 .filter(resource -> sharedDomainId.equals(ResourceUtils.getId(resource)))
                 .single())
@@ -85,8 +113,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
     public void listFilterByName() {
         String domainName = this.nameFactory.getDomainName();
 
-        requestCreateSharedDomain(this.cloudFoundryClient, domainName)
-            .map(ResourceUtils::getId)
+        getSharedDomainId(this.cloudFoundryClient, domainName)
             .then(sharedDomainId -> Mono.when(
                 Mono.just(sharedDomainId),
                 requestListSharedDomains(this.cloudFoundryClient, domainName)
@@ -94,6 +121,11 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
             ))
             .subscribe(this.<Tuple2<String, SharedDomainResource>>testSubscriber()
                 .assertThat(consumer((id, resource) -> assertEquals(id, ResourceUtils.getId(resource)))));
+    }
+
+    private static Mono<String> getSharedDomainId(CloudFoundryClient cloudFoundryClient, String domainName) {
+        return requestCreateSharedDomain(cloudFoundryClient, domainName)
+            .map(ResourceUtils::getId);
     }
 
     // TODO: awaiting story https://www.pivotaltracker.com/story/show/101527362 to re-implement with get()
