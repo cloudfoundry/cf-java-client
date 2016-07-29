@@ -43,23 +43,21 @@ public final class ClientsTest extends AbstractIntegrationTest {
 
     @Test
     public void getMetadata() {
-        requestUpdateMetadata(this.uaaClient, this.clientId, "http://get.test.url")
+        requestUpdateMetadata(this.uaaClient, this.clientId, "http://test.get.url")
             .then(this.uaaClient.clients()
                 .getMetadata(GetMetadataRequest.builder()
                     .clientId(this.clientId)
                     .build()))
             .subscribe(this.<GetMetadataResponse>testSubscriber()
                 .assertThat(metadata -> {
-                    assertEquals("", metadata.getAppIcon());
-                    assertEquals("http://get.test.url", metadata.getAppLaunchUrl());
+                    assertEquals("http://test.get.url", metadata.getAppLaunchUrl());
                     assertEquals(this.clientId, metadata.getClientId());
-                    assertEquals(false, metadata.getShowOnHomePage());
                 }));
     }
 
     @Test
     public void listMetadatas() {
-        requestUpdateMetadata(this.uaaClient, this.clientId, "http://list.test.url")
+        requestUpdateMetadata(this.uaaClient, this.clientId, "http://test.list.url")
             .then(this.uaaClient.clients()
                 .listMetadatas(ListMetadatasRequest.builder()
                     .build()))
@@ -68,10 +66,8 @@ public final class ClientsTest extends AbstractIntegrationTest {
             .single()
             .subscribe(this.<Metadata>testSubscriber()
                 .assertThat(metadata -> {
-                    assertEquals("", metadata.getAppIcon());
-                    assertEquals("http://list.test.url", metadata.getAppLaunchUrl());
+                    assertEquals("http://test.list.url", metadata.getAppLaunchUrl());
                     assertEquals(this.clientId, metadata.getClientId());
-                    assertEquals(false, metadata.getShowOnHomePage());
                 }));
     }
 
@@ -82,17 +78,19 @@ public final class ClientsTest extends AbstractIntegrationTest {
         this.uaaClient.clients()
             .updateMetadata(UpdateMetadataRequest.builder()
                 .appIcon(appIcon)
-                .appLaunchUrl("http://update.test.url")
+                .appLaunchUrl("http://test.app.launch.url")
                 .clientId(this.clientId)
-                .showOnHomePage(false)
+                .showOnHomePage(true)
+                .clientName("test-name")
                 .build())
             .then(requestGetMetadata(this.uaaClient, this.clientId))
             .subscribe(this.<GetMetadataResponse>testSubscriber()
                 .assertThat(metadata -> {
                     assertEquals(appIcon, metadata.getAppIcon());
-                    assertEquals("http://update.test.url", metadata.getAppLaunchUrl());
+                    assertEquals("http://test.app.launch.url", metadata.getAppLaunchUrl());
                     assertEquals(this.clientId, metadata.getClientId());
-                    assertEquals(false, metadata.getShowOnHomePage());
+                    assertEquals("test-name", metadata.getClientName());
+                    assertEquals(true, metadata.getShowOnHomePage());
                 }));
     }
 
@@ -108,7 +106,6 @@ public final class ClientsTest extends AbstractIntegrationTest {
             .updateMetadata(UpdateMetadataRequest.builder()
                 .appLaunchUrl(appLaunchUrl)
                 .clientId(clientId)
-                .showOnHomePage(false)
                 .build());
     }
 

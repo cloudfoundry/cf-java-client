@@ -38,6 +38,7 @@ abstract class _UpdateMetadataRequest implements IdentityZoned {
      * URL to which the app is linked
      */
     @JsonProperty("appLaunchUrl")
+    @Nullable
     abstract String getAppLaunchUrl();
 
     /**
@@ -47,9 +48,17 @@ abstract class _UpdateMetadataRequest implements IdentityZoned {
     abstract String getClientId();
 
     /**
+     * Client name
+     */
+    @JsonProperty("clientName")
+    @Nullable
+    abstract String getClientName();
+
+    /**
      * Flag to control visibility on home page
      */
     @JsonProperty("showOnHomePage")
+    @Nullable
     abstract Boolean getShowOnHomePage();
 
 }
