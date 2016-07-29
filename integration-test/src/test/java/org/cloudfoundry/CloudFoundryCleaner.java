@@ -23,9 +23,7 @@ import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingRequest;
 import org.cloudfoundry.client.v2.buildpacks.DeleteBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
-import org.cloudfoundry.client.v2.domains.DeleteDomainRequest;
 import org.cloudfoundry.client.v2.domains.GetDomainRequest;
-import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsRequest;
 import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsResponse;
 import org.cloudfoundry.client.v2.featureflags.SetFeatureFlagRequest;
@@ -37,6 +35,8 @@ import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
+import org.cloudfoundry.client.v2.shareddomains.DeleteSharedDomainRequest;
+import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
@@ -109,7 +109,7 @@ final class CloudFoundryCleaner {
             .thenMany(cleanPackages(this.cloudFoundryClient))
             .thenMany(cleanServiceInstances(this.cloudFoundryClient, this.nameFactory))
             .thenMany(cleanUserProvidedServiceInstances(this.cloudFoundryClient, this.nameFactory))
-            .thenMany(cleanDomains(this.cloudFoundryClient, this.nameFactory))
+            .thenMany(cleanSharedDomains(this.cloudFoundryClient, this.nameFactory))
             .thenMany(cleanPrivateDomains(this.cloudFoundryClient, this.nameFactory))
             .thenMany(cleanGroups(this.uaaClient, this.nameFactory))
             .thenMany(cleanUsers(this.uaaClient, this.nameFactory))
@@ -185,18 +185,18 @@ final class CloudFoundryCleaner {
                 .then());
     }
 
-    private static Flux<Void> cleanDomains(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
+    private static Flux<Void> cleanSharedDomains(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
         return PaginationUtils.
-            requestClientV2Resources(page -> cloudFoundryClient.domains()
-                .list(ListDomainsRequest.builder()
+            requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
+                .list(ListSharedDomainsRequest.builder()
                     .page(page)
                     .build()))
             .filter(domain -> nameFactory.isDomainName(ResourceUtils.getEntity(domain).getName()))
             .map(ResourceUtils::getId)
-            .flatMap(domainId -> cloudFoundryClient.domains()
-                .delete(DeleteDomainRequest.builder()
+            .flatMap(domainId -> cloudFoundryClient.sharedDomains()
+                .delete(DeleteSharedDomainRequest.builder()
                     .async(true)
-                    .domainId(domainId)
+                    .sharedDomainId(domainId)
                     .build()))
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }

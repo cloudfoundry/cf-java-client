@@ -17,8 +17,11 @@
 package org.cloudfoundry.reactor.client.v2.shareddomains;
 
 import org.cloudfoundry.client.v2.Metadata;
+import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest;
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
+import org.cloudfoundry.client.v2.shareddomains.DeleteSharedDomainRequest;
+import org.cloudfoundry.client.v2.shareddomains.DeleteSharedDomainResponse;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainEntity;
@@ -29,8 +32,11 @@ import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorSharedDomainsTest {
@@ -80,6 +86,88 @@ public final class ReactorSharedDomainsTest {
         @Override
         protected Mono<CreateSharedDomainResponse> invoke(CreateSharedDomainRequest request) {
             return this.sharedDomains.create(request);
+        }
+
+    }
+
+    public static final class Delete extends AbstractClientApiTest<DeleteSharedDomainRequest, DeleteSharedDomainResponse> {
+
+        private final ReactorSharedDomains sharedDomains = new ReactorSharedDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6?")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected DeleteSharedDomainResponse getResponse() {
+            return null;
+        }
+
+        @Override
+        protected DeleteSharedDomainRequest getValidRequest() throws Exception {
+            return DeleteSharedDomainRequest.builder()
+                .sharedDomainId("fa1385de-55ba-41d3-beb2-f83919c634d6")
+                .build();
+        }
+
+        @Override
+        protected Mono<DeleteSharedDomainResponse> invoke(DeleteSharedDomainRequest request) {
+            return this.sharedDomains.delete(request);
+        }
+
+    }
+
+    public static final class DeleteAsync extends AbstractClientApiTest<DeleteSharedDomainRequest, DeleteSharedDomainResponse> {
+
+        private final ReactorSharedDomains sharedDomains = new ReactorSharedDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6?async=true")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(ACCEPTED)
+                    .payload("fixtures/client/v2/shared_domains/DELETE_{id}_async_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected DeleteSharedDomainResponse getResponse() {
+            return DeleteSharedDomainResponse.builder()
+                .metadata(Metadata.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .createdAt("2016-02-02T17:16:31Z")
+                    .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .build())
+                .entity(JobEntity.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .status("queued")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected DeleteSharedDomainRequest getValidRequest() throws Exception {
+            return DeleteSharedDomainRequest.builder()
+                .async(true)
+                .sharedDomainId("fa1385de-55ba-41d3-beb2-f83919c634d6")
+                .build();
+        }
+
+        @Override
+        protected Mono<DeleteSharedDomainResponse> invoke(DeleteSharedDomainRequest request) {
+            return this.sharedDomains.delete(request);
         }
 
     }
