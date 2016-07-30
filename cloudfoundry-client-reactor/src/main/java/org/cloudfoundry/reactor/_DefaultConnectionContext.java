@@ -63,6 +63,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             .sndbuf(SEND_BUFFER_SIZE)
             .rcvbuf(RECEIVE_BUFFER_SIZE);
 
+        getKeepAlive().ifPresent(options::keepAlive);
         getProxyConfiguration().ifPresent(c -> options.proxy(ClientOptions.Proxy.HTTP, c.getHost(), c.getPort().orElse(null), c.getUsername().orElse(null), u -> c.getPassword().orElse(null)));
         getSocketTimeout().ifPresent(options::timeout);
         getSslCertificateTruster().ifPresent(trustManager -> options.ssl().trustManager(new StaticTrustManagerFactory(trustManager)));
@@ -132,6 +133,11 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             .map(m -> (Map<String, String>) m)
             .cache();
     }
+
+    /**
+     * The {@code SO_KEEPALIVE} value
+     */
+    abstract Optional<Boolean> getKeepAlive();
 
     /**
      * Jackson deserialization problem handlers.  Typically only used for testing.
