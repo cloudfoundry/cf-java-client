@@ -21,9 +21,6 @@ package org.cloudfoundry;
  */
 public interface NameFactory {
 
-    /**
-     * The application prefix
-     */
     String APPLICATION_PREFIX = "test-application-";
 
     String BUILDPACK_PREFIX = "test-buildpack-";
@@ -45,6 +42,8 @@ public interface NameFactory {
     String PASSWORD_PREFIX = "test-password-";
 
     String PATH_PREFIX = "/test-path-";
+
+    String QUOTA_DEFINITION_PREFIX = "test-quota-definition-";
 
     String SERVICE_INSTANCE_PREFIX = "test-service-instance-";
 
@@ -164,6 +163,15 @@ public interface NameFactory {
     }
 
     /**
+     * Creates a quota definition name
+     *
+     * @return the quota definition name
+     */
+    default String getQuotaDefinitionName() {
+        return getName(QUOTA_DEFINITION_PREFIX);
+    }
+
+    /**
      * Creates a service instance name
      *
      * @return the service instance name
@@ -209,10 +217,10 @@ public interface NameFactory {
     }
 
     /**
-     * Tests a name to determine if it is a application name
+     * Tests a name to determine if it is an application name
      *
      * @param candidate the candidate name
-     * @return {@code true} if the name is a application name, {@code false} otherwise
+     * @return {@code true} if the name is an application name, {@code false} otherwise
      */
     default boolean isApplicationName(String candidate) {
         return isName(APPLICATION_PREFIX, candidate);
@@ -279,10 +287,10 @@ public interface NameFactory {
     }
 
     /**
-     * Tests a name to determine if it is a identity zone name
+     * Tests a name to determine if it is an identity zone name
      *
      * @param candidate the candidate name
-     * @return {@code true} if the name is a identity zone name, {@code false} otherwise
+     * @return {@code true} if the name is an identity zone name, {@code false} otherwise
      */
     default boolean isIdentityZoneName(String candidate) {
         return isName(IDENTITY_ZONE_PREFIX, candidate);
@@ -298,10 +306,10 @@ public interface NameFactory {
     boolean isName(String prefix, String candidate);
 
     /**
-     * Tests a name to determine if it is a organization name
+     * Tests a name to determine if it is an organization name
      *
      * @param candidate the candidate name
-     * @return {@code true} if the name is a organization name, {@code false} otherwise
+     * @return {@code true} if the name is an organization name, {@code false} otherwise
      */
     default boolean isOrganizationName(String candidate) {
         return isName(ORGANIZATION_PREFIX, candidate);
@@ -325,6 +333,16 @@ public interface NameFactory {
      */
     default boolean isPath(String candidate) {
         return isName(PATH_PREFIX, candidate);
+    }
+
+    /**
+     * Tests a name to determine if it is a quota definition name
+     *
+     * @param candidate the candidate name
+     * @return {@code true} if the name is a quota definition name, {@code false} otherwise
+     */
+    default boolean isQuotaDefinitionName(String candidate) {
+        return isName(QUOTA_DEFINITION_PREFIX, candidate);
     }
 
     /**

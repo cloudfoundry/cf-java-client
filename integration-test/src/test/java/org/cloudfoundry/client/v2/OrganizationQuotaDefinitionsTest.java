@@ -18,52 +18,185 @@ package org.cloudfoundry.client.v2;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionResponse;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.DeleteOrganizationQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionEntity;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.UpdateOrganizationQuotaDefinitionRequest;
+import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
-import org.junit.Ignore;
+import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.core.publisher.Mono;
 
-import static org.junit.Assert.fail;
+import static org.cloudfoundry.util.OperationUtils.thenKeep;
 
 public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
 
-    @Ignore("TODO: finish story https://www.pivotaltracker.com/projects/816799/stories/101527322")
+    @SuppressWarnings("deprecation")
     @Test
     public void create() {
-        fail("TODO: finish story https://www.pivotaltracker.com/projects/816799/stories/101527322");
+        String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
+
+        @SuppressWarnings("deprecation")
+        OrganizationQuotaDefinitionEntity expectedEntity = OrganizationQuotaDefinitionEntity.builder()
+            .applicationInstanceLimit(-1)
+            .applicationTaskLimit(-1)
+            .instanceMemoryLimit(1024)
+            .memoryLimit(1024)
+            .name(quotaDefinitionName)
+            .nonBasicServicesAllowed(false)
+            .totalPrivateDomains(-1)
+            .totalRoutes(10)
+            .totalReservedRoutePorts(0)
+            .totalServiceKeys(-1)
+            .totalServices(-1)
+            .trialDatabaseAllowed(false)
+            .build();
+
+        this.cloudFoundryClient.organizationQuotaDefinitions()
+            .create(CreateOrganizationQuotaDefinitionRequest.builder()
+                .instanceMemoryLimit(1024)
+                .memoryLimit(1024)
+                .name(quotaDefinitionName)
+                .nonBasicServicesAllowed(false)
+                .totalRoutes(10)
+                .totalServices(-1)
+                .build())
+            .map(ResourceUtils::getEntity)
+            .subscribe(this.testSubscriber()
+                .assertEquals(expectedEntity)
+            );
     }
 
-    @Ignore("TODO: finish story https://www.pivotaltracker.com/projects/816799/stories/101527324")
     @Test
     public void delete() {
-        fail("TODO: finish story https://www.pivotaltracker.com/projects/816799/stories/101527324");
+        String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
+
+        requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)
+            .map(ResourceUtils::getId)
+            .as(thenKeep(organizationQuotaDefinitionId -> this.cloudFoundryClient.organizationQuotaDefinitions()
+                .delete(DeleteOrganizationQuotaDefinitionRequest.builder()
+                    .async(true)
+                    .organizationQuotaDefinitionId(organizationQuotaDefinitionId)
+                    .build())
+                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))))
+            .then(organizationQuotaDefinitionId -> requestGetOrganizationQuotaDefinition(this.cloudFoundryClient, organizationQuotaDefinitionId))
+            .subscribe(this.testSubscriber()
+                .assertErrorMatch(CloudFoundryException.class, "CF-QuotaDefinitionNotFound\\([0-9]+\\): Quota Definition could not be found: .*"));
     }
 
-    @Ignore("TODO: finish story https://www.pivotaltracker.com/projects/816799/stories/101527322")
     @Test
     public void get() {
-        fail("TODO: finish story https://www.pivotaltracker.com/projects/816799/stories/101527322");
+        String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
+
+        @SuppressWarnings("deprecation")
+        OrganizationQuotaDefinitionEntity expectedEntity = OrganizationQuotaDefinitionEntity.builder()
+            .applicationInstanceLimit(-1)
+            .applicationTaskLimit(-1)
+            .instanceMemoryLimit(50)
+            .memoryLimit(500)
+            .name(quotaDefinitionName)
+            .nonBasicServicesAllowed(false)
+            .totalPrivateDomains(-1)
+            .totalRoutes(10)
+            .totalReservedRoutePorts(0)
+            .totalServiceKeys(-1)
+            .totalServices(5)
+            .trialDatabaseAllowed(false)
+            .build();
+
+        requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)
+            .map(ResourceUtils::getId)
+            .then(organizationQuotaDefinitionId -> this.cloudFoundryClient.organizationQuotaDefinitions()
+                .get(GetOrganizationQuotaDefinitionRequest.builder()
+                    .organizationQuotaDefinitionId(organizationQuotaDefinitionId)
+                    .build()))
+            .map(ResourceUtils::getEntity)
+            .subscribe(this.testSubscriber()
+                .assertEquals(expectedEntity));
     }
 
-    @Ignore("TODO: ensure that a created quota exists in the list")
     @Test
     public void list() {
-        PaginationUtils
-            .requestClientV2Resources(page -> this.cloudFoundryClient.organizationQuotaDefinitions()
-                .list(ListOrganizationQuotaDefinitionsRequest.builder()
-                    .page(page)
-                    .build()))
-            .subscribe(this.testSubscriber());
+        String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
+
+        requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)
+            .map(ResourceUtils::getId)
+            .then(organizationQuotaDefinitionId -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.organizationQuotaDefinitions()
+                    .list(ListOrganizationQuotaDefinitionsRequest.builder()
+                        .page(page)
+                        .build()))
+                .filter(quotaDefinition -> ResourceUtils.getId(quotaDefinition).equals(organizationQuotaDefinitionId))
+                .single())
+            .map(ResourceUtils::getEntity)
+            .map(OrganizationQuotaDefinitionEntity::getName)
+            .subscribe(this.testSubscriber()
+                .assertEquals(quotaDefinitionName));
     }
 
-    @Ignore("TODO: finish story https://www.pivotaltracker.com/projects/816799/stories/101527330")
     @Test
     public void update() {
-        fail("TODO: finish story https://www.pivotaltracker.com/projects/816799/stories/101527330");
+        String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
+
+        @SuppressWarnings("deprecation")
+        OrganizationQuotaDefinitionEntity expectedEntity = OrganizationQuotaDefinitionEntity.builder()
+            .applicationInstanceLimit(-1)
+            .applicationTaskLimit(-1)
+            .instanceMemoryLimit(50)
+            .memoryLimit(1000)
+            .name(quotaDefinitionName)
+            .nonBasicServicesAllowed(false)
+            .totalPrivateDomains(-1)
+            .totalRoutes(10)
+            .totalReservedRoutePorts(0)
+            .totalServiceKeys(-1)
+            .totalServices(10)
+            .trialDatabaseAllowed(false)
+            .build();
+
+        requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)
+            .map(ResourceUtils::getId)
+            .as(thenKeep(organizationQuotaDefinitionId -> this.cloudFoundryClient.organizationQuotaDefinitions()
+                .update(UpdateOrganizationQuotaDefinitionRequest.builder()
+                    .organizationQuotaDefinitionId(organizationQuotaDefinitionId)
+                    .totalServices(10)
+                    .memoryLimit(1000)
+                    .build())))
+            .then(organizationQuotaDefinitionId -> this.cloudFoundryClient.organizationQuotaDefinitions()
+                .get(GetOrganizationQuotaDefinitionRequest.builder()
+                    .organizationQuotaDefinitionId(organizationQuotaDefinitionId)
+                    .build()))
+            .map(ResourceUtils::getEntity)
+            .subscribe(this.testSubscriber()
+                .assertEquals(expectedEntity));
+    }
+
+    private static Mono<CreateOrganizationQuotaDefinitionResponse> requestCreateOrganizationQuotaDefinition(CloudFoundryClient cloudFoundryClient, String quotaDefinitionName) {
+        return cloudFoundryClient.organizationQuotaDefinitions()
+            .create(CreateOrganizationQuotaDefinitionRequest.builder()
+                .instanceMemoryLimit(50)
+                .memoryLimit(500)
+                .name(quotaDefinitionName)
+                .nonBasicServicesAllowed(false)
+                .totalRoutes(10)
+                .totalServices(5)
+                .build());
+    }
+
+    private static Mono<GetOrganizationQuotaDefinitionResponse> requestGetOrganizationQuotaDefinition(CloudFoundryClient cloudFoundryClient, String organizationQuotaDefinitionId) {
+        return cloudFoundryClient.organizationQuotaDefinitions()
+            .get(GetOrganizationQuotaDefinitionRequest.builder()
+                .organizationQuotaDefinitionId(organizationQuotaDefinitionId)
+                .build());
     }
 
 }
