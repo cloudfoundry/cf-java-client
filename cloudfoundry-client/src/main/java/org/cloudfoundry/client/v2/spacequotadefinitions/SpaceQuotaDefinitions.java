@@ -33,6 +33,14 @@ public interface SpaceQuotaDefinitions {
     Mono<AssociateSpaceQuotaDefinitionResponse> associateSpace(AssociateSpaceQuotaDefinitionRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/space_quota_definitions/creating_a_space_quota_definition.html">Creating a Space Quota Definition</a> request
+     *
+     * @param request the Create a Space Quota Definition request
+     * @return the response from the Create a Space Quota Definition request
+     */
+    Mono<CreateSpaceQuotaDefinitionResponse> create(CreateSpaceQuotaDefinitionRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/space_quota_definitions/retrieve_a_particular_space_quota_definition.html">Retrieve a Particular Space Quota Definition</a>
      * request
      *
