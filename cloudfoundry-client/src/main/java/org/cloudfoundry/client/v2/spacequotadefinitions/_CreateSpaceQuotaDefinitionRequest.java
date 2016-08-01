@@ -17,106 +17,84 @@
 package org.cloudfoundry.client.v2.spacequotadefinitions;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * The entity response payload for the Space Quota Definition resource
+ * The request payload for the Create a Space Quota Definition operation
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class _SpaceQuotaDefinitionEntity {
+abstract class _CreateSpaceQuotaDefinitionRequest {
 
     /**
-     * The application instance limit
+     * How many app instances a space can create. (-1 represents an unlimited amount)
      */
-    @JsonProperty("app_instance_limit")
     @Nullable
+    @JsonProperty("app_instance_limit")
     abstract Integer getApplicationInstanceLimit();
 
     /**
      * The number of tasks that can be run per app. (-1 represents an unlimited amount)
      */
-    @JsonProperty("app_task_limit")
     @Nullable
+    @JsonProperty("app_task_limit")
     abstract Integer getApplicationTaskLimit();
 
     /**
-     * The instance memory limit
+     * The maximum amount of memory in megabytes an application instance can have. (-1 represents an unlimited amount)
      */
-    @JsonProperty("instance_memory_limit")
     @Nullable
+    @JsonProperty("instance_memory_limit")
     abstract Integer getInstanceMemoryLimit();
 
     /**
-     * The memory limit
+     * How much memory in megabytes a space can have
      */
     @JsonProperty("memory_limit")
-    @Nullable
     abstract Integer getMemoryLimit();
 
     /**
      * The name
      */
     @JsonProperty("name")
-    @Nullable
     abstract String getName();
 
     /**
-     * The non basic services allowed
+     * If a space can have non basic services
      */
     @JsonProperty("non_basic_services_allowed")
-    @Nullable
     abstract Boolean getNonBasicServicesAllowed();
 
     /**
-     * The organization id
+     * The owning organization of the space quota
      */
     @JsonProperty("organization_guid")
-    @Nullable
     abstract String getOrganizationId();
-
-    /**
-     * The organization url
-     */
-    @JsonProperty("organization_url")
-    @Nullable
-    abstract String getOrganizationUrl();
-
-    /**
-     * The spaces url
-     */
-    @JsonProperty("spaces_url")
-    @Nullable
-    abstract String getSpacesUrl();
 
     /**
      * How many routes a space can have that use a reserved port. These routes count toward total_routes. (-1 represents an unlimited amount; subject to org quota)
      */
-    @JsonProperty("total_reserved_route_ports")
     @Nullable
+    @JsonProperty("total_reserved_route_ports")
     abstract Integer getTotalReservedRoutePorts();
 
     /**
-     * The total routes
+     * How many routes a space can have. (-1 represents an unlimited amount)
      */
     @JsonProperty("total_routes")
-    @Nullable
     abstract Integer getTotalRoutes();
 
     /**
      * How many service keys an organization can have. (-1 represents an unlimited amount)
      */
-    @JsonProperty("total_service_keys")
     @Nullable
+    @JsonProperty("total_service_keys")
     abstract Integer getTotalServiceKeys();
 
     /**
-     * The total services
+     * How many services a space can have. (-1 represents an unlimited amount)
      */
     @JsonProperty("total_services")
-    @Nullable
     abstract Integer getTotalServices();
 
 }

@@ -19,6 +19,8 @@ package org.cloudfoundry.reactor.client.v2.spacequotadefinitions;
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.spacequotadefinitions.AssociateSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.AssociateSpaceQuotaDefinitionResponse;
+import org.cloudfoundry.client.v2.spacequotadefinitions.CreateSpaceQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.spacequotadefinitions.CreateSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsRequest;
@@ -35,7 +37,9 @@ import reactor.core.publisher.Mono;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
@@ -92,6 +96,69 @@ public final class ReactorSpaceQuotaDefinitionsTest {
         @Override
         protected Publisher<AssociateSpaceQuotaDefinitionResponse> invoke(AssociateSpaceQuotaDefinitionRequest request) {
             return this.spaceQuotaDefinitions.associateSpace(request);
+        }
+    }
+
+    public static final class Create extends AbstractClientApiTest<CreateSpaceQuotaDefinitionRequest, CreateSpaceQuotaDefinitionResponse> {
+
+        private final ReactorSpaceQuotaDefinitions spaceQuotaDefinitions = new ReactorSpaceQuotaDefinitions(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/v2/space_quota_definitions")
+                    .payload("fixtures/client/v2/space_quota_definitions/POST_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/client/v2/space_quota_definitions/POST_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected CreateSpaceQuotaDefinitionResponse getResponse() {
+            return CreateSpaceQuotaDefinitionResponse.builder()
+                .metadata(Metadata.builder()
+                    .id("17f055b8-b4c8-47cf-8737-0220d5706b4a")
+                    .url("/v2/space_quota_definitions/17f055b8-b4c8-47cf-8737-0220d5706b4a")
+                    .createdAt("2016-06-08T16:41:29Z")
+                    .build())
+                .entity(SpaceQuotaDefinitionEntity.builder()
+                    .name("gold_quota")
+                    .organizationId("c9b4ac17-ab4b-4368-b3e2-5cbf09b17a24")
+                    .nonBasicServicesAllowed(true)
+                    .totalServices(-1)
+                    .totalRoutes(10)
+                    .memoryLimit(5120)
+                    .instanceMemoryLimit(-1)
+                    .applicationInstanceLimit(-1)
+                    .applicationTaskLimit(5)
+                    .totalServiceKeys(-1)
+                    .totalReservedRoutePorts(5)
+                    .organizationUrl("/v2/organizations/c9b4ac17-ab4b-4368-b3e2-5cbf09b17a24")
+                    .spacesUrl("/v2/space_quota_definitions/17f055b8-b4c8-47cf-8737-0220d5706b4a/spaces")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected CreateSpaceQuotaDefinitionRequest getValidRequest() throws Exception {
+            return CreateSpaceQuotaDefinitionRequest.builder()
+                .name("gold_quota")
+                .nonBasicServicesAllowed(true)
+                .totalServices(-1)
+                .totalRoutes(10)
+                .memoryLimit(5120)
+                .organizationId("c9b4ac17-ab4b-4368-b3e2-5cbf09b17a24")
+                .totalReservedRoutePorts(5)
+                .build();
+        }
+
+        @Override
+        protected Publisher<CreateSpaceQuotaDefinitionResponse> invoke(CreateSpaceQuotaDefinitionRequest request) {
+            return this.spaceQuotaDefinitions.create(request);
         }
     }
 

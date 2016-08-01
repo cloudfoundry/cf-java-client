@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "guid": "17f055b8-b4c8-47cf-8737-0220d5706b4a",
+    "url": "/v2/space_quota_definitions/17f055b8-b4c8-47cf-8737-0220d5706b4a",
+    "created_at": "2016-06-08T16:41:29Z",
+    "updated_at": null
+  },
+  "entity": {
+    "name": "gold_quota",
+    "organization_guid": "c9b4ac17-ab4b-4368-b3e2-5cbf09b17a24",
+    "non_basic_services_allowed": true,
+    "total_services": -1,
+    "total_routes": 10,
+    "memory_limit": 5120,
+    "instance_memory_limit": -1,
+    "app_instance_limit": -1,
+    "app_task_limit": 5,
+    "total_service_keys": -1,
+    "total_reserved_route_ports": 5,
+    "organization_url": "/v2/organizations/c9b4ac17-ab4b-4368-b3e2-5cbf09b17a24",
+    "spaces_url": "/v2/space_quota_definitions/17f055b8-b4c8-47cf-8737-0220d5706b4a/spaces"
+  }
+}
