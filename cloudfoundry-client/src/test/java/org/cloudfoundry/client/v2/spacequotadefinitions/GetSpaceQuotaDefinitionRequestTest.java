@@ -20,16 +20,16 @@ import org.junit.Test;
 
 public final class GetSpaceQuotaDefinitionRequestTest {
 
-    @Test
-    public void isValid() {
-        GetSpaceQuotaDefinitionRequest.builder()
-            .spaceQuotaDefinitionId("test-space-quota-definition-id")
-            .build();
-    }
-
     @Test(expected = IllegalStateException.class)
     public void noSpaceQuotaDefinitionId() {
         GetSpaceQuotaDefinitionRequest.builder()
+            .build();
+    }
+
+    @Test
+    public void valid() {
+        GetSpaceQuotaDefinitionRequest.builder()
+            .spaceQuotaDefinitionId("test-space-quota-definition-id")
             .build();
     }
 

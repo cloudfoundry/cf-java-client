@@ -20,16 +20,16 @@ import org.junit.Test;
 
 public final class DeleteSecurityGroupStagingDefaultRequestTest {
 
-    @Test
-    public void isValid() {
-        DeleteSecurityGroupStagingDefaultRequest.builder()
-            .securityGroupStagingDefaultId("test-security-group-default-id")
-            .build();
-    }
-
     @Test(expected = IllegalStateException.class)
     public void noSecurityGroupStagingDefaultId() {
         DeleteSecurityGroupStagingDefaultRequest.builder()
+            .build();
+    }
+
+    @Test
+    public void valid() {
+        DeleteSecurityGroupStagingDefaultRequest.builder()
+            .securityGroupStagingDefaultId("test-security-group-default-id")
             .build();
     }
 

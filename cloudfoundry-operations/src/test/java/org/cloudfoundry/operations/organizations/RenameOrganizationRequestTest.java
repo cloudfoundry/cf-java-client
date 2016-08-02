@@ -21,13 +21,6 @@ import org.junit.Test;
 public final class RenameOrganizationRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void isValidNoNewName() {
-        RenameOrganizationRequest.builder()
-            .name("name")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
     public void noName() {
         RenameOrganizationRequest.builder()
             .newName("new-name")
@@ -39,6 +32,13 @@ public final class RenameOrganizationRequestTest {
         RenameOrganizationRequest.builder()
             .name("test-name")
             .newName("test-new-name")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void validNoNewName() {
+        RenameOrganizationRequest.builder()
+            .name("name")
             .build();
     }
 

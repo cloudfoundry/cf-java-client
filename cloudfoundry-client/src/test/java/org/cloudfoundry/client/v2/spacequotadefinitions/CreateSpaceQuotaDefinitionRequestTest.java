@@ -20,18 +20,6 @@ import org.junit.Test;
 
 public final class CreateSpaceQuotaDefinitionRequestTest {
 
-    @Test
-    public void isValid() {
-        CreateSpaceQuotaDefinitionRequest.builder()
-            .memoryLimit(100)
-            .name("test-space-quota-definition-name")
-            .nonBasicServicesAllowed(true)
-            .organizationId("test-organization-id")
-            .totalRoutes(1)
-            .totalServices(1)
-            .build();
-    }
-
     @Test(expected = IllegalStateException.class)
     public void noMemoryLimit() {
         CreateSpaceQuotaDefinitionRequest.builder()
@@ -95,6 +83,18 @@ public final class CreateSpaceQuotaDefinitionRequestTest {
             .nonBasicServicesAllowed(true)
             .organizationId("test-organization-id")
             .totalRoutes(1)
+            .build();
+    }
+
+    @Test
+    public void valid() {
+        CreateSpaceQuotaDefinitionRequest.builder()
+            .memoryLimit(100)
+            .name("test-space-quota-definition-name")
+            .nonBasicServicesAllowed(true)
+            .organizationId("test-organization-id")
+            .totalRoutes(1)
+            .totalServices(1)
             .build();
     }
 
