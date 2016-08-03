@@ -17,10 +17,13 @@
 package org.cloudfoundry.reactor.client.v2.spacequotadefinitions;
 
 import org.cloudfoundry.client.v2.Metadata;
+import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.spacequotadefinitions.AssociateSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.AssociateSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.CreateSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.CreateSpaceQuotaDefinitionResponse;
+import org.cloudfoundry.client.v2.spacequotadefinitions.DeleteSpaceQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.spacequotadefinitions.DeleteSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsRequest;
@@ -39,6 +42,7 @@ import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -159,6 +163,86 @@ public final class ReactorSpaceQuotaDefinitionsTest {
         @Override
         protected Publisher<CreateSpaceQuotaDefinitionResponse> invoke(CreateSpaceQuotaDefinitionRequest request) {
             return this.spaceQuotaDefinitions.create(request);
+        }
+    }
+
+    public static final class Delete extends AbstractClientApiTest<DeleteSpaceQuotaDefinitionRequest, DeleteSpaceQuotaDefinitionResponse> {
+
+        private final ReactorSpaceQuotaDefinitions spaceQuotaDefinitions = new ReactorSpaceQuotaDefinitions(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/space_quota_definitions/test-space-quota-definition-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected DeleteSpaceQuotaDefinitionResponse getResponse() {
+            return null;
+        }
+
+        @Override
+        protected DeleteSpaceQuotaDefinitionRequest getValidRequest() throws Exception {
+            return DeleteSpaceQuotaDefinitionRequest.builder()
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
+                .build();
+        }
+
+        @Override
+        protected Publisher<DeleteSpaceQuotaDefinitionResponse> invoke(DeleteSpaceQuotaDefinitionRequest request) {
+            return this.spaceQuotaDefinitions.delete(request);
+        }
+    }
+
+    public static final class DeleteAsync extends AbstractClientApiTest<DeleteSpaceQuotaDefinitionRequest, DeleteSpaceQuotaDefinitionResponse> {
+
+        private final ReactorSpaceQuotaDefinitions spaceQuotaDefinitions = new ReactorSpaceQuotaDefinitions(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/space_quota_definitions/test-space-quota-definition-id?async=true")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(ACCEPTED)
+                    .payload("fixtures/client/v2/space_quota_definitions/DELETE_{id}_async_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected DeleteSpaceQuotaDefinitionResponse getResponse() {
+            return DeleteSpaceQuotaDefinitionResponse.builder()
+                .metadata(Metadata.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .createdAt("2016-02-02T17:16:31Z")
+                    .build())
+                .entity(JobEntity.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .status("queued")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected DeleteSpaceQuotaDefinitionRequest getValidRequest() throws Exception {
+            return DeleteSpaceQuotaDefinitionRequest.builder()
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
+                .async(true)
+                .build();
+        }
+
+        @Override
+        protected Publisher<DeleteSpaceQuotaDefinitionResponse> invoke(DeleteSpaceQuotaDefinitionRequest request) {
+            return this.spaceQuotaDefinitions.delete(request);
         }
     }
 
