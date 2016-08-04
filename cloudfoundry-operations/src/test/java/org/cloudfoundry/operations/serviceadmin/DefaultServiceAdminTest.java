@@ -198,7 +198,7 @@ public final class DefaultServiceAdminTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, String.format("Service Broker %s does not exist", "test-service-broker-name"));
+                .expectError(IllegalArgumentException.class, String.format("Service Broker %s does not exist", "test-service-broker-name"));
         }
 
         @Override
@@ -223,7 +223,7 @@ public final class DefaultServiceAdminTest {
         @Override
         protected void assertions(TestSubscriber<ServiceBroker> testSubscriber) {
             testSubscriber
-                .assertEquals(ServiceBroker.builder()
+                .expectEquals(ServiceBroker.builder()
                     .id("test-service-broker-id")
                     .name("test-service-broker-resource-name")
                     .url("test-service-broker-resource-brokerUrl")

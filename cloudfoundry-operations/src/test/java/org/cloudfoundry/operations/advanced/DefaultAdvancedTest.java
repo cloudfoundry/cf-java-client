@@ -48,7 +48,7 @@ public final class DefaultAdvancedTest {
         @Override
         protected void assertions(TestSubscriber<String> testSubscriber) {
             testSubscriber
-                .assertEquals("test-code");
+                .expectEquals("test-code");
         }
 
         @Override

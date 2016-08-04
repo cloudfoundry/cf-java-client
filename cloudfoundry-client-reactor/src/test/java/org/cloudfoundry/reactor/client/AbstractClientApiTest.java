@@ -43,7 +43,7 @@ public abstract class AbstractClientApiTest<REQ, RSP> extends AbstractApiTest<RE
     @Test
     public final void error() throws Exception {
         mockRequest(getInteractionContext().getErrorResponse());
-        this.testSubscriber.assertError(CloudFoundryException.class, "CF-UnprocessableEntity(10008): The request is semantically invalid: space_guid and name unique");
+        this.testSubscriber.expectError(CloudFoundryException.class, "CF-UnprocessableEntity(10008): The request is semantically invalid: space_guid and name unique");
         invoke(getValidRequest()).subscribe(this.testSubscriber);
 
         this.testSubscriber.verify(Duration.ofSeconds(5));

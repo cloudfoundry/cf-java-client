@@ -56,7 +56,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getId)
             .then(sharedDomainId -> getSharedDomainResource(this.cloudFoundryClient, sharedDomainId))
             .subscribe(this.<GetSharedDomainResponse>testSubscriber()
-                .assertThat(response -> assertEquals(domainName, ResourceUtils.getEntity(response).getName())));
+                .expectThat(response -> assertEquals(domainName, ResourceUtils.getEntity(response).getName())));
     }
 
     @Test
@@ -72,7 +72,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
             .then(requestListSharedDomains(this.cloudFoundryClient, domainName)
                 .singleOrEmpty())
             .subscribe(this.testSubscriber()
-                .assertCount(0));
+                .expectCount(0));
     }
 
     @Test
@@ -89,7 +89,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
             .then(requestListSharedDomains(this.cloudFoundryClient, domainName)
                 .singleOrEmpty())
             .subscribe(this.testSubscriber()
-                .assertCount(0));
+                .expectCount(0));
     }
 
     @Test
@@ -104,7 +104,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getEntity)
             .map(SharedDomainEntity::getName)
             .subscribe(this.testSubscriber()
-                .assertEquals(domainName));
+                .expectEquals(domainName));
 
     }
 
@@ -117,7 +117,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
                 .filter(resource -> sharedDomainId.equals(ResourceUtils.getId(resource)))
                 .single())
             .subscribe(this.<SharedDomainResource>testSubscriber()
-                .assertThat(sharedDomainResource -> assertEquals(domainName, ResourceUtils.getEntity(sharedDomainResource).getName())));
+                .expectThat(sharedDomainResource -> assertEquals(domainName, ResourceUtils.getEntity(sharedDomainResource).getName())));
     }
 
     @Test
@@ -131,7 +131,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
                     .single()
             ))
             .subscribe(this.<Tuple2<String, SharedDomainResource>>testSubscriber()
-                .assertThat(consumer((id, resource) -> assertEquals(id, ResourceUtils.getId(resource)))));
+                .expectThat(consumer((id, resource) -> assertEquals(id, ResourceUtils.getId(resource)))));
     }
 
     private static Mono<String> getSharedDomainId(CloudFoundryClient cloudFoundryClient, String domainName) {

@@ -143,7 +143,7 @@ public final class CompareZips {
         assertEquals("Not both directories", ze1.t1.isDirectory(), ze2.t1.isDirectory());
         assertEquals("Different sizes", ze1.t1.getSize(), ze2.t1.getSize());
         assertEquals("Different compressed sizes", ze1.t1.getCompressedSize(), ze2.t1.getCompressedSize());
-        // assertEquals("Different timestamps", ze1.t1.getTime(), ze2.t1.getTime());  // CF changes the timestamps of the entries
+        // expectEquals("Different timestamps", ze1.t1.getTime(), ze2.t1.getTime());  // CF changes the timestamps of the entries
         assertEquals("Different cyclic redundancy check", ze1.t1.getCrc(), ze2.t1.getCrc());
         assertArrayEquals("Entry contents differ", ze1.t2, ze2.t2);
     }

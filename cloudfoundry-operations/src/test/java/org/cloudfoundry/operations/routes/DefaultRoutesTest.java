@@ -440,7 +440,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Boolean> testSubscriber) {
             testSubscriber
-                .assertEquals(false);
+                .expectEquals(false);
         }
 
         @Override
@@ -467,7 +467,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Boolean> testSubscriber) {
             testSubscriber
-                .assertEquals(false);
+                .expectEquals(false);
         }
 
         @Override
@@ -489,7 +489,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Boolean> testSubscriber) {
             testSubscriber
-                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
+                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override
@@ -517,7 +517,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Boolean> testSubscriber) {
             testSubscriber
-                .assertEquals(true);
+                .expectEquals(true);
         }
 
         @Override
@@ -546,7 +546,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Boolean> testSubscriber) {
             testSubscriber
-                .assertEquals(true);
+                .expectEquals(true);
         }
 
         @Override
@@ -575,7 +575,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Domain test-domain does not exist");
+                .expectError(IllegalArgumentException.class, "Domain test-domain does not exist");
         }
 
         @Override
@@ -603,7 +603,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Space test-space-name does not exist");
+                .expectError(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
 
         @Override
@@ -626,7 +626,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
+                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override
@@ -687,7 +687,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
+                .expectError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
         }
 
         @Override
@@ -715,7 +715,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Domain test-domain does not exist");
+                .expectError(IllegalArgumentException.class, "Domain test-domain does not exist");
         }
 
         @Override
@@ -743,7 +743,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Route test-host.test-domain does not exist");
+                .expectError(IllegalArgumentException.class, "Route test-host.test-domain does not exist");
         }
 
         @Override
@@ -765,7 +765,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
+                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override
@@ -844,7 +844,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
+                .expectError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
         }
 
         @Override
@@ -944,7 +944,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Route> testSubscriber) {
             testSubscriber
-                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
+                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override
@@ -963,7 +963,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Route> testSubscriber) {
             testSubscriber
-                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
+                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override
@@ -990,7 +990,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Route> testSubscriber) {
             testSubscriber
-                .assertEquals(fill(Route.builder())
+                .expectEquals(fill(Route.builder())
                     .application("test-application-name")
                     .domain("test-domain-name")
                     .host("test-route-entity-host")
@@ -1050,7 +1050,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Route> testSubscriber) {
             testSubscriber
-                .assertEquals(fill(Route.builder())
+                .expectEquals(fill(Route.builder())
                     .application("test-application-name")
                     .domain("test-domain-name")
                     .host("test-route-host")
@@ -1084,7 +1084,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Route> testSubscriber) {
             testSubscriber
-                .assertEquals(fill(Route.builder())
+                .expectEquals(fill(Route.builder())
                     .application("test-application-name")
                     .domain("test-domain-name")
                     .host("test-route-host")
@@ -1110,7 +1110,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Route> testSubscriber) {
             testSubscriber
-                .assertError(IllegalStateException.class, "MISSING_SPACE_ID");
+                .expectError(IllegalStateException.class, "MISSING_SPACE_ID");
         }
 
         @Override
@@ -1129,7 +1129,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Route> testSubscriber) {
             testSubscriber
-                .assertError(IllegalStateException.class, "MISSING_SPACE_ID");
+                .expectError(IllegalStateException.class, "MISSING_SPACE_ID");
         }
 
         @Override
@@ -1185,7 +1185,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Application test-application-name does not exist");
+                .expectError(IllegalArgumentException.class, "Application test-application-name does not exist");
         }
 
         @Override
@@ -1214,7 +1214,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Domain test-domain does not exist");
+                .expectError(IllegalArgumentException.class, "Domain test-domain does not exist");
         }
 
         @Override
@@ -1270,7 +1270,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
+                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override
@@ -1292,7 +1292,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalStateException.class, "MISSING_SPACE_ID");
+                .expectError(IllegalStateException.class, "MISSING_SPACE_ID");
         }
 
         @Override
@@ -1381,7 +1381,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Application test-application-name does not exist");
+                .expectError(IllegalArgumentException.class, "Application test-application-name does not exist");
         }
 
         @Override
@@ -1409,7 +1409,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Domain test-domain does not exist");
+                .expectError(IllegalArgumentException.class, "Domain test-domain does not exist");
         }
 
         @Override
@@ -1437,7 +1437,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Route test-host.test-domain does not exist");
+                .expectError(IllegalArgumentException.class, "Route test-host.test-domain does not exist");
         }
 
         @Override
@@ -1459,7 +1459,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
+                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override
@@ -1480,7 +1480,7 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalStateException.class, "MISSING_SPACE_ID");
+                .expectError(IllegalStateException.class, "MISSING_SPACE_ID");
         }
 
         @Override

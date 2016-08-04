@@ -91,7 +91,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
                     Mono.just(memberGroupId)
                 )))
             .subscribe(this.<Tuple2<AddMemberResponse, String>>testSubscriber()
-                .assertThat(consumer((response, memberGroupId) -> {
+                .expectThat(consumer((response, memberGroupId) -> {
                     assertEquals(memberGroupId, response.getMemberId());
                     assertEquals(Optional.of(memberDisplayName + "-origin"), response.getOrigin());
                     assertEquals(Optional.of(MemberType.GROUP), response.getType());
@@ -120,7 +120,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
                     Mono.just(userId)
                 )))
             .subscribe(this.<Tuple2<AddMemberResponse, String>>testSubscriber()
-                .assertThat(consumer((response, userId) -> {
+                .expectThat(consumer((response, userId) -> {
                     assertEquals(userId, response.getMemberId());
                     assertEquals(Optional.of(userName + "-origin"), response.getOrigin());
                     assertEquals(Optional.of(MemberType.USER), response.getType());
@@ -148,7 +148,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
                     Mono.just(userId)
                 )))
             .subscribe(this.<Tuple2<CheckMembershipResponse, String>>testSubscriber()
-                .assertThat(consumer((response, userId) -> {
+                .expectThat(consumer((response, userId) -> {
                     assertEquals(userId, response.getMemberId());
                     assertEquals(Optional.of("test-origin"), response.getOrigin());
                     assertEquals(Optional.of(MemberType.USER), response.getType());
@@ -173,7 +173,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
                 .filter(resource -> displayName.equals(resource.getDisplayName()))
                 .single())
             .subscribe(this.testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -186,7 +186,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
                     .groupId(groupId)
                     .build()))
             .subscribe(this.<DeleteGroupResponse>testSubscriber()
-                .assertThat(response -> assertEquals(displayName, response.getDisplayName())));
+                .expectThat(response -> assertEquals(displayName, response.getDisplayName())));
     }
 
     @Test
@@ -200,7 +200,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
                     .build())
                 .map(GetGroupResponse::getDisplayName))
             .subscribe(this.testSubscriber()
-                .assertEquals(displayName));
+                .expectEquals(displayName));
     }
 
     @Test
@@ -216,7 +216,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
                         .build()))
                 .single())
             .subscribe(this.<Group>testSubscriber()
-                .assertThat(group -> assertEquals(displayName, group.getDisplayName())));
+                .expectThat(group -> assertEquals(displayName, group.getDisplayName())));
     }
 
     @Test
@@ -232,7 +232,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
                         .build()))
                 .filter(group -> displayName.equals(group.getDisplayName())))
             .subscribe(this.<ExternalGroupResource>testSubscriber()
-                .assertThat(resource -> assertEquals(displayName + "-external-group", resource.getExternalGroup())));
+                .expectThat(resource -> assertEquals(displayName + "-external-group", resource.getExternalGroup())));
     }
 
     @Test
@@ -259,7 +259,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
                     Mono.just(userId)
                 )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -280,7 +280,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
             .cast(UserEntity.class)
             .single()
             .subscribe(this.<UserEntity>testSubscriber()
-                .assertThat(user -> assertEquals(userName, user.getUserName())));
+                .expectThat(user -> assertEquals(userName, user.getUserName())));
     }
 
     @Test
@@ -297,7 +297,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
             .flatMap(ignore -> requestListExternalGroupResource(this.uaaClient)
                 .filter(group -> displayName.equals(group.getDisplayName())))
             .subscribe(this.<ExternalGroupResource>testSubscriber()
-                .assertThat(resource -> {
+                .expectThat(resource -> {
                     assertEquals(displayName + "-external-group", resource.getExternalGroup());
                     assertEquals(displayName + "-origin", resource.getOrigin());
                 }));
@@ -325,7 +325,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
                     Mono.just(userId)
                 )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -343,7 +343,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
             .flatMap(ignore -> requestListExternalGroupResources(this.uaaClient))
             .filter(resource -> displayName.equals(resource.getDisplayName()))
             .subscribe(this.testSubscriber()
-                .assertCount(0));
+                .expectCount(0));
     }
 
     @Test
@@ -361,7 +361,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
             .flatMap(ignore -> requestListExternalGroupResources(this.uaaClient)
                 .filter(resource -> displayName.equals(resource.getDisplayName())))
             .subscribe(this.testSubscriber()
-                .assertCount(0));
+                .expectCount(0));
     }
 
     @Test
@@ -380,7 +380,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
                 .filter(resource -> newDisplayName.equals(resource.getDisplayName()))
                 .single())
             .subscribe(this.testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
 
     }
 

@@ -60,7 +60,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
                 Mono.just(organizationId)
             ))
             .subscribe(this.<Tuple2<CreatePrivateDomainResponse, String>>testSubscriber()
-                .assertThat(resourceMatchesDomainNameAndOrganizationId(privateDomainName)));
+                .expectThat(resourceMatchesDomainNameAndOrganizationId(privateDomainName)));
     }
 
     @Test
@@ -74,7 +74,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
                 .then(Mono.just(privateDomainResource)))
             .then(privateDomainResource -> requestGetPrivateDomain(this.cloudFoundryClient, ResourceUtils.getId(privateDomainResource)))
             .subscribe(testSubscriber()
-                .assertErrorMatch(CloudFoundryException.class, "CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"));
+                .expectErrorMatch(CloudFoundryException.class, "CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"));
     }
 
     @Test
@@ -91,7 +91,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
                 Mono.just(organizationId)
             )))
             .subscribe(this.<Tuple2<GetPrivateDomainResponse, String>>testSubscriber()
-                .assertThat(resourceMatchesDomainNameAndOrganizationId(privateDomainName)));
+                .expectThat(resourceMatchesDomainNameAndOrganizationId(privateDomainName)));
     }
 
     @Test
@@ -110,7 +110,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
                 Mono.just(organizationId)
             )))
             .subscribe(this.<Tuple2<PrivateDomainResource, String>>testSubscriber()
-                .assertThat(resourceMatchesDomainNameAndOrganizationId(privateDomainName)));
+                .expectThat(resourceMatchesDomainNameAndOrganizationId(privateDomainName)));
     }
 
     @Test
@@ -129,7 +129,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
                 Mono.just(organizationId)
             )))
             .subscribe(this.<Tuple2<PrivateDomainResource, String>>testSubscriber()
-                .assertThat(resourceMatchesDomainNameAndOrganizationId(privateDomainName)));
+                .expectThat(resourceMatchesDomainNameAndOrganizationId(privateDomainName)));
     }
 
     private static Flux<PrivateDomainResource> listPrivateDomains(CloudFoundryClient cloudFoundryClient) {

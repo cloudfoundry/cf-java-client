@@ -126,7 +126,7 @@ public final class DefaultBuildpacksTest {
         @Override
         protected void assertions(TestSubscriber<Buildpack> testSubscriber) {
             testSubscriber
-                .assertEquals(Buildpack.builder()
+                .expectEquals(Buildpack.builder()
                     .enabled(true)
                     .filename("test-buildpack-filename")
                     .id("test-buildpack-id")

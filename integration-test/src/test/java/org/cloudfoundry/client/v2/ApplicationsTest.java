@@ -124,7 +124,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 Mono.just(routeId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -151,7 +151,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 downloadApplication(this.cloudFoundryClient, targetId)
             )))
             .subscribe(this.<Tuple2<byte[], byte[]>>testSubscriber()
-                .assertThat(consumer((Consumer2<byte[], byte[]>) Assert::assertArrayEquals)));
+                .expectThat(consumer((Consumer2<byte[], byte[]>) Assert::assertArrayEquals)));
     }
 
     @Test
@@ -165,7 +165,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getEntity)
             ))
             .subscribe(this.<Tuple2<String, ApplicationEntity>>testSubscriber()
-                .assertThat(consumer((spaceId, entity) -> {
+                .expectThat(consumer((spaceId, entity) -> {
                     assertEquals(spaceId, entity.getSpaceId());
                     assertEquals(applicationName, entity.getName());
                 })));
@@ -183,7 +183,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build())))
             .then(applicationId -> requestGetApplication(this.cloudFoundryClient, applicationId))
             .subscribe(testSubscriber()
-                .assertErrorMatch(CloudFoundryException.class, "CF-AppNotFound\\([0-9]+\\): The app could not be found: .*"));
+                .expectErrorMatch(CloudFoundryException.class, "CF-AppNotFound\\([0-9]+\\): The app could not be found: .*"));
     }
 
     @Test
@@ -199,7 +199,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build())
                 .as(AbstractIntegrationTest::collectByteArray))
             .subscribe(this.<byte[]>testSubscriber()
-                .assertThat(ApplicationsTest::assertIsTestApplicationDroplet));
+                .expectThat(ApplicationsTest::assertIsTestApplicationDroplet));
     }
 
     @Test
@@ -217,7 +217,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .map(response -> getStringApplicationEnvValue(response.getApplicationEnvironmentJsons(), "VCAP_APPLICATION", "application_id")))
             )
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -231,7 +231,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 requestGetApplication(this.cloudFoundryClient, applicationId)
             ))
             .subscribe(this.<Tuple2<String, AbstractApplicationResource>>testSubscriber()
-                .assertThat(applicationIdAndResourceMatchesName(applicationName)));
+                .expectThat(applicationIdAndResourceMatchesName(applicationName)));
     }
 
     @Test
@@ -252,7 +252,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .cast(AbstractApplicationResource.class)
             ))
             .subscribe(this.<Tuple2<String, AbstractApplicationResource>>testSubscriber()
-                .assertThat(applicationIdAndResourceMatchesName(applicationName)));
+                .expectThat(applicationIdAndResourceMatchesName(applicationName)));
     }
 
     @Test
@@ -274,7 +274,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .cast(AbstractApplicationResource.class)
             ))
             .subscribe(this.<Tuple2<String, AbstractApplicationResource>>testSubscriber()
-                .assertThat(applicationIdAndResourceMatchesName(applicationName)));
+                .expectThat(applicationIdAndResourceMatchesName(applicationName)));
     }
 
     @Test
@@ -296,7 +296,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .cast(AbstractApplicationResource.class)
             ))
             .subscribe(this.<Tuple2<String, AbstractApplicationResource>>testSubscriber()
-                .assertThat(applicationIdAndResourceMatchesName(applicationName)));
+                .expectThat(applicationIdAndResourceMatchesName(applicationName)));
     }
 
     @Test
@@ -322,7 +322,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .cast(AbstractApplicationResource.class)
             )))
             .subscribe(this.<Tuple2<String, AbstractApplicationResource>>testSubscriber()
-                .assertThat(applicationIdAndResourceMatchesName(applicationName)));
+                .expectThat(applicationIdAndResourceMatchesName(applicationName)));
     }
 
     @Test
@@ -347,7 +347,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .cast(AbstractApplicationResource.class)
             )))
             .subscribe(this.<Tuple2<String, AbstractApplicationResource>>testSubscriber()
-                .assertThat(applicationIdAndResourceMatchesName(applicationName)));
+                .expectThat(applicationIdAndResourceMatchesName(applicationName)));
     }
 
     @Test
@@ -373,7 +373,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .cast(AbstractApplicationResource.class)
             )))
             .subscribe(this.<Tuple2<String, AbstractApplicationResource>>testSubscriber()
-                .assertThat(applicationIdAndResourceMatchesName(applicationName)));
+                .expectThat(applicationIdAndResourceMatchesName(applicationName)));
     }
 
     @Test
@@ -404,7 +404,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -436,7 +436,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -468,7 +468,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -500,7 +500,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -537,7 +537,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -556,7 +556,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 getSingleServiceBindingInstanceId(this.cloudFoundryClient, applicationId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -587,7 +587,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -651,7 +651,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build())))
             .then(applicationId -> waitForStagingApplication(this.cloudFoundryClient, applicationId))
             .subscribe(this.<AbstractApplicationResource>testSubscriber()
-                .assertThat(resource -> assertEquals(applicationName, ResourceUtils.getEntity(resource).getName())));
+                .expectThat(resource -> assertEquals(applicationName, ResourceUtils.getEntity(resource).getName())));
     }
 
     @Test
@@ -667,7 +667,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build())
                 .map(instanceStatistics -> instanceStatistics.getInstances().get("0").getStatistics().getName()))
             .subscribe(this.testSubscriber()
-                .assertEquals(applicationName));
+                .expectEquals(applicationName));
     }
 
     @Test
@@ -683,7 +683,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .map(SummaryApplicationResponse::getId)
                 .and(Mono.just(applicationId)))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -705,7 +705,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build()))))
             .then(function((applicationId, optionalSince) -> waitForInstanceRestart(this.cloudFoundryClient, applicationId, "0", optionalSince)))
             .subscribe(this.testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -740,7 +740,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .map(ResourceUtils::getEntity))
                 )))
             .subscribe(this.<Tuple2<ApplicationEntity, ApplicationEntity>>testSubscriber()
-                .assertThat(consumer((entity1, entity2) -> {
+                .expectThat(consumer((entity1, entity2) -> {
                     assertEquals("name change failed", applicationName2, entity1.getName());
                     assertEquals("env change failed", Collections.singletonMap("test-var", "test-value"), entity1.getEnvironmentJsons());
                     assertEquals("env not emptied", Collections.emptyMap(), entity2.getEnvironmentJsons());
@@ -759,7 +759,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 getBytes("test-application.zip")
             ))
             .subscribe(this.<Tuple2<byte[], byte[]>>testSubscriber()
-                .assertThat(consumer((bytes1, bytes2) -> zipAssertEquivalent(new ByteArrayInputStream(bytes1), new ByteArrayInputStream(bytes2)))));
+                .expectThat(consumer((bytes1, bytes2) -> zipAssertEquivalent(new ByteArrayInputStream(bytes1), new ByteArrayInputStream(bytes2)))));
     }
 
     @Test
@@ -774,7 +774,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 getBytes("test-application.zip")
             ))
             .subscribe(this.<Tuple2<byte[], byte[]>>testSubscriber()
-                .assertThat(consumer((bytes1, bytes2) -> zipAssertEquivalent(new ByteArrayInputStream(bytes1), new ByteArrayInputStream(bytes2)))));
+                .expectThat(consumer((bytes1, bytes2) -> zipAssertEquivalent(new ByteArrayInputStream(bytes1), new ByteArrayInputStream(bytes2)))));
     }
 
     private static Consumer<Tuple2<String, AbstractApplicationResource>> applicationIdAndResourceMatchesName(String applicationName) {

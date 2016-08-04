@@ -47,7 +47,7 @@ public final class StacksTest extends AbstractIntegrationTest {
                     .build()))
             .map(resource -> resource.getEntity().getName())
             .subscribe(this.testSubscriber()
-                .assertEquals(this.stackName));
+                .expectEquals(this.stackName));
     }
 
     @Test
@@ -62,7 +62,7 @@ public final class StacksTest extends AbstractIntegrationTest {
                     .filter(resource -> ResourceUtils.getId(resource).equals(stackId)))
             .map(resource -> resource.getEntity().getName())
             .subscribe(this.testSubscriber()
-                .assertEquals(this.stackName));
+                .expectEquals(this.stackName));
     }
 
     @Test
@@ -74,7 +74,7 @@ public final class StacksTest extends AbstractIntegrationTest {
                 .build()))
             .map(resource -> resource.getEntity().getName())
             .subscribe(this.testSubscriber()
-                .assertEquals(this.stackName));
+                .expectEquals(this.stackName));
     }
 
     private static Mono<String> getStackId(CloudFoundryClient cloudFoundryClient, String stackName) {

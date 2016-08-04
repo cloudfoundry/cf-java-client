@@ -82,7 +82,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 Mono.just(organizationId)
             ))
             .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
-                .assertThat(entityMatchesDomainNameAndOrganizationId(domainName)));
+                .expectThat(entityMatchesDomainNameAndOrganizationId(domainName)));
     }
 
     @Test
@@ -95,7 +95,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))))
             .then(domainId -> requestGetDomain(this.cloudFoundryClient, domainId))
             .subscribe(testSubscriber()
-                .assertErrorMatch(CloudFoundryException.class, "CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"));
+                .expectErrorMatch(CloudFoundryException.class, "CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"));
     }
 
     @Test
@@ -107,7 +107,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
             .as(thenKeep(domainId -> requestDeleteDomainAsyncFalse(this.cloudFoundryClient, domainId)))
             .then(domainId -> requestGetDomain(this.cloudFoundryClient, domainId))
             .subscribe(testSubscriber()
-                .assertErrorMatch(CloudFoundryException.class, "CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"));
+                .expectErrorMatch(CloudFoundryException.class, "CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"));
     }
 
     @Test
@@ -124,7 +124,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 Mono.just(organizationId)
             )))
             .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
-                .assertThat(entityMatchesDomainNameAndOrganizationId(domainName)));
+                .expectThat(entityMatchesDomainNameAndOrganizationId(domainName)));
     }
 
     @Test
@@ -144,7 +144,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 Mono.just(organizationId)
             )))
             .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
-                .assertThat(entityMatchesDomainNameAndOrganizationId(domainName)));
+                .expectThat(entityMatchesDomainNameAndOrganizationId(domainName)));
     }
 
     @Test
@@ -165,7 +165,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 Mono.just(spaceId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -192,7 +192,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 Mono.just(spaceId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -214,7 +214,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getId)
                 .and(Mono.just(spaceId))))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
 
     }
 
@@ -238,7 +238,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 Mono.just(spaceId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -260,7 +260,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 Mono.just(spaceId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -280,7 +280,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 Mono.just(organizationId)
             )))
             .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
-                .assertThat(entityMatchesDomainNameAndOrganizationId(domainName)));
+                .expectThat(entityMatchesDomainNameAndOrganizationId(domainName)));
     }
 
     @Test
@@ -300,7 +300,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 Mono.just(organizationId)
             )))
             .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
-                .assertThat(entityMatchesDomainNameAndOrganizationId(domainName)));
+                .expectThat(entityMatchesDomainNameAndOrganizationId(domainName)));
     }
 
     private static Mono<DomainEntity> createDomainEntity(CloudFoundryClient cloudFoundryClient, String organizationId, String domainName) {

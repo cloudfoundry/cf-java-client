@@ -60,7 +60,7 @@ public final class PaginationUtilsTest {
                     .page(page)
                     .build()))
             .subscribe(testSubscriber
-                .assertCount(3));
+                .expectCount(3));
 
         testSubscriber.verify(Duration.ofSeconds(1));
     }
@@ -78,7 +78,7 @@ public final class PaginationUtilsTest {
                     .page(page)
                     .build()))
             .subscribe(testSubscriber
-                .assertCount(0));
+                .expectCount(0));
 
         testSubscriber.verify(Duration.ofSeconds(1));
     }
@@ -96,7 +96,7 @@ public final class PaginationUtilsTest {
                     .page(page)
                     .build()))
             .subscribe(testSubscriber
-                .assertCount(0));
+                .expectCount(0));
 
         testSubscriber.verify(Duration.ofSeconds(1));
     }
@@ -116,7 +116,7 @@ public final class PaginationUtilsTest {
                     .page(page)
                     .build()))
             .subscribe(testSubscriber
-                .assertCount(3));
+                .expectCount(3));
 
         testSubscriber.verify(Duration.ofSeconds(1));
     }
@@ -136,7 +136,7 @@ public final class PaginationUtilsTest {
                     .startIndex(startIndex)
                     .build()))
             .subscribe(testSubscriber
-                .assertCount(3));
+                .expectCount(3));
 
         testSubscriber.verify(Duration.ofSeconds(1));
     }
@@ -154,7 +154,7 @@ public final class PaginationUtilsTest {
                     .startIndex(startIndex)
                     .build()))
             .subscribe(testSubscriber
-                .assertCount(0));
+                .expectCount(0));
 
         testSubscriber.verify(Duration.ofSeconds(1));
     }

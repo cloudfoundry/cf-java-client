@@ -73,7 +73,7 @@ public final class UsernameProviderTest {
         new UsernameProvider(this.connectionContext, this.tokenProvider, this.tokens)
             .get()
             .subscribe(testSubscriber
-                .assertEquals("test-username"));
+                .expectEquals("test-username"));
 
         testSubscriber.verify(Duration.ofSeconds(1));
     }

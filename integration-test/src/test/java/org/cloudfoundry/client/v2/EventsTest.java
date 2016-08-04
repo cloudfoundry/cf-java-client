@@ -48,7 +48,7 @@ public final class EventsTest extends AbstractIntegrationTest {
                         .build())
             ))
             .subscribe(this.<Tuple2<EventResource, GetEventResponse>>testSubscriber()
-                .assertThat(consumer((expected, actual) -> assertEquals(ResourceUtils.getId(expected), ResourceUtils.getId(actual)))));
+                .expectThat(consumer((expected, actual) -> assertEquals(ResourceUtils.getId(expected), ResourceUtils.getId(actual)))));
     }
 
     @Test
@@ -63,7 +63,7 @@ public final class EventsTest extends AbstractIntegrationTest {
                     .next()
             ))
             .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -79,7 +79,7 @@ public final class EventsTest extends AbstractIntegrationTest {
                     .next()
             ))
             .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -95,7 +95,7 @@ public final class EventsTest extends AbstractIntegrationTest {
                     .next()
             ))
             .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -111,7 +111,7 @@ public final class EventsTest extends AbstractIntegrationTest {
                     .next()
             ))
             .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     private static Mono<EventResource> getFirstEvent(CloudFoundryClient cloudFoundryClient) {

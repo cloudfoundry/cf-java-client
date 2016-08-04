@@ -419,7 +419,7 @@ public final class DefaultOrganizationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
+                .expectError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
         }
 
         @Override
@@ -448,7 +448,7 @@ public final class DefaultOrganizationsTest {
         @Override
         protected void assertions(TestSubscriber<OrganizationDetail> testSubscriber) {
             testSubscriber
-                .assertEquals(fill(OrganizationDetail.builder())
+                .expectEquals(fill(OrganizationDetail.builder())
                     .domain("test-name")
                     .id("test-organization-id")
                     .name("test-organization-name")
@@ -483,7 +483,7 @@ public final class DefaultOrganizationsTest {
         @Override
         protected void assertions(TestSubscriber<OrganizationSummary> testSubscriber) {
             testSubscriber
-                .assertEquals(fill(OrganizationSummary.builder(), "organization-")
+                .expectEquals(fill(OrganizationSummary.builder(), "organization-")
                     .build());
         }
 

@@ -68,7 +68,7 @@ public final class DefaultStacksTest {
         @Override
         protected void assertions(TestSubscriber<Stack> testSubscriber) {
             testSubscriber
-                .assertEquals(fill(Stack.builder(), "stack-")
+                .expectEquals(fill(Stack.builder(), "stack-")
                     .build());
         }
 
@@ -94,7 +94,7 @@ public final class DefaultStacksTest {
         @Override
         protected void assertions(TestSubscriber<Stack> testSubscriber) {
             testSubscriber
-                .assertEquals(fill(Stack.builder(), "stack-")
+                .expectEquals(fill(Stack.builder(), "stack-")
                     .build());
         }
 

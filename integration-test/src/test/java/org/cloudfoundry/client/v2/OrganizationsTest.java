@@ -131,7 +131,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 Mono.just(organizationId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -149,7 +149,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             ))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -171,7 +171,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -189,7 +189,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             ))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -211,7 +211,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -229,7 +229,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             ))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -252,7 +252,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -274,7 +274,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -292,7 +292,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             ))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -306,7 +306,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getEntity)
             .map(OrganizationEntity::getName)
             .subscribe(this.<String>testSubscriber()
-                .assertEquals(organizationName));
+                .expectEquals(organizationName));
     }
 
     @Test
@@ -322,7 +322,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))))
             .then(organizationId -> requestGetOrganization(this.cloudFoundryClient, organizationId))
             .subscribe(testSubscriber()
-                .assertErrorMatch(CloudFoundryException.class, "CF-OrganizationNotFound\\([0-9]+\\): The organization could not be found: .*"));
+                .expectErrorMatch(CloudFoundryException.class, "CF-OrganizationNotFound\\([0-9]+\\): The organization could not be found: .*"));
     }
 
     @Test
@@ -337,7 +337,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .build())))
             .then(organizationId -> requestGetOrganization(this.cloudFoundryClient, organizationId))
             .subscribe(testSubscriber()
-                .assertErrorMatch(CloudFoundryException.class, "CF-OrganizationNotFound\\([0-9]+\\): The organization could not be found: .*"));
+                .expectErrorMatch(CloudFoundryException.class, "CF-OrganizationNotFound\\([0-9]+\\): The organization could not be found: .*"));
     }
 
     @Test
@@ -352,7 +352,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getEntity)
             .map(OrganizationEntity::getName)
             .subscribe(this.<String>testSubscriber()
-                .assertEquals(organizationName));
+                .expectEquals(organizationName));
     }
 
     @Test
@@ -366,7 +366,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .build()))
             .map(GetOrganizationInstanceUsageResponse::getInstanceUsage)
             .subscribe(this.testSubscriber()
-                .assertEquals(0));
+                .expectEquals(0));
     }
 
     @Test
@@ -380,7 +380,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .build()))
             .map(GetOrganizationMemoryUsageResponse::getMemoryUsageInMb)
             .subscribe(this.testSubscriber()
-                .assertEquals(0));
+                .expectEquals(0));
     }
 
     @Test
@@ -405,7 +405,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getId)
                 .filter(organizationId::equals))
             .subscribe(this.testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -425,7 +425,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -450,7 +450,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -482,7 +482,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -507,7 +507,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -532,7 +532,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -564,7 +564,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Ignore("TODO: wait for resolution of issue https://github.com/cloudfoundry/cloud_controller_ng/issues/594, and then possibly create user APIs")
@@ -590,7 +590,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -610,7 +610,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -635,7 +635,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -667,7 +667,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -692,7 +692,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -717,7 +717,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -749,7 +749,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Ignore("TODO: wait for resolution of issue https://github.com/cloudfoundry/cloud_controller_ng/issues/594, and then possibly create user APIs")
@@ -776,7 +776,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)))
             )
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -796,7 +796,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)))
             )
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Ignore("TODO: await resolution of issue https://github.com/cloudfoundry/cloud_controller_ng/issues/595")
@@ -828,7 +828,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)))
             )
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Ignore("TODO: await resolution of issue https://github.com/cloudfoundry/cloud_controller_ng/issues/595")
@@ -856,7 +856,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)))
             )
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -873,7 +873,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getId)
                 .filter(organizationId::equals)))
             .subscribe(this.testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -890,7 +890,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getId)
                 .filter(organizationId::equals)))
             .subscribe(this.testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -907,7 +907,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getId)
                 .filter(organizationId::equals)))
             .subscribe(this.testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -917,7 +917,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         requestCreateOrganization(this.cloudFoundryClient, organizationName)
             .flatMap(ignore -> requestListOrganizations(this.cloudFoundryClient, builder -> builder.name(organizationName)))
             .subscribe(this.testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -937,7 +937,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Ignore("TODO: find a valid status other than 'active' and re-instate this test")
@@ -953,7 +953,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getEntity)
                 .map(OrganizationEntity::getName))
             .subscribe(this.testSubscriber()
-                .assertEquals(organizationName));
+                .expectEquals(organizationName));
     }
 
     @Test
@@ -970,7 +970,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getId)
                 .filter(organizationId::equals)))
             .subscribe(this.testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -990,7 +990,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -1015,7 +1015,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -1047,7 +1047,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -1072,7 +1072,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -1097,7 +1097,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -1129,7 +1129,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Ignore("TODO: wait for resolution of issue https://github.com/cloudfoundry/cloud_controller_ng/issues/594, and then possibly create user APIs")
@@ -1155,7 +1155,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -1181,7 +1181,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -1201,7 +1201,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)))
             )
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Ignore("TODO: rework this test when managed services are available")
@@ -1217,7 +1217,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .then(organizationId -> requestListOrganizationServices(this.cloudFoundryClient, organizationId)
                         .count()))
             .subscribe(this.<Tuple2<Long, Long>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501")
@@ -1255,7 +1255,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .page(page)
                     .build())))
             .subscribe(this.testSubscriber()
-                .assertCount(0));
+                .expectCount(0));
     }
 
     @Test
@@ -1267,7 +1267,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .as(thenKeep(organizationId -> requestCreateSpace(this.cloudFoundryClient, organizationId, spaceName)))
             .flatMap(organizationId -> requestListOrganizationSpaces(this.cloudFoundryClient, organizationId))
             .subscribe(this.testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -1293,7 +1293,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             ))))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -1320,7 +1320,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             ))))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -1340,7 +1340,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             ))))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -1360,7 +1360,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -1385,7 +1385,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -1417,7 +1417,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -1442,7 +1442,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -1467,7 +1467,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -1499,7 +1499,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Ignore("TODO: wait for resolution of issue https://github.com/cloudfoundry/cloud_controller_ng/issues/594, and then possibly create user APIs")
@@ -1525,7 +1525,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -1545,7 +1545,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .build()))))
             .flatMap(function((organizationId, userId) -> requestListOrganizationAuditors(this.cloudFoundryClient, organizationId)))
             .subscribe(testSubscriber()
-                .assertCount(0));
+                .expectCount(0));
     }
 
     @Test
@@ -1565,7 +1565,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .build()))))
             .flatMap(function((organizationId, userId) -> requestListOrganizationAuditors(this.cloudFoundryClient, organizationId)))
             .subscribe(testSubscriber()
-                .assertCount(0));
+                .expectCount(0));
     }
 
     @Test
@@ -1585,7 +1585,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .build()))))
             .flatMap(function((organizationId, userId) -> requestListOrganizationBillingManagers(this.cloudFoundryClient, organizationId)))
             .subscribe(testSubscriber()
-                .assertCount(0));
+                .expectCount(0));
     }
 
     @Test
@@ -1605,7 +1605,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .build()))))
             .flatMap(function((organizationId, userId) -> requestListOrganizationBillingManagers(this.cloudFoundryClient, organizationId)))
             .subscribe(testSubscriber()
-                .assertCount(0));
+                .expectCount(0));
     }
 
     @Test
@@ -1625,7 +1625,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .build()))))
             .flatMap(function((organizationId, userId) -> requestListOrganizationManagers(this.cloudFoundryClient, organizationId)))
             .subscribe(testSubscriber()
-                .assertCount(0));
+                .expectCount(0));
     }
 
     @Test
@@ -1645,7 +1645,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .build()))))
             .flatMap(function((organizationId, userId) -> requestListOrganizationManagers(this.cloudFoundryClient, organizationId)))
             .subscribe(testSubscriber()
-                .assertCount(0));
+                .expectCount(0));
     }
 
     @Test
@@ -1671,7 +1671,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .build()))))
             .flatMap(function((organizationId, privateDomainId) -> requestListOrganizationPrivateDomains(this.cloudFoundryClient, organizationId)))
             .subscribe(this.testSubscriber()
-                .assertCount(0));
+                .expectCount(0));
     }
 
     @Test
@@ -1691,7 +1691,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .build()))))
             .flatMap(function((organizationId, userId) -> requestListOrganizationUsers(this.cloudFoundryClient, organizationId)))
             .subscribe(testSubscriber()
-                .assertCount(0));
+                .expectCount(0));
     }
 
     @Test
@@ -1711,7 +1711,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .build()))))
             .flatMap(function((organizationId, userId) -> requestListOrganizationUsers(this.cloudFoundryClient, organizationId)))
             .subscribe(testSubscriber()
-                .assertCount(0));
+                .expectCount(0));
     }
 
     @Test
@@ -1725,7 +1725,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .build())
                 .map(SummaryOrganizationResponse::getName))
             .subscribe(this.testSubscriber()
-                .assertEquals(organizationName));
+                .expectEquals(organizationName));
     }
 
     @Test
@@ -1743,7 +1743,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getEntity)
             .map(OrganizationEntity::getName)
             .subscribe(this.testSubscriber()
-                .assertEquals(organizationName2));
+                .expectEquals(organizationName2));
     }
 
     private static Mono<String> createApplicationId(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {

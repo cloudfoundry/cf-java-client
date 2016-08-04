@@ -43,7 +43,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .list())
             .filter(organizationSummary -> organizationName.equals(organizationSummary.getName()))
             .subscribe(testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -53,7 +53,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .list()
                 .filter(organization -> organization.getId().equals(organizationId)))
             .subscribe(testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
 }

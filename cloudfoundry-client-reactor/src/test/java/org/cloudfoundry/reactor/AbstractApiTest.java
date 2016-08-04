@@ -44,7 +44,7 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
     protected void assertions(TestSubscriber<RSP> testSubscriber, Publisher<RSP> expected) {
         if (expected != null) {
             Flux.from(expected)
-                .subscribe(testSubscriber::assertEquals);
+                .subscribe(testSubscriber::expectEquals);
         }
     }
 

@@ -72,7 +72,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                 .build())
             .map(ResourceUtils::getEntity)
             .subscribe(this.testSubscriber()
-                .assertEquals(expectedEntity)
+                .expectEquals(expectedEntity)
             );
     }
 
@@ -90,7 +90,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                 .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))))
             .then(organizationQuotaDefinitionId -> requestGetOrganizationQuotaDefinition(this.cloudFoundryClient, organizationQuotaDefinitionId))
             .subscribe(this.testSubscriber()
-                .assertErrorMatch(CloudFoundryException.class, "CF-QuotaDefinitionNotFound\\([0-9]+\\): Quota Definition could not be found: .*"));
+                .expectErrorMatch(CloudFoundryException.class, "CF-QuotaDefinitionNotFound\\([0-9]+\\): Quota Definition could not be found: .*"));
     }
 
     @Test
@@ -121,7 +121,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                     .build()))
             .map(ResourceUtils::getEntity)
             .subscribe(this.testSubscriber()
-                .assertEquals(expectedEntity));
+                .expectEquals(expectedEntity));
     }
 
     @Test
@@ -140,7 +140,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
             .map(ResourceUtils::getEntity)
             .map(OrganizationQuotaDefinitionEntity::getName)
             .subscribe(this.testSubscriber()
-                .assertEquals(quotaDefinitionName));
+                .expectEquals(quotaDefinitionName));
     }
 
     @Test
@@ -177,7 +177,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                     .build()))
             .map(ResourceUtils::getEntity)
             .subscribe(this.testSubscriber()
-                .assertEquals(expectedEntity));
+                .expectEquals(expectedEntity));
     }
 
     private static Mono<CreateOrganizationQuotaDefinitionResponse> requestCreateOrganizationQuotaDefinition(CloudFoundryClient cloudFoundryClient, String quotaDefinitionName) {

@@ -64,17 +64,17 @@ public final class TestSubscriber<T> implements Subscriber<T> {
 
     private Subscription subscription;
 
-    public TestSubscriber<T> assertCount(Integer expected) {
+    public TestSubscriber<T> expectCount(Integer expected) {
         this.countExpectation = expected;
         return this;
     }
 
-    public TestSubscriber<T> assertEquals(T expected) {
-        assertThat(actual -> Assert.assertEquals(expected, actual));
+    public TestSubscriber<T> expectEquals(T expected) {
+        expectThat(actual -> Assert.assertEquals(expected, actual));
         return this;
     }
 
-    public TestSubscriber<T> assertError(Class<? extends Throwable> expected, String format, Object... args) {
+    public TestSubscriber<T> expectError(Class<? extends Throwable> expected, String format, Object... args) {
         this.errorExpectation = actual -> {
             StringWriter writer = new StringWriter();
             actual.printStackTrace(new PrintWriter(writer));
@@ -88,7 +88,7 @@ public final class TestSubscriber<T> implements Subscriber<T> {
         return this;
     }
 
-    public TestSubscriber<T> assertErrorMatch(Class<? extends Throwable> expected, String patternString) {
+    public TestSubscriber<T> expectErrorMatch(Class<? extends Throwable> expected, String patternString) {
         this.errorExpectation = actual -> {
             StringWriter writer = new StringWriter();
             actual.printStackTrace(new PrintWriter(writer));
@@ -105,7 +105,7 @@ public final class TestSubscriber<T> implements Subscriber<T> {
         return this;
     }
 
-    public TestSubscriber<T> assertThat(Consumer<T> expectation) {
+    public TestSubscriber<T> expectThat(Consumer<T> expectation) {
         this.expectations.add(expectation);
         return this;
     }
