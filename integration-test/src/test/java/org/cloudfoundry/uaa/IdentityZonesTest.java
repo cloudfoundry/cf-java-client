@@ -50,7 +50,7 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
             .flatMapIterable(ListIdentityZonesResponse::getIdentityZones)
             .filter(resource -> identityZoneName.equals(resource.getName()))
             .subscribe(this.testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -67,7 +67,7 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
             .flatMapIterable(ListIdentityZonesResponse::getIdentityZones)
             .filter(resource -> identityZoneName.equals(resource.getName()))
             .subscribe(this.testSubscriber()
-                .assertCount(0));
+                .expectCount(0));
     }
 
     @Test
@@ -82,7 +82,7 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
                     .build()))
             .map(GetIdentityZoneResponse::getName)
             .subscribe(this.testSubscriber()
-                .assertEquals(identityZoneName));
+                .expectEquals(identityZoneName));
     }
 
     @Test
@@ -97,7 +97,7 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
             .flatMapIterable(ListIdentityZonesResponse::getIdentityZones)
             .filter(resource -> identityZoneName.equals(resource.getName()))
             .subscribe(this.testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -117,7 +117,7 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
             .flatMapIterable(ListIdentityZonesResponse::getIdentityZones)
             .filter(resource -> newSubdomainName.equals(resource.getSubdomain()))
             .subscribe(this.testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     private static Mono<String> getIdentityZoneId(UaaClient uaaClient, String identityZoneName, String subdomainName) {

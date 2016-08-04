@@ -216,7 +216,7 @@ public final class DefaultDomainsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Organization test-organization does not exist");
+                .expectError(IllegalArgumentException.class, "Organization test-organization does not exist");
         }
 
         @Override
@@ -267,13 +267,13 @@ public final class DefaultDomainsTest {
         @Override
         protected void assertions(TestSubscriber<Domain> testSubscriber) {
             testSubscriber
-                .assertEquals(Domain.builder()
+                .expectEquals(Domain.builder()
                     .id("test-private-domain-id")
                     .name("test-private-domain-name")
                     .status(Status.OWNED)
                     .build());
             testSubscriber
-                .assertEquals(Domain.builder()
+                .expectEquals(Domain.builder()
                     .id("test-shared-domain-id")
                     .name("test-shared-domain-name")
                     .status(Status.SHARED)
@@ -301,7 +301,7 @@ public final class DefaultDomainsTest {
         @Override
         protected void assertions(TestSubscriber<Domain> testSubscriber) {
             testSubscriber
-                .assertEquals(Domain.builder()
+                .expectEquals(Domain.builder()
                     .id("test-private-domain-id")
                     .name("test-private-domain-name")
                     .status(Status.OWNED)
@@ -329,7 +329,7 @@ public final class DefaultDomainsTest {
         @Override
         protected void assertions(TestSubscriber<Domain> testSubscriber) {
             testSubscriber
-                .assertEquals(Domain.builder()
+                .expectEquals(Domain.builder()
                     .id("test-shared-domain-id")
                     .name("test-shared-domain-name")
                     .status(Status.SHARED)
@@ -384,7 +384,7 @@ public final class DefaultDomainsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Private domain test-domain does not exist");
+                .expectError(IllegalArgumentException.class, "Private domain test-domain does not exist");
         }
 
         @Override

@@ -33,7 +33,7 @@ public final class AdvancedTest extends AbstractIntegrationTest {
         this.cloudFoundryOperations.advanced()
             .sshCode()
             .subscribe(this.<String>testSubscriber()
-                .assertThat(code -> {
+                .expectThat(code -> {
                     assertNotNull(code);
                     assertTrue(code.length() == 6);
                 }));

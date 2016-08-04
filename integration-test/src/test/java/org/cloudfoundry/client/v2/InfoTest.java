@@ -38,7 +38,7 @@ public final class InfoTest extends AbstractIntegrationTest {
             .get(GetInfoRequest.builder()
                 .build())
             .subscribe(this.<GetInfoResponse>testSubscriber()
-                .assertThat(response -> {
+                .expectThat(response -> {
                     Version expected = Version.valueOf(SUPPORTED_API_VERSION);
                     Version actual = Version.valueOf(response.getApiVersion());
 

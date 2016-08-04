@@ -102,7 +102,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build()))
             .map(ApplicationDetail::getName)
             .subscribe(testSubscriber()
-                .assertEquals(applicationName));
+                .expectEquals(applicationName));
     }
 
     @Test
@@ -115,7 +115,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .name(applicationName)
                     .build()))
             .subscribe(testSubscriber()
-                .assertEquals(ApplicationHealthCheck.PORT));
+                .expectEquals(ApplicationHealthCheck.PORT));
     }
 
     @Test
@@ -129,7 +129,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build()))
             .map(ApplicationDetail::getName)
             .subscribe(testSubscriber()
-                .assertEquals(applicationName));
+                .expectEquals(applicationName));
     }
 
     @Test
@@ -147,7 +147,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .name(applicationName)
                 .build())
             .subscribe(testSubscriber()
-                .assertError(IllegalStateException.class, "Domain %s not found", domainName));
+                .expectError(IllegalStateException.class, "Domain %s not found", domainName));
     }
 
     @Test
@@ -265,7 +265,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build()))
             .map(ApplicationEnvironments::getUserProvided)
             .subscribe(testSubscriber()
-                .assertEquals(FluentMap.builder()
+                .expectEquals(FluentMap.builder()
                     .entry(variableName1, variableValue1)
                     .entry(variableName2, variableValue2)
                     .build()));
@@ -332,7 +332,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build()))
             .map(ApplicationEnvironments::getUserProvided)
             .subscribe(testSubscriber()
-                .assertEquals(Collections.emptyMap()));
+                .expectEquals(Collections.emptyMap()));
     }
 
     @Test
@@ -367,7 +367,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build()))
             .map(ApplicationEnvironments::getUserProvided)
             .subscribe(testSubscriber()
-                .assertEquals(Collections.singletonMap(variableName2, variableValue2)));
+                .expectEquals(Collections.singletonMap(variableName2, variableValue2)));
     }
 
     private static Mono<Void> bindServiceToApplication(CloudFoundryOperations cloudFoundryOperations, String applicationName, String serviceInstanceName) {

@@ -80,7 +80,7 @@ public final class TokensTest extends AbstractIntegrationTest {
                     .scope("scim.userids")
                     .build()))
             .subscribe(this.testSubscriber()
-                .assertError(HttpException.class, "HTTP request failed with code: 403"));
+                .expectError(HttpException.class, "HTTP request failed with code: 403"));
     }
 
     @Ignore("TODO: use test authorizationCode")
@@ -93,7 +93,7 @@ public final class TokensTest extends AbstractIntegrationTest {
                 .clientSecret(this.clientSecret)
                 .build())
             .subscribe(this.<GetTokenByAuthorizationCodeResponse>testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -105,7 +105,7 @@ public final class TokensTest extends AbstractIntegrationTest {
                 .tokenFormat(TokenFormat.OPAQUE)
                 .build())
             .subscribe(this.<GetTokenByClientCredentialsResponse>testSubscriber()
-                .assertThat(response -> assertEquals("bearer", response.getTokenType())));
+                .expectThat(response -> assertEquals("bearer", response.getTokenType())));
     }
 
     @Ignore("TODO: use test one-time passcode")
@@ -119,7 +119,7 @@ public final class TokensTest extends AbstractIntegrationTest {
                 .tokenFormat(TokenFormat.OPAQUE)
                 .build())
             .subscribe(this.<GetTokenByOneTimePasscodeResponse>testSubscriber()
-                .assertThat(response -> assertEquals("bearer", response.getTokenType())));
+                .expectThat(response -> assertEquals("bearer", response.getTokenType())));
     }
 
     @Ignore("TODO: use test openid authorizationCode")
@@ -133,7 +133,7 @@ public final class TokensTest extends AbstractIntegrationTest {
                 .tokenFormat(TokenFormat.OPAQUE)
                 .build())
             .subscribe(this.<GetTokenByOpenIdResponse>testSubscriber()
-                .assertThat(response -> assertEquals("bearer", response.getTokenType())));
+                .expectThat(response -> assertEquals("bearer", response.getTokenType())));
     }
 
     @Ignore("TODO: use test username and password")
@@ -148,7 +148,7 @@ public final class TokensTest extends AbstractIntegrationTest {
                 .tokenFormat(TokenFormat.OPAQUE)
                 .build())
             .subscribe(this.<GetTokenByPasswordResponse>testSubscriber()
-                .assertThat(response -> assertEquals("bearer", response.getTokenType())));
+                .expectThat(response -> assertEquals("bearer", response.getTokenType())));
     }
 
     @Test
@@ -157,7 +157,7 @@ public final class TokensTest extends AbstractIntegrationTest {
             .getKey(GetTokenKeyRequest.builder()
                 .build())
             .subscribe(this.<GetTokenKeyResponse>testSubscriber()
-                .assertThat(response -> {
+                .expectThat(response -> {
                     assertEquals("sig", response.getUse());
                     assertNotNull(response.getValue());
                 }));
@@ -179,7 +179,7 @@ public final class TokensTest extends AbstractIntegrationTest {
                     Mono.just(getKey)
                 ))
             .subscribe(this.<Tuple2<TokenKey, GetTokenKeyResponse>>testSubscriber()
-                .assertThat(consumer(TokensTest::assertTokenKeyEquality)));
+                .expectThat(consumer(TokensTest::assertTokenKeyEquality)));
     }
 
     @Ignore("TODO: use test refresh token")
@@ -193,7 +193,7 @@ public final class TokensTest extends AbstractIntegrationTest {
                 .refreshToken("a-refresh-token")
                 .build())
             .subscribe(this.<RefreshTokenResponse>testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     private static void assertTokenKeyEquality(AbstractTokenKey tk1, AbstractTokenKey tk2) {

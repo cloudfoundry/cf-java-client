@@ -46,7 +46,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
                     .build()))
             .map(ServiceInstance::getName)
             .subscribe(testSubscriber()
-                .assertEquals(serviceInstanceName));
+                .expectEquals(serviceInstanceName));
     }
 
 }

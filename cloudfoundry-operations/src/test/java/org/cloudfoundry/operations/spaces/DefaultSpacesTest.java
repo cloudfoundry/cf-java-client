@@ -468,7 +468,7 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Space test-space-name does not exist");
+                .expectError(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
 
         @Override
@@ -549,7 +549,7 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Space quota definition test-space-quota does not exist");
+                .expectError(IllegalArgumentException.class, "Space quota definition test-space-quota does not exist");
         }
 
         @Override
@@ -575,7 +575,7 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Organization test-other-organization does not exist");
+                .expectError(IllegalArgumentException.class, "Organization test-other-organization does not exist");
         }
 
         @Override
@@ -660,7 +660,7 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
+                .expectError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
         }
 
         @Override
@@ -685,7 +685,7 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Space test-space-name does not exist");
+                .expectError(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
 
         @Override
@@ -705,7 +705,7 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
+                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override
@@ -779,7 +779,7 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Space test-space-name does not exist");
+                .expectError(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
 
         @Override
@@ -810,7 +810,7 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<SpaceDetail> testSubscriber) {
             testSubscriber
-                .assertEquals(SpaceDetail.builder()
+                .expectEquals(SpaceDetail.builder()
                     .application("test-application-name")
                     .domain("test-domain-name")
                     .id(TEST_SPACE_ID)
@@ -846,7 +846,7 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<SpaceDetail> testSubscriber) {
             testSubscriber
-                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
+                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override
@@ -877,7 +877,7 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<SpaceDetail> testSubscriber) {
             testSubscriber
-                .assertEquals(SpaceDetail.builder()
+                .expectEquals(SpaceDetail.builder()
                     .application("test-application-name")
                     .domain("test-domain-name")
                     .id(TEST_SPACE_ID)
@@ -919,7 +919,7 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<SpaceDetail> testSubscriber) {
             testSubscriber
-                .assertEquals(SpaceDetail.builder()
+                .expectEquals(SpaceDetail.builder()
                     .application("test-application-name")
                     .domain("test-domain-name")
                     .id(TEST_SPACE_ID)
@@ -955,7 +955,7 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<SpaceSummary> testSubscriber) {
             testSubscriber
-                .assertEquals(fill(SpaceSummary.builder(), "space-")
+                .expectEquals(fill(SpaceSummary.builder(), "space-")
                     .build());
         }
 
@@ -974,7 +974,7 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<SpaceSummary> testSubscriber) {
             testSubscriber
-                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
+                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override
@@ -1023,7 +1023,7 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Space test-space-name does not exist");
+                .expectError(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
 
         @Override
@@ -1049,7 +1049,7 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<Boolean> testSubscriber) {
             testSubscriber
-                .assertEquals(true);
+                .expectEquals(true);
         }
 
         @Override
@@ -1074,7 +1074,7 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<Boolean> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Space test-space-name does not exist");
+                .expectError(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
 
         @Override

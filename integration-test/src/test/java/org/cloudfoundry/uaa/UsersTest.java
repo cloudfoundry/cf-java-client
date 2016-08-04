@@ -71,7 +71,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .userId(userId)
                     .build()))
             .subscribe(this.<ChangeUserPasswordResponse>testSubscriber()
-                .assertThat(response -> {
+                .expectThat(response -> {
                     assertEquals("password updated", response.getMessage());
                     assertEquals("ok", response.getStatus());
                 }));
@@ -96,7 +96,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .userName(userName)
                 .build())
             .subscribe(this.<CreateUserResponse>testSubscriber()
-                .assertThat(response -> {
+                .expectThat(response -> {
                     assertEquals("test-external-id", response.getExternalId());
                     assertEquals(userName, response.getUserName());
                 }));
@@ -115,7 +115,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(userId -> requestListUsers(this.uaaClient, userId))
             .map(ListUsersResponse::getTotalResults)
             .subscribe(this.testSubscriber()
-                .assertEquals(0));
+                .expectEquals(0));
     }
 
     @Test
@@ -130,7 +130,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .build()))
             .map(GetUserVerificationLinkResponse::getVerifyLink)
             .subscribe(this.<String>testSubscriber()
-                .assertThat(location -> assertTrue(location.contains("/verify_user?code="))));
+                .expectThat(location -> assertTrue(location.contains("/verify_user?code="))));
     }
 
     @Test
@@ -143,7 +143,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .flatMapIterable(InviteUsersResponse::getFailedInvites)
             .single()
             .subscribe(this.<Invite>testSubscriber()
-                .assertThat(invite -> {
+                .expectThat(invite -> {
                     assertEquals("test-email-address", invite.getEmail());
                     assertEquals("provider.ambiguous", invite.getErrorCode());
                 }));
@@ -161,7 +161,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .flatMapIterable(ListUsersResponse::getResources)
             .map(User::getUserName)
             .subscribe(this.testSubscriber()
-                .assertEquals(userName));
+                .expectEquals(userName));
     }
 
     @Test
@@ -176,7 +176,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .flatMapIterable(LookupUserIdsResponse::getResources)
             .map(UserId::getUserName)
             .subscribe(this.testSubscriber()
-                .assertEquals(userName));
+                .expectEquals(userName));
     }
 
     @Test
@@ -201,7 +201,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .flatMap(response -> Flux.fromIterable(response.getEmail())
                 .map(Email::getValue))
             .subscribe(this.testSubscriber()
-                .assertEquals("test-email-2"));
+                .expectEquals("test-email-2"));
     }
 
     @Test
@@ -215,7 +215,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .build()))
             .map(VerifyUserResponse::getUserName)
             .subscribe(this.testSubscriber()
-                .assertEquals(userName));
+                .expectEquals(userName));
     }
 
     private static Mono<String> createUserId(UaaClient uaaClient, String userName) {

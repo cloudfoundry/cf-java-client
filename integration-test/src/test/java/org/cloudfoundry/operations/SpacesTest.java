@@ -44,7 +44,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .list())
             .filter(spaceSummary -> spaceName.equals(spaceSummary.getName()))
             .subscribe(testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -53,7 +53,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .list()
             .count()
             .subscribe(this.<Long>testSubscriber()
-                .assertThat(count -> assertTrue(count > 0)));
+                .expectThat(count -> assertTrue(count > 0)));
     }
 
 }

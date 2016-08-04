@@ -82,7 +82,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
                         .map(ResourceUtils::getEntity)
                 )))
             .subscribe(this.<Tuple3<String, String, RouteMappingEntity>>testSubscriber()
-                .assertThat(responseMatchesInputs()));
+                .expectThat(responseMatchesInputs()));
     }
 
     @Test
@@ -100,7 +100,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
                     .build())))
             .then(routeMappingId -> requestGetRouteMapping(this.cloudFoundryClient, routeMappingId))
             .subscribe(this.testSubscriber()
-                .assertErrorMatch(CloudFoundryException.class, "CF-RouteMappingNotFound\\([0-9]+\\): The route mapping could not be found: .*"));
+                .expectErrorMatch(CloudFoundryException.class, "CF-RouteMappingNotFound\\([0-9]+\\): The route mapping could not be found: .*"));
     }
 
     @Test
@@ -119,7 +119,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
                 .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job))))
             .then(routeMappingId -> requestGetRouteMapping(this.cloudFoundryClient, routeMappingId))
             .subscribe(this.testSubscriber()
-                .assertErrorMatch(CloudFoundryException.class, "CF-RouteMappingNotFound\\([0-9]+\\): The route mapping could not be found: .*"));
+                .expectErrorMatch(CloudFoundryException.class, "CF-RouteMappingNotFound\\([0-9]+\\): The route mapping could not be found: .*"));
     }
 
     @Test
@@ -139,7 +139,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             ))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -168,7 +168,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
                 .filter(resource -> ResourceUtils.getEntity(resource).getApplicationId().equals(applicationId))
                 .single())
             .subscribe(testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -197,7 +197,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
                 .filter(resource -> ResourceUtils.getEntity(resource).getRouteId().equals(routeId))
                 .single())
             .subscribe(testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     private static Mono<String> createRouteMappingId(CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {

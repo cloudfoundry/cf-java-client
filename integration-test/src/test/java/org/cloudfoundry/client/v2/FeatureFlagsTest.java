@@ -70,7 +70,7 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
                 .map(response -> Tuples.of(flagName, response)))
             .collectList()
             .subscribe(this.<List<Tuple2<String, GetFeatureFlagResponse>>>testSubscriber()
-                .assertThat(getFlagList -> {
+                .expectThat(getFlagList -> {
                     for (Tuple2<String, GetFeatureFlagResponse> tuple : getFlagList) {
                         String flagName = tuple.t1;
                         GetFeatureFlagResponse getResponse = tuple.t2;
@@ -87,7 +87,7 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
             .list(ListFeatureFlagsRequest.builder()
                 .build())
             .subscribe(this.<ListFeatureFlagsResponse>testSubscriber()
-                .assertThat(response -> {
+                .expectThat(response -> {
                     Set<String> returnedFlagSet = flagNameSetFrom(response.getFeatureFlags());
 
                     assertTrue(String.format("feature flags listed (%s) does not include core set (%s)", returnedFlagSet, coreFeatureFlagNameList),
@@ -124,7 +124,7 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
                     ))))
             .collectList()
             .subscribe(this.<List<Tuple3<GetFeatureFlagResponse, SetFeatureFlagResponse, SetFeatureFlagResponse>>>testSubscriber()
-                .assertThat(responsesList -> {
+                .expectThat(responsesList -> {
                     for (Tuple3<GetFeatureFlagResponse, SetFeatureFlagResponse, SetFeatureFlagResponse> responses : responsesList) {
                         GetFeatureFlagResponse getResponse = responses.t1;
                         SetFeatureFlagResponse setResponse = responses.t2;

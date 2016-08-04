@@ -69,7 +69,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                     .build()))
             .map(response -> ResourceUtils.getEntity(response).getName())
             .subscribe(this.testSubscriber()
-                .assertEquals(instanceName));
+                .expectEquals(instanceName));
     }
 
     @Test
@@ -84,7 +84,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                     .build()))
             .thenMany(requestListUserProvidedServiceInstances(this.cloudFoundryClient, instanceName))
             .subscribe(this.testSubscriber()
-                .assertCount(0));
+                .expectCount(0));
     }
 
     @Test
@@ -99,7 +99,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                     .build()))
             .map(response -> ResourceUtils.getEntity(response).getName())
             .subscribe(this.testSubscriber()
-                .assertEquals(instanceName));
+                .expectEquals(instanceName));
     }
 
     @Test
@@ -117,7 +117,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
             .single()
             .map(response -> ResourceUtils.getEntity(response).getName())
             .subscribe(this.testSubscriber()
-                .assertEquals(instanceName));
+                .expectEquals(instanceName));
     }
 
     @Test
@@ -148,7 +148,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                                 .build()))
                         .single())))
             .subscribe(this.<Tuple3<String, String, ServiceBindingResource>>testSubscriber()
-                .assertThat(serviceBindingMatchesRequest()));
+                .expectThat(serviceBindingMatchesRequest()));
     }
 
     @Test
@@ -180,7 +180,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                         .map(UpdateUserProvidedServiceInstanceResponse::getEntity)
                 )))
             .subscribe(this.<Tuple2<UserProvidedServiceInstanceEntity, UserProvidedServiceInstanceEntity>>testSubscriber()
-                .assertThat(consumer((entity1, entity2) -> {
+                .expectThat(consumer((entity1, entity2) -> {
                     assertEquals("name not updated", newInstanceName, entity1.getName());
                     assertEquals("credentials not set", Collections.singletonMap("test-cred", "some value"), entity1.getCredentials());
                     assertEquals("credentials not cleared", Collections.emptyMap(), entity2.getCredentials());

@@ -85,7 +85,7 @@ public final class PackagesTest extends AbstractIntegrationTest {
                     .build()))
             .map(Package::getState)
             .subscribe(testSubscriber()
-                .assertThat(state -> assertTrue(state == PROCESSING_UPLOAD || state == READY)));
+                .expectThat(state -> assertTrue(state == PROCESSING_UPLOAD || state == READY)));
     }
 
 }

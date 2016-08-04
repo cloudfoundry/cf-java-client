@@ -103,7 +103,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
                 .tokenSalt("test-token-salt")
                 .build())
             .subscribe(this.<CreateClientResponse>testSubscriber()
-                .assertThat(response -> {
+                .expectThat(response -> {
                     assertEquals(Arrays.asList(PASSWORD, REFRESH_TOKEN), response.getAuthorizedGrantTypes());
                     assertEquals(clientId, response.getClientId());
                     assertEquals(Arrays.asList("client.read", "client.write"), response.getScopes());
@@ -124,7 +124,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
             .flatMap(ignore -> requestListClients(this.uaaClient))
             .filter(client -> clientId.equals(client.getClientId()))
             .subscribe(this.testSubscriber()
-                .assertCount(0));
+                .expectCount(0));
     }
 
     @Test
@@ -138,7 +138,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
                     .clientId(clientId)
                     .build()))
             .subscribe(this.<GetClientResponse>testSubscriber()
-                .assertThat(response -> {
+                .expectThat(response -> {
                     assertEquals(Arrays.asList(PASSWORD, REFRESH_TOKEN), response.getAuthorizedGrantTypes());
                     assertEquals(clientId, response.getClientId());
                 }));
@@ -152,7 +152,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
                     .clientId(this.clientId)
                     .build()))
             .subscribe(this.<GetMetadataResponse>testSubscriber()
-                .assertThat(metadata -> {
+                .expectThat(metadata -> {
                     assertEquals("http://test.get.url", metadata.getAppLaunchUrl());
                     assertEquals(this.clientId, metadata.getClientId());
                 }));
@@ -170,7 +170,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
             .flatMapIterable(ListClientsResponse::getResources)
             .filter(client -> clientId.equals(client.getClientId()))
             .subscribe(this.testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -183,7 +183,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
             .filter(metadata -> this.clientId.equals(metadata.getClientId()))
             .single()
             .subscribe(this.<Metadata>testSubscriber()
-                .assertThat(metadata -> {
+                .expectThat(metadata -> {
                     assertEquals("http://test.list.url", metadata.getAppLaunchUrl());
                     assertEquals(this.clientId, metadata.getClientId());
                 }));
@@ -210,7 +210,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
             .flatMap(ignore -> requestListClients(this.uaaClient))
             .filter(client -> clientId.equals(client.getClientId()))
             .subscribe(this.<Client>testSubscriber()
-                .assertThat(client -> {
+                .expectThat(client -> {
                     assertEquals(Collections.singletonList(CLIENT_CREDENTIALS), client.getAuthorizedGrantTypes());
                     assertEquals(clientId, client.getClientId());
                     assertEquals("test-name", client.getName());
@@ -231,7 +231,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
                 .build())
             .then(requestGetMetadata(this.uaaClient, this.clientId))
             .subscribe(this.<GetMetadataResponse>testSubscriber()
-                .assertThat(metadata -> {
+                .expectThat(metadata -> {
                     assertEquals(appIcon, metadata.getAppIcon());
                     assertEquals("http://test.app.launch.url", metadata.getAppLaunchUrl());
                     assertEquals(this.clientId, metadata.getClientId());

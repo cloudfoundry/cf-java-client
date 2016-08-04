@@ -46,7 +46,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
                 .list())
             .filter(buildpack -> buildpackName.equals(buildpack.getName()))
             .subscribe(testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
 
     }
 

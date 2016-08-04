@@ -67,7 +67,7 @@ public final class DefaultSpaceAdminTest {
         @Override
         protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) {
             testSubscriber
-                .assertEquals(fill(SpaceQuota.builder(), "space-quota-definition-")
+                .expectEquals(fill(SpaceQuota.builder(), "space-quota-definition-")
                     .build());
         }
 
@@ -88,7 +88,7 @@ public final class DefaultSpaceAdminTest {
         @Override
         protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) {
             testSubscriber
-                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
+                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override
@@ -113,7 +113,7 @@ public final class DefaultSpaceAdminTest {
         @Override
         protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Space Quota test-space-quota-definition-name does not exist");
+                .expectError(IllegalArgumentException.class, "Space Quota test-space-quota-definition-name does not exist");
         }
 
         @Override
@@ -138,7 +138,7 @@ public final class DefaultSpaceAdminTest {
         @Override
         protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) {
             testSubscriber
-                .assertEquals(fill(SpaceQuota.builder(), "space-quota-definition-")
+                .expectEquals(fill(SpaceQuota.builder(), "space-quota-definition-")
                     .build());
         }
 
@@ -157,7 +157,7 @@ public final class DefaultSpaceAdminTest {
         @Override
         protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) {
             testSubscriber
-                .assertError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
+                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
         }
 
         @Override

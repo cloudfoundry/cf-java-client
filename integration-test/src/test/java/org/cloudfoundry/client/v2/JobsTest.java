@@ -59,7 +59,7 @@ public final class JobsTest extends AbstractIntegrationTest {
             .filter(predicate((getId, deleteId) -> !"0".equals(getId)))
             .repeatWhenEmpty(5, DelayUtils.instant())
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
 }

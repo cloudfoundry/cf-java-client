@@ -69,7 +69,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
                     requestCreateServiceBinding(this.cloudFoundryClient, applicationId, serviceInstanceId)
                 )))
             .subscribe(this.<Tuple3<String, String, CreateServiceBindingResponse>>testSubscriber()
-                .assertThat(consumer(ServiceBindingsTest::testServiceBinding)));
+                .expectThat(consumer(ServiceBindingsTest::testServiceBinding)));
     }
 
     @Test
@@ -87,7 +87,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
             .as(thenKeep(function((serviceInstanceId, applicationId, serviceBindingId) -> deleteServiceBinding(this.cloudFoundryClient, serviceBindingId))))
             .then(function((serviceInstanceId, applicationId, serviceBindingId) -> requestGetServiceBinding(this.cloudFoundryClient, serviceBindingId)))
             .subscribe(this.testSubscriber()
-                .assertErrorMatch(CloudFoundryException.class, "CF-ServiceBindingNotFound\\([0-9]+\\): The service binding could not be found: .*"));
+                .expectErrorMatch(CloudFoundryException.class, "CF-ServiceBindingNotFound\\([0-9]+\\): The service binding could not be found: .*"));
     }
 
     @Test
@@ -109,7 +109,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
                     requestGetServiceBinding(this.cloudFoundryClient, serviceBindingId)
                 )))
             .subscribe(this.<Tuple3<String, String, GetServiceBindingResponse>>testSubscriber()
-                .assertThat(consumer(ServiceBindingsTest::testServiceBinding)));
+                .expectThat(consumer(ServiceBindingsTest::testServiceBinding)));
     }
 
     @Test
@@ -133,7 +133,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
                         .single()
                 )))
             .subscribe(this.<Tuple3<String, String, ServiceBindingResource>>testSubscriber()
-                .assertThat(consumer(ServiceBindingsTest::testServiceBinding)));
+                .expectThat(consumer(ServiceBindingsTest::testServiceBinding)));
     }
 
     @Test
@@ -157,7 +157,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
                         .single()
                 )))
             .subscribe(this.<Tuple3<String, String, ServiceBindingResource>>testSubscriber()
-                .assertThat(consumer(ServiceBindingsTest::testServiceBinding)));
+                .expectThat(consumer(ServiceBindingsTest::testServiceBinding)));
     }
 
     @Test
@@ -181,7 +181,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
                         .single()
                 )))
             .subscribe(this.<Tuple3<String, String, ServiceBindingResource>>testSubscriber()
-                .assertThat(consumer(ServiceBindingsTest::testServiceBinding)));
+                .expectThat(consumer(ServiceBindingsTest::testServiceBinding)));
     }
 
     private static Mono<String> createApplicationId(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {

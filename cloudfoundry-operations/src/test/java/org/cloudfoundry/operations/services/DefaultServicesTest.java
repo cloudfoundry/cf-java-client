@@ -877,7 +877,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Application test-application-name does not exist");
+                .expectError(IllegalArgumentException.class, "Application test-application-name does not exist");
         }
 
         @Override
@@ -905,7 +905,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Service instance test-service-instance-name does not exist");
+                .expectError(IllegalArgumentException.class, "Service instance test-service-instance-name does not exist");
         }
 
         @Override
@@ -989,7 +989,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalStateException.class, "MISSING_SPACE_ID");
+                .expectError(IllegalStateException.class, "MISSING_SPACE_ID");
         }
 
         @Override
@@ -1047,7 +1047,7 @@ public final class DefaultServicesTest {
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber.assertError(IllegalArgumentException.class,
+            testSubscriber.expectError(IllegalArgumentException.class,
                 String.format("Service instance %s does not exist", "test-service-instance-does-not-exist"));
         }
 
@@ -1130,7 +1130,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalStateException.class, "MISSING_SPACE_ID");
+                .expectError(IllegalStateException.class, "MISSING_SPACE_ID");
         }
 
         @Override
@@ -1156,7 +1156,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Service instance test-invalid-name does not exist");
+                .expectError(IllegalArgumentException.class, "Service instance test-invalid-name does not exist");
         }
 
         @Override
@@ -1206,7 +1206,7 @@ public final class DefaultServicesTest {
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber.assertError(IllegalArgumentException.class,
+            testSubscriber.expectError(IllegalArgumentException.class,
                 String.format("Service instance %s does not exist", "test-service-instance"));
         }
 
@@ -1233,7 +1233,7 @@ public final class DefaultServicesTest {
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber.assertError(IllegalArgumentException.class,
+            testSubscriber.expectError(IllegalArgumentException.class,
                 String.format("Service key %s does not exist", "test-service-key-not-found"));
         }
 
@@ -1289,7 +1289,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<ServiceInstance> testSubscriber) {
             testSubscriber
-                .assertEquals(fill(ServiceInstance.builder())
+                .expectEquals(fill(ServiceInstance.builder())
                     .application("test-application")
                     .documentationUrl("test-documentation-url")
                     .id("test-service-instance-id")
@@ -1323,7 +1323,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<ServiceInstance> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Service instance test-invalid-name does not exist");
+                .expectError(IllegalArgumentException.class, "Service instance test-invalid-name does not exist");
         }
 
         @Override
@@ -1343,7 +1343,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<ServiceInstance> testSubscriber) {
             testSubscriber
-                .assertError(IllegalStateException.class, "MISSING_SPACE_ID");
+                .expectError(IllegalStateException.class, "MISSING_SPACE_ID");
         }
 
         @Override
@@ -1370,7 +1370,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<ServiceInstance> testSubscriber) {
             testSubscriber
-                .assertEquals(ServiceInstance.builder()
+                .expectEquals(ServiceInstance.builder()
                     .application("test-application")
                     .id("test-service-instance-id")
                     .name("test-service-instance-name")
@@ -1401,7 +1401,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<ServiceKey> testSubscriber) {
             testSubscriber
-                .assertEquals(ServiceKey.builder()
+                .expectEquals(ServiceKey.builder()
                     .credential("key", "val")
                     .id("test-service-key-id")
                     .name("test-service-key-name")
@@ -1432,7 +1432,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<ServiceKey> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Service key test-service-key-not-found does not exist");
+                .expectError(IllegalArgumentException.class, "Service key test-service-key-not-found does not exist");
         }
 
         @Override
@@ -1464,12 +1464,12 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<ServiceInstance> testSubscriber) {
             testSubscriber
-                .assertEquals(ServiceInstance.builder()
+                .expectEquals(ServiceInstance.builder()
                     .name("test-service-instance1")
                     .id("test-service-instance1-id")
                     .type(ServiceInstanceType.USER_PROVIDED)
                     .build())
-                .assertEquals(fill(ServiceInstance.builder())
+                .expectEquals(fill(ServiceInstance.builder())
                     .application("test-application")
                     .documentationUrl("test-documentation-url")
                     .id("test-service-instance2-id")
@@ -1518,7 +1518,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<ServiceInstance> testSubscriber) {
             testSubscriber
-                .assertError(IllegalStateException.class, "MISSING_SPACE_ID");
+                .expectError(IllegalStateException.class, "MISSING_SPACE_ID");
         }
 
         @Override
@@ -1542,7 +1542,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<ServiceKey> testSubscriber) {
             testSubscriber
-                .assertEquals(ServiceKey.builder()
+                .expectEquals(ServiceKey.builder()
                     .credential("key", "val")
                     .id("test-service-key-id")
                     .name("test-service-key-entity-name")
@@ -1596,7 +1596,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<ServiceKey> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class,
+                .expectError(IllegalArgumentException.class,
                     String.format("Service instance %s does not exist", "test-service-instance-name"));
         }
 
@@ -1624,7 +1624,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<ServiceOffering> testSubscriber) {
             testSubscriber
-                .assertEquals(ServiceOffering.builder()
+                .expectEquals(ServiceOffering.builder()
                     .description("test-service1-description")
                     .id("test-service1-id")
                     .label("test-service1")
@@ -1635,7 +1635,7 @@ public final class DefaultServicesTest {
                         .name("test-service1-plan")
                         .build())
                     .build())
-                .assertEquals(ServiceOffering.builder()
+                .expectEquals(ServiceOffering.builder()
                     .description("test-service2-description")
                     .id("test-service2-id")
                     .label("test-service2")
@@ -1669,7 +1669,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<ServiceOffering> testSubscriber) {
             testSubscriber
-                .assertEquals(ServiceOffering.builder()
+                .expectEquals(ServiceOffering.builder()
                     .description("test-service-description")
                     .id("test-service-id")
                     .label("test-service")
@@ -1762,7 +1762,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
+                .expectError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
         }
 
         @Override
@@ -1783,7 +1783,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalStateException.class, "MISSING_SPACE_ID");
+                .expectError(IllegalStateException.class, "MISSING_SPACE_ID");
         }
 
         @Override
@@ -1844,7 +1844,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "New service plan test-plan not found");
+                .expectError(IllegalArgumentException.class, "New service plan test-plan not found");
         }
 
         @Override
@@ -1930,7 +1930,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Plan does not exist for the test-name service");
+                .expectError(IllegalArgumentException.class, "Plan does not exist for the test-name service");
         }
 
         @Override
@@ -2025,7 +2025,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Service Plan test-plan is not visible to your organization");
+                .expectError(IllegalArgumentException.class, "Service Plan test-plan is not visible to your organization");
         }
 
         @Override
@@ -2055,7 +2055,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Plan for the test-name service cannot be updated");
+                .expectError(IllegalArgumentException.class, "Plan for the test-name service cannot be updated");
         }
 
         @Override
@@ -2111,7 +2111,7 @@ public final class DefaultServicesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "User provided service instance test-service does not exist");
+                .expectError(IllegalArgumentException.class, "User provided service instance test-service does not exist");
         }
 
         @Override

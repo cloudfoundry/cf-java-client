@@ -126,7 +126,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -149,7 +149,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
             .subscribe(this.testSubscriber()
-                .assertEquals(this.username));
+                .expectEquals(this.username));
     }
 
     @Test
@@ -168,7 +168,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -191,7 +191,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
             .subscribe(this.testSubscriber()
-                .assertEquals(this.username));
+                .expectEquals(this.username));
     }
 
     @Test
@@ -210,7 +210,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -228,7 +228,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
             .subscribe(this.testSubscriber()
-                .assertEquals(this.username));
+                .expectEquals(this.username));
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656")
@@ -250,7 +250,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getEntity)
             .map(SpaceEntity::getName)
             .subscribe(this.<String>testSubscriber()
-                .assertEquals(spaceName));
+                .expectEquals(spaceName));
     }
 
     @Test
@@ -302,7 +302,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getEntity)
             .map(SpaceEntity::getName)
             .subscribe(this.<String>testSubscriber()
-                .assertEquals(spaceName));
+                .expectEquals(spaceName));
     }
 
     @Test
@@ -317,7 +317,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .build()))
             .map(GetSpaceSummaryResponse::getName)
             .subscribe(this.<String>testSubscriber()
-                .assertEquals(spaceName));
+                .expectEquals(spaceName));
     }
 
     @Test
@@ -334,7 +334,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -350,7 +350,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .map(ApplicationResource::getEntity)
             .map(ApplicationEntity::getName)
             .subscribe(this.<String>testSubscriber()
-                .assertEquals(applicationName));
+                .expectEquals(applicationName));
     }
 
     @Test
@@ -366,7 +366,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .map(ApplicationResource::getEntity)
             .map(ApplicationEntity::getName)
             .subscribe(this.<String>testSubscriber()
-                .assertEquals(applicationName));
+                .expectEquals(applicationName));
     }
 
     @Test
@@ -387,7 +387,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -405,7 +405,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getEntity)
             .map(ApplicationEntity::getName)
             .subscribe(this.<String>testSubscriber()
-                .assertEquals(applicationName));
+                .expectEquals(applicationName));
     }
 
     @Test
@@ -431,7 +431,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getEntity)
             .map(ApplicationEntity::getName)
             .subscribe(this.<String>testSubscriber()
-                .assertEquals(applicationName));
+                .expectEquals(applicationName));
     }
 
     @Test
@@ -454,7 +454,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getEntity)
             .map(UserEntity::getUsername)
             .subscribe(this.testSubscriber()
-                .assertEquals(this.username));
+                .expectEquals(this.username));
     }
 
     @Test
@@ -477,7 +477,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getEntity)
             .map(UserEntity::getUsername)
             .subscribe(this.testSubscriber()
-                .assertEquals(this.username));
+                .expectEquals(this.username));
     }
 
     @Test
@@ -494,7 +494,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .flatMap(function((spaceId, domainId) -> requestListSpaceDomains(this.cloudFoundryClient, spaceId)))
             .filter(domainResource -> domainName.equals(ResourceUtils.getEntity(domainResource).getName()))
             .subscribe(testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -508,7 +508,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getEntity)
             .map(DomainEntity::getName)
             .subscribe(this.<String>testSubscriber()
-                .assertEquals(domainName));
+                .expectEquals(domainName));
     }
 
     @Ignore("Filter parameter not honoured: see https://github.com/cloudfoundry/cloud_controller_ng/issues/584")
@@ -545,7 +545,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getEntity)
             .map(DomainEntity::getName)
             .subscribe(this.<String>testSubscriber()
-                .assertEquals(domainName));
+                .expectEquals(domainName));
     }
 
     @Test
@@ -558,7 +558,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getEntity)
             .map(EventEntity::getType)
             .subscribe(this.<String>testSubscriber()
-                .assertEquals("audit.space.create"));
+                .expectEquals("audit.space.create"));
     }
 
     @Test
@@ -571,7 +571,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getEntity)
             .map(EventEntity::getType)
             .subscribe(this.<String>testSubscriber()
-                .assertEquals("audit.space.create"));
+                .expectEquals("audit.space.create"));
     }
 
     @Test
@@ -585,7 +585,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getEntity)
             .map(EventEntity::getType)
             .subscribe(this.<String>testSubscriber()
-                .assertEquals("audit.space.create"));
+                .expectEquals("audit.space.create"));
     }
 
     @Test
@@ -602,7 +602,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .map(EventEntity::getSpaceId)
             ))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -623,7 +623,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .single()
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522686 really create a new user")
@@ -645,7 +645,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .single()
             ))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -661,7 +661,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -675,7 +675,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
             .subscribe(this.testSubscriber()
-                .assertEquals(this.username));
+                .expectEquals(this.username));
     }
 
     @Test
@@ -700,7 +700,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
             .subscribe(this.testSubscriber()
-                .assertEquals(this.username));
+                .expectEquals(this.username));
     }
 
     @Test
@@ -717,7 +717,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
             .subscribe(this.testSubscriber()
-                .assertEquals(this.username));
+                .expectEquals(this.username));
     }
 
     @Test
@@ -746,7 +746,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -775,7 +775,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -789,7 +789,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
             .subscribe(this.testSubscriber()
-                .assertEquals(this.username));
+                .expectEquals(this.username));
     }
 
     @Test
@@ -811,7 +811,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -833,7 +833,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .single()
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -856,7 +856,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .single()
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -878,7 +878,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .single()
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Test
@@ -900,7 +900,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .single()
             )))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
+                .expectThat(this::assertTupleEquality));
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656")
@@ -996,7 +996,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                         .build()))
                 .map(ResourceUtils::getEntity)))
             .subscribe(this.<UserSpaceRoleEntity>testSubscriber()
-                .assertThat(userSpaceRoleEntity -> {
+                .expectThat(userSpaceRoleEntity -> {
                     assertEquals(this.username, userSpaceRoleEntity.getUsername());
                     assertEquals(Collections.singletonList("space_manager"), userSpaceRoleEntity.getSpaceRoles());
                 }));
@@ -1155,7 +1155,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .build()))
             .map(GetSpaceSummaryResponse::getName)
             .subscribe(this.<String>testSubscriber()
-                .assertEquals(spaceName2));
+                .expectEquals(spaceName2));
     }
 
     @Test

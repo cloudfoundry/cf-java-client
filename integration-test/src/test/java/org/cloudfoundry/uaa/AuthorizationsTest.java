@@ -46,7 +46,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
                 .clientId(this.clientId)
                 .build())
             .subscribe(this.<String>testSubscriber()
-                .assertThat(code -> {
+                .expectThat(code -> {
                     assertNotNull(code);
                     assertTrue(code.length() == 6);
                 }));
@@ -60,7 +60,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
                 .redirectUri("http://redirect.to/app")
                 .build())
             .subscribe(this.<String>testSubscriber()
-                .assertThat(location -> assertTrue(location.startsWith("https://uaa."))));
+                .expectThat(location -> assertTrue(location.startsWith("https://uaa."))));
     }
 
     @Test
@@ -71,7 +71,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
                 .redirectUri("http://redirect.to/app")
                 .build())
             .subscribe(this.<String>testSubscriber()
-                .assertThat(location -> assertTrue(location.startsWith("https://uaa."))));
+                .expectThat(location -> assertTrue(location.startsWith("https://uaa."))));
     }
 
     @Test
@@ -83,7 +83,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
                 .scope("openid")
                 .build())
             .subscribe(this.<String>testSubscriber()
-                .assertThat(location -> assertTrue(location.startsWith("https://uaa."))));
+                .expectThat(location -> assertTrue(location.startsWith("https://uaa."))));
     }
 
     @Test
@@ -95,7 +95,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
                 .scope("open-id")
                 .build())
             .subscribe(this.<String>testSubscriber()
-                .assertThat(location -> assertTrue(location.startsWith("https://uaa."))));
+                .expectThat(location -> assertTrue(location.startsWith("https://uaa."))));
     }
 
     @Test
@@ -107,7 +107,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
                 .scope("openid")
                 .build())
             .subscribe(this.<String>testSubscriber()
-                .assertThat(location -> assertTrue(location.startsWith("https://uaa."))));
+                .expectThat(location -> assertTrue(location.startsWith("https://uaa."))));
     }
 
 

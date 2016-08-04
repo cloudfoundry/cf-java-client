@@ -198,7 +198,7 @@ public final class DefaultOrganizationAdminTest {
         @Override
         protected void assertions(TestSubscriber<OrganizationQuota> testSubscriber) {
             testSubscriber
-                .assertEquals(OrganizationQuota.builder()
+                .expectEquals(OrganizationQuota.builder()
                     .allowPaidServicePlans(true)
                     .applicationInstanceLimit(-1)
                     .id("test-quota-id")
@@ -235,7 +235,7 @@ public final class DefaultOrganizationAdminTest {
         @Override
         protected void assertions(TestSubscriber<OrganizationQuota> testSubscriber) {
             testSubscriber
-                .assertError(CloudFoundryException.class, "test-exception-errorCode(999): test-exception-description");
+                .expectError(CloudFoundryException.class, "test-exception-errorCode(999): test-exception-description");
         }
 
         @Override
@@ -258,7 +258,7 @@ public final class DefaultOrganizationAdminTest {
         @Override
         protected void assertions(TestSubscriber<OrganizationQuota> testSubscriber) {
             testSubscriber
-                .assertEquals(OrganizationQuota.builder()
+                .expectEquals(OrganizationQuota.builder()
                     .allowPaidServicePlans(true)
                     .applicationInstanceLimit(1)
                     .id("test-quota-id")
@@ -290,7 +290,7 @@ public final class DefaultOrganizationAdminTest {
         @Override
         protected void assertions(TestSubscriber<OrganizationQuota> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Quota test-quota-not-found does not exist");
+                .expectError(IllegalArgumentException.class, "Quota test-quota-not-found does not exist");
         }
 
         @Override
@@ -314,7 +314,7 @@ public final class DefaultOrganizationAdminTest {
         @Override
         protected void assertions(TestSubscriber<OrganizationQuota> testSubscriber) {
             testSubscriber
-                .assertEquals(OrganizationQuota.builder()
+                .expectEquals(OrganizationQuota.builder()
                     .allowPaidServicePlans(true)
                     .applicationInstanceLimit(1)
                     .id("test-quota-id")
@@ -371,7 +371,7 @@ public final class DefaultOrganizationAdminTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Organization test-organization-not-found does not exist");
+                .expectError(IllegalArgumentException.class, "Organization test-organization-not-found does not exist");
         }
 
         @Override
@@ -396,7 +396,7 @@ public final class DefaultOrganizationAdminTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Quota test-quota-not-found does not exist");
+                .expectError(IllegalArgumentException.class, "Quota test-quota-not-found does not exist");
         }
 
         @Override
@@ -421,7 +421,7 @@ public final class DefaultOrganizationAdminTest {
         @Override
         protected void assertions(TestSubscriber<OrganizationQuota> testSubscriber) {
             testSubscriber
-                .assertEquals(OrganizationQuota.builder()
+                .expectEquals(OrganizationQuota.builder()
                     .allowPaidServicePlans(true)
                     .applicationInstanceLimit(-1)
                     .id("test-quota-id")
@@ -459,7 +459,7 @@ public final class DefaultOrganizationAdminTest {
         @Override
         protected void assertions(TestSubscriber<OrganizationQuota> testSubscriber) {
             testSubscriber
-                .assertError(IllegalArgumentException.class, "Quota test-quota-not-found does not exist");
+                .expectError(IllegalArgumentException.class, "Quota test-quota-not-found does not exist");
         }
 
         @Override

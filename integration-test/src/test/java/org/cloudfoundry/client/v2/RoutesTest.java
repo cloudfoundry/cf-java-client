@@ -85,7 +85,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .routeId(routeId)
                         .build()))))
             .subscribe(testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -109,7 +109,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getEntity))
             ))
             .subscribe(this.<Tuple3<String, String, RouteEntity>>testSubscriber()
-                .assertThat(consumer(RoutesTest::assertDomainIdAndSpaceId)));
+                .expectThat(consumer(RoutesTest::assertDomainIdAndSpaceId)));
     }
 
     @Test
@@ -131,7 +131,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))))
             .then(routeId -> requestGetRoute(this.cloudFoundryClient, routeId))
             .subscribe(testSubscriber()
-                .assertErrorMatch(CloudFoundryException.class, "CF-RouteNotFound\\([0-9]+\\): The route could not be found: .*"));
+                .expectErrorMatch(CloudFoundryException.class, "CF-RouteNotFound\\([0-9]+\\): The route could not be found: .*"));
     }
 
     @Test
@@ -152,7 +152,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .build())))
             .then(routeId -> requestGetRoute(this.cloudFoundryClient, routeId))
             .subscribe(testSubscriber()
-                .assertErrorMatch(CloudFoundryException.class, "CF-RouteNotFound\\([0-9]+\\): The route could not be found: .*"));
+                .expectErrorMatch(CloudFoundryException.class, "CF-RouteNotFound\\([0-9]+\\): The route could not be found: .*"));
     }
 
     @Test
@@ -178,7 +178,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .host(hostName)
                     .build())))
             .subscribe(testSubscriber()
-                .assertEquals(true));
+                .expectEquals(true));
     }
 
     @Test
@@ -205,7 +205,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .host(hostName2)
                     .build())))
             .subscribe(testSubscriber()
-                .assertEquals(false));
+                .expectEquals(false));
     }
 
     @Test
@@ -235,7 +235,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .map(ResourceUtils::getEntity))
             ))
             .subscribe(this.<Tuple3<String, String, RouteEntity>>testSubscriber()
-                .assertThat(consumer(RoutesTest::assertDomainIdAndSpaceId)));
+                .expectThat(consumer(RoutesTest::assertDomainIdAndSpaceId)));
     }
 
     @Test
@@ -261,7 +261,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .routeId(routeId)
                         .build()))))
             .subscribe(testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -288,7 +288,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .routeId(routeId)
                         .build()))))
             .subscribe(testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -315,7 +315,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .routeId(routeId)
                         .build()))))
             .subscribe(testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -345,7 +345,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .routeId(routeId)
                         .build()))))
             .subscribe(testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -373,7 +373,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .spaceId(spaceId)
                         .build()))))
             .subscribe(testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -404,7 +404,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .stackId(stackId)
                         .build()))))
             .subscribe(testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -425,7 +425,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .page(page)
                         .build()))))
             .subscribe(testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -452,7 +452,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .page(page)
                         .build())))
             .subscribe(testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -475,7 +475,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .build()))))
             .count()
             .subscribe(this.<Long>testSubscriber()
-                .assertThat(count -> assertTrue("There should be at least one route in the organization", count > 0)));
+                .expectThat(count -> assertTrue("There should be at least one route in the organization", count > 0)));
     }
 
     @Test
@@ -502,7 +502,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .path(path)
                         .build())))
             .subscribe(testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -533,7 +533,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .routeId(routeId)
                         .build()))))
             .subscribe(testSubscriber()
-                .assertCount(0));
+                .expectCount(0));
     }
 
     @Test
@@ -554,7 +554,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .build())
                 .map(ResourceUtils::getEntity))
             .subscribe(this.<RouteEntity>testSubscriber()
-                .assertThat(entity -> assertEquals("test-host", entity.getHost())));
+                .expectThat(entity -> assertEquals("test-host", entity.getHost())));
     }
 
     private static void assertDomainIdAndSpaceId(String domainId, String spaceId, RouteEntity entity) {

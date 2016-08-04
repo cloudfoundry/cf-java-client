@@ -68,7 +68,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .path(path)
                 .build())
             .subscribe(testSubscriber()
-                .assertEquals(false));
+                .expectEquals(false));
     }
 
     @Ignore("Awaiting resolution of https://github.com/cloudfoundry/cloud_controller_ng/issues/650")
@@ -85,7 +85,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .path(path)
                     .build()))
             .subscribe(testSubscriber()
-                .assertEquals(true));
+                .expectEquals(true));
     }
 
     @Test
@@ -102,7 +102,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .path(path)
                     .build()))
             .subscribe(testSubscriber()
-                .assertEquals(true));
+                .expectEquals(true));
     }
 
     @Test
@@ -119,7 +119,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .path(path)
                     .build()))
             .subscribe(testSubscriber()
-                .assertEquals(true));
+                .expectEquals(true));
     }
 
     @Test
@@ -136,7 +136,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .space(this.spaceName)
                 .build())
             .subscribe(testSubscriber()
-                .assertError(IllegalArgumentException.class, "Domain " + domainName + " does not exist"));
+                .expectError(IllegalArgumentException.class, "Domain " + domainName + " does not exist"));
     }
 
     @Test
@@ -159,7 +159,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .path(path)
                     .build()))
             .subscribe(testSubscriber()
-                .assertEquals(false));
+                .expectEquals(false));
     }
 
     @Test
@@ -175,7 +175,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .path(path)
                 .build())
             .subscribe(testSubscriber()
-                .assertError(IllegalArgumentException.class, "Domain " + domainName + " does not exist"));
+                .expectError(IllegalArgumentException.class, "Domain " + domainName + " does not exist"));
     }
 
     @Test
@@ -194,7 +194,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .path(path)
                     .build()))
             .subscribe(testSubscriber()
-                .assertEquals(false));
+                .expectEquals(false));
     }
 
     @Test
@@ -210,7 +210,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .build()))
             .filter(filterRoutes(domainName, hostName, path, null))
             .subscribe(testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -226,7 +226,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .build()))
             .filter(filterRoutes(domainName, hostName, path, null))
             .subscribe(testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -254,7 +254,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .build()))
             .filter(filterRoutes(domainName, hostName, path, applicationName))
             .subscribe(testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -282,7 +282,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .build()))
             .filter(filterRoutes(domainName, hostName, path, applicationName))
             .subscribe(testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test
@@ -310,7 +310,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .build()))
             .filter(filterRoutes(domainName, hostName, path, applicationName))
             .subscribe(testSubscriber()
-                .assertCount(1));
+                .expectCount(1));
     }
 
     @Test

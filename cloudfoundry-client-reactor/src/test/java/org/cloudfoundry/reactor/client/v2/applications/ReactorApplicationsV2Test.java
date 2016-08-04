@@ -330,7 +330,7 @@ public final class ReactorApplicationsV2Test {
         @Override
         protected void assertions(TestSubscriber<byte[]> testSubscriber, Publisher<byte[]> expected) {
             Flux.from(expected)
-                .subscribe(e -> testSubscriber.assertThat(a -> assertArrayEquals(e, a)));
+                .subscribe(e -> testSubscriber.expectThat(a -> assertArrayEquals(e, a)));
         }
 
         @Override
@@ -373,7 +373,7 @@ public final class ReactorApplicationsV2Test {
         @Override
         protected void assertions(TestSubscriber<byte[]> testSubscriber, Publisher<byte[]> expected) {
             Flux.from(expected)
-                .subscribe(e -> testSubscriber.assertThat(a -> assertArrayEquals(e, a)));
+                .subscribe(e -> testSubscriber.expectThat(a -> assertArrayEquals(e, a)));
         }
 
         @Override
