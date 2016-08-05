@@ -21,7 +21,7 @@ import org.junit.Test;
 public final class BatchDeleteClientsRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void noClientIdentification() {
+    public void noClientIds() {
         BatchDeleteClientsRequest.builder()
             .build();
     }

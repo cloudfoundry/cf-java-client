@@ -37,7 +37,6 @@ import java.util.List;
 @Value.Immutable
 abstract class _BatchDeleteClientsResponse {
 
-
     /**
      * The deleted clients
      */

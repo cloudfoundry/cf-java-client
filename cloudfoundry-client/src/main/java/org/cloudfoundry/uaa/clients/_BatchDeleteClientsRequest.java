@@ -28,24 +28,23 @@ import org.immutables.value.Value;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
- * The request payload for Batch Delete Clients
+ * The request payload for the Batch Delete Clients operation
  */
 @Value.Immutable
 @JsonSerialize(using = _BatchDeleteClientsRequest.BatchDeleteClientsSerializer.class)
 abstract class _BatchDeleteClientsRequest implements IdentityZoned {
 
     @Value.Check
-    void checkClientIdentifications() {
+    void checkClientIds() {
         if (this.getClientIds() == null) {
             throw new IllegalStateException("Cannot build BatchDeleteClientsRequest, required attribute clientIds is not set");
         }
     }
 
     /**
-     * Clients identifiers to delete
+     * A list of identifiers of clients to delete
      */
     @Nullable
     @JsonIgnore
@@ -60,10 +59,10 @@ abstract class _BatchDeleteClientsRequest implements IdentityZoned {
         }
 
         @Override
-        public void serialize(BatchDeleteClientsRequest request, JsonGenerator g, SerializerProvider ctxt) throws IOException {
-            g.writeObject(request.getClientIds().stream()
+        public void serialize(BatchDeleteClientsRequest request, JsonGenerator gen, SerializerProvider provider) throws IOException {
+            gen.writeObject(request.getClientIds().stream()
                 .map(clientId -> Collections.singletonMap("client_id", clientId))
-                .collect(Collectors.toList()));
+                .toArray());
         }
     }
 
