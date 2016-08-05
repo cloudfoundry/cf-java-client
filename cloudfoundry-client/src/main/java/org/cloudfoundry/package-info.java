@@ -15,12 +15,12 @@
  */
 
 @Value.Style(
-    typeAbstract = "_*",
     add = "*",
     defaults = @Value.Immutable(copy = false),
     depluralize = true,
     depluralizeDictionary = "status:statuses",
     put = "*",
+    typeAbstract = "_*",
     typeImmutable = "*",
     visibility = ImplementationVisibility.PUBLIC
 )
