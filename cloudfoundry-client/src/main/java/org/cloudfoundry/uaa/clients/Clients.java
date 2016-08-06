@@ -24,6 +24,14 @@ import reactor.core.publisher.Mono;
 public interface Clients {
 
     /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#batch-create">Batch Create Client</a> request
+     *
+     * @param request Batch Create Client request
+     * @return the Response to the Batch Create Client Request
+     */
+    Mono<BatchCreateClientsResponse> batchCreate(BatchCreateClientsRequest request);
+
+    /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#batch-delete">Batch Delete Clients</a> request
      *
      * @param request Batch Delete Clients request

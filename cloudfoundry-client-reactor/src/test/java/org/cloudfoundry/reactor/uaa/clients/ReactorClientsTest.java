@@ -21,9 +21,12 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
 import org.cloudfoundry.uaa.SortOrder;
+import org.cloudfoundry.uaa.clients.BatchCreateClientsRequest;
+import org.cloudfoundry.uaa.clients.BatchCreateClientsResponse;
 import org.cloudfoundry.uaa.clients.BatchDeleteClientsRequest;
 import org.cloudfoundry.uaa.clients.BatchDeleteClientsResponse;
 import org.cloudfoundry.uaa.clients.Client;
+import org.cloudfoundry.uaa.clients.CreateClient;
 import org.cloudfoundry.uaa.clients.CreateClientRequest;
 import org.cloudfoundry.uaa.clients.CreateClientResponse;
 import org.cloudfoundry.uaa.clients.DeleteClientRequest;
@@ -54,6 +57,92 @@ import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
 import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
 
 public final class ReactorClientsTest {
+
+    public static final class BatchCreate extends AbstractUaaApiTest<BatchCreateClientsRequest, BatchCreateClientsResponse> {
+
+        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/oauth/clients/tx")
+                    .payload("fixtures/uaa/clients/POST_tx_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/uaa/clients/POST_tx_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected BatchCreateClientsResponse getResponse() {
+            return BatchCreateClientsResponse.builder()
+                .client(Client.builder()
+                    .allowedProvider("uaa", "ldap", "my-saml-provider")
+                    .authority("clients.read", "clients.write")
+                    .authorizedGrantType(CLIENT_CREDENTIALS)
+                    .autoApprove("true")
+                    .clientId("14pnUs")
+                    .lastModified(1468364444218L)
+                    .name("My Client Name")
+                    .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                    .resourceId("none")
+                    .scope("clients.read", "clients.write")
+                    .tokenSalt("erRsWH")
+                    .build())
+                .client(Client.builder()
+                    .allowedProvider("uaa", "ldap", "my-saml-provider")
+                    .authority("clients.read", "clients.write")
+                    .authorizedGrantType(CLIENT_CREDENTIALS)
+                    .autoApprove("true")
+                    .clientId("0Tgnfy")
+                    .lastModified(1468364444318L)
+                    .name("My Client Name")
+                    .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                    .resourceId("none")
+                    .scope("clients.read", "clients.write")
+                    .tokenSalt("4wMTwN")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected BatchCreateClientsRequest getValidRequest() throws Exception {
+            return BatchCreateClientsRequest.builder()
+                .client(CreateClient.builder()
+                    .allowedProvider("uaa", "ldap", "my-saml-provider")
+                    .authority("clients.read", "clients.write")
+                    .authorizedGrantType(CLIENT_CREDENTIALS)
+                    .autoApprove("true")
+                    .clientId("14pnUs")
+                    .clientSecret("secret")
+                    .name("My Client Name")
+                    .redirectUriPattern("http://test1.com", "http*://ant.path.wildcard/**/passback/*")
+                    .scope("clients.read", "clients.write")
+                    .tokenSalt("erRsWH")
+                    .build())
+                .client(CreateClient.builder()
+                    .allowedProvider("uaa", "ldap", "my-saml-provider")
+                    .authority("clients.read", "clients.write")
+                    .authorizedGrantType(CLIENT_CREDENTIALS)
+                    .autoApprove("true")
+                    .clientId("0Tgnfy")
+                    .clientSecret("secret")
+                    .name("My Client Name")
+                    .redirectUriPattern("http://test1.com", "http*://ant.path.wildcard/**/passback/*")
+                    .scope("clients.read", "clients.write")
+                    .tokenSalt("4wMTwN")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected Mono<BatchCreateClientsResponse> invoke(BatchCreateClientsRequest request) {
+            return this.clients.batchCreate(request);
+        }
+    }
 
     public static final class BatchDelete extends AbstractUaaApiTest<BatchDeleteClientsRequest, BatchDeleteClientsResponse> {
 
