@@ -21,6 +21,7 @@ import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteRequest;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteResponse;
+import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteRequest;
 import org.cloudfoundry.client.v2.domains.GetDomainRequest;
 import org.cloudfoundry.client.v2.domains.GetDomainResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
@@ -29,7 +30,6 @@ import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v2.routes.DeleteRouteResponse;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
-import org.cloudfoundry.client.v2.routes.RemoveRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.RouteResource;
@@ -170,7 +170,7 @@ public final class DefaultRoutes implements Routes {
                     getDomainId(cloudFoundryClient, organizationId, request.getDomain())
                         .then(domainId -> getRouteId(cloudFoundryClient, request.getHost(), request.getDomain(), domainId, request.getPath()))
                 )))
-            .then(function(DefaultRoutes::requestRemoveApplication));
+            .then(function(DefaultRoutes::requestRemoveRouteFromApplication));
     }
 
     private static Mono<Void> deleteRoute(CloudFoundryClient cloudFoundryClient, String routeId) {
@@ -341,9 +341,9 @@ public final class DefaultRoutes implements Routes {
                     .build()));
     }
 
-    private static Mono<Void> requestRemoveApplication(CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
-        return cloudFoundryClient.routes()
-            .removeApplication(RemoveRouteApplicationRequest.builder()
+    private static Mono<Void> requestRemoveRouteFromApplication(CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
+        return cloudFoundryClient.applicationsV2()
+            .removeRoute(RemoveApplicationRouteRequest.builder()
                 .applicationId(applicationId)
                 .routeId(routeId)
                 .build());
