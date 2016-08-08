@@ -20,14 +20,14 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.commons:commons-compress:1.10" level="project" />
     <orderEntry type="module" module-name="cloudfoundry-client-reactor" scope="TEST" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.8.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.8.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.fasterxml.jackson.core:jackson-core:2.8.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.8.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.8.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.fasterxml.jackson.core:jackson-core:2.8.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: io.jsonwebtoken:jjwt:0.6.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: io.projectreactor.ipc:reactor-netty:0.5.0.BUILD-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: io.projectreactor.ipc:reactor-ipc-api:0.5.0.BUILD-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-all:4.1.3.Final" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-all:4.1.4.Final" level="project" />
     <orderEntry type="module" module-name="cloudfoundry-client" scope="TEST" />
     <orderEntry type="library" scope="TEST" name="Maven: com.squareup.wire:wire-runtime:2.2.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.squareup.okio:okio:1.8.0" level="project" />
