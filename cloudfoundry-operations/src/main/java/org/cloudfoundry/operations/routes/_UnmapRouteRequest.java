@@ -26,7 +26,7 @@ import org.immutables.value.Value;
 abstract class _UnmapRouteRequest {
 
     /**
-     * The name of the application to have a route remove from it
+     * The name of the application to remove a route from
      */
     abstract String getApplicationName();
 

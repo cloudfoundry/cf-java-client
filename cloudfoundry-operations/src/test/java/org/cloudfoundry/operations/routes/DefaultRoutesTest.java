@@ -22,6 +22,7 @@ import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteRequest;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteResponse;
+import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteRequest;
 import org.cloudfoundry.client.v2.domains.GetDomainRequest;
 import org.cloudfoundry.client.v2.domains.GetDomainResponse;
 import org.cloudfoundry.client.v2.jobs.ErrorDetails;
@@ -38,7 +39,6 @@ import org.cloudfoundry.client.v2.routes.DeleteRouteResponse;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
-import org.cloudfoundry.client.v2.routes.RemoveRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.RouteResource;
@@ -281,9 +281,9 @@ public final class DefaultRoutesTest {
                     .build()));
     }
 
-    private static void requestRemoveApplication(CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
-        when(cloudFoundryClient.routes()
-            .removeApplication(RemoveRouteApplicationRequest.builder()
+    private static void requestRemoveRouteFromApplication(CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
+        when(cloudFoundryClient.applicationsV2()
+            .removeRoute(RemoveApplicationRouteRequest.builder()
                 .applicationId(applicationId)
                 .routeId(routeId)
                 .build()))
@@ -1503,7 +1503,7 @@ public final class DefaultRoutesTest {
             requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
             requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
             requestRoutes(this.cloudFoundryClient, "test-private-domain-metadata-id", "test-host", "test-path");
-            requestRemoveApplication(this.cloudFoundryClient, "test-application-id", "test-route-id");
+            requestRemoveRouteFromApplication(this.cloudFoundryClient, "test-application-id", "test-route-id");
         }
 
         @Override
@@ -1534,7 +1534,7 @@ public final class DefaultRoutesTest {
             requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
             requestSharedDomains(this.cloudFoundryClient, "test-domain");
             requestRoutes(this.cloudFoundryClient, "test-shared-domain-metadata-id", "test-host", "test-path");
-            requestRemoveApplication(this.cloudFoundryClient, "test-application-id", "test-route-id");
+            requestRemoveRouteFromApplication(this.cloudFoundryClient, "test-application-id", "test-route-id");
         }
 
         @Override
