@@ -30,7 +30,6 @@ public final class CreateGroupRequestTest {
     public void valid() {
         CreateGroupRequest.builder()
             .displayName("group-test")
-            .identityZoneId("test-identity-zone-id")
             .build();
     }
 
