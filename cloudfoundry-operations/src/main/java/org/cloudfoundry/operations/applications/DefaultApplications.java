@@ -295,27 +295,42 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> push(PushApplicationRequest request) {
-        return this.cloudFoundryClient
-            .then(cloudFoundryClient -> Mono.when(
-                Mono.just(cloudFoundryClient),
-                this.spaceId,
-                getOptionalStackId(cloudFoundryClient, request.getStack())
-            ))
-            .then(function((cloudFoundryClient, spaceId, stackId) -> Mono.when(
-                Mono.just(cloudFoundryClient),
-                getApplicationId(cloudFoundryClient, request, spaceId, stackId.orElse(null)),
-                Mono.just(this.pathTransformer.apply(request.getApplication())),
-                Mono.just(spaceId)
-            )))
-            .then(function((cloudFoundryClient, applicationId, inputStream, spaceId) -> prepareDomainsAndRoutes(cloudFoundryClient, request, applicationId, spaceId, this.randomWords)
-                .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId, inputStream)))))
-            .then(function((cloudFoundryClient, applicationId, inputStream) -> uploadApplicationAndWait(cloudFoundryClient, applicationId, inputStream)
-                .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId)))))
-            .then(function((cloudFoundryClient, applicationId) -> stopApplication(cloudFoundryClient, applicationId)
-                .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId)))))
-            .filter(predicate((cloudFoundryClient, applicationId) -> !Optional.ofNullable(request.getNoStart()).orElse(false)))
-            .then(function((cloudFoundryClient, applicationId) -> startApplicationAndWait(cloudFoundryClient, request.getName(), applicationId, request.getStagingTimeout(),
-                request.getStartupTimeout())));
+        if (request.getApplication() != null) {
+            return this.cloudFoundryClient
+                .then(cloudFoundryClient -> Mono.when(
+                    Mono.just(cloudFoundryClient),
+                    this.spaceId,
+                    getOptionalStackId(cloudFoundryClient, request.getStack())
+                ))
+                .then(function((cloudFoundryClient, spaceId, stackId) -> Mono.when(
+                    Mono.just(cloudFoundryClient),
+                    getApplicationId(cloudFoundryClient, request, spaceId, stackId.orElse(null)),
+                    Mono.just(this.pathTransformer.apply(request.getApplication())),
+                    Mono.just(spaceId)
+                )))
+                .then(function((cloudFoundryClient, applicationId, inputStream, spaceId) -> prepareDomainsAndRoutes(cloudFoundryClient, request, applicationId, spaceId, this.randomWords)
+                    .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId, inputStream)))))
+                .then(function((cloudFoundryClient, applicationId, inputStream) -> uploadApplicationAndWait(cloudFoundryClient, applicationId, inputStream)
+                    .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId)))))
+                .then(function((cloudFoundryClient, applicationId) -> stopAndStartApplication(cloudFoundryClient, applicationId, request)));
+        } else if (request.getDockerImage() != null) {
+            return this.cloudFoundryClient
+                .then(cloudFoundryClient -> Mono.when(
+                    Mono.just(cloudFoundryClient),
+                    this.spaceId,
+                    getOptionalStackId(cloudFoundryClient, request.getStack())
+                ))
+                .then(function((cloudFoundryClient, spaceId, stackId) -> Mono.when(
+                    Mono.just(cloudFoundryClient),
+                    getApplicationId(cloudFoundryClient, request, spaceId, stackId.orElse(null)),
+                    Mono.just(spaceId)
+                )))
+                .then(function((cloudFoundryClient, applicationId, spaceId) -> prepareDomainsAndRoutes(cloudFoundryClient, request, applicationId, spaceId, this.randomWords)
+                    .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId)))))
+                .then(function((cloudFoundryClient, applicationId) -> stopAndStartApplication(cloudFoundryClient, applicationId, request)));
+        } else {
+            throw new IllegalStateException("One of application or dockerImage must be supplied");
+        }
     }
 
     @Override
@@ -1186,6 +1201,12 @@ public final class DefaultApplications implements Applications {
         return requestUpdateApplicationState(cloudFoundryClient, applicationId, STARTED_STATE)
             .then(response -> waitForStaging(cloudFoundryClient, application, applicationId, stagingTimeout))
             .then(waitForRunning(cloudFoundryClient, application, applicationId, startupTimeout));
+    }
+
+    private static Mono<Void> stopAndStartApplication(CloudFoundryClient cloudFoundryClient, String applicationId, PushApplicationRequest request) {
+        return stopApplication(cloudFoundryClient, applicationId)
+            .filter(resource -> !Optional.ofNullable(request.getNoStart()).orElse(false))
+            .then(resource -> startApplicationAndWait(cloudFoundryClient, request.getName(), applicationId, request.getStagingTimeout(), request.getStartupTimeout()));
     }
 
     private static Mono<AbstractApplicationResource> stopApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
