@@ -42,15 +42,15 @@ public final class FileUtils {
     private static final Integer DEFAULT_PERMISSIONS = 0744;
 
     private static final Map<PosixFilePermission, Integer> PERMISSION_MODES = FluentMap.<PosixFilePermission, Integer>builder()
-        .entry(PosixFilePermission.OWNER_READ, 0100)
+        .entry(PosixFilePermission.OWNER_READ, 0400)
         .entry(PosixFilePermission.OWNER_WRITE, 0200)
-        .entry(PosixFilePermission.OWNER_EXECUTE, 0400)
-        .entry(PosixFilePermission.GROUP_READ, 0010)
+        .entry(PosixFilePermission.OWNER_EXECUTE, 0100)
+        .entry(PosixFilePermission.GROUP_READ, 0040)
         .entry(PosixFilePermission.GROUP_WRITE, 0020)
-        .entry(PosixFilePermission.GROUP_EXECUTE, 0040)
-        .entry(PosixFilePermission.OTHERS_READ, 0001)
+        .entry(PosixFilePermission.GROUP_EXECUTE, 0010)
+        .entry(PosixFilePermission.OTHERS_READ, 0004)
         .entry(PosixFilePermission.OTHERS_WRITE, 0002)
-        .entry(PosixFilePermission.OTHERS_EXECUTE, 0004)
+        .entry(PosixFilePermission.OTHERS_EXECUTE, 0001)
         .build();
 
     private FileUtils() {
@@ -65,7 +65,7 @@ public final class FileUtils {
      */
     public static String getRelativePathName(Path root, Path path) {
         Path relative = root.relativize(path);
-        return Files.isDirectory(relative) && !relative.toString().endsWith("/") ? String.format("%s/", relative.toString()) : relative.toString();
+        return Files.isDirectory(path) && !relative.toString().endsWith("/") ? String.format("%s/", relative.toString()) : relative.toString();
     }
 
     /**
