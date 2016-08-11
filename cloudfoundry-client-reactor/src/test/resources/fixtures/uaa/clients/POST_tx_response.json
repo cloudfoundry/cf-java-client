@@ -1,0 +1,66 @@
+[
+  {
+    "scope": [
+      "clients.read",
+      "clients.write"
+    ],
+    "client_id": "14pnUs",
+    "resource_ids": [
+      "none"
+    ],
+    "authorized_grant_types": [
+      "client_credentials"
+    ],
+    "redirect_uri": [
+      "http*://ant.path.wildcard/**/passback/*",
+      "http://test1.com"
+    ],
+    "autoapprove": [
+      "true"
+    ],
+    "authorities": [
+      "clients.read",
+      "clients.write"
+    ],
+    "token_salt": "erRsWH",
+    "allowedproviders": [
+      "uaa",
+      "ldap",
+      "my-saml-provider"
+    ],
+    "name": "My Client Name",
+    "lastModified": 1468364444218
+  },
+  {
+    "scope": [
+      "clients.read",
+      "clients.write"
+    ],
+    "client_id": "0Tgnfy",
+    "resource_ids": [
+      "none"
+    ],
+    "authorized_grant_types": [
+      "client_credentials"
+    ],
+    "redirect_uri": [
+      "http*://ant.path.wildcard/**/passback/*",
+      "http://test1.com"
+    ],
+    "autoapprove": [
+      "true"
+    ],
+    "authorities": [
+      "clients.read",
+      "clients.write"
+    ],
+    "token_salt": "4wMTwN",
+    "allowedproviders": [
+      "uaa",
+      "ldap",
+      "my-saml-provider"
+    ],
+    "name": "My Client Name",
+    "lastModified": 1468364444318
+  }
+]
