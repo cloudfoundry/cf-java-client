@@ -139,13 +139,12 @@ public final class CompareZips {
     }
 
     private static void zipEntriesMatch(Tuple2<ZipEntry, byte[]> ze1, Tuple2<ZipEntry, byte[]> ze2) {
-        assertEquals("Entry names differ", ze1.t1.getName(), ze2.t1.getName());
-        assertEquals("Not both directories", ze1.t1.isDirectory(), ze2.t1.isDirectory());
-        assertEquals("Different sizes", ze1.t1.getSize(), ze2.t1.getSize());
-        assertEquals("Different compressed sizes", ze1.t1.getCompressedSize(), ze2.t1.getCompressedSize());
-        // expectEquals("Different timestamps", ze1.t1.getTime(), ze2.t1.getTime());  // CF changes the timestamps of the entries
-        assertEquals("Different cyclic redundancy check", ze1.t1.getCrc(), ze2.t1.getCrc());
-        assertArrayEquals("Entry contents differ", ze1.t2, ze2.t2);
+        assertEquals("Entry names differ", ze1.getT1().getName(), ze2.getT1().getName());
+        assertEquals("Not both directories", ze1.getT1().isDirectory(), ze2.getT1().isDirectory());
+        assertEquals("Different sizes", ze1.getT1().getSize(), ze2.getT1().getSize());
+        assertEquals("Different compressed sizes", ze1.getT1().getCompressedSize(), ze2.getT1().getCompressedSize());
+        assertEquals("Different cyclic redundancy check", ze1.getT1().getCrc(), ze2.getT1().getCrc());
+        assertArrayEquals("Entry contents differ", ze1.getT2(), ze2.getT2());
     }
 
     private static boolean zipSuffix(String lowercaseName) {

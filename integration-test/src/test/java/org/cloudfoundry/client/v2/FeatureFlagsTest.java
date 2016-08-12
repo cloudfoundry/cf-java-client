@@ -72,8 +72,8 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
             .subscribe(this.<List<Tuple2<String, GetFeatureFlagResponse>>>testSubscriber()
                 .expectThat(getFlagList -> {
                     for (Tuple2<String, GetFeatureFlagResponse> tuple : getFlagList) {
-                        String flagName = tuple.t1;
-                        GetFeatureFlagResponse getResponse = tuple.t2;
+                        String flagName = tuple.getT1();
+                        GetFeatureFlagResponse getResponse = tuple.getT2();
 
                         assertEquals("feature flag entity has incorrect name", flagName, getResponse.getName());
                     }
@@ -126,9 +126,9 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
             .subscribe(this.<List<Tuple3<GetFeatureFlagResponse, SetFeatureFlagResponse, SetFeatureFlagResponse>>>testSubscriber()
                 .expectThat(responsesList -> {
                     for (Tuple3<GetFeatureFlagResponse, SetFeatureFlagResponse, SetFeatureFlagResponse> responses : responsesList) {
-                        GetFeatureFlagResponse getResponse = responses.t1;
-                        SetFeatureFlagResponse setResponse = responses.t2;
-                        SetFeatureFlagResponse resetResponse = responses.t3;
+                        GetFeatureFlagResponse getResponse = responses.getT1();
+                        SetFeatureFlagResponse setResponse = responses.getT2();
+                        SetFeatureFlagResponse resetResponse = responses.getT3();
 
                         String flagName = getResponse.getName();
                         assertTrue(String.format("feature flag %s was %s initially and was set to %s instead of %s during test", flagName, getResponse.getEnabled(), setResponse.getEnabled(),

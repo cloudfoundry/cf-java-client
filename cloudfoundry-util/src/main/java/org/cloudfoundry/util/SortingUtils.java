@@ -49,7 +49,7 @@ public final class SortingUtils {
      */
     public static <T> Function<Flux<T>, Flux<T>> timespan(Comparator<T> comparator, Duration timespan) {
         return source -> {
-            Queue<Tuple2<Long, T>> accumulator = new PriorityQueue<>((o1, o2) -> comparator.compare(o1.t2, o2.t2));
+            Queue<Tuple2<Long, T>> accumulator = new PriorityQueue<>((o1, o2) -> comparator.compare(o1.getT2(), o2.getT2()));
             Object monitor = new Object();
 
             DirectProcessor<Void> d = DirectProcessor.create();
@@ -75,7 +75,7 @@ public final class SortingUtils {
 
         synchronized (monitor) {
             while (isBefore(accumulator.peek(), timespan)) {
-                items.add(accumulator.remove().t2);
+                items.add(accumulator.remove().getT2());
             }
         }
 
@@ -83,7 +83,7 @@ public final class SortingUtils {
     }
 
     private static <T> boolean isBefore(Tuple2<Long, T> candidate, Duration timespan) {
-        return candidate != null && (Duration.ZERO == timespan || Instant.ofEpochMilli(candidate.t1).isBefore(Instant.now().minus(timespan)));
+        return candidate != null && (Duration.ZERO == timespan || Instant.ofEpochMilli(candidate.getT1()).isBefore(Instant.now().minus(timespan)));
     }
 
 }
