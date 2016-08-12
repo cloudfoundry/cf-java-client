@@ -19,7 +19,7 @@ package org.cloudfoundry.uaa.clients;
 import org.immutables.value.Value;
 
 /**
- * The resource in the batch create clients request
+ * The resource in the Batch Create Clients request
  */
 @Value.Immutable
 abstract class _CreateClient extends AbstractCreateClient {

@@ -100,7 +100,7 @@ abstract class AbstractClient {
     abstract String getName();
 
     /**
-     * Allowed URI pattern for redirect during authorization
+     * Allowed URI patterns for redirect during authorization
      */
     @JsonProperty("redirect_uri")
     @Nullable

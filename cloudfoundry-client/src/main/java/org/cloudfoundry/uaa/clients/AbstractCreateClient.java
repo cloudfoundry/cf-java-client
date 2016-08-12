@@ -24,7 +24,7 @@ import org.immutables.value.Value;
 import java.util.List;
 
 /**
- * Client in create request
+ * Client in Create request
  */
 abstract class AbstractCreateClient {
 
