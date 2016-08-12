@@ -16,13 +16,26 @@
 
 package org.cloudfoundry.uaa.clients;
 
-import org.cloudfoundry.uaa.IdentityZoned;
-import org.immutables.value.Value;
+import org.junit.Test;
 
-/**
- * The request payload for the create client
- */
-@Value.Immutable
-abstract class _CreateClientRequest extends AbstractCreateClient implements IdentityZoned {
+import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
+
+public final class BatchCreateClientsRequestTest {
+
+    @Test(expected = IllegalStateException.class)
+    public void noClient() {
+        BatchCreateClientsRequest.builder()
+            .build();
+    }
+
+    @Test
+    public void valid() {
+        BatchCreateClientsRequest.builder()
+            .client(CreateClient.builder()
+                .clientId("test-client-id")
+                .authorizedGrantType(CLIENT_CREDENTIALS)
+                .build())
+            .build();
+    }
 
 }

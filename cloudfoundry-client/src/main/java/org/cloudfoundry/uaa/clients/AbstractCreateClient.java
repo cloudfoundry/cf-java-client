@@ -19,27 +19,21 @@ package org.cloudfoundry.uaa.clients;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.uaa.tokens.GrantType;
+import org.immutables.value.Value;
 
 import java.util.List;
 
 /**
- * The payload for Client responses
+ * Client in Create request
  */
-abstract class AbstractClient {
+abstract class AbstractCreateClient {
 
-    /**
-     * The access token validity
-     */
-    @JsonProperty("access_token_validity")
-    @Nullable
-    abstract Long getAccessTokenValidity();
-
-    /**
-     * The action
-     */
-    @JsonProperty("action")
-    @Nullable
-    abstract String getAction();
+    @Value.Check
+    void checkAuthorizedGrantTypes() {
+        if (this.getAuthorizedGrantTypes() == null) {
+            throw new IllegalStateException("Cannot build CreateClientRequest, required attribute authorizedGrantTypes is not set");
+        }
+    }
 
     /**
      * A list of origin keys (alias) for identity providers the client is limited to. Null implies any identity provider is allowed.
@@ -59,18 +53,21 @@ abstract class AbstractClient {
      * Scopes that the client is able to grant when creating a client
      */
     @JsonProperty("authorities")
+    @Nullable
     abstract List<String> getAuthorities();
 
     /**
      * List of grant types that can be used to obtain a token with this client. Can include authorization_code, password, implicit, and/or client_credentials.
      */
     @JsonProperty("authorized_grant_types")
+    @Nullable
     abstract List<GrantType> getAuthorizedGrantTypes();
 
     /**
      * Scopes that do not require user approval
      */
     @JsonProperty("autoapprove")
+    @Nullable
     abstract List<String> getAutoApproves();
 
     /**
@@ -80,17 +77,18 @@ abstract class AbstractClient {
     abstract String getClientId();
 
     /**
+     * A secret string used for authenticating as this client
+     */
+    @JsonProperty("client_secret")
+    @Nullable
+    abstract String getClientSecret();
+
+    /**
      * What scope the bearer token had when client was created
      */
     @JsonProperty("createdwith")
     @Nullable
     abstract String getCreatedWith();
-
-    /**
-     * Epoch of the moment the client information was last altered
-     */
-    @JsonProperty("lastModified")
-    abstract Long getLastModified();
 
     /**
      * A human readable name for the client
@@ -100,33 +98,28 @@ abstract class AbstractClient {
     abstract String getName();
 
     /**
-     * Allowed URI patterns for redirect during authorization
+     * Allowed URI pattern for redirect during authorization
      */
     @JsonProperty("redirect_uri")
     @Nullable
     abstract List<String> getRedirectUriPatterns();
 
     /**
-     * The refresh token validity
-     */
-    @JsonProperty("refresh_token_validity")
-    @Nullable
-    abstract Long getRefreshTokenValidity();
-
-    /**
      * Resources the client is allowed access to
      */
     @JsonProperty("resource_ids")
+    @Nullable
     abstract List<String> getResourceIds();
 
     /**
      * Scopes allowed for the client
      */
     @JsonProperty("scope")
+    @Nullable
     abstract List<String> getScopes();
 
     /**
-     * A random string used to generate the client’s revocation key. Change this value to revoke all active tokens for the client
+     * A random string used to generate the client’s revokation key. Change this value to revoke all active tokens for the client
      */
     @JsonProperty("token_salt")
     @Nullable
