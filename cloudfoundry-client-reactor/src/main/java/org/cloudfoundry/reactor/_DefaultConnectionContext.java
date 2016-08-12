@@ -37,6 +37,8 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
@@ -48,6 +50,8 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 abstract class _DefaultConnectionContext implements ConnectionContext {
 
     private static final int DEFAULT_PORT = 443;
+
+    private static final Pattern HOSTNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9-.]+$");
 
     private static final int RECEIVE_BUFFER_SIZE = 10 * 1024 * 1024;
 
@@ -112,6 +116,15 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             .doOnSuccess(components -> trust(components, getSslCertificateTruster()))
             .map(UriComponents::toUriString)
             .cache();
+    }
+
+    @Value.Check
+    void checkForValidApiHost() {
+        Matcher matcher = HOSTNAME_PATTERN.matcher(getApiHost());
+
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException(String.format("API hostname %s is not correctly formatted (e.g. 'api.local.pcfdev.io')", getApiHost()));
+        }
     }
 
     /**
