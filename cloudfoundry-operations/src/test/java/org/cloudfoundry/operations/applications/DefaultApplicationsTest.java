@@ -2499,6 +2499,47 @@ public final class DefaultApplicationsTest {
 
     }
 
+    public static final class PushDocker extends AbstractOperationsApiTest<Void> {
+
+        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
+
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
+            new WordListRandomWords());
+
+        private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
+            .dockerImage("cloudfoundry/lattice-app")
+            .domain("test-domain")
+            .name("test-name")
+            .build();
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+            requestCreateApplication(this.cloudFoundryClient, this.pushApplicationRequest, TEST_SPACE_ID, null, "test-application-id");
+            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+            requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
+            requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
+            requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+            requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+            requestGetApplication(this.cloudFoundryClient, "test-application-id");
+            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .push(this.pushApplicationRequest);
+        }
+
+    }
+
     public static final class PushDomainNotFound extends AbstractOperationsApiTest<Void> {
 
         private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());

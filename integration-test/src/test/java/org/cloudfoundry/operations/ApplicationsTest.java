@@ -133,6 +133,14 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void pushNewDocker() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createDockerApplication(this.cloudFoundryOperations, applicationName, false)
+            .subscribe(testSubscriber());
+    }
+
+    @Test
     public void pushDomainNotFound() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
@@ -386,9 +394,21 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         return cloudFoundryOperations.applications()
             .push(PushApplicationRequest.builder()
                 .application(application)
-                .healthCheckType(ApplicationHealthCheck.PORT)
                 .buildpack("staticfile_buildpack")
                 .diskQuota(512)
+                .healthCheckType(ApplicationHealthCheck.PORT)
+                .memory(64)
+                .name(name)
+                .noStart(noStart)
+                .build());
+    }
+
+    private static Mono<Void> createDockerApplication(CloudFoundryOperations cloudFoundryOperations, String name, Boolean noStart) {
+        return cloudFoundryOperations.applications()
+            .push(PushApplicationRequest.builder()
+                .diskQuota(512)
+                .dockerImage("cloudfoundry/lattice-app")
+                .healthCheckType(ApplicationHealthCheck.PORT)
                 .memory(64)
                 .name(name)
                 .noStart(noStart)
