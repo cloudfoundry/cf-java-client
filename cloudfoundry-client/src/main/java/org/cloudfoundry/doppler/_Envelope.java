@@ -43,6 +43,7 @@ abstract class _Envelope {
             .timestamp(dropsonde.timestamp);
 
         Optional.ofNullable(dropsonde.containerMetric).ifPresent(d -> envelope.containerMetric(ContainerMetric.from(d)));
+        Optional.ofNullable(dropsonde.counterEvent).ifPresent(d -> envelope.counterEvent(CounterEvent.from(d)));
         Optional.ofNullable(dropsonde.error).ifPresent(d -> envelope.error(Error.from(d)));
         Optional.ofNullable(dropsonde.httpStart).ifPresent(d -> envelope.httpStart(HttpStart.from(d)));
         Optional.ofNullable(dropsonde.httpStartStop).ifPresent(d -> envelope.httpStartStop(HttpStartStop.from(d)));
@@ -58,6 +59,12 @@ abstract class _Envelope {
      */
     @Nullable
     abstract ContainerMetric getContainerMetric();
+
+    /**
+     * The enclosed {@link CounterEvent}
+     */
+    @Nullable
+    abstract CounterEvent getCounterEvent();
 
     /**
      * Deployment name (used to uniquely identify source)
