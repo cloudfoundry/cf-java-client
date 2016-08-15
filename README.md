@@ -13,12 +13,12 @@ Most projects will need two dependencies; the Operations API and an implementati
     <dependency>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cloudfoundry-client-reactor</artifactId>
-        <version>2.0.0.BUILD-SNAPSHOT</version>
+        <version>2.0.0.RC1</version>
     </dependency>
     <dependency>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cloudfoundry-operations</artifactId>
-        <version>2.0.0.BUILD-SNAPSHOT</version>
+        <version>2.0.0.RC1</version>
     </dependency>
     <dependency>
         <groupId>io.projectreactor</groupId>
@@ -76,8 +76,8 @@ For Gradle, the dependencies would be defined like this:
 
 ```groovy
 dependencies {
-    compile 'org.cloudfoundry:cloudfoundry-client-reactor:2.0.0.BUILD-SNAPSHOT'
-    compile 'org.cloudfoundry:cloudfoundry-operations:2.0.0.BUILD-SNAPSHOT'
+    compile 'org.cloudfoundry:cloudfoundry-client-reactor:2.0.0.RC1'
+    compile 'org.cloudfoundry:cloudfoundry-operations:2.0.0.RC1'
     compile 'io.projectreactor:reactor-core:3.0.0.RC2'
     compile 'io.projectreactor.ipc:reactor-netty:0.5.0.M3'
     ...
