@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.doppler;
 
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.Objects;
@@ -33,8 +34,10 @@ abstract class _ContainerMetric {
             .applicationId(dropsonde.applicationId)
             .cpuPercentage(dropsonde.cpuPercentage)
             .diskBytes(dropsonde.diskBytes)
+            .diskBytesQuota(dropsonde.diskBytesQuota)
             .instanceIndex(dropsonde.instanceIndex)
             .memoryBytes(dropsonde.memoryBytes)
+            .memoryBytesQuota(dropsonde.memoryBytesQuota)
             .build();
     }
 
@@ -54,6 +57,12 @@ abstract class _ContainerMetric {
     abstract Long getDiskBytes();
 
     /**
+     * The maximum bytes of disk allocated to container
+     */
+    @Nullable
+    abstract Long getDiskBytesQuota();
+
+    /**
      * The instance index of the contained application. (This, with applicationId, should uniquely identify a container.)
      */
     abstract Integer getInstanceIndex();
@@ -62,5 +71,11 @@ abstract class _ContainerMetric {
      * The bytes of memory used
      */
     abstract Long getMemoryBytes();
+
+    /**
+     * The maximum bytes of memory allocated to container
+     */
+    @Nullable
+    abstract Long getMemoryBytesQuota();
 
 }
