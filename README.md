@@ -290,6 +290,7 @@ API Documentation for each module can be found at the following locations:
 The project depends on Java 8.  To build from source and install to your local Maven cache, run the following:
 
 ```shell
+$ git submodule update --init --recursive
 $ ./mvnw clean install
 ```
 
