@@ -25,6 +25,8 @@ import org.cloudfoundry.uaa.clients.BatchCreateClientsRequest;
 import org.cloudfoundry.uaa.clients.BatchCreateClientsResponse;
 import org.cloudfoundry.uaa.clients.BatchDeleteClientsRequest;
 import org.cloudfoundry.uaa.clients.BatchDeleteClientsResponse;
+import org.cloudfoundry.uaa.clients.BatchUpdateClientsRequest;
+import org.cloudfoundry.uaa.clients.BatchUpdateClientsResponse;
 import org.cloudfoundry.uaa.clients.ChangeSecretRequest;
 import org.cloudfoundry.uaa.clients.ChangeSecretResponse;
 import org.cloudfoundry.uaa.clients.Client;
@@ -42,6 +44,7 @@ import org.cloudfoundry.uaa.clients.ListClientsResponse;
 import org.cloudfoundry.uaa.clients.ListMetadatasRequest;
 import org.cloudfoundry.uaa.clients.ListMetadatasResponse;
 import org.cloudfoundry.uaa.clients.Metadata;
+import org.cloudfoundry.uaa.clients.UpdateClient;
 import org.cloudfoundry.uaa.clients.UpdateClientRequest;
 import org.cloudfoundry.uaa.clients.UpdateClientResponse;
 import org.cloudfoundry.uaa.clients.UpdateMetadataRequest;
@@ -208,6 +211,90 @@ public final class ReactorClientsTest {
         @Override
         protected Mono<BatchDeleteClientsResponse> invoke(BatchDeleteClientsRequest request) {
             return this.clients.batchDelete(request);
+        }
+    }
+
+    public static final class BatchUpdate extends AbstractUaaApiTest<BatchUpdateClientsRequest, BatchUpdateClientsResponse> {
+
+        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/oauth/clients/tx")
+                    .payload("fixtures/uaa/clients/PUT_tx_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/clients/PUT_tx_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected BatchUpdateClientsResponse getResponse() {
+            return BatchUpdateClientsResponse.builder()
+                .client(Client.builder()
+                    .allowedProvider("uaa", "ldap", "my-saml-provider")
+                    .authority("clients.read", "clients.write")
+                    .authorizedGrantType(CLIENT_CREDENTIALS)
+                    .autoApprove("true")
+                    .clientId("14pnUs")
+                    .lastModified(1468364444218L)
+                    .name("My Client Name")
+                    .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                    .resourceId("none")
+                    .scope("clients.read", "clients.write")
+                    .tokenSalt("erRsWH")
+                    .build())
+                .client(Client.builder()
+                    .allowedProvider("uaa", "ldap", "my-saml-provider")
+                    .authority("clients.read", "new.authority", "clients.write")
+                    .authorizedGrantType(CLIENT_CREDENTIALS)
+                    .autoApprove("true")
+                    .clientId("0Tgnfy")
+                    .lastModified(1468364444318L)
+                    .name("My Client Name")
+                    .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                    .resourceId("none")
+                    .scope("clients.read", "clients.write")
+                    .tokenSalt("4wMTwN")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected BatchUpdateClientsRequest getValidRequest() throws Exception {
+            return BatchUpdateClientsRequest.builder()
+                .client(UpdateClient.builder()
+                    .allowedProvider("uaa", "ldap", "my-saml-provider")
+                    .authority("clients.read", "clients.write")
+                    .authorizedGrantType(CLIENT_CREDENTIALS)
+                    .autoApprove("true")
+                    .clientId("14pnUs")
+                    .name("My Client Name")
+                    .redirectUriPattern("http://test1.com", "http*://ant.path.wildcard/**/passback/*")
+                    .scope("clients.read", "clients.write")
+                    .tokenSalt("erRsWH")
+                    .build())
+                .client(UpdateClient.builder()
+                    .allowedProvider("uaa", "ldap", "my-saml-provider")
+                    .authority("clients.read", "new.authority", "clients.write")
+                    .authorizedGrantType(CLIENT_CREDENTIALS)
+                    .autoApprove("true")
+                    .clientId("0Tgnfy")
+                    .name("My Client Name")
+                    .redirectUriPattern("http://test1.com", "http*://ant.path.wildcard/**/passback/*")
+                    .scope("clients.read", "clients.write")
+                    .tokenSalt("4wMTwN")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected Mono<BatchUpdateClientsResponse> invoke(BatchUpdateClientsRequest request) {
+            return this.clients.batchUpdate(request);
         }
     }
 
