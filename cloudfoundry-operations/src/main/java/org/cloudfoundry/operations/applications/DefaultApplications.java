@@ -603,8 +603,7 @@ public final class DefaultApplications implements Applications {
             .then(applicationId -> requestUpdateApplication(cloudFoundryClient, applicationId, request, stackId)
                 .map(ResourceUtils::getId))
             .otherwiseIfEmpty(requestCreateApplication(cloudFoundryClient, request, spaceId, stackId)
-                .map(ResourceUtils::getId)
-            );
+                .map(ResourceUtils::getId));
     }
 
     private static Mono<String> getApplicationIdFromOrgSpace(CloudFoundryClient cloudFoundryClient, String application, String spaceId, String organization, String space) {
@@ -918,20 +917,25 @@ public final class DefaultApplications implements Applications {
     }
 
     private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, PushApplicationRequest request, String spaceId, String stackId) {
+        CreateApplicationRequest.Builder builder = CreateApplicationRequest.builder()
+            .buildpack(request.getBuildpack())
+            .command(request.getCommand())
+            .diskQuota(request.getDiskQuota())
+            .healthCheckTimeout(request.getTimeout())
+            .healthCheckType(Optional.ofNullable(request.getHealthCheckType()).map(ApplicationHealthCheck::getValue).orElse(null))
+            .instances(request.getInstances())
+            .memory(request.getMemory())
+            .name(request.getName())
+            .spaceId(spaceId)
+            .stackId(stackId);
+
+        Optional.ofNullable(request.getDockerImage())
+            .ifPresent(dockerImage -> builder
+                .diego(true)
+                .dockerImage(dockerImage));
+
         return cloudFoundryClient.applicationsV2()
-            .create(CreateApplicationRequest.builder()
-                .buildpack(request.getBuildpack())
-                .command(request.getCommand())
-                .diskQuota(request.getDiskQuota())
-                .dockerImage(request.getDockerImage())
-                .healthCheckTimeout(request.getTimeout())
-                .healthCheckType(Optional.ofNullable(request.getHealthCheckType()).map(ApplicationHealthCheck::getValue).orElse(null))
-                .instances(request.getInstances())
-                .memory(request.getMemory())
-                .name(request.getName())
-                .spaceId(spaceId)
-                .stackId(stackId)
-                .build());
+            .create(builder.build());
     }
 
     private static Mono<CreateRouteResponse> requestCreateRoute(CloudFoundryClient cloudFoundryClient, String domainId, String host, String routePath, String spaceId) {

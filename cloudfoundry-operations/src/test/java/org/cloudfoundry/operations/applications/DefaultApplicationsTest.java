@@ -497,6 +497,29 @@ public final class DefaultApplicationsTest {
                 .buildpack(request.getBuildpack())
                 .command(request.getCommand())
                 .diskQuota(request.getDiskQuota())
+                .healthCheckTimeout(request.getTimeout())
+                .healthCheckType(Optional.ofNullable(request.getHealthCheckType()).map(ApplicationHealthCheck::getValue).orElse(null))
+                .instances(request.getInstances())
+                .memory(request.getMemory())
+                .name(request.getName())
+                .spaceId(spaceId)
+                .stackId(stackId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(CreateApplicationResponse.builder(), "create-")
+                    .metadata(fill(Metadata.builder())
+                        .id(applicationId)
+                        .build())
+                    .build()));
+    }
+
+    private static void requestCreateDockerApplication(CloudFoundryClient cloudFoundryClient, PushApplicationRequest request, String spaceId, String stackId, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .create(CreateApplicationRequest.builder()
+                .buildpack(request.getBuildpack())
+                .command(request.getCommand())
+                .diego(true)
+                .diskQuota(request.getDiskQuota())
                 .dockerImage(request.getDockerImage())
                 .healthCheckTimeout(request.getTimeout())
                 .healthCheckType(Optional.ofNullable(request.getHealthCheckType()).map(ApplicationHealthCheck::getValue).orElse(null))
@@ -512,7 +535,6 @@ public final class DefaultApplicationsTest {
                         .id(applicationId)
                         .build())
                     .build()));
-
     }
 
     private static void requestCreateRoute(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path, String spaceId, String routeId) {
@@ -2515,7 +2537,7 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-            requestCreateApplication(this.cloudFoundryClient, this.pushApplicationRequest, TEST_SPACE_ID, null, "test-application-id");
+            requestCreateDockerApplication(this.cloudFoundryClient, this.pushApplicationRequest, TEST_SPACE_ID, null, "test-application-id");
             requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
             requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
             requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
