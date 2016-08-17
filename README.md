@@ -307,13 +307,16 @@ The integration tests require a running instance of Cloud Foundry to test agains
 
 Name | Description
 ---- | -----------
+`TEST_ADMIN_CLIENTID` | Client ID for a client with permissions for a Client Credentials grant
+`TEST_ADMIN_CLIENTSECRET` | Client secret for a client with permissions for a Client Credentials grant
+`TEST_ADMIN_PASSWORD` | Password for a user with admin permissions
+`TEST_ADMIN_USERNAME` | Username for a user with admin permissions
 `TEST_APIHOST` | The host of Cloud Foundry instance.  Typically something like `api.local.pcfdev.io`.
-`TEST_PASSWORD` | The test user's password
-`TEST_SKIPSSLVALIDATION` | Whether to skip SSL validation when connecting to the Cloud Foundry instance.  Typically `true` when connecting to a PCF Dev instance.
-`TEST_UAA_CLIENTID` | The client id to use for testing the UAA APIs
-`TEST_UAA_CLIENTSECRET` | The client secret to use for testing the UAA APIs
-`TEST_USERNAME` | The test user's username
-
+`TEST_PROXY_HOST` | _(Optional)_ The host of a proxy to route all requests through
+`TEST_PROXY_PASSWORD` | _(Optional)_ The password for a proxy to route all requests through
+`TEST_PROXY_PORT` | _(Optional)_ The port of a proxy to route all requests through. Defaults to `8080`.
+`TEST_PROXY_USERNAME` | _(Optional)_ The username for a proxy to route all requests through
+`TEST_SKIPSSLVALIDATION` | _(Optional)_ Whether to skip SSL validation when connecting to the Cloud Foundry instance.  Defaults to `false`.
 
 ## Contributing
 [Pull requests][u] and [Issues][e] are welcome.
