@@ -1132,17 +1132,25 @@ public final class DefaultApplications implements Applications {
 
     private static Mono<AbstractApplicationResource> requestUpdateApplication(CloudFoundryClient cloudFoundryClient, String applicationId, PushApplicationRequest request, String stackId) {
         return requestUpdateApplication(cloudFoundryClient, applicationId,
-            builder -> builder
-                .buildpack(request.getBuildpack())
-                .command(request.getCommand())
-                .diskQuota(request.getDiskQuota())
-                .dockerImage(request.getDockerImage())
-                .healthCheckTimeout(request.getTimeout())
-                .healthCheckType(Optional.ofNullable(request.getHealthCheckType()).map(ApplicationHealthCheck::getValue).orElse(null))
-                .instances(request.getInstances())
-                .memory(request.getMemory())
-                .name(request.getName())
-                .stackId(stackId));
+            builder -> {
+                builder
+                    .buildpack(request.getBuildpack())
+                    .command(request.getCommand())
+                    .diskQuota(request.getDiskQuota())
+                    .healthCheckTimeout(request.getTimeout())
+                    .healthCheckType(Optional.ofNullable(request.getHealthCheckType()).map(ApplicationHealthCheck::getValue).orElse(null))
+                    .instances(request.getInstances())
+                    .memory(request.getMemory())
+                    .name(request.getName())
+                    .stackId(stackId);
+
+                Optional.ofNullable(request.getDockerImage())
+                    .ifPresent(dockerImage -> builder
+                        .diego(true)
+                        .dockerImage(dockerImage));
+
+                return builder;
+            });
     }
 
     private static Mono<AbstractApplicationResource> requestUpdateApplication(CloudFoundryClient cloudFoundryClient, String applicationId, UnaryOperator<UpdateApplicationRequest.Builder> modifier) {
