@@ -206,7 +206,7 @@
                                 <contextUrl>https://repo.spring.io</contextUrl>
                                 <username>{{ARTIFACTORY_USERNAME}}</username>
                                 <password>{{ARTIFACTORY_PASSWORD}}</password>
-                                <repoKey>{{ARTIFACTORY_REPO_KEY|"libs-milestone-local"}}</repoKey>
+                                <repoKey>{{ARTIFACTORY_REPO_KEY|"libs-release-local"}}</repoKey>
                                 <snapshotRepoKey>{{ARTIFACTORY_SNAPSHOT_REPO_KEY|"libs-snapshot-local"}}</snapshotRepoKey>
                             </publisher>
                         </configuration>
