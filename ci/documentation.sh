@@ -34,8 +34,8 @@ for PROJECT in $PROJECTS ; do
 done
 
 pushd updated-cf-java-client-documentation
-  git config --local user.name "Spring Buildmaster"
-  git config --local user.email "buildmaster@springframework.org"
+  git config --local user.name "$GIT_USER_NAME"
+  git config --local user.email $GIT_USER_EMAIL
   git add .
 
   if ! git diff-index --cached --quiet HEAD --ignore-submodules --; then

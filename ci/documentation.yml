@@ -15,3 +15,7 @@ outputs:
 
 run:
   path: cf-java-client/ci/documentation.sh
+
+params:
+  GIT_USER_EMAIL:
+  GIT_USER_NAME:
