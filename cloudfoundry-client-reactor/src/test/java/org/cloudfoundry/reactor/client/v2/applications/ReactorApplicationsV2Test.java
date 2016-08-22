@@ -72,6 +72,7 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.cloudfoundry.util.FluentMap;
+import org.cloudfoundry.util.OperationUtils;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.reactivestreams.Publisher;
 import org.springframework.core.io.ClassPathResource;
@@ -361,7 +362,7 @@ public final class ReactorApplicationsV2Test {
         @Override
         protected Mono<byte[]> invoke(DownloadApplicationRequest request) {
             return this.applications.download(request)
-                .as(AbstractClientApiTest::collectByteArray);
+                .as(OperationUtils::collectByteArray);
         }
 
     }
@@ -404,7 +405,7 @@ public final class ReactorApplicationsV2Test {
         @Override
         protected Mono<byte[]> invoke(DownloadApplicationDropletRequest request) {
             return this.applications.downloadDroplet(request)
-                .as(AbstractClientApiTest::collectByteArray);
+                .as(OperationUtils::collectByteArray);
         }
 
     }

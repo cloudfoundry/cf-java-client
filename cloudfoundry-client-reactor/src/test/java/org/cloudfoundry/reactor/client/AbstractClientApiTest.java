@@ -20,9 +20,6 @@ import okhttp3.Headers;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.reactor.AbstractApiTest;
 import org.junit.Test;
-import reactor.core.Exceptions;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -48,19 +45,6 @@ public abstract class AbstractClientApiTest<REQ, RSP> extends AbstractApiTest<RE
 
         this.testSubscriber.verify(Duration.ofSeconds(5));
         verify();
-    }
-
-    protected static Mono<byte[]> collectByteArray(Flux<byte[]> bytes) {
-        return bytes
-            .reduceWith(ByteArrayOutputStream::new, (prev, next) -> {
-                try {
-                    prev.write(next);
-                } catch (IOException e) {
-                    throw Exceptions.propagate(e);
-                }
-                return prev;
-            })
-            .map(ByteArrayOutputStream::toByteArray);
     }
 
     protected static String extractBoundary(Headers headers) {

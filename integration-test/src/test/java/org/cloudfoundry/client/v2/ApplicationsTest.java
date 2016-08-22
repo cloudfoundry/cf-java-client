@@ -60,6 +60,7 @@ import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.util.JobUtils;
+import org.cloudfoundry.util.OperationUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.tuple.Consumer2;
@@ -197,7 +198,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .downloadDroplet(DownloadApplicationDropletRequest.builder()
                     .applicationId(applicationId)
                     .build())
-                .as(AbstractIntegrationTest::collectByteArray))
+                .as(OperationUtils::collectByteArray))
             .subscribe(this.<byte[]>testSubscriber()
                 .expectThat(ApplicationsTest::assertIsTestApplicationDroplet));
     }
@@ -1017,7 +1018,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .download(DownloadApplicationRequest.builder()
                 .applicationId(applicationId)
                 .build())
-            .as(AbstractIntegrationTest::collectByteArray);
+            .as(OperationUtils::collectByteArray);
     }
 
 }
