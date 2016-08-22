@@ -27,8 +27,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import reactor.core.Exceptions;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
@@ -65,19 +63,6 @@ public abstract class AbstractIntegrationTest {
     public final void verify() throws InterruptedException {
         this.testSubscriber.verify(Duration.ofMinutes(5));
         this.logger.debug("<< {} >>", getTestName());
-    }
-
-    protected static Mono<byte[]> collectByteArray(Flux<byte[]> bytes) {
-        return bytes
-            .reduceWith(ByteArrayOutputStream::new, (prev, next) -> {
-                try {
-                    prev.write(next);
-                } catch (IOException e) {
-                    throw Exceptions.propagate(e);
-                }
-                return prev;
-            })
-            .map(ByteArrayOutputStream::toByteArray);
     }
 
     protected static Mono<byte[]> getBytes(String path) {

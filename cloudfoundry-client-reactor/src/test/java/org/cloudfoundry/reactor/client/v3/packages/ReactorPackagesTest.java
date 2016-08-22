@@ -46,6 +46,7 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.cloudfoundry.util.FluentMap;
+import org.cloudfoundry.util.OperationUtils;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.reactivestreams.Publisher;
 import org.springframework.core.io.ClassPathResource;
@@ -253,7 +254,7 @@ public final class ReactorPackagesTest {
         @Override
         protected Mono<byte[]> invoke(DownloadPackageRequest request) {
             return this.packages.download(request)
-                .as(AbstractClientApiTest::collectByteArray);
+                .as(OperationUtils::collectByteArray);
         }
 
     }
