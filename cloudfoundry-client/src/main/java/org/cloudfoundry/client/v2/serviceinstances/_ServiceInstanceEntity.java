@@ -45,7 +45,7 @@ abstract class _ServiceInstanceEntity extends BaseServiceInstanceEntity {
     @Deprecated
     @JsonProperty("gateway_data")
     @Nullable
-    abstract Map<String, Object> getGatewayDatas();
+    abstract GatewayData getGatewayData();
 
     /**
      * The last operation

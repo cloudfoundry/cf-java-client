@@ -19,6 +19,7 @@ package org.cloudfoundry.client.v2.servicebindings;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v2.serviceinstances.GatewayData;
 import org.immutables.value.Value;
 
 import java.util.Map;
@@ -64,7 +65,7 @@ abstract class _ServiceBindingEntity {
     @Deprecated
     @JsonProperty("gateway_data")
     @Nullable
-    abstract Map<String, Object> getGatewayDatas();
+    abstract GatewayData getGatewayData();
 
     /**
      * The gateway name
