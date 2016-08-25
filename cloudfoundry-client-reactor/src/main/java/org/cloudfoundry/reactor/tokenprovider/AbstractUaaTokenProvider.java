@@ -65,6 +65,15 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
         return "";
     }
 
+    /**
+     * Returns the current refresh token.  May be {@code null} if there is no valid refresh token.
+     */
+    public final String getRefreshToken() {
+        synchronized (this.refreshTokenMonitor) {
+            return this.refreshToken;
+        }
+    }
+
     @Override
     public final Mono<String> getToken(ConnectionContext connectionContext) {
         return this.tokens.computeIfAbsent(connectionContext, this::getTokenFlow);
