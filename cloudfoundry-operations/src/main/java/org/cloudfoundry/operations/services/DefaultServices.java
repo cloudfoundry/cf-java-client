@@ -534,9 +534,11 @@ public final class DefaultServices implements Services {
     private static Mono<BaseServiceInstanceEntity> renameServiceInstance(CloudFoundryClient cloudFoundryClient, UnionServiceInstanceResource serviceInstance, String newName) {
         if (isUserProvidedService(serviceInstance)) {
             return requestUserProvidedServiceInstanceUpdate(cloudFoundryClient, ResourceUtils.getId(serviceInstance), newName)
+                .map(ResourceUtils::getEntity)
                 .cast(BaseServiceInstanceEntity.class);
         } else {
             return requestServiceInstanceUpdate(cloudFoundryClient, ResourceUtils.getId(serviceInstance), newName)
+                .map(ResourceUtils::getEntity)
                 .cast(BaseServiceInstanceEntity.class);
         }
     }
