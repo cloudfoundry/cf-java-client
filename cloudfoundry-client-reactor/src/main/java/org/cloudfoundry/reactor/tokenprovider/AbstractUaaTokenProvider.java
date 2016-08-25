@@ -34,7 +34,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-abstract class AbstractUaaTokenProvider implements TokenProvider {
+/**
+ * An abstract base class for all token providers that interact with the UAA.  It encapsulates the logic to refresh the token before expiration.
+ */
+public abstract class AbstractUaaTokenProvider implements TokenProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("cloudfoundry-client.token");
 
@@ -67,6 +70,12 @@ abstract class AbstractUaaTokenProvider implements TokenProvider {
         return this.tokens.computeIfAbsent(connectionContext, this::getTokenFlow);
     }
 
+    /**
+     * Return a {@link UriComponentsBuilder} that contains the configured access token uri
+     *
+     * @param builder a {@link UriComponentsBuilder} to modify
+     * @return the modified {@link UriComponentsBuilder}
+     */
     protected abstract UriComponentsBuilder getAccessTokenUri(UriComponentsBuilder builder);
 
     private static Duration getRefreshDelay(Map<String, Integer> r) {
