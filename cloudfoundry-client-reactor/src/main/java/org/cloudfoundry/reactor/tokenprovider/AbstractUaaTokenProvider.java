@@ -18,6 +18,7 @@ package org.cloudfoundry.reactor.tokenprovider;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
+import io.netty.util.AsciiString;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.util.JsonCodec;
@@ -30,6 +31,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -73,6 +75,11 @@ abstract class AbstractUaaTokenProvider implements TokenProvider {
         return Duration.ofSeconds(r.get("expires_in")).minus(REFRESH_MARGIN);
     }
 
+    private String getAuthorizationValue() {
+        String encoded = Base64.getEncoder().encodeToString(new AsciiString(getClientId()).concat(":").concat(getClientSecret()).toByteArray());
+        return String.format("Basic %s", encoded);
+    }
+
     private UriComponentsBuilder getRefreshTokenUri(UriComponentsBuilder builder, String refreshToken) {
         return builder
             .queryParam("grant_type", "refresh_token")
@@ -90,6 +97,7 @@ abstract class AbstractUaaTokenProvider implements TokenProvider {
                 .post(uri, outbound -> outbound
                     .addHeader("Content-Length", "0")
                     .addHeader(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED)
+                    .addHeader(HttpHeaderNames.AUTHORIZATION, getAuthorizationValue())
                     .removeTransferEncodingChunked()
                     .sendHeaders())
                 .doOnSubscribe(NetworkLogging.get(uri))
