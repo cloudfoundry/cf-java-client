@@ -31,14 +31,12 @@ import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQ
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.privatedomains.DeletePrivateDomainRequest;
-import org.cloudfoundry.client.v2.privatedomains.GetPrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.shareddomains.DeleteSharedDomainRequest;
-import org.cloudfoundry.client.v2.shareddomains.GetSharedDomainRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
@@ -66,6 +64,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuples;
 
 import javax.net.ssl.SSLException;
 import java.time.Duration;
@@ -283,19 +282,17 @@ final class CloudFoundryCleaner {
     }
 
     private static Flux<Void> cleanRoutes(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
-        return PaginationUtils
-            .requestClientV2Resources(page -> cloudFoundryClient.routes()
-                .list(ListRoutesRequest.builder()
-                    .page(page)
-                    .build()))
-            .flatMap(route -> Mono.when(
-                Mono.just(route),
-                getDomainName(cloudFoundryClient, ResourceUtils.getEntity(route).getDomainId())
-            ))
-            .filter(predicate((route, domainName) -> nameFactory.isDomainName(domainName) ||
+        return getAllDomains(cloudFoundryClient)
+            .flatMap(domains -> PaginationUtils
+                .requestClientV2Resources(page -> cloudFoundryClient.routes()
+                    .list(ListRoutesRequest.builder()
+                        .page(page)
+                        .build()))
+                .map(resource -> Tuples.of(domains, resource)))
+            .filter(predicate((domains, route) -> nameFactory.isDomainName(domains.get(ResourceUtils.getEntity(route).getDomainId())) ||
                 nameFactory.isApplicationName(ResourceUtils.getEntity(route).getHost()) ||
                 nameFactory.isHostName(ResourceUtils.getEntity(route).getHost())))
-            .map(function((route, domainName) -> ResourceUtils.getId(route)))
+            .map(function((domains, route) -> ResourceUtils.getId(route)))
             .flatMap(routeId -> cloudFoundryClient.routes()
                 .delete(DeleteRouteRequest.builder()
                     .async(true)
@@ -382,17 +379,20 @@ final class CloudFoundryCleaner {
                 .then());
     }
 
-    private static Mono<String> getDomainName(CloudFoundryClient cloudFoundryClient, String domainId) {
-        return cloudFoundryClient.sharedDomains()
-            .get(GetSharedDomainRequest.builder()
-                .sharedDomainId(domainId)
-                .build())
-            .map(response -> response.getEntity().getName())
-            .otherwise(e -> cloudFoundryClient.privateDomains()
-                .get(GetPrivateDomainRequest.builder()
-                    .privateDomainId(domainId)
-                    .build())
-                .map(response -> response.getEntity().getName()));
+    private static Mono<Map<String, String>> getAllDomains(CloudFoundryClient cloudFoundryClient) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.privateDomains()
+                .list(ListPrivateDomainsRequest.builder()
+                    .page(1)
+                    .build()))
+            .map(response -> Tuples.of(ResourceUtils.getId(response), ResourceUtils.getEntity(response).getName()))
+            .mergeWith(PaginationUtils
+                .requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
+                    .list(ListSharedDomainsRequest.builder()
+                        .page(page)
+                        .build()))
+                .map(response -> Tuples.of(ResourceUtils.getId(response), ResourceUtils.getEntity(response).getName())))
+            .collectMap(function((id, name) -> id), function((id, name) -> name));
     }
 
     private static Flux<Void> removeServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId) {
