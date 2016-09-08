@@ -34,7 +34,7 @@ final class RandomNameFactory implements NameFactory {
 
     @Override
     public boolean isName(String prefix, String candidate) {
-        return candidate.startsWith(prefix);
+        return candidate != null && candidate.startsWith(prefix);
     }
 
 }
