@@ -17,6 +17,7 @@
 package org.cloudfoundry;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
@@ -34,6 +35,7 @@ import org.cloudfoundry.client.v2.privatedomains.DeletePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
+import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.shareddomains.DeleteSharedDomainRequest;
@@ -42,20 +44,15 @@ import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
-import org.cloudfoundry.client.v3.applications.Application;
 import org.cloudfoundry.client.v3.packages.DeletePackageRequest;
 import org.cloudfoundry.client.v3.packages.ListPackagesRequest;
-import org.cloudfoundry.client.v3.packages.Package;
 import org.cloudfoundry.uaa.UaaClient;
-import org.cloudfoundry.uaa.clients.Client;
 import org.cloudfoundry.uaa.clients.DeleteClientRequest;
 import org.cloudfoundry.uaa.clients.ListClientsRequest;
 import org.cloudfoundry.uaa.groups.DeleteGroupRequest;
-import org.cloudfoundry.uaa.groups.Group;
 import org.cloudfoundry.uaa.groups.ListGroupsRequest;
 import org.cloudfoundry.uaa.users.DeleteUserRequest;
 import org.cloudfoundry.uaa.users.ListUsersRequest;
-import org.cloudfoundry.uaa.users.User;
 import org.cloudfoundry.util.FluentMap;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
@@ -75,6 +72,8 @@ import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
 
 final class CloudFoundryCleaner {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger("cloudfoundry-client.test");
+
     private static final Map<String, Boolean> STANDARD_FEATURE_FLAGS = FluentMap.<String, Boolean>builder()
         .entry("app_bits_upload", true)
         .entry("app_scaling", true)
@@ -86,8 +85,6 @@ final class CloudFoundryCleaner {
         .entry("unset_roles_by_username", true)
         .entry("user_org_creation", false)
         .build();
-
-    private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.test");
 
     private final CloudFoundryClient cloudFoundryClient;
 
@@ -120,9 +117,9 @@ final class CloudFoundryCleaner {
             .thenMany(cleanOrganizations(this.cloudFoundryClient, this.nameFactory))
             .thenMany(cleanOrganizationQuotaDefinitions(this.cloudFoundryClient, this.nameFactory))
             .retry(5, t -> t instanceof SSLException)
-            .doOnSubscribe(s -> this.logger.debug(">> CLEANUP <<"))
+            .doOnSubscribe(s -> LOGGER.debug(">> CLEANUP <<"))
             .doOnError(Throwable::printStackTrace)
-            .doOnComplete(() -> this.logger.debug("<< CLEANUP >>"))
+            .doOnComplete(() -> LOGGER.debug("<< CLEANUP >>"))
             .then()
             .block(Duration.ofMinutes(30));
     }
@@ -134,13 +131,13 @@ final class CloudFoundryCleaner {
                     .page(page)
                     .build()))
             .filter(application -> nameFactory.isApplicationName(ResourceUtils.getEntity(application).getName()))
-            .map(ResourceUtils::getId)
-            .flatMap(applicationId -> removeServiceBindings(cloudFoundryClient, applicationId)
-                .thenMany(Flux.just(applicationId)))
-            .flatMap(applicationId -> cloudFoundryClient.applicationsV2()
+            .flatMap(application -> removeServiceBindings(cloudFoundryClient, application)
+                .thenMany(Flux.just(application)))
+            .flatMap(application -> cloudFoundryClient.applicationsV2()
                 .delete(DeleteApplicationRequest.builder()
-                    .applicationId(applicationId)
-                    .build()));
+                    .applicationId(ResourceUtils.getId(application))
+                    .build())
+                .doOnError(t -> LOGGER.error("Unable to delete V2 application {}", ResourceUtils.getEntity(application).getName(), t)));
     }
 
     private static Flux<Void> cleanApplicationsV3(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
@@ -150,11 +147,11 @@ final class CloudFoundryCleaner {
                     .page(page)
                     .build()))
             .filter(application -> nameFactory.isApplicationName(application.getName()))
-            .map(Application::getId)
-            .flatMap(applicationId -> cloudFoundryClient.applicationsV3()
+            .flatMap(application -> cloudFoundryClient.applicationsV3()
                 .delete(org.cloudfoundry.client.v3.applications.DeleteApplicationRequest.builder()
-                    .applicationId(applicationId)
-                    .build()));
+                    .applicationId(application.getId())
+                    .build())
+                .doOnError(t -> LOGGER.error("Unable to delete V3 application {}", application.getName(), t)));
     }
 
     private static Flux<Void> cleanBuildpacks(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
@@ -164,12 +161,12 @@ final class CloudFoundryCleaner {
                     .page(page)
                     .build()))
             .filter(buildpack -> nameFactory.isBuildpackName(ResourceUtils.getEntity(buildpack).getName()))
-            .map(ResourceUtils::getId)
-            .flatMap(buildpackId -> cloudFoundryClient.buildpacks()
+            .flatMap(buildpack -> cloudFoundryClient.buildpacks()
                 .delete(DeleteBuildpackRequest.builder()
                     .async(true)
-                    .buildpackId(buildpackId)
-                    .build()))
+                    .buildpackId(ResourceUtils.getId(buildpack))
+                    .build())
+                .doOnError(t -> LOGGER.error("Unable to delete buildpack {}", ResourceUtils.getEntity(buildpack).getName(), t)))
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 
@@ -180,11 +177,11 @@ final class CloudFoundryCleaner {
                     .startIndex(startIndex)
                     .build()))
             .filter(client -> nameFactory.isClientId(client.getClientId()))
-            .map(Client::getClientId)
-            .flatMap(clientId -> uaaClient.clients()
+            .flatMap(client -> uaaClient.clients()
                 .delete(DeleteClientRequest.builder()
-                    .clientId(clientId)
+                    .clientId(client.getClientId())
                     .build())
+                .doOnError(t -> LOGGER.error("Unable to delete client {}", client.getName(), t))
                 .then());
     }
 
@@ -200,6 +197,7 @@ final class CloudFoundryCleaner {
                     .name(featureFlag.getName())
                     .enabled(STANDARD_FEATURE_FLAGS.get(featureFlag.getName()))
                     .build())
+                .doOnError(t -> LOGGER.error("Unable to set feature flag {} to {}", featureFlag.getName(), STANDARD_FEATURE_FLAGS.get(featureFlag.getName()), t))
                 .then());
     }
 
@@ -210,12 +208,12 @@ final class CloudFoundryCleaner {
                     .startIndex(startIndex)
                     .build()))
             .filter(group -> nameFactory.isGroupName(group.getDisplayName()))
-            .map(Group::getId)
-            .flatMap(groupId -> uaaClient.groups()
+            .flatMap(group -> uaaClient.groups()
                 .delete(DeleteGroupRequest.builder()
-                    .groupId(groupId)
+                    .groupId(group.getId())
                     .version("*")
                     .build())
+                .doOnError(t -> LOGGER.error("Unable to delete group {}", group.getDisplayName(), t))
                 .then());
     }
 
@@ -226,13 +224,13 @@ final class CloudFoundryCleaner {
                     .page(page)
                     .build()))
             .filter(domain -> nameFactory.isQuotaDefinitionName(ResourceUtils.getEntity(domain).getName()))
-            .map(ResourceUtils::getId)
-            .flatMap(organizationQuotaDefinitionId -> cloudFoundryClient.organizationQuotaDefinitions()
+            .flatMap(organizationQuotaDefinition -> cloudFoundryClient.organizationQuotaDefinitions()
                 .delete(DeleteOrganizationQuotaDefinitionRequest.builder()
                     .async(true)
-                    .organizationQuotaDefinitionId(organizationQuotaDefinitionId)
-                    .build()))
-            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+                    .organizationQuotaDefinitionId(ResourceUtils.getId(organizationQuotaDefinition))
+                    .build())
+                .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job))
+                .doOnError(t -> LOGGER.error("Unable to delete organization quota definition {}", ResourceUtils.getEntity(organizationQuotaDefinition).getName(), t)));
     }
 
     private static Flux<Void> cleanOrganizations(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
@@ -242,13 +240,13 @@ final class CloudFoundryCleaner {
                     .page(page)
                     .build()))
             .filter(organization -> nameFactory.isOrganizationName(ResourceUtils.getEntity(organization).getName()))
-            .map(ResourceUtils::getId)
-            .flatMap(organizationId -> cloudFoundryClient.organizations()
+            .flatMap(organization -> cloudFoundryClient.organizations()
                 .delete(DeleteOrganizationRequest.builder()
                     .async(true)
-                    .organizationId(organizationId)
-                    .build()))
-            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+                    .organizationId(ResourceUtils.getId(organization))
+                    .build())
+                .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job))
+                .doOnError(t -> LOGGER.error("Unable to delete organization {}", ResourceUtils.getEntity(organization).getName(), t)));
     }
 
     private static Flux<Void> cleanPackages(CloudFoundryClient cloudFoundryClient) {
@@ -257,12 +255,12 @@ final class CloudFoundryCleaner {
                 .list(ListPackagesRequest.builder()
                     .page(page)
                     .build()))
-            .filter(package1 -> true)
-            .map(Package::getId)
-            .flatMap(packageId -> cloudFoundryClient.packages()
+            .filter(p -> true)
+            .flatMap(p -> cloudFoundryClient.packages()
                 .delete(DeletePackageRequest.builder()
-                    .packageId(packageId)
-                    .build()));
+                    .packageId(p.getId())
+                    .build())
+                .doOnError(t -> LOGGER.error("Unable to delete package", t)));
     }
 
     private static Flux<Void> cleanPrivateDomains(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
@@ -272,13 +270,13 @@ final class CloudFoundryCleaner {
                     .page(page)
                     .build()))
             .filter(domain -> nameFactory.isDomainName(ResourceUtils.getEntity(domain).getName()))
-            .map(ResourceUtils::getId)
-            .flatMap(privateDomainId -> cloudFoundryClient.privateDomains()
+            .flatMap(privateDomain -> cloudFoundryClient.privateDomains()
                 .delete(DeletePrivateDomainRequest.builder()
                     .async(true)
-                    .privateDomainId(privateDomainId)
-                    .build()))
-            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+                    .privateDomainId(ResourceUtils.getId(privateDomain))
+                    .build())
+                .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job))
+                .doOnError(t -> LOGGER.error("Unable to delete private domain {}", ResourceUtils.getEntity(privateDomain).getName(), t)));
     }
 
     private static Flux<Void> cleanRoutes(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
@@ -292,13 +290,16 @@ final class CloudFoundryCleaner {
             .filter(predicate((domains, route) -> nameFactory.isDomainName(domains.get(ResourceUtils.getEntity(route).getDomainId())) ||
                 nameFactory.isApplicationName(ResourceUtils.getEntity(route).getHost()) ||
                 nameFactory.isHostName(ResourceUtils.getEntity(route).getHost())))
-            .map(function((domains, route) -> ResourceUtils.getId(route)))
-            .flatMap(routeId -> cloudFoundryClient.routes()
+            .flatMap(function((domains, route) -> cloudFoundryClient.routes()
                 .delete(DeleteRouteRequest.builder()
                     .async(true)
-                    .routeId(routeId)
-                    .build()))
-            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+                    .routeId(ResourceUtils.getId(route))
+                    .build())
+                .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job))
+                .doOnError(t -> {
+                    RouteEntity entity = ResourceUtils.getEntity(route);
+                    LOGGER.error("Unable to delete route {}.{}:{}{}", entity.getHost(), domains.get(entity.getDomainId()), entity.getPort(), entity.getPath(), t);
+                })));
     }
 
     private static Flux<Void> cleanServiceInstances(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
@@ -308,13 +309,13 @@ final class CloudFoundryCleaner {
                     .page(page)
                     .build()))
             .filter(serviceInstance -> nameFactory.isServiceInstanceName(ResourceUtils.getEntity(serviceInstance).getName()))
-            .map(ResourceUtils::getId)
-            .flatMap(serviceInstanceId -> cloudFoundryClient.serviceInstances()
+            .flatMap(serviceInstance -> cloudFoundryClient.serviceInstances()
                 .delete(DeleteServiceInstanceRequest.builder()
                     .async(true)
-                    .serviceInstanceId(serviceInstanceId)
-                    .build()))
-            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+                    .serviceInstanceId(ResourceUtils.getId(serviceInstance))
+                    .build())
+                .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job))
+                .doOnError(t -> LOGGER.error("Unable to delete service instance {}", ResourceUtils.getEntity(serviceInstance).getName(), t)));
     }
 
     private static Flux<Void> cleanSharedDomains(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
@@ -324,13 +325,13 @@ final class CloudFoundryCleaner {
                     .page(page)
                     .build()))
             .filter(domain -> nameFactory.isDomainName(ResourceUtils.getEntity(domain).getName()))
-            .map(ResourceUtils::getId)
-            .flatMap(domainId -> cloudFoundryClient.sharedDomains()
+            .flatMap(domain -> cloudFoundryClient.sharedDomains()
                 .delete(DeleteSharedDomainRequest.builder()
                     .async(true)
-                    .sharedDomainId(domainId)
-                    .build()))
-            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+                    .sharedDomainId(ResourceUtils.getId(domain))
+                    .build())
+                .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job))
+                .doOnError(t -> LOGGER.error("Unable to delete domain {}", ResourceUtils.getEntity(domain).getName(), t)));
     }
 
     private static Flux<Void> cleanSpaces(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
@@ -340,13 +341,13 @@ final class CloudFoundryCleaner {
                     .page(page)
                     .build()))
             .filter(space -> nameFactory.isSpaceName(ResourceUtils.getEntity(space).getName()))
-            .map(ResourceUtils::getId)
-            .flatMap(spaceId -> cloudFoundryClient.spaces()
+            .flatMap(space -> cloudFoundryClient.spaces()
                 .delete(DeleteSpaceRequest.builder()
                     .async(true)
-                    .spaceId(spaceId)
-                    .build()))
-            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+                    .spaceId(ResourceUtils.getId(space))
+                    .build())
+                .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job))
+                .doOnError(t -> LOGGER.error("Unable to delete space {}", ResourceUtils.getEntity(space).getName(), t)));
     }
 
     private static Flux<Void> cleanUserProvidedServiceInstances(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
@@ -356,11 +357,11 @@ final class CloudFoundryCleaner {
                     .page(page)
                     .build()))
             .filter(userProvidedServiceInstance -> nameFactory.isServiceInstanceName(ResourceUtils.getEntity(userProvidedServiceInstance).getName()))
-            .map(ResourceUtils::getId)
-            .flatMap(userProvidedServiceInstanceId -> cloudFoundryClient.userProvidedServiceInstances()
+            .flatMap(userProvidedServiceInstance -> cloudFoundryClient.userProvidedServiceInstances()
                 .delete(DeleteUserProvidedServiceInstanceRequest.builder()
-                    .userProvidedServiceInstanceId(userProvidedServiceInstanceId)
-                    .build()));
+                    .userProvidedServiceInstanceId(ResourceUtils.getId(userProvidedServiceInstance))
+                    .build())
+                .doOnError(t -> LOGGER.error("Unable to delete user provided service instance", ResourceUtils.getEntity(userProvidedServiceInstance).getName(), t)));
     }
 
     private static Flux<Void> cleanUsers(UaaClient uaaClient, NameFactory nameFactory) {
@@ -370,12 +371,12 @@ final class CloudFoundryCleaner {
                     .startIndex(startIndex)
                     .build()))
             .filter(user -> nameFactory.isUserName(user.getUserName()))
-            .map(User::getId)
-            .flatMap(userId -> uaaClient.users()
+            .flatMap(user -> uaaClient.users()
                 .delete(DeleteUserRequest.builder()
-                    .userId(userId)
+                    .userId(user.getId())
                     .version("*")
                     .build())
+                .doOnError(t -> LOGGER.error("Unable to delete user {}", user.getName(), t))
                 .then());
     }
 
@@ -395,19 +396,19 @@ final class CloudFoundryCleaner {
             .collectMap(function((id, name) -> id), function((id, name) -> name));
     }
 
-    private static Flux<Void> removeServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId) {
+    private static Flux<Void> removeServiceBindings(CloudFoundryClient cloudFoundryClient, ApplicationResource application) {
         return PaginationUtils
             .requestClientV2Resources(page -> cloudFoundryClient.applicationsV2()
                 .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
                     .page(page)
-                    .applicationId(applicationId)
+                    .applicationId(ResourceUtils.getId(application))
                     .build()))
-            .map(ResourceUtils::getId)
-            .flatMap(serviceBindingId -> cloudFoundryClient.applicationsV2()
+            .flatMap(serviceBinding -> cloudFoundryClient.applicationsV2()
                 .removeServiceBinding(RemoveApplicationServiceBindingRequest.builder()
-                    .applicationId(applicationId)
-                    .serviceBindingId(serviceBindingId)
-                    .build()));
+                    .applicationId(ResourceUtils.getId(application))
+                    .serviceBindingId(ResourceUtils.getId(serviceBinding))
+                    .build())
+                .doOnError(t -> LOGGER.error("Unable to delete remove service binding from {}", ResourceUtils.getEntity(application).getName(), t)));
     }
 
 }
