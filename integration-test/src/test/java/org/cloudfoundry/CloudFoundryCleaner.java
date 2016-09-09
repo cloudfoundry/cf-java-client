@@ -118,7 +118,6 @@ final class CloudFoundryCleaner {
             .thenMany(cleanOrganizationQuotaDefinitions(this.cloudFoundryClient, this.nameFactory))
             .retry(5, t -> t instanceof SSLException)
             .doOnSubscribe(s -> LOGGER.debug(">> CLEANUP <<"))
-            .doOnError(Throwable::printStackTrace)
             .doOnComplete(() -> LOGGER.debug("<< CLEANUP >>"))
             .then()
             .block(Duration.ofMinutes(30));
@@ -384,7 +383,7 @@ final class CloudFoundryCleaner {
         return PaginationUtils
             .requestClientV2Resources(page -> cloudFoundryClient.privateDomains()
                 .list(ListPrivateDomainsRequest.builder()
-                    .page(1)
+                    .page(page)
                     .build()))
             .map(response -> Tuples.of(ResourceUtils.getId(response), ResourceUtils.getEntity(response).getName()))
             .mergeWith(PaginationUtils
