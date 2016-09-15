@@ -25,6 +25,8 @@ import org.cloudfoundry.uaa.clients.BatchCreateClientsRequest;
 import org.cloudfoundry.uaa.clients.BatchCreateClientsResponse;
 import org.cloudfoundry.uaa.clients.BatchDeleteClientsRequest;
 import org.cloudfoundry.uaa.clients.BatchDeleteClientsResponse;
+import org.cloudfoundry.uaa.clients.ChangeSecretRequest;
+import org.cloudfoundry.uaa.clients.ChangeSecretResponse;
 import org.cloudfoundry.uaa.clients.Client;
 import org.cloudfoundry.uaa.clients.CreateClient;
 import org.cloudfoundry.uaa.clients.CreateClientRequest;
@@ -206,6 +208,46 @@ public final class ReactorClientsTest {
         @Override
         protected Mono<BatchDeleteClientsResponse> invoke(BatchDeleteClientsRequest request) {
             return this.clients.batchDelete(request);
+        }
+    }
+
+    public static final class ChangeSecret extends AbstractUaaApiTest<ChangeSecretRequest, ChangeSecretResponse> {
+
+        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/oauth/clients/BMGkqk/secret")
+                    .payload("fixtures/uaa/clients/PUT_{id}_secret_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/clients/PUT_{id}_secret_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ChangeSecretResponse getResponse() {
+            return ChangeSecretResponse.builder()
+                .message("secret updated")
+                .status("ok")
+                .build();
+        }
+
+        @Override
+        protected ChangeSecretRequest getValidRequest() throws Exception {
+            return ChangeSecretRequest.builder()
+                .clientId("BMGkqk")
+                .secret("new_secret")
+                .build();
+        }
+
+        @Override
+        protected Mono<ChangeSecretResponse> invoke(ChangeSecretRequest request) {
+            return this.clients.changeSecret(request);
         }
     }
 
