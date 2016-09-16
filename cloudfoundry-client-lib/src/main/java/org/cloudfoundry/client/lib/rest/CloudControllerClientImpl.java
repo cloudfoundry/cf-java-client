@@ -830,6 +830,9 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		serviceRequest.put("space_guid", sessionSpace.getMeta().getGuid());
 		serviceRequest.put("name", service.getName());
 		serviceRequest.put("service_plan_guid", cloudServicePlan.getMeta().getGuid());
+		if (service.getParameters() != null) {
+			serviceRequest.put("parameters", service.getParameters());
+		}
 		getRestTemplate().postForObject(getUrl("/v2/service_instances?accepts_incomplete=true"), serviceRequest, String.class);
 	}
 
