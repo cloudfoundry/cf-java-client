@@ -17,6 +17,8 @@
 package org.cloudfoundry.client.lib.domain;
 
 
+import java.util.Map;
+
 /**
  * Class representing service plan info for a service instance.
  *
@@ -29,6 +31,8 @@ public class CloudService extends CloudEntity {
 
 	private String label;
 	private String plan;
+
+	private Map<String,String> parameters;
 
 	public CloudService() {
 		super();
@@ -72,5 +76,13 @@ public class CloudService extends CloudEntity {
 
 	public void setPlan(String plan) {
 		this.plan = plan;
+	}
+
+	public Map<String, String> getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(Map<String, String> parameters) {
+		this.parameters = parameters;
 	}
 }
