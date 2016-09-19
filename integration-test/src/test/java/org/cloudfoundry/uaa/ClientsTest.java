@@ -18,6 +18,7 @@ package org.cloudfoundry.uaa;
 
 import io.netty.util.AsciiString;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.uaa.clients.ChangeSecretRequest;
 import org.cloudfoundry.uaa.clients.Client;
 import org.cloudfoundry.uaa.clients.CreateClientRequest;
 import org.cloudfoundry.uaa.clients.CreateClientResponse;
@@ -40,6 +41,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.ipc.netty.http.HttpException;
 
 import java.util.Arrays;
 import java.util.Base64;
@@ -82,10 +84,27 @@ public final class ClientsTest extends AbstractIntegrationTest {
         //
     }
 
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/125553341")
     @Test
     public void changeSecret() {
-        //
+        String clientId = this.nameFactory.getClientId();
+        String newClientSecret = this.nameFactory.getClientSecret();
+        String oldClientSecret = this.nameFactory.getClientSecret();
+
+        requestCreateClient(this.uaaClient, clientId, oldClientSecret)
+            .then(this.uaaClient.clients()
+                .changeSecret(ChangeSecretRequest.builder()
+                    .clientId(clientId)
+                    .oldSecret(oldClientSecret)
+                    .secret(newClientSecret)
+                    .build()))
+            .subscribe(this.testSubscriber()
+                .expectError(HttpException.class, "HTTP request failed with code: 400"));
+        //TODO: Update test based on https://www.pivotaltracker.com/n/projects/997278/stories/130645469 to use the following
+//            .subscribe(this.<ChangeSecretResponse>testSubscriber()
+//                .expectThat(response -> {
+//                    assertEquals("secret updated", response.getMessage());
+//                    assertEquals("ok", response.getStatus());
+//                }));
     }
 
     @Test

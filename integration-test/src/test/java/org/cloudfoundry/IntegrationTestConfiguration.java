@@ -76,6 +76,7 @@ public class IntegrationTestConfiguration {
 
     private static final List<String> GROUPS = Arrays.asList(
         "clients.admin",
+        "clients.secret",
         "cloud_controller.admin",
         "scim.create",
         "scim.invite",
@@ -87,6 +88,7 @@ public class IntegrationTestConfiguration {
 
     private static final List<String> SCOPES = Arrays.asList(
         "clients.admin",
+        "clients.secret",
         "cloud_controller.admin",
         "cloud_controller.read",
         "cloud_controller.write",

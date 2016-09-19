@@ -23,6 +23,8 @@ import org.cloudfoundry.uaa.clients.BatchCreateClientsRequest;
 import org.cloudfoundry.uaa.clients.BatchCreateClientsResponse;
 import org.cloudfoundry.uaa.clients.BatchDeleteClientsRequest;
 import org.cloudfoundry.uaa.clients.BatchDeleteClientsResponse;
+import org.cloudfoundry.uaa.clients.ChangeSecretRequest;
+import org.cloudfoundry.uaa.clients.ChangeSecretResponse;
 import org.cloudfoundry.uaa.clients.Clients;
 import org.cloudfoundry.uaa.clients.CreateClientRequest;
 import org.cloudfoundry.uaa.clients.CreateClientResponse;
@@ -66,6 +68,11 @@ public final class ReactorClients extends AbstractUaaOperations implements Clien
     @Override
     public Mono<BatchDeleteClientsResponse> batchDelete(BatchDeleteClientsRequest request) {
         return post(request, BatchDeleteClientsResponse.class, builder -> builder.pathSegment("oauth", "clients", "tx", "delete"));
+    }
+
+    @Override
+    public Mono<ChangeSecretResponse> changeSecret(ChangeSecretRequest request) {
+        return put(request, ChangeSecretResponse.class, builder -> builder.pathSegment("oauth", "clients", request.getClientId(), "secret"));
     }
 
     @Override
