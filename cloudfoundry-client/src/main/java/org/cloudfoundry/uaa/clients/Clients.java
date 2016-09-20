@@ -40,6 +40,14 @@ public interface Clients {
     Mono<BatchDeleteClientsResponse> batchDelete(BatchDeleteClientsRequest request);
 
     /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#batch-update">Batch Update Clients</a> request
+     *
+     * @param request the Batch Update Clients request
+     * @return the Response to the Batch Update Clients Request
+     */
+    Mono<BatchUpdateClientsResponse> batchUpdate(BatchUpdateClientsRequest request);
+
+    /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#change-secret">Change Secret</a> request
      *
      * @param request the Change Secret request

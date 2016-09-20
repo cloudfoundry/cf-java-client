@@ -16,13 +16,26 @@
 
 package org.cloudfoundry.uaa.clients;
 
-import org.cloudfoundry.uaa.IdentityZoned;
-import org.immutables.value.Value;
+import org.junit.Test;
 
-/**
- * The request payload for Update Client
- */
-@Value.Immutable
-abstract class _UpdateClientRequest extends AbstractUpdateClient implements IdentityZoned {
+import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
+
+public final class BatchUpdateClientsRequestTest {
+
+    @Test(expected = IllegalStateException.class)
+    public void noClient() {
+        BatchUpdateClientsRequest.builder()
+            .build();
+    }
+
+    @Test
+    public void valid() {
+        BatchUpdateClientsRequest.builder()
+            .client(UpdateClient.builder()
+                .clientId("test-client-id")
+                .authorizedGrantType(CLIENT_CREDENTIALS)
+                .build())
+            .build();
+    }
 
 }

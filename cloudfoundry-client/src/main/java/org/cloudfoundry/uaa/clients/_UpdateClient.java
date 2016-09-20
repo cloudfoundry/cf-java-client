@@ -16,13 +16,12 @@
 
 package org.cloudfoundry.uaa.clients;
 
-import org.cloudfoundry.uaa.IdentityZoned;
 import org.immutables.value.Value;
 
 /**
- * The request payload for Update Client
+ * The resource in the Batch Update Clients request
  */
 @Value.Immutable
-abstract class _UpdateClientRequest extends AbstractUpdateClient implements IdentityZoned {
+abstract class _UpdateClient extends AbstractUpdateClient {
 
 }
