@@ -18,6 +18,8 @@ package org.cloudfoundry.uaa;
 
 import io.netty.util.AsciiString;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.uaa.clients.BatchUpdateClientsRequest;
+import org.cloudfoundry.uaa.clients.BatchUpdateClientsResponse;
 import org.cloudfoundry.uaa.clients.ChangeSecretRequest;
 import org.cloudfoundry.uaa.clients.Client;
 import org.cloudfoundry.uaa.clients.CreateClientRequest;
@@ -32,6 +34,7 @@ import org.cloudfoundry.uaa.clients.ListClientsResponse;
 import org.cloudfoundry.uaa.clients.ListMetadatasRequest;
 import org.cloudfoundry.uaa.clients.ListMetadatasResponse;
 import org.cloudfoundry.uaa.clients.Metadata;
+import org.cloudfoundry.uaa.clients.UpdateClient;
 import org.cloudfoundry.uaa.clients.UpdateClientRequest;
 import org.cloudfoundry.uaa.clients.UpdateMetadataRequest;
 import org.cloudfoundry.uaa.clients.UpdateMetadataResponse;
@@ -48,6 +51,7 @@ import java.util.Base64;
 import java.util.Collections;
 
 import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
+import static org.cloudfoundry.uaa.tokens.GrantType.IMPLICIT;
 import static org.cloudfoundry.uaa.tokens.GrantType.PASSWORD;
 import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
 import static org.junit.Assert.assertEquals;
@@ -78,10 +82,41 @@ public final class ClientsTest extends AbstractIntegrationTest {
         //
     }
 
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/125572281")
     @Test
     public void batchUpdate() {
-        //
+        String clientId1 = this.nameFactory.getClientId();
+        String clientId2 = this.nameFactory.getClientId();
+        String clientSecret = this.nameFactory.getClientSecret();
+
+        requestCreateClient(this.uaaClient, clientId1, clientSecret)
+            .then(requestCreateClient(this.uaaClient, clientId2, clientSecret))
+            .then(this.uaaClient.clients()
+                .batchUpdate(BatchUpdateClientsRequest.builder()
+                    .client(UpdateClient.builder()
+                            .authorizedGrantType(CLIENT_CREDENTIALS, IMPLICIT)
+                            .clientId(clientId1)
+                            .name("test-name")
+                            .scope("client.read", "client.write")
+                            .tokenSalt("test-token-salt")
+                            .build(),
+                        UpdateClient.builder()
+                            .authorizedGrantType(PASSWORD)
+                            .clientId(clientId2)
+                            .name("filtered-test-name")
+                            .scope("client.write")
+                            .tokenSalt("filtered-test-token-salt")
+                            .build())
+                    .build()))
+            .flatMapIterable(BatchUpdateClientsResponse::getClients)
+            .filter(client -> clientId1.equals(client.getClientId()))
+            .subscribe(this.<Client>testSubscriber()
+                .expectThat(client -> {
+                    assertEquals(Arrays.asList(IMPLICIT, CLIENT_CREDENTIALS), client.getAuthorizedGrantTypes());
+                    assertEquals(clientId1, client.getClientId());
+                    assertEquals("test-name", client.getName());
+                    assertEquals(Arrays.asList("client.read", "client.write"), client.getScopes());
+                    assertEquals("test-token-salt", client.getTokenSalt());
+                }));
     }
 
     @Test
