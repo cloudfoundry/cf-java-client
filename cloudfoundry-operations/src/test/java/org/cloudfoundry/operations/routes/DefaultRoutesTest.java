@@ -412,6 +412,26 @@ public final class DefaultRoutesTest {
                     .build()));
     }
 
+    private static void requestSpacesAll(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        when(cloudFoundryClient.organizations()
+            .listSpaces(ListOrganizationSpacesRequest.builder()
+                .organizationId(organizationId)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListOrganizationSpacesResponse.builder())
+                    .resource(SpaceResource.builder()
+                        .metadata(fill(Metadata.builder(), "space-resource-")
+                            .id("test-route-entity-spaceId")
+                            .build())
+                        .entity(fill(SpaceEntity.builder(), "space-entity-")
+                            .name("test-space-entity-name")
+                            .organizationId(organizationId)
+                            .build())
+                        .build())
+                    .build()));
+    }
+
     private static void requestSpaceRoutes(CloudFoundryClient cloudFoundryClient, String spaceId) {
         when(cloudFoundryClient.spaces()
             .listRoutes(ListSpaceRoutesRequest.builder()
@@ -1021,7 +1041,7 @@ public final class DefaultRoutesTest {
             requestOrganizationsRoutes(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
             requestPrivateDomainsAll(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
             requestSharedDomainsAll(this.cloudFoundryClient);
-            requestSpace(this.cloudFoundryClient, "test-route-entity-spaceId");
+            requestSpacesAll(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
             requestApplications(this.cloudFoundryClient, "test-id");
         }
 
@@ -1056,7 +1076,7 @@ public final class DefaultRoutesTest {
             requestOrganizationsRoutesEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
             requestPrivateDomainsAll(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
             requestSharedDomainsAll(this.cloudFoundryClient);
-            requestSpace(this.cloudFoundryClient, "test-route-entity-spaceId");
+            requestSpacesAll(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
             requestApplications(this.cloudFoundryClient, "test-id");
         }
 
@@ -1083,7 +1103,7 @@ public final class DefaultRoutesTest {
             requestSpaceRoutes(this.cloudFoundryClient, TEST_SPACE_ID);
             requestPrivateDomainsAll(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
             requestSharedDomainsAll(this.cloudFoundryClient);
-            requestSpace(this.cloudFoundryClient, "test-route-entity-spaceId");
+            requestSpacesAll(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
             requestApplications(this.cloudFoundryClient, "test-route-id");
         }
 
@@ -1136,6 +1156,7 @@ public final class DefaultRoutesTest {
         public void setUp() throws Exception {
             requestPrivateDomainsAll(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
             requestSharedDomainsAll(this.cloudFoundryClient);
+            requestSpacesAll(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         }
 
         @Override
