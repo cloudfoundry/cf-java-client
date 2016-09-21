@@ -33,8 +33,6 @@ import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
-import org.cloudfoundry.client.v2.spaces.GetSpaceRequest;
-import org.cloudfoundry.client.v2.spaces.GetSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
@@ -136,16 +134,17 @@ public final class DefaultRoutes implements Routes {
             .then(function((cloudFoundryClient, organizationId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
-                    getAllDomains(cloudFoundryClient, organizationId)
+                    getAllDomains(cloudFoundryClient, organizationId),
+                    getAllSpaces(cloudFoundryClient, organizationId)
                 )))
-            .flatMap(function((cloudFoundryClient, domains) -> getRoutes(cloudFoundryClient, request, this.organizationId, this.spaceId)
-                .map(resource -> Tuples.of(cloudFoundryClient, domains, resource))))
-            .flatMap(function((cloudFoundryClient, domains, resource) -> Mono
+            .flatMap(function((cloudFoundryClient, domains, spaces) -> getRoutes(cloudFoundryClient, request, this.organizationId, this.spaceId)
+                .map(resource -> Tuples.of(cloudFoundryClient, domains, resource, spaces))))
+            .flatMap(function((cloudFoundryClient, domains, resource, spaces) -> Mono
                 .when(
                     getApplicationNames(cloudFoundryClient, ResourceUtils.getId(resource)),
                     getDomainName(domains, ResourceUtils.getEntity(resource).getDomainId()),
                     Mono.just(resource),
-                    getSpaceName(cloudFoundryClient, ResourceUtils.getEntity(resource).getSpaceId())
+                    getSpaceName(spaces, ResourceUtils.getEntity(resource).getSpaceId())
                 )))
             .map(function(DefaultRoutes::toRoute));
     }
@@ -188,6 +187,12 @@ public final class DefaultRoutes implements Routes {
             .map(resource -> Tuples.of(ResourceUtils.getId(resource), ResourceUtils.getEntity(resource).getName()))
             .mergeWith(requestAllSharedDomains(cloudFoundryClient)
                 .map(resource -> Tuples.of(ResourceUtils.getId(resource), ResourceUtils.getEntity(resource).getName())))
+            .collectMap(function((id, name) -> id), function((id, name) -> name));
+    }
+
+    private static Mono<Map<String, String>> getAllSpaces(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return requestAllSpaces(cloudFoundryClient, organizationId)
+            .map(resource -> Tuples.of(ResourceUtils.getId(resource), ResourceUtils.getEntity(resource).getName()))
             .collectMap(function((id, name) -> id), function((id, name) -> name));
     }
 
@@ -282,9 +287,8 @@ public final class DefaultRoutes implements Routes {
             .map(ResourceUtils::getId);
     }
 
-    private static Mono<String> getSpaceName(CloudFoundryClient cloudFoundryClient, String spaceId) {
-        return requestSpace(cloudFoundryClient, spaceId)
-            .map(response -> ResourceUtils.getEntity(response).getName());
+    private static Mono<String> getSpaceName(Map<String, String> spaces, String spaceId) {
+        return Mono.just(spaces.get(spaceId));
     }
 
     private static boolean isOrphan(List<ApplicationResource> applications) {
@@ -304,6 +308,15 @@ public final class DefaultRoutes implements Routes {
         return PaginationUtils
             .requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
                 .list(ListSharedDomainsRequest.builder()
+                    .page(page)
+                    .build()));
+    }
+
+    private static Flux<SpaceResource> requestAllSpaces(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
+                .listSpaces(ListOrganizationSpacesRequest.builder()
+                    .organizationId(organizationId)
                     .page(page)
                     .build()));
     }
@@ -406,13 +419,6 @@ public final class DefaultRoutes implements Routes {
                     .name(domain)
                     .page(page)
                     .build()));
-    }
-
-    private static Mono<GetSpaceResponse> requestSpace(CloudFoundryClient cloudFoundryClient, String spaceId) {
-        return cloudFoundryClient.spaces()
-            .get(GetSpaceRequest.builder()
-                .spaceId(spaceId)
-                .build());
     }
 
     private static Flux<RouteResource> requestSpaceRoutes(CloudFoundryClient cloudFoundryClient, String spaceId) {
