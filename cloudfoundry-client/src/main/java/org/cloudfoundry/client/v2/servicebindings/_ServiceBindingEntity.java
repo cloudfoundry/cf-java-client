@@ -61,6 +61,7 @@ abstract class _ServiceBindingEntity {
     /**
      * The gateway data
      */
+    @Deprecated
     @JsonProperty("gateway_data")
     @Nullable
     abstract Map<String, Object> getGatewayDatas();
