@@ -23,6 +23,7 @@ import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * The entity response payload for Service Instances
@@ -44,7 +45,7 @@ abstract class _ServiceInstanceEntity extends BaseServiceInstanceEntity {
     @Deprecated
     @JsonProperty("gateway_data")
     @Nullable
-    abstract String getGatewayData();
+    abstract Map<String, Object> getGatewayDatas();
 
     /**
      * The last operation
