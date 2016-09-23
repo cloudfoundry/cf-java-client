@@ -23,6 +23,7 @@ import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * The entity response payload for Service Instances
