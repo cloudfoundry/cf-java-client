@@ -18,7 +18,11 @@ package org.cloudfoundry.uaa;
 
 import io.netty.util.AsciiString;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.uaa.clients.BatchCreateClientsRequest;
+import org.cloudfoundry.uaa.clients.BatchCreateClientsResponse;
+import org.cloudfoundry.uaa.clients.BatchDeleteClientsRequest;
 import org.cloudfoundry.uaa.clients.Client;
+import org.cloudfoundry.uaa.clients.CreateClient;
 import org.cloudfoundry.uaa.clients.CreateClientRequest;
 import org.cloudfoundry.uaa.clients.CreateClientResponse;
 import org.cloudfoundry.uaa.clients.DeleteClientRequest;
@@ -64,16 +68,60 @@ public final class ClientsTest extends AbstractIntegrationTest {
         //
     }
 
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/125554031")
     @Test
     public void batchCreate() {
-        //
+        String clientId1 = this.nameFactory.getClientId();
+        String clientId2 = this.nameFactory.getClientId();
+        String clientSecret = this.nameFactory.getClientSecret();
+
+        this.uaaClient.clients()
+            .batchCreate(BatchCreateClientsRequest.builder()
+                .client(CreateClient.builder()
+                    .approvalsDeleted(true)
+                    .authorizedGrantType(PASSWORD)
+                    .clientId(clientId1)
+                    .clientSecret(clientSecret)
+                    .scope("client.read", "client.write")
+                    .tokenSalt("test-token-salt")
+                    .build())
+                .client(CreateClient.builder()
+                    .approvalsDeleted(true)
+                    .authorizedGrantType(PASSWORD, REFRESH_TOKEN)
+                    .clientId(clientId2)
+                    .clientSecret(clientSecret)
+                    .scope("client.write")
+                    .tokenSalt("filtered-test-token-salt")
+                    .build())
+                .build())
+            .flatMapIterable(BatchCreateClientsResponse::getClients)
+            .filter(client -> clientId1.equals(client.getClientId()))
+            .subscribe(this.<Client>testSubscriber()
+                .expectThat(response -> {
+                    assertEquals(Arrays.asList(PASSWORD, REFRESH_TOKEN), response.getAuthorizedGrantTypes());
+                    assertEquals(clientId1, response.getClientId());
+                    assertEquals(Arrays.asList("client.read", "client.write"), response.getScopes());
+                    assertEquals("test-token-salt", response.getTokenSalt());
+                }));
     }
 
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/125575011")
     @Test
     public void batchDelete() {
-        //
+        String clientId1 = this.nameFactory.getClientId();
+        String clientId2 = this.nameFactory.getClientId();
+        String clientSecret = this.nameFactory.getClientSecret();
+
+        batchCreateClients(this.uaaClient, clientId1, clientId2, clientSecret)
+            .flatMapIterable(BatchCreateClientsResponse::getClients)
+            .map(Client::getClientId)
+            .collectList()
+            .then(clientIds -> this.uaaClient.clients()
+                .batchDelete(BatchDeleteClientsRequest.builder()
+                    .clientIds(clientIds)
+                    .build()))
+            .flatMap(ignore -> requestListClients(this.uaaClient))
+            .filter(client -> clientId1.equals(client.getClientId()) || clientId2.equals(client.getClientId()))
+            .subscribe(this.testSubscriber()
+                .expectCount(0));
     }
 
     @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/125572281")
@@ -238,6 +286,28 @@ public final class ClientsTest extends AbstractIntegrationTest {
                     assertEquals("test-name", metadata.getClientName());
                     assertEquals(true, metadata.getShowOnHomePage());
                 }));
+    }
+
+    private static Mono<BatchCreateClientsResponse> batchCreateClients(UaaClient uaaClient, String clientId1, String clientId2, String clientSecret) {
+        return uaaClient.clients()
+            .batchCreate(BatchCreateClientsRequest.builder()
+                .client(CreateClient.builder()
+                    .approvalsDeleted(true)
+                    .authorizedGrantType(PASSWORD)
+                    .clientId(clientId1)
+                    .clientSecret(clientSecret)
+                    .scope("client.read", "client.write")
+                    .tokenSalt("test-token-salt")
+                    .build())
+                .client(CreateClient.builder()
+                    .approvalsDeleted(true)
+                    .authorizedGrantType(PASSWORD, REFRESH_TOKEN)
+                    .clientId(clientId2)
+                    .clientSecret(clientSecret)
+                    .scope("client.write")
+                    .tokenSalt("alternate-test-token-salt")
+                    .build())
+                .build());
     }
 
     private static Mono<CreateClientResponse> requestCreateClient(UaaClient uaaClient, String clientId, String clientSecret) {
