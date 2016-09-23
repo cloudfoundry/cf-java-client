@@ -90,6 +90,7 @@ abstract class AbstractClient {
      * Epoch of the moment the client information was last altered
      */
     @JsonProperty("lastModified")
+    @Nullable
     abstract Long getLastModified();
 
     /**
