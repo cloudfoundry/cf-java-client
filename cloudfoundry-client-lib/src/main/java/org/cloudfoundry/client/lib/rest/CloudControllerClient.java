@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -52,6 +53,7 @@ import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.Staging;
 import org.cloudfoundry.client.lib.domain.CloudUser;
+import org.cloudfoundry.client.lib.domain.LastOperation;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.web.client.ResponseErrorHandler;
 
@@ -215,6 +217,8 @@ public interface CloudControllerClient {
 	CloudSpace getSpace(String spaceName);
 
 	void deleteSpace(String spaceName);
+
+	LastOperation getLastOperationForAServiceInSpace(String spaceGuid, String serviceName) throws ParseException;
 
 	// Domains and routes management
 
