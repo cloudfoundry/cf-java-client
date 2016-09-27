@@ -26,6 +26,7 @@ import java.net.SocketException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,36 +55,7 @@ import org.cloudfoundry.client.lib.UploadStatusCallback;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.archive.DirectoryApplicationArchive;
 import org.cloudfoundry.client.lib.archive.ZipApplicationArchive;
-import org.cloudfoundry.client.lib.domain.ApplicationLog;
-import org.cloudfoundry.client.lib.domain.ApplicationLogs;
-import org.cloudfoundry.client.lib.domain.ApplicationStats;
-import org.cloudfoundry.client.lib.domain.CloudApplication;
-import org.cloudfoundry.client.lib.domain.CloudDomain;
-import org.cloudfoundry.client.lib.domain.CloudEvent;
-import org.cloudfoundry.client.lib.domain.CloudInfo;
-import org.cloudfoundry.client.lib.domain.CloudJob;
-import org.cloudfoundry.client.lib.domain.CloudOrganization;
-import org.cloudfoundry.client.lib.domain.CloudQuota;
-import org.cloudfoundry.client.lib.domain.CloudResource;
-import org.cloudfoundry.client.lib.domain.CloudResources;
-import org.cloudfoundry.client.lib.domain.CloudRoute;
-import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
-import org.cloudfoundry.client.lib.domain.CloudService;
-import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
-import org.cloudfoundry.client.lib.domain.CloudServiceInstance;
-import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
-import org.cloudfoundry.client.lib.domain.CloudServicePlan;
-import org.cloudfoundry.client.lib.domain.CloudSpace;
-import org.cloudfoundry.client.lib.domain.CloudStack;
-import org.cloudfoundry.client.lib.domain.CrashInfo;
-import org.cloudfoundry.client.lib.domain.CrashesInfo;
-import org.cloudfoundry.client.lib.domain.InstanceState;
-import org.cloudfoundry.client.lib.domain.InstanceStats;
-import org.cloudfoundry.client.lib.domain.InstancesInfo;
-import org.cloudfoundry.client.lib.domain.SecurityGroupRule;
-import org.cloudfoundry.client.lib.domain.Staging;
-import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
-import org.cloudfoundry.client.lib.domain.CloudUser;
+import org.cloudfoundry.client.lib.domain.*;
 import org.cloudfoundry.client.lib.oauth2.OauthClient;
 import org.cloudfoundry.client.lib.util.CloudEntityResourceMapper;
 import org.cloudfoundry.client.lib.util.CloudUtil;
@@ -597,6 +569,40 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			space = resourceMapper.mapResource(resource, CloudSpace.class);
 		}
 		return space;
+	}
+
+	@Override
+	public LastOperation getLastOperationForAServiceInSpace(String spaceGuid, String serviceName) throws ParseException {
+		/*
+		Provides support for the following GET
+		GET /v2/spaces/4aac4aa9-fa1b-478f-b277-0ea1f8c8e127/service_instances?return_user_provided_service_instances=true&q=name%3Abd3bc418-5e54-48d9-8fda-e8def5fb010d-database&inline-relations-depth=1
+		 */
+		LastOperation result = new LastOperation();
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "/v2/spaces/{spaceGuid}/service_instances?return_user_provided_service_instances=true&q=name%{serviceName}&inline-relations-depth=1";
+		urlVars.put("spaceGuid", spaceGuid);
+		urlVars.put("serviceName", serviceName);
+		// there will be a single resource because of inline relations depth
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
+		//response["resources"][0]["entity"]["last_operation"]
+		if (resourceList.size() > 0) {
+			Map<String, Object> resource = resourceList.get(0);
+			Map<String, Object> entity = (Map<String, Object>) resource.get("entity");
+			Object lastOperation = entity.get("last_operation");
+
+			if (lastOperation != null){
+				Map<String, String>  lastOperationMap = (Map<String, String>) lastOperation;
+				result.setCreatedAt(lastOperationMap.get("created_at"));
+				result.setDescription(lastOperationMap.get("description"));
+				result.setState(lastOperationMap.get("state"));
+				result.setType(lastOperationMap.get("type"));
+				result.setUpdatedAt(lastOperationMap.get("updated_at"));
+				return result;
+			}else {
+				return null;
+			}
+		}
+		return null;
 	}
 
 	@Override
