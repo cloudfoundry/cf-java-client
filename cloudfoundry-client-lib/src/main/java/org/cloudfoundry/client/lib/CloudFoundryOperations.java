@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.text.ParseException;
 
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationLog;
@@ -45,6 +46,7 @@ import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.Staging;
 import org.cloudfoundry.client.lib.domain.CloudUser;
+import org.cloudfoundry.client.lib.domain.LastOperation;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.web.client.ResponseErrorHandler;
 
@@ -231,6 +233,15 @@ public interface CloudFoundryOperations {
 	 * @param spaceName name of the space
 	 */
 	void deleteSpace(String spaceName);
+
+	/**
+	 *
+	 * @param spaceGuid
+	 * @param serviceName
+	 * @return the last_operation data of the service instance / unpacked
+	 * @throws ParseException
+	 */
+	LastOperation getLastOperationForAServiceInSpace(String spaceGuid, String serviceName) throws ParseException;
 
 	/**
 	 * Get list of CloudOrganizations for the current cloud.
