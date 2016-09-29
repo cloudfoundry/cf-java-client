@@ -22,6 +22,7 @@ import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v2.serviceinstances.GatewayData;
 import org.immutables.value.Value;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -94,5 +95,12 @@ abstract class _ServiceBindingEntity {
     @JsonProperty("syslog_drain_url")
     @Nullable
     abstract String getSyslogDrainUrl();
+
+    /**
+     * The volume mounts
+     */
+    @JsonProperty("volume_mounts")
+    @Nullable
+    abstract List<VolumeMounts> getVolumeMounts();
 
 }

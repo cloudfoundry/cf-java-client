@@ -54,7 +54,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .organization(this.organizationName)
                 .build())
             .subscribe(testSubscriber()
-                .expectError(CloudFoundryException.class, "CF-DomainInvalid(130001): The domain is invalid: name format"));
+                .expectErrorMatch(CloudFoundryException.class, "CF-DomainInvalid\\(130001\\): The domain is invalid: .*"));
     }
 
     @Test

@@ -63,6 +63,13 @@ abstract class _Statistics {
     abstract String getName();
 
     /**
+     * The net info
+     */
+    @JsonProperty("net_info")
+    @Nullable
+    abstract NetInfo getNetInfo();
+
+    /**
      * The application port
      */
     @JsonProperty("port")
