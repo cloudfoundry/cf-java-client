@@ -49,7 +49,6 @@ import org.cloudfoundry.uaa.users.CreateUserResponse;
 import org.cloudfoundry.uaa.users.Email;
 import org.cloudfoundry.uaa.users.Name;
 import org.cloudfoundry.util.PaginationUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
@@ -63,7 +62,6 @@ import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
 
-@Ignore("TODO: Figure out what is causing UAA failures in CI")
 public final class GroupsTest extends AbstractIntegrationTest {
 
     @Autowired
