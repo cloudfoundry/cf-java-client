@@ -30,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-@Ignore("TODO: Figure out what is causing UAA failures in CI")
 public final class AuthorizationsTest extends AbstractIntegrationTest {
 
     @Autowired
