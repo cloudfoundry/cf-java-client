@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.text.ParseException;
 
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationLog;
@@ -46,6 +47,7 @@ import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.Staging;
 import org.cloudfoundry.client.lib.domain.CloudUser;
+import org.cloudfoundry.client.lib.domain.LastOperation;
 import org.cloudfoundry.client.lib.rest.CloudControllerClient;
 import org.cloudfoundry.client.lib.rest.CloudControllerClientFactory;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -600,6 +602,9 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.deleteSpace(spaceName);
 	}
 
+	@Override
+	public LastOperation getLastOperationForAServiceInSpace(String spaceGuid, String serviceName) throws ParseException
+    { return cc.getLastOperationForAServiceInSpace(spaceGuid, serviceName); }
 
 	@Override
 	public CloudSpace getSpace(String spaceName) {

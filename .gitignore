@@ -13,3 +13,4 @@ Servers
 /*.DS_Store
 /*.iml
 !cloudfoundry-client-lib/src/test/resources/apps/app-with-scm-metadata/*.svn
+cloudfoundry-client-lib/cloudfoundry-client-lib.iml
