@@ -248,21 +248,26 @@ public final class DefaultRoutes implements Routes {
 
     private static Mono<String> getOrCreateRoute(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceId, String domain, String host, String path) {
         return getDomainId(cloudFoundryClient, organizationId, domain)
-            .then(domainId -> requestRoutes(cloudFoundryClient, domainId, host, path)
-                .singleOrEmpty()
+            .then(domainId -> getRoute(cloudFoundryClient, domainId, host, path)
                 .map(OperationUtils.<RouteResource, Resource<RouteEntity>>cast())
                 .otherwiseIfEmpty(requestCreateRoute(cloudFoundryClient, domainId, host, path, spaceId)))
             .map(ResourceUtils::getId);
     }
 
-    private static Mono<RouteResource> getRoute(CloudFoundryClient cloudFoundryClient, String host, String domain, String domainId, String path) {
+    private static Mono<RouteResource> getRoute(CloudFoundryClient cloudFoundryClient, String domainId, String domain, String host, String path) {
+        return getRoute(cloudFoundryClient, domainId, host, path)
+            .otherwiseIfEmpty(ExceptionUtils.illegalArgument("Route %s.%s does not exist", host, domain));
+    }
+
+    private static Mono<RouteResource> getRoute(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
         return requestRoutes(cloudFoundryClient, domainId, host, path)
-            .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Route %s.%s does not exist", host, domain));
+            .filter(resource -> isIdentical(nullSafe(host), ResourceUtils.getEntity(resource).getHost()))
+            .filter(resource -> isIdentical(Optional.ofNullable(path).orElse(""), ResourceUtils.getEntity(resource).getPath()))
+            .singleOrEmpty();
     }
 
     private static Mono<String> getRouteId(CloudFoundryClient cloudFoundryClient, String host, String domain, String domainId, String path) {
-        return getRoute(cloudFoundryClient, host, domain, domainId, path)
+        return getRoute(cloudFoundryClient, domainId, domain, host, path)
             .map(ResourceUtils::getId);
     }
 
@@ -291,8 +296,16 @@ public final class DefaultRoutes implements Routes {
         return Mono.just(spaces.get(spaceId));
     }
 
+    private static boolean isIdentical(String s, String t) {
+        return s == null ? t == null : s.equals(t);
+    }
+
     private static boolean isOrphan(List<ApplicationResource> applications) {
         return applications.isEmpty();
+    }
+
+    private static String nullSafe(String host) {
+        return host == null ? "" : host;
     }
 
     private static Flux<PrivateDomainResource> requestAllPrivateDomains(CloudFoundryClient cloudFoundryClient, String organizationId) {

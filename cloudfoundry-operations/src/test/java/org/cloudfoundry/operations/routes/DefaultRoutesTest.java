@@ -340,6 +340,10 @@ public final class DefaultRoutesTest {
             .thenReturn(Mono
                 .just(fill(ListRoutesResponse.builder())
                     .resource(fill(RouteResource.builder(), "route-")
+                        .entity(RouteEntity.builder()
+                            .host(host)
+                            .path(path == null ? "" : path)
+                            .build())
                         .build())
                     .build()));
     }
@@ -354,6 +358,31 @@ public final class DefaultRoutesTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListRoutesResponse.builder())
+                    .build()));
+    }
+
+    private static void requestRoutesTwo(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
+        when(cloudFoundryClient.routes()
+            .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
+                .domainId(domainId)
+                .hosts(Optional.ofNullable(host).map(Collections::singletonList).orElse(null))
+                .page(1)
+                .paths(Optional.ofNullable(path).map(Collections::singletonList).orElse(null))
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListRoutesResponse.builder())
+                    .resource(fill(RouteResource.builder(), "route-")
+                        .entity(RouteEntity.builder()
+                            .host(null)
+                            .path(null)
+                            .build())
+                        .build())
+                    .resource(fill(RouteResource.builder(), "route-")
+                        .entity(RouteEntity.builder()
+                            .host(host)
+                            .path(path == null ? "" : path)
+                            .build())
+                        .build())
                     .build()));
     }
 
@@ -412,26 +441,6 @@ public final class DefaultRoutesTest {
                     .build()));
     }
 
-    private static void requestSpacesAll(CloudFoundryClient cloudFoundryClient, String organizationId) {
-        when(cloudFoundryClient.organizations()
-            .listSpaces(ListOrganizationSpacesRequest.builder()
-                .organizationId(organizationId)
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListOrganizationSpacesResponse.builder())
-                    .resource(SpaceResource.builder()
-                        .metadata(fill(Metadata.builder(), "space-resource-")
-                            .id("test-route-entity-spaceId")
-                            .build())
-                        .entity(fill(SpaceEntity.builder(), "space-entity-")
-                            .name("test-space-entity-name")
-                            .organizationId(organizationId)
-                            .build())
-                        .build())
-                    .build()));
-    }
-
     private static void requestSpaceRoutes(CloudFoundryClient cloudFoundryClient, String spaceId) {
         when(cloudFoundryClient.spaces()
             .listRoutes(ListSpaceRoutesRequest.builder()
@@ -469,6 +478,26 @@ public final class DefaultRoutesTest {
             .thenReturn(Mono
                 .just(fill(ListOrganizationSpacesResponse.builder())
                     .resource(fill(SpaceResource.builder(), "space-").build())
+                    .build()));
+    }
+
+    private static void requestSpacesAll(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        when(cloudFoundryClient.organizations()
+            .listSpaces(ListOrganizationSpacesRequest.builder()
+                .organizationId(organizationId)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListOrganizationSpacesResponse.builder())
+                    .resource(SpaceResource.builder()
+                        .metadata(fill(Metadata.builder(), "space-resource-")
+                            .id("test-route-entity-spaceId")
+                            .build())
+                        .entity(fill(SpaceEntity.builder(), "space-entity-")
+                            .name("test-space-entity-name")
+                            .organizationId(organizationId)
+                            .build())
+                        .build())
                     .build()));
     }
 
@@ -739,7 +768,6 @@ public final class DefaultRoutesTest {
             requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
             requestJobFailure(this.cloudFoundryClient, "test-id");
         }
-
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) {
@@ -1201,6 +1229,7 @@ public final class DefaultRoutesTest {
                     .path("test-path")
                     .build());
         }
+
     }
 
     public static final class MapRouteInvalidApplicationName extends AbstractOperationsApiTest<Void> {
@@ -1338,6 +1367,36 @@ public final class DefaultRoutesTest {
                     .path("test-path")
                     .build());
         }
+    }
+
+    public static final class MapRoutePath extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
+            requestRoutesTwo(this.cloudFoundryClient, "test-private-domain-metadata-id", "test-host", "test-path");
+            requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.routes
+                .map(MapRouteRequest.builder()
+                    .applicationName("test-application-name")
+                    .domain("test-domain")
+                    .host("test-host")
+                    .path("test-path")
+                    .build());
+        }
+
     }
 
     public static final class MapRoutePrivateDomain extends AbstractOperationsApiTest<Void> {
