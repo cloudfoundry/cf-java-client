@@ -1,0 +1,122 @@
+== Gradle plugin to manage an application in Cloud Foundry.
+
+The purpose of this plugin is to provide ways to manage an application in the Cloud Foundry Environment - Be able to deploy, update, start/stop/restart, attach/remove routes.
+
+
+=== Using the Plugin
+
+* Add a buildscript dependency:
+
+[source]
+----
+buildscript {
+	ext {
+		cfPluginVersion = '2.1.0.BUILD-SNAPSHOT'
+	}
+	repositories {
+		mavenLocal() //if using a local build of plugin..
+		mavenCentral()
+		maven { url "https://oss.sonatype.org/content/repositories/releases" }
+		maven { url "https://repo.spring.io/release" }
+	}
+	dependencies {
+		classpath("org.cloudfoundry:cloudfoundry-gradle-plugin:${cfPluginVersion}")
+	}
+}
+----
+
+* Apply the plugin and provide the Cloud Foundry details:
+
+[source]
+----
+apply plugin: 'cf'
+
+cfConfig {
+	//CF Details
+	ccHost = "api.local.pcfdev.io"
+	ccUser = "admin"
+	ccPassword = "admin"
+	org = "pcfdev-org"
+	space = "pcfdev-space"
+
+	//App Details
+	name = "cf-plugin-showcase"
+	hostName = "cf-plugin-showcase"
+	filePath = "build/libs/cf-plugin-showcase-0.0.1-SNAPSHOT.jar"
+
+	path = ""
+	domain = "local.pcfdev.io"
+	instances = 2
+	memory = 512
+
+	//Env and services
+	buildpack = "https://github.com/cloudfoundry/java-buildpack.git"
+	environment = ["JAVA_OPTS": "-Djava.security.egd=file:/dev/./urandom", "SPRING_PROFILES_ACTIVE": "cloud"]
+	services  = ["mydb"]
+}
+----
+
+* Check if the plugin is registered correctly:
+
+[source]
+----
+./gradlew tasks
+----
+
+* Run the task(s):
+
+[source]
+----
+./gradlew cf-push
+----
+
+* Override the values using explicit gradle properties, they follow a `cf.*` pattern:
+
+[source]
+----
+./gradlew cf-push -Pcf.name=Green -Pcf.hostName=demo-time-temp
+----
+
+* There is one task to retrieve the details of an application (cf-get-app-detail).
+You can use the plugin the following way, say to retrieve the app url's in a gradle task:
+
+[source]
+----
+task showAppUrls(dependsOn: "cf-get-app-detail") << {
+	print "${project.cfConfig.applicationDetail.urls}"
+}
+----
+
+Say if you wanted to deploy an app and use the apps url to run an acceptance test against you can define a task alone these lines:
+
+[source]
+----
+task acceptanceTest(type: Test, dependsOn: "cf-get-app-detail")  {
+	doFirst() {
+		systemProperty "url", "https://${project.cfConfig.applicationDetail.urls[0]}"
+	}
+	useJUnit {
+		includeCategories 'test.AcceptanceTest'
+	}
+}
+----
+
+
+=== List of all Tasks
+
+.Tasks
+[width="100%",frame="topbot",options="header,footer"]
+|================================================================================================
+|Task                      |Description
+|cf-push                   |Pushes an Application to Cloud Foundry
+|cf-delete-app             |Delete an application from Cloud Foundry
+|cf-delete-route           |Delete a route from Cloud Foundry
+|cf-get-app-detail         |Get the application detail from Cloud Foundry
+|cf-map-route              |Add a route for an application
+|cf-unmap-route            |Remove an existing route for an application
+|cf-rename-app             |Rename an applicaiton
+|cf-start-app              |Start an Application
+|cf-stop-app               |Stop an Application
+|cf-restage-app            |Restage an Application
+|cf-restart-app            |Restart an Application
+|================================================================================================
