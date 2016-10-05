@@ -19,8 +19,8 @@ package org.cloudfoundry.uaa;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
-import org.cloudfoundry.uaa.tokens.AbstractTokenKey;
 import org.cloudfoundry.uaa.tokens.CheckTokenRequest;
+import org.cloudfoundry.uaa.tokens.CheckTokenResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenByClientCredentialsRequest;
@@ -44,11 +44,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.HttpException;
+import reactor.test.subscriber.ScriptedSubscriber;
 import reactor.util.function.Tuple2;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import java.time.Duration;
+import java.util.concurrent.TimeoutException;
 
 public final class TokensTest extends AbstractIntegrationTest {
 
@@ -68,7 +68,9 @@ public final class TokensTest extends AbstractIntegrationTest {
     private UaaClient uaaClient;
 
     @Test
-    public void checkTokenNotAuthorized() {
+    public void checkTokenNotAuthorized() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<CheckTokenResponse> subscriber = errorExpectation(HttpException.class, "HTTP request failed with code: 403");
+
         this.tokenProvider.getToken(this.connectionContext)
             .then(token -> this.uaaClient.tokens()
                 .check(CheckTokenRequest.builder()
@@ -78,38 +80,53 @@ public final class TokensTest extends AbstractIntegrationTest {
                     .scope("password.write")
                     .scope("scim.userids")
                     .build()))
-            .subscribe(this.testSubscriber()
-                .expectError(HttpException.class, "HTTP request failed with code: 403"));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Ignore("TODO: use test authorizationCode")
     @Test
-    public void getTokenByAuthorizationCode() {
+    public void getTokenByAuthorizationCode() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<GetTokenByAuthorizationCodeResponse> subscriber = ScriptedSubscriber.<GetTokenByAuthorizationCodeResponse>expectValueCount(1)
+            .expectComplete();
+
         this.uaaClient.tokens()
             .getByAuthorizationCode(GetTokenByAuthorizationCodeRequest.builder()
                 .authorizationCode("some auth code")
                 .clientId(this.clientId)
                 .clientSecret(this.clientSecret)
                 .build())
-            .subscribe(this.<GetTokenByAuthorizationCodeResponse>testSubscriber()
-                .expectCount(1));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void getTokenByClientCredentials() {
+    public void getTokenByClientCredentials() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue("bearer")
+            .expectComplete();
+
         this.uaaClient.tokens()
             .getByClientCredentials(GetTokenByClientCredentialsRequest.builder()
                 .clientId(this.clientId)
                 .clientSecret(this.clientSecret)
                 .tokenFormat(TokenFormat.OPAQUE)
                 .build())
-            .subscribe(this.<GetTokenByClientCredentialsResponse>testSubscriber()
-                .expectThat(response -> assertEquals("bearer", response.getTokenType())));
+            .map(GetTokenByClientCredentialsResponse::getTokenType)
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Ignore("TODO: use test one-time passcode")
     @Test
-    public void getTokenByOneTimePasscode() {
+    public void getTokenByOneTimePasscode() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue("bearer")
+            .expectComplete();
+
         this.uaaClient.tokens()
             .getByOneTimePasscode(GetTokenByOneTimePasscodeRequest.builder()
                 .passcode("Some passcode")
@@ -117,13 +134,19 @@ public final class TokensTest extends AbstractIntegrationTest {
                 .clientSecret(this.clientSecret)
                 .tokenFormat(TokenFormat.OPAQUE)
                 .build())
-            .subscribe(this.<GetTokenByOneTimePasscodeResponse>testSubscriber()
-                .expectThat(response -> assertEquals("bearer", response.getTokenType())));
+            .map(GetTokenByOneTimePasscodeResponse::getTokenType)
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Ignore("TODO: use test openid authorizationCode")
     @Test
-    public void getTokenByOpenId() {
+    public void getTokenByOpenId() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue("bearer")
+            .expectComplete();
+
         this.uaaClient.tokens()
             .getByOpenId(GetTokenByOpenIdRequest.builder()
                 .authorizationCode("Some authorization code")
@@ -131,13 +154,19 @@ public final class TokensTest extends AbstractIntegrationTest {
                 .clientSecret(this.clientSecret)
                 .tokenFormat(TokenFormat.OPAQUE)
                 .build())
-            .subscribe(this.<GetTokenByOpenIdResponse>testSubscriber()
-                .expectThat(response -> assertEquals("bearer", response.getTokenType())));
+            .map(GetTokenByOpenIdResponse::getTokenType)
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Ignore("TODO: use test username and password")
     @Test
-    public void getTokenByPassword() {
+    public void getTokenByPassword() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue("bearer")
+            .expectComplete();
+
         this.uaaClient.tokens()
             .getByPassword(GetTokenByPasswordRequest.builder()
                 .password("a-password")
@@ -146,24 +175,29 @@ public final class TokensTest extends AbstractIntegrationTest {
                 .clientSecret(this.clientSecret)
                 .tokenFormat(TokenFormat.OPAQUE)
                 .build())
-            .subscribe(this.<GetTokenByPasswordResponse>testSubscriber()
-                .expectThat(response -> assertEquals("bearer", response.getTokenType())));
+            .map(GetTokenByPasswordResponse::getTokenType)
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void getTokenKey() {
+    public void getTokenKey() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<GetTokenKeyResponse> subscriber = ScriptedSubscriber.<GetTokenKeyResponse>expectValueCount(1)
+            .expectComplete();
+
         this.uaaClient.tokens()
             .getKey(GetTokenKeyRequest.builder()
                 .build())
-            .subscribe(this.<GetTokenKeyResponse>testSubscriber()
-                .expectThat(response -> {
-                    assertEquals("sig", response.getUse());
-                    assertNotNull(response.getValue());
-                }));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listTokenKeys() {
+    public void listTokenKeys() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
+
         this.uaaClient.tokens()
             .getKey(GetTokenKeyRequest.builder()
                 .build())
@@ -174,16 +208,22 @@ public final class TokensTest extends AbstractIntegrationTest {
                             .build())
                         .flatMap(response -> Flux.fromIterable(response.getKeys()))
                         .filter(tokenKey -> getKey.getValue().equals(tokenKey.getValue()))
-                        .single(),
+                        .single()
+                        .map(TokenKey::getId),
                     Mono.just(getKey)
+                        .map(GetTokenKeyResponse::getId)
                 ))
-            .subscribe(this.<Tuple2<TokenKey, GetTokenKeyResponse>>testSubscriber()
-                .expectThat(consumer(TokensTest::assertTokenKeyEquality)));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Ignore("TODO: use test refresh token")
     @Test
-    public void refreshToken() {
+    public void refreshToken() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<RefreshTokenResponse> subscriber = ScriptedSubscriber.<RefreshTokenResponse>expectValueCount(1)
+            .expectComplete();
+
         this.uaaClient.tokens()
             .refresh(RefreshTokenRequest.builder()
                 .tokenFormat(TokenFormat.OPAQUE)
@@ -191,17 +231,9 @@ public final class TokensTest extends AbstractIntegrationTest {
                 .clientSecret(this.clientSecret)
                 .refreshToken("a-refresh-token")
                 .build())
-            .subscribe(this.<RefreshTokenResponse>testSubscriber()
-                .expectCount(1));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
-    private static void assertTokenKeyEquality(AbstractTokenKey tk1, AbstractTokenKey tk2) {
-        assertEquals("algorithm", tk1.getAlgorithm(), tk2.getAlgorithm());
-        assertEquals("e", tk1.getE(), tk2.getE());
-        assertEquals("keyType", tk1.getKeyType(), tk2.getKeyType());
-        assertEquals("id", tk1.getId(), tk2.getId());
-        assertEquals("n", tk1.getN(), tk2.getN());
-        assertEquals("use", tk1.getUse(), tk2.getUse());
-        assertEquals("value", tk1.getValue(), tk2.getValue());
-    }
 }

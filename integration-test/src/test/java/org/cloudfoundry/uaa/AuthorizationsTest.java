@@ -25,9 +25,12 @@ import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithIdTokenRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithImplicitGrantRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.test.subscriber.ScriptedSubscriber;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import java.time.Duration;
+import java.util.Optional;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 
 public final class AuthorizationsTest extends AbstractIntegrationTest {
 
@@ -38,74 +41,100 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
     private UaaClient uaaClient;
 
     @Test
-    public void authorizeByAuthorizationCodeGrantApi() {
+    public void authorizeByAuthorizationCodeGrantApi() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValueWith(actual -> actual.length() == 6, actual -> String.format("expected length: %d; actual length: %d", 6, actual.length()))
+            .expectComplete();
+
         this.uaaClient.authorizations()
             .authorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest.builder()
                 .clientId(this.clientId)
                 .build())
-            .subscribe(this.<String>testSubscriber()
-                .expectThat(code -> {
-                    assertNotNull(code);
-                    assertTrue(code.length() == 6);
-                }));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void authorizeByAuthorizationCodeGrantBrowser() {
+    public void authorizeByAuthorizationCodeGrantBrowser() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<String> subscriber = startsWithExpectation("https://uaa.");
+
         this.uaaClient.authorizations()
             .authorizationCodeGrantBrowser(AuthorizeByAuthorizationCodeGrantBrowserRequest.builder()
                 .clientId(this.clientId)
                 .redirectUri("http://redirect.to/app")
                 .build())
-            .subscribe(this.<String>testSubscriber()
-                .expectThat(location -> assertTrue(location.startsWith("https://uaa."))));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void authorizeByImplicitGrantBrowser() {
+    public void authorizeByImplicitGrantBrowser() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<String> subscriber = startsWithExpectation("https://uaa.");
+
         this.uaaClient.authorizations()
             .implicitGrantBrowser(AuthorizeByImplicitGrantBrowserRequest.builder()
                 .clientId(this.clientId)
                 .redirectUri("http://redirect.to/app")
                 .build())
-            .subscribe(this.<String>testSubscriber()
-                .expectThat(location -> assertTrue(location.startsWith("https://uaa."))));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void authorizeByOpenIdWithAuthorizationCodeGrant() {
+    public void authorizeByOpenIdWithAuthorizationCodeGrant() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<String> subscriber = startsWithExpectation("https://uaa.");
+
         this.uaaClient.authorizations()
             .openIdWithAuthorizationCodeGrant(AuthorizeByOpenIdWithAuthorizationCodeGrantRequest.builder()
                 .clientId("app")
                 .redirectUri("http://redirect.to/app")
                 .scope("openid")
                 .build())
-            .subscribe(this.<String>testSubscriber()
-                .expectThat(location -> assertTrue(location.startsWith("https://uaa."))));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void authorizeByOpenIdWithIdToken() {
+    public void authorizeByOpenIdWithIdToken() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<String> subscriber = startsWithExpectation("https://uaa.");
+
         this.uaaClient.authorizations()
             .openIdWithIdToken(AuthorizeByOpenIdWithIdTokenRequest.builder()
                 .clientId("app")
                 .redirectUri("http://redirect.to/app")
                 .scope("open-id")
                 .build())
-            .subscribe(this.<String>testSubscriber()
-                .expectThat(location -> assertTrue(location.startsWith("https://uaa."))));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void authorizeByOpenIdWithImplicitGrant() {
+    public void authorizeByOpenIdWithImplicitGrant() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<String> subscriber = startsWithExpectation("https://uaa.");
+
         this.uaaClient.authorizations()
             .openIdWithImplicitGrant(AuthorizeByOpenIdWithImplicitGrantRequest.builder()
                 .clientId("app")
                 .redirectUri("http://redirect.to/app")
                 .scope("openid")
                 .build())
-            .subscribe(this.<String>testSubscriber()
-                .expectThat(location -> assertTrue(location.startsWith("https://uaa."))));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
+    }
+
+    private static ScriptedSubscriber<String> startsWithExpectation(String prefix) {
+        Function<String, Optional<String>> assertion = actual -> actual.startsWith(prefix) ? Optional.empty() : Optional.of("expected to start with: %s; actual: %s, actual");
+
+        return ScriptedSubscriber.<String>create()
+            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
+                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching value")))
+            .expectComplete();
     }
 
 

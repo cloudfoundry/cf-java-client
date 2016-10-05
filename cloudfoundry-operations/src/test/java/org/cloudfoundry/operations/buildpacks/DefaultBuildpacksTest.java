@@ -23,16 +23,16 @@ import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksResponse;
 import org.cloudfoundry.client.v2.buildpacks.UploadBuildpackResponse;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.file.Paths;
 
-import static org.cloudfoundry.util.test.TestObjects.fill;
+import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
 public final class DefaultBuildpacksTest {
@@ -96,8 +96,9 @@ public final class DefaultBuildpacksTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -124,16 +125,17 @@ public final class DefaultBuildpacksTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Buildpack> testSubscriber) {
-            testSubscriber
-                .expectEquals(Buildpack.builder()
+        protected ScriptedSubscriber<Buildpack> expectations() {
+            return ScriptedSubscriber.<Buildpack>create()
+                .expectValue(Buildpack.builder()
                     .enabled(true)
                     .filename("test-buildpack-filename")
                     .id("test-buildpack-id")
                     .locked(true)
                     .name("test-buildpack-name")
                     .position(1)
-                    .build());
+                    .build())
+                .expectComplete();
         }
 
         @Override

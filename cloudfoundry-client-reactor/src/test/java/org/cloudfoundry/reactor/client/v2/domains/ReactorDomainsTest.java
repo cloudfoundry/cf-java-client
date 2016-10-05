@@ -37,6 +37,7 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
 import java.util.Collections;
 
@@ -54,7 +55,27 @@ public final class ReactorDomainsTest {
         private final ReactorDomains domains = new ReactorDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<CreateDomainResponse> expectations() {
+            return ScriptedSubscriber.<CreateDomainResponse>create()
+                .expectValue(CreateDomainResponse.builder()
+                    .metadata(Metadata.builder()
+                        .id("abb8338f-eaea-4149-85c0-61888bac0737")
+                        .url("/v2/domains/abb8338f-eaea-4149-85c0-61888bac0737")
+                        .createdAt("2015-07-27T22:43:33Z")
+                        .build())
+                    .entity(DomainEntity.builder()
+                        .name("exmaple.com")
+                        .owningOrganizationId("09e0d56f-4e50-4bff-af83-9bd87a7d7f00")
+                        .owningOrganizationUrl("/v2/organizations/09e0d56f-4e50-4bff-af83-9bd87a7d7f00")
+                        .sharedOrganizations(Collections.emptyList())
+                        .spacesUrl("/v2/domains/abb8338f-eaea-4149-85c0-61888bac0737/spaces")
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(POST).path("/v2/domains")
@@ -68,35 +89,17 @@ public final class ReactorDomainsTest {
         }
 
         @Override
-        protected CreateDomainResponse getResponse() {
-            return CreateDomainResponse.builder()
-                .metadata(Metadata.builder()
-                    .id("abb8338f-eaea-4149-85c0-61888bac0737")
-                    .url("/v2/domains/abb8338f-eaea-4149-85c0-61888bac0737")
-                    .createdAt("2015-07-27T22:43:33Z")
-                    .build())
-                .entity(DomainEntity.builder()
-                    .name("exmaple.com")
-                    .owningOrganizationId("09e0d56f-4e50-4bff-af83-9bd87a7d7f00")
-                    .owningOrganizationUrl("/v2/organizations/09e0d56f-4e50-4bff-af83-9bd87a7d7f00")
-                    .sharedOrganizations(Collections.emptyList())
-                    .spacesUrl("/v2/domains/abb8338f-eaea-4149-85c0-61888bac0737/spaces")
-                    .build())
-                .build();
+        protected Mono<CreateDomainResponse> invoke(CreateDomainRequest request) {
+            return this.domains.create(request);
         }
 
         @Override
-        protected CreateDomainRequest getValidRequest() throws Exception {
+        protected CreateDomainRequest validRequest() {
             return CreateDomainRequest.builder()
                 .name("exmaple.com")
                 .owningOrganizationId("09e0d56f-4e50-4bff-af83-9bd87a7d7f00")
                 .wildcard(true)
                 .build();
-        }
-
-        @Override
-        protected Mono<CreateDomainResponse> invoke(CreateDomainRequest request) {
-            return this.domains.create(request);
         }
     }
 
@@ -105,7 +108,13 @@ public final class ReactorDomainsTest {
         private final ReactorDomains domains = new ReactorDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<DeleteDomainResponse> expectations() {
+            return ScriptedSubscriber.<DeleteDomainResponse>create()
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(DELETE).path("/v2/domains/test-domain-id")
@@ -117,20 +126,15 @@ public final class ReactorDomainsTest {
         }
 
         @Override
-        protected DeleteDomainResponse getResponse() {
-            return null;
+        protected Mono<DeleteDomainResponse> invoke(DeleteDomainRequest request) {
+            return this.domains.delete(request);
         }
 
         @Override
-        protected DeleteDomainRequest getValidRequest() throws Exception {
+        protected DeleteDomainRequest validRequest() {
             return DeleteDomainRequest.builder()
                 .domainId("test-domain-id")
                 .build();
-        }
-
-        @Override
-        protected Mono<DeleteDomainResponse> invoke(DeleteDomainRequest request) {
-            return this.domains.delete(request);
         }
     }
 
@@ -139,7 +143,24 @@ public final class ReactorDomainsTest {
         private final ReactorDomains domains = new ReactorDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<DeleteDomainResponse> expectations() {
+            return ScriptedSubscriber.<DeleteDomainResponse>create()
+                .expectValue(DeleteDomainResponse.builder()
+                    .metadata(Metadata.builder()
+                        .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                        .createdAt("2016-02-02T17:16:31Z")
+                        .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                        .build())
+                    .entity(JobEntity.builder()
+                        .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                        .status("queued")
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(DELETE).path("/v2/domains/test-domain-id?async=true")
@@ -152,31 +173,16 @@ public final class ReactorDomainsTest {
         }
 
         @Override
-        protected DeleteDomainResponse getResponse() {
-            return DeleteDomainResponse.builder()
-                .metadata(Metadata.builder()
-                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
-                    .createdAt("2016-02-02T17:16:31Z")
-                    .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
-                    .build())
-                .entity(JobEntity.builder()
-                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
-                    .status("queued")
-                    .build())
-                .build();
+        protected Mono<DeleteDomainResponse> invoke(DeleteDomainRequest request) {
+            return this.domains.delete(request);
         }
 
         @Override
-        protected DeleteDomainRequest getValidRequest() throws Exception {
+        protected DeleteDomainRequest validRequest() {
             return DeleteDomainRequest.builder()
                 .async(true)
                 .domainId("test-domain-id")
                 .build();
-        }
-
-        @Override
-        protected Mono<DeleteDomainResponse> invoke(DeleteDomainRequest request) {
-            return this.domains.delete(request);
         }
     }
 
@@ -185,7 +191,23 @@ public final class ReactorDomainsTest {
         private final ReactorDomains domains = new ReactorDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<GetDomainResponse> expectations() {
+            return ScriptedSubscriber.<GetDomainResponse>create()
+                .expectValue(GetDomainResponse.builder()
+                    .metadata(Metadata.builder()
+                        .id("7cd249aa-197c-425c-8831-57cbc24e8e26")
+                        .url("/v2/domains/7cd249aa-197c-425c-8831-57cbc24e8e26")
+                        .createdAt("2015-07-27T22:43:33Z")
+                        .build())
+                    .entity(DomainEntity.builder()
+                        .name("domain-63.example.com")
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/v2/domains/test-domain-id")
@@ -198,29 +220,15 @@ public final class ReactorDomainsTest {
         }
 
         @Override
-        protected GetDomainResponse getResponse() {
-            return GetDomainResponse.builder()
-                .metadata(Metadata.builder()
-                    .id("7cd249aa-197c-425c-8831-57cbc24e8e26")
-                    .url("/v2/domains/7cd249aa-197c-425c-8831-57cbc24e8e26")
-                    .createdAt("2015-07-27T22:43:33Z")
-                    .build())
-                .entity(DomainEntity.builder()
-                    .name("domain-63.example.com")
-                    .build())
-                .build();
+        protected Mono<GetDomainResponse> invoke(GetDomainRequest request) {
+            return this.domains.get(request);
         }
 
         @Override
-        protected GetDomainRequest getValidRequest() {
+        protected GetDomainRequest validRequest() {
             return GetDomainRequest.builder()
                 .domainId("test-domain-id")
                 .build();
-        }
-
-        @Override
-        protected Mono<GetDomainResponse> invoke(GetDomainRequest request) {
-            return this.domains.get(request);
         }
 
     }
@@ -230,7 +238,60 @@ public final class ReactorDomainsTest {
         private final ReactorDomains domains = new ReactorDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<ListDomainsResponse> expectations() {
+            return ScriptedSubscriber.<ListDomainsResponse>create()
+                .expectValue(ListDomainsResponse.builder()
+                    .totalResults(4)
+                    .totalPages(1)
+                    .resource(DomainResource.builder()
+                        .metadata(Metadata.builder()
+                            .id("c8e670ff-2473-4e21-8047-afc6e0c62ce7")
+                            .url("/v2/domains/c8e670ff-2473-4e21-8047-afc6e0c62ce7")
+                            .createdAt("2015-07-27T22:43:31Z")
+                            .build())
+                        .entity(DomainEntity.builder()
+                            .name("customer-app-domain1.com")
+                            .build())
+                        .build())
+                    .resource(DomainResource.builder()
+                        .metadata(Metadata.builder()
+                            .id("2b63d3fa-52e9-4f12-87d1-a96af5bd3cd4")
+                            .url("/v2/domains/2b63d3fa-52e9-4f12-87d1-a96af5bd3cd4")
+                            .createdAt("2015-07-27T22:43:31Z")
+                            .build())
+                        .entity(DomainEntity.builder()
+                            .name("customer-app-domain2.com")
+                            .build())
+                        .build())
+                    .resource(DomainResource.builder()
+                        .metadata(Metadata.builder()
+                            .id("2c60a78c-0f6e-4ef8-81db-f3a6cb5e31da")
+                            .url("/v2/domains/2c60a78c-0f6e-4ef8-81db-f3a6cb5e31da")
+                            .createdAt("2015-07-27T22:43:31Z")
+                            .build())
+                        .entity(DomainEntity.builder()
+                            .name("vcap.me")
+                            .owningOrganizationId("f93d5a41-5d35-4e21-ac32-421dfd545d3c")
+                            .owningOrganizationUrl("/v2/organizations/f93d5a41-5d35-4e21-ac32-421dfd545d3c")
+                            .spacesUrl("/v2/domains/2c60a78c-0f6e-4ef8-81db-f3a6cb5e31da/spaces")
+                            .build())
+                        .build())
+                    .resource(DomainResource.builder()
+                        .metadata(Metadata.builder()
+                            .id("b37aab98-5882-420a-a91f-65539e36e860")
+                            .url("/v2/domains/b37aab98-5882-420a-a91f-65539e36e860")
+                            .createdAt("2015-07-27T22:43:33Z")
+                            .build())
+                        .entity(DomainEntity.builder()
+                            .name("domain-62.example.com")
+                            .build())
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/v2/domains?page=-1")
@@ -243,66 +304,15 @@ public final class ReactorDomainsTest {
         }
 
         @Override
-        protected ListDomainsResponse getResponse() {
-            return ListDomainsResponse.builder()
-                .totalResults(4)
-                .totalPages(1)
-                .resource(DomainResource.builder()
-                    .metadata(Metadata.builder()
-                        .id("c8e670ff-2473-4e21-8047-afc6e0c62ce7")
-                        .url("/v2/domains/c8e670ff-2473-4e21-8047-afc6e0c62ce7")
-                        .createdAt("2015-07-27T22:43:31Z")
-                        .build())
-                    .entity(DomainEntity.builder()
-                        .name("customer-app-domain1.com")
-                        .build())
-                    .build())
-                .resource(DomainResource.builder()
-                    .metadata(Metadata.builder()
-                        .id("2b63d3fa-52e9-4f12-87d1-a96af5bd3cd4")
-                        .url("/v2/domains/2b63d3fa-52e9-4f12-87d1-a96af5bd3cd4")
-                        .createdAt("2015-07-27T22:43:31Z")
-                        .build())
-                    .entity(DomainEntity.builder()
-                        .name("customer-app-domain2.com")
-                        .build())
-                    .build())
-                .resource(DomainResource.builder()
-                    .metadata(Metadata.builder()
-                        .id("2c60a78c-0f6e-4ef8-81db-f3a6cb5e31da")
-                        .url("/v2/domains/2c60a78c-0f6e-4ef8-81db-f3a6cb5e31da")
-                        .createdAt("2015-07-27T22:43:31Z")
-                        .build())
-                    .entity(DomainEntity.builder()
-                        .name("vcap.me")
-                        .owningOrganizationId("f93d5a41-5d35-4e21-ac32-421dfd545d3c")
-                        .owningOrganizationUrl("/v2/organizations/f93d5a41-5d35-4e21-ac32-421dfd545d3c")
-                        .spacesUrl("/v2/domains/2c60a78c-0f6e-4ef8-81db-f3a6cb5e31da/spaces")
-                        .build())
-                    .build())
-                .resource(DomainResource.builder()
-                    .metadata(Metadata.builder()
-                        .id("b37aab98-5882-420a-a91f-65539e36e860")
-                        .url("/v2/domains/b37aab98-5882-420a-a91f-65539e36e860")
-                        .createdAt("2015-07-27T22:43:33Z")
-                        .build())
-                    .entity(DomainEntity.builder()
-                        .name("domain-62.example.com")
-                        .build())
-                    .build())
-                .build();
+        protected Mono<ListDomainsResponse> invoke(ListDomainsRequest request) {
+            return this.domains.list(request);
         }
 
         @Override
-        protected ListDomainsRequest getValidRequest() throws Exception {
+        protected ListDomainsRequest validRequest() {
             return ListDomainsRequest.builder()
                 .page(-1)
                 .build();
-        }
-
-        @Override
-        protected Mono<ListDomainsResponse> invoke(ListDomainsRequest request) {
-            return this.domains.list(request);
         }
     }
 
@@ -311,7 +321,40 @@ public final class ReactorDomainsTest {
         private final ReactorDomains domains = new ReactorDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<ListDomainSpacesResponse> expectations() {
+            return ScriptedSubscriber.<ListDomainSpacesResponse>create()
+                .expectValue(ListDomainSpacesResponse.builder()
+                    .totalResults(1)
+                    .totalPages(1)
+                    .resource(SpaceResource.builder()
+                        .metadata(Metadata.builder()
+                            .id("d1686ef7-59dc-4ada-8900-85e89d749046")
+                            .url("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046")
+                            .createdAt("2015-07-27T22:43:33Z")
+                            .build())
+                        .entity(SpaceEntity.builder()
+                            .name("name-2311")
+                            .organizationId("836b112a-30bc-4d55-b8e4-7323849759d1")
+                            .allowSsh(true)
+                            .organizationUrl("/v2/organizations/836b112a-30bc-4d55-b8e4-7323849759d1")
+                            .developersUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/developers")
+                            .managersUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/managers")
+                            .auditorsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/auditors")
+                            .applicationsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/apps")
+                            .routesUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/routes")
+                            .domainsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/domains")
+                            .serviceInstancesUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/service_instances")
+                            .applicationEventsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/app_events")
+                            .eventsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/events")
+                            .securityGroupsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/security_groups")
+                            .build())
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/v2/domains/test-domain-id/spaces?page=-1")
@@ -324,47 +367,16 @@ public final class ReactorDomainsTest {
         }
 
         @Override
-        protected ListDomainSpacesResponse getResponse() {
-            return ListDomainSpacesResponse.builder()
-                .totalResults(1)
-                .totalPages(1)
-                .resource(SpaceResource.builder()
-                    .metadata(Metadata.builder()
-                        .id("d1686ef7-59dc-4ada-8900-85e89d749046")
-                        .url("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046")
-                        .createdAt("2015-07-27T22:43:33Z")
-                        .build())
-                    .entity(SpaceEntity.builder()
-                        .name("name-2311")
-                        .organizationId("836b112a-30bc-4d55-b8e4-7323849759d1")
-                        .allowSsh(true)
-                        .organizationUrl("/v2/organizations/836b112a-30bc-4d55-b8e4-7323849759d1")
-                        .developersUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/developers")
-                        .managersUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/managers")
-                        .auditorsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/auditors")
-                        .applicationsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/apps")
-                        .routesUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/routes")
-                        .domainsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/domains")
-                        .serviceInstancesUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/service_instances")
-                        .applicationEventsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/app_events")
-                        .eventsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/events")
-                        .securityGroupsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/security_groups")
-                        .build())
-                    .build())
-                .build();
+        protected Mono<ListDomainSpacesResponse> invoke(ListDomainSpacesRequest request) {
+            return this.domains.listSpaces(request);
         }
 
         @Override
-        protected ListDomainSpacesRequest getValidRequest() throws Exception {
+        protected ListDomainSpacesRequest validRequest() {
             return ListDomainSpacesRequest.builder()
                 .domainId("test-domain-id")
                 .page(-1)
                 .build();
-        }
-
-        @Override
-        protected Mono<ListDomainSpacesResponse> invoke(ListDomainSpacesRequest request) {
-            return this.domains.listSpaces(request);
         }
 
     }

@@ -33,12 +33,12 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 import reactor.util.function.Tuple2;
 
+import java.time.Duration;
 import java.util.Optional;
-
-import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
-import static org.junit.Assert.assertEquals;
+import java.util.concurrent.TimeoutException;
 
 public final class SharedDomainsTest extends AbstractIntegrationTest {
 
@@ -46,8 +46,12 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
     private CloudFoundryClient cloudFoundryClient;
 
     @Test
-    public void create() {
+    public void create() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(domainName)
+            .expectComplete();
 
         this.cloudFoundryClient.sharedDomains()
             .create(CreateSharedDomainRequest.builder()
@@ -55,13 +59,18 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
                 .build())
             .map(ResourceUtils::getId)
             .then(sharedDomainId -> getSharedDomainResource(this.cloudFoundryClient, sharedDomainId))
-            .subscribe(this.<GetSharedDomainResponse>testSubscriber()
-                .expectThat(response -> assertEquals(domainName, ResourceUtils.getEntity(response).getName())));
+            .map(resource -> ResourceUtils.getEntity(resource).getName())
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void deleteAsyncFalse() {
+    public void deleteAsyncFalse() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
+
+        ScriptedSubscriber<SharedDomainResource> subscriber = ScriptedSubscriber.<SharedDomainResource>create()
+            .expectComplete();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)
             .then(sharedDomainId -> this.cloudFoundryClient.sharedDomains()
@@ -71,13 +80,17 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
                     .build()))
             .then(requestListSharedDomains(this.cloudFoundryClient, domainName)
                 .singleOrEmpty())
-            .subscribe(this.testSubscriber()
-                .expectCount(0));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void deleteAsyncTrue() {
+    public void deleteAsyncTrue() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
+
+        ScriptedSubscriber<SharedDomainResource> subscriber = ScriptedSubscriber.<SharedDomainResource>create()
+            .expectComplete();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)
             .then(sharedDomainId -> this.cloudFoundryClient.sharedDomains()
@@ -88,13 +101,18 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
                 .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job)))
             .then(requestListSharedDomains(this.cloudFoundryClient, domainName)
                 .singleOrEmpty())
-            .subscribe(this.testSubscriber()
-                .expectCount(0));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void get() {
+    public void get() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(domainName)
+            .expectComplete();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)
             .then(sharedDomainId -> this.cloudFoundryClient.sharedDomains()
@@ -103,35 +121,45 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
                     .build()))
             .map(ResourceUtils::getEntity)
             .map(SharedDomainEntity::getName)
-            .subscribe(this.testSubscriber()
-                .expectEquals(domainName));
+            .subscribe(subscriber);
 
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void list() {
+    public void list() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(domainName)
+            .expectComplete();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)
             .then(sharedDomainId -> requestListSharedDomains(this.cloudFoundryClient, null)
                 .filter(resource -> sharedDomainId.equals(ResourceUtils.getId(resource)))
                 .single())
-            .subscribe(this.<SharedDomainResource>testSubscriber()
-                .expectThat(sharedDomainResource -> assertEquals(domainName, ResourceUtils.getEntity(sharedDomainResource).getName())));
+            .map(resource -> ResourceUtils.getEntity(resource).getName())
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listFilterByName() {
+    public void listFilterByName() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
+
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)
             .then(sharedDomainId -> Mono.when(
                 Mono.just(sharedDomainId),
                 requestListSharedDomains(this.cloudFoundryClient, domainName)
                     .single()
+                    .map(ResourceUtils::getId)
             ))
-            .subscribe(this.<Tuple2<String, SharedDomainResource>>testSubscriber()
-                .expectThat(consumer((id, resource) -> assertEquals(id, ResourceUtils.getId(resource)))));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     private static Mono<String> getSharedDomainId(CloudFoundryClient cloudFoundryClient, String domainName) {

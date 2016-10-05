@@ -32,12 +32,13 @@ import org.cloudfoundry.uaa.users.Meta;
 import org.cloudfoundry.uaa.users.Name;
 import org.cloudfoundry.uaa.users.User;
 import org.cloudfoundry.uaa.users.Users;
-import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.concurrent.TimeoutException;
 
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
@@ -46,117 +47,126 @@ import static org.mockito.Mockito.when;
 public final class PaginationUtilsTest {
 
     @Test
-    public void requestClientV2Resources() throws InterruptedException {
+    public void requestClientV2Resources() throws InterruptedException, TimeoutException {
         Spaces spaces = mock(Spaces.class, RETURNS_SMART_NULLS);
-        TestSubscriber<SpaceResource> testSubscriber = new TestSubscriber<>();
 
         requestListSpaces(spaces, 1, 3);
         requestListSpaces(spaces, 2, 3);
         requestListSpaces(spaces, 3, 3);
 
+        ScriptedSubscriber<SpaceResource> subscriber = ScriptedSubscriber
+            .<SpaceResource>expectValueCount(3)
+            .expectComplete();
+
         PaginationUtils
             .requestClientV2Resources(page -> spaces
                 .list(ListSpacesRequest.builder()
                     .page(page)
                     .build()))
-            .subscribe(testSubscriber
-                .expectCount(3));
+            .subscribe(subscriber);
 
-        testSubscriber.verify(Duration.ofSeconds(1));
+        subscriber.verify(Duration.ofSeconds(1));
     }
 
     @Test
-    public void requestClientV2ResourcesEmpty() throws InterruptedException {
+    public void requestClientV2ResourcesEmpty() throws InterruptedException, TimeoutException {
         Spaces spaces = mock(Spaces.class, RETURNS_SMART_NULLS);
-        TestSubscriber<SpaceResource> testSubscriber = new TestSubscriber<>();
 
         requestListSpacesEmpty(spaces);
 
+        ScriptedSubscriber<SpaceResource> subscriber = ScriptedSubscriber.<SpaceResource>create()
+            .expectComplete();
+
         PaginationUtils
             .requestClientV2Resources(page -> spaces
                 .list(ListSpacesRequest.builder()
                     .page(page)
                     .build()))
-            .subscribe(testSubscriber
-                .expectCount(0));
+            .subscribe(subscriber);
 
-        testSubscriber.verify(Duration.ofSeconds(1));
+        subscriber.verify(Duration.ofSeconds(1));
     }
 
     @Test
-    public void requestClientV3Empty() throws InterruptedException {
+    public void requestClientV3Empty() throws InterruptedException, TimeoutException {
         Packages packages = mock(Packages.class, RETURNS_SMART_NULLS);
-        TestSubscriber<PackageResource> testSubscriber = new TestSubscriber<>();
 
         requestListPackagesEmpty(packages);
+
+        ScriptedSubscriber<PackageResource> subscriber = ScriptedSubscriber.<PackageResource>create()
+            .expectComplete();
 
         PaginationUtils
             .requestClientV3Resources(page -> packages
                 .list(ListPackagesRequest.builder()
                     .page(page)
                     .build()))
-            .subscribe(testSubscriber
-                .expectCount(0));
+            .subscribe(subscriber);
 
-        testSubscriber.verify(Duration.ofSeconds(1));
+        subscriber.verify(Duration.ofSeconds(1));
     }
 
     @Test
-    public void requestClientV3Resources() throws InterruptedException {
+    public void requestClientV3Resources() throws InterruptedException, TimeoutException {
         Packages packages = mock(Packages.class, RETURNS_SMART_NULLS);
-        TestSubscriber<PackageResource> testSubscriber = new TestSubscriber<>();
 
         requestListPackages(packages, 1, 3);
         requestListPackages(packages, 2, 3);
         requestListPackages(packages, 3, 3);
 
+        ScriptedSubscriber<PackageResource> subscriber = ScriptedSubscriber
+            .<PackageResource>expectValueCount(3)
+            .expectComplete();
+
         PaginationUtils
             .requestClientV3Resources(page -> packages
                 .list(ListPackagesRequest.builder()
                     .page(page)
                     .build()))
-            .subscribe(testSubscriber
-                .expectCount(3));
+            .subscribe(subscriber);
 
-        testSubscriber.verify(Duration.ofSeconds(1));
+        subscriber.verify(Duration.ofSeconds(1));
     }
 
     @Test
-    public void requestUaaResources() throws InterruptedException {
+    public void requestUaaResources() throws InterruptedException, TimeoutException {
         Users users = mock(Users.class, RETURNS_SMART_NULLS);
-        TestSubscriber<User> testSubscriber = new TestSubscriber<>();
 
         requestListUsers(users, 1, 100, 250);
         requestListUsers(users, 101, 100, 250);
         requestListUsers(users, 201, 100, 250);
 
+        ScriptedSubscriber<User> subscriber = ScriptedSubscriber
+            .<User>expectValueCount(3)
+            .expectComplete();
+
         PaginationUtils
             .requestUaaResources(startIndex -> users
                 .list(ListUsersRequest.builder()
                     .startIndex(startIndex)
                     .build()))
-            .subscribe(testSubscriber
-                .expectCount(3));
+            .subscribe(subscriber);
 
-        testSubscriber.verify(Duration.ofSeconds(1));
+        subscriber.verify(Duration.ofSeconds(1));
     }
 
     @Test
-    public void requestUaaResourcesEmpty() throws InterruptedException {
+    public void requestUaaResourcesEmpty() throws InterruptedException, TimeoutException {
         Users users = mock(Users.class, RETURNS_SMART_NULLS);
-        TestSubscriber<User> testSubscriber = new TestSubscriber<>();
 
         requestListUsersEmpty(users, 1, 100);
+
+        ScriptedSubscriber<User> subscriber = ScriptedSubscriber.<User>create()
+            .expectComplete();
 
         PaginationUtils
             .requestUaaResources(startIndex -> users
                 .list(ListUsersRequest.builder()
                     .startIndex(startIndex)
                     .build()))
-            .subscribe(testSubscriber
-                .expectCount(0));
+            .subscribe(subscriber);
 
-        testSubscriber.verify(Duration.ofSeconds(1));
+        subscriber.verify(Duration.ofSeconds(1));
     }
 
     private static void requestListPackages(Packages packages, Integer page, Integer totalPages) {

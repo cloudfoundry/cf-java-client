@@ -20,17 +20,17 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.events.GetEventRequest;
-import org.cloudfoundry.client.v2.events.GetEventResponse;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 import reactor.util.function.Tuple2;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
-import static org.junit.Assert.assertEquals;
+import java.time.Duration;
+import java.util.concurrent.TimeoutException;
 
 public final class EventsTest extends AbstractIntegrationTest {
 
@@ -38,21 +38,28 @@ public final class EventsTest extends AbstractIntegrationTest {
     private CloudFoundryClient cloudFoundryClient;
 
     @Test
-    public void get() {
+    public void get() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
+
         getFirstEvent(this.cloudFoundryClient)
             .then(resource -> Mono.when(
-                Mono.just(resource),
+                Mono.just(resource)
+                    .map(ResourceUtils::getId),
                 this.cloudFoundryClient.events()
                     .get(GetEventRequest.builder()
                         .eventId(ResourceUtils.getId(resource))
                         .build())
+                    .map(ResourceUtils::getId)
             ))
-            .subscribe(this.<Tuple2<EventResource, GetEventResponse>>testSubscriber()
-                .expectThat(consumer((expected, actual) -> assertEquals(ResourceUtils.getId(expected), ResourceUtils.getId(actual)))));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void list() {
+    public void list() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<Tuple2<EventResource, EventResource>> subscriber = tupleEquality();
+
         getFirstEvent(this.cloudFoundryClient)
             .then(resource -> Mono.when(
                 Mono.just(resource),
@@ -62,12 +69,15 @@ public final class EventsTest extends AbstractIntegrationTest {
                     .flatMap(ResourceUtils::getResources)
                     .next()
             ))
-            .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listFilterByActee() {
+    public void listFilterByActee() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<Tuple2<EventResource, EventResource>> subscriber = tupleEquality();
+
         getFirstEvent(this.cloudFoundryClient)
             .then(resource -> Mono.when(
                 Mono.just(resource),
@@ -78,12 +88,15 @@ public final class EventsTest extends AbstractIntegrationTest {
                     .flatMap(ResourceUtils::getResources)
                     .next()
             ))
-            .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listFilterByTimestamp() {
+    public void listFilterByTimestamp() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<Tuple2<EventResource, EventResource>> subscriber = tupleEquality();
+
         getFirstEvent(this.cloudFoundryClient)
             .then(resource -> Mono.when(
                 Mono.just(resource),
@@ -94,12 +107,15 @@ public final class EventsTest extends AbstractIntegrationTest {
                     .flatMap(ResourceUtils::getResources)
                     .next()
             ))
-            .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listFilterByType() {
+    public void listFilterByType() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<Tuple2<EventResource, EventResource>> subscriber = tupleEquality();
+
         getFirstEvent(this.cloudFoundryClient)
             .then(resource -> Mono.when(
                 Mono.just(resource),
@@ -110,8 +126,9 @@ public final class EventsTest extends AbstractIntegrationTest {
                     .flatMap(ResourceUtils::getResources)
                     .next()
             ))
-            .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     private static Mono<EventResource> getFirstEvent(CloudFoundryClient cloudFoundryClient) {

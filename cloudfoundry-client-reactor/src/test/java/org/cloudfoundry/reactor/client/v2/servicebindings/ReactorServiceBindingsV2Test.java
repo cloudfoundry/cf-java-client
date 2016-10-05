@@ -34,6 +34,7 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
 import java.util.Collections;
 
@@ -52,7 +53,29 @@ public final class ReactorServiceBindingsV2Test {
         private final ReactorServiceBindingsV2 serviceBindings = new ReactorServiceBindingsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<CreateServiceBindingResponse> expectations() {
+            return ScriptedSubscriber.<CreateServiceBindingResponse>create()
+                .expectValue(CreateServiceBindingResponse.builder()
+                    .metadata(Metadata.builder()
+                        .createdAt("2015-07-27T22:43:20Z")
+                        .id("42eda707-fe4d-4eed-9b39-7cb5e665c226")
+                        .url("/v2/service_bindings/42eda707-fe4d-4eed-9b39-7cb5e665c226")
+                        .build())
+                    .entity(ServiceBindingEntity.builder()
+                        .applicationId("26ddc1de-3eeb-424b-82f3-f7f30a38b610")
+                        .serviceInstanceId("650d0eb7-3b83-414a-82a0-d503d1c8eb5f")
+                        .bindingOptions(Collections.emptyMap())
+                        .credential("creds-key-356", "creds-val-356")
+                        .gatewayName("")
+                        .applicationUrl("/v2/apps/26ddc1de-3eeb-424b-82f3-f7f30a38b610")
+                        .serviceInstanceUrl("/v2/service_instances/650d0eb7-3b83-414a-82a0-d503d1c8eb5f")
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(POST).path("/v2/service_bindings")
@@ -66,37 +89,17 @@ public final class ReactorServiceBindingsV2Test {
         }
 
         @Override
-        protected CreateServiceBindingResponse getResponse() {
-            return CreateServiceBindingResponse.builder()
-                .metadata(Metadata.builder()
-                    .createdAt("2015-07-27T22:43:20Z")
-                    .id("42eda707-fe4d-4eed-9b39-7cb5e665c226")
-                    .url("/v2/service_bindings/42eda707-fe4d-4eed-9b39-7cb5e665c226")
-                    .build())
-                .entity(ServiceBindingEntity.builder()
-                    .applicationId("26ddc1de-3eeb-424b-82f3-f7f30a38b610")
-                    .serviceInstanceId("650d0eb7-3b83-414a-82a0-d503d1c8eb5f")
-                    .bindingOptions(Collections.emptyMap())
-                    .credential("creds-key-356", "creds-val-356")
-                    .gatewayName("")
-                    .applicationUrl("/v2/apps/26ddc1de-3eeb-424b-82f3-f7f30a38b610")
-                    .serviceInstanceUrl("/v2/service_instances/650d0eb7-3b83-414a-82a0-d503d1c8eb5f")
-                    .build())
-                .build();
+        protected Mono<CreateServiceBindingResponse> invoke(CreateServiceBindingRequest request) {
+            return this.serviceBindings.create(request);
         }
 
         @Override
-        protected CreateServiceBindingRequest getValidRequest() throws Exception {
+        protected CreateServiceBindingRequest validRequest() {
             return CreateServiceBindingRequest.builder()
                 .applicationId("26ddc1de-3eeb-424b-82f3-f7f30a38b610")
                 .serviceInstanceId("650d0eb7-3b83-414a-82a0-d503d1c8eb5f")
                 .parameters(Collections.singletonMap("the_service_broker", (Object) "wants this object"))
                 .build();
-        }
-
-        @Override
-        protected Mono<CreateServiceBindingResponse> invoke(CreateServiceBindingRequest request) {
-            return this.serviceBindings.create(request);
         }
 
     }
@@ -106,7 +109,13 @@ public final class ReactorServiceBindingsV2Test {
         private final ReactorServiceBindingsV2 serviceBindings = new ReactorServiceBindingsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<DeleteServiceBindingResponse> expectations() {
+            return ScriptedSubscriber.<DeleteServiceBindingResponse>create()
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(DELETE).path("/v2/service_bindings/test-service-binding-id")
@@ -118,20 +127,15 @@ public final class ReactorServiceBindingsV2Test {
         }
 
         @Override
-        protected DeleteServiceBindingResponse getResponse() {
-            return null;
+        protected Mono<DeleteServiceBindingResponse> invoke(DeleteServiceBindingRequest request) {
+            return this.serviceBindings.delete(request);
         }
 
         @Override
-        protected DeleteServiceBindingRequest getValidRequest() {
+        protected DeleteServiceBindingRequest validRequest() {
             return DeleteServiceBindingRequest.builder()
                 .serviceBindingId("test-service-binding-id")
                 .build();
-        }
-
-        @Override
-        protected Mono<DeleteServiceBindingResponse> invoke(DeleteServiceBindingRequest request) {
-            return this.serviceBindings.delete(request);
         }
 
     }
@@ -141,7 +145,24 @@ public final class ReactorServiceBindingsV2Test {
         private final ReactorServiceBindingsV2 serviceBindings = new ReactorServiceBindingsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<DeleteServiceBindingResponse> expectations() {
+            return ScriptedSubscriber.<DeleteServiceBindingResponse>create()
+                .expectValue(DeleteServiceBindingResponse.builder()
+                    .metadata(Metadata.builder()
+                        .id("c4faac01-5bbd-494f-8849-256a3bab06b8")
+                        .createdAt("2016-03-14T22:30:51Z")
+                        .url("/v2/jobs/c4faac01-5bbd-494f-8849-256a3bab06b8")
+                        .build())
+                    .entity(JobEntity.builder()
+                        .id("c4faac01-5bbd-494f-8849-256a3bab06b8")
+                        .status("queued")
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(DELETE).path("/v2/service_bindings/test-service-binding-id?async=true")
@@ -154,31 +175,16 @@ public final class ReactorServiceBindingsV2Test {
         }
 
         @Override
-        protected DeleteServiceBindingResponse getResponse() {
-            return DeleteServiceBindingResponse.builder()
-                .metadata(Metadata.builder()
-                    .id("c4faac01-5bbd-494f-8849-256a3bab06b8")
-                    .createdAt("2016-03-14T22:30:51Z")
-                    .url("/v2/jobs/c4faac01-5bbd-494f-8849-256a3bab06b8")
-                    .build())
-                .entity(JobEntity.builder()
-                    .id("c4faac01-5bbd-494f-8849-256a3bab06b8")
-                    .status("queued")
-                    .build())
-                .build();
+        protected Mono<DeleteServiceBindingResponse> invoke(DeleteServiceBindingRequest request) {
+            return this.serviceBindings.delete(request);
         }
 
         @Override
-        protected DeleteServiceBindingRequest getValidRequest() {
+        protected DeleteServiceBindingRequest validRequest() {
             return DeleteServiceBindingRequest.builder()
                 .async(true)
                 .serviceBindingId("test-service-binding-id")
                 .build();
-        }
-
-        @Override
-        protected Mono<DeleteServiceBindingResponse> invoke(DeleteServiceBindingRequest request) {
-            return this.serviceBindings.delete(request);
         }
 
     }
@@ -188,7 +194,30 @@ public final class ReactorServiceBindingsV2Test {
         private final ReactorServiceBindingsV2 serviceBindings = new ReactorServiceBindingsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<GetServiceBindingResponse> expectations() {
+            return ScriptedSubscriber.<GetServiceBindingResponse>create()
+                .expectValue(GetServiceBindingResponse.builder()
+                    .metadata(Metadata.builder()
+                        .createdAt("2015-11-03T00:53:50Z")
+                        .id("925d8848-4808-47cf-a3e8-049aa0163328")
+                        .updatedAt("2015-11-04T12:54:50Z")
+                        .url("/v2/service_bindings/925d8848-4808-47cf-a3e8-049aa0163328")
+                        .build())
+                    .entity(ServiceBindingEntity.builder()
+                        .applicationId("56ae4265-4c1c-43a9-9069-2c1fee7fd42f")
+                        .serviceInstanceId("f99b3d23-55f9-48b5-add3-d7ab08b2ff0c")
+                        .bindingOptions(Collections.emptyMap())
+                        .credential("creds-key-108", "creds-val-108")
+                        .gatewayName("")
+                        .applicationUrl("/v2/apps/56ae4265-4c1c-43a9-9069-2c1fee7fd42f")
+                        .serviceInstanceUrl("/v2/service_instances/f99b3d23-55f9-48b5-add3-d7ab08b2ff0c")
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/v2/service_bindings/test-service-binding-id")
@@ -201,36 +230,15 @@ public final class ReactorServiceBindingsV2Test {
         }
 
         @Override
-        protected GetServiceBindingResponse getResponse() {
-            return GetServiceBindingResponse.builder()
-                .metadata(Metadata.builder()
-                    .createdAt("2015-11-03T00:53:50Z")
-                    .id("925d8848-4808-47cf-a3e8-049aa0163328")
-                    .updatedAt("2015-11-04T12:54:50Z")
-                    .url("/v2/service_bindings/925d8848-4808-47cf-a3e8-049aa0163328")
-                    .build())
-                .entity(ServiceBindingEntity.builder()
-                    .applicationId("56ae4265-4c1c-43a9-9069-2c1fee7fd42f")
-                    .serviceInstanceId("f99b3d23-55f9-48b5-add3-d7ab08b2ff0c")
-                    .bindingOptions(Collections.emptyMap())
-                    .credential("creds-key-108", "creds-val-108")
-                    .gatewayName("")
-                    .applicationUrl("/v2/apps/56ae4265-4c1c-43a9-9069-2c1fee7fd42f")
-                    .serviceInstanceUrl("/v2/service_instances/f99b3d23-55f9-48b5-add3-d7ab08b2ff0c")
-                    .build())
-                .build();
+        protected Mono<GetServiceBindingResponse> invoke(GetServiceBindingRequest request) {
+            return this.serviceBindings.get(request);
         }
 
         @Override
-        protected GetServiceBindingRequest getValidRequest() throws Exception {
+        protected GetServiceBindingRequest validRequest() {
             return GetServiceBindingRequest.builder()
                 .serviceBindingId("test-service-binding-id")
                 .build();
-        }
-
-        @Override
-        protected Mono<GetServiceBindingResponse> invoke(GetServiceBindingRequest request) {
-            return this.serviceBindings.get(request);
         }
 
     }
@@ -240,7 +248,66 @@ public final class ReactorServiceBindingsV2Test {
         private final ReactorServiceBindingsV2 serviceBindings = new ReactorServiceBindingsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<ListServiceBindingsResponse> expectations() {
+            return ScriptedSubscriber.<ListServiceBindingsResponse>create()
+                .expectValue(ListServiceBindingsResponse.builder()
+                    .totalResults(3)
+                    .totalPages(1)
+                    .resource(ServiceBindingResource.builder()
+                        .metadata(Metadata.builder()
+                            .createdAt("2015-07-27T22:43:06Z")
+                            .id("d6d87c3d-a38f-4b31-9bbe-2432d2faaa1d")
+                            .url("/v2/service_bindings/d6d87c3d-a38f-4b31-9bbe-2432d2faaa1d")
+                            .build())
+                        .entity(ServiceBindingEntity.builder()
+                            .applicationId("dd44fd4f-5e20-4c52-b66d-7af6e201f01e")
+                            .serviceInstanceId("bbd1f170-bb1f-481d-bcf7-def2bbe6a3a2")
+                            .bindingOptions(Collections.emptyMap())
+                            .credential("creds-key-3", "creds-val-3")
+                            .gatewayName("")
+                            .applicationUrl("/v2/apps/dd44fd4f-5e20-4c52-b66d-7af6e201f01e")
+                            .serviceInstanceUrl("/v2/service_instances/bbd1f170-bb1f-481d-bcf7-def2bbe6a3a2")
+                            .build())
+                        .build())
+                    .resource(ServiceBindingResource.builder()
+                        .metadata(Metadata.builder()
+                            .createdAt("2015-11-03T00:53:50Z")
+                            .id("925d8848-4808-47cf-a3e8-049aa0163328")
+                            .updatedAt("2015-11-04T12:54:50Z")
+                            .url("/v2/service_bindings/925d8848-4808-47cf-a3e8-049aa0163328")
+                            .build())
+                        .entity(ServiceBindingEntity.builder()
+                            .applicationId("dd44fd4f-5e20-4c52-b66d-7af6e201f01e")
+                            .serviceInstanceId("f99b3d23-55f9-48b5-add3-d7ab08b2ff0c")
+                            .bindingOptions(Collections.emptyMap())
+                            .credential("creds-key-108", "creds-val-108")
+                            .gatewayName("")
+                            .applicationUrl("/v2/apps/dd44fd4f-5e20-4c52-b66d-7af6e201f01e")
+                            .serviceInstanceUrl("/v2/service_instances/f99b3d23-55f9-48b5-add3-d7ab08b2ff0c")
+                            .build())
+                        .build())
+                    .resource(ServiceBindingResource.builder()
+                        .metadata(Metadata.builder()
+                            .createdAt("2015-07-27T22:43:20Z")
+                            .id("42eda707-fe4d-4eed-9b39-7cb5e665c226")
+                            .url("/v2/service_bindings/42eda707-fe4d-4eed-9b39-7cb5e665c226")
+                            .build())
+                        .entity(ServiceBindingEntity.builder()
+                            .applicationId("dd44fd4f-5e20-4c52-b66d-7af6e201f01e")
+                            .serviceInstanceId("650d0eb7-3b83-414a-82a0-d503d1c8eb5f")
+                            .bindingOptions(Collections.emptyMap())
+                            .credential("creds-key-356", "creds-val-356")
+                            .gatewayName("")
+                            .applicationUrl("/v2/apps/dd44fd4f-5e20-4c52-b66d-7af6e201f01e")
+                            .serviceInstanceUrl("/v2/service_instances/650d0eb7-3b83-414a-82a0-d503d1c8eb5f")
+                            .build())
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/v2/service_bindings?q=app_guid%20IN%20dd44fd4f-5e20-4c52-b66d-7af6e201f01e&page=-1")
@@ -253,73 +320,16 @@ public final class ReactorServiceBindingsV2Test {
         }
 
         @Override
-        protected ListServiceBindingsResponse getResponse() {
-            return ListServiceBindingsResponse.builder()
-                .totalResults(3)
-                .totalPages(1)
-                .resource(ServiceBindingResource.builder()
-                    .metadata(Metadata.builder()
-                        .createdAt("2015-07-27T22:43:06Z")
-                        .id("d6d87c3d-a38f-4b31-9bbe-2432d2faaa1d")
-                        .url("/v2/service_bindings/d6d87c3d-a38f-4b31-9bbe-2432d2faaa1d")
-                        .build())
-                    .entity(ServiceBindingEntity.builder()
-                        .applicationId("dd44fd4f-5e20-4c52-b66d-7af6e201f01e")
-                        .serviceInstanceId("bbd1f170-bb1f-481d-bcf7-def2bbe6a3a2")
-                        .bindingOptions(Collections.emptyMap())
-                        .credential("creds-key-3", "creds-val-3")
-                        .gatewayName("")
-                        .applicationUrl("/v2/apps/dd44fd4f-5e20-4c52-b66d-7af6e201f01e")
-                        .serviceInstanceUrl("/v2/service_instances/bbd1f170-bb1f-481d-bcf7-def2bbe6a3a2")
-                        .build())
-                    .build())
-                .resource(ServiceBindingResource.builder()
-                    .metadata(Metadata.builder()
-                        .createdAt("2015-11-03T00:53:50Z")
-                        .id("925d8848-4808-47cf-a3e8-049aa0163328")
-                        .updatedAt("2015-11-04T12:54:50Z")
-                        .url("/v2/service_bindings/925d8848-4808-47cf-a3e8-049aa0163328")
-                        .build())
-                    .entity(ServiceBindingEntity.builder()
-                        .applicationId("dd44fd4f-5e20-4c52-b66d-7af6e201f01e")
-                        .serviceInstanceId("f99b3d23-55f9-48b5-add3-d7ab08b2ff0c")
-                        .bindingOptions(Collections.emptyMap())
-                        .credential("creds-key-108", "creds-val-108")
-                        .gatewayName("")
-                        .applicationUrl("/v2/apps/dd44fd4f-5e20-4c52-b66d-7af6e201f01e")
-                        .serviceInstanceUrl("/v2/service_instances/f99b3d23-55f9-48b5-add3-d7ab08b2ff0c")
-                        .build())
-                    .build())
-                .resource(ServiceBindingResource.builder()
-                    .metadata(Metadata.builder()
-                        .createdAt("2015-07-27T22:43:20Z")
-                        .id("42eda707-fe4d-4eed-9b39-7cb5e665c226")
-                        .url("/v2/service_bindings/42eda707-fe4d-4eed-9b39-7cb5e665c226")
-                        .build())
-                    .entity(ServiceBindingEntity.builder()
-                        .applicationId("dd44fd4f-5e20-4c52-b66d-7af6e201f01e")
-                        .serviceInstanceId("650d0eb7-3b83-414a-82a0-d503d1c8eb5f")
-                        .bindingOptions(Collections.emptyMap())
-                        .credential("creds-key-356", "creds-val-356")
-                        .gatewayName("")
-                        .applicationUrl("/v2/apps/dd44fd4f-5e20-4c52-b66d-7af6e201f01e")
-                        .serviceInstanceUrl("/v2/service_instances/650d0eb7-3b83-414a-82a0-d503d1c8eb5f")
-                        .build())
-                    .build())
-                .build();
+        protected Mono<ListServiceBindingsResponse> invoke(ListServiceBindingsRequest request) {
+            return this.serviceBindings.list(request);
         }
 
         @Override
-        protected ListServiceBindingsRequest getValidRequest() throws Exception {
+        protected ListServiceBindingsRequest validRequest() {
             return ListServiceBindingsRequest.builder()
                 .applicationId("dd44fd4f-5e20-4c52-b66d-7af6e201f01e")
                 .page(-1)
                 .build();
-        }
-
-        @Override
-        protected Mono<ListServiceBindingsResponse> invoke(ListServiceBindingsRequest request) {
-            return this.serviceBindings.list(request);
         }
 
     }

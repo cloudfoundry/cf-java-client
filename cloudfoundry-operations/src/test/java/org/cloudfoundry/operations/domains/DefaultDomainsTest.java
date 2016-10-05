@@ -33,12 +33,12 @@ import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
-import static org.cloudfoundry.util.test.TestObjects.fill;
+import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
 public final class DefaultDomainsTest {
@@ -189,8 +189,9 @@ public final class DefaultDomainsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -214,9 +215,8 @@ public final class DefaultDomainsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalArgumentException.class, "Organization test-organization does not exist");
+        protected ScriptedSubscriber<Void> expectations() {
+            return errorExpectation(IllegalArgumentException.class, "Organization test-organization does not exist");
         }
 
         @Override
@@ -240,8 +240,9 @@ public final class DefaultDomainsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -265,19 +266,19 @@ public final class DefaultDomainsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Domain> testSubscriber) {
-            testSubscriber
-                .expectEquals(Domain.builder()
-                    .id("test-private-domain-id")
-                    .name("test-private-domain-name")
-                    .status(Status.OWNED)
-                    .build());
-            testSubscriber
-                .expectEquals(Domain.builder()
-                    .id("test-shared-domain-id")
-                    .name("test-shared-domain-name")
-                    .status(Status.SHARED)
-                    .build());
+        protected ScriptedSubscriber<Domain> expectations() {
+            return ScriptedSubscriber.<Domain>create()
+                .expectValues(Domain.builder()
+                        .id("test-private-domain-id")
+                        .name("test-private-domain-name")
+                        .status(Status.OWNED)
+                        .build(),
+                    Domain.builder()
+                        .id("test-shared-domain-id")
+                        .name("test-shared-domain-name")
+                        .status(Status.SHARED)
+                        .build())
+                .expectComplete();
         }
 
         @Override
@@ -299,13 +300,14 @@ public final class DefaultDomainsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Domain> testSubscriber) {
-            testSubscriber
-                .expectEquals(Domain.builder()
+        protected ScriptedSubscriber<Domain> expectations() {
+            return ScriptedSubscriber.<Domain>create()
+                .expectValue(Domain.builder()
                     .id("test-private-domain-id")
                     .name("test-private-domain-name")
                     .status(Status.OWNED)
-                    .build());
+                    .build())
+                .expectComplete();
         }
 
         @Override
@@ -327,13 +329,14 @@ public final class DefaultDomainsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Domain> testSubscriber) {
-            testSubscriber
-                .expectEquals(Domain.builder()
+        protected ScriptedSubscriber<Domain> expectations() {
+            return ScriptedSubscriber.<Domain>create()
+                .expectValue(Domain.builder()
                     .id("test-shared-domain-id")
                     .name("test-shared-domain-name")
                     .status(Status.SHARED)
-                    .build());
+                    .build())
+                .expectComplete();
         }
 
         @Override
@@ -356,8 +359,9 @@ public final class DefaultDomainsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -382,9 +386,8 @@ public final class DefaultDomainsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalArgumentException.class, "Private domain test-domain does not exist");
+        protected ScriptedSubscriber<Void> expectations() {
+            return errorExpectation(IllegalArgumentException.class, "Private domain test-domain does not exist");
         }
 
         @Override
@@ -410,8 +413,9 @@ public final class DefaultDomainsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override

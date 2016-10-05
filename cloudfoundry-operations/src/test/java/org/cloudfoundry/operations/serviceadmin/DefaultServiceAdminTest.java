@@ -23,12 +23,12 @@ import org.cloudfoundry.client.v2.servicebrokers.ListServiceBrokersResponse;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokerEntity;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokerResource;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
-import static org.cloudfoundry.util.test.TestObjects.fill;
+import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
 public final class DefaultServiceAdminTest {
@@ -115,8 +115,9 @@ public final class DefaultServiceAdminTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -142,8 +143,9 @@ public final class DefaultServiceAdminTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -171,8 +173,9 @@ public final class DefaultServiceAdminTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -196,9 +199,8 @@ public final class DefaultServiceAdminTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalArgumentException.class, String.format("Service Broker %s does not exist", "test-service-broker-name"));
+        protected ScriptedSubscriber<Void> expectations() {
+            return errorExpectation(IllegalArgumentException.class, "Service Broker test-service-broker-name does not exist");
         }
 
         @Override
@@ -221,13 +223,14 @@ public final class DefaultServiceAdminTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<ServiceBroker> testSubscriber) {
-            testSubscriber
-                .expectEquals(ServiceBroker.builder()
+        protected ScriptedSubscriber<ServiceBroker> expectations() {
+            return ScriptedSubscriber.<ServiceBroker>create()
+                .expectValue(ServiceBroker.builder()
                     .id("test-service-broker-id")
                     .name("test-service-broker-resource-name")
                     .url("test-service-broker-resource-brokerUrl")
-                    .build());
+                    .build())
+                .expectComplete();
         }
 
         @Override
@@ -248,8 +251,9 @@ public final class DefaultServiceAdminTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<ServiceBroker> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<ServiceBroker> expectations() {
+            return ScriptedSubscriber.<ServiceBroker>create()
+                .expectComplete();
         }
 
         @Override

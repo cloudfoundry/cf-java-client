@@ -16,32 +16,28 @@
 
 package org.cloudfoundry.reactor;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
-import org.cloudfoundry.util.test.FailingDeserializationProblemHandler;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.HttpClient;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public abstract class AbstractRestTest {
 
     protected static final ConnectionContext CONNECTION_CONTEXT = DefaultConnectionContext.builder()
         .apiHost("localhost")
         .httpClient(HttpClient.create())
-        .objectMapper(new ObjectMapper()
-            .addHandler(new FailingDeserializationProblemHandler())
-            .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-            .registerModule(new Jdk8Module())
-            .setSerializationInclusion(NON_NULL))
+        .problemHandler(new FailingDeserializationProblemHandler())  // Test-only problem handler
         .build();
 
     protected static final TokenProvider TOKEN_PROVIDER = connectionContext -> Mono.just("test-authorization");
@@ -80,6 +76,16 @@ public abstract class AbstractRestTest {
         if (this.interactionContext != null) {
             assertTrue("Expected request not received", this.interactionContext.isDone());
         }
+    }
+
+    private static final class FailingDeserializationProblemHandler extends DeserializationProblemHandler {
+
+        @Override
+        public boolean handleUnknownProperty(DeserializationContext ctxt, JsonParser jp, JsonDeserializer<?> deserializer, Object beanOrClass, String propertyName) {
+            fail(String.format("Found unexpected property %s in payload for %s", propertyName, beanOrClass.getClass().getSimpleName()));
+            return false;
+        }
+
     }
 
 }

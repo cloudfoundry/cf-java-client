@@ -28,6 +28,7 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
@@ -40,7 +41,18 @@ public final class ReactorFeatureFlagsTest {
         private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<GetFeatureFlagResponse> expectations() {
+            return ScriptedSubscriber.<GetFeatureFlagResponse>create()
+                .expectValue(GetFeatureFlagResponse.builder()
+                    .name("app_scaling")
+                    .enabled(true)
+                    .url("/v2/config/feature_flags/app_scaling")
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/v2/config/feature_flags/app_scaling")
@@ -53,24 +65,15 @@ public final class ReactorFeatureFlagsTest {
         }
 
         @Override
-        protected GetFeatureFlagResponse getResponse() {
-            return GetFeatureFlagResponse.builder()
-                .name("app_scaling")
-                .enabled(true)
-                .url("/v2/config/feature_flags/app_scaling")
-                .build();
+        protected Mono<GetFeatureFlagResponse> invoke(GetFeatureFlagRequest request) {
+            return this.featureFlags.get(request);
         }
 
         @Override
-        protected GetFeatureFlagRequest getValidRequest() {
+        protected GetFeatureFlagRequest validRequest() {
             return GetFeatureFlagRequest.builder()
                 .name("app_scaling")
                 .build();
-        }
-
-        @Override
-        protected Mono<GetFeatureFlagResponse> invoke(GetFeatureFlagRequest request) {
-            return this.featureFlags.get(request);
         }
 
     }
@@ -80,7 +83,18 @@ public final class ReactorFeatureFlagsTest {
         private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<GetFeatureFlagResponse> expectations() {
+            return ScriptedSubscriber.<GetFeatureFlagResponse>create()
+                .expectValue(GetFeatureFlagResponse.builder()
+                    .name("set_roles_by_username")
+                    .enabled(true)
+                    .url("/v2/config/feature_flags/set_roles_by_username")
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/v2/config/feature_flags/set_roles_by_username")
@@ -93,24 +107,15 @@ public final class ReactorFeatureFlagsTest {
         }
 
         @Override
-        protected GetFeatureFlagResponse getResponse() {
-            return GetFeatureFlagResponse.builder()
-                .name("set_roles_by_username")
-                .enabled(true)
-                .url("/v2/config/feature_flags/set_roles_by_username")
-                .build();
+        protected Mono<GetFeatureFlagResponse> invoke(GetFeatureFlagRequest request) {
+            return this.featureFlags.get(request);
         }
 
         @Override
-        protected GetFeatureFlagRequest getValidRequest() {
+        protected GetFeatureFlagRequest validRequest() {
             return GetFeatureFlagRequest.builder()
                 .name("set_roles_by_username")
                 .build();
-        }
-
-        @Override
-        protected Mono<GetFeatureFlagResponse> invoke(GetFeatureFlagRequest request) {
-            return this.featureFlags.get(request);
         }
 
     }
@@ -120,7 +125,88 @@ public final class ReactorFeatureFlagsTest {
         private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<ListFeatureFlagsResponse> expectations() {
+            return ScriptedSubscriber.<ListFeatureFlagsResponse>create()
+                .expectValue(ListFeatureFlagsResponse.builder()
+                    .featureFlag(FeatureFlagEntity.builder()
+                        .name("user_org_creation")
+                        .enabled(false)
+                        .url("/v2/config/feature_flags/user_org_creation")
+                        .build()
+                    )
+                    .featureFlag(FeatureFlagEntity.builder()
+                        .name("private_domain_creation")
+                        .enabled(false)
+                        .errorMessage("foobar")
+                        .url("/v2/config/feature_flags/private_domain_creation")
+                        .build()
+                    )
+                    .featureFlag(FeatureFlagEntity.builder()
+                        .name("app_bits_upload")
+                        .enabled(true)
+                        .url("/v2/config/feature_flags/app_bits_upload")
+                        .build()
+                    )
+                    .featureFlag(FeatureFlagEntity.builder()
+                        .name("app_scaling")
+                        .enabled(true)
+                        .url("/v2/config/feature_flags/app_scaling")
+                        .build()
+                    )
+                    .featureFlag(FeatureFlagEntity.builder()
+                        .name("route_creation")
+                        .enabled(true)
+                        .url("/v2/config/feature_flags/route_creation")
+                        .build()
+                    )
+                    .featureFlag(FeatureFlagEntity.builder()
+                        .name("service_instance_creation")
+                        .enabled(true)
+                        .url("/v2/config/feature_flags/service_instance_creation")
+                        .build()
+                    )
+                    .featureFlag(FeatureFlagEntity.builder()
+                        .name("diego_docker")
+                        .enabled(false)
+                        .url("/v2/config/feature_flags/diego_docker")
+                        .build()
+                    )
+                    .featureFlag(FeatureFlagEntity.builder()
+                        .name("set_roles_by_username")
+                        .enabled(true)
+                        .url("/v2/config/feature_flags/set_roles_by_username")
+                        .build()
+                    )
+                    .featureFlag(FeatureFlagEntity.builder()
+                        .name("unset_roles_by_username")
+                        .enabled(true)
+                        .url("/v2/config/feature_flags/unset_roles_by_username")
+                        .build()
+                    )
+                    .featureFlag(FeatureFlagEntity.builder()
+                        .name("task_creation")
+                        .enabled(false)
+                        .url("/v2/config/feature_flags/task_creation")
+                        .build()
+                    )
+                    .featureFlag(FeatureFlagEntity.builder()
+                        .name("space_scoped_private_broker_creation")
+                        .enabled(true)
+                        .url("/v2/config/feature_flags/space_scoped_private_broker_creation")
+                        .build()
+                    )
+                    .featureFlag(FeatureFlagEntity.builder()
+                        .name("space_developer_env_var_visibility")
+                        .enabled(true)
+                        .url("/v2/config/feature_flags/space_developer_env_var_visibility")
+                        .build()
+                    )
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/v2/config/feature_flags")
@@ -133,92 +219,13 @@ public final class ReactorFeatureFlagsTest {
         }
 
         @Override
-        protected ListFeatureFlagsResponse getResponse() {
-            return ListFeatureFlagsResponse.builder()
-                .featureFlag(FeatureFlagEntity.builder()
-                    .name("user_org_creation")
-                    .enabled(false)
-                    .url("/v2/config/feature_flags/user_org_creation")
-                    .build()
-                )
-                .featureFlag(FeatureFlagEntity.builder()
-                    .name("private_domain_creation")
-                    .enabled(false)
-                    .errorMessage("foobar")
-                    .url("/v2/config/feature_flags/private_domain_creation")
-                    .build()
-                )
-                .featureFlag(FeatureFlagEntity.builder()
-                    .name("app_bits_upload")
-                    .enabled(true)
-                    .url("/v2/config/feature_flags/app_bits_upload")
-                    .build()
-                )
-                .featureFlag(FeatureFlagEntity.builder()
-                    .name("app_scaling")
-                    .enabled(true)
-                    .url("/v2/config/feature_flags/app_scaling")
-                    .build()
-                )
-                .featureFlag(FeatureFlagEntity.builder()
-                    .name("route_creation")
-                    .enabled(true)
-                    .url("/v2/config/feature_flags/route_creation")
-                    .build()
-                )
-                .featureFlag(FeatureFlagEntity.builder()
-                    .name("service_instance_creation")
-                    .enabled(true)
-                    .url("/v2/config/feature_flags/service_instance_creation")
-                    .build()
-                )
-                .featureFlag(FeatureFlagEntity.builder()
-                    .name("diego_docker")
-                    .enabled(false)
-                    .url("/v2/config/feature_flags/diego_docker")
-                    .build()
-                )
-                .featureFlag(FeatureFlagEntity.builder()
-                    .name("set_roles_by_username")
-                    .enabled(true)
-                    .url("/v2/config/feature_flags/set_roles_by_username")
-                    .build()
-                )
-                .featureFlag(FeatureFlagEntity.builder()
-                    .name("unset_roles_by_username")
-                    .enabled(true)
-                    .url("/v2/config/feature_flags/unset_roles_by_username")
-                    .build()
-                )
-                .featureFlag(FeatureFlagEntity.builder()
-                    .name("task_creation")
-                    .enabled(false)
-                    .url("/v2/config/feature_flags/task_creation")
-                    .build()
-                )
-                .featureFlag(FeatureFlagEntity.builder()
-                    .name("space_scoped_private_broker_creation")
-                    .enabled(true)
-                    .url("/v2/config/feature_flags/space_scoped_private_broker_creation")
-                    .build()
-                )
-                .featureFlag(FeatureFlagEntity.builder()
-                    .name("space_developer_env_var_visibility")
-                    .enabled(true)
-                    .url("/v2/config/feature_flags/space_developer_env_var_visibility")
-                    .build()
-                )
-                .build();
-        }
-
-        @Override
-        protected ListFeatureFlagsRequest getValidRequest() throws Exception {
-            return ListFeatureFlagsRequest.builder().build();
-        }
-
-        @Override
         protected Mono<ListFeatureFlagsResponse> invoke(ListFeatureFlagsRequest request) {
             return this.featureFlags.list(request);
+        }
+
+        @Override
+        protected ListFeatureFlagsRequest validRequest() {
+            return ListFeatureFlagsRequest.builder().build();
         }
 
     }
@@ -228,7 +235,18 @@ public final class ReactorFeatureFlagsTest {
         private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<SetFeatureFlagResponse> expectations() {
+            return ScriptedSubscriber.<SetFeatureFlagResponse>create()
+                .expectValue(SetFeatureFlagResponse.builder()
+                    .name("user_org_creation")
+                    .enabled(true)
+                    .url("/v2/config/feature_flags/user_org_creation")
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(PUT).path("/v2/config/feature_flags/user_org_creation")
@@ -242,25 +260,16 @@ public final class ReactorFeatureFlagsTest {
         }
 
         @Override
-        protected SetFeatureFlagResponse getResponse() {
-            return SetFeatureFlagResponse.builder()
-                .name("user_org_creation")
-                .enabled(true)
-                .url("/v2/config/feature_flags/user_org_creation")
-                .build();
+        protected Mono<SetFeatureFlagResponse> invoke(SetFeatureFlagRequest request) {
+            return this.featureFlags.set(request);
         }
 
         @Override
-        protected SetFeatureFlagRequest getValidRequest() {
+        protected SetFeatureFlagRequest validRequest() {
             return SetFeatureFlagRequest.builder()
                 .enabled(true)
                 .name("user_org_creation")
                 .build();
-        }
-
-        @Override
-        protected Mono<SetFeatureFlagResponse> invoke(SetFeatureFlagRequest request) {
-            return this.featureFlags.set(request);
         }
 
     }
