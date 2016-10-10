@@ -24,6 +24,14 @@ import reactor.core.publisher.Mono;
 public interface Clients {
 
     /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#batch-create">Batch Change Secret</a> request
+     *
+     * @param request the Batch Change Secret request
+     * @return the response to the Batch Change Secret Request
+     */
+    Mono<BatchChangeSecretResponse> batchChangeSecret(BatchChangeSecretRequest request);
+
+    /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#batch-create">Batch Create Client</a> request
      *
      * @param request the Batch Create Client request

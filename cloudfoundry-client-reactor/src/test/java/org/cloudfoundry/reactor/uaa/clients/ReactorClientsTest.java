@@ -21,12 +21,15 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
 import org.cloudfoundry.uaa.SortOrder;
+import org.cloudfoundry.uaa.clients.BatchChangeSecretRequest;
+import org.cloudfoundry.uaa.clients.BatchChangeSecretResponse;
 import org.cloudfoundry.uaa.clients.BatchCreateClientsRequest;
 import org.cloudfoundry.uaa.clients.BatchCreateClientsResponse;
 import org.cloudfoundry.uaa.clients.BatchDeleteClientsRequest;
 import org.cloudfoundry.uaa.clients.BatchDeleteClientsResponse;
 import org.cloudfoundry.uaa.clients.BatchUpdateClientsRequest;
 import org.cloudfoundry.uaa.clients.BatchUpdateClientsResponse;
+import org.cloudfoundry.uaa.clients.ChangeSecret;
 import org.cloudfoundry.uaa.clients.ChangeSecretRequest;
 import org.cloudfoundry.uaa.clients.ChangeSecretResponse;
 import org.cloudfoundry.uaa.clients.Client;
@@ -62,6 +65,82 @@ import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
 import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
 
 public final class ReactorClientsTest {
+
+    public static final class BatchChangeSecret extends AbstractUaaApiTest<BatchChangeSecretRequest, BatchChangeSecretResponse> {
+
+        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+        @Override
+        protected InteractionContext getInteractionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/oauth/clients/tx/secret")
+                    .payload("fixtures/uaa/clients/POST_tx_secret_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(CREATED)
+                    .payload("fixtures/uaa/clients/POST_tx_secret_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected BatchChangeSecretResponse getResponse() {
+            return BatchChangeSecretResponse.builder()
+                .client(Client.builder()
+                    .accessTokenValidity(2700L)
+                    .allowedProvider("uaa", "ldap", "my-saml-provider")
+                    .approvalsDeleted(true)
+                    .authority("clients.read", "clients.write")
+                    .authorizedGrantType(CLIENT_CREDENTIALS)
+                    .autoApprove("true")
+                    .clientId("Zkgt1Y")
+                    .lastModified(1474923482301L)
+                    .name("My Client Name")
+                    .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                    .refreshTokenValidity(7000L)
+                    .resourceId("none")
+                    .scope("clients.read", "clients.write")
+                    .tokenSalt("uHICvG")
+                    .build())
+                .client(Client.builder()
+                    .accessTokenValidity(2700L)
+                    .allowedProvider("uaa", "ldap", "my-saml-provider")
+                    .approvalsDeleted(true)
+                    .authority("clients.read", "new.authority", "clients.write")
+                    .authorizedGrantType(CLIENT_CREDENTIALS)
+                    .autoApprove("true")
+                    .clientId("Xm43aH")
+                    .lastModified(1474923482302L)
+                    .name("My Client Name")
+                    .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                    .refreshTokenValidity(7000L)
+                    .resourceId("none")
+                    .scope("clients.read", "clients.write")
+                    .tokenSalt("WjlWvu")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected BatchChangeSecretRequest getValidRequest() throws Exception {
+            return BatchChangeSecretRequest.builder()
+                .changeSecret(ChangeSecret.builder()
+                    .clientId("Zkgt1Y")
+                    .secret("new_secret")
+                    .build())
+                .changeSecret(ChangeSecret.builder()
+                    .clientId("Xm43aH")
+                    .secret("new_secret")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected Mono<BatchChangeSecretResponse> invoke(BatchChangeSecretRequest request) {
+            return this.clients.batchChangeSecret(request);
+        }
+    }
 
     public static final class BatchCreate extends AbstractUaaApiTest<BatchCreateClientsRequest, BatchCreateClientsResponse> {
 
@@ -298,7 +377,7 @@ public final class ReactorClientsTest {
         }
     }
 
-    public static final class ChangeSecret extends AbstractUaaApiTest<ChangeSecretRequest, ChangeSecretResponse> {
+    public static final class ChangeSecrets extends AbstractUaaApiTest<ChangeSecretRequest, ChangeSecretResponse> {
 
         private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
