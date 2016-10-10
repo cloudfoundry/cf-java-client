@@ -16,13 +16,31 @@
 
 package org.cloudfoundry.uaa.clients;
 
-import org.cloudfoundry.uaa.IdentityZoned;
-import org.immutables.value.Value;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.Nullable;
 
 /**
- * The request payload for Change Secret
+ * The payload for change secret requests
  */
-@Value.Immutable
-abstract class _ChangeSecretRequest extends AbstractChangeSecret implements IdentityZoned {
+abstract class AbstractChangeSecret {
+
+    /**
+     * The client id
+     */
+    @JsonProperty("clientId")
+    abstract String getClientId();
+
+    /**
+     * The old secret
+     */
+    @JsonProperty("oldSecret")
+    @Nullable
+    abstract String getOldSecret();
+
+    /**
+     * The new secret
+     */
+    @JsonProperty("secret")
+    abstract String getSecret();
 
 }

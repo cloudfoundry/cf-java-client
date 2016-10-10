@@ -18,12 +18,16 @@ package org.cloudfoundry.uaa;
 
 import io.netty.util.AsciiString;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.uaa.clients.BatchChangeSecretRequest;
+import org.cloudfoundry.uaa.clients.BatchChangeSecretResponse;
 import org.cloudfoundry.uaa.clients.BatchCreateClientsRequest;
 import org.cloudfoundry.uaa.clients.BatchCreateClientsResponse;
 import org.cloudfoundry.uaa.clients.BatchDeleteClientsRequest;
 import org.cloudfoundry.uaa.clients.BatchUpdateClientsRequest;
 import org.cloudfoundry.uaa.clients.BatchUpdateClientsResponse;
+import org.cloudfoundry.uaa.clients.ChangeSecret;
 import org.cloudfoundry.uaa.clients.ChangeSecretRequest;
+import org.cloudfoundry.uaa.clients.ChangeSecretResponse;
 import org.cloudfoundry.uaa.clients.Client;
 import org.cloudfoundry.uaa.clients.CreateClient;
 import org.cloudfoundry.uaa.clients.CreateClientRequest;
@@ -68,10 +72,32 @@ public final class ClientsTest extends AbstractIntegrationTest {
     @Autowired
     private UaaClient uaaClient;
 
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/125574491")
     @Test
     public void batchChangeSecret() {
-        //
+        String clientId1 = this.nameFactory.getClientId();
+        String clientId2 = this.nameFactory.getClientId();
+        String clientSecret = this.nameFactory.getClientSecret();
+        String newClientSecret1 = this.nameFactory.getClientSecret();
+        String newClientSecret2 = this.nameFactory.getClientSecret();
+
+        requestCreateClient(this.uaaClient, clientId1, clientSecret)
+            .then(requestCreateClient(this.uaaClient, clientId2, clientSecret))
+            .then(this.uaaClient.clients()
+                .batchChangeSecret(BatchChangeSecretRequest.builder()
+                    .changeSecret(ChangeSecret.builder()
+                            .clientId(clientId1)
+                            .oldSecret(clientSecret)
+                            .secret(newClientSecret1)
+                            .build(),
+                        ChangeSecret.builder()
+                            .clientId(clientId2)
+                            .oldSecret(clientSecret)
+                            .secret(newClientSecret2)
+                            .build())
+                    .build()))
+            .flatMapIterable(BatchChangeSecretResponse::getClients)
+            .subscribe(this.testSubscriber()
+                .expectCount(2));
     }
 
     @Test
@@ -182,7 +208,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
                     .build()))
             .subscribe(this.testSubscriber()
                 .expectError(HttpException.class, "HTTP request failed with code: 400"));
-        //TODO: Update test based on https://www.pivotaltracker.com/n/projects/997278/stories/130645469 to use the following
+//        TODO: Update test based on https://www.pivotaltracker.com/n/projects/997278/stories/130645469 to use the following
 //            .subscribe(this.<ChangeSecretResponse>testSubscriber()
 //                .expectThat(response -> {
 //                    assertEquals("secret updated", response.getMessage());
