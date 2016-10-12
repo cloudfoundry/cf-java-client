@@ -23,6 +23,13 @@ import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
 public final class BatchUpdateClientsRequestTest {
 
     @Test(expected = IllegalStateException.class)
+    public void emptyClient() {
+        BatchUpdateClientsRequest.builder()
+            .client()
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
     public void noClient() {
         BatchUpdateClientsRequest.builder()
             .build();

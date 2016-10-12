@@ -21,7 +21,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import org.cloudfoundry.Nullable;
 import org.cloudfoundry.uaa.IdentityZoned;
 import org.immutables.value.Value;
 
@@ -37,7 +36,7 @@ abstract class _BatchUpdateClientsRequest implements IdentityZoned {
 
     @Value.Check
     void checkClients() {
-        if (this.getClients() == null) {
+        if (this.getClients().isEmpty()) {
             throw new IllegalStateException("Cannot build BatchUpdateClientsRequest, required attribute clients is not set");
         }
     }
@@ -45,7 +44,6 @@ abstract class _BatchUpdateClientsRequest implements IdentityZoned {
     /**
      * A list of clients to update
      */
-    @Nullable
     @JsonIgnore
     abstract List<UpdateClient> getClients();
 

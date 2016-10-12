@@ -18,25 +18,33 @@ package org.cloudfoundry.uaa.clients;
 
 import org.junit.Test;
 
-public final class BatchDeleteClientsRequestTest {
+import static org.cloudfoundry.uaa.tokens.GrantType.IMPLICIT;
+
+public final class MixedActionsRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void emptyClientIds() {
-        BatchDeleteClientsRequest.builder()
-            .clientId()
+    public void emptyAction() {
+        MixedActionsRequest.builder()
+            .action()
             .build();
     }
 
     @Test(expected = IllegalStateException.class)
-    public void noClientIds() {
-        BatchDeleteClientsRequest.builder()
+    public void noAction() {
+        MixedActionsRequest.builder()
             .build();
     }
 
     @Test
     public void valid() {
-        BatchDeleteClientsRequest.builder()
-            .clientId("test-client-id")
+        MixedActionsRequest.builder()
+            .action(CreateClientAction.builder()
+                .authorizedGrantType(IMPLICIT)
+                .clientId("test-client-id")
+                .build())
+            .action(DeleteClientAction.builder()
+                .clientId("test-client-id")
+                .build())
             .build();
     }
 

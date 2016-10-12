@@ -16,28 +16,25 @@
 
 package org.cloudfoundry.uaa.clients;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.immutables.value.Value;
 
-public final class BatchDeleteClientsRequestTest {
+/**
+ * The payload for the delete client action
+ */
+@Value.Immutable
+abstract class _DeleteClientAction implements Action {
 
-    @Test(expected = IllegalStateException.class)
-    public void emptyClientIds() {
-        BatchDeleteClientsRequest.builder()
-            .clientId()
-            .build();
+    @JsonProperty("action")
+    @Value.Derived
+    public String getAction() {
+        return "delete";
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientIds() {
-        BatchDeleteClientsRequest.builder()
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        BatchDeleteClientsRequest.builder()
-            .clientId("test-client-id")
-            .build();
-    }
+    /**
+     * The client id
+     */
+    @JsonProperty("client_id")
+    abstract String getClientId();
 
 }

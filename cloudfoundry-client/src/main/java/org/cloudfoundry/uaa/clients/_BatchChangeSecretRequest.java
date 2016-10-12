@@ -21,7 +21,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import org.cloudfoundry.Nullable;
 import org.cloudfoundry.uaa.IdentityZoned;
 import org.immutables.value.Value;
 
@@ -37,7 +36,7 @@ abstract class _BatchChangeSecretRequest implements IdentityZoned {
 
     @Value.Check
     void checkClients() {
-        if (this.getChangeSecrets() == null) {
+        if (this.getChangeSecrets().isEmpty()) {
             throw new IllegalStateException("Cannot build BatchChangeSecretsRequest, required attribute changeSecret is not set"); //TODO: Validate this ************************
         }
     }
@@ -45,20 +44,19 @@ abstract class _BatchChangeSecretRequest implements IdentityZoned {
     /**
      * A list of secrets to change
      */
-    @Nullable
     @JsonIgnore
     abstract List<ChangeSecret> getChangeSecrets();
 
-    static class BatchChangeSecretSerializer extends StdSerializer<_BatchChangeSecretRequest> {
+    static class BatchChangeSecretSerializer extends StdSerializer<BatchChangeSecretRequest> {
 
-        private static final long serialVersionUID = 958714647149130533L;
+        private static final long serialVersionUID = 8880285813370852371L;
 
         BatchChangeSecretSerializer() {
-            super(_BatchChangeSecretRequest.class);
+            super(BatchChangeSecretRequest.class);
         }
 
         @Override
-        public void serialize(_BatchChangeSecretRequest request, JsonGenerator gen, SerializerProvider provider) throws IOException {
+        public void serialize(BatchChangeSecretRequest request, JsonGenerator gen, SerializerProvider provider) throws IOException {
             gen.writeObject(request.getChangeSecrets());
         }
 

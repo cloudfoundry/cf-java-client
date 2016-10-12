@@ -1,0 +1,42 @@
+[
+  {
+    "action": "secret",
+    "client_secret": "new_secret",
+    "client_id": "Zkgt1Y"
+  },
+  {
+    "action": "delete",
+    "client_id": "Xm43aH"
+  },
+  {
+    "scope": [
+      "clients.read",
+      "clients.write"
+    ],
+    "client_id": "tlA1z5",
+    "client_secret": "secret",
+    "resource_ids": [],
+    "authorized_grant_types": [
+      "client_credentials"
+    ],
+    "access_token_validity": 2700,
+    "refresh_token_validity": 7000,
+    "action": "add",
+    "authorities": [
+      "clients.read",
+      "clients.write"
+    ],
+    "token_salt": "UpzrHR",
+    "autoapprove": [ "true" ],
+    "allowedproviders": [
+      "uaa",
+      "ldap",
+      "my-saml-provider"
+    ],
+    "name": "My Client Name",
+    "redirect_uri": [
+      "http://test1.com",
+      "http*://ant.path.wildcard/**/passback/*"
+    ]
+  }
+]

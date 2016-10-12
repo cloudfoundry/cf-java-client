@@ -40,7 +40,7 @@ abstract class _BatchChangeSecretResponse {
 
     static class BatchChangeSecretResponseDeserializer extends StdDeserializer<BatchChangeSecretResponse> {
 
-        private static final long serialVersionUID = -6791422038021875174L;
+        private static final long serialVersionUID = -4294840228888720278L;
 
         BatchChangeSecretResponseDeserializer() {
             super(BatchChangeSecretResponse.class);

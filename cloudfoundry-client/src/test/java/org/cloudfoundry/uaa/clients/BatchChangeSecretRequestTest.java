@@ -18,13 +18,18 @@ package org.cloudfoundry.uaa.clients;
 
 import org.junit.Test;
 
-import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
-
 public final class BatchChangeSecretRequestTest {
 
     @Test(expected = IllegalStateException.class)
+    public void emptyChangeSecrets() {
+        BatchChangeSecretRequest.builder()
+            .changeSecret()
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
     public void noChangeSecrets() {
-        BatchCreateClientsRequest.builder()
+        BatchChangeSecretRequest.builder()
             .build();
     }
 
