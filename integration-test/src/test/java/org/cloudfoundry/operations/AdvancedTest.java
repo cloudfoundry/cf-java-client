@@ -19,9 +19,10 @@ package org.cloudfoundry.operations;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.test.subscriber.ScriptedSubscriber;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import java.time.Duration;
+import java.util.concurrent.TimeoutException;
 
 public final class AdvancedTest extends AbstractIntegrationTest {
 
@@ -29,14 +30,16 @@ public final class AdvancedTest extends AbstractIntegrationTest {
     private CloudFoundryOperations cloudFoundryOperations;
 
     @Test
-    public void sshCode() {
+    public void sshCode() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValueWith(actual -> actual.length() == 6, actual -> String.format("expected length: %d; actual length: %d", 6, actual.length()))
+            .expectComplete();
+
         this.cloudFoundryOperations.advanced()
             .sshCode()
-            .subscribe(this.<String>testSubscriber()
-                .expectThat(code -> {
-                    assertNotNull(code);
-                    assertTrue(code.length() == 6);
-                }));
+            .subscribe(subscriber);
 
+        subscriber.verify(Duration.ofMinutes(5));
     }
+
 }

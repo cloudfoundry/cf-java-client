@@ -20,6 +20,8 @@ import okhttp3.Headers;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.reactor.AbstractApiTest;
 import org.junit.Test;
+import org.springframework.util.Assert;
+import reactor.test.subscriber.ScriptedSubscriber;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -27,6 +29,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,11 +43,12 @@ public abstract class AbstractClientApiTest<REQ, RSP> extends AbstractApiTest<RE
 
     @Test
     public final void error() throws Exception {
-        mockRequest(getInteractionContext().getErrorResponse());
-        this.testSubscriber.expectError(CloudFoundryException.class, "CF-UnprocessableEntity(10008): The request is semantically invalid: space_guid and name unique");
-        invoke(getValidRequest()).subscribe(this.testSubscriber);
+        mockRequest(interactionContext().getErrorResponse());
 
-        this.testSubscriber.verify(Duration.ofSeconds(5));
+        ScriptedSubscriber<RSP> subscriber = errorExpectation(CloudFoundryException.class, "CF-UnprocessableEntity(10008): The request is semantically invalid: space_guid and name unique");
+        invoke(validRequest()).subscribe(subscriber);
+        subscriber.verify(Duration.ofSeconds(5));
+
         verify();
     }
 
@@ -69,6 +74,28 @@ public abstract class AbstractClientApiTest<REQ, RSP> extends AbstractApiTest<RE
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static <T> ScriptedSubscriber<T> errorExpectation(Class<? extends Throwable> type, String format, Object... args) {
+        Assert.notNull(type, "type must not be null");
+        Assert.notNull(format, "format must not be null");
+
+        Function<Throwable, Optional<String>> assertion = t -> {
+            if (!type.isInstance(t)) {
+                return Optional.of(String.format("expected error of type: %s; actual type: %s", type.getSimpleName(), t.getClass().getSimpleName()));
+            }
+
+            String expected = String.format(format, args);
+            if (!expected.equals(t.getMessage())) {
+                return Optional.of(String.format("expected message: %s; actual message: %s", expected, t.getMessage()));
+            }
+
+            return Optional.empty();
+        };
+
+        return ScriptedSubscriber.<T>create()
+            .expectErrorWith(t -> !assertion.apply(t).isPresent(),
+                t -> assertion.apply(t).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching error")));
     }
 
 }

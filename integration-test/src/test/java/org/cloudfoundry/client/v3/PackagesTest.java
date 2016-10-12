@@ -25,18 +25,21 @@ import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.Package;
 import org.cloudfoundry.client.v3.packages.PackageType;
+import org.cloudfoundry.client.v3.packages.State;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.util.concurrent.TimeoutException;
 
 import static org.cloudfoundry.client.v3.packages.State.PROCESSING_UPLOAD;
 import static org.cloudfoundry.client.v3.packages.State.READY;
-import static org.junit.Assert.assertTrue;
 
 public final class PackagesTest extends AbstractIntegrationTest {
 
@@ -47,8 +50,12 @@ public final class PackagesTest extends AbstractIntegrationTest {
     private Mono<String> spaceId;
 
     @Test
-    public void upload() {
+    public void upload() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
+
+        ScriptedSubscriber<State> subscriber = ScriptedSubscriber.<State>create()
+            .expectValueWith(state -> PROCESSING_UPLOAD == state || READY == state, state -> String.format("expected state: PROCESSING_UPLOAD or READY: actual state: %s", state))
+            .expectComplete();
 
         this.spaceId
             .then(spaceId -> this.cloudFoundryClient.applicationsV3()
@@ -84,8 +91,9 @@ public final class PackagesTest extends AbstractIntegrationTest {
                     .packageId(packageId)
                     .build()))
             .map(Package::getState)
-            .subscribe(testSubscriber()
-                .expectThat(state -> assertTrue(state == PROCESSING_UPLOAD || state == READY)));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
 }

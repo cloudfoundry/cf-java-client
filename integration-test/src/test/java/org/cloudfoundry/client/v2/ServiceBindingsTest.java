@@ -38,15 +38,17 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuple3;
 
+import java.time.Duration;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
-import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
-import static org.junit.Assert.assertEquals;
 
 public final class ServiceBindingsTest extends AbstractIntegrationTest {
 
@@ -57,9 +59,11 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
     private Mono<String> spaceId;
 
     @Test
-    public void create() {
+    public void create() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
+
+        ScriptedSubscriber<Tuple3<String, String, CreateServiceBindingResponse>> subscriber = serviceBindingEquality();
 
         createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
             .then(function((serviceInstanceId, applicationId) -> Mono
@@ -68,14 +72,18 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
                     Mono.just(applicationId),
                     requestCreateServiceBinding(this.cloudFoundryClient, applicationId, serviceInstanceId)
                 )))
-            .subscribe(this.<Tuple3<String, String, CreateServiceBindingResponse>>testSubscriber()
-                .expectThat(consumer(ServiceBindingsTest::testServiceBinding)));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void delete() {
+    public void delete() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
+
+        ScriptedSubscriber<GetServiceBindingResponse> subscriber = errorExpectation(CloudFoundryException.class,
+            "CF-ServiceBindingNotFound\\([0-9]+\\): The service binding could not be found: .*");
 
         createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
             .then(function((serviceInstanceId, applicationId) -> Mono
@@ -86,14 +94,17 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
                 )))
             .as(thenKeep(function((serviceInstanceId, applicationId, serviceBindingId) -> deleteServiceBinding(this.cloudFoundryClient, serviceBindingId))))
             .then(function((serviceInstanceId, applicationId, serviceBindingId) -> requestGetServiceBinding(this.cloudFoundryClient, serviceBindingId)))
-            .subscribe(this.testSubscriber()
-                .expectErrorMatch(CloudFoundryException.class, "CF-ServiceBindingNotFound\\([0-9]+\\): The service binding could not be found: .*"));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void get() {
+    public void get() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
+
+        ScriptedSubscriber<Tuple3<String, String, GetServiceBindingResponse>> subscriber = serviceBindingEquality();
 
         createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
             .then(function((serviceInstanceId, applicationId) -> Mono
@@ -108,14 +119,17 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
                     Mono.just(applicationId),
                     requestGetServiceBinding(this.cloudFoundryClient, serviceBindingId)
                 )))
-            .subscribe(this.<Tuple3<String, String, GetServiceBindingResponse>>testSubscriber()
-                .expectThat(consumer(ServiceBindingsTest::testServiceBinding)));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void list() {
+    public void list() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
+
+        ScriptedSubscriber<Tuple3<String, String, ServiceBindingResource>> subscriber = serviceBindingEquality();
 
         createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
             .then(function((serviceInstanceId, applicationId) -> Mono
@@ -132,14 +146,17 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
                         .filter(resource -> serviceBindingId.equals(ResourceUtils.getId(resource)))
                         .single()
                 )))
-            .subscribe(this.<Tuple3<String, String, ServiceBindingResource>>testSubscriber()
-                .expectThat(consumer(ServiceBindingsTest::testServiceBinding)));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listFilterByApplicationId() {
+    public void listFilterByApplicationId() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
+
+        ScriptedSubscriber<Tuple3<String, String, ServiceBindingResource>> subscriber = serviceBindingEquality();
 
         createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
             .then(function((serviceInstanceId, applicationId) -> Mono
@@ -156,14 +173,17 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
                         .filter(resource -> serviceBindingId.equals(ResourceUtils.getId(resource)))
                         .single()
                 )))
-            .subscribe(this.<Tuple3<String, String, ServiceBindingResource>>testSubscriber()
-                .expectThat(consumer(ServiceBindingsTest::testServiceBinding)));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listFilterByServiceInstanceId() {
+    public void listFilterByServiceInstanceId() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
+
+        ScriptedSubscriber<Tuple3<String, String, ServiceBindingResource>> subscriber = serviceBindingEquality();
 
         createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
             .then(function((serviceInstanceId, applicationId) -> Mono
@@ -180,8 +200,9 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
                         .filter(resource -> serviceBindingId.equals(ResourceUtils.getId(resource)))
                         .single()
                 )))
-            .subscribe(this.<Tuple3<String, String, ServiceBindingResource>>testSubscriber()
-                .expectThat(consumer(ServiceBindingsTest::testServiceBinding)));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     private static Mono<String> createApplicationId(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
@@ -268,9 +289,23 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
                     .build()));
     }
 
-    private static <R extends AbstractServiceBindingResource> void testServiceBinding(String serviceInstanceId, String applicationId, R serviceBindingResource) {
-        assertEquals(serviceInstanceId, ResourceUtils.getEntity(serviceBindingResource).getServiceInstanceId());
-        assertEquals(applicationId, ResourceUtils.getEntity(serviceBindingResource).getApplicationId());
+    private static <T extends AbstractServiceBindingResource> ScriptedSubscriber<Tuple3<String, String, T>> serviceBindingEquality() {
+        Function<Tuple3<String, String, T>, Optional<String>> assertion = function((serviceInstanceId, applicationId, resource) -> {
+            if (!serviceInstanceId.equals(ResourceUtils.getEntity(resource).getServiceInstanceId())) {
+                return Optional.of(String.format("expected service instance id: %s; actual service instance id: %s", serviceInstanceId, ResourceUtils.getEntity(resource).getServiceInstanceId()));
+            }
+
+            if (!applicationId.equals(ResourceUtils.getEntity(resource).getApplicationId())) {
+                return Optional.of(String.format("expected application id: %s; actual application id: %s", applicationId, ResourceUtils.getEntity(resource).getApplicationId()));
+            }
+
+            return Optional.empty();
+        });
+
+        return ScriptedSubscriber.<Tuple3<String, String, T>>create()
+            .expectValueWith(tuple -> !assertion.apply(tuple).isPresent(),
+                tuple -> assertion.apply(tuple).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching service binding")))
+            .expectComplete();
     }
 
 }

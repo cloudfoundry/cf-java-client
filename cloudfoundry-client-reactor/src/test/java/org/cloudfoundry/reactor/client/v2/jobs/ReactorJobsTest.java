@@ -26,6 +26,7 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -37,7 +38,30 @@ public final class ReactorJobsTest {
         private final ReactorJobs jobs = new ReactorJobs(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<GetJobResponse> expectations() {
+            return ScriptedSubscriber.<GetJobResponse>create()
+                .expectValue(GetJobResponse.builder()
+                    .metadata(Metadata.builder()
+                        .id("e86ffe00-a243-48f7-be05-8f1f41bee864")
+                        .createdAt("2015-11-30T23:38:44Z")
+                        .url("/v2/jobs/e86ffe00-a243-48f7-be05-8f1f41bee864")
+                        .build())
+                    .entity(JobEntity.builder()
+                        .id("e86ffe00-a243-48f7-be05-8f1f41bee864")
+                        .status("failed")
+                        .error("Use of entity>error is deprecated in favor of entity>error_details.")
+                        .errorDetails(ErrorDetails.builder()
+                            .errorCode("UnknownError")
+                            .description("An unknown error occurred.")
+                            .code(10001)
+                            .build())
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/v2/jobs/test-job-id")
@@ -50,36 +74,15 @@ public final class ReactorJobsTest {
         }
 
         @Override
-        protected GetJobResponse getResponse() {
-            return GetJobResponse.builder()
-                .metadata(Metadata.builder()
-                    .id("e86ffe00-a243-48f7-be05-8f1f41bee864")
-                    .createdAt("2015-11-30T23:38:44Z")
-                    .url("/v2/jobs/e86ffe00-a243-48f7-be05-8f1f41bee864")
-                    .build())
-                .entity(JobEntity.builder()
-                    .id("e86ffe00-a243-48f7-be05-8f1f41bee864")
-                    .status("failed")
-                    .error("Use of entity>error is deprecated in favor of entity>error_details.")
-                    .errorDetails(ErrorDetails.builder()
-                        .errorCode("UnknownError")
-                        .description("An unknown error occurred.")
-                        .code(10001)
-                        .build())
-                    .build())
-                .build();
+        protected Mono<GetJobResponse> invoke(GetJobRequest request) {
+            return this.jobs.get(request);
         }
 
         @Override
-        protected GetJobRequest getValidRequest() throws Exception {
+        protected GetJobRequest validRequest() {
             return GetJobRequest.builder()
                 .jobId("test-job-id")
                 .build();
-        }
-
-        @Override
-        protected Mono<GetJobResponse> invoke(GetJobRequest request) {
-            return this.jobs.get(request);
         }
 
     }

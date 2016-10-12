@@ -26,6 +26,7 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -37,7 +38,56 @@ public final class ReactorUsersTest {
         private final ReactorUsers users = new ReactorUsers(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<ListUsersResponse> expectations() {
+            return ScriptedSubscriber.<ListUsersResponse>create()
+                .expectValue(ListUsersResponse.builder()
+                    .totalResults(2)
+                    .totalPages(1)
+                    .resource(UserResource.builder()
+                        .metadata(Metadata.builder()
+                            .id("uaa-id-133")
+                            .url("/v2/users/uaa-id-133")
+                            .createdAt("2015-12-22T18:28:01Z")
+                            .build())
+                        .entity(UserEntity.builder()
+                            .active(false)
+                            .admin(false)
+                            .auditedOrganizationsUrl("/v2/users/uaa-id-133/audited_organizations")
+                            .auditedSpacesUrl("/v2/users/uaa-id-133/audited_spaces")
+                            .billingManagedOrganizationsUrl("/v2/users/uaa-id-133/billing_managed_organizations")
+                            .defaultSpaceUrl("/v2/spaces/55b306f6-b956-4c85-a7dc-64358121d39e")
+                            .defaultSpaceId("55b306f6-b956-4c85-a7dc-64358121d39e")
+                            .managedOrganizationsUrl("/v2/users/uaa-id-133/managed_organizations")
+                            .managedSpacesUrl("/v2/users/uaa-id-133/managed_spaces")
+                            .organizationsUrl("/v2/users/uaa-id-133/organizations")
+                            .spacesUrl("/v2/users/uaa-id-133/spaces")
+                            .username("user@example.com")
+                            .build())
+                        .build())
+                    .resource(UserResource.builder()
+                        .metadata(Metadata.builder()
+                            .id("uaa-id-134")
+                            .url("/v2/users/uaa-id-134")
+                            .createdAt("2015-12-22T18:28:01Z")
+                            .build())
+                        .entity(UserEntity.builder()
+                            .active(true)
+                            .admin(false)
+                            .auditedOrganizationsUrl("/v2/users/uaa-id-134/audited_organizations")
+                            .auditedSpacesUrl("/v2/users/uaa-id-134/audited_spaces")
+                            .billingManagedOrganizationsUrl("/v2/users/uaa-id-134/billing_managed_organizations")
+                            .managedOrganizationsUrl("/v2/users/uaa-id-134/managed_organizations")
+                            .managedSpacesUrl("/v2/users/uaa-id-134/managed_spaces")
+                            .organizationsUrl("/v2/users/uaa-id-134/organizations")
+                            .spacesUrl("/v2/users/uaa-id-134/spaces")
+                            .build())
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/v2/users?page=-1")
@@ -50,62 +100,15 @@ public final class ReactorUsersTest {
         }
 
         @Override
-        protected ListUsersResponse getResponse() {
-            return ListUsersResponse.builder()
-                .totalResults(2)
-                .totalPages(1)
-                .resource(UserResource.builder()
-                    .metadata(Metadata.builder()
-                        .id("uaa-id-133")
-                        .url("/v2/users/uaa-id-133")
-                        .createdAt("2015-12-22T18:28:01Z")
-                        .build())
-                    .entity(UserEntity.builder()
-                        .active(false)
-                        .admin(false)
-                        .auditedOrganizationsUrl("/v2/users/uaa-id-133/audited_organizations")
-                        .auditedSpacesUrl("/v2/users/uaa-id-133/audited_spaces")
-                        .billingManagedOrganizationsUrl("/v2/users/uaa-id-133/billing_managed_organizations")
-                        .defaultSpaceUrl("/v2/spaces/55b306f6-b956-4c85-a7dc-64358121d39e")
-                        .defaultSpaceId("55b306f6-b956-4c85-a7dc-64358121d39e")
-                        .managedOrganizationsUrl("/v2/users/uaa-id-133/managed_organizations")
-                        .managedSpacesUrl("/v2/users/uaa-id-133/managed_spaces")
-                        .organizationsUrl("/v2/users/uaa-id-133/organizations")
-                        .spacesUrl("/v2/users/uaa-id-133/spaces")
-                        .username("user@example.com")
-                        .build())
-                    .build())
-                .resource(UserResource.builder()
-                    .metadata(Metadata.builder()
-                        .id("uaa-id-134")
-                        .url("/v2/users/uaa-id-134")
-                        .createdAt("2015-12-22T18:28:01Z")
-                        .build())
-                    .entity(UserEntity.builder()
-                        .active(true)
-                        .admin(false)
-                        .auditedOrganizationsUrl("/v2/users/uaa-id-134/audited_organizations")
-                        .auditedSpacesUrl("/v2/users/uaa-id-134/audited_spaces")
-                        .billingManagedOrganizationsUrl("/v2/users/uaa-id-134/billing_managed_organizations")
-                        .managedOrganizationsUrl("/v2/users/uaa-id-134/managed_organizations")
-                        .managedSpacesUrl("/v2/users/uaa-id-134/managed_spaces")
-                        .organizationsUrl("/v2/users/uaa-id-134/organizations")
-                        .spacesUrl("/v2/users/uaa-id-134/spaces")
-                        .build())
-                    .build())
-                .build();
+        protected Mono<ListUsersResponse> invoke(ListUsersRequest request) {
+            return this.users.list(request);
         }
 
         @Override
-        protected ListUsersRequest getValidRequest() throws Exception {
+        protected ListUsersRequest validRequest() {
             return ListUsersRequest.builder()
                 .page(-1)
                 .build();
-        }
-
-        @Override
-        protected Mono<ListUsersResponse> invoke(ListUsersRequest request) {
-            return this.users.list(request);
         }
 
     }

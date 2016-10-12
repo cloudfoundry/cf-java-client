@@ -26,7 +26,11 @@ import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 import reactor.util.function.Tuple2;
+
+import java.time.Duration;
+import java.util.concurrent.TimeoutException;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
 
@@ -36,8 +40,10 @@ public final class JobsTest extends AbstractIntegrationTest {
     private CloudFoundryClient cloudFoundryClient;
 
     @Test
-    public void getJob() {
+    public void getJob() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
+
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
 
         this.cloudFoundryClient.organizations()
             .create(CreateOrganizationRequest.builder()
@@ -58,8 +64,9 @@ public final class JobsTest extends AbstractIntegrationTest {
                 .and(Mono.just(jobId)))
             .filter(predicate((getId, deleteId) -> !"0".equals(getId)))
             .repeatWhenEmpty(5, DelayUtils.instant())
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
 }

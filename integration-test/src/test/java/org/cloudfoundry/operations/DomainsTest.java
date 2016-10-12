@@ -25,6 +25,10 @@ import org.cloudfoundry.operations.organizations.CreateOrganizationRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
+
+import java.time.Duration;
+import java.util.concurrent.TimeoutException;
 
 public final class DomainsTest extends AbstractIntegrationTest {
 
@@ -35,32 +39,43 @@ public final class DomainsTest extends AbstractIntegrationTest {
     private String organizationName;
 
     @Test
-    public void create() {
+    public void create() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
+
+        ScriptedSubscriber<Void> subscriber = ScriptedSubscriber.<Void>create()
+            .expectComplete();
 
         this.cloudFoundryOperations.domains()
             .create(CreateDomainRequest.builder()
                 .domain(domainName)
                 .organization(this.organizationName)
                 .build())
-            .subscribe(testSubscriber());
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void createInvalidDomain() {
+    public void createInvalidDomain() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<Void> subscriber = errorExpectation(CloudFoundryException.class, "CF-DomainInvalid\\(130001\\): The domain is invalid: name format");
+
         this.cloudFoundryOperations.domains()
             .create(CreateDomainRequest.builder()
                 .domain("invalid-domain")
                 .organization(this.organizationName)
                 .build())
-            .subscribe(testSubscriber()
-                .expectErrorMatch(CloudFoundryException.class, "CF-DomainInvalid\\(130001\\): The domain is invalid: .*"));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void share() {
+    public void share() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
         String targetOrganizationName = this.nameFactory.getOrganizationName();
+
+        ScriptedSubscriber<Void> subscriber = ScriptedSubscriber.<Void>create()
+            .expectComplete();
 
         requestCreateOrganization(this.cloudFoundryOperations, targetOrganizationName)
             .then(requestCreateDomain(this.cloudFoundryOperations, domainName, this.organizationName))
@@ -69,13 +84,18 @@ public final class DomainsTest extends AbstractIntegrationTest {
                     .domain(domainName)
                     .organization(targetOrganizationName)
                     .build()))
-            .subscribe(testSubscriber());
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void unshare() {
+    public void unshare() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
         String targetOrganizationName = this.nameFactory.getOrganizationName();
+
+        ScriptedSubscriber<Void> subscriber = ScriptedSubscriber.<Void>create()
+            .expectComplete();
 
         requestCreateOrganization(this.cloudFoundryOperations, targetOrganizationName)
             .then(requestCreateDomain(this.cloudFoundryOperations, domainName, this.organizationName))
@@ -85,7 +105,9 @@ public final class DomainsTest extends AbstractIntegrationTest {
                     .domain(domainName)
                     .organization(targetOrganizationName)
                     .build()))
-            .subscribe(testSubscriber());
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     private static Mono<Void> requestCreateDomain(CloudFoundryOperations cloudFoundryOperations, String domainName, String organizationName) {

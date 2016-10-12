@@ -23,9 +23,14 @@ import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.test.subscriber.ScriptedSubscriber;
+
+import java.time.Duration;
+import java.util.Optional;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 
 import static org.cloudfoundry.client.CloudFoundryClient.SUPPORTED_API_VERSION;
-import static org.junit.Assert.assertTrue;
 
 public final class InfoTest extends AbstractIntegrationTest {
 
@@ -33,18 +38,29 @@ public final class InfoTest extends AbstractIntegrationTest {
     private CloudFoundryClient cloudFoundryClient;
 
     @Test
-    public void info() {
+    public void info() throws TimeoutException, InterruptedException {
+        Function<GetInfoResponse, Optional<String>> assertion = response -> {
+            Version expected = Version.valueOf(SUPPORTED_API_VERSION);
+            Version actual = Version.valueOf(response.getApiVersion());
+
+            if (expected.lessThan(actual)) {
+                return Optional.of(String.format("Supported API version %s < actual API version %s", SUPPORTED_API_VERSION, response.getApiVersion()));
+            }
+
+            return Optional.empty();
+        };
+
+        ScriptedSubscriber<GetInfoResponse> subscriber = ScriptedSubscriber.<GetInfoResponse>create()
+            .expectValueWith(response -> !assertion.apply(response).isPresent(),
+                response -> assertion.apply(response).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching response")))
+            .expectComplete();
+
         this.cloudFoundryClient.info()
             .get(GetInfoRequest.builder()
                 .build())
-            .subscribe(this.<GetInfoResponse>testSubscriber()
-                .expectThat(response -> {
-                    Version expected = Version.valueOf(SUPPORTED_API_VERSION);
-                    Version actual = Version.valueOf(response.getApiVersion());
+            .subscribe(subscriber);
 
-                    assertTrue(String.format("Supported API version %s < actual API version %s", SUPPORTED_API_VERSION, response.getApiVersion()),
-                        expected.greaterThanOrEqualTo(actual));
-                }));
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
 }

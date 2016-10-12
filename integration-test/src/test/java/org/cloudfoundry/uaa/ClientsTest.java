@@ -53,16 +53,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.HttpException;
+import reactor.test.subscriber.ScriptedSubscriber;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.Optional;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 
 import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
 import static org.cloudfoundry.uaa.tokens.GrantType.IMPLICIT;
 import static org.cloudfoundry.uaa.tokens.GrantType.PASSWORD;
 import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
-import static org.junit.Assert.assertEquals;
 
 public final class ClientsTest extends AbstractIntegrationTest {
 
@@ -73,12 +77,15 @@ public final class ClientsTest extends AbstractIntegrationTest {
     private UaaClient uaaClient;
 
     @Test
-    public void batchChangeSecret() {
+    public void batchChangeSecret() throws TimeoutException, InterruptedException {
         String clientId1 = this.nameFactory.getClientId();
         String clientId2 = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
         String newClientSecret1 = this.nameFactory.getClientSecret();
         String newClientSecret2 = this.nameFactory.getClientSecret();
+
+        ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>expectValueCount(2)
+            .expectComplete();
 
         requestCreateClient(this.uaaClient, clientId1, clientSecret)
             .then(requestCreateClient(this.uaaClient, clientId2, clientSecret))
@@ -96,15 +103,41 @@ public final class ClientsTest extends AbstractIntegrationTest {
                             .build())
                     .build()))
             .flatMapIterable(BatchChangeSecretResponse::getClients)
-            .subscribe(this.testSubscriber()
-                .expectCount(2));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void batchCreate() {
+    public void batchCreate() throws TimeoutException, InterruptedException {
         String clientId1 = this.nameFactory.getClientId();
         String clientId2 = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
+
+        Function<Client, Optional<String>> assertion = response -> {
+            if (!Arrays.asList(PASSWORD, REFRESH_TOKEN).equals(response.getAuthorizedGrantTypes())) {
+                return Optional.of(String.format("expected authorized grant types: %s; actual authorized grant types: %s", Arrays.asList(PASSWORD, REFRESH_TOKEN), response.getAuthorizedGrantTypes()));
+            }
+
+            if (!clientId1.equals(response.getClientId())) {
+                return Optional.of(String.format("expected client id: %s; actual client id: %s", clientId1, response.getClientId()));
+            }
+
+            if (!Arrays.asList("client.read", "client.write").equals(response.getScopes())) {
+                return Optional.of(String.format("expected scopes: %s; actual scopes: %s", Arrays.asList("client.read", "client.write"), response.getScopes()));
+            }
+
+            if (!"test-token-salt".equals(response.getTokenSalt())) {
+                return Optional.of(String.format("expected token salt: %s; actual token salt: %s", "test-token-salt", response.getTokenSalt()));
+            }
+
+            return Optional.empty();
+        };
+
+        ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
+            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
+                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching client")))
+            .expectComplete();
 
         this.uaaClient.clients()
             .batchCreate(BatchCreateClientsRequest.builder()
@@ -127,20 +160,19 @@ public final class ClientsTest extends AbstractIntegrationTest {
                 .build())
             .flatMapIterable(BatchCreateClientsResponse::getClients)
             .filter(client -> clientId1.equals(client.getClientId()))
-            .subscribe(this.<Client>testSubscriber()
-                .expectThat(response -> {
-                    assertEquals(Arrays.asList(PASSWORD, REFRESH_TOKEN), response.getAuthorizedGrantTypes());
-                    assertEquals(clientId1, response.getClientId());
-                    assertEquals(Arrays.asList("client.read", "client.write"), response.getScopes());
-                    assertEquals("test-token-salt", response.getTokenSalt());
-                }));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void batchDelete() {
+    public void batchDelete() throws TimeoutException, InterruptedException {
         String clientId1 = this.nameFactory.getClientId();
         String clientId2 = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
+
+        ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
+            .expectComplete();
 
         batchCreateClients(this.uaaClient, clientId1, clientId2, clientSecret)
             .flatMapIterable(BatchCreateClientsResponse::getClients)
@@ -152,15 +184,46 @@ public final class ClientsTest extends AbstractIntegrationTest {
                     .build()))
             .flatMap(ignore -> requestListClients(this.uaaClient))
             .filter(client -> clientId1.equals(client.getClientId()) || clientId2.equals(client.getClientId()))
-            .subscribe(this.testSubscriber()
-                .expectCount(0));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void batchUpdate() {
+    public void batchUpdate() throws TimeoutException, InterruptedException {
         String clientId1 = this.nameFactory.getClientId();
         String clientId2 = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
+
+        Function<Client, Optional<String>> assertion = response -> {
+            if (!Arrays.asList(IMPLICIT, CLIENT_CREDENTIALS).equals(response.getAuthorizedGrantTypes())) {
+                return Optional.of(String.format("expected authorized grant types: %s; actual authorized grant types: %s", Arrays.asList(IMPLICIT, CLIENT_CREDENTIALS),
+                    response.getAuthorizedGrantTypes()));
+            }
+
+            if (!clientId1.equals(response.getClientId())) {
+                return Optional.of(String.format("expected client id: %s; actual client id: %s", clientId1, response.getClientId()));
+            }
+
+            if (!"test-name".equals(response.getName())) {
+                return Optional.of(String.format("expected name: %s; actual name: %s", "test-name", response.getName()));
+            }
+
+            if (!Arrays.asList("client.read", "client.write").equals(response.getScopes())) {
+                return Optional.of(String.format("expected scopes: %s; actual scopes: %s", Arrays.asList("client.read", "client.write"), response.getScopes()));
+            }
+
+            if (!"test-token-salt".equals(response.getTokenSalt())) {
+                return Optional.of(String.format("expected token salt: %s; actual token salt: %s", "test-token-salt", response.getTokenSalt()));
+            }
+
+            return Optional.empty();
+        };
+
+        ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
+            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
+                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching client")))
+            .expectComplete();
 
         requestCreateClient(this.uaaClient, clientId1, clientSecret)
             .then(requestCreateClient(this.uaaClient, clientId2, clientSecret))
@@ -183,21 +246,18 @@ public final class ClientsTest extends AbstractIntegrationTest {
                     .build()))
             .flatMapIterable(BatchUpdateClientsResponse::getClients)
             .filter(client -> clientId1.equals(client.getClientId()))
-            .subscribe(this.<Client>testSubscriber()
-                .expectThat(client -> {
-                    assertEquals(Arrays.asList(IMPLICIT, CLIENT_CREDENTIALS), client.getAuthorizedGrantTypes());
-                    assertEquals(clientId1, client.getClientId());
-                    assertEquals("test-name", client.getName());
-                    assertEquals(Arrays.asList("client.read", "client.write"), client.getScopes());
-                    assertEquals("test-token-salt", client.getTokenSalt());
-                }));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void changeSecret() {
+    public void changeSecret() throws TimeoutException, InterruptedException {
         String clientId = this.nameFactory.getClientId();
         String newClientSecret = this.nameFactory.getClientSecret();
         String oldClientSecret = this.nameFactory.getClientSecret();
+
+        ScriptedSubscriber<ChangeSecretResponse> subscriber = errorExpectation(HttpException.class, "HTTP request failed with code: 400");
 
         requestCreateClient(this.uaaClient, clientId, oldClientSecret)
             .then(this.uaaClient.clients()
@@ -206,20 +266,46 @@ public final class ClientsTest extends AbstractIntegrationTest {
                     .oldSecret(oldClientSecret)
                     .secret(newClientSecret)
                     .build()))
-            .subscribe(this.testSubscriber()
-                .expectError(HttpException.class, "HTTP request failed with code: 400"));
+            .subscribe(subscriber);
 //        TODO: Update test based on https://www.pivotaltracker.com/n/projects/997278/stories/130645469 to use the following
 //            .subscribe(this.<ChangeSecretResponse>testSubscriber()
 //                .expectThat(response -> {
 //                    assertEquals("secret updated", response.getMessage());
 //                    assertEquals("ok", response.getStatus());
 //                }));
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void create() {
+    public void create() throws TimeoutException, InterruptedException {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
+
+        Function<CreateClientResponse, Optional<String>> assertion = response -> {
+            if (!Arrays.asList(PASSWORD, REFRESH_TOKEN).equals(response.getAuthorizedGrantTypes())) {
+                return Optional.of(String.format("expected authorized grant types: %s; actual authorized grant types: %s", Arrays.asList(PASSWORD, REFRESH_TOKEN), response.getAuthorizedGrantTypes()));
+            }
+
+            if (!clientId.equals(response.getClientId())) {
+                return Optional.of(String.format("expected client id: %s; actual client id: %s", clientId, response.getClientId()));
+            }
+
+            if (!Arrays.asList("client.read", "client.write").equals(response.getScopes())) {
+                return Optional.of(String.format("expected scopes: %s; actual scopes: %s", Arrays.asList("client.read", "client.write"), response.getScopes()));
+            }
+
+            if (!"test-token-salt".equals(response.getTokenSalt())) {
+                return Optional.of(String.format("expected token salt: %s; actual token salt: %s", "test-token-salt", response.getTokenSalt()));
+            }
+
+            return Optional.empty();
+        };
+
+        ScriptedSubscriber<CreateClientResponse> subscriber = ScriptedSubscriber.<CreateClientResponse>create()
+            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
+                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching client")))
+            .expectComplete();
 
         this.uaaClient.clients()
             .create(CreateClientRequest.builder()
@@ -230,17 +316,16 @@ public final class ClientsTest extends AbstractIntegrationTest {
                 .scope("client.read", "client.write")
                 .tokenSalt("test-token-salt")
                 .build())
-            .subscribe(this.<CreateClientResponse>testSubscriber()
-                .expectThat(response -> {
-                    assertEquals(Arrays.asList(PASSWORD, REFRESH_TOKEN), response.getAuthorizedGrantTypes());
-                    assertEquals(clientId, response.getClientId());
-                    assertEquals(Arrays.asList("client.read", "client.write"), response.getScopes());
-                    assertEquals("test-token-salt", response.getTokenSalt());
-                }));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void delete() {
+    public void delete() throws TimeoutException, InterruptedException {
+
+        ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
+            .expectComplete();
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
 
@@ -251,45 +336,79 @@ public final class ClientsTest extends AbstractIntegrationTest {
                     .build()))
             .flatMap(ignore -> requestListClients(this.uaaClient))
             .filter(client -> clientId.equals(client.getClientId()))
-            .subscribe(this.testSubscriber()
-                .expectCount(0));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void get() {
+    public void get() throws TimeoutException, InterruptedException {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
+
+        Function<GetClientResponse, Optional<String>> assertion = response -> {
+            if (!Arrays.asList(PASSWORD, REFRESH_TOKEN).equals(response.getAuthorizedGrantTypes())) {
+                return Optional.of(String.format("expected authorized grant types: %s; actual authorized grant types: %s", Arrays.asList(PASSWORD, REFRESH_TOKEN), response.getAuthorizedGrantTypes()));
+            }
+
+            if (!clientId.equals(response.getClientId())) {
+                return Optional.of(String.format("expected client id: %s; actual client id: %s", clientId, response.getClientId()));
+            }
+
+            return Optional.empty();
+        };
+
+        ScriptedSubscriber<GetClientResponse> subscriber = ScriptedSubscriber.<GetClientResponse>create()
+            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
+                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching client")))
+            .expectComplete();
 
         requestCreateClient(this.uaaClient, clientId, clientSecret)
             .then(this.uaaClient.clients()
                 .get(GetClientRequest.builder()
                     .clientId(clientId)
                     .build()))
-            .subscribe(this.<GetClientResponse>testSubscriber()
-                .expectThat(response -> {
-                    assertEquals(Arrays.asList(PASSWORD, REFRESH_TOKEN), response.getAuthorizedGrantTypes());
-                    assertEquals(clientId, response.getClientId());
-                }));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void getMetadata() {
+    public void getMetadata() throws TimeoutException, InterruptedException {
+        Function<GetMetadataResponse, Optional<String>> assertion = metadata -> {
+            if (!"http://test.get.url".equals(metadata.getAppLaunchUrl())) {
+                return Optional.of(String.format("expected app launch url: %s; actual app launch url: %s", "http://test.get.url", metadata.getAppLaunchUrl()));
+            }
+
+            if (!this.clientId.equals(metadata.getClientId())) {
+                return Optional.of(String.format("expected client id: %s; actual client id: %s", this.clientId, metadata.getClientId()));
+            }
+
+            return Optional.empty();
+        };
+
+        ScriptedSubscriber<GetMetadataResponse> subscriber = ScriptedSubscriber.<GetMetadataResponse>create()
+            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
+                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching metadata")))
+            .expectComplete();
+
         requestUpdateMetadata(this.uaaClient, this.clientId, "http://test.get.url")
             .then(this.uaaClient.clients()
                 .getMetadata(GetMetadataRequest.builder()
                     .clientId(this.clientId)
                     .build()))
-            .subscribe(this.<GetMetadataResponse>testSubscriber()
-                .expectThat(metadata -> {
-                    assertEquals("http://test.get.url", metadata.getAppLaunchUrl());
-                    assertEquals(this.clientId, metadata.getClientId());
-                }));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void list() {
+    public void list() throws TimeoutException, InterruptedException {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
+
+        ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>expectValueCount(1)
+            .expectComplete();
 
         requestCreateClient(this.uaaClient, clientId, clientSecret)
             .then(this.uaaClient.clients()
@@ -297,12 +416,30 @@ public final class ClientsTest extends AbstractIntegrationTest {
                     .build()))
             .flatMapIterable(ListClientsResponse::getResources)
             .filter(client -> clientId.equals(client.getClientId()))
-            .subscribe(this.testSubscriber()
-                .expectCount(1));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listMetadatas() {
+    public void listMetadatas() throws TimeoutException, InterruptedException {
+        Function<Metadata, Optional<String>> assertion = metadata -> {
+            if (!"http://test.list.url".equals(metadata.getAppLaunchUrl())) {
+                return Optional.of(String.format("expected app launch url: %s; actual app launch url: %s", "http://test.list.url", metadata.getAppLaunchUrl()));
+            }
+
+            if (!this.clientId.equals(metadata.getClientId())) {
+                return Optional.of(String.format("expected client id: %s; actual client id: %s", this.clientId, metadata.getClientId()));
+            }
+
+            return Optional.empty();
+        };
+
+        ScriptedSubscriber<Metadata> subscriber = ScriptedSubscriber.<Metadata>create()
+            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
+                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching metadata")))
+            .expectComplete();
+
         requestUpdateMetadata(this.uaaClient, this.clientId, "http://test.list.url")
             .then(this.uaaClient.clients()
                 .listMetadatas(ListMetadatasRequest.builder()
@@ -310,11 +447,9 @@ public final class ClientsTest extends AbstractIntegrationTest {
             .flatMapIterable(ListMetadatasResponse::getMetadatas)
             .filter(metadata -> this.clientId.equals(metadata.getClientId()))
             .single()
-            .subscribe(this.<Metadata>testSubscriber()
-                .expectThat(metadata -> {
-                    assertEquals("http://test.list.url", metadata.getAppLaunchUrl());
-                    assertEquals(this.clientId, metadata.getClientId());
-                }));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/125572641")
@@ -324,9 +459,31 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
+    public void update() throws TimeoutException, InterruptedException {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
+
+        Function<Client, Optional<String>> assertion = response -> {
+            if (!Collections.singletonList(CLIENT_CREDENTIALS).equals(response.getAuthorizedGrantTypes())) {
+                return Optional.of(String.format("expected authorized grant types: %s; actual authorized grant types: %s", Collections.singletonList(CLIENT_CREDENTIALS), response
+                    .getAuthorizedGrantTypes()));
+            }
+
+            if (!clientId.equals(response.getClientId())) {
+                return Optional.of(String.format("expected client id: %s; actual client id: %s", clientId, response.getClientId()));
+            }
+
+            if (!"test-name".equals(response.getName())) {
+                return Optional.of(String.format("expected name: %s; actual name: %s", "test-name", response.getName()));
+            }
+
+            return Optional.empty();
+        };
+
+        ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
+            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
+                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching client")))
+            .expectComplete();
 
         requestCreateClient(this.uaaClient, clientId, clientSecret)
             .then(this.uaaClient.clients()
@@ -337,17 +494,43 @@ public final class ClientsTest extends AbstractIntegrationTest {
                     .build()))
             .flatMap(ignore -> requestListClients(this.uaaClient))
             .filter(client -> clientId.equals(client.getClientId()))
-            .subscribe(this.<Client>testSubscriber()
-                .expectThat(client -> {
-                    assertEquals(Collections.singletonList(CLIENT_CREDENTIALS), client.getAuthorizedGrantTypes());
-                    assertEquals(clientId, client.getClientId());
-                    assertEquals("test-name", client.getName());
-                }));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void updateMetadata() {
+    public void updateMetadata() throws TimeoutException, InterruptedException {
         String appIcon = Base64.getEncoder().encodeToString(new AsciiString("test-image").toByteArray());
+
+        Function<GetMetadataResponse, Optional<String>> assertion = metadata -> {
+            if (!appIcon.equals(metadata.getAppIcon())) {
+                return Optional.of(String.format("expected app icon: %s; actual app icon: %s", appIcon, metadata.getAppIcon()));
+            }
+
+            if (!"http://test.app.launch.url".equals(metadata.getAppLaunchUrl())) {
+                return Optional.of(String.format("expected app launch url: %s; actual app launch url: %s", "http://test.app.launch.url", metadata.getAppLaunchUrl()));
+            }
+
+            if (!this.clientId.equals(metadata.getClientId())) {
+                return Optional.of(String.format("expected client id: %s; actual client id: %s", this.clientId, metadata.getClientId()));
+            }
+
+            if (!"test-name".equals(metadata.getClientName())) {
+                return Optional.of(String.format("expected client name: %s; actual client name: %s", "test-name", metadata.getClientName()));
+            }
+
+            if (!metadata.getShowOnHomePage()) {
+                return Optional.of(String.format("expected show on homepage: %b; actual show on homepage: %b", true, metadata.getShowOnHomePage()));
+            }
+
+            return Optional.empty();
+        };
+
+        ScriptedSubscriber<GetMetadataResponse> subscriber = ScriptedSubscriber.<GetMetadataResponse>create()
+            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
+                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching metadata")))
+            .expectComplete();
 
         this.uaaClient.clients()
             .updateMetadata(UpdateMetadataRequest.builder()
@@ -358,14 +541,9 @@ public final class ClientsTest extends AbstractIntegrationTest {
                 .clientName("test-name")
                 .build())
             .then(requestGetMetadata(this.uaaClient, this.clientId))
-            .subscribe(this.<GetMetadataResponse>testSubscriber()
-                .expectThat(metadata -> {
-                    assertEquals(appIcon, metadata.getAppIcon());
-                    assertEquals("http://test.app.launch.url", metadata.getAppLaunchUrl());
-                    assertEquals(this.clientId, metadata.getClientId());
-                    assertEquals("test-name", metadata.getClientName());
-                    assertEquals(true, metadata.getShowOnHomePage());
-                }));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     private static Mono<BatchCreateClientsResponse> batchCreateClients(UaaClient uaaClient, String clientId1, String clientId2, String clientSecret) {

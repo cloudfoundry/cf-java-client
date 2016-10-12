@@ -664,11 +664,11 @@ public final class DefaultApplications implements Applications {
             return getSharedDomainIds(cloudFoundryClient)
                 .switchIfEmpty(getPrivateDomainIds(cloudFoundryClient, organizationId))
                 .next()
-                .otherwiseIfEmpty(ExceptionUtils.illegalState("Domain not found"));
+                .otherwiseIfEmpty(ExceptionUtils.illegalArgument("Domain not found"));
         } else {
             return getPrivateDomainId(cloudFoundryClient, domain, organizationId)
                 .otherwiseIfEmpty(getSharedDomainId(cloudFoundryClient, domain))
-                .otherwiseIfEmpty(ExceptionUtils.illegalState("Domain %s not found", domain));
+                .otherwiseIfEmpty(ExceptionUtils.illegalArgument("Domain %s not found", domain));
         }
     }
 

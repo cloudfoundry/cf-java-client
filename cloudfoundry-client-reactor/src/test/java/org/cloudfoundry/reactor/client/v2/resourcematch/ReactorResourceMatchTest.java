@@ -24,6 +24,7 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
 import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -35,7 +36,19 @@ public final class ReactorResourceMatchTest {
         private final ReactorResourceMatch resourceMatch = new ReactorResourceMatch(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<ListMatchingResourcesResponse> expectations() {
+            return ScriptedSubscriber.<ListMatchingResourcesResponse>create()
+                .expectValue(ListMatchingResourcesResponse.builder()
+                    .resource(Resource.builder()
+                        .hash("002d760bea1be268e27077412e11a320d0f164d3")
+                        .size(36)
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(PUT).path("/v2/resource_match")
@@ -49,17 +62,12 @@ public final class ReactorResourceMatchTest {
         }
 
         @Override
-        protected ListMatchingResourcesResponse getResponse() {
-            return ListMatchingResourcesResponse.builder()
-                .resource(Resource.builder()
-                    .hash("002d760bea1be268e27077412e11a320d0f164d3")
-                    .size(36)
-                    .build())
-                .build();
+        protected Mono<ListMatchingResourcesResponse> invoke(ListMatchingResourcesRequest request) {
+            return this.resourceMatch.list(request);
         }
 
         @Override
-        protected ListMatchingResourcesRequest getValidRequest() throws Exception {
+        protected ListMatchingResourcesRequest validRequest() {
             return ListMatchingResourcesRequest.builder()
                 .resource(Resource.builder()
                     .hash("002d760bea1be268e27077412e11a320d0f164d3")
@@ -70,11 +78,6 @@ public final class ReactorResourceMatchTest {
                     .size(1)
                     .build())
                 .build();
-        }
-
-        @Override
-        protected Mono<ListMatchingResourcesResponse> invoke(ListMatchingResourcesRequest request) {
-            return this.resourceMatch.list(request);
         }
     }
 

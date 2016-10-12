@@ -16,6 +16,10 @@
 
 package org.cloudfoundry;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
@@ -44,7 +48,6 @@ import org.cloudfoundry.uaa.users.Email;
 import org.cloudfoundry.uaa.users.Name;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.cloudfoundry.util.test.FailingDeserializationProblemHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -69,6 +72,7 @@ import static org.cloudfoundry.uaa.tokens.GrantType.AUTHORIZATION_CODE;
 import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
 import static org.cloudfoundry.uaa.tokens.GrantType.PASSWORD;
 import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
+import static org.junit.Assert.fail;
 
 @Configuration
 @EnableAutoConfiguration
@@ -360,6 +364,16 @@ public class IntegrationTestConfiguration {
     @Bean
     String username(NameFactory nameFactory) {
         return nameFactory.getUserName();
+    }
+
+    private static final class FailingDeserializationProblemHandler extends DeserializationProblemHandler {
+
+        @Override
+        public boolean handleUnknownProperty(DeserializationContext ctxt, JsonParser jp, JsonDeserializer<?> deserializer, Object beanOrClass, String propertyName) {
+            fail(String.format("Found unexpected property %s in payload for %s", propertyName, beanOrClass.getClass().getSimpleName()));
+            return false;
+        }
+
     }
 
 }

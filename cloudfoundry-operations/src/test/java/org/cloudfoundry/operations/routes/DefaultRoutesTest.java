@@ -54,10 +54,10 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -66,7 +66,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.function.Supplier;
 
-import static org.cloudfoundry.util.test.TestObjects.fill;
+import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
 public final class DefaultRoutesTest {
@@ -524,9 +524,10 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Boolean> testSubscriber) {
-            testSubscriber
-                .expectEquals(false);
+        protected ScriptedSubscriber<Boolean> expectations() {
+            return ScriptedSubscriber.<Boolean>create()
+                .expectValue(false)
+                .expectComplete();
         }
 
         @Override
@@ -551,31 +552,10 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Boolean> testSubscriber) {
-            testSubscriber
-                .expectEquals(false);
-        }
-
-        @Override
-        protected Mono<Boolean> invoke() {
-            return this.routes
-                .check(CheckRouteRequest.builder()
-                    .domain("test-domain")
-                    .host("test-host")
-                    .path("test-path")
-                    .build());
-        }
-
-    }
-
-    public static final class CheckRouteNoOrganization extends AbstractOperationsApiTest<Boolean> {
-
-        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, MISSING_SPACE_ID);
-
-        @Override
-        protected void assertions(TestSubscriber<Boolean> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
+        protected ScriptedSubscriber<Boolean> expectations() {
+            return ScriptedSubscriber.<Boolean>create()
+                .expectValue(false)
+                .expectComplete();
         }
 
         @Override
@@ -601,9 +581,10 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Boolean> testSubscriber) {
-            testSubscriber
-                .expectEquals(true);
+        protected ScriptedSubscriber<Boolean> expectations() {
+            return ScriptedSubscriber.<Boolean>create()
+                .expectValue(true)
+                .expectComplete();
         }
 
         @Override
@@ -630,9 +611,10 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Boolean> testSubscriber) {
-            testSubscriber
-                .expectEquals(true);
+        protected ScriptedSubscriber<Boolean> expectations() {
+            return ScriptedSubscriber.<Boolean>create()
+                .expectValue(true)
+                .expectComplete();
         }
 
         @Override
@@ -659,9 +641,8 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalArgumentException.class, "Domain test-domain does not exist");
+        protected ScriptedSubscriber<Void> expectations() {
+            return errorExpectation(IllegalArgumentException.class, "Domain test-domain does not exist");
         }
 
         @Override
@@ -687,32 +668,8 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalArgumentException.class, "Space test-space-name does not exist");
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.routes
-                .create(CreateRouteRequest.builder()
-                    .domain("test-domain")
-                    .host("test-host")
-                    .path("test-path")
-                    .space(TEST_SPACE_NAME)
-                    .build());
-        }
-
-    }
-
-    public static final class CreateRouteNoOrganization extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, MISSING_SPACE_ID);
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
+        protected ScriptedSubscriber<Void> expectations() {
+            return errorExpectation(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
 
         @Override
@@ -740,8 +697,9 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -770,9 +728,8 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
+        protected ScriptedSubscriber<Void> expectations() {
+            return errorExpectation(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
         }
 
         @Override
@@ -798,9 +755,8 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalArgumentException.class, "Domain test-domain does not exist");
+        protected ScriptedSubscriber<Void> expectations() {
+            return errorExpectation(IllegalArgumentException.class, "Domain test-domain does not exist");
         }
 
         @Override
@@ -826,31 +782,8 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalArgumentException.class, "Route test-host.test-domain does not exist");
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.routes
-                .delete(DeleteRouteRequest.builder()
-                    .domain("test-domain")
-                    .host("test-host")
-                    .path("test-path")
-                    .build());
-        }
-
-    }
-
-    public static final class DeleteNoOrganization extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, Mono.just(TEST_SPACE_ID));
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
+        protected ScriptedSubscriber<Void> expectations() {
+            return errorExpectation(IllegalArgumentException.class, "Route test-host.test-domain does not exist");
         }
 
         @Override
@@ -877,8 +810,9 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -902,8 +836,9 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -927,9 +862,8 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
+        protected ScriptedSubscriber<Void> expectations() {
+            return errorExpectation(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
         }
 
         @Override
@@ -950,8 +884,9 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -974,10 +909,10 @@ public final class DefaultRoutesTest {
             requestJobSuccess(this.cloudFoundryClient, "test-id");
         }
 
-
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -1006,8 +941,9 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -1020,44 +956,6 @@ public final class DefaultRoutesTest {
                     .build());
         }
 
-    }
-
-    public static final class ListCurrentOrganizationNoOrganization extends AbstractOperationsApiTest<Route> {
-
-        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, Mono.just(TEST_SPACE_ID));
-
-        @Override
-        protected void assertions(TestSubscriber<Route> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
-        }
-
-        @Override
-        protected Publisher<Route> invoke() {
-            return this.routes
-                .list(ListRoutesRequest.builder()
-                    .level(Level.ORGANIZATION)
-                    .build());
-        }
-    }
-
-    public static final class ListCurrentOrganizationNoOrganizationNoSpace extends AbstractOperationsApiTest<Route> {
-
-        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, MISSING_SPACE_ID);
-
-        @Override
-        protected void assertions(TestSubscriber<Route> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
-        }
-
-        @Override
-        protected Publisher<Route> invoke() {
-            return this.routes
-                .list(ListRoutesRequest.builder()
-                    .level(Level.ORGANIZATION)
-                    .build());
-        }
     }
 
     public static final class ListCurrentOrganizationNoSpace extends AbstractOperationsApiTest<Route> {
@@ -1074,16 +972,17 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Route> testSubscriber) {
-            testSubscriber
-                .expectEquals(fill(Route.builder())
+        protected ScriptedSubscriber<Route> expectations() {
+            return ScriptedSubscriber.<Route>create()
+                .expectValue(fill(Route.builder())
                     .application("test-application-name")
                     .domain("test-shared-domain-name")
                     .host("test-route-entity-host")
                     .id("test-id")
                     .path("test-route-entity-path")
                     .space("test-space-entity-name")
-                    .build());
+                    .build())
+                .expectComplete();
         }
 
         @Override
@@ -1109,8 +1008,9 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Route> testSubscriber) {
-            // onComplete and not onNext
+        protected ScriptedSubscriber<Route> expectations() {
+            return ScriptedSubscriber.<Route>create()
+                .expectComplete();
         }
 
         @Override
@@ -1136,61 +1036,17 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Route> testSubscriber) {
-            testSubscriber
-                .expectEquals(fill(Route.builder())
+        protected ScriptedSubscriber<Route> expectations() {
+            return ScriptedSubscriber.<Route>create()
+                .expectValue(fill(Route.builder())
                     .application("test-application-name")
                     .domain("test-shared-domain-name")
                     .host("test-route-entity-host")
                     .id("test-route-id")
                     .path("test-route-entity-path")
                     .space("test-space-entity-name")
-                    .build());
-        }
-
-        @Override
-        protected Publisher<Route> invoke() {
-            return this.routes
-                .list(ListRoutesRequest.builder()
-                    .level(Level.SPACE)
-                    .build());
-        }
-    }
-
-    public static final class ListCurrentSpaceNoOrganizationNoSpace extends AbstractOperationsApiTest<Route> {
-
-        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, MISSING_SPACE_ID);
-
-        @Override
-        protected void assertions(TestSubscriber<Route> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
-        }
-
-        @Override
-        protected Publisher<Route> invoke() {
-            return this.routes
-                .list(ListRoutesRequest.builder()
-                    .level(Level.SPACE)
-                    .build());
-        }
-    }
-
-    public static final class ListCurrentSpaceNoSpace extends AbstractOperationsApiTest<Route> {
-
-        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
-
-        @Before
-        public void setUp() throws Exception {
-            requestPrivateDomainsAll(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
-            requestSharedDomainsAll(this.cloudFoundryClient);
-            requestSpacesAll(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
-        }
-
-        @Override
-        protected void assertions(TestSubscriber<Route> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalStateException.class, "MISSING_SPACE_ID");
+                    .build())
+                .expectComplete();
         }
 
         @Override
@@ -1215,8 +1071,9 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -1245,9 +1102,8 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalArgumentException.class, "Application test-application-name does not exist");
+        protected ScriptedSubscriber<Void> expectations() {
+            return errorExpectation(IllegalArgumentException.class, "Application test-application-name does not exist");
         }
 
         @Override
@@ -1274,9 +1130,8 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalArgumentException.class, "Domain test-domain does not exist");
+        protected ScriptedSubscriber<Void> expectations() {
+            return errorExpectation(IllegalArgumentException.class, "Domain test-domain does not exist");
         }
 
         @Override
@@ -1305,8 +1160,9 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -1315,55 +1171,6 @@ public final class DefaultRoutesTest {
                 .map(MapRouteRequest.builder()
                     .applicationName("test-application-name")
                     .domain("test-domain")
-                    .path("test-path")
-                    .build());
-        }
-    }
-
-    public static final class MapRouteNoOrganization extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.routes
-                .map(MapRouteRequest.builder()
-                    .applicationName("test-application-name")
-                    .domain("test-domain")
-                    .host("test-host")
-                    .path("test-path")
-                    .build());
-        }
-    }
-
-    public static final class MapRouteNoSpace extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalStateException.class, "MISSING_SPACE_ID");
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.routes
-                .map(MapRouteRequest.builder()
-                    .applicationName("test-application-name")
-                    .domain("test-domain")
-                    .host("test-host")
                     .path("test-path")
                     .build());
         }
@@ -1382,8 +1189,9 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -1413,8 +1221,9 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -1444,8 +1253,9 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -1471,9 +1281,8 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalArgumentException.class, "Application test-application-name does not exist");
+        protected ScriptedSubscriber<Void> expectations() {
+            return errorExpectation(IllegalArgumentException.class, "Application test-application-name does not exist");
         }
 
         @Override
@@ -1499,9 +1308,8 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalArgumentException.class, "Domain test-domain does not exist");
+        protected ScriptedSubscriber<Void> expectations() {
+            return errorExpectation(IllegalArgumentException.class, "Domain test-domain does not exist");
         }
 
         @Override
@@ -1527,9 +1335,8 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalArgumentException.class, "Route test-host.test-domain does not exist");
+        protected ScriptedSubscriber<Void> expectations() {
+            return errorExpectation(IllegalArgumentException.class, "Route test-host.test-domain does not exist");
         }
 
         @Override
@@ -1540,48 +1347,6 @@ public final class DefaultRoutesTest {
                     .domain("test-domain")
                     .host("test-host")
                     .path("test-path")
-                    .build());
-        }
-    }
-
-    public static final class UnmapRouteNoOrganization extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, Mono.just(TEST_SPACE_ID));
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.routes
-                .unmap(UnmapRouteRequest.builder()
-                    .applicationName("test-application-name")
-                    .domain("test-domain")
-                    .host("test-host")
-                    .build());
-        }
-    }
-
-    public static final class UnmapRouteNoSpace extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_SPACE_ID);
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalStateException.class, "MISSING_SPACE_ID");
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.routes
-                .unmap(UnmapRouteRequest.builder()
-                    .applicationName("test-application-name")
-                    .domain("test-domain")
-                    .host("test-host")
                     .build());
         }
     }
@@ -1599,8 +1364,9 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -1630,8 +1396,9 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override

@@ -31,6 +31,7 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -46,7 +47,26 @@ public final class ReactorServiceKeysTest {
         private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<CreateServiceKeyResponse> expectations() {
+            return ScriptedSubscriber.<CreateServiceKeyResponse>create()
+                .expectValue(CreateServiceKeyResponse.builder()
+                    .metadata(Metadata.builder()
+                        .createdAt("2015-07-27T22:43:22Z")
+                        .id("79aa4b11-99f3-484b-adfc-a63fa818c4d1")
+                        .url("/v2/service_keys/79aa4b11-99f3-484b-adfc-a63fa818c4d1")
+                        .build())
+                    .entity(ServiceKeyEntity.builder()
+                        .credential("creds-key-392", "creds-val-392")
+                        .name("name-960")
+                        .serviceInstanceId("132944c8-c31d-4bb8-9155-ae4e2ebe1a0c")
+                        .serviceInstanceUrl("/v2/service_instances/132944c8-c31d-4bb8-9155-ae4e2ebe1a0c")
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(POST).path("/v2/service_keys")
@@ -60,33 +80,16 @@ public final class ReactorServiceKeysTest {
         }
 
         @Override
-        protected CreateServiceKeyResponse getResponse() {
-            return CreateServiceKeyResponse.builder()
-                .metadata(Metadata.builder()
-                    .createdAt("2015-07-27T22:43:22Z")
-                    .id("79aa4b11-99f3-484b-adfc-a63fa818c4d1")
-                    .url("/v2/service_keys/79aa4b11-99f3-484b-adfc-a63fa818c4d1")
-                    .build())
-                .entity(ServiceKeyEntity.builder()
-                    .credential("creds-key-392", "creds-val-392")
-                    .name("name-960")
-                    .serviceInstanceId("132944c8-c31d-4bb8-9155-ae4e2ebe1a0c")
-                    .serviceInstanceUrl("/v2/service_instances/132944c8-c31d-4bb8-9155-ae4e2ebe1a0c")
-                    .build())
-                .build();
+        protected Mono<CreateServiceKeyResponse> invoke(CreateServiceKeyRequest request) {
+            return this.serviceKeys.create(request);
         }
 
         @Override
-        protected CreateServiceKeyRequest getValidRequest() throws Exception {
+        protected CreateServiceKeyRequest validRequest() {
             return CreateServiceKeyRequest.builder()
                 .name("name-960")
                 .serviceInstanceId("132944c8-c31d-4bb8-9155-ae4e2ebe1a0c")
                 .build();
-        }
-
-        @Override
-        protected Mono<CreateServiceKeyResponse> invoke(CreateServiceKeyRequest request) {
-            return this.serviceKeys.create(request);
         }
     }
 
@@ -95,7 +98,13 @@ public final class ReactorServiceKeysTest {
         private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(DELETE).path("/v2/service_keys/test-service-key-id")
@@ -107,20 +116,15 @@ public final class ReactorServiceKeysTest {
         }
 
         @Override
-        protected Void getResponse() {
-            return null;
+        protected Mono<Void> invoke(DeleteServiceKeyRequest request) {
+            return this.serviceKeys.delete(request);
         }
 
         @Override
-        protected DeleteServiceKeyRequest getValidRequest() throws Exception {
+        protected DeleteServiceKeyRequest validRequest() {
             return DeleteServiceKeyRequest.builder()
                 .serviceKeyId("test-service-key-id")
                 .build();
-        }
-
-        @Override
-        protected Mono<Void> invoke(DeleteServiceKeyRequest request) {
-            return this.serviceKeys.delete(request);
         }
     }
 
@@ -129,7 +133,26 @@ public final class ReactorServiceKeysTest {
         private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<GetServiceKeyResponse> expectations() {
+            return ScriptedSubscriber.<GetServiceKeyResponse>create()
+                .expectValue(GetServiceKeyResponse.builder()
+                    .metadata(Metadata.builder()
+                        .createdAt("2015-07-27T22:43:22Z")
+                        .id("7f1f30d3-bed3-4ba7-bf88-fd3a678ff4f5")
+                        .url("/v2/service_keys/7f1f30d3-bed3-4ba7-bf88-fd3a678ff4f5")
+                        .build())
+                    .entity(ServiceKeyEntity.builder()
+                        .credential("creds-key-388", "creds-val-388")
+                        .name("name-947")
+                        .serviceInstanceId("011457da-c205-4415-a578-de5df82b15a8")
+                        .serviceInstanceUrl("/v2/service_instances/011457da-c205-4415-a578-de5df82b15a8")
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/v2/service_keys/test-service-key-id")
@@ -142,32 +165,15 @@ public final class ReactorServiceKeysTest {
         }
 
         @Override
-        protected GetServiceKeyResponse getResponse() {
-            return GetServiceKeyResponse.builder()
-                .metadata(Metadata.builder()
-                    .createdAt("2015-07-27T22:43:22Z")
-                    .id("7f1f30d3-bed3-4ba7-bf88-fd3a678ff4f5")
-                    .url("/v2/service_keys/7f1f30d3-bed3-4ba7-bf88-fd3a678ff4f5")
-                    .build())
-                .entity(ServiceKeyEntity.builder()
-                    .credential("creds-key-388", "creds-val-388")
-                    .name("name-947")
-                    .serviceInstanceId("011457da-c205-4415-a578-de5df82b15a8")
-                    .serviceInstanceUrl("/v2/service_instances/011457da-c205-4415-a578-de5df82b15a8")
-                    .build())
-                .build();
+        protected Mono<GetServiceKeyResponse> invoke(GetServiceKeyRequest request) {
+            return this.serviceKeys.get(request);
         }
 
         @Override
-        protected GetServiceKeyRequest getValidRequest() throws Exception {
+        protected GetServiceKeyRequest validRequest() {
             return GetServiceKeyRequest.builder()
                 .serviceKeyId("test-service-key-id")
                 .build();
-        }
-
-        @Override
-        protected Mono<GetServiceKeyResponse> invoke(GetServiceKeyRequest request) {
-            return this.serviceKeys.get(request);
         }
     }
 
@@ -176,7 +182,30 @@ public final class ReactorServiceKeysTest {
         private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<ListServiceKeysResponse> expectations() {
+            return ScriptedSubscriber.<ListServiceKeysResponse>create()
+                .expectValue(ListServiceKeysResponse.builder()
+                    .totalResults(1)
+                    .totalPages(1)
+                    .resource(ServiceKeyResource.builder()
+                        .metadata(Metadata.builder()
+                            .createdAt("2015-07-27T22:43:22Z")
+                            .id("3936801c-9d3f-4b9f-8465-aa3bd263612e")
+                            .url("/v2/service_keys/3936801c-9d3f-4b9f-8465-aa3bd263612e")
+                            .build())
+                        .entity(ServiceKeyEntity.builder()
+                            .credential("creds-key-383", "creds-val-383")
+                            .name("name-934")
+                            .serviceInstanceId("84d384d9-42c2-4e4b-a8c6-865e9446e024")
+                            .serviceInstanceUrl("/v2/service_instances/84d384d9-42c2-4e4b-a8c6-865e9446e024")
+                            .build())
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/v2/service_keys?q=name%20IN%20test-name&page=-1")
@@ -189,37 +218,16 @@ public final class ReactorServiceKeysTest {
         }
 
         @Override
-        protected ListServiceKeysResponse getResponse() {
-            return ListServiceKeysResponse.builder()
-                .totalResults(1)
-                .totalPages(1)
-                .resource(ServiceKeyResource.builder()
-                    .metadata(Metadata.builder()
-                        .createdAt("2015-07-27T22:43:22Z")
-                        .id("3936801c-9d3f-4b9f-8465-aa3bd263612e")
-                        .url("/v2/service_keys/3936801c-9d3f-4b9f-8465-aa3bd263612e")
-                        .build())
-                    .entity(ServiceKeyEntity.builder()
-                        .credential("creds-key-383", "creds-val-383")
-                        .name("name-934")
-                        .serviceInstanceId("84d384d9-42c2-4e4b-a8c6-865e9446e024")
-                        .serviceInstanceUrl("/v2/service_instances/84d384d9-42c2-4e4b-a8c6-865e9446e024")
-                        .build())
-                    .build())
-                .build();
+        protected Mono<ListServiceKeysResponse> invoke(ListServiceKeysRequest request) {
+            return this.serviceKeys.list(request);
         }
 
         @Override
-        protected ListServiceKeysRequest getValidRequest() throws Exception {
+        protected ListServiceKeysRequest validRequest() {
             return ListServiceKeysRequest.builder()
                 .name("test-name")
                 .page(-1)
                 .build();
-        }
-
-        @Override
-        protected Mono<ListServiceKeysResponse> invoke(ListServiceKeysRequest request) {
-            return this.serviceKeys.list(request);
         }
     }
 

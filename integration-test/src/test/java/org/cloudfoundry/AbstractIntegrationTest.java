@@ -16,7 +16,6 @@
 
 package org.cloudfoundry;
 
-import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -27,7 +26,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 import reactor.util.function.Tuple2;
 
 import java.io.ByteArrayOutputStream;
@@ -35,9 +36,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.Duration;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.regex.Pattern;
 
-import static org.junit.Assert.assertEquals;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(IntegrationTestConfiguration.class)
@@ -48,9 +52,6 @@ public abstract class AbstractIntegrationTest {
     @Rule
     public final TestName testName = new TestName();
 
-    private final TestSubscriber<?> testSubscriber = new TestSubscriber<>()
-        .setPerformanceLoggerName(this::getTestName);
-
     @Autowired
     protected NameFactory nameFactory;
 
@@ -60,9 +61,51 @@ public abstract class AbstractIntegrationTest {
     }
 
     @After
-    public final void verify() throws InterruptedException {
-        this.testSubscriber.verify(Duration.ofMinutes(5));
+    public final void testExit() throws InterruptedException {
         this.logger.debug("<< {} >>", getTestName());
+    }
+
+    protected static <T> ScriptedSubscriber<T> errorExpectation(Class<? extends Throwable> type, String format, Object... args) {
+        Assert.notNull(type, "type must not be null");
+        Assert.notNull(format, "format must not be null");
+
+        Function<Throwable, Optional<String>> assertion = t -> {
+            if (!type.isInstance(t)) {
+                return Optional.of(String.format("expected error of type: %s; actual type: %s", type.getSimpleName(), t.getClass().getSimpleName()));
+            }
+
+            String expected = String.format(format, args);
+            if (!expected.equals(t.getMessage())) {
+                return Optional.of(String.format("expected message: %s; actual message: %s", expected, t.getMessage()));
+            }
+
+            return Optional.empty();
+        };
+
+        return ScriptedSubscriber.<T>create()
+            .expectErrorWith(t -> !assertion.apply(t).isPresent(),
+                t -> assertion.apply(t).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching error")));
+    }
+
+    protected static <T> ScriptedSubscriber<T> errorExpectation(Class<? extends Throwable> type, String pattern) {
+        Assert.notNull(type, "type must not be null");
+        Assert.notNull(pattern, "pattern must not be null");
+
+        Function<Throwable, Optional<String>> assertion = t -> {
+            if (!type.isInstance(t)) {
+                return Optional.of(String.format("expected error of type: %s; actual type: %s", type.getSimpleName(), t.getClass().getSimpleName()));
+            }
+
+            if (!Pattern.compile(pattern).matcher(t.getMessage()).matches()) {
+                return Optional.of(String.format("expected message pattern: %s; actual message: %s", pattern, t.getMessage()));
+            }
+
+            return Optional.empty();
+        };
+
+        return ScriptedSubscriber.<T>create()
+            .expectErrorWith(t -> !assertion.apply(t).isPresent(),
+                t -> assertion.apply(t).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching error")));
     }
 
     protected static Mono<byte[]> getBytes(String path) {
@@ -80,16 +123,27 @@ public abstract class AbstractIntegrationTest {
         }
     }
 
-    protected final <T> void assertTupleEquality(Tuple2<T, T> tuple) {
-        T expected = tuple.getT1();
-        T actual = tuple.getT2();
+    protected static <T> ScriptedSubscriber<Tuple2<T, T>> tupleEquality() {
+        Function<Tuple2<T, T>, Optional<String>> assertion = function((expected, actual) -> {
 
-        assertEquals("tuple components not equal", expected, actual);
-    }
+            boolean matches;
+            if (expected.getClass().isArray()) {
+                if (expected.getClass().getComponentType().equals(byte.class)) {
+                    matches = Arrays.equals((byte[]) expected, (byte[]) actual);
+                } else {
+                    matches = Arrays.equals((Object[]) expected, (Object[]) actual);
+                }
+            } else {
+                matches = expected.equals(actual);
+            }
 
-    @SuppressWarnings("unchecked")
-    protected final <T> TestSubscriber<T> testSubscriber() {
-        return (TestSubscriber<T>) this.testSubscriber;
+            return matches ? Optional.empty() : Optional.of(String.format("expected value: %s; actual value: %s", expected, actual));
+        });
+
+        return ScriptedSubscriber.<Tuple2<T, T>>create()
+            .expectValueWith(tuple -> !assertion.apply(tuple).isPresent(),
+                tuple -> assertion.apply(tuple).orElseThrow(() -> new IllegalStateException("Cannot generate assertion message for matching result")))
+            .expectComplete();
     }
 
     private String getTestName() {

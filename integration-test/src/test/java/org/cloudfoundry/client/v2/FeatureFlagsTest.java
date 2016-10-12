@@ -29,18 +29,22 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static reactor.core.publisher.Flux.fromIterable;
 
 public final class FeatureFlagsTest extends AbstractIntegrationTest {
 
@@ -60,7 +64,22 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
     private CloudFoundryClient cloudFoundryClient;
 
     @Test
-    public void getEach() {
+    public void getEach() throws TimeoutException, InterruptedException {
+        Function<List<Tuple2<String, GetFeatureFlagResponse>>, Optional<String>> assertion = list -> {
+            for (Tuple2<String, GetFeatureFlagResponse> tuple : list) {
+                if (!tuple.getT1().equals(tuple.getT2().getName())) {
+                    return Optional.of(String.format("expected name: %s; actual name: %s", tuple.getT1(), tuple.getT2().getName()));
+                }
+            }
+
+            return Optional.empty();
+        };
+
+        ScriptedSubscriber<List<Tuple2<String, GetFeatureFlagResponse>>> subscriber = ScriptedSubscriber.<List<Tuple2<String, GetFeatureFlagResponse>>>create()
+            .expectValueWith(list -> !assertion.apply(list).isPresent(),
+                list -> assertion.apply(list).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching list")))
+            .expectComplete();
+
         Flux
             .fromIterable(coreFeatureFlagNameList)
             .flatMap(flagName -> this.cloudFoundryClient.featureFlags()
@@ -69,37 +88,63 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
                     .build())
                 .map(response -> Tuples.of(flagName, response)))
             .collectList()
-            .subscribe(this.<List<Tuple2<String, GetFeatureFlagResponse>>>testSubscriber()
-                .expectThat(getFlagList -> {
-                    for (Tuple2<String, GetFeatureFlagResponse> tuple : getFlagList) {
-                        String flagName = tuple.getT1();
-                        GetFeatureFlagResponse getResponse = tuple.getT2();
+            .subscribe(subscriber);
 
-                        assertEquals("feature flag entity has incorrect name", flagName, getResponse.getName());
-                    }
-                }));
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void list() {
+    public void list() throws TimeoutException, InterruptedException {
+        Function<ListFeatureFlagsResponse, Optional<String>> assertion = response -> {
+            Set<String> returnedFlagSet = flagNameSetFrom(response.getFeatureFlags());
+
+            if (!returnedFlagSet.containsAll(coreFeatureFlagNameList)) {
+                return Optional.of(String.format("expected flags: %s; actual flags: %s", coreFeatureFlagNameList, returnedFlagSet));
+            }
+
+            return Optional.empty();
+        };
+
+        ScriptedSubscriber<ListFeatureFlagsResponse> subscriber = ScriptedSubscriber.<ListFeatureFlagsResponse>create()
+            .expectValueWith(list -> !assertion.apply(list).isPresent(),
+                list -> assertion.apply(list).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching response")))
+            .expectComplete();
 
         this.cloudFoundryClient.featureFlags()
             .list(ListFeatureFlagsRequest.builder()
                 .build())
-            .subscribe(this.<ListFeatureFlagsResponse>testSubscriber()
-                .expectThat(response -> {
-                    Set<String> returnedFlagSet = flagNameSetFrom(response.getFeatureFlags());
+            .subscribe(subscriber);
 
-                    assertTrue(String.format("feature flags listed (%s) does not include core set (%s)", returnedFlagSet, coreFeatureFlagNameList),
-                        returnedFlagSet.containsAll(coreFeatureFlagNameList));
-                }));
-
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void setAndResetEach() {
-        Flux
-            .fromIterable(coreFeatureFlagNameList)
+    public void setAndResetEach() throws TimeoutException, InterruptedException {
+        Function<List<Tuple3<GetFeatureFlagResponse, SetFeatureFlagResponse, SetFeatureFlagResponse>>, Optional<String>> assertion = list -> {
+            for (Tuple3<GetFeatureFlagResponse, SetFeatureFlagResponse, SetFeatureFlagResponse> responses : list) {
+                GetFeatureFlagResponse getResponse = responses.getT1();
+                SetFeatureFlagResponse setResponse = responses.getT2();
+                SetFeatureFlagResponse resetResponse = responses.getT3();
+
+                if (!getResponse.getEnabled().equals(!setResponse.getEnabled())) {
+                    return Optional.of(String.format("expected initial state: %s; actual initial state: %s", getResponse.getEnabled(), setResponse.getEnabled()));
+                }
+
+                if (!getResponse.getEnabled().equals(resetResponse.getEnabled())) {
+                    return Optional.of(String.format("expected state: %s; actual state: $s", resetResponse.getEnabled(), getResponse.getEnabled()));
+                }
+            }
+
+            return Optional.empty();
+        };
+
+        ScriptedSubscriber<List<Tuple3<GetFeatureFlagResponse, SetFeatureFlagResponse, SetFeatureFlagResponse>>> subscriber =
+            ScriptedSubscriber.<List<Tuple3<GetFeatureFlagResponse, SetFeatureFlagResponse, SetFeatureFlagResponse>>>create()
+                .expectValueWith(list -> !assertion.apply(list).isPresent(),
+                    list -> assertion.apply(list).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching list")))
+                .expectComplete();
+
+        fromIterable(coreFeatureFlagNameList)
             .flatMap(flagName -> this.cloudFoundryClient.featureFlags()
                 .get(GetFeatureFlagRequest.builder()
                     .name(flagName)
@@ -123,22 +168,9 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
                                 .build())
                     ))))
             .collectList()
-            .subscribe(this.<List<Tuple3<GetFeatureFlagResponse, SetFeatureFlagResponse, SetFeatureFlagResponse>>>testSubscriber()
-                .expectThat(responsesList -> {
-                    for (Tuple3<GetFeatureFlagResponse, SetFeatureFlagResponse, SetFeatureFlagResponse> responses : responsesList) {
-                        GetFeatureFlagResponse getResponse = responses.getT1();
-                        SetFeatureFlagResponse setResponse = responses.getT2();
-                        SetFeatureFlagResponse resetResponse = responses.getT3();
+            .subscribe(subscriber);
 
-                        String flagName = getResponse.getName();
-                        assertTrue(String.format("feature flag %s was %s initially and was set to %s instead of %s during test", flagName, getResponse.getEnabled(), setResponse.getEnabled(),
-                            !getResponse.getEnabled()),
-                            getResponse.getEnabled().equals(!setResponse.getEnabled()));
-                        assertTrue(String.format("feature flag %s was %s but was reset to %s after testing instead of %s", flagName, getResponse.getEnabled(), resetResponse.getEnabled(), getResponse
-                                .getEnabled()),
-                            getResponse.getEnabled().equals(resetResponse.getEnabled()));
-                    }
-                }));
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     private static Set<String> flagNameSetFrom(List<FeatureFlagEntity> listFlags) {

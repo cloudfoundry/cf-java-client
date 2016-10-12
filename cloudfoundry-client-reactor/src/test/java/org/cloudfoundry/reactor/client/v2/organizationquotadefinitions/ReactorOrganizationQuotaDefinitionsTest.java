@@ -35,6 +35,7 @@ import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -50,8 +51,35 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
 
         private final ReactorOrganizationQuotaDefinitions quotaDefinitions = new ReactorOrganizationQuotaDefinitions(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
+        @SuppressWarnings("deprecation")
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<CreateOrganizationQuotaDefinitionResponse> expectations() {
+            return ScriptedSubscriber.<CreateOrganizationQuotaDefinitionResponse>create()
+                .expectValue(CreateOrganizationQuotaDefinitionResponse.builder()
+                    .metadata(Metadata.builder()
+                        .id("27a0466e-53c0-439a-ab9f-3e56854302f9")
+                        .url("/v2/quota_definitions/27a0466e-53c0-439a-ab9f-3e56854302f9")
+                        .createdAt("2016-04-06T00:17:26Z")
+                        .build())
+                    .entity(OrganizationQuotaDefinitionEntity.builder()
+                        .name("gold_quota")
+                        .nonBasicServicesAllowed(true)
+                        .totalServices(-1)
+                        .totalRoutes(-1)
+                        .totalPrivateDomains(-1)
+                        .memoryLimit(5120)
+                        .trialDatabaseAllowed(false)
+                        .instanceMemoryLimit(10240)
+                        .applicationInstanceLimit(10)
+                        .applicationTaskLimit(5)
+                        .totalServiceKeys(-1)
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(POST).path("/v2/quota_definitions")
@@ -64,33 +92,13 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
                 .build();
         }
 
-        @SuppressWarnings("deprecation")
         @Override
-        protected CreateOrganizationQuotaDefinitionResponse getResponse() {
-            return CreateOrganizationQuotaDefinitionResponse.builder()
-                .metadata(Metadata.builder()
-                    .id("27a0466e-53c0-439a-ab9f-3e56854302f9")
-                    .url("/v2/quota_definitions/27a0466e-53c0-439a-ab9f-3e56854302f9")
-                    .createdAt("2016-04-06T00:17:26Z")
-                    .build())
-                .entity(OrganizationQuotaDefinitionEntity.builder()
-                    .name("gold_quota")
-                    .nonBasicServicesAllowed(true)
-                    .totalServices(-1)
-                    .totalRoutes(-1)
-                    .totalPrivateDomains(-1)
-                    .memoryLimit(5120)
-                    .trialDatabaseAllowed(false)
-                    .instanceMemoryLimit(10240)
-                    .applicationInstanceLimit(10)
-                    .applicationTaskLimit(5)
-                    .totalServiceKeys(-1)
-                    .build())
-                .build();
+        protected Mono<CreateOrganizationQuotaDefinitionResponse> invoke(CreateOrganizationQuotaDefinitionRequest request) {
+            return this.quotaDefinitions.create(request);
         }
 
         @Override
-        protected CreateOrganizationQuotaDefinitionRequest getValidRequest() throws Exception {
+        protected CreateOrganizationQuotaDefinitionRequest validRequest() {
             return CreateOrganizationQuotaDefinitionRequest.builder()
                 .name("gold_quota")
                 .nonBasicServicesAllowed(true)
@@ -103,11 +111,6 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
                 .build();
         }
 
-        @Override
-        protected Mono<CreateOrganizationQuotaDefinitionResponse> invoke(CreateOrganizationQuotaDefinitionRequest request) {
-            return this.quotaDefinitions.create(request);
-        }
-
     }
 
     public static final class DeleteQuotaDefinition extends AbstractClientApiTest<DeleteOrganizationQuotaDefinitionRequest, DeleteOrganizationQuotaDefinitionResponse> {
@@ -115,7 +118,13 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
         private final ReactorOrganizationQuotaDefinitions quotaDefinitions = new ReactorOrganizationQuotaDefinitions(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<DeleteOrganizationQuotaDefinitionResponse> expectations() {
+            return ScriptedSubscriber.<DeleteOrganizationQuotaDefinitionResponse>create()
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(DELETE).path("/v2/quota_definitions/test-quota-definition-id")
@@ -127,20 +136,15 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
         }
 
         @Override
-        protected DeleteOrganizationQuotaDefinitionResponse getResponse() {
-            return null;
+        protected Mono<DeleteOrganizationQuotaDefinitionResponse> invoke(DeleteOrganizationQuotaDefinitionRequest request) {
+            return this.quotaDefinitions.delete(request);
         }
 
         @Override
-        protected DeleteOrganizationQuotaDefinitionRequest getValidRequest() throws Exception {
+        protected DeleteOrganizationQuotaDefinitionRequest validRequest() {
             return DeleteOrganizationQuotaDefinitionRequest.builder()
                 .organizationQuotaDefinitionId("test-quota-definition-id")
                 .build();
-        }
-
-        @Override
-        protected Mono<DeleteOrganizationQuotaDefinitionResponse> invoke(DeleteOrganizationQuotaDefinitionRequest request) {
-            return this.quotaDefinitions.delete(request);
         }
 
     }
@@ -149,8 +153,35 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
 
         private final ReactorOrganizationQuotaDefinitions quotaDefinitions = new ReactorOrganizationQuotaDefinitions(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
+        @SuppressWarnings("deprecation")
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<GetOrganizationQuotaDefinitionResponse> expectations() {
+            return ScriptedSubscriber.<GetOrganizationQuotaDefinitionResponse>create()
+                .expectValue(GetOrganizationQuotaDefinitionResponse.builder()
+                    .metadata(Metadata.builder()
+                        .id("c1b8a422-e2b2-4e28-8a16-90ebef2a6922")
+                        .url("/v2/quota_definitions/c1b8a422-e2b2-4e28-8a16-90ebef2a6922")
+                        .createdAt("2016-01-26T22:20:36Z")
+                        .build())
+                    .entity(OrganizationQuotaDefinitionEntity.builder()
+                        .name("name-2527")
+                        .nonBasicServicesAllowed(true)
+                        .totalServices(60)
+                        .totalRoutes(1000)
+                        .totalPrivateDomains(-1)
+                        .memoryLimit(20480)
+                        .trialDatabaseAllowed(false)
+                        .instanceMemoryLimit(-1)
+                        .applicationInstanceLimit(-1)
+                        .applicationTaskLimit(-1)
+                        .totalServiceKeys(-1)
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/v2/quota_definitions/test-quota-definition-id")
@@ -162,41 +193,16 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
                 .build();
         }
 
-        @SuppressWarnings("deprecation")
-        @Override
-        protected GetOrganizationQuotaDefinitionResponse getResponse() {
-            return GetOrganizationQuotaDefinitionResponse.builder()
-                .metadata(Metadata.builder()
-                    .id("c1b8a422-e2b2-4e28-8a16-90ebef2a6922")
-                    .url("/v2/quota_definitions/c1b8a422-e2b2-4e28-8a16-90ebef2a6922")
-                    .createdAt("2016-01-26T22:20:36Z")
-                    .build())
-                .entity(OrganizationQuotaDefinitionEntity.builder()
-                    .name("name-2527")
-                    .nonBasicServicesAllowed(true)
-                    .totalServices(60)
-                    .totalRoutes(1000)
-                    .totalPrivateDomains(-1)
-                    .memoryLimit(20480)
-                    .trialDatabaseAllowed(false)
-                    .instanceMemoryLimit(-1)
-                    .applicationInstanceLimit(-1)
-                    .applicationTaskLimit(-1)
-                    .totalServiceKeys(-1)
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected GetOrganizationQuotaDefinitionRequest getValidRequest() throws Exception {
-            return GetOrganizationQuotaDefinitionRequest.builder()
-                .organizationQuotaDefinitionId("test-quota-definition-id")
-                .build();
-        }
-
         @Override
         protected Mono<GetOrganizationQuotaDefinitionResponse> invoke(GetOrganizationQuotaDefinitionRequest request) {
             return this.quotaDefinitions.get(request);
+        }
+
+        @Override
+        protected GetOrganizationQuotaDefinitionRequest validRequest() {
+            return GetOrganizationQuotaDefinitionRequest.builder()
+                .organizationQuotaDefinitionId("test-quota-definition-id")
+                .build();
         }
 
     }
@@ -205,8 +211,39 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
 
         private final ReactorOrganizationQuotaDefinitions quotaDefinitions = new ReactorOrganizationQuotaDefinitions(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
+        @SuppressWarnings("deprecation")
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<ListOrganizationQuotaDefinitionsResponse> expectations() {
+            return ScriptedSubscriber.<ListOrganizationQuotaDefinitionsResponse>create()
+                .expectValue(ListOrganizationQuotaDefinitionsResponse.builder()
+                    .totalPages(1)
+                    .totalResults(1)
+                    .resource(OrganizationQuotaDefinitionResource.builder()
+                        .metadata(Metadata.builder()
+                            .id("9a76e262-9dc1-4316-87ad-a8b3bfbb11d4")
+                            .url("/v2/quota_definitions/9a76e262-9dc1-4316-87ad-a8b3bfbb11d4")
+                            .createdAt("2016-01-26T22:20:04Z")
+                            .build())
+                        .entity(OrganizationQuotaDefinitionEntity.builder()
+                            .applicationInstanceLimit(-1)
+                            .instanceMemoryLimit(-1)
+                            .memoryLimit(10240)
+                            .name("default")
+                            .nonBasicServicesAllowed(true)
+                            .totalPrivateDomains(-1)
+                            .totalRoutes(1000)
+                            .totalServices(100)
+                            .trialDatabaseAllowed(false)
+                            .applicationTaskLimit(-1)
+                            .totalServiceKeys(-1)
+                            .build())
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/v2/quota_definitions?page=-1")
@@ -218,45 +255,16 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
                 .build();
         }
 
-        @SuppressWarnings("deprecation")
-        @Override
-        protected ListOrganizationQuotaDefinitionsResponse getResponse() {
-            return ListOrganizationQuotaDefinitionsResponse.builder()
-                .totalPages(1)
-                .totalResults(1)
-                .resource(OrganizationQuotaDefinitionResource.builder()
-                    .metadata(Metadata.builder()
-                        .id("9a76e262-9dc1-4316-87ad-a8b3bfbb11d4")
-                        .url("/v2/quota_definitions/9a76e262-9dc1-4316-87ad-a8b3bfbb11d4")
-                        .createdAt("2016-01-26T22:20:04Z")
-                        .build())
-                    .entity(OrganizationQuotaDefinitionEntity.builder()
-                        .applicationInstanceLimit(-1)
-                        .instanceMemoryLimit(-1)
-                        .memoryLimit(10240)
-                        .name("default")
-                        .nonBasicServicesAllowed(true)
-                        .totalPrivateDomains(-1)
-                        .totalRoutes(1000)
-                        .totalServices(100)
-                        .trialDatabaseAllowed(false)
-                        .applicationTaskLimit(-1)
-                        .totalServiceKeys(-1)
-                        .build())
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected ListOrganizationQuotaDefinitionsRequest getValidRequest() throws Exception {
-            return ListOrganizationQuotaDefinitionsRequest.builder()
-                .page(-1)
-                .build();
-        }
-
         @Override
         protected Publisher<ListOrganizationQuotaDefinitionsResponse> invoke(ListOrganizationQuotaDefinitionsRequest request) {
             return this.quotaDefinitions.list(request);
+        }
+
+        @Override
+        protected ListOrganizationQuotaDefinitionsRequest validRequest() {
+            return ListOrganizationQuotaDefinitionsRequest.builder()
+                .page(-1)
+                .build();
         }
 
     }
@@ -265,8 +273,36 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
 
         private final ReactorOrganizationQuotaDefinitions quotaDefinitions = new ReactorOrganizationQuotaDefinitions(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
+        @SuppressWarnings("deprecation")
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<UpdateOrganizationQuotaDefinitionResponse> expectations() {
+            return ScriptedSubscriber.<UpdateOrganizationQuotaDefinitionResponse>create()
+                .expectValue(UpdateOrganizationQuotaDefinitionResponse.builder()
+                    .metadata(Metadata.builder()
+                        .id("cd10a1dd-f372-4b19-8ff6-60214b265f6f")
+                        .url("/v2/quota_definitions/cd10a1dd-f372-4b19-8ff6-60214b265f6f")
+                        .createdAt("2016-04-06T00:17:26Z")
+                        .updatedAt("2016-04-06T00:17:26Z")
+                        .build())
+                    .entity(OrganizationQuotaDefinitionEntity.builder()
+                        .name("name-601")
+                        .nonBasicServicesAllowed(true)
+                        .totalServices(60)
+                        .totalRoutes(1000)
+                        .totalPrivateDomains(-1)
+                        .memoryLimit(20480)
+                        .trialDatabaseAllowed(false)
+                        .instanceMemoryLimit(-1)
+                        .applicationInstanceLimit(-1)
+                        .applicationTaskLimit(-1)
+                        .totalServiceKeys(-1)
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(PUT).path("/v2/quota_definitions/test-quota-definition-id")
@@ -279,42 +315,16 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
                 .build();
         }
 
-        @SuppressWarnings("deprecation")
-        @Override
-        protected UpdateOrganizationQuotaDefinitionResponse getResponse() {
-            return UpdateOrganizationQuotaDefinitionResponse.builder()
-                .metadata(Metadata.builder()
-                    .id("cd10a1dd-f372-4b19-8ff6-60214b265f6f")
-                    .url("/v2/quota_definitions/cd10a1dd-f372-4b19-8ff6-60214b265f6f")
-                    .createdAt("2016-04-06T00:17:26Z")
-                    .updatedAt("2016-04-06T00:17:26Z")
-                    .build())
-                .entity(OrganizationQuotaDefinitionEntity.builder()
-                    .name("name-601")
-                    .nonBasicServicesAllowed(true)
-                    .totalServices(60)
-                    .totalRoutes(1000)
-                    .totalPrivateDomains(-1)
-                    .memoryLimit(20480)
-                    .trialDatabaseAllowed(false)
-                    .instanceMemoryLimit(-1)
-                    .applicationInstanceLimit(-1)
-                    .applicationTaskLimit(-1)
-                    .totalServiceKeys(-1)
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected UpdateOrganizationQuotaDefinitionRequest getValidRequest() throws Exception {
-            return UpdateOrganizationQuotaDefinitionRequest.builder()
-                .organizationQuotaDefinitionId("test-quota-definition-id")
-                .build();
-        }
-
         @Override
         protected Mono<UpdateOrganizationQuotaDefinitionResponse> invoke(UpdateOrganizationQuotaDefinitionRequest request) {
             return this.quotaDefinitions.update(request);
+        }
+
+        @Override
+        protected UpdateOrganizationQuotaDefinitionRequest validRequest() {
+            return UpdateOrganizationQuotaDefinitionRequest.builder()
+                .organizationQuotaDefinitionId("test-quota-definition-id")
+                .build();
         }
 
     }

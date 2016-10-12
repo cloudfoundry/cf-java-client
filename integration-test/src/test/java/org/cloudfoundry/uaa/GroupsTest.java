@@ -53,14 +53,17 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 import reactor.util.function.Tuple2;
 
+import java.time.Duration;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
-import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
-import static org.junit.Assert.assertEquals;
+import static reactor.core.publisher.Mono.when;
 
 public final class GroupsTest extends AbstractIntegrationTest {
 
@@ -68,9 +71,30 @@ public final class GroupsTest extends AbstractIntegrationTest {
     private UaaClient uaaClient;
 
     @Test
-    public void addMemberGroup() {
+    public void addMemberGroup() throws TimeoutException, InterruptedException {
         String baseDisplayName = this.nameFactory.getGroupName();
         String memberDisplayName = this.nameFactory.getGroupName();
+
+        Function<Tuple2<AddMemberResponse, String>, Optional<String>> assertion = function((response, memberGroupId) -> {
+            if (!memberGroupId.equals(response.getMemberId())) {
+                return Optional.of(String.format("expected group id: %s; actual group id: %s", memberGroupId, response.getMemberId()));
+            }
+
+            if (!Optional.of(memberDisplayName + "-origin").equals(response.getOrigin())) {
+                return Optional.of(String.format("expected origin: %s; actual origin: %s", Optional.of(memberDisplayName + "-origin"), response.getOrigin()));
+            }
+
+            if (!Optional.of(MemberType.GROUP).equals(response.getType())) {
+                return Optional.of(String.format("expected type: %s; actual type: %s", Optional.of(MemberType.GROUP), response.getType()));
+            }
+
+            return Optional.empty();
+        });
+
+        ScriptedSubscriber<Tuple2<AddMemberResponse, String>> subscriber = ScriptedSubscriber.<Tuple2<AddMemberResponse, String>>create()
+            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
+                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching response")))
+            .expectComplete();
 
         Mono
             .when(
@@ -88,26 +112,43 @@ public final class GroupsTest extends AbstractIntegrationTest {
                             .build()),
                     Mono.just(memberGroupId)
                 )))
-            .subscribe(this.<Tuple2<AddMemberResponse, String>>testSubscriber()
-                .expectThat(consumer((response, memberGroupId) -> {
-                    assertEquals(memberGroupId, response.getMemberId());
-                    assertEquals(Optional.of(memberDisplayName + "-origin"), response.getOrigin());
-                    assertEquals(Optional.of(MemberType.GROUP), response.getType());
-                })));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void addMemberUser() {
+    public void addMemberUser() throws TimeoutException, InterruptedException {
         String displayName = this.nameFactory.getGroupName();
         String userName = this.nameFactory.getUserName();
 
-        Mono
-            .when(
-                createGroupId(this.uaaClient, displayName),
-                createUserId(this.uaaClient, userName)
-            )
-            .then(function((groupId, userId) -> Mono
-                .when(
+        Function<Tuple2<AddMemberResponse, String>, Optional<String>> assertion = function((response, userId) -> {
+            if (!userId.equals(response.getMemberId())) {
+                return Optional.of(String.format("expected member id: %s; actual member id: %s", userId, response.getMemberId()));
+            }
+
+            if (!Optional.of(userName + "-origin").equals(response.getOrigin())) {
+                return Optional.of(String.format("expected origin: %s; actual origin: %s", Optional.of(userName + "-origin"), response.getOrigin()));
+            }
+
+            if (!Optional.of(MemberType.USER).equals(response.getType())) {
+                return Optional.of(String.format("expected type: %s; actual type: %s", Optional.of(MemberType.USER), response.getType()));
+            }
+
+            return Optional.empty();
+        });
+
+        ScriptedSubscriber<Tuple2<AddMemberResponse, String>> subscriber = ScriptedSubscriber.<Tuple2<AddMemberResponse, String>>create()
+            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
+                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching response")))
+            .expectComplete();
+
+        when(
+            createGroupId(this.uaaClient, displayName),
+            createUserId(this.uaaClient, userName)
+        )
+            .then(function((groupId, userId) ->
+                when(
                     this.uaaClient.groups()
                         .addMember(AddMemberRequest.builder()
                             .groupId(groupId)
@@ -117,27 +158,45 @@ public final class GroupsTest extends AbstractIntegrationTest {
                             .build()),
                     Mono.just(userId)
                 )))
-            .subscribe(this.<Tuple2<AddMemberResponse, String>>testSubscriber()
-                .expectThat(consumer((response, userId) -> {
-                    assertEquals(userId, response.getMemberId());
-                    assertEquals(Optional.of(userName + "-origin"), response.getOrigin());
-                    assertEquals(Optional.of(MemberType.USER), response.getType());
-                })));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void checkMembership() {
+    public void checkMembership() throws TimeoutException, InterruptedException {
         String displayName = this.nameFactory.getGroupName();
         String userName = this.nameFactory.getUserName();
 
+        Function<Tuple2<CheckMembershipResponse, String>, Optional<String>> assertion = function((response, userId) -> {
+            if (!userId.equals(response.getMemberId())) {
+                return Optional.of(String.format("expected member id: %s; actual member id: %s", userId, response.getMemberId()));
+            }
+
+            if (!Optional.of("test-origin").equals(response.getOrigin())) {
+                return Optional.of(String.format("expected origin: %s; actual origin: %s", Optional.of("test-origin"), response.getOrigin()));
+            }
+
+            if (!Optional.of(MemberType.USER).equals(response.getType())) {
+                return Optional.of(String.format("expected type: %s; actual type: %s", Optional.of(MemberType.USER), response.getType()));
+            }
+
+            return Optional.empty();
+        });
+
+        ScriptedSubscriber<Tuple2<CheckMembershipResponse, String>> subscriber = ScriptedSubscriber.<Tuple2<CheckMembershipResponse, String>>create()
+            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
+                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching response")))
+            .expectComplete();
+
         createUserId(this.uaaClient, userName)
-            .then(userId -> Mono
-                .when(
+            .then(userId ->
+                when(
                     createGroupIdWithMember(this.uaaClient, displayName, userId),
                     Mono.just(userId)
                 ))
-            .then(function((groupId, userId) -> Mono
-                .when(
+            .then(function((groupId, userId) ->
+                when(
                     this.uaaClient.groups()
                         .checkMembership(CheckMembershipRequest.builder()
                             .groupId(groupId)
@@ -145,19 +204,18 @@ public final class GroupsTest extends AbstractIntegrationTest {
                             .build()),
                     Mono.just(userId)
                 )))
-            .subscribe(this.<Tuple2<CheckMembershipResponse, String>>testSubscriber()
-                .expectThat(consumer((response, userId) -> {
-                    assertEquals(userId, response.getMemberId());
-                    assertEquals(Optional.of("test-origin"), response.getOrigin());
-                    assertEquals(Optional.of(MemberType.USER), response.getType());
-                })));
+            .subscribe(subscriber);
 
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void create() {
+    public void create() throws TimeoutException, InterruptedException {
         String displayName = this.nameFactory.getGroupName();
         String userName = this.nameFactory.getUserName();
+
+        ScriptedSubscriber<Group> subscriber = ScriptedSubscriber.<Group>expectValueCount(1)
+            .expectComplete();
 
         createUserId(this.uaaClient, userName)
             .then(userId -> this.uaaClient.groups()
@@ -170,26 +228,37 @@ public final class GroupsTest extends AbstractIntegrationTest {
             .then(requestList(this.uaaClient)
                 .filter(resource -> displayName.equals(resource.getDisplayName()))
                 .single())
-            .subscribe(this.testSubscriber()
-                .expectCount(1));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void delete() {
+    public void delete() throws TimeoutException, InterruptedException {
         String displayName = this.nameFactory.getGroupName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(displayName)
+            .expectComplete();
 
         createGroupId(this.uaaClient, displayName)
             .then(groupId -> this.uaaClient.groups()
                 .delete(DeleteGroupRequest.builder()
                     .groupId(groupId)
                     .build()))
-            .subscribe(this.<DeleteGroupResponse>testSubscriber()
-                .expectThat(response -> assertEquals(displayName, response.getDisplayName())));
+            .map(DeleteGroupResponse::getDisplayName)
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void get() {
+    public void get() throws TimeoutException, InterruptedException {
         String displayName = this.nameFactory.getGroupName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(displayName)
+            .expectComplete();
 
         createGroupId(this.uaaClient, displayName)
             .then(groupId -> this.uaaClient.groups()
@@ -197,13 +266,18 @@ public final class GroupsTest extends AbstractIntegrationTest {
                     .groupId(groupId)
                     .build())
                 .map(GetGroupResponse::getDisplayName))
-            .subscribe(this.testSubscriber()
-                .expectEquals(displayName));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void list() {
+    public void list() throws TimeoutException, InterruptedException {
         String displayName = this.nameFactory.getGroupName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(displayName)
+            .expectComplete();
 
         createGroupId(this.uaaClient, displayName)
             .then(groupId -> PaginationUtils
@@ -213,13 +287,19 @@ public final class GroupsTest extends AbstractIntegrationTest {
                         .startIndex(startIndex)
                         .build()))
                 .single())
-            .subscribe(this.<Group>testSubscriber()
-                .expectThat(group -> assertEquals(displayName, group.getDisplayName())));
+            .map(Group::getDisplayName)
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listExternalGroupMappings() {
+    public void listExternalGroupMappings() throws TimeoutException, InterruptedException {
         String displayName = this.nameFactory.getGroupName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(displayName + "-external-group")
+            .expectComplete();
 
         createGroupId(this.uaaClient, displayName)
             .then(groupId -> requestMapExternalGroupResponse(this.uaaClient, displayName, groupId))
@@ -229,23 +309,27 @@ public final class GroupsTest extends AbstractIntegrationTest {
                         .startIndex(startIndex)
                         .build()))
                 .filter(group -> displayName.equals(group.getDisplayName())))
-            .subscribe(this.<ExternalGroupResource>testSubscriber()
-                .expectThat(resource -> assertEquals(displayName + "-external-group", resource.getExternalGroup())));
+            .map(ExternalGroupResource::getExternalGroup)
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listMembers() {
+    public void listMembers() throws TimeoutException, InterruptedException {
         String displayName = this.nameFactory.getGroupName();
         String userName = this.nameFactory.getUserName();
 
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
+
         createUserId(this.uaaClient, userName)
-            .then(userId -> Mono
-                .when(
+            .then(userId ->
+                when(
                     createGroupIdWithMember(this.uaaClient, displayName, userId),
                     Mono.just(userId)
                 ))
-            .then(function((groupId, userId) -> Mono
-                .when(
+            .then(function((groupId, userId) ->
+                when(
                     this.uaaClient.groups()
                         .listMembers(ListMembersRequest.builder()
                             .groupId(groupId)
@@ -256,14 +340,19 @@ public final class GroupsTest extends AbstractIntegrationTest {
                         .single(),
                     Mono.just(userId)
                 )))
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listMembersWithEntity() {
+    public void listMembersWithEntity() throws TimeoutException, InterruptedException {
         String displayName = this.nameFactory.getGroupName();
         String userName = this.nameFactory.getUserName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(userName)
+            .expectComplete();
 
         createUserId(this.uaaClient, userName)
             .then(userId -> createGroupIdWithMember(this.uaaClient, displayName, userId))
@@ -277,13 +366,32 @@ public final class GroupsTest extends AbstractIntegrationTest {
             .map(Optional::get)
             .cast(UserEntity.class)
             .single()
-            .subscribe(this.<UserEntity>testSubscriber()
-                .expectThat(user -> assertEquals(userName, user.getUserName())));
+            .map(UserEntity::getUserName)
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void mapExternalGroupMappings() {
         String displayName = this.nameFactory.getGroupName();
+
+        Function<ExternalGroupResource, Optional<String>> assertion = resource -> {
+            if (!(displayName + "-external-group").equals(resource.getExternalGroup())) {
+                return Optional.of(String.format("expected external group: %s; actual external group: %s", displayName + "-external-group", resource.getExternalGroup()));
+            }
+
+            if (!(displayName + "-origin").equals(resource.getOrigin())) {
+                return Optional.of(String.format("expected origin: %s; actual origin: %s", displayName + "-origin", resource.getOrigin()));
+            }
+
+            return Optional.empty();
+        };
+
+        ScriptedSubscriber<ExternalGroupResource> subscriber = ScriptedSubscriber.<ExternalGroupResource>create()
+            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
+                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching response")))
+            .expectComplete();
 
         createGroupId(this.uaaClient, displayName)
             .then(groupId -> this.uaaClient.groups()
@@ -294,26 +402,24 @@ public final class GroupsTest extends AbstractIntegrationTest {
                     .build()))
             .flatMap(ignore -> requestListExternalGroupResource(this.uaaClient)
                 .filter(group -> displayName.equals(group.getDisplayName())))
-            .subscribe(this.<ExternalGroupResource>testSubscriber()
-                .expectThat(resource -> {
-                    assertEquals(displayName + "-external-group", resource.getExternalGroup());
-                    assertEquals(displayName + "-origin", resource.getOrigin());
-                }));
+            .subscribe(subscriber);
     }
 
     @Test
-    public void removeMember() {
+    public void removeMember() throws TimeoutException, InterruptedException {
         String displayName = this.nameFactory.getGroupName();
         String userName = this.nameFactory.getUserName();
 
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
+
         createUserId(this.uaaClient, userName)
-            .then(userId -> Mono
-                .when(
+            .then(userId ->
+                when(
                     createGroupIdWithMember(this.uaaClient, displayName, userId),
                     Mono.just(userId)
                 ))
-            .then(function((groupId, userId) -> Mono
-                .when(
+            .then(function((groupId, userId) ->
+                when(
                     this.uaaClient.groups()
                         .removeMember(RemoveMemberRequest.builder()
                             .groupId(groupId)
@@ -322,13 +428,17 @@ public final class GroupsTest extends AbstractIntegrationTest {
                         .map(RemoveMemberResponse::getMemberId),
                     Mono.just(userId)
                 )))
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void unmapExternalGroupMappingsByGroupDisplayName() {
+    public void unmapExternalGroupMappingsByGroupDisplayName() throws TimeoutException, InterruptedException {
         String displayName = this.nameFactory.getGroupName();
+
+        ScriptedSubscriber<ExternalGroupResource> subscriber = ScriptedSubscriber.<ExternalGroupResource>create()
+            .expectComplete();
 
         createGroupId(this.uaaClient, displayName)
             .then(groupId -> requestMapExternalGroupResponse(this.uaaClient, displayName, groupId))
@@ -340,13 +450,17 @@ public final class GroupsTest extends AbstractIntegrationTest {
                     .build()))
             .flatMap(ignore -> requestListExternalGroupResources(this.uaaClient))
             .filter(resource -> displayName.equals(resource.getDisplayName()))
-            .subscribe(this.testSubscriber()
-                .expectCount(0));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void unmapExternalGroupMappingsByGroupId() {
+    public void unmapExternalGroupMappingsByGroupId() throws TimeoutException, InterruptedException {
         String displayName = this.nameFactory.getGroupName();
+
+        ScriptedSubscriber<ExternalGroupResource> subscriber = ScriptedSubscriber.<ExternalGroupResource>create()
+            .expectComplete();
 
         createGroupId(this.uaaClient, displayName)
             .as(thenKeep(groupId -> requestMapExternalGroupResponse(this.uaaClient, displayName, groupId)))
@@ -358,14 +472,18 @@ public final class GroupsTest extends AbstractIntegrationTest {
                     .build()))
             .flatMap(ignore -> requestListExternalGroupResources(this.uaaClient)
                 .filter(resource -> displayName.equals(resource.getDisplayName())))
-            .subscribe(this.testSubscriber()
-                .expectCount(0));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void update() {
+    public void update() throws TimeoutException, InterruptedException {
         String baseDisplayName = this.nameFactory.getGroupName();
         String newDisplayName = this.nameFactory.getGroupName();
+
+        ScriptedSubscriber<Group> subscriber = ScriptedSubscriber.<Group>expectValueCount(1)
+            .expectComplete();
 
         createGroupId(this.uaaClient, baseDisplayName)
             .then(groupId -> this.uaaClient.groups()
@@ -377,9 +495,9 @@ public final class GroupsTest extends AbstractIntegrationTest {
             .then(requestList(this.uaaClient)
                 .filter(resource -> newDisplayName.equals(resource.getDisplayName()))
                 .single())
-            .subscribe(this.testSubscriber()
-                .expectCount(1));
+            .subscribe(subscriber);
 
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     private static Mono<String> createGroupId(UaaClient uaaClient, String displayName) {
