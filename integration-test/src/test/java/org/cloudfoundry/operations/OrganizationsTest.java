@@ -18,9 +18,14 @@ package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.operations.organizations.CreateOrganizationRequest;
+import org.cloudfoundry.operations.organizations.OrganizationSummary;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
+
+import java.time.Duration;
+import java.util.concurrent.TimeoutException;
 
 
 public final class OrganizationsTest extends AbstractIntegrationTest {
@@ -32,8 +37,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     private Mono<String> organizationId;
 
     @Test
-    public void create() {
+    public void create() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
+
+        ScriptedSubscriber<OrganizationSummary> subscriber = ScriptedSubscriber.<OrganizationSummary>expectValueCount(1)
+            .expectComplete();
 
         this.cloudFoundryOperations.organizations()
             .create(CreateOrganizationRequest.builder()
@@ -42,18 +50,23 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .thenMany(this.cloudFoundryOperations.organizations()
                 .list())
             .filter(organizationSummary -> organizationName.equals(organizationSummary.getName()))
-            .subscribe(testSubscriber()
-                .expectCount(1));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void list() {
+    public void list() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<OrganizationSummary> subscriber = ScriptedSubscriber.<OrganizationSummary>expectValueCount(1)
+            .expectComplete();
+
         this.organizationId
             .flatMap(organizationId -> this.cloudFoundryOperations.organizations()
                 .list()
                 .filter(organization -> organization.getId().equals(organizationId)))
-            .subscribe(testSubscriber()
-                .expectCount(1));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
 }

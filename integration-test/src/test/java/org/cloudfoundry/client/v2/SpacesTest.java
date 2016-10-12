@@ -81,11 +81,15 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 import reactor.util.function.Tuple2;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
@@ -93,7 +97,6 @@ import java.util.function.UnaryOperator;
 import static java.time.temporal.ChronoUnit.HOURS;
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public final class SpacesTest extends AbstractIntegrationTest {
@@ -111,9 +114,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
     private String username;
 
     @Test
-    public void associateAuditor() {
+    public void associateAuditor() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .then(function((userId, spaceId) -> Mono.when(
@@ -125,14 +130,19 @@ public final class SpacesTest extends AbstractIntegrationTest {
                         .build())
                     .map(ResourceUtils::getId)
             )))
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void associateAuditorByUsername() {
+    public void associateAuditorByUsername() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(this.username)
+            .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
@@ -148,14 +158,17 @@ public final class SpacesTest extends AbstractIntegrationTest {
                         .build()))
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
-            .subscribe(this.testSubscriber()
-                .expectEquals(this.username));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void associateDeveloper() {
+    public void associateDeveloper() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .then(function((userId, spaceId) -> Mono.when(
@@ -167,14 +180,19 @@ public final class SpacesTest extends AbstractIntegrationTest {
                         .build())
                     .map(ResourceUtils::getId)
             )))
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void associateDeveloperByUsername() {
+    public void associateDeveloperByUsername() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(this.username)
+            .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
@@ -190,14 +208,17 @@ public final class SpacesTest extends AbstractIntegrationTest {
                         .build()))
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
-            .subscribe(this.testSubscriber()
-                .expectEquals(this.username));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void associateManager() {
+    public void associateManager() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .then(function((userId, spaceId) -> Mono.when(
@@ -209,14 +230,19 @@ public final class SpacesTest extends AbstractIntegrationTest {
                         .build())
                     .map(ResourceUtils::getId)
             )))
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void associateManagerByUsername() {
+    public void associateManagerByUsername() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(this.username)
+            .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
@@ -227,8 +253,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .flatMap(function((userId, spaceId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId)
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
-            .subscribe(this.testSubscriber()
-                .expectEquals(this.username));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656")
@@ -238,8 +265,12 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() {
+    public void create() throws TimeoutException, InterruptedException {
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(spaceName)
+            .expectComplete();
 
         this.organizationId
             .then(organizationId -> this.cloudFoundryClient.spaces()
@@ -249,13 +280,17 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .build()))
             .map(ResourceUtils::getEntity)
             .map(SpaceEntity::getName)
-            .subscribe(this.<String>testSubscriber()
-                .expectEquals(spaceName));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void delete() {
+    public void delete() throws TimeoutException, InterruptedException {
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectComplete();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -269,12 +304,17 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .flatMap(spaceId -> requestListSpaces(this.cloudFoundryClient)
                 .map(ResourceUtils::getId)
                 .filter(spaceId::equals))
-            .subscribe(testSubscriber());
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void deleteAsyncFalse() {
+    public void deleteAsyncFalse() throws TimeoutException, InterruptedException {
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectComplete();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -286,12 +326,18 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .flatMap(spaceId -> requestListSpaces(this.cloudFoundryClient)
                 .map(ResourceUtils::getId)
                 .filter(spaceId::equals))
-            .subscribe(testSubscriber());
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void get() {
+    public void get() throws TimeoutException, InterruptedException {
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(spaceName)
+            .expectComplete();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -301,13 +347,18 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .build()))
             .map(ResourceUtils::getEntity)
             .map(SpaceEntity::getName)
-            .subscribe(this.<String>testSubscriber()
-                .expectEquals(spaceName));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void getSummary() {
+    public void getSummary() throws TimeoutException, InterruptedException {
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(spaceName)
+            .expectComplete();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -316,14 +367,17 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .spaceId(spaceId)
                     .build()))
             .map(GetSpaceSummaryResponse::getName)
-            .subscribe(this.<String>testSubscriber()
-                .expectEquals(spaceName));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void list() {
+    public void list() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
 
         createOrganizationIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName)
             .then(function((organizationId, spaceId) -> Mono.when(
@@ -333,14 +387,19 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .single()
                     .map(ResourceUtils::getId)
             )))
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listApplications() {
+    public void listApplications() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(applicationName)
+            .expectComplete();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -349,14 +408,19 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .single())
             .map(ApplicationResource::getEntity)
             .map(ApplicationEntity::getName)
-            .subscribe(this.<String>testSubscriber()
-                .expectEquals(applicationName));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listApplicationsFilterByDiego() {
+    public void listApplicationsFilterByDiego() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(applicationName)
+            .expectComplete();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -365,14 +429,17 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .single())
             .map(ApplicationResource::getEntity)
             .map(ApplicationEntity::getName)
-            .subscribe(this.<String>testSubscriber()
-                .expectEquals(applicationName));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listApplicationsFilterByName() {
+    public void listApplicationsFilterByName() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -386,14 +453,19 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .single()
                     .map(ResourceUtils::getId)
             )))
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listApplicationsFilterByOrganizationId() {
+    public void listApplicationsFilterByOrganizationId() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(applicationName)
+            .expectComplete();
 
         this.organizationId
             .then(organizationId -> Mono.when(
@@ -404,14 +476,19 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .flatMap(function((organizationId, spaceId) -> requestListSpaceApplications(this.cloudFoundryClient, spaceId, builder -> builder.organizationId(organizationId))))
             .map(ResourceUtils::getEntity)
             .map(ApplicationEntity::getName)
-            .subscribe(this.<String>testSubscriber()
-                .expectEquals(applicationName));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listApplicationsFilterByStackId() {
+    public void listApplicationsFilterByStackId() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(applicationName)
+            .expectComplete();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -430,14 +507,19 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .flatMap(function((spaceId, stackId) -> requestListSpaceApplications(this.cloudFoundryClient, spaceId, builder -> builder.stackId(stackId))))
             .map(ResourceUtils::getEntity)
             .map(ApplicationEntity::getName)
-            .subscribe(this.<String>testSubscriber()
-                .expectEquals(applicationName));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listAuditors() {
+    public void listAuditors() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(this.username)
+            .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
@@ -453,14 +535,19 @@ public final class SpacesTest extends AbstractIntegrationTest {
                         .build()))))
             .map(ResourceUtils::getEntity)
             .map(UserEntity::getUsername)
-            .subscribe(this.testSubscriber()
-                .expectEquals(this.username));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listDevelopers() {
+    public void listDevelopers() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(this.username)
+            .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
@@ -476,14 +563,18 @@ public final class SpacesTest extends AbstractIntegrationTest {
                         .build()))))
             .map(ResourceUtils::getEntity)
             .map(UserEntity::getUsername)
-            .subscribe(this.testSubscriber()
-                .expectEquals(this.username));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listDomains() {
+    public void listDomains() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<DomainResource> subscriber = ScriptedSubscriber.<DomainResource>expectValueCount(1)
+            .expectComplete();
 
         this.organizationId
             .then(organizationId -> createSpaceIdWithDomain(this.cloudFoundryClient, organizationId, spaceName, domainName))
@@ -493,31 +584,41 @@ public final class SpacesTest extends AbstractIntegrationTest {
             ))
             .flatMap(function((spaceId, domainId) -> requestListSpaceDomains(this.cloudFoundryClient, spaceId)))
             .filter(domainResource -> domainName.equals(ResourceUtils.getEntity(domainResource).getName()))
-            .subscribe(testSubscriber()
-                .expectCount(1));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listDomainsFilterByName() {
+    public void listDomainsFilterByName() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(domainName)
+            .expectComplete();
 
         this.organizationId
             .then(organizationId -> createSpaceIdWithDomain(this.cloudFoundryClient, organizationId, spaceName, domainName))
             .flatMap(spaceId -> requestListSpaceDomains(this.cloudFoundryClient, spaceId, builder -> builder.name(domainName)))
             .map(ResourceUtils::getEntity)
             .map(DomainEntity::getName)
-            .subscribe(this.<String>testSubscriber()
-                .expectEquals(domainName));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Ignore("Filter parameter not honoured: see https://github.com/cloudfoundry/cloud_controller_ng/issues/584")
     @Test
-    public void listDomainsFilterByOwningOrganizationId() {
+    public void listDomainsFilterByOwningOrganizationId() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
         String spaceOrganizationName = this.nameFactory.getOrganizationName();
         String domainOrganizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(domainName)
+            .expectComplete();
 
         Mono
             .when(
@@ -544,53 +645,71 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .flatMap(function((domainOrganizationId, spaceId) -> requestListSpaceDomains(this.cloudFoundryClient, spaceId, builder -> builder.owningOrganizationId(domainOrganizationId))))
             .map(ResourceUtils::getEntity)
             .map(DomainEntity::getName)
-            .subscribe(this.<String>testSubscriber()
-                .expectEquals(domainName));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listEvents() {
+    public void listEvents() throws TimeoutException, InterruptedException {
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue("audit.space.create")
+            .expectComplete();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
             .flatMap(spaceId -> requestListSpaceEvents(this.cloudFoundryClient, spaceId))
             .map(ResourceUtils::getEntity)
             .map(EventEntity::getType)
-            .subscribe(this.<String>testSubscriber()
-                .expectEquals("audit.space.create"));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listEventsFilterByActee() {
+    public void listEventsFilterByActee() throws TimeoutException, InterruptedException {
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue("audit.space.create")
+            .expectComplete();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
             .flatMap(spaceId -> requestListSpaceEvents(this.cloudFoundryClient, spaceId, builder -> builder.actee(spaceId)))
             .map(ResourceUtils::getEntity)
             .map(EventEntity::getType)
-            .subscribe(this.<String>testSubscriber()
-                .expectEquals("audit.space.create"));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listEventsFilterByTimestamp() {
+    public void listEventsFilterByTimestamp() throws TimeoutException, InterruptedException {
         String spaceName = this.nameFactory.getSpaceName();
         String timestamp = getPastTimestamp();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue("audit.space.create")
+            .expectComplete();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
             .flatMap(spaceId -> requestListSpaceEvents(this.cloudFoundryClient, spaceId, builder -> builder.timestamp(timestamp)))
             .map(ResourceUtils::getEntity)
             .map(EventEntity::getType)
-            .subscribe(this.<String>testSubscriber()
-                .expectEquals("audit.space.create"));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listEventsFilterByType() {
+    public void listEventsFilterByType() throws TimeoutException, InterruptedException {
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -601,14 +720,17 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getEntity)
                     .map(EventEntity::getSpaceId)
             ))
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listFilterByApplicationId() {
+    public void listFilterByApplicationId() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -622,8 +744,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
                     .single()
             )))
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522686 really create a new user")
@@ -633,8 +756,10 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByName() {
+    public void listFilterByName() throws TimeoutException, InterruptedException {
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -644,14 +769,17 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
                     .single()
             ))
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listFilterByOrganizationId() {
+    public void listFilterByOrganizationId() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
 
         createOrganizationIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName)
             .then(function((organizationId, spaceId) -> Mono.when(
@@ -660,28 +788,38 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .single()
                     .map(ResourceUtils::getId)
             )))
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listManagers() {
+    public void listManagers() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(this.username)
+            .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
             .flatMap(function((userId, spaceId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId)
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
-            .subscribe(this.testSubscriber()
-                .expectEquals(this.username));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listManagersFilterByAuditedOrganizationId() {
+    public void listManagersFilterByAuditedOrganizationId() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(this.username)
+            .expectComplete();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
@@ -699,14 +837,19 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .flatMap(function((userId, spaceId, organizationId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId, builder -> builder.auditedOrganizationId(organizationId))
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
-            .subscribe(this.testSubscriber()
-                .expectEquals(this.username));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listManagersFilterByAuditedSpaceId() {
+    public void listManagersFilterByAuditedSpaceId() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(this.username)
+            .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> Mono.when(
@@ -716,14 +859,17 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .flatMap(function((userId, spaceId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId, builder -> builder.auditedSpaceId(spaceId))
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
-            .subscribe(this.testSubscriber()
-                .expectEquals(this.username));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listManagersFilterByBillingManagedOrganizationId() {
+    public void listManagersFilterByBillingManagedOrganizationId() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
@@ -745,14 +891,17 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .single()
                     .map(ResourceUtils::getId)
             )))
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listManagersFilterByManagedOrganizationId() {
+    public void listManagersFilterByManagedOrganizationId() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
@@ -774,28 +923,36 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .single()
                     .map(ResourceUtils::getId)
             )))
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listManagersFilterByManagedSpaceId() {
+    public void listManagersFilterByManagedSpaceId() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(this.username)
+            .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
             .flatMap(function((userId, spaceId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId, builder -> builder.managedSpaceId(spaceId))
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
-            .subscribe(this.testSubscriber()
-                .expectEquals(this.username));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listManagersFilterByOrganizationId() {
+    public void listManagersFilterByOrganizationId() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
@@ -810,15 +967,18 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .single()
                     .map(ResourceUtils::getId)
             )))
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listRoutes() {
+    public void listRoutes() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
 
         this.organizationId
             .then(organizationId -> createSpaceIdWithDomain(this.cloudFoundryClient, organizationId, spaceName, domainName))
@@ -832,15 +992,18 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
                     .single()
             )))
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listRoutesFilterByDomainId() {
+    public void listRoutesFilterByDomainId() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
 
         this.organizationId
             .then(organizationId -> createSpaceIdWithDomain(this.cloudFoundryClient, organizationId, spaceName, domainName))
@@ -855,15 +1018,18 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
                     .single()
             )))
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listRoutesFilterByHost() {
+    public void listRoutesFilterByHost() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
 
         this.organizationId
             .then(organizationId -> createSpaceIdWithDomain(this.cloudFoundryClient, organizationId, spaceName, domainName))
@@ -877,15 +1043,18 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
                     .single()
             )))
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listRoutesFilterByPath() {
+    public void listRoutesFilterByPath() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
 
         this.organizationId
             .then(organizationId -> createSpaceIdWithDomain(this.cloudFoundryClient, organizationId, spaceName, domainName))
@@ -899,8 +1068,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId)
                     .single()
             )))
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656")
@@ -982,9 +1152,26 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listUserRoles() {
+    public void listUserRoles() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        Function<UserSpaceRoleEntity, Optional<String>> assertion = entity -> {
+            if (!this.username.equals(entity.getUsername())) {
+                return Optional.of(String.format("expected username: %s; actual username: %s", this.username, entity.getUsername()));
+            }
+
+            if (!Collections.singletonList("space_manager").equals(entity.getSpaceRoles())) {
+                return Optional.of(String.format("expected space roles: %s; actual space roles: %s", Collections.singletonList("space_manager"), entity.getSpaceRoles()));
+            }
+
+            return Optional.empty();
+        };
+
+        ScriptedSubscriber<UserSpaceRoleEntity> subscriber = ScriptedSubscriber.<UserSpaceRoleEntity>create()
+            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
+                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching entity")))
+            .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
@@ -995,17 +1182,18 @@ public final class SpacesTest extends AbstractIntegrationTest {
                         .spaceId(spaceId)
                         .build()))
                 .map(ResourceUtils::getEntity)))
-            .subscribe(this.<UserSpaceRoleEntity>testSubscriber()
-                .expectThat(userSpaceRoleEntity -> {
-                    assertEquals(this.username, userSpaceRoleEntity.getUsername());
-                    assertEquals(Collections.singletonList("space_manager"), userSpaceRoleEntity.getSpaceRoles());
-                }));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void removeAuditor() {
+    public void removeAuditor() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<UserResource> subscriber = ScriptedSubscriber.<UserResource>create()
+            .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId))))
@@ -1020,13 +1208,18 @@ public final class SpacesTest extends AbstractIntegrationTest {
                         .page(page)
                         .spaceId(spaceId)
                         .build()))))
-            .subscribe(this.testSubscriber());
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void removeAuditorByUsername() {
+    public void removeAuditorByUsername() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<UserResource> subscriber = ScriptedSubscriber.<UserResource>create()
+            .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId))))
@@ -1041,13 +1234,18 @@ public final class SpacesTest extends AbstractIntegrationTest {
                         .page(page)
                         .spaceId(spaceId)
                         .build()))))
-            .subscribe(this.testSubscriber());
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void removeDeveloper() {
+    public void removeDeveloper() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<UserResource> subscriber = ScriptedSubscriber.<UserResource>create()
+            .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
@@ -1066,13 +1264,18 @@ public final class SpacesTest extends AbstractIntegrationTest {
                         .page(page)
                         .spaceId(spaceId)
                         .build()))))
-            .subscribe(this.testSubscriber());
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void removeDeveloperByUsername() {
+    public void removeDeveloperByUsername() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<UserResource> subscriber = ScriptedSubscriber.<UserResource>create()
+            .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
@@ -1091,13 +1294,18 @@ public final class SpacesTest extends AbstractIntegrationTest {
                         .page(page)
                         .spaceId(spaceId)
                         .build()))))
-            .subscribe(this.testSubscriber());
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void removeManager() {
+    public void removeManager() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
@@ -1110,13 +1318,18 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)
             ))
-            .subscribe(this.testSubscriber());
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void removeManagerByUsername() {
+    public void removeManagerByUsername() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
@@ -1128,7 +1341,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .flatMap(function((userId, spaceId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId)
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
-            .subscribe(this.testSubscriber());
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522658")
@@ -1138,9 +1353,13 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
+    public void update() throws TimeoutException, InterruptedException {
         String spaceName = this.nameFactory.getSpaceName();
         String spaceName2 = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(spaceName2)
+            .expectComplete();
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -1154,14 +1373,18 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .spaceId(spaceId)
                     .build()))
             .map(GetSpaceSummaryResponse::getName)
-            .subscribe(this.<String>testSubscriber()
-                .expectEquals(spaceName2));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void updateEmptyManagers() {
+    public void updateEmptyManagers() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
             .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
@@ -1174,7 +1397,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)
             ))
-            .subscribe(this.testSubscriber());
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     private static Mono<String> createApplicationId(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {

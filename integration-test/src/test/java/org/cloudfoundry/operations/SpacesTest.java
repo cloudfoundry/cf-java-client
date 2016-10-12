@@ -18,10 +18,13 @@ package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.operations.spaces.CreateSpaceRequest;
+import org.cloudfoundry.operations.spaces.SpaceSummary;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.test.subscriber.ScriptedSubscriber;
 
-import static org.junit.Assert.assertTrue;
+import java.time.Duration;
+import java.util.concurrent.TimeoutException;
 
 public final class SpacesTest extends AbstractIntegrationTest {
 
@@ -32,8 +35,12 @@ public final class SpacesTest extends AbstractIntegrationTest {
     private String organizationName;
 
     @Test
-    public void create() {
+    public void create() throws TimeoutException, InterruptedException {
         String spaceName = this.nameFactory.getSpaceName();
+
+        ScriptedSubscriber<SpaceSummary> subscriber = ScriptedSubscriber
+            .<SpaceSummary>expectValueCount(1)
+            .expectComplete();
 
         this.cloudFoundryOperations.spaces()
             .create(CreateSpaceRequest.builder()
@@ -43,17 +50,23 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .thenMany(this.cloudFoundryOperations.spaces()
                 .list())
             .filter(spaceSummary -> spaceName.equals(spaceSummary.getName()))
-            .subscribe(testSubscriber()
-                .expectCount(1));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void list() {
+    public void list() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<Long> subscriber = ScriptedSubscriber.<Long>create()
+            .expectValueWith(count -> count > 0, count -> String.format("expected count: 0; actual count: %d", count))
+            .expectComplete();
+
         this.cloudFoundryOperations.spaces()
             .list()
             .count()
-            .subscribe(this.<Long>testSubscriber()
-                .expectThat(count -> assertTrue(count > 0)));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
 }

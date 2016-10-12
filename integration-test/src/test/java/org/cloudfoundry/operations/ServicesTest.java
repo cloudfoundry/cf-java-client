@@ -23,6 +23,10 @@ import org.cloudfoundry.operations.services.ServiceInstance;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.test.subscriber.ScriptedSubscriber;
+
+import java.time.Duration;
+import java.util.concurrent.TimeoutException;
 
 public final class ServicesTest extends AbstractIntegrationTest {
 
@@ -31,8 +35,12 @@ public final class ServicesTest extends AbstractIntegrationTest {
 
     @Ignore("Needs marketplace feature to derive planName and serviceName - https://www.pivotaltracker.com/story/show/106155472")
     @Test
-    public void getManagedService() {
+    public void getManagedService() throws TimeoutException, InterruptedException {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(serviceInstanceName)
+            .expectComplete();
 
         this.cloudFoundryOperations.services()
             .createInstance(CreateServiceInstanceRequest.builder()
@@ -45,8 +53,9 @@ public final class ServicesTest extends AbstractIntegrationTest {
                     .name(serviceInstanceName)
                     .build()))
             .map(ServiceInstance::getName)
-            .subscribe(testSubscriber()
-                .expectEquals(serviceInstanceName));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
 }

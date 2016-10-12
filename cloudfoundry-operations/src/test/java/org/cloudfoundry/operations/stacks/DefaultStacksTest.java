@@ -21,12 +21,12 @@ import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksResponse;
 import org.cloudfoundry.client.v2.stacks.StackResource;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
-import static org.cloudfoundry.util.test.TestObjects.fill;
+import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
 public final class DefaultStacksTest {
@@ -66,10 +66,11 @@ public final class DefaultStacksTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Stack> testSubscriber) {
-            testSubscriber
-                .expectEquals(fill(Stack.builder(), "stack-")
-                    .build());
+        protected ScriptedSubscriber<Stack> expectations() {
+            return ScriptedSubscriber.<Stack>create()
+                .expectValue(fill(Stack.builder(), "stack-")
+                    .build())
+                .expectComplete();
         }
 
         @Override
@@ -92,10 +93,11 @@ public final class DefaultStacksTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Stack> testSubscriber) {
-            testSubscriber
-                .expectEquals(fill(Stack.builder(), "stack-")
-                    .build());
+        protected ScriptedSubscriber<Stack> expectations() {
+            return ScriptedSubscriber.<Stack>create()
+                .expectValue(fill(Stack.builder(), "stack-")
+                    .build())
+                .expectComplete();
         }
 
         @Override

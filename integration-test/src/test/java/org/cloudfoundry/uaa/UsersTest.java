@@ -44,9 +44,12 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import java.time.Duration;
+import java.util.Optional;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 
 public final class UsersTest extends AbstractIntegrationTest {
 
@@ -61,7 +64,23 @@ public final class UsersTest extends AbstractIntegrationTest {
 
     @Ignore("TODO: Refresh token after password change")
     @Test
-    public void changePassword() {
+    public void changePassword() throws TimeoutException, InterruptedException {
+        Function<ChangeUserPasswordResponse, Optional<String>> assertion = response -> {
+            if (!"password updated".equals(response.getMessage())) {
+                return Optional.of(String.format("expected message: %s; actual message: %s", "password updated", response.getMessage()));
+            }
+
+            if (!"ok".equals(response.getStatus())) {
+                return Optional.of(String.format("expected status: %s; actual status: %s", "ok", response.getStatus()));
+            }
+
+            return Optional.empty();
+        };
+
+        ScriptedSubscriber<ChangeUserPasswordResponse> subscriber = ScriptedSubscriber.<ChangeUserPasswordResponse>create()
+            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
+                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching response")))
+            .expectComplete();
 
         getUserIdByUsername(this.uaaClient, this.username)
             .then(userId -> this.uaaClient.users()
@@ -70,16 +89,31 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .password("test-new-password")
                     .userId(userId)
                     .build()))
-            .subscribe(this.<ChangeUserPasswordResponse>testSubscriber()
-                .expectThat(response -> {
-                    assertEquals("password updated", response.getMessage());
-                    assertEquals("ok", response.getStatus());
-                }));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void create() {
+    public void create() throws TimeoutException, InterruptedException {
         String userName = this.nameFactory.getUserName();
+
+        Function<CreateUserResponse, Optional<String>> assertion = response -> {
+            if (!"test-external-id".equals(response.getExternalId())) {
+                return Optional.of(String.format("expected external id: %s; actual external id: %s", "test-external-id", response.getExternalId()));
+            }
+
+            if (!userName.equals(response.getUserName())) {
+                return Optional.of(String.format("expected username: %s; actual username: %s", userName, response.getUserName()));
+            }
+
+            return Optional.empty();
+        };
+
+        ScriptedSubscriber<CreateUserResponse> subscriber = ScriptedSubscriber.<CreateUserResponse>create()
+            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
+                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching response")))
+            .expectComplete();
 
         this.uaaClient.users()
             .create(CreateUserRequest.builder()
@@ -95,16 +129,18 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .password("test-password")
                 .userName(userName)
                 .build())
-            .subscribe(this.<CreateUserResponse>testSubscriber()
-                .expectThat(response -> {
-                    assertEquals("test-external-id", response.getExternalId());
-                    assertEquals(userName, response.getUserName());
-                }));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void delete() {
+    public void delete() throws TimeoutException, InterruptedException {
         String userName = this.nameFactory.getUserName();
+
+        ScriptedSubscriber<Integer> subscriber = ScriptedSubscriber.<Integer>create()
+            .expectValue(0)
+            .expectComplete();
 
         createUserId(this.uaaClient, userName)
             .then(userId -> this.uaaClient.users()
@@ -114,13 +150,27 @@ public final class UsersTest extends AbstractIntegrationTest {
             .map(DeleteUserResponse::getId)
             .then(userId -> requestListUsers(this.uaaClient, userId))
             .map(ListUsersResponse::getTotalResults)
-            .subscribe(this.testSubscriber()
-                .expectEquals(0));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void getVerificationLink() {
+    public void getVerificationLink() throws TimeoutException, InterruptedException {
         String userName = this.nameFactory.getUserName();
+
+        Function<String, Optional<String>> assertion = location -> {
+            if (!location.contains("/verify_user?code=")) {
+                return Optional.of(String.format("expected location to start with: %s; actual location: %s", "/verify_user?code=", location));
+            }
+
+            return Optional.empty();
+        };
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
+                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching link")))
+            .expectComplete();
 
         createUserId(this.uaaClient, userName)
             .then(userId -> this.uaaClient.users()
@@ -129,12 +179,34 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .userId(userId)
                     .build()))
             .map(GetUserVerificationLinkResponse::getVerifyLink)
-            .subscribe(this.<String>testSubscriber()
-                .expectThat(location -> assertTrue(location.contains("/verify_user?code="))));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void invite() {
+    public void invite() throws TimeoutException, InterruptedException {
+        Function<Invite, Optional<String>> assertion = invite -> {
+            if (!"test-email-address".equals(invite.getEmail())) {
+                return Optional.of(String.format("expected email: %s; actual email: %s", "test-email-address", invite.getEmail()));
+            }
+
+            if (invite.getErrorCode() != null) {
+                return Optional.of(String.format("expected error code: %s; actual error code: %s", null, invite.getErrorCode()));
+            }
+
+            if (!invite.getSuccess()) {
+                return Optional.of(String.format("expected success: %s; actual success: %s", true, invite.getSuccess()));
+            }
+
+            return Optional.empty();
+        };
+
+        ScriptedSubscriber<Invite> subscriber = ScriptedSubscriber.<Invite>create()
+            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
+                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching invite")))
+            .expectComplete();
+
         this.uaaClient.users()
             .invite(InviteUsersRequest.builder()
                 .email("test-email-address")
@@ -142,17 +214,18 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .build())
             .flatMapIterable(InviteUsersResponse::getNewInvites)
             .single()
-            .subscribe(this.<Invite>testSubscriber()
-                .expectThat(invite -> {
-                    assertEquals("test-email-address", invite.getEmail());
-                    assertEquals(null, invite.getErrorCode());
-                    assertTrue(invite.getSuccess());
-                }));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void list() {
+    public void list() throws TimeoutException, InterruptedException {
         String userName = this.nameFactory.getUserName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(userName)
+            .expectComplete();
 
         createUserId(this.uaaClient, userName)
             .then(userId -> this.uaaClient.users()
@@ -161,13 +234,18 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .build()))
             .flatMapIterable(ListUsersResponse::getResources)
             .map(User::getUserName)
-            .subscribe(this.testSubscriber()
-                .expectEquals(userName));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void lookup() {
+    public void lookup() throws TimeoutException, InterruptedException {
         String userName = this.nameFactory.getUserName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(userName)
+            .expectComplete();
 
         createUserId(this.uaaClient, userName)
             .then(userId -> this.uaaClient.users()
@@ -176,13 +254,18 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .build()))
             .flatMapIterable(LookupUserIdsResponse::getResources)
             .map(UserId::getUserName)
-            .subscribe(this.testSubscriber()
-                .expectEquals(userName));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void update() {
+    public void update() throws TimeoutException, InterruptedException {
         String userName = this.nameFactory.getUserName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue("test-email-2")
+            .expectComplete();
 
         createUserId(this.uaaClient, userName)
             .then(userId -> this.uaaClient.users()
@@ -201,13 +284,18 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .build()))
             .flatMap(response -> Flux.fromIterable(response.getEmail())
                 .map(Email::getValue))
-            .subscribe(this.testSubscriber()
-                .expectEquals("test-email-2"));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void verifyUser() {
+    public void verifyUser() throws TimeoutException, InterruptedException {
         String userName = this.nameFactory.getUserName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(userName)
+            .expectComplete();
 
         createUserId(this.uaaClient, userName)
             .then(userId -> this.uaaClient.users()
@@ -215,8 +303,9 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .userId(userId)
                     .build()))
             .map(VerifyUserResponse::getUserName)
-            .subscribe(this.testSubscriber()
-                .expectEquals(userName));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     private static Mono<String> createUserId(UaaClient uaaClient, String userName) {

@@ -27,6 +27,7 @@ import org.cloudfoundry.client.v2.routemappings.GetRouteMappingRequest;
 import org.cloudfoundry.client.v2.routemappings.GetRouteMappingResponse;
 import org.cloudfoundry.client.v2.routemappings.ListRouteMappingsRequest;
 import org.cloudfoundry.client.v2.routemappings.RouteMappingEntity;
+import org.cloudfoundry.client.v2.routemappings.RouteMappingResource;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest;
@@ -37,15 +38,18 @@ import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuple3;
 
-import java.util.function.Consumer;
+import java.time.Duration;
+import java.util.Optional;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
-import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
-import static org.junit.Assert.assertEquals;
+import static reactor.core.publisher.Mono.when;
 
 public final class RouteMappingsTest extends AbstractIntegrationTest {
 
@@ -56,10 +60,27 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
     private Mono<String> spaceId;
 
     @Test
-    public void createSharedDomain() {
+    public void createSharedDomain() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
+
+        Function<Tuple3<String, String, RouteMappingEntity>, Optional<String>> assertion = function((applicationId, routeId, entity) -> {
+            if (!applicationId.equals(entity.getApplicationId())) {
+                return Optional.of(String.format("expected application id: %s; actual application id: %s", applicationId, entity.getApplicationId()));
+            }
+
+            if (!routeId.equals(entity.getRouteId())) {
+                return Optional.of(String.format("expected route id: %s; actual route id: %s", routeId, entity.getRouteId()));
+            }
+
+            return Optional.empty();
+        });
+
+        ScriptedSubscriber<Tuple3<String, String, RouteMappingEntity>> subscriber = ScriptedSubscriber.<Tuple3<String, String, RouteMappingEntity>>create()
+            .expectValueWith(tuple -> !assertion.apply(tuple).isPresent(),
+                tuple -> assertion.apply(tuple).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching entity")))
+            .expectComplete();
 
         Mono
             .when(
@@ -81,15 +102,18 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
                             .build())
                         .map(ResourceUtils::getEntity)
                 )))
-            .subscribe(this.<Tuple3<String, String, RouteMappingEntity>>testSubscriber()
-                .expectThat(responseMatchesInputs()));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void deleteAsyncFalse() {
+    public void deleteAsyncFalse() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
+
+        ScriptedSubscriber<GetRouteMappingResponse> subscriber = errorExpectation(CloudFoundryException.class, "CF-RouteMappingNotFound\\([0-9]+\\): The route mapping could not be found: .*");
 
         this.spaceId
             .then(spaceId -> getRouteMappingId(this.cloudFoundryClient, applicationName, domainName, hostName, spaceId))
@@ -99,15 +123,18 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
                     .routeMappingId(routeMappingId)
                     .build())))
             .then(routeMappingId -> requestGetRouteMapping(this.cloudFoundryClient, routeMappingId))
-            .subscribe(this.testSubscriber()
-                .expectErrorMatch(CloudFoundryException.class, "CF-RouteMappingNotFound\\([0-9]+\\): The route mapping could not be found: .*"));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void deleteAsyncTrue() {
+    public void deleteAsyncTrue() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
+
+        ScriptedSubscriber<GetRouteMappingResponse> subscriber = errorExpectation(CloudFoundryException.class, "CF-RouteMappingNotFound\\([0-9]+\\): The route mapping could not be found: .*");
 
         this.spaceId
             .then(spaceId -> getRouteMappingId(this.cloudFoundryClient, applicationName, domainName, hostName, spaceId))
@@ -118,42 +145,48 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
                     .build())
                 .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job))))
             .then(routeMappingId -> requestGetRouteMapping(this.cloudFoundryClient, routeMappingId))
-            .subscribe(this.testSubscriber()
-                .expectErrorMatch(CloudFoundryException.class, "CF-RouteMappingNotFound\\([0-9]+\\): The route mapping could not be found: .*"));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void get() {
+    public void get() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
 
+        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
+
         this.spaceId
             .then(spaceId -> getRouteMappingId(this.cloudFoundryClient, applicationName, domainName, hostName, spaceId))
-            .then(routeMappingId -> Mono.when(
+            .then(routeMappingId -> when(
                 Mono.just(routeMappingId),
                 this.cloudFoundryClient.routeMappings()
                     .get(GetRouteMappingRequest.builder()
                         .routeMappingId(routeMappingId)
                         .build())
-                    .map(ResourceUtils::getId)
-            ))
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .expectThat(this::assertTupleEquality));
+                    .map(ResourceUtils::getId)))
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listFilterByApplicationId() {
+    public void listFilterByApplicationId() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
 
+        ScriptedSubscriber<RouteMappingResource> subscriber = ScriptedSubscriber.<RouteMappingResource>expectValueCount(1)
+            .expectComplete();
+
         this.spaceId
-            .then(spaceId -> Mono.when(
+            .then(spaceId -> when(
                 getSharedDomainId(this.cloudFoundryClient, domainName),
                 Mono.just(spaceId)
             ))
-            .then(function((domainId, spaceId) -> Mono.when(
+            .then(function((domainId, spaceId) -> when(
                 getApplicationId(this.cloudFoundryClient, applicationName, spaceId),
                 getRouteId(this.cloudFoundryClient, domainId, hostName, spaceId)
             )))
@@ -167,22 +200,26 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
                         .build()))
                 .filter(resource -> ResourceUtils.getEntity(resource).getApplicationId().equals(applicationId))
                 .single())
-            .subscribe(testSubscriber()
-                .expectCount(1));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listFilterByRouteId() {
+    public void listFilterByRouteId() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
 
+        ScriptedSubscriber<RouteMappingResource> subscriber = ScriptedSubscriber.<RouteMappingResource>expectValueCount(1)
+            .expectComplete();
+
         this.spaceId
-            .then(spaceId -> Mono.when(
+            .then(spaceId -> when(
                 getSharedDomainId(this.cloudFoundryClient, domainName),
                 Mono.just(spaceId)
             ))
-            .then(function((domainId, spaceId) -> Mono.when(
+            .then(function((domainId, spaceId) -> when(
                 getApplicationId(this.cloudFoundryClient, applicationName, spaceId),
                 getRouteId(this.cloudFoundryClient, domainId, hostName, spaceId)
             )))
@@ -196,8 +233,9 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
                         .build()))
                 .filter(resource -> ResourceUtils.getEntity(resource).getRouteId().equals(routeId))
                 .single())
-            .subscribe(testSubscriber()
-                .expectCount(1));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     private static Mono<String> createRouteMappingId(CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
@@ -217,7 +255,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
 
     private static Mono<String> getRouteMappingId(CloudFoundryClient cloudFoundryClient, String applicationName, String domainName, String hostName, String spaceId) {
         return getSharedDomainId(cloudFoundryClient, domainName)
-            .then(domainId -> Mono.when(
+            .then(domainId -> when(
                 getApplicationId(cloudFoundryClient, applicationName, spaceId),
                 getRouteId(cloudFoundryClient, domainId, hostName, spaceId)
             ))
@@ -268,13 +306,6 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
             .get(GetRouteMappingRequest.builder()
                 .routeMappingId(routeMappingId)
                 .build());
-    }
-
-    private static Consumer<Tuple3<String, String, RouteMappingEntity>> responseMatchesInputs() {
-        return consumer((applicationId, routeId, entity) -> {
-            assertEquals(applicationId, entity.getApplicationId());
-            assertEquals(routeId, entity.getRouteId());
-        });
     }
 
 }

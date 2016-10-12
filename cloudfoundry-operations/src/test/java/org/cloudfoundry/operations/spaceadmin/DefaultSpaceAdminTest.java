@@ -21,12 +21,12 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefini
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
-import static org.cloudfoundry.util.test.TestObjects.fill;
+import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
 public final class DefaultSpaceAdminTest {
@@ -65,30 +65,11 @@ public final class DefaultSpaceAdminTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) {
-            testSubscriber
-                .expectEquals(fill(SpaceQuota.builder(), "space-quota-definition-")
-                    .build());
-        }
-
-        @Override
-        protected Mono<SpaceQuota> invoke() {
-            return this.spaceAdmin
-                .get(GetSpaceQuotaRequest.builder()
-                    .name("test-space-quota-definition-name")
-                    .build());
-        }
-
-    }
-
-    public static final class GetNoOrganization extends AbstractOperationsApiTest<SpaceQuota> {
-
-        private final DefaultSpaceAdmin spaceAdmin = new DefaultSpaceAdmin(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID);
-
-        @Override
-        protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
+        protected ScriptedSubscriber<SpaceQuota> expectations() {
+            return ScriptedSubscriber.<SpaceQuota>create()
+                .expectValue(fill(SpaceQuota.builder(), "space-quota-definition-")
+                    .build())
+                .expectComplete();
         }
 
         @Override
@@ -111,9 +92,8 @@ public final class DefaultSpaceAdminTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalArgumentException.class, "Space Quota test-space-quota-definition-name does not exist");
+        protected ScriptedSubscriber<SpaceQuota> expectations() {
+            return errorExpectation(IllegalArgumentException.class, "Space Quota test-space-quota-definition-name does not exist");
         }
 
         @Override
@@ -136,28 +116,11 @@ public final class DefaultSpaceAdminTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) {
-            testSubscriber
-                .expectEquals(fill(SpaceQuota.builder(), "space-quota-definition-")
-                    .build());
-        }
-
-        @Override
-        protected Publisher<SpaceQuota> invoke() {
-            return this.spaceAdmin
-                .listQuotas();
-        }
-
-    }
-
-    public static final class ListNoOrganization extends AbstractOperationsApiTest<SpaceQuota> {
-
-        private final DefaultSpaceAdmin spaceAdmin = new DefaultSpaceAdmin(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID);
-
-        @Override
-        protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
+        protected ScriptedSubscriber<SpaceQuota> expectations() {
+            return ScriptedSubscriber.<SpaceQuota>create()
+                .expectValue(fill(SpaceQuota.builder(), "space-quota-definition-")
+                    .build())
+                .expectComplete();
         }
 
         @Override

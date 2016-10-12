@@ -29,6 +29,7 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
 import java.util.Collections;
 
@@ -44,7 +45,17 @@ public class ReactorEnvironmentVariableGroupsTest {
         private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<GetRunningEnvironmentVariablesResponse> expectations() {
+            return ScriptedSubscriber.<GetRunningEnvironmentVariablesResponse>create()
+                .expectValue(GetRunningEnvironmentVariablesResponse.builder()
+                    .environmentVariable("abc", 123)
+                    .environmentVariable("do-re-me", "far-so-la-tee")
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/v2/config/environment_variable_groups/running")
@@ -57,22 +68,14 @@ public class ReactorEnvironmentVariableGroupsTest {
         }
 
         @Override
-        protected GetRunningEnvironmentVariablesResponse getResponse() {
-            return GetRunningEnvironmentVariablesResponse.builder()
-                .environmentVariable("abc", 123)
-                .environmentVariable("do-re-me", "far-so-la-tee")
-                .build();
-        }
-
-        @Override
-        protected GetRunningEnvironmentVariablesRequest getValidRequest() throws Exception {
-            return GetRunningEnvironmentVariablesRequest.builder()
-                .build();
-        }
-
-        @Override
         protected Mono<GetRunningEnvironmentVariablesResponse> invoke(GetRunningEnvironmentVariablesRequest request) {
             return this.environmentVariableGroups.getRunningEnvironmentVariables(request);
+        }
+
+        @Override
+        protected GetRunningEnvironmentVariablesRequest validRequest() {
+            return GetRunningEnvironmentVariablesRequest.builder()
+                .build();
         }
     }
 
@@ -81,7 +84,17 @@ public class ReactorEnvironmentVariableGroupsTest {
         private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<GetStagingEnvironmentVariablesResponse> expectations() {
+            return ScriptedSubscriber.<GetStagingEnvironmentVariablesResponse>create()
+                .expectValue(GetStagingEnvironmentVariablesResponse.builder()
+                    .environmentVariable("abc", 123)
+                    .environmentVariable("do-re-me", "far-so-la-tee")
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/v2/config/environment_variable_groups/staging")
@@ -94,22 +107,14 @@ public class ReactorEnvironmentVariableGroupsTest {
         }
 
         @Override
-        protected GetStagingEnvironmentVariablesResponse getResponse() {
-            return GetStagingEnvironmentVariablesResponse.builder()
-                .environmentVariable("abc", 123)
-                .environmentVariable("do-re-me", "far-so-la-tee")
-                .build();
-        }
-
-        @Override
-        protected GetStagingEnvironmentVariablesRequest getValidRequest() throws Exception {
-            return GetStagingEnvironmentVariablesRequest.builder()
-                .build();
-        }
-
-        @Override
         protected Mono<GetStagingEnvironmentVariablesResponse> invoke(GetStagingEnvironmentVariablesRequest request) {
             return this.environmentVariableGroups.getStagingEnvironmentVariables(request);
+        }
+
+        @Override
+        protected GetStagingEnvironmentVariablesRequest validRequest() {
+            return GetStagingEnvironmentVariablesRequest.builder()
+                .build();
         }
     }
 
@@ -118,7 +123,17 @@ public class ReactorEnvironmentVariableGroupsTest {
         private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<UpdateRunningEnvironmentVariablesResponse> expectations() {
+            return ScriptedSubscriber.<UpdateRunningEnvironmentVariablesResponse>create()
+                .expectValue(UpdateRunningEnvironmentVariablesResponse.builder()
+                    .environmentVariable("abc", 123)
+                    .environmentVariable("do-re-me", "fa-so-la-tee")
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(PUT).path("/v2/config/environment_variable_groups/running")
@@ -132,24 +147,16 @@ public class ReactorEnvironmentVariableGroupsTest {
         }
 
         @Override
-        protected UpdateRunningEnvironmentVariablesResponse getResponse() {
-            return UpdateRunningEnvironmentVariablesResponse.builder()
-                .environmentVariable("abc", 123)
-                .environmentVariable("do-re-me", "fa-so-la-tee")
-                .build();
+        protected Mono<UpdateRunningEnvironmentVariablesResponse> invoke(UpdateRunningEnvironmentVariablesRequest request) {
+            return this.environmentVariableGroups.updateRunningEnvironmentVariables(request);
         }
 
         @Override
-        protected UpdateRunningEnvironmentVariablesRequest getValidRequest() throws Exception {
+        protected UpdateRunningEnvironmentVariablesRequest validRequest() {
             return UpdateRunningEnvironmentVariablesRequest.builder()
                 .environmentVariable("abc", 123)
                 .environmentVariable("do-re-me", "fa-so-la-tee")
                 .build();
-        }
-
-        @Override
-        protected Mono<UpdateRunningEnvironmentVariablesResponse> invoke(UpdateRunningEnvironmentVariablesRequest request) {
-            return this.environmentVariableGroups.updateRunningEnvironmentVariables(request);
         }
     }
 
@@ -158,7 +165,16 @@ public class ReactorEnvironmentVariableGroupsTest {
         private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<UpdateRunningEnvironmentVariablesResponse> expectations() {
+            return ScriptedSubscriber.<UpdateRunningEnvironmentVariablesResponse>create()
+                .expectValue(UpdateRunningEnvironmentVariablesResponse.builder()
+                    .environmentVariables(Collections.emptyMap())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(PUT).path("/v2/config/environment_variable_groups/running")
@@ -172,22 +188,15 @@ public class ReactorEnvironmentVariableGroupsTest {
         }
 
         @Override
-        protected UpdateRunningEnvironmentVariablesResponse getResponse() {
-            return UpdateRunningEnvironmentVariablesResponse.builder()
-                .environmentVariables(Collections.emptyMap())
-                .build();
+        protected Mono<UpdateRunningEnvironmentVariablesResponse> invoke(UpdateRunningEnvironmentVariablesRequest request) {
+            return this.environmentVariableGroups.updateRunningEnvironmentVariables(request);
         }
 
         @Override
-        protected UpdateRunningEnvironmentVariablesRequest getValidRequest() throws Exception {
+        protected UpdateRunningEnvironmentVariablesRequest validRequest() {
             return UpdateRunningEnvironmentVariablesRequest.builder()
                 .environmentVariables(Collections.emptyMap())
                 .build();
-        }
-
-        @Override
-        protected Mono<UpdateRunningEnvironmentVariablesResponse> invoke(UpdateRunningEnvironmentVariablesRequest request) {
-            return this.environmentVariableGroups.updateRunningEnvironmentVariables(request);
         }
     }
 
@@ -196,7 +205,17 @@ public class ReactorEnvironmentVariableGroupsTest {
         private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<UpdateStagingEnvironmentVariablesResponse> expectations() {
+            return ScriptedSubscriber.<UpdateStagingEnvironmentVariablesResponse>create()
+                .expectValue(UpdateStagingEnvironmentVariablesResponse.builder()
+                    .environmentVariable("abc", 123)
+                    .environmentVariable("do-re-me", "far-so-la-tee")
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(PUT).path("/v2/config/environment_variable_groups/staging")
@@ -210,24 +229,16 @@ public class ReactorEnvironmentVariableGroupsTest {
         }
 
         @Override
-        protected UpdateStagingEnvironmentVariablesResponse getResponse() {
-            return UpdateStagingEnvironmentVariablesResponse.builder()
-                .environmentVariable("abc", 123)
-                .environmentVariable("do-re-me", "far-so-la-tee")
-                .build();
+        protected Mono<UpdateStagingEnvironmentVariablesResponse> invoke(UpdateStagingEnvironmentVariablesRequest request) {
+            return this.environmentVariableGroups.updateStagingEnvironmentVariables(request);
         }
 
         @Override
-        protected UpdateStagingEnvironmentVariablesRequest getValidRequest() throws Exception {
+        protected UpdateStagingEnvironmentVariablesRequest validRequest() {
             return UpdateStagingEnvironmentVariablesRequest.builder()
                 .environmentVariable("abc", 123)
                 .environmentVariable("do-re-me", "far-so-la-tee")
                 .build();
-        }
-
-        @Override
-        protected Mono<UpdateStagingEnvironmentVariablesResponse> invoke(UpdateStagingEnvironmentVariablesRequest request) {
-            return this.environmentVariableGroups.updateStagingEnvironmentVariables(request);
         }
     }
 
@@ -236,7 +247,16 @@ public class ReactorEnvironmentVariableGroupsTest {
         private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<UpdateStagingEnvironmentVariablesResponse> expectations() {
+            return ScriptedSubscriber.<UpdateStagingEnvironmentVariablesResponse>create()
+                .expectValue(UpdateStagingEnvironmentVariablesResponse.builder()
+                    .environmentVariables(Collections.emptyMap())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(PUT).path("/v2/config/environment_variable_groups/staging")
@@ -250,22 +270,15 @@ public class ReactorEnvironmentVariableGroupsTest {
         }
 
         @Override
-        protected UpdateStagingEnvironmentVariablesResponse getResponse() {
-            return UpdateStagingEnvironmentVariablesResponse.builder()
-                .environmentVariables(Collections.emptyMap())
-                .build();
+        protected Mono<UpdateStagingEnvironmentVariablesResponse> invoke(UpdateStagingEnvironmentVariablesRequest request) {
+            return this.environmentVariableGroups.updateStagingEnvironmentVariables(request);
         }
 
         @Override
-        protected UpdateStagingEnvironmentVariablesRequest getValidRequest() throws Exception {
+        protected UpdateStagingEnvironmentVariablesRequest validRequest() {
             return UpdateStagingEnvironmentVariablesRequest.builder()
                 .environmentVariables(Collections.emptyMap())
                 .build();
-        }
-
-        @Override
-        protected Mono<UpdateStagingEnvironmentVariablesResponse> invoke(UpdateStagingEnvironmentVariablesRequest request) {
-            return this.environmentVariableGroups.updateStagingEnvironmentVariables(request);
         }
     }
 

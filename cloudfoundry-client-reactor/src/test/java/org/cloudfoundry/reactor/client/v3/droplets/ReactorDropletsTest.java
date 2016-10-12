@@ -37,6 +37,7 @@ import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.cloudfoundry.util.FluentMap;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
 import java.util.Collections;
 
@@ -52,7 +53,13 @@ public final class ReactorDropletsTest {
         private final ReactorDroplets droplets = new ReactorDroplets(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(DELETE).path("/v3/droplets/test-droplet-id")
@@ -64,20 +71,15 @@ public final class ReactorDropletsTest {
         }
 
         @Override
-        protected Void getResponse() {
-            return null;
+        protected Mono<Void> invoke(DeleteDropletRequest request) {
+            return this.droplets.delete(request);
         }
 
         @Override
-        protected DeleteDropletRequest getValidRequest() throws Exception {
+        protected DeleteDropletRequest validRequest() {
             return DeleteDropletRequest.builder()
                 .dropletId("test-droplet-id")
                 .build();
-        }
-
-        @Override
-        protected Mono<Void> invoke(DeleteDropletRequest request) {
-            return this.droplets.delete(request);
         }
 
     }
@@ -87,124 +89,9 @@ public final class ReactorDropletsTest {
         private final ReactorDroplets droplets = new ReactorDroplets(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/v3/droplets/test-droplet-id")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v3/droplets/GET_{id}_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected GetDropletResponse getResponse() {
-            return GetDropletResponse.builder()
-                .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
-                .state(State.STAGED)
-                .lifecycle(Lifecycle.builder()
-                    .type(Type.BUILDPACK)
-                    .data(BuildpackData.builder()
-                        .build())
-                    .build())
-                .stagingMemoryInMb(1_024)
-                .stagingDiskInMb(4_096)
-                .result(StagedResult.builder()
-                    .executionMetadata("")
-                    .processType("rake", "bundle exec rake")
-                    .processType("web", "bundle exec rackup config.ru -p $PORT")
-                    .hash(Hash.builder()
-                        .type("sha1")
-                        .value("0cd90dd63dd9f42db25340445d203fba25c69cf6")
-                        .build())
-                    .buildpack("ruby 1.6.14")
-                    .stack("cflinuxfs2")
-                    .build())
-                .environmentVariable("CF_STACK", "cflinuxfs2")
-                .environmentVariable("VCAP_APPLICATION", FluentMap.builder()
-                    .entry("limits", FluentMap.builder()
-                        .entry("mem", 1_024)
-                        .entry("disk", 4_096)
-                        .entry("fds", 16_384)
-                        .build())
-                    .entry("application_id", "7b34f1cf-7e73-428a-bb5a-8a17a8058396")
-                    .entry("application_version", "d5985d64-c455-44d0-99a5-285b6521f84c")
-                    .entry("application_name", "my_app")
-                    .entry("application_uris", Collections.singletonList("my_app.example.com"))
-                    .entry("version", "d5985d64-c455-44d0-99a5-285b6521f84c")
-                    .entry("name", "my_app")
-                    .entry("space_name", "my_space")
-                    .entry("space_id", "2f35885d-0c9d-4423-83ad-fd05066f8576")
-                    .entry("uris", Collections.singletonList("my_app.example.com"))
-                    .entry("users", null)
-                    .build())
-                .environmentVariable("MEMORY_LIMIT", "1024m")
-                .environmentVariable("VCAP_SERVICES", Collections.emptyMap())
-                .createdAt("2016-03-28T23:39:34Z")
-                .updatedAt("2016-03-28T23:39:47Z")
-                .link("self", Link.builder()
-                    .href("/v3/droplets/585bc3c1-3743-497d-88b0-403ad6b56d16")
-                    .build())
-                .link("package", Link.builder()
-                    .href("/v3/packages/8222f76a-9e09-4360-b3aa-1ed329945e92")
-                    .build())
-                .link("app", Link.builder()
-                    .href("/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
-                    .build())
-                .link("assign_current_droplet", Link.builder()
-                    .href("/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396/droplets/current")
-                    .method("PUT")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected GetDropletRequest getValidRequest() throws Exception {
-            return GetDropletRequest.builder()
-                .dropletId("test-droplet-id")
-                .build();
-        }
-
-        @Override
-        protected Mono<GetDropletResponse> invoke(GetDropletRequest request) {
-            return this.droplets.get(request);
-        }
-
-    }
-
-    public static final class List extends AbstractClientApiTest<ListDropletsRequest, ListDropletsResponse> {
-
-        private final ReactorDroplets droplets = new ReactorDroplets(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected InteractionContext getInteractionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/v3/droplets")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v3/droplets/GET_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected ListDropletsResponse getResponse() {
-            return ListDropletsResponse.builder()
-                .pagination(Pagination.builder()
-                    .totalResults(2)
-                    .totalPages(1)
-                    .first(Link.builder()
-                        .href("/v3/droplets?page=1&per_page=50")
-                        .build())
-                    .last(Link.builder()
-                        .href("/v3/droplets?page=1&per_page=50")
-                        .build())
-                    .build())
-                .resource(DropletResource.builder()
+        protected ScriptedSubscriber<GetDropletResponse> expectations() {
+            return ScriptedSubscriber.<GetDropletResponse>create()
+                .expectValue(GetDropletResponse.builder()
                     .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
                     .state(State.STAGED)
                     .lifecycle(Lifecycle.builder()
@@ -212,11 +99,12 @@ public final class ReactorDropletsTest {
                         .data(BuildpackData.builder()
                             .build())
                         .build())
-                    .stagingMemoryInMb(1024)
-                    .stagingDiskInMb(4096)
+                    .stagingMemoryInMb(1_024)
+                    .stagingDiskInMb(4_096)
                     .result(StagedResult.builder()
-                        .executionMetadata("[PRIVATE DATA HIDDEN IN LISTS]")
-                        .processType("redacted_message", "[PRIVATE DATA HIDDEN IN LISTS]")
+                        .executionMetadata("")
+                        .processType("rake", "bundle exec rake")
+                        .processType("web", "bundle exec rackup config.ru -p $PORT")
                         .hash(Hash.builder()
                             .type("sha1")
                             .value("0cd90dd63dd9f42db25340445d203fba25c69cf6")
@@ -224,7 +112,26 @@ public final class ReactorDropletsTest {
                         .buildpack("ruby 1.6.14")
                         .stack("cflinuxfs2")
                         .build())
-                    .environmentVariable("redacted_message", "[PRIVATE DATA HIDDEN IN LISTS]")
+                    .environmentVariable("CF_STACK", "cflinuxfs2")
+                    .environmentVariable("VCAP_APPLICATION", FluentMap.builder()
+                        .entry("limits", FluentMap.builder()
+                            .entry("mem", 1_024)
+                            .entry("disk", 4_096)
+                            .entry("fds", 16_384)
+                            .build())
+                        .entry("application_id", "7b34f1cf-7e73-428a-bb5a-8a17a8058396")
+                        .entry("application_version", "d5985d64-c455-44d0-99a5-285b6521f84c")
+                        .entry("application_name", "my_app")
+                        .entry("application_uris", Collections.singletonList("my_app.example.com"))
+                        .entry("version", "d5985d64-c455-44d0-99a5-285b6521f84c")
+                        .entry("name", "my_app")
+                        .entry("space_name", "my_space")
+                        .entry("space_id", "2f35885d-0c9d-4423-83ad-fd05066f8576")
+                        .entry("uris", Collections.singletonList("my_app.example.com"))
+                        .entry("users", null)
+                        .build())
+                    .environmentVariable("MEMORY_LIMIT", "1024m")
+                    .environmentVariable("VCAP_SERVICES", Collections.emptyMap())
                     .createdAt("2016-03-28T23:39:34Z")
                     .updatedAt("2016-03-28T23:39:47Z")
                     .link("self", Link.builder()
@@ -241,45 +148,144 @@ public final class ReactorDropletsTest {
                         .method("PUT")
                         .build())
                     .build())
-                .resource(DropletResource.builder()
-                    .id("fdf3851c-def8-4de1-87f1-6d4543189e22")
-                    .state(State.STAGING)
-                    .lifecycle(Lifecycle.builder()
-                        .type(Type.DOCKER)
-                        .data(DockerData.builder()
-                            .build())
-                        .build())
-                    .stagingMemoryInMb(1024)
-                    .stagingDiskInMb(4096)
-                    .environmentVariable("redacted_message", "[PRIVATE DATA HIDDEN IN LISTS]")
-                    .createdAt("2016-03-17T00:00:01Z")
-                    .updatedAt("2016-03-17T21:41:32Z")
-                    .link("self", Link.builder()
-                        .href("/v3/droplets/fdf3851c-def8-4de1-87f1-6d4543189e22")
-                        .build())
-                    .link("package", Link.builder()
-                        .href("/v3/packages/c5725684-a02f-4e59-bc67-8f36ae944688")
-                        .build())
-                    .link("app", Link.builder()
-                        .href("/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
-                        .build())
-                    .link("assign_current_droplet", Link.builder()
-                        .href("/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396/droplets/current")
-                        .method("PUT")
-                        .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/droplets/test-droplet-id")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/droplets/GET_{id}_response.json")
                     .build())
                 .build();
         }
 
         @Override
-        protected ListDropletsRequest getValidRequest() throws Exception {
-            return ListDropletsRequest.builder()
+        protected Mono<GetDropletResponse> invoke(GetDropletRequest request) {
+            return this.droplets.get(request);
+        }
+
+        @Override
+        protected GetDropletRequest validRequest() {
+            return GetDropletRequest.builder()
+                .dropletId("test-droplet-id")
+                .build();
+        }
+
+    }
+
+    public static final class List extends AbstractClientApiTest<ListDropletsRequest, ListDropletsResponse> {
+
+        private final ReactorDroplets droplets = new ReactorDroplets(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+        @Override
+        protected ScriptedSubscriber<ListDropletsResponse> expectations() {
+            return ScriptedSubscriber.<ListDropletsResponse>create()
+                .expectValue(ListDropletsResponse.builder()
+                    .pagination(Pagination.builder()
+                        .totalResults(2)
+                        .totalPages(1)
+                        .first(Link.builder()
+                            .href("/v3/droplets?page=1&per_page=50")
+                            .build())
+                        .last(Link.builder()
+                            .href("/v3/droplets?page=1&per_page=50")
+                            .build())
+                        .build())
+                    .resource(DropletResource.builder()
+                        .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
+                        .state(State.STAGED)
+                        .lifecycle(Lifecycle.builder()
+                            .type(Type.BUILDPACK)
+                            .data(BuildpackData.builder()
+                                .build())
+                            .build())
+                        .stagingMemoryInMb(1024)
+                        .stagingDiskInMb(4096)
+                        .result(StagedResult.builder()
+                            .executionMetadata("[PRIVATE DATA HIDDEN IN LISTS]")
+                            .processType("redacted_message", "[PRIVATE DATA HIDDEN IN LISTS]")
+                            .hash(Hash.builder()
+                                .type("sha1")
+                                .value("0cd90dd63dd9f42db25340445d203fba25c69cf6")
+                                .build())
+                            .buildpack("ruby 1.6.14")
+                            .stack("cflinuxfs2")
+                            .build())
+                        .environmentVariable("redacted_message", "[PRIVATE DATA HIDDEN IN LISTS]")
+                        .createdAt("2016-03-28T23:39:34Z")
+                        .updatedAt("2016-03-28T23:39:47Z")
+                        .link("self", Link.builder()
+                            .href("/v3/droplets/585bc3c1-3743-497d-88b0-403ad6b56d16")
+                            .build())
+                        .link("package", Link.builder()
+                            .href("/v3/packages/8222f76a-9e09-4360-b3aa-1ed329945e92")
+                            .build())
+                        .link("app", Link.builder()
+                            .href("/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
+                            .build())
+                        .link("assign_current_droplet", Link.builder()
+                            .href("/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396/droplets/current")
+                            .method("PUT")
+                            .build())
+                        .build())
+                    .resource(DropletResource.builder()
+                        .id("fdf3851c-def8-4de1-87f1-6d4543189e22")
+                        .state(State.STAGING)
+                        .lifecycle(Lifecycle.builder()
+                            .type(Type.DOCKER)
+                            .data(DockerData.builder()
+                                .build())
+                            .build())
+                        .stagingMemoryInMb(1024)
+                        .stagingDiskInMb(4096)
+                        .environmentVariable("redacted_message", "[PRIVATE DATA HIDDEN IN LISTS]")
+                        .createdAt("2016-03-17T00:00:01Z")
+                        .updatedAt("2016-03-17T21:41:32Z")
+                        .link("self", Link.builder()
+                            .href("/v3/droplets/fdf3851c-def8-4de1-87f1-6d4543189e22")
+                            .build())
+                        .link("package", Link.builder()
+                            .href("/v3/packages/c5725684-a02f-4e59-bc67-8f36ae944688")
+                            .build())
+                        .link("app", Link.builder()
+                            .href("/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
+                            .build())
+                        .link("assign_current_droplet", Link.builder()
+                            .href("/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396/droplets/current")
+                            .method("PUT")
+                            .build())
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(GET).path("/v3/droplets")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v3/droplets/GET_response.json")
+                    .build())
                 .build();
         }
 
         @Override
         protected Mono<ListDropletsResponse> invoke(ListDropletsRequest request) {
             return this.droplets.list(request);
+        }
+
+        @Override
+        protected ListDropletsRequest validRequest() {
+            return ListDropletsRequest.builder()
+                .build();
         }
 
     }

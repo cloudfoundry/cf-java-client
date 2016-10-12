@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
@@ -33,6 +34,7 @@ import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v2.routes.RemoveRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
+import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.routes.UpdateRouteRequest;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
@@ -40,13 +42,16 @@ import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 import reactor.util.function.Tuple3;
 
+import java.time.Duration;
+import java.util.Optional;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
+
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
-import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public final class RoutesTest extends AbstractIntegrationTest {
 
@@ -63,9 +68,12 @@ public final class RoutesTest extends AbstractIntegrationTest {
     private Mono<String> stackId;
 
     @Test
-    public void associateApplication() {
+    public void associateApplication() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
+
+        ScriptedSubscriber<ApplicationResource> subscriber = ScriptedSubscriber.<ApplicationResource>expectValueCount(1)
+            .expectComplete();
 
         Mono
             .when(
@@ -84,13 +92,16 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .page(page)
                         .routeId(routeId)
                         .build()))))
-            .subscribe(testSubscriber()
-                .expectCount(1));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void create() {
+    public void create() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
+
+        ScriptedSubscriber<Tuple3<String, String, RouteEntity>> subscriber = domainIdSpaceIdEquality();
 
         Mono
             .when(
@@ -108,13 +119,16 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .build())
                     .map(ResourceUtils::getEntity))
             ))
-            .subscribe(this.<Tuple3<String, String, RouteEntity>>testSubscriber()
-                .expectThat(consumer(RoutesTest::assertDomainIdAndSpaceId)));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void delete() {
+    public void delete() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
+
+        ScriptedSubscriber<GetRouteResponse> subscriber = errorExpectation(CloudFoundryException.class, "CF-RouteNotFound\\([0-9]+\\): The route could not be found: .*");
 
         Mono
             .when(
@@ -130,13 +144,16 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .build())
                 .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))))
             .then(routeId -> requestGetRoute(this.cloudFoundryClient, routeId))
-            .subscribe(testSubscriber()
-                .expectErrorMatch(CloudFoundryException.class, "CF-RouteNotFound\\([0-9]+\\): The route could not be found: .*"));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void deleteAsyncFalse() {
+    public void deleteAsyncFalse() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
+
+        ScriptedSubscriber<GetRouteResponse> subscriber = errorExpectation(CloudFoundryException.class, "CF-RouteNotFound\\([0-9]+\\): The route could not be found: .*");
 
         Mono
             .when(
@@ -151,14 +168,19 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .routeId(routeId)
                     .build())))
             .then(routeId -> requestGetRoute(this.cloudFoundryClient, routeId))
-            .subscribe(testSubscriber()
-                .expectErrorMatch(CloudFoundryException.class, "CF-RouteNotFound\\([0-9]+\\): The route could not be found: .*"));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void exists() {
+    public void exists() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
+
+        ScriptedSubscriber<Boolean> subscriber = ScriptedSubscriber.<Boolean>create()
+            .expectValue(true)
+            .expectComplete();
 
         Mono
             .when(
@@ -177,15 +199,20 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .domainId(domainId)
                     .host(hostName)
                     .build())))
-            .subscribe(testSubscriber()
-                .expectEquals(true));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void existsDoesNotExist() {
+    public void existsDoesNotExist() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
         String hostName1 = this.nameFactory.getHostName();
         String hostName2 = this.nameFactory.getHostName();
+
+        ScriptedSubscriber<Boolean> subscriber = ScriptedSubscriber.<Boolean>create()
+            .expectValue(false)
+            .expectComplete();
 
         Mono
             .when(
@@ -204,13 +231,16 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .domainId(domainId)
                     .host(hostName2)
                     .build())))
-            .subscribe(testSubscriber()
-                .expectEquals(false));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void get() {
+    public void get() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
+
+        ScriptedSubscriber<Tuple3<String, String, RouteEntity>> subscriber = domainIdSpaceIdEquality();
 
         Mono
             .when(
@@ -234,14 +264,18 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build())
                         .map(ResourceUtils::getEntity))
             ))
-            .subscribe(this.<Tuple3<String, String, RouteEntity>>testSubscriber()
-                .expectThat(consumer(RoutesTest::assertDomainIdAndSpaceId)));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listApplications() {
+    public void listApplications() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
+
+        ScriptedSubscriber<ApplicationResource> subscriber = ScriptedSubscriber.<ApplicationResource>expectValueCount(1)
+            .expectComplete();
 
         Mono
             .when(
@@ -260,14 +294,18 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .page(page)
                         .routeId(routeId)
                         .build()))))
-            .subscribe(testSubscriber()
-                .expectCount(1));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listApplicationsFilterByDiego() {
+    public void listApplicationsFilterByDiego() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
+
+        ScriptedSubscriber<ApplicationResource> subscriber = ScriptedSubscriber.<ApplicationResource>expectValueCount(1)
+            .expectComplete();
 
         Mono
             .when(
@@ -287,14 +325,18 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .page(page)
                         .routeId(routeId)
                         .build()))))
-            .subscribe(testSubscriber()
-                .expectCount(1));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listApplicationsFilterByName() {
+    public void listApplicationsFilterByName() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
+
+        ScriptedSubscriber<ApplicationResource> subscriber = ScriptedSubscriber.<ApplicationResource>expectValueCount(1)
+            .expectComplete();
 
         Mono
             .when(
@@ -314,14 +356,18 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .page(page)
                         .routeId(routeId)
                         .build()))))
-            .subscribe(testSubscriber()
-                .expectCount(1));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listApplicationsFilterByOrganizationId() {
+    public void listApplicationsFilterByOrganizationId() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
+
+        ScriptedSubscriber<ApplicationResource> subscriber = ScriptedSubscriber.<ApplicationResource>expectValueCount(1)
+            .expectComplete();
 
         this.organizationId
             .then(organizationId -> Mono
@@ -344,14 +390,18 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .page(page)
                         .routeId(routeId)
                         .build()))))
-            .subscribe(testSubscriber()
-                .expectCount(1));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listApplicationsFilterBySpaceId() {
+    public void listApplicationsFilterBySpaceId() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
+
+        ScriptedSubscriber<ApplicationResource> subscriber = ScriptedSubscriber.<ApplicationResource>expectValueCount(1)
+            .expectComplete();
 
         Mono
             .when(
@@ -372,14 +422,18 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .routeId(routeId)
                         .spaceId(spaceId)
                         .build()))))
-            .subscribe(testSubscriber()
-                .expectCount(1));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listApplicationsFilterByStackId() {
+    public void listApplicationsFilterByStackId() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
+
+        ScriptedSubscriber<ApplicationResource> subscriber = ScriptedSubscriber.<ApplicationResource>expectValueCount(1)
+            .expectComplete();
 
         Mono
             .when(
@@ -403,13 +457,17 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .routeId(routeId)
                         .stackId(stackId)
                         .build()))))
-            .subscribe(testSubscriber()
-                .expectCount(1));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listFilterByDomainId() {
+    public void listFilterByDomainId() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
+
+        ScriptedSubscriber<RouteResource> subscriber = ScriptedSubscriber.<RouteResource>expectValueCount(1)
+            .expectComplete();
 
         Mono
             .when(
@@ -424,14 +482,18 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .domainId(domainId)
                         .page(page)
                         .build()))))
-            .subscribe(testSubscriber()
-                .expectCount(1));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listFilterByHost() {
+    public void listFilterByHost() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
         String host = this.nameFactory.getHostName();
+
+        ScriptedSubscriber<RouteResource> subscriber = ScriptedSubscriber.<RouteResource>expectValueCount(1)
+            .expectComplete();
 
         Mono
             .when(
@@ -451,13 +513,27 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .host(host)
                         .page(page)
                         .build())))
-            .subscribe(testSubscriber()
-                .expectCount(1));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listFilterByOrganizationId() {
+    public void listFilterByOrganizationId() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
+
+        Function<Long, Optional<String>> assertion = count -> {
+            if (count <= 0) {
+                return Optional.of(String.format("expected at least one organization; actual: %s", count));
+            }
+
+            return Optional.empty();
+        };
+
+        ScriptedSubscriber<Long> subscriber = ScriptedSubscriber.<Long>create()
+            .expectValueWith(count -> !assertion.apply(count).isPresent(),
+                count -> assertion.apply(count).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching count")))
+            .expectComplete();
 
         this.organizationId
             .then(organizationId -> Mono
@@ -474,14 +550,18 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .page(page)
                         .build()))))
             .count()
-            .subscribe(this.<Long>testSubscriber()
-                .expectThat(count -> assertTrue("There should be at least one route in the organization", count > 0)));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listFilterByPath() {
+    public void listFilterByPath() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
         String path = this.nameFactory.getPath();
+
+        ScriptedSubscriber<RouteResource> subscriber = ScriptedSubscriber.<RouteResource>expectValueCount(1)
+            .expectComplete();
 
         Mono
             .when(
@@ -501,14 +581,18 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .page(page)
                         .path(path)
                         .build())))
-            .subscribe(testSubscriber()
-                .expectCount(1));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void removeApplication() {
+    public void removeApplication() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
+
+        ScriptedSubscriber<ApplicationResource> subscriber = ScriptedSubscriber.<ApplicationResource>create()
+            .expectComplete();
 
         Mono
             .when(
@@ -532,13 +616,18 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .page(page)
                         .routeId(routeId)
                         .build()))))
-            .subscribe(testSubscriber()
-                .expectCount(0));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void update() {
         String domainName = this.nameFactory.getDomainName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue("test-host")
+            .expectComplete();
 
         Mono
             .when(
@@ -552,14 +641,9 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .host("test-host")
                     .routeId(routeId)
                     .build())
-                .map(ResourceUtils::getEntity))
-            .subscribe(this.<RouteEntity>testSubscriber()
-                .expectThat(entity -> assertEquals("test-host", entity.getHost())));
-    }
-
-    private static void assertDomainIdAndSpaceId(String domainId, String spaceId, RouteEntity entity) {
-        assertEquals(domainId, entity.getDomainId());
-        assertEquals(spaceId, entity.getSpaceId());
+                .map(ResourceUtils::getEntity)
+                .map(RouteEntity::getHost))
+            .subscribe(subscriber);
     }
 
     private static Mono<AssociateRouteApplicationResponse> associateApplicationWithRoute(CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
@@ -588,6 +672,25 @@ public final class RoutesTest extends AbstractIntegrationTest {
     private static Mono<String> createRouteId(CloudFoundryClient cloudFoundryClient, String domainId, String spaceId) {
         return requestCreateRoute(cloudFoundryClient, domainId, spaceId)
             .map(ResourceUtils::getId);
+    }
+
+    private static ScriptedSubscriber<Tuple3<String, String, RouteEntity>> domainIdSpaceIdEquality() {
+        Function<Tuple3<String, String, RouteEntity>, Optional<String>> assertion = function((domainId, spaceId, entity) -> {
+            if (!domainId.equals(entity.getDomainId())) {
+                return Optional.of(String.format("expected domain id: %s; actual domain id: %s", domainId, entity.getDomainId()));
+            }
+
+            if (!spaceId.equals(entity.getSpaceId())) {
+                return Optional.of(String.format("expected space id: %s; actual space id: %s", spaceId, entity.getSpaceId()));
+            }
+
+            return Optional.empty();
+        });
+
+        return ScriptedSubscriber.<Tuple3<String, String, RouteEntity>>create()
+            .expectValueWith(tuple -> !assertion.apply(tuple).isPresent(),
+                tuple -> assertion.apply(tuple).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching entity")))
+            .expectComplete();
     }
 
     private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName, String stackId) {

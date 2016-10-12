@@ -32,6 +32,10 @@ import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
+
+import java.time.Duration;
+import java.util.concurrent.TimeoutException;
 
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
 
@@ -42,24 +46,25 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
 
     @SuppressWarnings("deprecation")
     @Test
-    public void create() {
+    public void create() throws TimeoutException, InterruptedException {
         String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
 
-        @SuppressWarnings("deprecation")
-        OrganizationQuotaDefinitionEntity expectedEntity = OrganizationQuotaDefinitionEntity.builder()
-            .applicationInstanceLimit(-1)
-            .applicationTaskLimit(-1)
-            .instanceMemoryLimit(1024)
-            .memoryLimit(1024)
-            .name(quotaDefinitionName)
-            .nonBasicServicesAllowed(false)
-            .totalPrivateDomains(-1)
-            .totalRoutes(10)
-            .totalReservedRoutePorts(0)
-            .totalServiceKeys(-1)
-            .totalServices(-1)
-            .trialDatabaseAllowed(false)
-            .build();
+        ScriptedSubscriber<OrganizationQuotaDefinitionEntity> subscriber = ScriptedSubscriber.<OrganizationQuotaDefinitionEntity>create()
+            .expectValue(OrganizationQuotaDefinitionEntity.builder()
+                .applicationInstanceLimit(-1)
+                .applicationTaskLimit(-1)
+                .instanceMemoryLimit(1024)
+                .memoryLimit(1024)
+                .name(quotaDefinitionName)
+                .nonBasicServicesAllowed(false)
+                .totalPrivateDomains(-1)
+                .totalRoutes(10)
+                .totalReservedRoutePorts(0)
+                .totalServiceKeys(-1)
+                .totalServices(-1)
+                .trialDatabaseAllowed(false)
+                .build())
+            .expectComplete();
 
         this.cloudFoundryClient.organizationQuotaDefinitions()
             .create(CreateOrganizationQuotaDefinitionRequest.builder()
@@ -71,14 +76,17 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                 .totalServices(-1)
                 .build())
             .map(ResourceUtils::getEntity)
-            .subscribe(this.testSubscriber()
-                .expectEquals(expectedEntity)
-            );
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void delete() {
+    public void delete() throws TimeoutException, InterruptedException {
         String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
+
+        ScriptedSubscriber<GetOrganizationQuotaDefinitionResponse> subscriber = errorExpectation(CloudFoundryException.class,
+            "CF-QuotaDefinitionNotFound\\([0-9]+\\): Quota Definition could not be found: .*");
 
         requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)
             .map(ResourceUtils::getId)
@@ -89,29 +97,32 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                     .build())
                 .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))))
             .then(organizationQuotaDefinitionId -> requestGetOrganizationQuotaDefinition(this.cloudFoundryClient, organizationQuotaDefinitionId))
-            .subscribe(this.testSubscriber()
-                .expectErrorMatch(CloudFoundryException.class, "CF-QuotaDefinitionNotFound\\([0-9]+\\): Quota Definition could not be found: .*"));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
+    @SuppressWarnings("deprecation")
     @Test
-    public void get() {
+    public void get() throws TimeoutException, InterruptedException {
         String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
 
-        @SuppressWarnings("deprecation")
-        OrganizationQuotaDefinitionEntity expectedEntity = OrganizationQuotaDefinitionEntity.builder()
-            .applicationInstanceLimit(-1)
-            .applicationTaskLimit(-1)
-            .instanceMemoryLimit(50)
-            .memoryLimit(500)
-            .name(quotaDefinitionName)
-            .nonBasicServicesAllowed(false)
-            .totalPrivateDomains(-1)
-            .totalRoutes(10)
-            .totalReservedRoutePorts(0)
-            .totalServiceKeys(-1)
-            .totalServices(5)
-            .trialDatabaseAllowed(false)
-            .build();
+        ScriptedSubscriber<OrganizationQuotaDefinitionEntity> subscriber = ScriptedSubscriber.<OrganizationQuotaDefinitionEntity>create()
+            .expectValue(OrganizationQuotaDefinitionEntity.builder()
+                .applicationInstanceLimit(-1)
+                .applicationTaskLimit(-1)
+                .instanceMemoryLimit(50)
+                .memoryLimit(500)
+                .name(quotaDefinitionName)
+                .nonBasicServicesAllowed(false)
+                .totalPrivateDomains(-1)
+                .totalRoutes(10)
+                .totalReservedRoutePorts(0)
+                .totalServiceKeys(-1)
+                .totalServices(5)
+                .trialDatabaseAllowed(false)
+                .build())
+            .expectComplete();
 
         requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)
             .map(ResourceUtils::getId)
@@ -120,13 +131,18 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                     .organizationQuotaDefinitionId(organizationQuotaDefinitionId)
                     .build()))
             .map(ResourceUtils::getEntity)
-            .subscribe(this.testSubscriber()
-                .expectEquals(expectedEntity));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void list() {
+    public void list() throws TimeoutException, InterruptedException {
         String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(quotaDefinitionName)
+            .expectComplete();
 
         requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)
             .map(ResourceUtils::getId)
@@ -139,29 +155,32 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                 .single())
             .map(ResourceUtils::getEntity)
             .map(OrganizationQuotaDefinitionEntity::getName)
-            .subscribe(this.testSubscriber()
-                .expectEquals(quotaDefinitionName));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
+    @SuppressWarnings("deprecation")
     @Test
-    public void update() {
+    public void update() throws TimeoutException, InterruptedException {
         String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
 
-        @SuppressWarnings("deprecation")
-        OrganizationQuotaDefinitionEntity expectedEntity = OrganizationQuotaDefinitionEntity.builder()
-            .applicationInstanceLimit(-1)
-            .applicationTaskLimit(-1)
-            .instanceMemoryLimit(50)
-            .memoryLimit(1000)
-            .name(quotaDefinitionName)
-            .nonBasicServicesAllowed(false)
-            .totalPrivateDomains(-1)
-            .totalRoutes(10)
-            .totalReservedRoutePorts(0)
-            .totalServiceKeys(-1)
-            .totalServices(10)
-            .trialDatabaseAllowed(false)
-            .build();
+        ScriptedSubscriber<OrganizationQuotaDefinitionEntity> subscriber = ScriptedSubscriber.<OrganizationQuotaDefinitionEntity>create()
+            .expectValue(OrganizationQuotaDefinitionEntity.builder()
+                .applicationInstanceLimit(-1)
+                .applicationTaskLimit(-1)
+                .instanceMemoryLimit(50)
+                .memoryLimit(1000)
+                .name(quotaDefinitionName)
+                .nonBasicServicesAllowed(false)
+                .totalPrivateDomains(-1)
+                .totalRoutes(10)
+                .totalReservedRoutePorts(0)
+                .totalServiceKeys(-1)
+                .totalServices(10)
+                .trialDatabaseAllowed(false)
+                .build())
+            .expectComplete();
 
         requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)
             .map(ResourceUtils::getId)
@@ -176,8 +195,9 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                     .organizationQuotaDefinitionId(organizationQuotaDefinitionId)
                     .build()))
             .map(ResourceUtils::getEntity)
-            .subscribe(this.testSubscriber()
-                .expectEquals(expectedEntity));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     private static Mono<CreateOrganizationQuotaDefinitionResponse> requestCreateOrganizationQuotaDefinition(CloudFoundryClient cloudFoundryClient, String quotaDefinitionName) {

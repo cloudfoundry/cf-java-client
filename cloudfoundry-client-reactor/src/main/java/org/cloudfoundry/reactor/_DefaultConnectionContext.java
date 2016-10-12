@@ -18,13 +18,13 @@ package org.cloudfoundry.reactor;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.cloudfoundry.reactor.util.DefaultSslCertificateTruster;
 import org.cloudfoundry.reactor.util.JsonCodec;
 import org.cloudfoundry.reactor.util.NetworkLogging;
 import org.cloudfoundry.reactor.util.SslCertificateTruster;
 import org.cloudfoundry.reactor.util.StaticTrustManagerFactory;
-import org.cloudfoundry.util.test.FailingDeserializationProblemHandler;
 import org.immutables.value.Value;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -155,7 +155,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     /**
      * Jackson deserialization problem handlers.  Typically only used for testing.
      */
-    abstract List<FailingDeserializationProblemHandler> getProblemHandlers();
+    abstract List<DeserializationProblemHandler> getProblemHandlers();
 
     /**
      * The (optional) proxy configuration

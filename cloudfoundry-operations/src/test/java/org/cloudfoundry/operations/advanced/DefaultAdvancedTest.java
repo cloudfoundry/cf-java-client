@@ -19,9 +19,9 @@ package org.cloudfoundry.operations.advanced;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
-import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
 import static org.mockito.Mockito.when;
 
@@ -46,9 +46,10 @@ public final class DefaultAdvancedTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<String> testSubscriber) {
-            testSubscriber
-                .expectEquals("test-code");
+        protected ScriptedSubscriber<String> expectations() {
+            return ScriptedSubscriber.<String>create()
+                .expectValue("test-code")
+                .expectComplete();
         }
 
         @Override
@@ -56,6 +57,7 @@ public final class DefaultAdvancedTest {
             return this.advanced
                 .sshCode();
         }
+
     }
 
 }

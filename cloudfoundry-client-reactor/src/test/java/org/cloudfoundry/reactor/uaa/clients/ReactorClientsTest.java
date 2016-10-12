@@ -45,6 +45,7 @@ import org.cloudfoundry.uaa.clients.UpdateClientResponse;
 import org.cloudfoundry.uaa.clients.UpdateMetadataRequest;
 import org.cloudfoundry.uaa.clients.UpdateMetadataResponse;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -63,7 +64,41 @@ public final class ReactorClientsTest {
         private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<BatchCreateClientsResponse> expectations() {
+            return ScriptedSubscriber.<BatchCreateClientsResponse>create()
+                .expectValue(BatchCreateClientsResponse.builder()
+                    .client(Client.builder()
+                        .allowedProvider("uaa", "ldap", "my-saml-provider")
+                        .authority("clients.read", "clients.write")
+                        .authorizedGrantType(CLIENT_CREDENTIALS)
+                        .autoApprove("true")
+                        .clientId("14pnUs")
+                        .lastModified(1468364444218L)
+                        .name("My Client Name")
+                        .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                        .resourceId("none")
+                        .scope("clients.read", "clients.write")
+                        .tokenSalt("erRsWH")
+                        .build())
+                    .client(Client.builder()
+                        .allowedProvider("uaa", "ldap", "my-saml-provider")
+                        .authority("clients.read", "clients.write")
+                        .authorizedGrantType(CLIENT_CREDENTIALS)
+                        .autoApprove("true")
+                        .clientId("0Tgnfy")
+                        .lastModified(1468364444318L)
+                        .name("My Client Name")
+                        .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                        .resourceId("none")
+                        .scope("clients.read", "clients.write")
+                        .tokenSalt("4wMTwN")
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(POST).path("/oauth/clients/tx")
@@ -77,39 +112,12 @@ public final class ReactorClientsTest {
         }
 
         @Override
-        protected BatchCreateClientsResponse getResponse() {
-            return BatchCreateClientsResponse.builder()
-                .client(Client.builder()
-                    .allowedProvider("uaa", "ldap", "my-saml-provider")
-                    .authority("clients.read", "clients.write")
-                    .authorizedGrantType(CLIENT_CREDENTIALS)
-                    .autoApprove("true")
-                    .clientId("14pnUs")
-                    .lastModified(1468364444218L)
-                    .name("My Client Name")
-                    .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
-                    .resourceId("none")
-                    .scope("clients.read", "clients.write")
-                    .tokenSalt("erRsWH")
-                    .build())
-                .client(Client.builder()
-                    .allowedProvider("uaa", "ldap", "my-saml-provider")
-                    .authority("clients.read", "clients.write")
-                    .authorizedGrantType(CLIENT_CREDENTIALS)
-                    .autoApprove("true")
-                    .clientId("0Tgnfy")
-                    .lastModified(1468364444318L)
-                    .name("My Client Name")
-                    .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
-                    .resourceId("none")
-                    .scope("clients.read", "clients.write")
-                    .tokenSalt("4wMTwN")
-                    .build())
-                .build();
+        protected Mono<BatchCreateClientsResponse> invoke(BatchCreateClientsRequest request) {
+            return this.clients.batchCreate(request);
         }
 
         @Override
-        protected BatchCreateClientsRequest getValidRequest() throws Exception {
+        protected BatchCreateClientsRequest validRequest() {
             return BatchCreateClientsRequest.builder()
                 .client(CreateClient.builder()
                     .allowedProvider("uaa", "ldap", "my-saml-provider")
@@ -137,11 +145,6 @@ public final class ReactorClientsTest {
                     .build())
                 .build();
         }
-
-        @Override
-        protected Mono<BatchCreateClientsResponse> invoke(BatchCreateClientsRequest request) {
-            return this.clients.batchCreate(request);
-        }
     }
 
     public static final class BatchDelete extends AbstractUaaApiTest<BatchDeleteClientsRequest, BatchDeleteClientsResponse> {
@@ -149,7 +152,43 @@ public final class ReactorClientsTest {
         private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<BatchDeleteClientsResponse> expectations() {
+            return ScriptedSubscriber.<BatchDeleteClientsResponse>create()
+                .expectValue(BatchDeleteClientsResponse.builder()
+                    .client(Client.builder()
+                        .approvalsDeleted(true)
+                        .allowedProvider("uaa", "ldap", "my-saml-provider")
+                        .authority("clients.read", "clients.write")
+                        .authorizedGrantType(CLIENT_CREDENTIALS)
+                        .autoApprove("true")
+                        .clientId("14pnUs")
+                        .lastModified(1468364444461L)
+                        .name("My Client Name")
+                        .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                        .resourceId("none")
+                        .scope("clients.read", "clients.write")
+                        .tokenSalt("erRsWH")
+                        .build())
+                    .client(Client.builder()
+                        .approvalsDeleted(true)
+                        .allowedProvider("uaa", "ldap", "my-saml-provider")
+                        .authority("clients.read", "clients.write")
+                        .authorizedGrantType(CLIENT_CREDENTIALS)
+                        .autoApprove("true")
+                        .clientId("qECLyr")
+                        .lastModified(1468364444868L)
+                        .name("My Client Name")
+                        .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                        .resourceId("none")
+                        .scope("clients.read", "clients.write")
+                        .tokenSalt("48TIsq")
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(POST).path("/oauth/clients/tx/delete")
@@ -163,49 +202,15 @@ public final class ReactorClientsTest {
         }
 
         @Override
-        protected BatchDeleteClientsResponse getResponse() {
-            return BatchDeleteClientsResponse.builder()
-                .client(Client.builder()
-                    .approvalsDeleted(true)
-                    .allowedProvider("uaa", "ldap", "my-saml-provider")
-                    .authority("clients.read", "clients.write")
-                    .authorizedGrantType(CLIENT_CREDENTIALS)
-                    .autoApprove("true")
-                    .clientId("14pnUs")
-                    .lastModified(1468364444461L)
-                    .name("My Client Name")
-                    .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
-                    .resourceId("none")
-                    .scope("clients.read", "clients.write")
-                    .tokenSalt("erRsWH")
-                    .build())
-                .client(Client.builder()
-                    .approvalsDeleted(true)
-                    .allowedProvider("uaa", "ldap", "my-saml-provider")
-                    .authority("clients.read", "clients.write")
-                    .authorizedGrantType(CLIENT_CREDENTIALS)
-                    .autoApprove("true")
-                    .clientId("qECLyr")
-                    .lastModified(1468364444868L)
-                    .name("My Client Name")
-                    .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
-                    .resourceId("none")
-                    .scope("clients.read", "clients.write")
-                    .tokenSalt("48TIsq")
-                    .build())
-                .build();
+        protected Mono<BatchDeleteClientsResponse> invoke(BatchDeleteClientsRequest request) {
+            return this.clients.batchDelete(request);
         }
 
         @Override
-        protected BatchDeleteClientsRequest getValidRequest() throws Exception {
+        protected BatchDeleteClientsRequest validRequest() {
             return BatchDeleteClientsRequest.builder()
                 .clientId("14pnUs", "qECLyr")
                 .build();
-        }
-
-        @Override
-        protected Mono<BatchDeleteClientsResponse> invoke(BatchDeleteClientsRequest request) {
-            return this.clients.batchDelete(request);
         }
     }
 
@@ -214,7 +219,26 @@ public final class ReactorClientsTest {
         private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<CreateClientResponse> expectations() {
+            return ScriptedSubscriber.<CreateClientResponse>create()
+                .expectValue(CreateClientResponse.builder()
+                    .allowedProvider("uaa", "ldap", "my-saml-provider")
+                    .authority("clients.read", "clients.write")
+                    .authorizedGrantType(CLIENT_CREDENTIALS)
+                    .autoApprove("true")
+                    .clientId("aPq3I1")
+                    .lastModified(1468364445109L)
+                    .name("My Client Name")
+                    .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                    .resourceId("none")
+                    .scope("clients.read", "clients.write")
+                    .tokenSalt("hRZ21X")
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(POST).path("/oauth/clients")
@@ -228,24 +252,12 @@ public final class ReactorClientsTest {
         }
 
         @Override
-        protected CreateClientResponse getResponse() {
-            return CreateClientResponse.builder()
-                .allowedProvider("uaa", "ldap", "my-saml-provider")
-                .authority("clients.read", "clients.write")
-                .authorizedGrantType(CLIENT_CREDENTIALS)
-                .autoApprove("true")
-                .clientId("aPq3I1")
-                .lastModified(1468364445109L)
-                .name("My Client Name")
-                .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
-                .resourceId("none")
-                .scope("clients.read", "clients.write")
-                .tokenSalt("hRZ21X")
-                .build();
+        protected Mono<CreateClientResponse> invoke(CreateClientRequest request) {
+            return this.clients.create(request);
         }
 
         @Override
-        protected CreateClientRequest getValidRequest() throws Exception {
+        protected CreateClientRequest validRequest() {
             return CreateClientRequest.builder()
                 .allowedProvider("uaa", "ldap", "my-saml-provider")
                 .authority("clients.read", "clients.write")
@@ -259,11 +271,6 @@ public final class ReactorClientsTest {
                 .tokenSalt("hRZ21X")
                 .build();
         }
-
-        @Override
-        protected Mono<CreateClientResponse> invoke(CreateClientRequest request) {
-            return this.clients.create(request);
-        }
     }
 
     public static final class Delete extends AbstractUaaApiTest<DeleteClientRequest, DeleteClientResponse> {
@@ -271,7 +278,26 @@ public final class ReactorClientsTest {
         private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<DeleteClientResponse> expectations() {
+            return ScriptedSubscriber.<DeleteClientResponse>create()
+                .expectValue(DeleteClientResponse.builder()
+                    .allowedProvider("uaa", "ldap", "my-saml-provider")
+                    .authority("clients.read", "clients.write")
+                    .authorizedGrantType(CLIENT_CREDENTIALS)
+                    .autoApprove("true")
+                    .clientId("Gieovr")
+                    .lastModified(1468364443957L)
+                    .name("My Client Name")
+                    .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                    .resourceId("none")
+                    .scope("clients.read", "clients.write")
+                    .tokenSalt("a4mzKu")
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(DELETE).path("/oauth/clients/test-client-id")
@@ -284,32 +310,15 @@ public final class ReactorClientsTest {
         }
 
         @Override
-        protected DeleteClientResponse getResponse() {
-            return DeleteClientResponse.builder()
-                .allowedProvider("uaa", "ldap", "my-saml-provider")
-                .authority("clients.read", "clients.write")
-                .authorizedGrantType(CLIENT_CREDENTIALS)
-                .autoApprove("true")
-                .clientId("Gieovr")
-                .lastModified(1468364443957L)
-                .name("My Client Name")
-                .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
-                .resourceId("none")
-                .scope("clients.read", "clients.write")
-                .tokenSalt("a4mzKu")
-                .build();
+        protected Mono<DeleteClientResponse> invoke(DeleteClientRequest request) {
+            return this.clients.delete(request);
         }
 
         @Override
-        protected DeleteClientRequest getValidRequest() throws Exception {
+        protected DeleteClientRequest validRequest() {
             return DeleteClientRequest.builder()
                 .clientId("test-client-id")
                 .build();
-        }
-
-        @Override
-        protected Mono<DeleteClientResponse> invoke(DeleteClientRequest request) {
-            return this.clients.delete(request);
         }
     }
 
@@ -318,7 +327,40 @@ public final class ReactorClientsTest {
         private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<ListClientsResponse> expectations() {
+            return ScriptedSubscriber.<ListClientsResponse>create()
+                .expectValue(ListClientsResponse.builder()
+                    .resource(Client.builder()
+                        .action("none")
+                        .authority("uaa.none")
+                        .authorizedGrantType(AUTHORIZATION_CODE, REFRESH_TOKEN)
+                        .autoApprove("true")
+                        .clientId("ssh-proxy")
+                        .lastModified(1469112324000L)
+                        .redirectUriPattern("/login")
+                        .resourceId("none")
+                        .scope("openid", "cloud_controller.read", "cloud_controller.write")
+                        .build())
+                    .resource(Client.builder()
+                        .action("none")
+                        .authority("routing.routes.write", "routing.routes.read")
+                        .authorizedGrantType(CLIENT_CREDENTIALS, REFRESH_TOKEN)
+                        .autoApprove("routing.routes.write", "routing.routes.read")
+                        .clientId("tcp_emitter")
+                        .lastModified(1469112324000L)
+                        .resourceId("none")
+                        .scope("uaa.none")
+                        .build())
+                    .startIndex(1)
+                    .itemsPerPage(2)
+                    .totalResults(2)
+                    .schema("http://cloudfoundry.org/schema/scim/oauth-clients-1.0")
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/oauth/clients")
@@ -331,45 +373,14 @@ public final class ReactorClientsTest {
         }
 
         @Override
-        protected ListClientsResponse getResponse() {
-            return ListClientsResponse.builder()
-                .resource(Client.builder()
-                    .action("none")
-                    .authority("uaa.none")
-                    .authorizedGrantType(AUTHORIZATION_CODE, REFRESH_TOKEN)
-                    .autoApprove("true")
-                    .clientId("ssh-proxy")
-                    .lastModified(1469112324000L)
-                    .redirectUriPattern("/login")
-                    .resourceId("none")
-                    .scope("openid", "cloud_controller.read", "cloud_controller.write")
-                    .build())
-                .resource(Client.builder()
-                    .action("none")
-                    .authority("routing.routes.write", "routing.routes.read")
-                    .authorizedGrantType(CLIENT_CREDENTIALS, REFRESH_TOKEN)
-                    .autoApprove("routing.routes.write", "routing.routes.read")
-                    .clientId("tcp_emitter")
-                    .lastModified(1469112324000L)
-                    .resourceId("none")
-                    .scope("uaa.none")
-                    .build())
-                .startIndex(1)
-                .itemsPerPage(2)
-                .totalResults(2)
-                .schema("http://cloudfoundry.org/schema/scim/oauth-clients-1.0")
-                .build();
-        }
-
-        @Override
-        protected ListClientsRequest getValidRequest() throws Exception {
-            return ListClientsRequest.builder()
-                .build();
-        }
-
-        @Override
         protected Mono<ListClientsResponse> invoke(ListClientsRequest request) {
             return this.clients.list(request);
+        }
+
+        @Override
+        protected ListClientsRequest validRequest() {
+            return ListClientsRequest.builder()
+                .build();
         }
     }
 
@@ -378,7 +389,26 @@ public final class ReactorClientsTest {
         private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<GetClientResponse> expectations() {
+            return ScriptedSubscriber.<GetClientResponse>create()
+                .expectValue(GetClientResponse.builder()
+                    .allowedProvider("uaa", "ldap", "my-saml-provider")
+                    .authority("clients.read", "clients.write")
+                    .authorizedGrantType(CLIENT_CREDENTIALS)
+                    .autoApprove("true")
+                    .clientId("4Z3t1r")
+                    .lastModified(1468364445592L)
+                    .name("My Client Name")
+                    .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                    .resourceId("none")
+                    .scope("clients.read", "clients.write")
+                    .tokenSalt("mr80UZ")
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/oauth/clients/test-client-id")
@@ -391,32 +421,15 @@ public final class ReactorClientsTest {
         }
 
         @Override
-        protected GetClientResponse getResponse() {
-            return GetClientResponse.builder()
-                .allowedProvider("uaa", "ldap", "my-saml-provider")
-                .authority("clients.read", "clients.write")
-                .authorizedGrantType(CLIENT_CREDENTIALS)
-                .autoApprove("true")
-                .clientId("4Z3t1r")
-                .lastModified(1468364445592L)
-                .name("My Client Name")
-                .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
-                .resourceId("none")
-                .scope("clients.read", "clients.write")
-                .tokenSalt("mr80UZ")
-                .build();
+        protected Mono<GetClientResponse> invoke(GetClientRequest request) {
+            return this.clients.get(request);
         }
 
         @Override
-        protected GetClientRequest getValidRequest() throws Exception {
+        protected GetClientRequest validRequest() {
             return GetClientRequest.builder()
                 .clientId("test-client-id")
                 .build();
-        }
-
-        @Override
-        protected Mono<GetClientResponse> invoke(GetClientRequest request) {
-            return this.clients.get(request);
         }
     }
 
@@ -425,7 +438,19 @@ public final class ReactorClientsTest {
         private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<GetMetadataResponse> expectations() {
+            return ScriptedSubscriber.<GetMetadataResponse>create()
+                .expectValue(GetMetadataResponse.builder()
+                    .appIcon("aWNvbiBmb3IgY2xpZW50IDQ=")
+                    .appLaunchUrl("http://myloginpage.com")
+                    .clientId("P4vuAaSe")
+                    .showOnHomePage(true)
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/oauth/clients/P4vuAaSe/meta")
@@ -438,25 +463,15 @@ public final class ReactorClientsTest {
         }
 
         @Override
-        protected GetMetadataResponse getResponse() {
-            return GetMetadataResponse.builder()
-                .appIcon("aWNvbiBmb3IgY2xpZW50IDQ=")
-                .appLaunchUrl("http://myloginpage.com")
-                .clientId("P4vuAaSe")
-                .showOnHomePage(true)
-                .build();
+        protected Mono<GetMetadataResponse> invoke(GetMetadataRequest request) {
+            return this.clients.getMetadata(request);
         }
 
         @Override
-        protected GetMetadataRequest getValidRequest() throws Exception {
+        protected GetMetadataRequest validRequest() {
             return GetMetadataRequest.builder()
                 .clientId("P4vuAaSe")
                 .build();
-        }
-
-        @Override
-        protected Mono<GetMetadataResponse> invoke(GetMetadataRequest request) {
-            return this.clients.getMetadata(request);
         }
     }
 
@@ -465,7 +480,32 @@ public final class ReactorClientsTest {
         private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<ListClientsResponse> expectations() {
+            return ScriptedSubscriber.<ListClientsResponse>create()
+                .expectValue(ListClientsResponse.builder()
+                    .resource(Client.builder()
+                        .allowedProvider("uaa", "ldap", "my-saml-provider")
+                        .authority("clients.read", "clients.write")
+                        .authorizedGrantType(CLIENT_CREDENTIALS)
+                        .autoApprove("true")
+                        .clientId("EGgNW3")
+                        .lastModified(1468364445334L)
+                        .name("My Client Name")
+                        .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                        .resourceId("none")
+                        .scope("clients.read", "clients.write")
+                        .tokenSalt("7uDPJX")
+                        .build())
+                    .startIndex(1)
+                    .itemsPerPage(1)
+                    .totalResults(1)
+                    .schema("http://cloudfoundry.org/schema/scim/oauth-clients-1.0")
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/oauth/clients?count=10&filter=client_id%2Beq%2B%22EGgNW3%22&sortBy=client_id&sortOrder=descending&startIndex=1")
@@ -478,30 +518,12 @@ public final class ReactorClientsTest {
         }
 
         @Override
-        protected ListClientsResponse getResponse() {
-            return ListClientsResponse.builder()
-                .resource(Client.builder()
-                    .allowedProvider("uaa", "ldap", "my-saml-provider")
-                    .authority("clients.read", "clients.write")
-                    .authorizedGrantType(CLIENT_CREDENTIALS)
-                    .autoApprove("true")
-                    .clientId("EGgNW3")
-                    .lastModified(1468364445334L)
-                    .name("My Client Name")
-                    .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
-                    .resourceId("none")
-                    .scope("clients.read", "clients.write")
-                    .tokenSalt("7uDPJX")
-                    .build())
-                .startIndex(1)
-                .itemsPerPage(1)
-                .totalResults(1)
-                .schema("http://cloudfoundry.org/schema/scim/oauth-clients-1.0")
-                .build();
+        protected Mono<ListClientsResponse> invoke(ListClientsRequest request) {
+            return this.clients.list(request);
         }
 
         @Override
-        protected ListClientsRequest getValidRequest() throws Exception {
+        protected ListClientsRequest validRequest() {
             return ListClientsRequest.builder()
                 .count(10)
                 .filter("client_id+eq+\"EGgNW3\"")
@@ -510,11 +532,6 @@ public final class ReactorClientsTest {
                 .startIndex(1)
                 .build();
         }
-
-        @Override
-        protected Mono<ListClientsResponse> invoke(ListClientsRequest request) {
-            return this.clients.list(request);
-        }
     }
 
     public static final class ListMetadatas extends AbstractUaaApiTest<ListMetadatasRequest, ListMetadatasResponse> {
@@ -522,7 +539,39 @@ public final class ReactorClientsTest {
         private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<ListMetadatasResponse> expectations() {
+            return ScriptedSubscriber.<ListMetadatasResponse>create()
+                .expectValue(ListMetadatasResponse.builder()
+                    .metadata(Metadata.builder()
+                        .appIcon("Y2xpZW50IDMgaWNvbg==")
+                        .appLaunchUrl("http://client3.com/app")
+                        .clientId("9134O7y4")
+                        .showOnHomePage(true)
+                        .build())
+                    .metadata(Metadata.builder()
+                        .appIcon("")
+                        .appLaunchUrl("http://changed.app.launch/url")
+                        .clientId("RpFRZpY3")
+                        .showOnHomePage(false)
+                        .build())
+                    .metadata(Metadata.builder()
+                        .appIcon("aWNvbiBmb3IgY2xpZW50IDQ=")
+                        .appLaunchUrl("http://client4.com/app")
+                        .clientId("ewegZo0R")
+                        .showOnHomePage(false)
+                        .build())
+                    .metadata(Metadata.builder()
+                        .appIcon("aWNvbiBmb3IgY2xpZW50IDQ=")
+                        .appLaunchUrl("http://myloginpage.com")
+                        .clientId("lqhK1n8q")
+                        .showOnHomePage(true)
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/oauth/clients/meta")
@@ -535,44 +584,14 @@ public final class ReactorClientsTest {
         }
 
         @Override
-        protected ListMetadatasResponse getResponse() {
-            return ListMetadatasResponse.builder()
-                .metadata(Metadata.builder()
-                    .appIcon("Y2xpZW50IDMgaWNvbg==")
-                    .appLaunchUrl("http://client3.com/app")
-                    .clientId("9134O7y4")
-                    .showOnHomePage(true)
-                    .build())
-                .metadata(Metadata.builder()
-                    .appIcon("")
-                    .appLaunchUrl("http://changed.app.launch/url")
-                    .clientId("RpFRZpY3")
-                    .showOnHomePage(false)
-                    .build())
-                .metadata(Metadata.builder()
-                    .appIcon("aWNvbiBmb3IgY2xpZW50IDQ=")
-                    .appLaunchUrl("http://client4.com/app")
-                    .clientId("ewegZo0R")
-                    .showOnHomePage(false)
-                    .build())
-                .metadata(Metadata.builder()
-                    .appIcon("aWNvbiBmb3IgY2xpZW50IDQ=")
-                    .appLaunchUrl("http://myloginpage.com")
-                    .clientId("lqhK1n8q")
-                    .showOnHomePage(true)
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected ListMetadatasRequest getValidRequest() throws Exception {
-            return ListMetadatasRequest.builder()
-                .build();
-        }
-
-        @Override
         protected Mono<ListMetadatasResponse> invoke(ListMetadatasRequest request) {
             return this.clients.listMetadatas(request);
+        }
+
+        @Override
+        protected ListMetadatasRequest validRequest() {
+            return ListMetadatasRequest.builder()
+                .build();
         }
     }
 
@@ -581,7 +600,26 @@ public final class ReactorClientsTest {
         private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<UpdateClientResponse> expectations() {
+            return ScriptedSubscriber.<UpdateClientResponse>create()
+                .expectValue(UpdateClientResponse.builder()
+                    .allowedProvider("uaa", "ldap", "my-saml-provider")
+                    .authority("clients.read", "clients.write")
+                    .authorizedGrantType(CLIENT_CREDENTIALS)
+                    .autoApprove("clients.autoapprove")
+                    .clientId("55pTMX")
+                    .lastModified(1468364443857L)
+                    .name("My Client Name")
+                    .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                    .resourceId("none")
+                    .scope("clients.new", "clients.autoapprove")
+                    .tokenSalt("8mwCEy")
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(PUT).path("/oauth/clients/55pTMX")
@@ -595,35 +633,18 @@ public final class ReactorClientsTest {
         }
 
         @Override
-        protected UpdateClientResponse getResponse() {
-            return UpdateClientResponse.builder()
-                .allowedProvider("uaa", "ldap", "my-saml-provider")
-                .authority("clients.read", "clients.write")
-                .authorizedGrantType(CLIENT_CREDENTIALS)
-                .autoApprove("clients.autoapprove")
-                .clientId("55pTMX")
-                .lastModified(1468364443857L)
-                .name("My Client Name")
-                .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
-                .resourceId("none")
-                .scope("clients.new", "clients.autoapprove")
-                .tokenSalt("8mwCEy")
-                .build();
+        protected Mono<UpdateClientResponse> invoke(UpdateClientRequest request) {
+            return this.clients.update(request);
         }
 
         @Override
-        protected UpdateClientRequest getValidRequest() throws Exception {
+        protected UpdateClientRequest validRequest() {
             return UpdateClientRequest.builder()
                 .authorizedGrantType(CLIENT_CREDENTIALS)
                 .autoApprove("clients.autoapprove")
                 .clientId("55pTMX")
                 .scope("clients.new", "clients.autoapprove")
                 .build();
-        }
-
-        @Override
-        protected Mono<UpdateClientResponse> invoke(UpdateClientRequest request) {
-            return this.clients.update(request);
         }
     }
 
@@ -632,7 +653,19 @@ public final class ReactorClientsTest {
         private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<UpdateMetadataResponse> expectations() {
+            return ScriptedSubscriber.<UpdateMetadataResponse>create()
+                .expectValue(UpdateMetadataResponse.builder()
+                    .appLaunchUrl("http://changed.app.launch/url")
+                    .appIcon("")
+                    .clientId("RpFRZpY3")
+                    .showOnHomePage(false)
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(PUT).path("/oauth/clients/RpFRZpY3/meta")
@@ -646,27 +679,17 @@ public final class ReactorClientsTest {
         }
 
         @Override
-        protected UpdateMetadataResponse getResponse() {
-            return UpdateMetadataResponse.builder()
-                .appLaunchUrl("http://changed.app.launch/url")
-                .appIcon("")
-                .clientId("RpFRZpY3")
-                .showOnHomePage(false)
-                .build();
+        protected Mono<UpdateMetadataResponse> invoke(UpdateMetadataRequest request) {
+            return this.clients.updateMetadata(request);
         }
 
         @Override
-        protected UpdateMetadataRequest getValidRequest() throws Exception {
+        protected UpdateMetadataRequest validRequest() {
             return UpdateMetadataRequest.builder()
                 .appLaunchUrl("http://changed.app.launch/url")
                 .clientId("RpFRZpY3")
                 .showOnHomePage(false)
                 .build();
-        }
-
-        @Override
-        protected Mono<UpdateMetadataResponse> invoke(UpdateMetadataRequest request) {
-            return this.clients.updateMetadata(request);
         }
     }
 

@@ -27,6 +27,10 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
+
+import java.time.Duration;
+import java.util.concurrent.TimeoutException;
 
 import static org.cloudfoundry.util.PaginationUtils.requestClientV2Resources;
 
@@ -39,19 +43,28 @@ public final class StacksTest extends AbstractIntegrationTest {
     private String stackName;
 
     @Test
-    public void get() {
+    public void get() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(this.stackName)
+            .expectComplete();
+
         getStackId(this.cloudFoundryClient, this.stackName)
             .then(stackId -> this.cloudFoundryClient.stacks()
                 .get(GetStackRequest.builder()
                     .stackId(stackId)
                     .build()))
             .map(resource -> resource.getEntity().getName())
-            .subscribe(this.testSubscriber()
-                .expectEquals(this.stackName));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void list() {
+    public void list() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(this.stackName)
+            .expectComplete();
+
         getStackId(this.cloudFoundryClient, this.stackName)
             .flatMap(stackId ->
                 PaginationUtils
@@ -61,20 +74,26 @@ public final class StacksTest extends AbstractIntegrationTest {
                             .build()))
                     .filter(resource -> ResourceUtils.getId(resource).equals(stackId)))
             .map(resource -> resource.getEntity().getName())
-            .subscribe(this.testSubscriber()
-                .expectEquals(this.stackName));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listFilterByName() {
+    public void listFilterByName() throws TimeoutException, InterruptedException {
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(this.stackName)
+            .expectComplete();
+
         requestClientV2Resources(page -> this.cloudFoundryClient.stacks()
             .list(ListStacksRequest.builder()
                 .name(this.stackName)
                 .page(page)
                 .build()))
             .map(resource -> resource.getEntity().getName())
-            .subscribe(this.testSubscriber()
-                .expectEquals(this.stackName));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     private static Mono<String> getStackId(CloudFoundryClient cloudFoundryClient, String stackName) {

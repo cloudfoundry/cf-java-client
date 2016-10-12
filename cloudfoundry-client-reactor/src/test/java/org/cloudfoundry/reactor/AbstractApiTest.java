@@ -16,50 +16,31 @@
 
 package org.cloudfoundry.reactor;
 
-import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Test;
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
 import java.time.Duration;
-import java.util.Optional;
 
 public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
 
-    protected final TestSubscriber<RSP> testSubscriber = new TestSubscriber<>();
-
     @Test
     public final void success() throws Exception {
-        Publisher<RSP> responses = getResponses();
-        assertions(this.testSubscriber, responses);
+        mockRequest(interactionContext());
 
-        mockRequest(getInteractionContext());
-        invoke(getValidRequest()).subscribe(this.testSubscriber);
+        ScriptedSubscriber<RSP> subscriber = expectations();
+        invoke(validRequest()).subscribe(subscriber);
 
-        this.testSubscriber.verify(Duration.ofSeconds(5));
+        subscriber.verify(Duration.ofSeconds(5));
         verify();
     }
 
-    protected void assertions(TestSubscriber<RSP> testSubscriber, Publisher<RSP> expected) {
-        if (expected != null) {
-            Flux.from(expected)
-                .subscribe(testSubscriber::expectEquals);
-        }
-    }
+    protected abstract ScriptedSubscriber<RSP> expectations();
 
-    protected abstract InteractionContext getInteractionContext();
-
-    protected abstract RSP getResponse();
-
-    protected Publisher<RSP> getResponses() {
-        return Optional.ofNullable(getResponse())
-            .map(Mono::just)
-            .orElse(Mono.empty());
-    }
-
-    protected abstract REQ getValidRequest() throws Exception;
+    protected abstract InteractionContext interactionContext();
 
     protected abstract Publisher<RSP> invoke(REQ request);
+
+    protected abstract REQ validRequest();
 
 }

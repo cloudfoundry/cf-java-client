@@ -39,6 +39,7 @@ import org.cloudfoundry.uaa.identityzones.TokenPolicy;
 import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneResponse;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
 import java.util.Collections;
 
@@ -56,7 +57,65 @@ public final class ReactorIdentityZonesTest {
         private final ReactorIdentityZones identityZones = new ReactorIdentityZones(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<CreateIdentityZoneResponse> expectations() {
+            return ScriptedSubscriber.<CreateIdentityZoneResponse>create()
+                .expectValue(CreateIdentityZoneResponse.builder()
+                    .createdAt(1463595920184L)
+                    .description("Like the Twilight Zone but tastier.")
+                    .id("twiglet-create")
+                    .lastModified(1463595920184L)
+                    .name("The Twiglet Zone")
+                    .subdomain("twiglet-create")
+                    .version(0)
+                    .configuration(IdentityZoneConfiguration.builder()
+                        .tokenPolicy(TokenPolicy.builder()
+                            .accessTokenValidity(-1)
+                            .jwtRevocable(false)
+                            .refreshTokenValidity(-1)
+                            .key("exampleKeyId", Collections.singletonMap("signingKey", "s1gNiNg.K3y/t3XT"))
+                            .build())
+                        .samlConfiguration(SamlConfiguration.builder()
+                            .assertionSigned(true)
+                            .requestSigned(true)
+                            .wantAssertionSigned(false)
+                            .wantPartnerAuthenticationRequestSigned(false)
+                            .assertionTimeToLive(600)
+                            .build())
+                        .links(Links.builder()
+                            .logout(LogoutLink.builder()
+                                .redirectUrl("/login")
+                                .redirectParameterName("redirect")
+                                .disableRedirectParameter(true)
+                                .build())
+                            .selfService(SelfServiceLink.builder()
+                                .selfServiceLinksEnabled(true)
+                                .signupLink("/create_account")
+                                .resetPasswordLink("/forgot_password")
+                                .build())
+                            .build())
+                        .prompt(Prompt.builder()
+                            .fieldName("username")
+                            .text("Email")
+                            .fieldType("text")
+                            .build())
+                        .prompt(Prompt.builder()
+                            .fieldName("password")
+                            .text("Password")
+                            .fieldType("password")
+                            .build())
+                        .prompt(Prompt.builder()
+                            .fieldName("passcode")
+                            .text("One Time Code (Get on at /passcode)")
+                            .fieldType("password")
+                            .build())
+                        .ldapDiscoveryEnabled(false)
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(POST).path("/identity-zones")
@@ -70,63 +129,12 @@ public final class ReactorIdentityZonesTest {
         }
 
         @Override
-        protected CreateIdentityZoneResponse getResponse() {
-            return CreateIdentityZoneResponse.builder()
-                .createdAt(1463595920184L)
-                .description("Like the Twilight Zone but tastier.")
-                .id("twiglet-create")
-                .lastModified(1463595920184L)
-                .name("The Twiglet Zone")
-                .subdomain("twiglet-create")
-                .version(0)
-                .configuration(IdentityZoneConfiguration.builder()
-                    .tokenPolicy(TokenPolicy.builder()
-                        .accessTokenValidity(-1)
-                        .jwtRevocable(false)
-                        .refreshTokenValidity(-1)
-                        .key("exampleKeyId", Collections.singletonMap("signingKey", "s1gNiNg.K3y/t3XT"))
-                        .build())
-                    .samlConfiguration(SamlConfiguration.builder()
-                        .assertionSigned(true)
-                        .requestSigned(true)
-                        .wantAssertionSigned(false)
-                        .wantPartnerAuthenticationRequestSigned(false)
-                        .assertionTimeToLive(600)
-                        .build())
-                    .links(Links.builder()
-                        .logout(LogoutLink.builder()
-                            .redirectUrl("/login")
-                            .redirectParameterName("redirect")
-                            .disableRedirectParameter(true)
-                            .build())
-                        .selfService(SelfServiceLink.builder()
-                            .selfServiceLinksEnabled(true)
-                            .signupLink("/create_account")
-                            .resetPasswordLink("/forgot_password")
-                            .build())
-                        .build())
-                    .prompt(Prompt.builder()
-                        .fieldName("username")
-                        .text("Email")
-                        .fieldType("text")
-                        .build())
-                    .prompt(Prompt.builder()
-                        .fieldName("password")
-                        .text("Password")
-                        .fieldType("password")
-                        .build())
-                    .prompt(Prompt.builder()
-                        .fieldName("passcode")
-                        .text("One Time Code (Get on at /passcode)")
-                        .fieldType("password")
-                        .build())
-                    .ldapDiscoveryEnabled(false)
-                    .build())
-                .build();
+        protected Mono<CreateIdentityZoneResponse> invoke(CreateIdentityZoneRequest request) {
+            return this.identityZones.create(request);
         }
 
         @Override
-        protected CreateIdentityZoneRequest getValidRequest() throws Exception {
+        protected CreateIdentityZoneRequest validRequest() {
             return CreateIdentityZoneRequest.builder()
                 .description("Like the Twilight Zone but tastier.")
                 .identityZoneId("twiglet-create")
@@ -178,11 +186,6 @@ public final class ReactorIdentityZonesTest {
                     .build())
                 .build();
         }
-
-        @Override
-        protected Mono<CreateIdentityZoneResponse> invoke(CreateIdentityZoneRequest request) {
-            return this.identityZones.create(request);
-        }
     }
 
     public static final class Delete extends AbstractUaaApiTest<DeleteIdentityZoneRequest, DeleteIdentityZoneResponse> {
@@ -190,7 +193,65 @@ public final class ReactorIdentityZonesTest {
         private final ReactorIdentityZones identityZones = new ReactorIdentityZones(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<DeleteIdentityZoneResponse> expectations() {
+            return ScriptedSubscriber.<DeleteIdentityZoneResponse>create()
+                .expectValue(DeleteIdentityZoneResponse.builder()
+                    .createdAt(1463595919906L)
+                    .description("Like the Twilight Zone but tastier.")
+                    .id("twiglet-delete")
+                    .lastModified(1463595919906L)
+                    .name("The Twiglet Zone")
+                    .subdomain("twiglet-delete")
+                    .version(0)
+                    .configuration(IdentityZoneConfiguration.builder()
+                        .tokenPolicy(TokenPolicy.builder()
+                            .accessTokenValidity(-1)
+                            .jwtRevocable(false)
+                            .keys(Collections.emptyMap())
+                            .refreshTokenValidity(-1)
+                            .build())
+                        .samlConfiguration(SamlConfiguration.builder()
+                            .assertionSigned(true)
+                            .requestSigned(true)
+                            .wantAssertionSigned(false)
+                            .wantPartnerAuthenticationRequestSigned(false)
+                            .assertionTimeToLive(600)
+                            .build())
+                        .links(Links.builder()
+                            .logout(LogoutLink.builder()
+                                .redirectUrl("/login")
+                                .redirectParameterName("redirect")
+                                .disableRedirectParameter(true)
+                                .build())
+                            .selfService(SelfServiceLink.builder()
+                                .selfServiceLinksEnabled(true)
+                                .signupLink("/create_account")
+                                .resetPasswordLink("/forgot_password")
+                                .build())
+                            .build())
+                        .prompt(Prompt.builder()
+                            .fieldName("username")
+                            .text("Email")
+                            .fieldType("text")
+                            .build())
+                        .prompt(Prompt.builder()
+                            .fieldName("password")
+                            .text("Password")
+                            .fieldType("password")
+                            .build())
+                        .prompt(Prompt.builder()
+                            .fieldName("passcode")
+                            .text("One Time Code (Get on at /passcode)")
+                            .fieldType("password")
+                            .build())
+                        .ldapDiscoveryEnabled(false)
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(DELETE).path("/identity-zones/twiglet-delete")
@@ -203,71 +264,15 @@ public final class ReactorIdentityZonesTest {
         }
 
         @Override
-        protected DeleteIdentityZoneResponse getResponse() {
-            return DeleteIdentityZoneResponse.builder()
-                .createdAt(1463595919906L)
-                .description("Like the Twilight Zone but tastier.")
-                .id("twiglet-delete")
-                .lastModified(1463595919906L)
-                .name("The Twiglet Zone")
-                .subdomain("twiglet-delete")
-                .version(0)
-                .configuration(IdentityZoneConfiguration.builder()
-                    .tokenPolicy(TokenPolicy.builder()
-                        .accessTokenValidity(-1)
-                        .jwtRevocable(false)
-                        .keys(Collections.emptyMap())
-                        .refreshTokenValidity(-1)
-                        .build())
-                    .samlConfiguration(SamlConfiguration.builder()
-                        .assertionSigned(true)
-                        .requestSigned(true)
-                        .wantAssertionSigned(false)
-                        .wantPartnerAuthenticationRequestSigned(false)
-                        .assertionTimeToLive(600)
-                        .build())
-                    .links(Links.builder()
-                        .logout(LogoutLink.builder()
-                            .redirectUrl("/login")
-                            .redirectParameterName("redirect")
-                            .disableRedirectParameter(true)
-                            .build())
-                        .selfService(SelfServiceLink.builder()
-                            .selfServiceLinksEnabled(true)
-                            .signupLink("/create_account")
-                            .resetPasswordLink("/forgot_password")
-                            .build())
-                        .build())
-                    .prompt(Prompt.builder()
-                        .fieldName("username")
-                        .text("Email")
-                        .fieldType("text")
-                        .build())
-                    .prompt(Prompt.builder()
-                        .fieldName("password")
-                        .text("Password")
-                        .fieldType("password")
-                        .build())
-                    .prompt(Prompt.builder()
-                        .fieldName("passcode")
-                        .text("One Time Code (Get on at /passcode)")
-                        .fieldType("password")
-                        .build())
-                    .ldapDiscoveryEnabled(false)
-                    .build())
-                .build();
+        protected Mono<DeleteIdentityZoneResponse> invoke(DeleteIdentityZoneRequest request) {
+            return this.identityZones.delete(request);
         }
 
         @Override
-        protected DeleteIdentityZoneRequest getValidRequest() throws Exception {
+        protected DeleteIdentityZoneRequest validRequest() {
             return DeleteIdentityZoneRequest.builder()
                 .identityZoneId("twiglet-delete")
                 .build();
-        }
-
-        @Override
-        protected Mono<DeleteIdentityZoneResponse> invoke(DeleteIdentityZoneRequest request) {
-            return this.identityZones.delete(request);
         }
     }
 
@@ -276,7 +281,64 @@ public final class ReactorIdentityZonesTest {
         private final ReactorIdentityZones identityZones = new ReactorIdentityZones(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<GetIdentityZoneResponse> expectations() {
+            return ScriptedSubscriber.<GetIdentityZoneResponse>create()
+                .expectValue(GetIdentityZoneResponse.builder()
+                    .createdAt(1463595920104L)
+                    .id("twiglet-get")
+                    .lastModified(1463595920104L)
+                    .name("The Twiglet Zone")
+                    .subdomain("twiglet-get")
+                    .version(0)
+                    .configuration(IdentityZoneConfiguration.builder()
+                        .tokenPolicy(TokenPolicy.builder()
+                            .accessTokenValidity(-1)
+                            .jwtRevocable(false)
+                            .keys(Collections.emptyMap())
+                            .refreshTokenValidity(-1)
+                            .build())
+                        .samlConfiguration(SamlConfiguration.builder()
+                            .assertionSigned(true)
+                            .requestSigned(true)
+                            .wantAssertionSigned(false)
+                            .wantPartnerAuthenticationRequestSigned(false)
+                            .assertionTimeToLive(600)
+                            .build())
+                        .links(Links.builder()
+                            .logout(LogoutLink.builder()
+                                .redirectUrl("/login")
+                                .redirectParameterName("redirect")
+                                .disableRedirectParameter(true)
+                                .build())
+                            .selfService(SelfServiceLink.builder()
+                                .selfServiceLinksEnabled(true)
+                                .signupLink("/create_account")
+                                .resetPasswordLink("/forgot_password")
+                                .build())
+                            .build())
+                        .prompt(Prompt.builder()
+                            .fieldName("username")
+                            .text("Email")
+                            .fieldType("text")
+                            .build())
+                        .prompt(Prompt.builder()
+                            .fieldName("password")
+                            .text("Password")
+                            .fieldType("password")
+                            .build())
+                        .prompt(Prompt.builder()
+                            .fieldName("passcode")
+                            .text("One Time Code (Get on at /passcode)")
+                            .fieldType("password")
+                            .build())
+                        .ldapDiscoveryEnabled(false)
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/identity-zones/twiglet-get")
@@ -289,70 +351,15 @@ public final class ReactorIdentityZonesTest {
         }
 
         @Override
-        protected GetIdentityZoneResponse getResponse() {
-            return GetIdentityZoneResponse.builder()
-                .createdAt(1463595920104L)
-                .id("twiglet-get")
-                .lastModified(1463595920104L)
-                .name("The Twiglet Zone")
-                .subdomain("twiglet-get")
-                .version(0)
-                .configuration(IdentityZoneConfiguration.builder()
-                    .tokenPolicy(TokenPolicy.builder()
-                        .accessTokenValidity(-1)
-                        .jwtRevocable(false)
-                        .keys(Collections.emptyMap())
-                        .refreshTokenValidity(-1)
-                        .build())
-                    .samlConfiguration(SamlConfiguration.builder()
-                        .assertionSigned(true)
-                        .requestSigned(true)
-                        .wantAssertionSigned(false)
-                        .wantPartnerAuthenticationRequestSigned(false)
-                        .assertionTimeToLive(600)
-                        .build())
-                    .links(Links.builder()
-                        .logout(LogoutLink.builder()
-                            .redirectUrl("/login")
-                            .redirectParameterName("redirect")
-                            .disableRedirectParameter(true)
-                            .build())
-                        .selfService(SelfServiceLink.builder()
-                            .selfServiceLinksEnabled(true)
-                            .signupLink("/create_account")
-                            .resetPasswordLink("/forgot_password")
-                            .build())
-                        .build())
-                    .prompt(Prompt.builder()
-                        .fieldName("username")
-                        .text("Email")
-                        .fieldType("text")
-                        .build())
-                    .prompt(Prompt.builder()
-                        .fieldName("password")
-                        .text("Password")
-                        .fieldType("password")
-                        .build())
-                    .prompt(Prompt.builder()
-                        .fieldName("passcode")
-                        .text("One Time Code (Get on at /passcode)")
-                        .fieldType("password")
-                        .build())
-                    .ldapDiscoveryEnabled(false)
-                    .build())
-                .build();
+        protected Mono<GetIdentityZoneResponse> invoke(GetIdentityZoneRequest request) {
+            return this.identityZones.get(request);
         }
 
         @Override
-        protected GetIdentityZoneRequest getValidRequest() throws Exception {
+        protected GetIdentityZoneRequest validRequest() {
             return GetIdentityZoneRequest.builder()
                 .identityZoneId("twiglet-get")
                 .build();
-        }
-
-        @Override
-        protected Mono<GetIdentityZoneResponse> invoke(GetIdentityZoneRequest request) {
-            return this.identityZones.get(request);
         }
     }
 
@@ -361,7 +368,119 @@ public final class ReactorIdentityZonesTest {
         private final ReactorIdentityZones identityZones = new ReactorIdentityZones(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<ListIdentityZonesResponse> expectations() {
+            return ScriptedSubscriber.<ListIdentityZonesResponse>create()
+                .expectValue(ListIdentityZonesResponse.builder()
+                    .identityZone(IdentityZone.builder()
+                        .createdAt(1463595916851L)
+                        .id("twiglet-list-1")
+                        .description("Like the Twilight Zone but tastier.")
+                        .lastModified(1463595916851L)
+                        .name("The Twiglet Zone")
+                        .subdomain("twiglet-list-1")
+                        .version(0)
+                        .configuration(IdentityZoneConfiguration.builder()
+                            .tokenPolicy(TokenPolicy.builder()
+                                .accessTokenValidity(-1)
+                                .jwtRevocable(false)
+                                .keys(Collections.emptyMap())
+                                .refreshTokenValidity(-1)
+                                .build())
+                            .samlConfiguration(SamlConfiguration.builder()
+                                .assertionSigned(true)
+                                .requestSigned(true)
+                                .wantAssertionSigned(false)
+                                .wantPartnerAuthenticationRequestSigned(false)
+                                .assertionTimeToLive(600)
+                                .build())
+                            .links(Links.builder()
+                                .logout(LogoutLink.builder()
+                                    .redirectUrl("/login")
+                                    .redirectParameterName("redirect")
+                                    .disableRedirectParameter(true)
+                                    .build())
+                                .selfService(SelfServiceLink.builder()
+                                    .selfServiceLinksEnabled(true)
+                                    .signupLink("/create_account")
+                                    .resetPasswordLink("/forgot_password")
+                                    .build())
+                                .build())
+                            .prompt(Prompt.builder()
+                                .fieldName("username")
+                                .text("Email")
+                                .fieldType("text")
+                                .build())
+                            .prompt(Prompt.builder()
+                                .fieldName("password")
+                                .text("Password")
+                                .fieldType("password")
+                                .build())
+                            .prompt(Prompt.builder()
+                                .fieldName("passcode")
+                                .text("One Time Code (Get on at /passcode)")
+                                .fieldType("password")
+                                .build())
+                            .ldapDiscoveryEnabled(false)
+                            .build())
+                        .build())
+                    .identityZone(IdentityZone.builder()
+                        .createdAt(1463595918196L)
+                        .description("Like the Twilight Zone but tastier.")
+                        .id("twiglet-list-2")
+                        .lastModified(1463595918196L)
+                        .name("The Twiglet Zone")
+                        .subdomain("twiglet-list-2")
+                        .version(0)
+                        .configuration(IdentityZoneConfiguration.builder()
+                            .tokenPolicy(TokenPolicy.builder()
+                                .accessTokenValidity(-1)
+                                .jwtRevocable(false)
+                                .keys(Collections.emptyMap())
+                                .refreshTokenValidity(-1)
+                                .build())
+                            .samlConfiguration(SamlConfiguration.builder()
+                                .assertionSigned(true)
+                                .requestSigned(true)
+                                .wantAssertionSigned(false)
+                                .wantPartnerAuthenticationRequestSigned(false)
+                                .assertionTimeToLive(600)
+                                .build())
+                            .links(Links.builder()
+                                .logout(LogoutLink.builder()
+                                    .redirectUrl("/login")
+                                    .redirectParameterName("redirect")
+                                    .disableRedirectParameter(true)
+                                    .build())
+                                .selfService(SelfServiceLink.builder()
+                                    .selfServiceLinksEnabled(true)
+                                    .signupLink("/create_account")
+                                    .resetPasswordLink("/forgot_password")
+                                    .build())
+                                .build())
+                            .prompt(Prompt.builder()
+                                .fieldName("username")
+                                .text("Email")
+                                .fieldType("text")
+                                .build())
+                            .prompt(Prompt.builder()
+                                .fieldName("password")
+                                .text("Password")
+                                .fieldType("password")
+                                .build())
+                            .prompt(Prompt.builder()
+                                .fieldName("passcode")
+                                .text("One Time Code (Get on at /passcode)")
+                                .fieldType("password")
+                                .build())
+                            .ldapDiscoveryEnabled(false)
+                            .build())
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/identity-zones")
@@ -374,123 +493,13 @@ public final class ReactorIdentityZonesTest {
         }
 
         @Override
-        protected ListIdentityZonesResponse getResponse() {
-            return ListIdentityZonesResponse.builder()
-                .identityZone(IdentityZone.builder()
-                    .createdAt(1463595916851L)
-                    .id("twiglet-list-1")
-                    .description("Like the Twilight Zone but tastier.")
-                    .lastModified(1463595916851L)
-                    .name("The Twiglet Zone")
-                    .subdomain("twiglet-list-1")
-                    .version(0)
-                    .configuration(IdentityZoneConfiguration.builder()
-                        .tokenPolicy(TokenPolicy.builder()
-                            .accessTokenValidity(-1)
-                            .jwtRevocable(false)
-                            .keys(Collections.emptyMap())
-                            .refreshTokenValidity(-1)
-                            .build())
-                        .samlConfiguration(SamlConfiguration.builder()
-                            .assertionSigned(true)
-                            .requestSigned(true)
-                            .wantAssertionSigned(false)
-                            .wantPartnerAuthenticationRequestSigned(false)
-                            .assertionTimeToLive(600)
-                            .build())
-                        .links(Links.builder()
-                            .logout(LogoutLink.builder()
-                                .redirectUrl("/login")
-                                .redirectParameterName("redirect")
-                                .disableRedirectParameter(true)
-                                .build())
-                            .selfService(SelfServiceLink.builder()
-                                .selfServiceLinksEnabled(true)
-                                .signupLink("/create_account")
-                                .resetPasswordLink("/forgot_password")
-                                .build())
-                            .build())
-                        .prompt(Prompt.builder()
-                            .fieldName("username")
-                            .text("Email")
-                            .fieldType("text")
-                            .build())
-                        .prompt(Prompt.builder()
-                            .fieldName("password")
-                            .text("Password")
-                            .fieldType("password")
-                            .build())
-                        .prompt(Prompt.builder()
-                            .fieldName("passcode")
-                            .text("One Time Code (Get on at /passcode)")
-                            .fieldType("password")
-                            .build())
-                        .ldapDiscoveryEnabled(false)
-                        .build())
-                    .build())
-                .identityZone(IdentityZone.builder()
-                    .createdAt(1463595918196L)
-                    .description("Like the Twilight Zone but tastier.")
-                    .id("twiglet-list-2")
-                    .lastModified(1463595918196L)
-                    .name("The Twiglet Zone")
-                    .subdomain("twiglet-list-2")
-                    .version(0)
-                    .configuration(IdentityZoneConfiguration.builder()
-                        .tokenPolicy(TokenPolicy.builder()
-                            .accessTokenValidity(-1)
-                            .jwtRevocable(false)
-                            .keys(Collections.emptyMap())
-                            .refreshTokenValidity(-1)
-                            .build())
-                        .samlConfiguration(SamlConfiguration.builder()
-                            .assertionSigned(true)
-                            .requestSigned(true)
-                            .wantAssertionSigned(false)
-                            .wantPartnerAuthenticationRequestSigned(false)
-                            .assertionTimeToLive(600)
-                            .build())
-                        .links(Links.builder()
-                            .logout(LogoutLink.builder()
-                                .redirectUrl("/login")
-                                .redirectParameterName("redirect")
-                                .disableRedirectParameter(true)
-                                .build())
-                            .selfService(SelfServiceLink.builder()
-                                .selfServiceLinksEnabled(true)
-                                .signupLink("/create_account")
-                                .resetPasswordLink("/forgot_password")
-                                .build())
-                            .build())
-                        .prompt(Prompt.builder()
-                            .fieldName("username")
-                            .text("Email")
-                            .fieldType("text")
-                            .build())
-                        .prompt(Prompt.builder()
-                            .fieldName("password")
-                            .text("Password")
-                            .fieldType("password")
-                            .build())
-                        .prompt(Prompt.builder()
-                            .fieldName("passcode")
-                            .text("One Time Code (Get on at /passcode)")
-                            .fieldType("password")
-                            .build())
-                        .ldapDiscoveryEnabled(false)
-                        .build())
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected ListIdentityZonesRequest getValidRequest() throws Exception {
-            return ListIdentityZonesRequest.builder().build();
-        }
-
-        @Override
         protected Mono<ListIdentityZonesResponse> invoke(ListIdentityZonesRequest request) {
             return this.identityZones.list(request);
+        }
+
+        @Override
+        protected ListIdentityZonesRequest validRequest() {
+            return ListIdentityZonesRequest.builder().build();
         }
     }
 
@@ -499,7 +508,65 @@ public final class ReactorIdentityZonesTest {
         private final ReactorIdentityZones identityZones = new ReactorIdentityZones(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
         @Override
-        protected InteractionContext getInteractionContext() {
+        protected ScriptedSubscriber<UpdateIdentityZoneResponse> expectations() {
+            return ScriptedSubscriber.<UpdateIdentityZoneResponse>create()
+                .expectValue(UpdateIdentityZoneResponse.builder()
+                    .createdAt(1463595920023L)
+                    .description("Like the Twilight Zone but not tastier.")
+                    .id("twiglet-update")
+                    .lastModified(1463595920023L)
+                    .name("The Updated Twiglet Zone")
+                    .subdomain("twiglet-update")
+                    .version(1)
+                    .configuration(IdentityZoneConfiguration.builder()
+                        .tokenPolicy(TokenPolicy.builder()
+                            .accessTokenValidity(-1)
+                            .jwtRevocable(false)
+                            .refreshTokenValidity(-1)
+                            .key("exampleKeyId", Collections.singletonMap("signingKey", "upD4t3d.s1gNiNg.K3y/t3XT"))
+                            .build())
+                        .samlConfiguration(SamlConfiguration.builder()
+                            .assertionSigned(true)
+                            .requestSigned(true)
+                            .wantAssertionSigned(false)
+                            .wantPartnerAuthenticationRequestSigned(false)
+                            .assertionTimeToLive(600)
+                            .build())
+                        .links(Links.builder()
+                            .logout(LogoutLink.builder()
+                                .redirectUrl("/login")
+                                .redirectParameterName("redirect")
+                                .disableRedirectParameter(true)
+                                .build())
+                            .selfService(SelfServiceLink.builder()
+                                .selfServiceLinksEnabled(true)
+                                .signupLink("/create_account")
+                                .resetPasswordLink("/forgot_password")
+                                .build())
+                            .build())
+                        .prompt(Prompt.builder()
+                            .fieldName("username")
+                            .fieldType("text")
+                            .text("Email")
+                            .build())
+                        .prompt(Prompt.builder()
+                            .fieldName("password")
+                            .fieldType("password")
+                            .text("Password")
+                            .build())
+                        .prompt(Prompt.builder()
+                            .fieldName("passcode")
+                            .fieldType("password")
+                            .text("One Time Code (Get on at /passcode)")
+                            .build())
+                        .ldapDiscoveryEnabled(false)
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(PUT).path("/identity-zones/twiglet-update")
@@ -513,63 +580,12 @@ public final class ReactorIdentityZonesTest {
         }
 
         @Override
-        protected UpdateIdentityZoneResponse getResponse() {
-            return UpdateIdentityZoneResponse.builder()
-                .createdAt(1463595920023L)
-                .description("Like the Twilight Zone but not tastier.")
-                .id("twiglet-update")
-                .lastModified(1463595920023L)
-                .name("The Updated Twiglet Zone")
-                .subdomain("twiglet-update")
-                .version(1)
-                .configuration(IdentityZoneConfiguration.builder()
-                    .tokenPolicy(TokenPolicy.builder()
-                        .accessTokenValidity(-1)
-                        .jwtRevocable(false)
-                        .refreshTokenValidity(-1)
-                        .key("exampleKeyId", Collections.singletonMap("signingKey", "upD4t3d.s1gNiNg.K3y/t3XT"))
-                        .build())
-                    .samlConfiguration(SamlConfiguration.builder()
-                        .assertionSigned(true)
-                        .requestSigned(true)
-                        .wantAssertionSigned(false)
-                        .wantPartnerAuthenticationRequestSigned(false)
-                        .assertionTimeToLive(600)
-                        .build())
-                    .links(Links.builder()
-                        .logout(LogoutLink.builder()
-                            .redirectUrl("/login")
-                            .redirectParameterName("redirect")
-                            .disableRedirectParameter(true)
-                            .build())
-                        .selfService(SelfServiceLink.builder()
-                            .selfServiceLinksEnabled(true)
-                            .signupLink("/create_account")
-                            .resetPasswordLink("/forgot_password")
-                            .build())
-                        .build())
-                    .prompt(Prompt.builder()
-                        .fieldName("username")
-                        .fieldType("text")
-                        .text("Email")
-                        .build())
-                    .prompt(Prompt.builder()
-                        .fieldName("password")
-                        .fieldType("password")
-                        .text("Password")
-                        .build())
-                    .prompt(Prompt.builder()
-                        .fieldName("passcode")
-                        .fieldType("password")
-                        .text("One Time Code (Get on at /passcode)")
-                        .build())
-                    .ldapDiscoveryEnabled(false)
-                    .build())
-                .build();
+        protected Mono<UpdateIdentityZoneResponse> invoke(UpdateIdentityZoneRequest request) {
+            return this.identityZones.update(request);
         }
 
         @Override
-        protected UpdateIdentityZoneRequest getValidRequest() throws Exception {
+        protected UpdateIdentityZoneRequest validRequest() {
             return UpdateIdentityZoneRequest.builder()
                 .description("Like the Twilight Zone but not tastier.")
                 .identityZoneId("twiglet-update")
@@ -620,11 +636,6 @@ public final class ReactorIdentityZonesTest {
                     .ldapDiscoveryEnabled(false)
                     .build())
                 .build();
-        }
-
-        @Override
-        protected Mono<UpdateIdentityZoneResponse> invoke(UpdateIdentityZoneRequest request) {
-            return this.identityZones.update(request);
         }
     }
 

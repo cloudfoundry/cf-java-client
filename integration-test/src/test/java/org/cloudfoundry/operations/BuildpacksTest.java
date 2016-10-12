@@ -17,14 +17,17 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.operations.buildpacks.Buildpack;
 import org.cloudfoundry.operations.buildpacks.CreateBuildpackRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.Exceptions;
+import reactor.test.subscriber.ScriptedSubscriber;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Duration;
 
 public final class BuildpacksTest extends AbstractIntegrationTest {
 
@@ -34,6 +37,9 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
     @Test
     public void createBuildpack() throws Exception {
         String buildpackName = this.nameFactory.getBuildpackName();
+
+        ScriptedSubscriber<Buildpack> subscriber = ScriptedSubscriber.<Buildpack>expectValueCount(1)
+            .expectComplete();
 
         this.cloudFoundryOperations.buildpacks()
             .create(CreateBuildpackRequest.builder()
@@ -45,9 +51,9 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
             .thenMany(this.cloudFoundryOperations.buildpacks()
                 .list())
             .filter(buildpack -> buildpackName.equals(buildpack.getName()))
-            .subscribe(testSubscriber()
-                .expectCount(1));
+            .subscribe(subscriber);
 
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     private static Path getBuildpackPath() {

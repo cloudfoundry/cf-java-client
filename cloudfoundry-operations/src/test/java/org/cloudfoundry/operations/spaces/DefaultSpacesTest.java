@@ -66,10 +66,10 @@ import org.cloudfoundry.client.v2.spaces.UpdateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceResponse;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
 import org.cloudfoundry.operations.spaceadmin.SpaceQuota;
-import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -77,7 +77,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.function.Supplier;
 
-import static org.cloudfoundry.util.test.TestObjects.fill;
+import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
 public final class DefaultSpacesTest {
@@ -418,8 +418,9 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -442,8 +443,9 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -466,9 +468,8 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalArgumentException.class, "Space test-space-name does not exist");
+        protected ScriptedSubscriber<Void> expectations() {
+            return errorExpectation(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
 
         @Override
@@ -494,8 +495,9 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -522,8 +524,9 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -547,9 +550,8 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalArgumentException.class, "Space quota definition test-space-quota does not exist");
+        protected ScriptedSubscriber<Void> expectations() {
+            return errorExpectation(IllegalArgumentException.class, "Space quota definition test-space-quota does not exist");
         }
 
         @Override
@@ -573,9 +575,8 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalArgumentException.class, "Organization test-other-organization does not exist");
+        protected ScriptedSubscriber<Void> expectations() {
+            return errorExpectation(IllegalArgumentException.class, "Organization test-other-organization does not exist");
         }
 
         @Override
@@ -605,8 +606,9 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -633,7 +635,9 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -658,9 +662,8 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
+        protected ScriptedSubscriber<Void> expectations() {
+            return errorExpectation(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
         }
 
         @Override
@@ -683,29 +686,8 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalArgumentException.class, "Space test-space-name does not exist");
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.spaces
-                .delete(DeleteSpaceRequest.builder()
-                    .name("test-space-name")
-                    .build());
-        }
-
-    }
-
-    public static final class DeleteNoOrganization extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, MISSING_USERNAME);
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
+        protected ScriptedSubscriber<Void> expectations() {
+            return errorExpectation(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
 
         @Override
@@ -729,8 +711,9 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -753,8 +736,9 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -777,9 +761,8 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalArgumentException.class, "Space test-space-name does not exist");
+        protected ScriptedSubscriber<Void> expectations() {
+            return errorExpectation(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
 
         @Override
@@ -808,9 +791,9 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<SpaceDetail> testSubscriber) {
-            testSubscriber
-                .expectEquals(SpaceDetail.builder()
+        protected ScriptedSubscriber<SpaceDetail> expectations() {
+            return ScriptedSubscriber.<SpaceDetail>create()
+                .expectValue(SpaceDetail.builder()
                     .application("test-application-name")
                     .domain("test-domain-name")
                     .id(TEST_SPACE_ID)
@@ -825,7 +808,8 @@ public final class DefaultSpacesTest {
                     .spaceQuota(Optional
                         .of(fill(SpaceQuota.builder(), "space-quota-definition-")
                             .build()))
-                    .build());
+                    .build())
+                .expectComplete();
         }
 
         @Override
@@ -834,26 +818,6 @@ public final class DefaultSpacesTest {
                 .get(GetSpaceRequest.builder()
                     .name("test-space-name")
                     .securityGroupRules(true)
-                    .build());
-        }
-
-    }
-
-    public static final class GetNoOrganization extends AbstractOperationsApiTest<SpaceDetail> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, MISSING_USERNAME);
-
-        @Override
-        protected void assertions(TestSubscriber<SpaceDetail> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
-        }
-
-        @Override
-        protected Publisher<SpaceDetail> invoke() {
-            return this.spaces
-                .get(GetSpaceRequest.builder()
-                    .name("test-space-name")
                     .build());
         }
 
@@ -875,9 +839,9 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<SpaceDetail> testSubscriber) {
-            testSubscriber
-                .expectEquals(SpaceDetail.builder()
+        protected ScriptedSubscriber<SpaceDetail> expectations() {
+            return ScriptedSubscriber.<SpaceDetail>create()
+                .expectValue(SpaceDetail.builder()
                     .application("test-application-name")
                     .domain("test-domain-name")
                     .id(TEST_SPACE_ID)
@@ -890,7 +854,8 @@ public final class DefaultSpacesTest {
                     .spaceQuota(Optional
                         .of(fill(SpaceQuota.builder(), "space-quota-definition-")
                             .build()))
-                    .build());
+                    .build())
+                .expectComplete();
         }
 
         @Override
@@ -917,9 +882,9 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<SpaceDetail> testSubscriber) {
-            testSubscriber
-                .expectEquals(SpaceDetail.builder()
+        protected ScriptedSubscriber<SpaceDetail> expectations() {
+            return ScriptedSubscriber.<SpaceDetail>create()
+                .expectValue(SpaceDetail.builder()
                     .application("test-application-name")
                     .domain("test-domain-name")
                     .id(TEST_SPACE_ID)
@@ -930,7 +895,8 @@ public final class DefaultSpacesTest {
                         .build())
                     .service("test-service-label")
                     .spaceQuota(Optional.empty())
-                    .build());
+                    .build())
+                .expectComplete();
         }
 
         @Override
@@ -953,28 +919,11 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<SpaceSummary> testSubscriber) {
-            testSubscriber
-                .expectEquals(fill(SpaceSummary.builder(), "space-")
-                    .build());
-        }
-
-        @Override
-        protected Publisher<SpaceSummary> invoke() {
-            return this.spaces
-                .list();
-        }
-
-    }
-
-    public static final class ListNoOrganization extends AbstractOperationsApiTest<SpaceSummary> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), MISSING_ORGANIZATION_ID, MISSING_USERNAME);
-
-        @Override
-        protected void assertions(TestSubscriber<SpaceSummary> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalStateException.class, "MISSING_ORGANIZATION_ID");
+        protected ScriptedSubscriber<SpaceSummary> expectations() {
+            return ScriptedSubscriber.<SpaceSummary>create()
+                .expectValue(fill(SpaceSummary.builder(), "space-")
+                    .build())
+                .expectComplete();
         }
 
         @Override
@@ -996,8 +945,9 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            // Expects onComplete() with no onNext()
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
         }
 
         @Override
@@ -1021,9 +971,8 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalArgumentException.class, "Space test-space-name does not exist");
+        protected ScriptedSubscriber<Void> expectations() {
+            return errorExpectation(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
 
         @Override
@@ -1047,9 +996,10 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Boolean> testSubscriber) {
-            testSubscriber
-                .expectEquals(true);
+        protected ScriptedSubscriber<Boolean> expectations() {
+            return ScriptedSubscriber.<Boolean>create()
+                .expectValue(true)
+                .expectComplete();
         }
 
         @Override
@@ -1072,9 +1022,8 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Boolean> testSubscriber) {
-            testSubscriber
-                .expectError(IllegalArgumentException.class, "Space test-space-name does not exist");
+        protected ScriptedSubscriber<Boolean> expectations() {
+            return errorExpectation(IllegalArgumentException.class, "Space test-space-name does not exist");
         }
 
         @Override

@@ -38,16 +38,18 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.subscriber.ScriptedSubscriber;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuple3;
 
+import java.time.Duration;
 import java.util.Collections;
-import java.util.function.Consumer;
+import java.util.Optional;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
-import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
-import static org.junit.Assert.assertEquals;
 
 public final class UserProvidedServicesTest extends AbstractIntegrationTest {
 
@@ -58,8 +60,12 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
     private Mono<String> spaceId;
 
     @Test
-    public void create() {
+    public void create() throws TimeoutException, InterruptedException {
         String instanceName = this.nameFactory.getServiceInstanceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(instanceName)
+            .expectComplete();
 
         this.spaceId
             .then(spaceId -> this.cloudFoundryClient.userProvidedServiceInstances()
@@ -68,13 +74,17 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                     .spaceId(spaceId)
                     .build()))
             .map(response -> ResourceUtils.getEntity(response).getName())
-            .subscribe(this.testSubscriber()
-                .expectEquals(instanceName));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void delete() {
+    public void delete() throws TimeoutException, InterruptedException {
         String instanceName = this.nameFactory.getServiceInstanceName();
+
+        ScriptedSubscriber<UserProvidedServiceInstanceResource> subscriber = ScriptedSubscriber.<UserProvidedServiceInstanceResource>create()
+            .expectComplete();
 
         this.spaceId
             .then(spaceId -> getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))
@@ -83,13 +93,18 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                     .userProvidedServiceInstanceId(instanceId)
                     .build()))
             .thenMany(requestListUserProvidedServiceInstances(this.cloudFoundryClient, instanceName))
-            .subscribe(this.testSubscriber()
-                .expectCount(0));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void get() {
+    public void get() throws TimeoutException, InterruptedException {
         String instanceName = this.nameFactory.getServiceInstanceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(instanceName)
+            .expectComplete();
 
         this.spaceId
             .then(spaceId -> getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))
@@ -98,13 +113,18 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                     .userProvidedServiceInstanceId(instanceId)
                     .build()))
             .map(response -> ResourceUtils.getEntity(response).getName())
-            .subscribe(this.testSubscriber()
-                .expectEquals(instanceName));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void list() {
+    public void list() throws TimeoutException, InterruptedException {
         String instanceName = this.nameFactory.getServiceInstanceName();
+
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(instanceName)
+            .expectComplete();
 
         this.spaceId
             .then(spaceId -> requestCreateUserProvidedServiceInstance(this.cloudFoundryClient, instanceName, spaceId))
@@ -116,14 +136,17 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                         .build())))
             .single()
             .map(response -> ResourceUtils.getEntity(response).getName())
-            .subscribe(this.testSubscriber()
-                .expectEquals(instanceName));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void listServiceBindings() {
+    public void listServiceBindings() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String instanceName = this.nameFactory.getServiceInstanceName();
+
+        ScriptedSubscriber<Tuple3<String, String, ServiceBindingResource>> subscriber = serviceBindingEquality();
 
         this.spaceId
             .then(spaceId -> Mono.when(
@@ -147,14 +170,37 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                                 .userProvidedServiceInstanceId(instanceId)
                                 .build()))
                         .single())))
-            .subscribe(this.<Tuple3<String, String, ServiceBindingResource>>testSubscriber()
-                .expectThat(serviceBindingMatchesRequest()));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
-    public void update() {
+    public void update() throws TimeoutException, InterruptedException {
         String instanceName = this.nameFactory.getServiceInstanceName();
         String newInstanceName = this.nameFactory.getServiceInstanceName();
+
+        Function<Tuple2<UserProvidedServiceInstanceEntity, UserProvidedServiceInstanceEntity>, Optional<String>> assertion = function((entity1, entity2) -> {
+            if (!newInstanceName.equals(entity1.getName())) {
+                return Optional.of(String.format("expected instance name: %s; actual instance name: %s", newInstanceName, entity1.getName()));
+            }
+
+            if (!Collections.singletonMap("test-cred", "some value").equals(entity1.getCredentials())) {
+                return Optional.of(String.format("expected credentials: %s; actual credentials: %s", Collections.singletonMap("test-cred", "some value"), entity1.getCredentials()));
+            }
+
+            if (!Collections.emptyMap().equals(entity2.getCredentials())) {
+                return Optional.of(String.format("expected credentials: %s; actual credentials: %s", Collections.emptyMap(), entity2.getCredentials()));
+            }
+
+            return Optional.empty();
+        });
+
+        ScriptedSubscriber<Tuple2<UserProvidedServiceInstanceEntity, UserProvidedServiceInstanceEntity>> subscriber =
+            ScriptedSubscriber.<Tuple2<UserProvidedServiceInstanceEntity, UserProvidedServiceInstanceEntity>>create()
+                .expectValueWith(tuple -> !assertion.apply(tuple).isPresent(),
+                    tuple -> assertion.apply(tuple).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching values")))
+                .expectComplete();
 
         this.spaceId
             .then(spaceId -> getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))
@@ -179,12 +225,9 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                             .build())
                         .map(UpdateUserProvidedServiceInstanceResponse::getEntity)
                 )))
-            .subscribe(this.<Tuple2<UserProvidedServiceInstanceEntity, UserProvidedServiceInstanceEntity>>testSubscriber()
-                .expectThat(consumer((entity1, entity2) -> {
-                    assertEquals("name not updated", newInstanceName, entity1.getName());
-                    assertEquals("credentials not set", Collections.singletonMap("test-cred", "some value"), entity1.getCredentials());
-                    assertEquals("credentials not cleared", Collections.emptyMap(), entity2.getCredentials());
-                })));
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     private static Mono<String> getCreateApplicationId(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
@@ -222,11 +265,23 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                     .build()));
     }
 
-    private static Consumer<Tuple3<String, String, ServiceBindingResource>> serviceBindingMatchesRequest() {
-        return consumer((applicationId, instanceId, resource) -> {
-            assertEquals(applicationId, resource.getEntity().getApplicationId());
-            assertEquals(instanceId, resource.getEntity().getServiceInstanceId());
+    private static ScriptedSubscriber<Tuple3<String, String, ServiceBindingResource>> serviceBindingEquality() {
+        Function<Tuple3<String, String, ServiceBindingResource>, Optional<String>> assertion = function((applicationId, instanceId, resource) -> {
+            if (!applicationId.equals(resource.getEntity().getApplicationId())) {
+                return Optional.of(String.format("expected application id: %s; actual application id: %s", applicationId, resource.getEntity().getApplicationId()));
+            }
+
+            if (!instanceId.equals(resource.getEntity().getServiceInstanceId())) {
+                return Optional.of(String.format("expected instance id: %s; actual instance id: %s", instanceId, resource.getEntity().getServiceInstanceId()));
+            }
+
+            return Optional.empty();
         });
+
+        return ScriptedSubscriber.<Tuple3<String, String, ServiceBindingResource>>create()
+            .expectValueWith(t -> !assertion.apply(t).isPresent(),
+                t -> assertion.apply(t).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching service binding")))
+            .expectComplete();
     }
 
 }
