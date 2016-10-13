@@ -29,7 +29,7 @@ import reactor.test.subscriber.ScriptedSubscriber;
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
 

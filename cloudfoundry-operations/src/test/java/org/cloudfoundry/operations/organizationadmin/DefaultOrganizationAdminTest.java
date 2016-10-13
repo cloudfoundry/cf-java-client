@@ -38,6 +38,7 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.test.subscriber.ScriptedSubscriber;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
@@ -235,7 +236,8 @@ public final class DefaultOrganizationAdminTest {
 
         @Override
         protected ScriptedSubscriber<OrganizationQuota> expectations() {
-            return errorExpectation(CloudFoundryException.class, "test-exception-errorCode(999): test-exception-description");
+            return ScriptedSubscriber.<OrganizationQuota>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessage("test-exception-errorCode(999): test-exception-description"));
         }
 
         @Override
@@ -290,7 +292,8 @@ public final class DefaultOrganizationAdminTest {
 
         @Override
         protected ScriptedSubscriber<OrganizationQuota> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Quota test-quota-not-found does not exist");
+            return ScriptedSubscriber.<OrganizationQuota>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Quota test-quota-not-found does not exist"));
         }
 
         @Override
@@ -373,7 +376,8 @@ public final class DefaultOrganizationAdminTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Organization test-organization-not-found does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Organization test-organization-not-found does not exist"));
         }
 
         @Override
@@ -397,7 +401,8 @@ public final class DefaultOrganizationAdminTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Quota test-quota-not-found does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Quota test-quota-not-found does not exist"));
         }
 
         @Override
@@ -460,7 +465,8 @@ public final class DefaultOrganizationAdminTest {
 
         @Override
         protected ScriptedSubscriber<OrganizationQuota> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Quota test-quota-not-found does not exist");
+            return ScriptedSubscriber.<OrganizationQuota>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Quota test-quota-not-found does not exist"));
         }
 
         @Override

@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.operations;
 
-import org.junit.Assert;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
@@ -33,6 +32,8 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * {@code TestObjects} provides a generic utility which transforms a builder object of type {@code T}, by calling its configuration methods with default values.
  * <p>
@@ -47,16 +48,16 @@ import java.util.stream.Collectors;
  * <p>
  * {@code TestObjects} populates builder objects with test values. Builder setter methods are called with standard values based upon the parameter type and the name of the setter method.
  * <ul>
- *      <li>{@code enum} types are set to the first enumerated constant value.</li>
- *      <li>{@link Boolean} types are set to {@code true}.</li>
- *      <li>{@link Date} types are set to {@code new Date(0)}.</li>
- *      <li>{@link Double} types are set to {@code 1.0}.</li>
- *      <li>{@link Duration} types are set to a duration of 15 seconds.</li>
- *      <li>{@link Integer} or {@link Long} types are set to {@code 1}.</li>
- *      <li>{@link Iterable} types are set to empty.</li>
- *      <li>{@link Map} types are set to empty.</li>
- *      <li>{@link String} types are set to {@code "test-"+modifier+settername}.</li>
- *      <li>Types of <i>built objects</i> are set to a value built from a (recursively) {@code fill()}ed builder instance.</li>
+ * <li>{@code enum} types are set to the first enumerated constant value.</li>
+ * <li>{@link Boolean} types are set to {@code true}.</li>
+ * <li>{@link Date} types are set to {@code new Date(0)}.</li>
+ * <li>{@link Double} types are set to {@code 1.0}.</li>
+ * <li>{@link Duration} types are set to a duration of 15 seconds.</li>
+ * <li>{@link Integer} or {@link Long} types are set to {@code 1}.</li>
+ * <li>{@link Iterable} types are set to empty.</li>
+ * <li>{@link Map} types are set to empty.</li>
+ * <li>{@link String} types are set to {@code "test-"+modifier+settername}.</li>
+ * <li>Types of <i>built objects</i> are set to a value built from a (recursively) {@code fill()}ed builder instance.</li>
  * </ul>
  * <p>
  * Only public, chainable, single-parameter setter methods which have a corresponding getter (on the type built) are configured.
@@ -97,8 +98,8 @@ public abstract class TestObjects {
 
     private static <T> T fill(T builder, Optional<String> modifier) {
         Class<?> builderType = builder.getClass();
-        Assert.assertTrue(String.format("Cannot fill type %s", builderType.getName()), isBuilderType(builderType));
-        Assert.assertFalse("Do not fill Request types", buildsRequestType(builderType));
+        assertThat(isBuilderType(builderType)).as("Cannot fill type %s", builderType.getName()).isTrue();
+        assertThat(buildsRequestType(builderType)).as("Do not fill Request types").isFalse();
 
         List<Method> builderMethods = getMethods(builderType);
         Set<String> builtGetters = getBuiltGetters(builderType);
@@ -108,12 +109,12 @@ public abstract class TestObjects {
             });
     }
 
-    private static Method getBuilderMethod(Class<?> builderType) {
-        return ReflectionUtils.findMethod(builderType, "builder");
-    }
-
     private static Method getBuildMethod(Class<?> builderType) {
         return ReflectionUtils.findMethod(builderType, "build");
+    }
+
+    private static Method getBuilderMethod(Class<?> builderType) {
+        return ReflectionUtils.findMethod(builderType, "builder");
     }
 
     private static Set<String> getBuiltGetters(Class<?> builderType) {

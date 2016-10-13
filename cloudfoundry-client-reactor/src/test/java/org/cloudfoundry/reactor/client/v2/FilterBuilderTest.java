@@ -30,8 +30,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public final class FilterBuilderTest {
 
@@ -43,14 +42,9 @@ public final class FilterBuilderTest {
 
         MultiValueMap<String, String> queryParams = builder.build().getQueryParams();
         List<String> q = queryParams.get("q");
-        assertEquals(7, q.size());
-        assertTrue(q.contains("test-greater-than>test-value-1"));
-        assertTrue(q.contains("test-greater-than-or-equal-to>=test-value-2"));
-        assertTrue(q.contains("test-in IN test-value-3,test-value-4"));
-        assertTrue(q.contains("test-is:test-value-5"));
-        assertTrue(q.contains("test-less-than<test-value-6"));
-        assertTrue(q.contains("test-less-than-or-equal-to<=test-value-7"));
-        assertTrue(q.contains("test-default IN test-value-8,test-value-9"));
+
+        assertThat(q).hasSize(7).containsOnly("test-greater-than>test-value-1", "test-greater-than-or-equal-to>=test-value-2", "test-in IN test-value-3,test-value-4", "test-is:test-value-5",
+            "test-less-than<test-value-6", "test-less-than-or-equal-to<=test-value-7", "test-default IN test-value-8,test-value-9");
     }
 
     private static abstract class StubFilterParams {

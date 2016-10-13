@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.v3.packages.State.PROCESSING_UPLOAD;
 import static org.cloudfoundry.client.v3.packages.State.READY;
 
@@ -54,7 +55,7 @@ public final class PackagesTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         ScriptedSubscriber<State> subscriber = ScriptedSubscriber.<State>create()
-            .expectValueWith(state -> PROCESSING_UPLOAD == state || READY == state, state -> String.format("expected state: PROCESSING_UPLOAD or READY: actual state: %s", state))
+            .consumeValueWith(state -> assertThat(state).isIn(PROCESSING_UPLOAD, READY))
             .expectComplete();
 
         this.spaceId

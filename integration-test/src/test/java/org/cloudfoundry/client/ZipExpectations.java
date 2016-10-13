@@ -24,44 +24,32 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 
 public final class ZipExpectations {
 
     public static ScriptedSubscriber<Tuple2<byte[], byte[]>> zipEquality() {
-        Function<Tuple2<byte[], byte[]>, Optional<String>> assertion = function((expected, actual) -> {
-            List<Entry> expectedEntries = entries(expected);
-            List<Entry> actualEntries = entries(expected);
-
-            if (expectedEntries.size() != actualEntries.size()) {
-                return Optional.of(String.format("expected entries: %d; actual entries: %d", expectedEntries.size(), actualEntries.size()));
-            }
-
-            Iterator<Entry> expectedIterator = expectedEntries.iterator();
-            Iterator<Entry> actualIterator = actualEntries.iterator();
-
-            while (expectedIterator.hasNext()) {
-                Optional<String> message = expectedIterator.next().equality(actualIterator.next());
-                if (message.isPresent()) {
-                    return message;
-                }
-            }
-
-            return Optional.empty();
-        });
-
         return ScriptedSubscriber.<Tuple2<byte[], byte[]>>create()
-            .expectValueWith(tuple -> !assertion.apply(tuple).isPresent(),
-                tuple -> assertion.apply(tuple).orElseThrow(() -> new IllegalStateException("Cannot generate assertion message for matching zip")))
+            .consumeValueWith(consumer((expected, actual) -> {
+                List<Entry> expectedEntries = entries(expected);
+                List<Entry> actualEntries = entries(expected);
+
+                assertThat(expectedEntries).hasSameSizeAs(actualEntries);
+
+                Iterator<Entry> expectedIterator = expectedEntries.iterator();
+                Iterator<Entry> actualIterator = actualEntries.iterator();
+
+                while (actualIterator.hasNext()) {
+                    assertThat(actualIterator.next()).isEqualToComparingOnlyGivenFields(expectedIterator.next(), "compressedSize", "contents", "crc", "directory", "name", "size");
+                }
+            }))
             .expectComplete();
     }
 
@@ -117,34 +105,6 @@ public final class ZipExpectations {
         @Override
         public int compareTo(Entry o) {
             return this.name.compareTo(o.name);
-        }
-
-        private Optional<String> equality(Entry o) {
-            if (this.compressedSize != o.compressedSize) {
-                return Optional.of(String.format("%s; expected compressed size: %d; actual compressed size: %d", this.name, this.compressedSize, o.compressedSize));
-            }
-
-            if (!Arrays.equals(this.contents, o.contents)) {
-                return Optional.of(String.format("%s; expected and actual contents do not match", this.name));
-            }
-
-            if (this.crc != o.crc) {
-                return Optional.of(String.format("%s; expected crc: %d; actual crc: %d", this.name, this.crc, o.crc));
-            }
-
-            if (this.directory != o.directory) {
-                return Optional.of(String.format("%s; expected is directory: %b; actual is directory: %b", this.name, this.directory, o.directory));
-            }
-
-            if (!this.name.equals(o.name)) {
-                return Optional.of(String.format("%s; expected name: %s; actual name: %s", this.name, this.name, o.name));
-            }
-
-            if (this.size != o.size) {
-                return Optional.of(String.format("%s; expected size: %d; actual size: %d", this.name, this.size, o.size));
-            }
-
-            return Optional.empty();
         }
 
     }

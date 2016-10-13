@@ -28,6 +28,7 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.test.subscriber.ScriptedSubscriber;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
@@ -200,7 +201,8 @@ public final class DefaultServiceAdminTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Service Broker test-service-broker-name does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service Broker test-service-broker-name does not exist"));
         }
 
         @Override

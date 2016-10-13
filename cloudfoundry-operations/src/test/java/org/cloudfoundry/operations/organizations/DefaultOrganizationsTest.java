@@ -63,6 +63,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.function.Supplier;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
@@ -422,7 +423,8 @@ public final class DefaultOrganizationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"));
         }
 
         @Override

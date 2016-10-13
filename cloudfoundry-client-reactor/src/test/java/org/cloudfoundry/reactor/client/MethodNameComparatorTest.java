@@ -20,7 +20,7 @@ import org.junit.Test;
 
 import java.lang.reflect.Method;
 
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 public final class MethodNameComparatorTest {
@@ -32,9 +32,9 @@ public final class MethodNameComparatorTest {
         Method alpha = this.getClass().getDeclaredMethod("alpha");
         Method bravo = this.getClass().getDeclaredMethod("bravo");
 
-        assertTrue(this.comparator.compare(alpha, bravo) < 0);
-        assertTrue(this.comparator.compare(bravo, alpha) > 0);
-        assertTrue(this.comparator.compare(alpha, alpha) == 0);
+        assertThat(this.comparator.compare(alpha, bravo)).isLessThan(0);
+        assertThat(this.comparator.compare(bravo, alpha)).isGreaterThan(0);
+        assertThat(this.comparator.compare(alpha, alpha)).isZero();
     }
 
     private void alpha() {

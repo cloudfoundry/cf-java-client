@@ -53,11 +53,11 @@ import reactor.test.subscriber.ScriptedSubscriber;
 import reactor.util.function.Tuple2;
 
 import java.time.Duration;
-import java.util.Optional;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static reactor.core.publisher.Mono.when;
 
@@ -95,7 +95,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
     public void delete() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<GetDomainResponse> subscriber = errorExpectation(CloudFoundryException.class, "CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*");
+        ScriptedSubscriber<GetDomainResponse> subscriber = ScriptedSubscriber.<GetDomainResponse>create()
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"));
 
         this.organizationId
             .then(organizationId -> createDomainId(this.cloudFoundryClient, domainName, organizationId))
@@ -111,7 +112,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
     public void deleteNotAsync() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<GetDomainResponse> subscriber = errorExpectation(CloudFoundryException.class, "CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*");
+        ScriptedSubscriber<GetDomainResponse> subscriber = ScriptedSubscriber.<GetDomainResponse>create()
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"));
 
         this.organizationId
             .then(organizationId -> createDomainId(this.cloudFoundryClient, domainName, organizationId))
@@ -349,21 +351,11 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     private static ScriptedSubscriber<Tuple2<DomainEntity, String>> domainNameAndOrganizationIdEquality(String domainName) {
-        Function<Tuple2<DomainEntity, String>, Optional<String>> assertion = function((entity, organizationId) -> {
-            if (!domainName.equals(entity.getName())) {
-                return Optional.of(String.format("expected name: %s; actual name: %s", domainName, entity.getName()));
-            }
-
-            if (!organizationId.equals(entity.getOwningOrganizationId())) {
-                return Optional.of(String.format("expected organization id: %s; actual organization id: %s", organizationId, entity.getOwningOrganizationId()));
-            }
-
-            return Optional.empty();
-        });
-
         return ScriptedSubscriber.<Tuple2<DomainEntity, String>>create()
-            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
-                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching entity")))
+            .consumeValueWith(consumer((entity, organizationId) -> {
+                assertThat(entity.getName()).isEqualTo(domainName);
+                assertThat(entity.getOwningOrganizationId()).isEqualTo(organizationId);
+            }))
             .expectComplete();
     }
 

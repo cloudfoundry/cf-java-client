@@ -45,9 +45,10 @@ import reactor.util.function.Tuple3;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class ServiceBindingsTest extends AbstractIntegrationTest {
@@ -82,8 +83,8 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
-        ScriptedSubscriber<GetServiceBindingResponse> subscriber = errorExpectation(CloudFoundryException.class,
-            "CF-ServiceBindingNotFound\\([0-9]+\\): The service binding could not be found: .*");
+        ScriptedSubscriber<GetServiceBindingResponse> subscriber = ScriptedSubscriber.<GetServiceBindingResponse>create()
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-ServiceBindingNotFound\\([0-9]+\\): The service binding could not be found: .*"));
 
         createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
             .then(function((serviceInstanceId, applicationId) -> Mono
@@ -290,21 +291,11 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
     }
 
     private static <T extends AbstractServiceBindingResource> ScriptedSubscriber<Tuple3<String, String, T>> serviceBindingEquality() {
-        Function<Tuple3<String, String, T>, Optional<String>> assertion = function((serviceInstanceId, applicationId, resource) -> {
-            if (!serviceInstanceId.equals(ResourceUtils.getEntity(resource).getServiceInstanceId())) {
-                return Optional.of(String.format("expected service instance id: %s; actual service instance id: %s", serviceInstanceId, ResourceUtils.getEntity(resource).getServiceInstanceId()));
-            }
-
-            if (!applicationId.equals(ResourceUtils.getEntity(resource).getApplicationId())) {
-                return Optional.of(String.format("expected application id: %s; actual application id: %s", applicationId, ResourceUtils.getEntity(resource).getApplicationId()));
-            }
-
-            return Optional.empty();
-        });
-
         return ScriptedSubscriber.<Tuple3<String, String, T>>create()
-            .expectValueWith(tuple -> !assertion.apply(tuple).isPresent(),
-                tuple -> assertion.apply(tuple).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching service binding")))
+            .consumeValueWith(consumer((serviceInstanceId, applicationId, resource) -> {
+                assertThat(ResourceUtils.getEntity(resource).getServiceInstanceId()).isEqualTo(serviceInstanceId);
+                assertThat(ResourceUtils.getEntity(resource).getApplicationId()).isEqualTo(applicationId);
+            }))
             .expectComplete();
     }
 

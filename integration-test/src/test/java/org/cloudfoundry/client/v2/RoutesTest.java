@@ -46,11 +46,11 @@ import reactor.test.subscriber.ScriptedSubscriber;
 import reactor.util.function.Tuple3;
 
 import java.time.Duration;
-import java.util.Optional;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class RoutesTest extends AbstractIntegrationTest {
@@ -128,7 +128,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void delete() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<GetRouteResponse> subscriber = errorExpectation(CloudFoundryException.class, "CF-RouteNotFound\\([0-9]+\\): The route could not be found: .*");
+        ScriptedSubscriber<GetRouteResponse> subscriber = ScriptedSubscriber.<GetRouteResponse>create()
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-RouteNotFound\\([0-9]+\\): The route could not be found: .*"));
 
         Mono
             .when(
@@ -153,7 +154,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void deleteAsyncFalse() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<GetRouteResponse> subscriber = errorExpectation(CloudFoundryException.class, "CF-RouteNotFound\\([0-9]+\\): The route could not be found: .*");
+        ScriptedSubscriber<GetRouteResponse> subscriber = ScriptedSubscriber.<GetRouteResponse>create()
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-RouteNotFound\\([0-9]+\\): The route could not be found: .*"));
 
         Mono
             .when(
@@ -522,17 +524,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void listFilterByOrganizationId() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
 
-        Function<Long, Optional<String>> assertion = count -> {
-            if (count <= 0) {
-                return Optional.of(String.format("expected at least one organization; actual: %s", count));
-            }
-
-            return Optional.empty();
-        };
-
         ScriptedSubscriber<Long> subscriber = ScriptedSubscriber.<Long>create()
-            .expectValueWith(count -> !assertion.apply(count).isPresent(),
-                count -> assertion.apply(count).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching count")))
+            .consumeValueWith(count -> assertThat(count).isGreaterThan(0))
             .expectComplete();
 
         this.organizationId
@@ -675,21 +668,11 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     private static ScriptedSubscriber<Tuple3<String, String, RouteEntity>> domainIdSpaceIdEquality() {
-        Function<Tuple3<String, String, RouteEntity>, Optional<String>> assertion = function((domainId, spaceId, entity) -> {
-            if (!domainId.equals(entity.getDomainId())) {
-                return Optional.of(String.format("expected domain id: %s; actual domain id: %s", domainId, entity.getDomainId()));
-            }
-
-            if (!spaceId.equals(entity.getSpaceId())) {
-                return Optional.of(String.format("expected space id: %s; actual space id: %s", spaceId, entity.getSpaceId()));
-            }
-
-            return Optional.empty();
-        });
-
         return ScriptedSubscriber.<Tuple3<String, String, RouteEntity>>create()
-            .expectValueWith(tuple -> !assertion.apply(tuple).isPresent(),
-                tuple -> assertion.apply(tuple).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching entity")))
+            .consumeValueWith(consumer((domainId, spaceId, entity) -> {
+                assertThat(entity.getDomainId()).isEqualTo(domainId);
+                assertThat(entity.getSpaceId()).isEqualTo(spaceId);
+            }))
             .expectComplete();
     }
 

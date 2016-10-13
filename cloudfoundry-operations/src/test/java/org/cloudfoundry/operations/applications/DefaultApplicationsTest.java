@@ -122,6 +122,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.function.Supplier;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
@@ -1236,7 +1237,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Organization test-target-organization not found");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Organization test-target-organization not found"));
         }
 
         @Override
@@ -1300,7 +1302,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Space test-target-space not found");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space test-target-space not found"));
         }
 
         @Override
@@ -1361,7 +1364,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"));
         }
 
         @Override
@@ -1497,7 +1501,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Application test-app-name does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app-name does not exist"));
         }
 
         @Override
@@ -1572,7 +1577,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Application test-app-name does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app-name does not exist"));
         }
 
         @Override
@@ -1799,7 +1805,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<ApplicationEnvironments> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Application test-app does not exist");
+            return ScriptedSubscriber.<ApplicationEnvironments>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app does not exist"));
         }
 
         @Override
@@ -2479,7 +2486,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<LogMessage> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Application test-application-name does not exist");
+            return ScriptedSubscriber.<LogMessage>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-application-name does not exist"));
         }
 
         @Override
@@ -2615,7 +2623,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Domain test-domain not found");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Domain test-domain not found"));
         }
 
         @Override
@@ -2772,7 +2781,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Stack invalid-stack does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Stack invalid-stack does not exist"));
         }
 
         @Override
@@ -2944,7 +2954,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Domain not found");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Domain not found"));
         }
 
         @Override
@@ -3249,7 +3260,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalStateException.class, "Application test-name failed during start");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-name failed during start"));
         }
 
         @Override
@@ -3291,7 +3303,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalStateException.class, "Application test-name failed during staging");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-name failed during staging"));
         }
 
         @Override
@@ -3330,7 +3343,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"));
         }
 
         @Override
@@ -3379,7 +3393,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Application test-app-name does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app-name does not exist"));
         }
 
         @Override
@@ -3432,7 +3447,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Application test-application-name does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-application-name does not exist"));
         }
 
         @Override
@@ -3458,7 +3474,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalStateException.class, "Application test-application-name failed during staging");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-application-name failed during staging"));
         }
 
         @Override
@@ -3513,7 +3530,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalStateException.class, "Application test-application-name failed during start");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-application-name failed during start"));
         }
 
         @Override
@@ -3539,7 +3557,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalStateException.class, "Application test-application-name timed out during staging");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-application-name timed out during staging"));
         }
 
         @Override
@@ -3597,7 +3616,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalStateException.class, "Application test-app-name failed during start");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-app-name failed during start"));
         }
 
         @Override
@@ -3648,7 +3668,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Application test-non-existent-app-name does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-non-existent-app-name does not exist"));
         }
 
         @Override
@@ -3843,7 +3864,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Application test-app-name does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app-name does not exist"));
         }
 
         @Override
@@ -3931,7 +3953,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Application test-app does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app does not exist"));
         }
 
         @Override
@@ -4010,7 +4033,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Boolean> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Application test-app-name does not exist");
+            return ScriptedSubscriber.<Boolean>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app-name does not exist"));
         }
 
         @Override
@@ -4065,7 +4089,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalStateException.class, "Application test-application-name failed during start");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-application-name failed during start"));
         }
 
         @Override
@@ -4092,7 +4117,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalStateException.class, "Application test-application-name timed out during start");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-application-name timed out during start"));
         }
 
         @Override
@@ -4117,7 +4143,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Application test-application-name does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-application-name does not exist"));
         }
 
         @Override
@@ -4194,7 +4221,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Application test-application-name does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-application-name does not exist"));
         }
 
         @Override
@@ -4305,7 +4333,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Application test-app does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app does not exist"));
         }
 
         @Override

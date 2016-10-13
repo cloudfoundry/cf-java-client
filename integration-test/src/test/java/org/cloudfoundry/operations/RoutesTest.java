@@ -44,6 +44,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.operations.routes.Level.ORGANIZATION;
 import static org.cloudfoundry.operations.routes.Level.SPACE;
 
@@ -151,7 +152,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
 
-        ScriptedSubscriber<Void> subscriber = errorExpectation(IllegalArgumentException.class, "Domain %s does not exist", domainName);
+        ScriptedSubscriber<Void> subscriber = ScriptedSubscriber.<Void>create()
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Domain %s does not exist", domainName));
 
         this.cloudFoundryOperations.routes()
             .create(CreateRouteRequest.builder()
@@ -199,7 +201,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
 
-        ScriptedSubscriber<Void> subscriber = errorExpectation(IllegalArgumentException.class, "Domain %s does not exist", domainName);
+        ScriptedSubscriber<Void> subscriber = ScriptedSubscriber.<Void>create()
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Domain %s does not exist", domainName));
 
         this.cloudFoundryOperations.routes()
             .delete(DeleteRouteRequest.builder()

@@ -26,6 +26,7 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.test.subscriber.ScriptedSubscriber;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
@@ -93,7 +94,8 @@ public final class DefaultSpaceAdminTest {
 
         @Override
         protected ScriptedSubscriber<SpaceQuota> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Space Quota test-space-quota-definition-name does not exist");
+            return ScriptedSubscriber.<SpaceQuota>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space Quota test-space-quota-definition-name does not exist"));
         }
 
         @Override

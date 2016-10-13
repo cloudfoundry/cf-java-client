@@ -50,8 +50,8 @@ import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
-import static org.junit.Assert.assertEquals;
 
 public final class ReactorBuildpacksTest {
 
@@ -377,13 +377,14 @@ public final class ReactorBuildpacksTest {
                     .contents(consumer((headers, body) -> {
                         String boundary = extractBoundary(headers);
 
-                        assertEquals("--" + boundary + "\r\n" +
-                            "Content-Disposition: form-data; name=\"buildpack\"; filename=\"test-filename\"\r\n" +
-                            "Content-Type: application/zip\r\n" +
-                            "\r\n" +
-                            "test-content\n" +
-                            "\r\n" +
-                            "--" + boundary + "--", body.readString(Charset.defaultCharset()));
+                        assertThat(body.readString(Charset.defaultCharset()))
+                            .isEqualTo("--" + boundary + "\r\n" +
+                                "Content-Disposition: form-data; name=\"buildpack\"; filename=\"test-filename\"\r\n" +
+                                "Content-Type: application/zip\r\n" +
+                                "\r\n" +
+                                "test-content\n" +
+                                "\r\n" +
+                                "--" + boundary + "--");
                     }))
                     .build())
                 .response(TestResponse.builder()

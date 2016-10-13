@@ -29,8 +29,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.HttpClient;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 public abstract class AbstractRestTest {
 
@@ -74,7 +74,7 @@ public abstract class AbstractRestTest {
 
     protected final void verify() {
         if (this.interactionContext != null) {
-            assertTrue("Expected request not received", this.interactionContext.isDone());
+            assertThat(this.interactionContext.isDone()).as("Expected request not received").isTrue();
         }
     }
 
