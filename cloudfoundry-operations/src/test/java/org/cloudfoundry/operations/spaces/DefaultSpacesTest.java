@@ -77,6 +77,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.function.Supplier;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
@@ -469,7 +470,8 @@ public final class DefaultSpacesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Space test-space-name does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space test-space-name does not exist"));
         }
 
         @Override
@@ -551,7 +553,8 @@ public final class DefaultSpacesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Space quota definition test-space-quota does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space quota definition test-space-quota does not exist"));
         }
 
         @Override
@@ -576,7 +579,8 @@ public final class DefaultSpacesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Organization test-other-organization does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Organization test-other-organization does not exist"));
         }
 
         @Override
@@ -663,7 +667,8 @@ public final class DefaultSpacesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"));
         }
 
         @Override
@@ -687,7 +692,8 @@ public final class DefaultSpacesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Space test-space-name does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space test-space-name does not exist"));
         }
 
         @Override
@@ -762,7 +768,8 @@ public final class DefaultSpacesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Space test-space-name does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space test-space-name does not exist"));
         }
 
         @Override
@@ -972,7 +979,8 @@ public final class DefaultSpacesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Space test-space-name does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space test-space-name does not exist"));
         }
 
         @Override
@@ -1023,7 +1031,8 @@ public final class DefaultSpacesTest {
 
         @Override
         protected ScriptedSubscriber<Boolean> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Space test-space-name does not exist");
+            return ScriptedSubscriber.<Boolean>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space test-space-name does not exist"));
         }
 
         @Override

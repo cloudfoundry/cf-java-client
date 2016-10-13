@@ -19,7 +19,7 @@ package org.cloudfoundry.reactor.uaa;
 import org.cloudfoundry.reactor.AbstractRestTest;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public final class ReactorUaaClientTest extends AbstractRestTest {
 
@@ -31,37 +31,37 @@ public final class ReactorUaaClientTest extends AbstractRestTest {
 
     @Test
     public void authorizations() {
-        assertNotNull(this.client.authorizations());
+        assertThat(this.client.authorizations()).isNotNull();
     }
 
     @Test
     public void clients() {
-        assertNotNull(this.client.clients());
+        assertThat(this.client.clients()).isNotNull();
     }
 
     @Test
     public void groups() {
-        assertNotNull(this.client.groups());
+        assertThat(this.client.groups()).isNotNull();
     }
 
     @Test
     public void identityProviders() {
-        assertNotNull(this.client.identityProviders());
+        assertThat(this.client.identityProviders()).isNotNull();
     }
 
     @Test
     public void identityZones() {
-        assertNotNull(this.client.identityZones());
+        assertThat(this.client.identityZones()).isNotNull();
     }
 
     @Test
     public void tokens() {
-        assertNotNull(this.client.tokens());
+        assertThat(this.client.tokens()).isNotNull();
     }
 
     @Test
     public void users() {
-        assertNotNull(this.client.users());
+        assertThat(this.client.users()).isNotNull();
     }
 
 }

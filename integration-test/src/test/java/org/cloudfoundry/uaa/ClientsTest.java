@@ -56,13 +56,10 @@ import reactor.ipc.netty.http.HttpException;
 import reactor.test.subscriber.ScriptedSubscriber;
 
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.Collections;
-import java.util.Optional;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
 import static org.cloudfoundry.uaa.tokens.GrantType.IMPLICIT;
 import static org.cloudfoundry.uaa.tokens.GrantType.PASSWORD;
@@ -114,29 +111,13 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientId2 = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
 
-        Function<Client, Optional<String>> assertion = response -> {
-            if (!Arrays.asList(PASSWORD, REFRESH_TOKEN).equals(response.getAuthorizedGrantTypes())) {
-                return Optional.of(String.format("expected authorized grant types: %s; actual authorized grant types: %s", Arrays.asList(PASSWORD, REFRESH_TOKEN), response.getAuthorizedGrantTypes()));
-            }
-
-            if (!clientId1.equals(response.getClientId())) {
-                return Optional.of(String.format("expected client id: %s; actual client id: %s", clientId1, response.getClientId()));
-            }
-
-            if (!Arrays.asList("client.read", "client.write").equals(response.getScopes())) {
-                return Optional.of(String.format("expected scopes: %s; actual scopes: %s", Arrays.asList("client.read", "client.write"), response.getScopes()));
-            }
-
-            if (!"test-token-salt".equals(response.getTokenSalt())) {
-                return Optional.of(String.format("expected token salt: %s; actual token salt: %s", "test-token-salt", response.getTokenSalt()));
-            }
-
-            return Optional.empty();
-        };
-
         ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
-            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
-                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching client")))
+            .consumeValueWith(response -> {
+                assertThat(response.getAuthorizedGrantTypes()).containsExactly(PASSWORD, REFRESH_TOKEN);
+                assertThat(response.getClientId()).isEqualTo(clientId1);
+                assertThat(response.getScopes()).containsExactly("client.read", "client.write");
+                assertThat(response.getTokenSalt()).isEqualTo("test-token-salt");
+            })
             .expectComplete();
 
         this.uaaClient.clients()
@@ -195,34 +176,14 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientId2 = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
 
-        Function<Client, Optional<String>> assertion = response -> {
-            if (!Arrays.asList(IMPLICIT, CLIENT_CREDENTIALS).equals(response.getAuthorizedGrantTypes())) {
-                return Optional.of(String.format("expected authorized grant types: %s; actual authorized grant types: %s", Arrays.asList(IMPLICIT, CLIENT_CREDENTIALS),
-                    response.getAuthorizedGrantTypes()));
-            }
-
-            if (!clientId1.equals(response.getClientId())) {
-                return Optional.of(String.format("expected client id: %s; actual client id: %s", clientId1, response.getClientId()));
-            }
-
-            if (!"test-name".equals(response.getName())) {
-                return Optional.of(String.format("expected name: %s; actual name: %s", "test-name", response.getName()));
-            }
-
-            if (!Arrays.asList("client.read", "client.write").equals(response.getScopes())) {
-                return Optional.of(String.format("expected scopes: %s; actual scopes: %s", Arrays.asList("client.read", "client.write"), response.getScopes()));
-            }
-
-            if (!"test-token-salt".equals(response.getTokenSalt())) {
-                return Optional.of(String.format("expected token salt: %s; actual token salt: %s", "test-token-salt", response.getTokenSalt()));
-            }
-
-            return Optional.empty();
-        };
-
         ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
-            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
-                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching client")))
+            .consumeValueWith(response -> {
+                assertThat(response.getAuthorizedGrantTypes()).containsExactly(IMPLICIT, CLIENT_CREDENTIALS);
+                assertThat(response.getClientId()).isEqualTo(clientId1);
+                assertThat(response.getName()).isEqualTo("test-name");
+                assertThat(response.getScopes()).containsExactly("client.read", "client.write");
+                assertThat(response.getTokenSalt()).isEqualTo("test-token-salt");
+            })
             .expectComplete();
 
         requestCreateClient(this.uaaClient, clientId1, clientSecret)
@@ -257,7 +218,8 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String newClientSecret = this.nameFactory.getClientSecret();
         String oldClientSecret = this.nameFactory.getClientSecret();
 
-        ScriptedSubscriber<ChangeSecretResponse> subscriber = errorExpectation(HttpException.class, "HTTP request failed with code: 400");
+        ScriptedSubscriber<ChangeSecretResponse> subscriber = ScriptedSubscriber.<ChangeSecretResponse>create()
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(HttpException.class).hasMessage("HTTP request failed with code: 400"));
 
         requestCreateClient(this.uaaClient, clientId, oldClientSecret)
             .then(this.uaaClient.clients()
@@ -282,29 +244,13 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
 
-        Function<CreateClientResponse, Optional<String>> assertion = response -> {
-            if (!Arrays.asList(PASSWORD, REFRESH_TOKEN).equals(response.getAuthorizedGrantTypes())) {
-                return Optional.of(String.format("expected authorized grant types: %s; actual authorized grant types: %s", Arrays.asList(PASSWORD, REFRESH_TOKEN), response.getAuthorizedGrantTypes()));
-            }
-
-            if (!clientId.equals(response.getClientId())) {
-                return Optional.of(String.format("expected client id: %s; actual client id: %s", clientId, response.getClientId()));
-            }
-
-            if (!Arrays.asList("client.read", "client.write").equals(response.getScopes())) {
-                return Optional.of(String.format("expected scopes: %s; actual scopes: %s", Arrays.asList("client.read", "client.write"), response.getScopes()));
-            }
-
-            if (!"test-token-salt".equals(response.getTokenSalt())) {
-                return Optional.of(String.format("expected token salt: %s; actual token salt: %s", "test-token-salt", response.getTokenSalt()));
-            }
-
-            return Optional.empty();
-        };
-
         ScriptedSubscriber<CreateClientResponse> subscriber = ScriptedSubscriber.<CreateClientResponse>create()
-            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
-                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching client")))
+            .consumeValueWith(response -> {
+                assertThat(response.getAuthorizedGrantTypes()).containsExactly(PASSWORD, REFRESH_TOKEN);
+                assertThat(response.getClientId()).isEqualTo(clientId);
+                assertThat(response.getScopes()).containsExactly("client.read", "client.write");
+                assertThat(response.getTokenSalt()).isEqualTo("test-token-salt");
+            })
             .expectComplete();
 
         this.uaaClient.clients()
@@ -346,21 +292,11 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
 
-        Function<GetClientResponse, Optional<String>> assertion = response -> {
-            if (!Arrays.asList(PASSWORD, REFRESH_TOKEN).equals(response.getAuthorizedGrantTypes())) {
-                return Optional.of(String.format("expected authorized grant types: %s; actual authorized grant types: %s", Arrays.asList(PASSWORD, REFRESH_TOKEN), response.getAuthorizedGrantTypes()));
-            }
-
-            if (!clientId.equals(response.getClientId())) {
-                return Optional.of(String.format("expected client id: %s; actual client id: %s", clientId, response.getClientId()));
-            }
-
-            return Optional.empty();
-        };
-
         ScriptedSubscriber<GetClientResponse> subscriber = ScriptedSubscriber.<GetClientResponse>create()
-            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
-                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching client")))
+            .consumeValueWith(response -> {
+                assertThat(response.getAuthorizedGrantTypes()).containsExactly(PASSWORD, REFRESH_TOKEN);
+                assertThat(response.getClientId()).isEqualTo(clientId);
+            })
             .expectComplete();
 
         requestCreateClient(this.uaaClient, clientId, clientSecret)
@@ -375,21 +311,11 @@ public final class ClientsTest extends AbstractIntegrationTest {
 
     @Test
     public void getMetadata() throws TimeoutException, InterruptedException {
-        Function<GetMetadataResponse, Optional<String>> assertion = metadata -> {
-            if (!"http://test.get.url".equals(metadata.getAppLaunchUrl())) {
-                return Optional.of(String.format("expected app launch url: %s; actual app launch url: %s", "http://test.get.url", metadata.getAppLaunchUrl()));
-            }
-
-            if (!this.clientId.equals(metadata.getClientId())) {
-                return Optional.of(String.format("expected client id: %s; actual client id: %s", this.clientId, metadata.getClientId()));
-            }
-
-            return Optional.empty();
-        };
-
         ScriptedSubscriber<GetMetadataResponse> subscriber = ScriptedSubscriber.<GetMetadataResponse>create()
-            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
-                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching metadata")))
+            .consumeValueWith(metadata -> {
+                assertThat(metadata.getAppLaunchUrl()).isEqualTo("http://test.get.url");
+                assertThat(metadata.getClientId()).isEqualTo(this.clientId);
+            })
             .expectComplete();
 
         requestUpdateMetadata(this.uaaClient, this.clientId, "http://test.get.url")
@@ -423,21 +349,11 @@ public final class ClientsTest extends AbstractIntegrationTest {
 
     @Test
     public void listMetadatas() throws TimeoutException, InterruptedException {
-        Function<Metadata, Optional<String>> assertion = metadata -> {
-            if (!"http://test.list.url".equals(metadata.getAppLaunchUrl())) {
-                return Optional.of(String.format("expected app launch url: %s; actual app launch url: %s", "http://test.list.url", metadata.getAppLaunchUrl()));
-            }
-
-            if (!this.clientId.equals(metadata.getClientId())) {
-                return Optional.of(String.format("expected client id: %s; actual client id: %s", this.clientId, metadata.getClientId()));
-            }
-
-            return Optional.empty();
-        };
-
         ScriptedSubscriber<Metadata> subscriber = ScriptedSubscriber.<Metadata>create()
-            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
-                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching metadata")))
+            .consumeValueWith(metadata -> {
+                assertThat(metadata.getAppLaunchUrl()).isEqualTo("http://test.list.url");
+                assertThat(metadata.getClientId()).isEqualTo(this.clientId);
+            })
             .expectComplete();
 
         requestUpdateMetadata(this.uaaClient, this.clientId, "http://test.list.url")
@@ -463,26 +379,12 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
 
-        Function<Client, Optional<String>> assertion = response -> {
-            if (!Collections.singletonList(CLIENT_CREDENTIALS).equals(response.getAuthorizedGrantTypes())) {
-                return Optional.of(String.format("expected authorized grant types: %s; actual authorized grant types: %s", Collections.singletonList(CLIENT_CREDENTIALS), response
-                    .getAuthorizedGrantTypes()));
-            }
-
-            if (!clientId.equals(response.getClientId())) {
-                return Optional.of(String.format("expected client id: %s; actual client id: %s", clientId, response.getClientId()));
-            }
-
-            if (!"test-name".equals(response.getName())) {
-                return Optional.of(String.format("expected name: %s; actual name: %s", "test-name", response.getName()));
-            }
-
-            return Optional.empty();
-        };
-
         ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
-            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
-                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching client")))
+            .consumeValueWith(response -> {
+                assertThat(response.getAuthorizedGrantTypes()).containsExactly(CLIENT_CREDENTIALS);
+                assertThat(response.getClientId()).isEqualTo(clientId);
+                assertThat(response.getName()).isEqualTo("test-name");
+            })
             .expectComplete();
 
         requestCreateClient(this.uaaClient, clientId, clientSecret)
@@ -503,33 +405,14 @@ public final class ClientsTest extends AbstractIntegrationTest {
     public void updateMetadata() throws TimeoutException, InterruptedException {
         String appIcon = Base64.getEncoder().encodeToString(new AsciiString("test-image").toByteArray());
 
-        Function<GetMetadataResponse, Optional<String>> assertion = metadata -> {
-            if (!appIcon.equals(metadata.getAppIcon())) {
-                return Optional.of(String.format("expected app icon: %s; actual app icon: %s", appIcon, metadata.getAppIcon()));
-            }
-
-            if (!"http://test.app.launch.url".equals(metadata.getAppLaunchUrl())) {
-                return Optional.of(String.format("expected app launch url: %s; actual app launch url: %s", "http://test.app.launch.url", metadata.getAppLaunchUrl()));
-            }
-
-            if (!this.clientId.equals(metadata.getClientId())) {
-                return Optional.of(String.format("expected client id: %s; actual client id: %s", this.clientId, metadata.getClientId()));
-            }
-
-            if (!"test-name".equals(metadata.getClientName())) {
-                return Optional.of(String.format("expected client name: %s; actual client name: %s", "test-name", metadata.getClientName()));
-            }
-
-            if (!metadata.getShowOnHomePage()) {
-                return Optional.of(String.format("expected show on homepage: %b; actual show on homepage: %b", true, metadata.getShowOnHomePage()));
-            }
-
-            return Optional.empty();
-        };
-
         ScriptedSubscriber<GetMetadataResponse> subscriber = ScriptedSubscriber.<GetMetadataResponse>create()
-            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
-                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching metadata")))
+            .consumeValueWith(metadata -> {
+                assertThat(metadata.getAppIcon()).isEqualTo(appIcon);
+                assertThat(metadata.getAppLaunchUrl()).isEqualTo("http://test.app.launch.url");
+                assertThat(metadata.getClientId()).isEqualTo(this.clientId);
+                assertThat(metadata.getClientName()).isEqualTo("test-name");
+                assertThat(metadata.getShowOnHomePage()).isTrue();
+            })
             .expectComplete();
 
         this.uaaClient.clients()

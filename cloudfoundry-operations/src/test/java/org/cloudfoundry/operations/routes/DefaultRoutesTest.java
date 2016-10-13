@@ -23,8 +23,6 @@ import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteRequest;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteResponse;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteRequest;
-import org.cloudfoundry.client.v2.domains.GetDomainRequest;
-import org.cloudfoundry.client.v2.domains.GetDomainResponse;
 import org.cloudfoundry.client.v2.jobs.ErrorDetails;
 import org.cloudfoundry.client.v2.jobs.GetJobRequest;
 import org.cloudfoundry.client.v2.jobs.GetJobResponse;
@@ -45,8 +43,6 @@ import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
-import org.cloudfoundry.client.v2.spaces.GetSpaceRequest;
-import org.cloudfoundry.client.v2.spaces.GetSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesRequest;
@@ -66,6 +62,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.function.Supplier;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
@@ -155,16 +152,6 @@ public final class DefaultRoutesTest {
                 .just(fill(DeleteRouteResponse.builder())
                     .entity(fill(JobEntity.builder(), "job-entity-")
                         .build())
-                    .build()));
-    }
-
-    private static void requestDomain(CloudFoundryClient cloudFoundryClient, String domainId) {
-        when(cloudFoundryClient.domains()
-            .get(GetDomainRequest.builder()
-                .domainId(domainId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(GetDomainResponse.builder(), "domain-")
                     .build()));
     }
 
@@ -429,18 +416,6 @@ public final class DefaultRoutesTest {
                     .build()));
     }
 
-    private static void requestSpace(CloudFoundryClient cloudFoundryClient, String spaceId) {
-        when(cloudFoundryClient.spaces()
-            .get(GetSpaceRequest.builder()
-                .spaceId(spaceId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(GetSpaceResponse.builder())
-                    .entity(fill(SpaceEntity.builder(), "space-entity-")
-                        .build())
-                    .build()));
-    }
-
     private static void requestSpaceRoutes(CloudFoundryClient cloudFoundryClient, String spaceId) {
         when(cloudFoundryClient.spaces()
             .listRoutes(ListSpaceRoutesRequest.builder()
@@ -642,7 +617,8 @@ public final class DefaultRoutesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Domain test-domain does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Domain test-domain does not exist"));
         }
 
         @Override
@@ -669,7 +645,8 @@ public final class DefaultRoutesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Space test-space-name does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space test-space-name does not exist"));
         }
 
         @Override
@@ -729,7 +706,8 @@ public final class DefaultRoutesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"));
         }
 
         @Override
@@ -756,7 +734,8 @@ public final class DefaultRoutesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Domain test-domain does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Domain test-domain does not exist"));
         }
 
         @Override
@@ -783,7 +762,8 @@ public final class DefaultRoutesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Route test-host.test-domain does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Route test-host.test-domain does not exist"));
         }
 
         @Override
@@ -863,7 +843,8 @@ public final class DefaultRoutesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"));
         }
 
         @Override
@@ -1103,7 +1084,8 @@ public final class DefaultRoutesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Application test-application-name does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-application-name does not exist"));
         }
 
         @Override
@@ -1131,7 +1113,8 @@ public final class DefaultRoutesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Domain test-domain does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Domain test-domain does not exist"));
         }
 
         @Override
@@ -1282,7 +1265,8 @@ public final class DefaultRoutesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Application test-application-name does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-application-name does not exist"));
         }
 
         @Override
@@ -1309,7 +1293,8 @@ public final class DefaultRoutesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Domain test-domain does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Domain test-domain does not exist"));
         }
 
         @Override
@@ -1336,7 +1321,8 @@ public final class DefaultRoutesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Route test-host.test-domain does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Route test-host.test-domain does not exist"));
         }
 
         @Override

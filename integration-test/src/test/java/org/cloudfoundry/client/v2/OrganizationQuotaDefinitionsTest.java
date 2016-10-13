@@ -37,6 +37,7 @@ import reactor.test.subscriber.ScriptedSubscriber;
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
 
 public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationTest {
@@ -85,8 +86,8 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
     public void delete() throws TimeoutException, InterruptedException {
         String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
 
-        ScriptedSubscriber<GetOrganizationQuotaDefinitionResponse> subscriber = errorExpectation(CloudFoundryException.class,
-            "CF-QuotaDefinitionNotFound\\([0-9]+\\): Quota Definition could not be found: .*");
+        ScriptedSubscriber<GetOrganizationQuotaDefinitionResponse> subscriber = ScriptedSubscriber.<GetOrganizationQuotaDefinitionResponse>create()
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-QuotaDefinitionNotFound\\([0-9]+\\): Quota Definition could not be found: .*"));
 
         requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)
             .map(ResourceUtils::getId)

@@ -88,6 +88,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.function.Supplier;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
@@ -878,7 +879,8 @@ public final class DefaultServicesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Application test-application-name does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-application-name does not exist"));
         }
 
         @Override
@@ -905,7 +907,8 @@ public final class DefaultServicesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Service instance test-service-instance-name does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service instance test-service-instance-name does not exist"));
         }
 
         @Override
@@ -1022,7 +1025,8 @@ public final class DefaultServicesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Service instance test-service-instance-does-not-exist does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service instance test-service-instance-does-not-exist does not exist"));
         }
 
         @Override
@@ -1109,7 +1113,8 @@ public final class DefaultServicesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Service instance test-invalid-name does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service instance test-invalid-name does not exist"));
         }
 
         @Override
@@ -1160,7 +1165,8 @@ public final class DefaultServicesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Service instance test-service-instance does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service instance test-service-instance does not exist"));
         }
 
         @Override
@@ -1186,7 +1192,8 @@ public final class DefaultServicesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Service key test-service-key-not-found does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service key test-service-key-not-found does not exist"));
         }
 
         @Override
@@ -1276,7 +1283,8 @@ public final class DefaultServicesTest {
 
         @Override
         protected ScriptedSubscriber<ServiceInstance> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Service instance test-invalid-name does not exist");
+            return ScriptedSubscriber.<ServiceInstance>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service instance test-invalid-name does not exist"));
         }
 
         @Override
@@ -1366,7 +1374,8 @@ public final class DefaultServicesTest {
 
         @Override
         protected ScriptedSubscriber<ServiceKey> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Service key test-service-key-not-found does not exist");
+            return ScriptedSubscriber.<ServiceKey>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service key test-service-key-not-found does not exist"));
         }
 
         @Override
@@ -1515,7 +1524,8 @@ public final class DefaultServicesTest {
 
         @Override
         protected ScriptedSubscriber<ServiceKey> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Service instance test-service-instance-name does not exist");
+            return ScriptedSubscriber.<ServiceKey>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service instance test-service-instance-name does not exist"));
         }
 
         @Override
@@ -1684,7 +1694,8 @@ public final class DefaultServicesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(CloudFoundryException.class, "test-error-details-errorCode(1): test-error-details-description");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"));
         }
 
         @Override
@@ -1745,7 +1756,8 @@ public final class DefaultServicesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "New service plan test-plan not found");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("New service plan test-plan not found"));
         }
 
         @Override
@@ -1832,7 +1844,8 @@ public final class DefaultServicesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Plan does not exist for the test-name service");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Plan does not exist for the test-name service"));
         }
 
         @Override
@@ -1928,7 +1941,8 @@ public final class DefaultServicesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Service Plan test-plan is not visible to your organization");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service Plan test-plan is not visible to your organization"));
         }
 
         @Override
@@ -1957,7 +1971,8 @@ public final class DefaultServicesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "Plan for the test-name service cannot be updated");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Plan for the test-name service cannot be updated"));
         }
 
         @Override
@@ -2013,7 +2028,8 @@ public final class DefaultServicesTest {
 
         @Override
         protected ScriptedSubscriber<Void> expectations() {
-            return errorExpectation(IllegalArgumentException.class, "User provided service instance test-service does not exist");
+            return ScriptedSubscriber.<Void>create()
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("User provided service instance test-service does not exist"));
         }
 
         @Override

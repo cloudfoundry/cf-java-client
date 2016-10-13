@@ -47,6 +47,7 @@
     </modules>
 
     <properties>
+        <assertj.version>3.5.2</assertj.version>
         <commons-compress.version>1.12</commons-compress.version>
         <immutables.version>2.2.10</immutables.version>
         <jackson.version>2.8.3</jackson.version>
@@ -102,6 +103,11 @@
                 <groupId>io.projectreactor.ipc</groupId>
                 <artifactId>reactor-netty</artifactId>
                 <version>${reactor-netty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${assertj.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.immutables</groupId>

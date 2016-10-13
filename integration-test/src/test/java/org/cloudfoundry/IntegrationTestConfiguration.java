@@ -68,11 +68,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import static org.assertj.core.api.Assertions.fail;
 import static org.cloudfoundry.uaa.tokens.GrantType.AUTHORIZATION_CODE;
 import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
 import static org.cloudfoundry.uaa.tokens.GrantType.PASSWORD;
 import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
-import static org.junit.Assert.fail;
 
 @Configuration
 @EnableAutoConfiguration

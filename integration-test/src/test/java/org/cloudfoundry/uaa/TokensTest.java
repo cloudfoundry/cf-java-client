@@ -50,6 +50,8 @@ import reactor.util.function.Tuple2;
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public final class TokensTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -69,7 +71,8 @@ public final class TokensTest extends AbstractIntegrationTest {
 
     @Test
     public void checkTokenNotAuthorized() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<CheckTokenResponse> subscriber = errorExpectation(HttpException.class, "HTTP request failed with code: 403");
+        ScriptedSubscriber<CheckTokenResponse> subscriber = ScriptedSubscriber.<CheckTokenResponse>create()
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(HttpException.class).hasMessage("HTTP request failed with code: 403"));
 
         this.tokenProvider.getToken(this.connectionContext)
             .then(token -> this.uaaClient.tokens()

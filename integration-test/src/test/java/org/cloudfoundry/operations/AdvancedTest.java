@@ -24,6 +24,8 @@ import reactor.test.subscriber.ScriptedSubscriber;
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public final class AdvancedTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -32,7 +34,7 @@ public final class AdvancedTest extends AbstractIntegrationTest {
     @Test
     public void sshCode() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValueWith(actual -> actual.length() == 6, actual -> String.format("expected length: %d; actual length: %d", 6, actual.length()))
+            .consumeValueWith(actual -> assertThat(actual).hasSize(6))
             .expectComplete();
 
         this.cloudFoundryOperations.advanced()

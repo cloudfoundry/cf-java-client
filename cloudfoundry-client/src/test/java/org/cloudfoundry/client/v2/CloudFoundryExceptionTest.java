@@ -18,8 +18,7 @@ package org.cloudfoundry.client.v2;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public final class CloudFoundryExceptionTest {
 
@@ -28,13 +27,13 @@ public final class CloudFoundryExceptionTest {
         Exception cause = new Exception();
         CloudFoundryException exception = new CloudFoundryException(-1, "test-description", "test-error-code", cause);
 
-        assertEquals(Integer.valueOf(-1), exception.getCode());
-        assertEquals("test-description", exception.getDescription());
-        assertEquals("test-error-code", exception.getErrorCode());
-        assertEquals("test-error-code(-1): test-description", exception.getMessage());
-        assertEquals(cause, exception.getCause());
+        assertThat(exception.getCode()).isEqualTo(-1);
+        assertThat(exception.getDescription()).isEqualTo("test-description");
+        assertThat(exception.getErrorCode()).isEqualTo("test-error-code");
+        assertThat(exception.getMessage()).isEqualTo("test-error-code(-1): test-description");
+        assertThat(exception.getCause()).isEqualTo(cause);
 
-        assertNull(new CloudFoundryException(-1, "test-description", "test-error-code").getCause());
+        assertThat(new CloudFoundryException(-1, "test-description", "test-error-code").getCause()).isNull();
     }
 
 }

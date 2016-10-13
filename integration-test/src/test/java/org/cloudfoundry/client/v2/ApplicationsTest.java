@@ -83,12 +83,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
 import java.util.zip.GZIPInputStream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.ZipExpectations.zipEquality;
 import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static reactor.core.publisher.Mono.when;
 
@@ -164,21 +165,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void create() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
 
-        Function<Tuple2<String, ApplicationEntity>, Optional<String>> assertion = function((spaceId, entity) -> {
-            if (!spaceId.equals(entity.getSpaceId())) {
-                return Optional.of(String.format("expected space id: %s; actual space id: %s", spaceId, entity.getSpaceId()));
-            }
-
-            if (!applicationName.equals(entity.getName())) {
-                return Optional.of(String.format("expected application name: %s; actual application name: %s", applicationName, entity.getName()));
-            }
-
-            return Optional.empty();
-        });
-
         ScriptedSubscriber<Tuple2<String, ApplicationEntity>> subscriber = ScriptedSubscriber.<Tuple2<String, ApplicationEntity>>create()
-            .expectValueWith(tuple -> !assertion.apply(tuple).isPresent(),
-                tuple -> assertion.apply(tuple).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching result")))
+            .consumeValueWith(consumer((spaceId, entity) -> {
+                assertThat(entity.getSpaceId()).isEqualTo(spaceId);
+                assertThat(entity.getName()).isEqualTo(applicationName);
+            }))
             .expectComplete();
 
         this.spaceId
@@ -196,7 +187,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void delete() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
 
-        ScriptedSubscriber<AbstractApplicationResource> subscriber = errorExpectation(CloudFoundryException.class, "CF-AppNotFound\\([0-9]+\\): The app could not be found: .*");
+        ScriptedSubscriber<AbstractApplicationResource> subscriber = ScriptedSubscriber.<AbstractApplicationResource>create()
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-AppNotFound\\([0-9]+\\): The app could not be found: .*"));
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
@@ -714,17 +706,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void restage() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
 
-        Function<AbstractApplicationResource, Optional<String>> assertion = resource -> {
-            if (!applicationName.equals(ResourceUtils.getEntity(resource).getName())) {
-                return Optional.of(String.format("expected value: %s; actual value: %s", applicationName, ResourceUtils.getEntity(resource).getName()));
-            }
-
-            return Optional.empty();
-        };
-
-        ScriptedSubscriber<AbstractApplicationResource> subscriber = ScriptedSubscriber.<AbstractApplicationResource>create()
-            .expectValueWith(resource -> !assertion.apply(resource).isPresent(),
-                resource -> assertion.apply(resource).orElseThrow(() -> new IllegalStateException("Cannot generate assertion message for matching result")))
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectValue(applicationName)
             .expectComplete();
 
         this.spaceId
@@ -735,6 +718,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .applicationId(applicationId)
                     .build())))
             .then(applicationId -> waitForStagingApplication(this.cloudFoundryClient, applicationId))
+            .map(resource -> ResourceUtils.getEntity(resource).getName())
             .subscribe(subscriber);
 
         subscriber.verify(Duration.ofMinutes(5));
@@ -812,25 +796,12 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String applicationName2 = this.nameFactory.getApplicationName();
 
-        Function<Tuple2<ApplicationEntity, ApplicationEntity>, Optional<String>> assertion = function((entity1, entity2) -> {
-            if (!applicationName2.equals(entity1.getName())) {
-                return Optional.of(String.format("expected changed name: %s; actual changed name: %s", applicationName2, entity1.getName()));
-            }
-
-            if (!Collections.singletonMap("test-var", "test-value").equals(entity1.getEnvironmentJsons())) {
-                return Optional.of(String.format("expected environment: %s; actual environment: %s", Collections.singletonMap("test-var", "test-value"), entity1.getEnvironmentJsons()));
-            }
-
-            if (!entity2.getEnvironmentJsons().isEmpty()) {
-                return Optional.of(String.format("expected empty environment; actual environment: %s", entity2.getEnvironmentJsons()));
-            }
-
-            return Optional.empty();
-        });
-
         ScriptedSubscriber<Tuple2<ApplicationEntity, ApplicationEntity>> subscriber = ScriptedSubscriber.<Tuple2<ApplicationEntity, ApplicationEntity>>create()
-            .expectValueWith(tuple -> !assertion.apply(tuple).isPresent(),
-                tuple -> assertion.apply(tuple).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching result")))
+            .consumeValueWith(consumer((entity1, entity2) -> {
+                assertThat(entity1.getName()).isEqualTo(applicationName2);
+                assertThat(entity1.getEnvironmentJsons()).containsEntry("test-var", "test-value");
+                assertThat(entity2.getEnvironmentJsons()).isEmpty();
+            }))
             .expectComplete();
 
         this.spaceId
@@ -903,21 +874,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     private static ScriptedSubscriber<Tuple2<String, AbstractApplicationResource>> applicationIdAndNameEquality(String name) {
         Assert.notNull(name, "name must not be null");
 
-        Function<Tuple2<String, AbstractApplicationResource>, Optional<String>> assertion = function((applicationId, resource) -> {
-            if (!applicationId.equals(ResourceUtils.getId(resource))) {
-                return Optional.of(String.format("expected id: %s; actual id %s", applicationId, ResourceUtils.getId(resource)));
-            }
-
-            if (!name.equals(ResourceUtils.getEntity(resource).getName())) {
-                return Optional.of(String.format("expected name: %s; actual name %s", name, ResourceUtils.getEntity(resource).getName()));
-            }
-
-            return Optional.empty();
-        });
-
         return ScriptedSubscriber.<Tuple2<String, AbstractApplicationResource>>create()
-            .expectValueWith(tuple -> !assertion.apply(tuple).isPresent(),
-                tuple -> assertion.apply(tuple).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching application id an name")))
+            .consumeValueWith(consumer((applicationId, resource) -> {
+                assertThat(ResourceUtils.getId(resource)).isEqualTo(applicationId);
+                assertThat(ResourceUtils.getEntity(resource).getName()).isEqualTo(name);
+            }))
             .expectComplete();
     }
 
@@ -991,32 +952,21 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     private static ScriptedSubscriber<byte[]> isTestApplicationDroplet() {
-        Function<byte[], Optional<String>> assertion = bytes -> {
-            Set<String> names = new HashSet<>();
-
-            try (TarArchiveInputStream in = new TarArchiveInputStream(new GZIPInputStream(new ByteArrayInputStream(bytes)))) {
-                TarArchiveEntry entry;
-                while ((entry = in.getNextTarEntry()) != null) {
-                    names.add(entry.getName());
-                }
-            } catch (IOException e) {
-                throw Exceptions.propagate(e);
-            }
-
-            if (!names.contains("./app/Staticfile")) {
-                return Optional.of("Application droplet does not have ./app/Staticfile");
-            }
-
-            if (!names.contains("./app/public/index.html")) {
-                return Optional.of("Application droplet does not have ./app/public/index.html");
-            }
-
-            return Optional.empty();
-        };
-
         return ScriptedSubscriber.<byte[]>create()
-            .expectValueWith(bytes -> !assertion.apply(bytes).isPresent(),
-                bytes -> assertion.apply(bytes).orElseThrow(() -> new IllegalStateException("Cannot generate assertion message for matching result")))
+            .consumeValueWith(bytes -> {
+                Set<String> names = new HashSet<>();
+
+                try (TarArchiveInputStream in = new TarArchiveInputStream(new GZIPInputStream(new ByteArrayInputStream(bytes)))) {
+                    TarArchiveEntry entry;
+                    while ((entry = in.getNextTarEntry()) != null) {
+                        names.add(entry.getName());
+                    }
+                } catch (IOException e) {
+                    throw Exceptions.propagate(e);
+                }
+
+                assertThat(names).contains("./app/Staticfile", "./app/public/index.html");
+            })
             .expectComplete();
     }
 

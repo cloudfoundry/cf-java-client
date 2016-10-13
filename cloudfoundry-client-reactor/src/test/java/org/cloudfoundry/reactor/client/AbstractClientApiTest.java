@@ -20,7 +20,6 @@ import okhttp3.Headers;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.reactor.AbstractApiTest;
 import org.junit.Test;
-import org.springframework.util.Assert;
 import reactor.test.subscriber.ScriptedSubscriber;
 
 import java.io.ByteArrayOutputStream;
@@ -29,13 +28,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
-import java.util.Optional;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class AbstractClientApiTest<REQ, RSP> extends AbstractApiTest<REQ, RSP> {
 
@@ -45,7 +41,10 @@ public abstract class AbstractClientApiTest<REQ, RSP> extends AbstractApiTest<RE
     public final void error() throws Exception {
         mockRequest(interactionContext().getErrorResponse());
 
-        ScriptedSubscriber<RSP> subscriber = errorExpectation(CloudFoundryException.class, "CF-UnprocessableEntity(10008): The request is semantically invalid: space_guid and name unique");
+        ScriptedSubscriber<RSP> subscriber = ScriptedSubscriber.<RSP>create()
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class)
+                .hasMessage("CF-UnprocessableEntity(10008): The request is semantically invalid: space_guid and name unique"));
+
         invoke(validRequest()).subscribe(subscriber);
         subscriber.verify(Duration.ofSeconds(5));
 
@@ -54,10 +53,10 @@ public abstract class AbstractClientApiTest<REQ, RSP> extends AbstractApiTest<RE
 
     protected static String extractBoundary(Headers headers) {
         String contentType = headers.get("Content-Type");
-        assertNotNull(contentType);
+        assertThat(contentType).isNotNull();
 
         Matcher matcher = BOUNDARY.matcher(contentType);
-        assertTrue(matcher.find());
+        assertThat(matcher.find()).isTrue();
         return matcher.group(1);
     }
 
@@ -74,28 +73,6 @@ public abstract class AbstractClientApiTest<REQ, RSP> extends AbstractApiTest<RE
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private static <T> ScriptedSubscriber<T> errorExpectation(Class<? extends Throwable> type, String format, Object... args) {
-        Assert.notNull(type, "type must not be null");
-        Assert.notNull(format, "format must not be null");
-
-        Function<Throwable, Optional<String>> assertion = t -> {
-            if (!type.isInstance(t)) {
-                return Optional.of(String.format("expected error of type: %s; actual type: %s", type.getSimpleName(), t.getClass().getSimpleName()));
-            }
-
-            String expected = String.format(format, args);
-            if (!expected.equals(t.getMessage())) {
-                return Optional.of(String.format("expected message: %s; actual message: %s", expected, t.getMessage()));
-            }
-
-            return Optional.empty();
-        };
-
-        return ScriptedSubscriber.<T>create()
-            .expectErrorWith(t -> !assertion.apply(t).isPresent(),
-                t -> assertion.apply(t).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching error")));
     }
 
 }
