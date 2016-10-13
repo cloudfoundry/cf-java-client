@@ -38,10 +38,10 @@ import reactor.test.subscriber.ScriptedSubscriber;
 import reactor.util.function.Tuple2;
 
 import java.time.Duration;
-import java.util.Optional;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class PrivateDomainsTest extends AbstractIntegrationTest {
@@ -72,7 +72,8 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     public void delete() throws TimeoutException, InterruptedException {
         String privateDomainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<GetPrivateDomainResponse> subscriber = errorExpectation(CloudFoundryException.class, "CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*");
+        ScriptedSubscriber<GetPrivateDomainResponse> subscriber = ScriptedSubscriber.<GetPrivateDomainResponse>create()
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"));
 
         this.organizationId
             .then(organizationId -> requestCreatePrivateDomain(this.cloudFoundryClient, organizationId, privateDomainName))
@@ -150,21 +151,11 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     private static <R extends AbstractPrivateDomainResource> ScriptedSubscriber<Tuple2<R, String>> domainNameAndOrganizationIdEquality(String domainName) {
-        Function<Tuple2<R, String>, Optional<String>> assertion = function((resource, organizationId) -> {
-            if (!domainName.equals(ResourceUtils.getEntity(resource).getName())) {
-                return Optional.of(String.format("expected domain name: %s; actual domain name: %s", domainName, ResourceUtils.getEntity(resource).getName()));
-            }
-
-            if (!organizationId.equals(ResourceUtils.getEntity(resource).getOwningOrganizationId())) {
-                return Optional.of(String.format("expected organization id: %s; actual organization id: %s", organizationId, ResourceUtils.getEntity(resource).getOwningOrganizationId()));
-            }
-
-            return Optional.empty();
-        });
-
         return ScriptedSubscriber.<Tuple2<R, String>>create()
-            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
-                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching resource")))
+            .consumeValueWith(consumer((resource, organizationId) -> {
+                assertThat(ResourceUtils.getEntity(resource).getName()).isEqualTo(domainName);
+                assertThat(ResourceUtils.getEntity(resource).getOwningOrganizationId()).isEqualTo(organizationId);
+            }))
             .expectComplete();
     }
 

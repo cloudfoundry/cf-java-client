@@ -30,6 +30,8 @@ import reactor.test.subscriber.ScriptedSubscriber;
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public final class DomainsTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -57,7 +59,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void createInvalidDomain() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<Void> subscriber = errorExpectation(CloudFoundryException.class, "CF-DomainInvalid\\(130001\\): The domain is invalid: name format");
+        ScriptedSubscriber<Void> subscriber = ScriptedSubscriber.<Void>create()
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-DomainInvalid\\([0-9]+\\): The domain is invalid: name format"));
 
         this.cloudFoundryOperations.domains()
             .create(CreateDomainRequest.builder()

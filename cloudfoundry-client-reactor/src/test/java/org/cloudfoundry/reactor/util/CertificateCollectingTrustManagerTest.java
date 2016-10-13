@@ -23,12 +23,7 @@ import javax.net.ssl.X509TrustManager;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -53,14 +48,14 @@ public final class CertificateCollectingTrustManagerTest {
 
         this.trustManager.checkClientTrusted(this.chain, null);
 
-        assertFalse(this.trustManager.isTrusted());
+        assertThat(this.trustManager.isTrusted()).isFalse();
     }
 
     @Test
     public void checkClientTrustedTrusted() throws CertificateException {
         this.trustManager.checkClientTrusted(this.chain, null);
 
-        assertTrue(this.trustManager.isTrusted());
+        assertThat(this.trustManager.isTrusted()).isTrue();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -75,14 +70,14 @@ public final class CertificateCollectingTrustManagerTest {
 
         this.trustManager.checkServerTrusted(this.chain, null);
 
-        assertFalse(this.trustManager.isTrusted());
+        assertThat(this.trustManager.isTrusted()).isFalse();
     }
 
     @Test
     public void checkServerTrustedTrusted() throws CertificateException {
         this.trustManager.checkServerTrusted(this.chain, null);
 
-        assertTrue(this.trustManager.isTrusted());
+        assertThat(this.trustManager.isTrusted()).isTrue();
     }
 
     @Test
@@ -97,18 +92,18 @@ public final class CertificateCollectingTrustManagerTest {
         this.trustManager.checkServerTrusted(this.chain, null);
 
         X509Certificate[] collectedCertificateChain = this.trustManager.getCollectedCertificateChain();
-        assertNotNull(collectedCertificateChain);
-        assertEquals(0, collectedCertificateChain.length);
-        assertNotSame(this.chain, collectedCertificateChain);
+        assertThat(collectedCertificateChain).isNotNull();
+        assertThat(collectedCertificateChain).hasSize(0);
+        assertThat(collectedCertificateChain).isNotSameAs(this.chain);
     }
 
     @Test
     public void getCollectedCertificateChainNotCollected() {
-        assertNull(this.trustManager.getCollectedCertificateChain());
+        assertThat(this.trustManager.getCollectedCertificateChain()).isNull();
     }
 
     @Test
     public void isTrusted() {
-        assertFalse(this.trustManager.isTrusted());
+        assertThat(this.trustManager.isTrusted()).isFalse();
     }
 }

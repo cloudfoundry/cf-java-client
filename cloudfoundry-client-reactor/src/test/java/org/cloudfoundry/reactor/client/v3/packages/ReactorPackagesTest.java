@@ -54,7 +54,6 @@ import reactor.test.subscriber.ScriptedSubscriber;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
@@ -62,8 +61,8 @@ import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
-import static org.junit.Assert.assertEquals;
 
 public final class ReactorPackagesTest {
 
@@ -228,7 +227,7 @@ public final class ReactorPackagesTest {
         @Override
         protected ScriptedSubscriber<byte[]> expectations() {
             return ScriptedSubscriber.<byte[]>create()
-                .expectValueWith(actual -> Arrays.equals(getBytes("fixtures/client/v3/packages/GET_{id}_download_response.bin"), actual), actual -> "Download response does not match")
+                .consumeValueWith(actual -> assertThat(actual).isEqualTo(getBytes("fixtures/client/v3/packages/GET_{id}_download_response.bin")))
                 .expectComplete();
         }
 
@@ -565,13 +564,14 @@ public final class ReactorPackagesTest {
                     .contents(consumer((headers, body) -> {
                         String boundary = extractBoundary(headers);
 
-                        assertEquals("--" + boundary + "\r\n" +
-                            "Content-Disposition: form-data; name=\"bits\"; filename=\"application.zip\"\r\n" +
-                            "Content-Type: application/zip\r\n" +
-                            "\r\n" +
-                            "test-content\n" +
-                            "\r\n" +
-                            "--" + boundary + "--", body.readString(Charset.defaultCharset()));
+                        assertThat(body.readString(Charset.defaultCharset()))
+                            .isEqualTo("--" + boundary + "\r\n" +
+                                "Content-Disposition: form-data; name=\"bits\"; filename=\"application.zip\"\r\n" +
+                                "Content-Type: application/zip\r\n" +
+                                "\r\n" +
+                                "test-content\n" +
+                                "\r\n" +
+                                "--" + boundary + "--");
                     }))
                     .build())
                 .response(TestResponse.builder()

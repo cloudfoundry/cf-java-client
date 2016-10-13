@@ -105,10 +105,11 @@ import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 import java.util.function.UnaryOperator;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.PaginationUtils.requestClientV2Resources;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
-import static org.junit.Assert.fail;
 import static reactor.core.publisher.Mono.when;
 
 public final class OrganizationsTest extends AbstractIntegrationTest {
@@ -348,7 +349,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void delete() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
 
-        ScriptedSubscriber<GetOrganizationResponse> subscriber = errorExpectation(CloudFoundryException.class, "CF-OrganizationNotFound\\([0-9]+\\): The organization could not be found: .*");
+        ScriptedSubscriber<GetOrganizationResponse> subscriber = ScriptedSubscriber.<GetOrganizationResponse>create()
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-OrganizationNotFound\\([0-9]+\\): The organization could not be found: .*"));
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .as(thenKeep(organizationId -> this.cloudFoundryClient.organizations()
@@ -367,7 +369,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void deleteAsyncFalse() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
 
-        ScriptedSubscriber<GetOrganizationResponse> subscriber = errorExpectation(CloudFoundryException.class, "CF-OrganizationNotFound\\([0-9]+\\): The organization could not be found: .*");
+        ScriptedSubscriber<GetOrganizationResponse> subscriber = ScriptedSubscriber.<GetOrganizationResponse>create()
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-OrganizationNotFound\\([0-9]+\\): The organization could not be found: .*"));
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .as(thenKeep(organizationId -> this.cloudFoundryClient.organizations()

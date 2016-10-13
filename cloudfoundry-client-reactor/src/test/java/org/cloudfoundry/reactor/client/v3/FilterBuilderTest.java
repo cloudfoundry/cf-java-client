@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public final class FilterBuilderTest {
 
@@ -36,10 +36,11 @@ public final class FilterBuilderTest {
         FilterBuilder.augment(builder, new StubFilterParamsSubClass());
 
         MultiValueMap<String, String> queryParams = builder.build().getQueryParams();
-        assertEquals(3, queryParams.size());
-        assertEquals("test-value-1", queryParams.getFirst("test-single"));
-        assertEquals("test-value-2,test-value-3", queryParams.getFirst("test-collection"));
-        assertEquals("test-value-4", queryParams.getFirst("test-subclass"));
+
+        assertThat(queryParams).hasSize(3);
+        assertThat(queryParams.getFirst("test-single")).isEqualTo("test-value-1");
+        assertThat(queryParams.getFirst("test-collection")).isEqualTo("test-value-2,test-value-3");
+        assertThat(queryParams.getFirst("test-subclass")).isEqualTo("test-value-4");
     }
 
     private static abstract class StubFilterParams {

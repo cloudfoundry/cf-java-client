@@ -28,9 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.subscriber.ScriptedSubscriber;
 
 import java.time.Duration;
-import java.util.Optional;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public final class AuthorizationsTest extends AbstractIntegrationTest {
 
@@ -43,7 +43,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
     @Test
     public void authorizeByAuthorizationCodeGrantApi() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValueWith(actual -> actual.length() == 6, actual -> String.format("expected length: %d; actual length: %d", 6, actual.length()))
+            .consumeValueWith(actual -> assertThat(actual).hasSize(6))
             .expectComplete();
 
         this.uaaClient.authorizations()
@@ -129,11 +129,8 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
     }
 
     private static ScriptedSubscriber<String> startsWithExpectation(String prefix) {
-        Function<String, Optional<String>> assertion = actual -> actual.startsWith(prefix) ? Optional.empty() : Optional.of("expected to start with: %s; actual: %s, actual");
-
         return ScriptedSubscriber.<String>create()
-            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
-                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching value")))
+            .consumeValueWith(actual -> assertThat(actual).startsWith(prefix))
             .expectComplete();
     }
 

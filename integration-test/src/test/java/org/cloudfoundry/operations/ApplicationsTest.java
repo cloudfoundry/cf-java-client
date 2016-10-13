@@ -47,6 +47,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -171,7 +173,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<Void> subscriber = errorExpectation(IllegalArgumentException.class, "Domain %s not found", domainName);
+        ScriptedSubscriber<Void> subscriber = ScriptedSubscriber.<Void>create()
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Domain %s not found", domainName));
 
         this.cloudFoundryOperations.applications()
             .push(PushApplicationRequest.builder()

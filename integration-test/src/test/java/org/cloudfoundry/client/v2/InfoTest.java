@@ -26,10 +26,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.subscriber.ScriptedSubscriber;
 
 import java.time.Duration;
-import java.util.Optional;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.CloudFoundryClient.SUPPORTED_API_VERSION;
 
 public final class InfoTest extends AbstractIntegrationTest {
@@ -39,20 +38,13 @@ public final class InfoTest extends AbstractIntegrationTest {
 
     @Test
     public void info() throws TimeoutException, InterruptedException {
-        Function<GetInfoResponse, Optional<String>> assertion = response -> {
-            Version expected = Version.valueOf(SUPPORTED_API_VERSION);
-            Version actual = Version.valueOf(response.getApiVersion());
-
-            if (expected.lessThan(actual)) {
-                return Optional.of(String.format("Supported API version %s < actual API version %s", SUPPORTED_API_VERSION, response.getApiVersion()));
-            }
-
-            return Optional.empty();
-        };
-
         ScriptedSubscriber<GetInfoResponse> subscriber = ScriptedSubscriber.<GetInfoResponse>create()
-            .expectValueWith(response -> !assertion.apply(response).isPresent(),
-                response -> assertion.apply(response).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching response")))
+            .consumeValueWith(response -> {
+                Version expected = Version.valueOf(SUPPORTED_API_VERSION);
+                Version actual = Version.valueOf(response.getApiVersion());
+
+                assertThat(actual).isLessThanOrEqualTo(expected);
+            })
             .expectComplete();
 
         this.cloudFoundryClient.info()

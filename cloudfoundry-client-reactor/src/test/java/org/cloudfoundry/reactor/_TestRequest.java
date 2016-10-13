@@ -23,7 +23,6 @@ import okhttp3.Headers;
 import okhttp3.mockwebserver.RecordedRequest;
 import okio.Buffer;
 import org.immutables.value.Value;
-import org.junit.Assert;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.Exceptions;
 import reactor.util.function.Tuple2;
@@ -37,7 +36,7 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Value.Immutable
 abstract class _TestRequest {
@@ -49,14 +48,14 @@ abstract class _TestRequest {
     private static final Pattern PATH_PATTERN = Pattern.compile("[A-Z]+ (.*) [A-Z0-9\\./]+");
 
     public void assertEquals(RecordedRequest request) {
-        Assert.assertEquals(getMethod().toString(), request.getMethod());
-        Assert.assertEquals(getPath(), extractPath(request));
+        assertThat(getMethod()).hasToString(request.getMethod());
+        assertThat(getPath()).isEqualTo(extractPath(request));
 
         getHeaders().forEach((key, value) -> {
             if (EMPTY_HEADER == value) {
-                assertNull(request.getHeader(key));
+                assertThat(request.getHeader(key)).isNull();
             } else {
-                Assert.assertEquals(value, request.getHeader(key));
+                assertThat(value).isEqualTo(request.getHeader(key));
             }
         });
 
@@ -65,7 +64,7 @@ abstract class _TestRequest {
         } else if (getContents().isPresent()) {
             getContents().get().accept(Tuples.of(request.getHeaders(), request.getBody()));
         } else {
-            Assert.assertEquals("Invalid request body: " + request.getBody().readUtf8(), 0, request.getBodySize());
+            assertThat(request.getBodySize()).as("Invalid request body: %s", request.getBody().readUtf8()).isEqualTo(0);
         }
     }
 
@@ -80,7 +79,7 @@ abstract class _TestRequest {
     abstract Optional<String> getPayload();
 
     private static void assertBodyEquals(Buffer expectedBuffer, Buffer actualBuffer) {
-        Assert.assertEquals(getValue(expectedBuffer), getValue(actualBuffer));
+        assertThat(getValue(expectedBuffer)).isEqualTo(getValue(actualBuffer));
     }
 
     private static Buffer getBuffer(String path) {

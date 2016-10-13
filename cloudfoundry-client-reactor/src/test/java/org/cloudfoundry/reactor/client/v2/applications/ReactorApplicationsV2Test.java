@@ -80,7 +80,6 @@ import reactor.test.subscriber.ScriptedSubscriber;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
@@ -90,9 +89,9 @@ import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.v2.serviceinstances.Plan.builder;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
-import static org.junit.Assert.assertEquals;
 
 public final class ReactorApplicationsV2Test {
 
@@ -338,7 +337,7 @@ public final class ReactorApplicationsV2Test {
         @Override
         protected ScriptedSubscriber<byte[]> expectations() {
             return ScriptedSubscriber.<byte[]>create()
-                .expectValueWith(actual -> Arrays.equals(getBytes("fixtures/client/v2/apps/GET_{id}_download_response.bin"), actual), actual -> "Download response does not match")
+                .consumeValueWith(actual -> assertThat(actual).isEqualTo(getBytes("fixtures/client/v2/apps/GET_{id}_download_response.bin")))
                 .expectComplete();
         }
 
@@ -377,7 +376,7 @@ public final class ReactorApplicationsV2Test {
         @Override
         protected ScriptedSubscriber<byte[]> expectations() {
             return ScriptedSubscriber.<byte[]>create()
-                .expectValueWith(actual -> Arrays.equals(getBytes("fixtures/client/v2/apps/GET_{id}_download_response.bin"), actual), actual -> "Download response does not match")
+                .consumeValueWith(actual -> assertThat(actual).isEqualTo(getBytes("fixtures/client/v2/apps/GET_{id}_download_response.bin")))
                 .expectComplete();
         }
 
@@ -1282,19 +1281,20 @@ public final class ReactorApplicationsV2Test {
                     .contents(consumer((headers, body) -> {
                         String boundary = extractBoundary(headers);
 
-                        assertEquals("--" + boundary + "\r\n" +
-                            "Content-Disposition: form-data; name=\"resources\"\r\n" +
-                            "Content-Type: application/json\r\n" +
-                            "\r\n" +
-                            "[{\"sha1\":\"b907173290db6a155949ab4dc9b2d019dea0c901\",\"fn\":\"path/to/content.txt\",\"size\":123}," +
-                            "{\"sha1\":\"ff84f89760317996b9dd180ab996b079f418396f\",\"fn\":\"path/to/code.jar\",\"size\":123}]" +
-                            "\r\n" + "--" + boundary + "\r\n" +
-                            "Content-Disposition: form-data; name=\"application\"; filename=\"application.zip\"\r\n" +
-                            "Content-Type: application/zip\r\n" +
-                            "\r\n" +
-                            "test-content\n" +
-                            "\r\n" +
-                            "--" + boundary + "--", body.readString(Charset.defaultCharset()));
+                        assertThat(body.readString(Charset.defaultCharset()))
+                            .isEqualTo("--" + boundary + "\r\n" +
+                                "Content-Disposition: form-data; name=\"resources\"\r\n" +
+                                "Content-Type: application/json\r\n" +
+                                "\r\n" +
+                                "[{\"sha1\":\"b907173290db6a155949ab4dc9b2d019dea0c901\",\"fn\":\"path/to/content.txt\",\"size\":123}," +
+                                "{\"sha1\":\"ff84f89760317996b9dd180ab996b079f418396f\",\"fn\":\"path/to/code.jar\",\"size\":123}]" +
+                                "\r\n" + "--" + boundary + "\r\n" +
+                                "Content-Disposition: form-data; name=\"application\"; filename=\"application.zip\"\r\n" +
+                                "Content-Type: application/zip\r\n" +
+                                "\r\n" +
+                                "test-content\n" +
+                                "\r\n" +
+                                "--" + boundary + "--");
                     }))
                     .build())
                 .response(TestResponse.builder()

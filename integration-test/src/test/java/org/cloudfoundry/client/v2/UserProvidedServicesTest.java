@@ -44,11 +44,11 @@ import reactor.util.function.Tuple3;
 
 import java.time.Duration;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class UserProvidedServicesTest extends AbstractIntegrationTest {
@@ -180,26 +180,13 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
         String instanceName = this.nameFactory.getServiceInstanceName();
         String newInstanceName = this.nameFactory.getServiceInstanceName();
 
-        Function<Tuple2<UserProvidedServiceInstanceEntity, UserProvidedServiceInstanceEntity>, Optional<String>> assertion = function((entity1, entity2) -> {
-            if (!newInstanceName.equals(entity1.getName())) {
-                return Optional.of(String.format("expected instance name: %s; actual instance name: %s", newInstanceName, entity1.getName()));
-            }
-
-            if (!Collections.singletonMap("test-cred", "some value").equals(entity1.getCredentials())) {
-                return Optional.of(String.format("expected credentials: %s; actual credentials: %s", Collections.singletonMap("test-cred", "some value"), entity1.getCredentials()));
-            }
-
-            if (!Collections.emptyMap().equals(entity2.getCredentials())) {
-                return Optional.of(String.format("expected credentials: %s; actual credentials: %s", Collections.emptyMap(), entity2.getCredentials()));
-            }
-
-            return Optional.empty();
-        });
-
         ScriptedSubscriber<Tuple2<UserProvidedServiceInstanceEntity, UserProvidedServiceInstanceEntity>> subscriber =
             ScriptedSubscriber.<Tuple2<UserProvidedServiceInstanceEntity, UserProvidedServiceInstanceEntity>>create()
-                .expectValueWith(tuple -> !assertion.apply(tuple).isPresent(),
-                    tuple -> assertion.apply(tuple).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching values")))
+                .consumeValueWith(consumer((entity1, entity2) -> {
+                    assertThat(entity1.getName()).isEqualTo(newInstanceName);
+                    assertThat(entity1.getCredentials()).containsEntry("test-cred", "some value");
+                    assertThat(entity2.getCredentials()).isEmpty();
+                }))
                 .expectComplete();
 
         this.spaceId
@@ -266,21 +253,11 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
     }
 
     private static ScriptedSubscriber<Tuple3<String, String, ServiceBindingResource>> serviceBindingEquality() {
-        Function<Tuple3<String, String, ServiceBindingResource>, Optional<String>> assertion = function((applicationId, instanceId, resource) -> {
-            if (!applicationId.equals(resource.getEntity().getApplicationId())) {
-                return Optional.of(String.format("expected application id: %s; actual application id: %s", applicationId, resource.getEntity().getApplicationId()));
-            }
-
-            if (!instanceId.equals(resource.getEntity().getServiceInstanceId())) {
-                return Optional.of(String.format("expected instance id: %s; actual instance id: %s", instanceId, resource.getEntity().getServiceInstanceId()));
-            }
-
-            return Optional.empty();
-        });
-
         return ScriptedSubscriber.<Tuple3<String, String, ServiceBindingResource>>create()
-            .expectValueWith(t -> !assertion.apply(t).isPresent(),
-                t -> assertion.apply(t).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching service binding")))
+            .consumeValueWith(consumer((applicationId, instanceId, resource) -> {
+                assertThat(resource.getEntity().getApplicationId()).isEqualTo(applicationId);
+                assertThat(resource.getEntity().getServiceInstanceId()).isEqualTo(instanceId);
+            }))
             .expectComplete();
     }
 

@@ -18,7 +18,8 @@ package org.cloudfoundry.operations.applications;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 public final class WordListRandomWordsTest {
 
@@ -26,12 +27,12 @@ public final class WordListRandomWordsTest {
 
     @Test
     public void getAdjective() {
-        assertNotNull(this.randomWords.getAdjective());
+        assertThat(this.randomWords.getAdjective()).isNotNull();
     }
 
     @Test
     public void getNoun() {
-        assertNotNull(this.randomWords.getNoun());
+        assertThat(this.randomWords.getNoun()).isNotNull();
     }
 
 }

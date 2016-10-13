@@ -43,11 +43,11 @@ import reactor.util.function.Tuple2;
 import reactor.util.function.Tuple3;
 
 import java.time.Duration;
-import java.util.Optional;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static reactor.core.publisher.Mono.when;
 
@@ -65,21 +65,11 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
 
-        Function<Tuple3<String, String, RouteMappingEntity>, Optional<String>> assertion = function((applicationId, routeId, entity) -> {
-            if (!applicationId.equals(entity.getApplicationId())) {
-                return Optional.of(String.format("expected application id: %s; actual application id: %s", applicationId, entity.getApplicationId()));
-            }
-
-            if (!routeId.equals(entity.getRouteId())) {
-                return Optional.of(String.format("expected route id: %s; actual route id: %s", routeId, entity.getRouteId()));
-            }
-
-            return Optional.empty();
-        });
-
         ScriptedSubscriber<Tuple3<String, String, RouteMappingEntity>> subscriber = ScriptedSubscriber.<Tuple3<String, String, RouteMappingEntity>>create()
-            .expectValueWith(tuple -> !assertion.apply(tuple).isPresent(),
-                tuple -> assertion.apply(tuple).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching entity")))
+            .consumeValueWith(consumer((applicationId, routeId, entity) -> {
+                assertThat(entity.getApplicationId()).isEqualTo(applicationId);
+                assertThat(entity.getRouteId()).isEqualTo(routeId);
+            }))
             .expectComplete();
 
         Mono
@@ -113,7 +103,8 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
 
-        ScriptedSubscriber<GetRouteMappingResponse> subscriber = errorExpectation(CloudFoundryException.class, "CF-RouteMappingNotFound\\([0-9]+\\): The route mapping could not be found: .*");
+        ScriptedSubscriber<GetRouteMappingResponse> subscriber = ScriptedSubscriber.<GetRouteMappingResponse>create()
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-RouteMappingNotFound\\([0-9]+\\): The route mapping could not be found: .*"));
 
         this.spaceId
             .then(spaceId -> getRouteMappingId(this.cloudFoundryClient, applicationName, domainName, hostName, spaceId))
@@ -134,7 +125,8 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
 
-        ScriptedSubscriber<GetRouteMappingResponse> subscriber = errorExpectation(CloudFoundryException.class, "CF-RouteMappingNotFound\\([0-9]+\\): The route mapping could not be found: .*");
+        ScriptedSubscriber<GetRouteMappingResponse> subscriber = ScriptedSubscriber.<GetRouteMappingResponse>create()
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-RouteMappingNotFound\\([0-9]+\\): The route mapping could not be found: .*"));
 
         this.spaceId
             .then(spaceId -> getRouteMappingId(this.cloudFoundryClient, applicationName, domainName, hostName, spaceId))
@@ -143,7 +135,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
                     .async(true)
                     .routeMappingId(routeMappingId)
                     .build())
-                .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job))))
+                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))))
             .then(routeMappingId -> requestGetRouteMapping(this.cloudFoundryClient, routeMappingId))
             .subscribe(subscriber);
 

@@ -19,7 +19,7 @@ package org.cloudfoundry.reactor.client;
 import org.cloudfoundry.reactor.AbstractRestTest;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public final class ReactorCloudFoundryClientTest extends AbstractRestTest {
 
@@ -31,182 +31,182 @@ public final class ReactorCloudFoundryClientTest extends AbstractRestTest {
 
     @Test
     public void applicationUsageEvents() {
-        assertNotNull(this.client.applicationUsageEvents());
+        assertThat(this.client.applicationUsageEvents()).isNotNull();
     }
 
     @Test
     public void applicationsV2() {
-        assertNotNull(this.client.applicationsV2());
+        assertThat(this.client.applicationsV2()).isNotNull();
     }
 
     @Test
     public void applicationsV3() {
-        assertNotNull(this.client.applicationsV3());
+        assertThat(this.client.applicationsV3()).isNotNull();
     }
 
     @Test
     public void buildpacks() {
-        assertNotNull(this.client.buildpacks());
+        assertThat(this.client.buildpacks()).isNotNull();
     }
 
     @Test
     public void domains() {
-        assertNotNull(this.client.domains());
+        assertThat(this.client.domains()).isNotNull();
     }
 
     @Test
     public void droplets() {
-        assertNotNull(this.client.droplets());
+        assertThat(this.client.droplets()).isNotNull();
     }
 
     @Test
     public void environmentVariableGroups() {
-        assertNotNull(this.client.environmentVariableGroups());
+        assertThat(this.client.environmentVariableGroups()).isNotNull();
     }
 
     @Test
     public void events() {
-        assertNotNull(this.client.events());
+        assertThat(this.client.events()).isNotNull();
     }
 
     @Test
     public void featureFlags() {
-        assertNotNull(this.client.featureFlags());
+        assertThat(this.client.featureFlags()).isNotNull();
     }
 
     @Test
     public void info() {
-        assertNotNull(this.client.info());
+        assertThat(this.client.info()).isNotNull();
     }
 
     @Test
     public void jobs() {
-        assertNotNull(this.client.jobs());
+        assertThat(this.client.jobs()).isNotNull();
     }
 
     @Test
     public void organizationQuotaDefinitions() {
-        assertNotNull(this.client.organizationQuotaDefinitions());
+        assertThat(this.client.organizationQuotaDefinitions()).isNotNull();
     }
 
     @Test
     public void organizations() {
-        assertNotNull(this.client.organizations());
+        assertThat(this.client.organizations()).isNotNull();
     }
 
     @Test
     public void packages() {
-        assertNotNull(this.client.packages());
+        assertThat(this.client.packages()).isNotNull();
     }
 
     @Test
     public void privateDomains() {
-        assertNotNull(this.client.privateDomains());
+        assertThat(this.client.privateDomains()).isNotNull();
     }
 
     @Test
     public void processes() {
-        assertNotNull(this.client.processes());
+        assertThat(this.client.processes()).isNotNull();
     }
 
     @Test
     public void resourceMatch() throws Exception {
-        assertNotNull(this.client.resourceMatch());
+        assertThat(this.client.resourceMatch()).isNotNull();
     }
 
     @Test
     public void routeMappings() {
-        assertNotNull(this.client.routeMappings());
+        assertThat(this.client.routeMappings()).isNotNull();
     }
 
     @Test
     public void routes() {
-        assertNotNull(this.client.routes());
+        assertThat(this.client.routes()).isNotNull();
     }
 
     @Test
     public void runningSecurityGroups() {
-        assertNotNull(this.client.securityGroups());
+        assertThat(this.client.securityGroups()).isNotNull();
     }
 
     @Test
     public void serviceBindingsV2() {
-        assertNotNull(this.client.serviceBindingsV2());
+        assertThat(this.client.serviceBindingsV2()).isNotNull();
     }
 
     @Test
     public void serviceBindingsV3() {
-        assertNotNull(this.client.serviceBindingsV3());
+        assertThat(this.client.serviceBindingsV3()).isNotNull();
     }
 
     @Test
     public void serviceBrokers() {
-        assertNotNull(this.client.serviceBrokers());
+        assertThat(this.client.serviceBrokers()).isNotNull();
     }
 
     @Test
     public void serviceInstances() {
-        assertNotNull(this.client.serviceInstances());
+        assertThat(this.client.serviceInstances()).isNotNull();
     }
 
     @Test
     public void serviceKeys() {
-        assertNotNull(this.client.serviceKeys());
+        assertThat(this.client.serviceKeys()).isNotNull();
     }
 
     @Test
     public void servicePlanVisibilities() {
-        assertNotNull(this.client.servicePlanVisibilities());
+        assertThat(this.client.servicePlanVisibilities()).isNotNull();
     }
 
     @Test
     public void servicePlans() {
-        assertNotNull(this.client.servicePlans());
+        assertThat(this.client.servicePlans()).isNotNull();
     }
 
     @Test
     public void serviceUsageEvents() {
-        assertNotNull(this.client.serviceUsageEvents());
+        assertThat(this.client.serviceUsageEvents()).isNotNull();
     }
 
     @Test
     public void services() {
-        assertNotNull(this.client.services());
+        assertThat(this.client.services()).isNotNull();
     }
 
     @Test
     public void sharedDomains() {
-        assertNotNull(this.client.sharedDomains());
+        assertThat(this.client.sharedDomains()).isNotNull();
     }
 
     @Test
     public void space() {
-        assertNotNull(this.client.spaces());
+        assertThat(this.client.spaces()).isNotNull();
     }
 
     @Test
     public void spaceQuotaDefinitions() {
-        assertNotNull(this.client.spaceQuotaDefinitions());
+        assertThat(this.client.spaceQuotaDefinitions()).isNotNull();
     }
 
     @Test
     public void stacks() {
-        assertNotNull(this.client.stacks());
+        assertThat(this.client.stacks()).isNotNull();
     }
 
     @Test
     public void tasks() {
-        assertNotNull(this.client.tasks());
+        assertThat(this.client.tasks()).isNotNull();
     }
 
     @Test
     public void userProvidedServiceInstances() {
-        assertNotNull(this.client.userProvidedServiceInstances());
+        assertThat(this.client.userProvidedServiceInstances()).isNotNull();
     }
 
     @Test
     public void users() {
-        assertNotNull(this.client.users());
+        assertThat(this.client.users()).isNotNull();
     }
 
 }

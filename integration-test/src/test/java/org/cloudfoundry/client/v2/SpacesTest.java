@@ -88,16 +88,16 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 import static java.time.temporal.ChronoUnit.HOURS;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
-import static org.junit.Assert.fail;
 
 public final class SpacesTest extends AbstractIntegrationTest {
 
@@ -1156,21 +1156,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
 
-        Function<UserSpaceRoleEntity, Optional<String>> assertion = entity -> {
-            if (!this.username.equals(entity.getUsername())) {
-                return Optional.of(String.format("expected username: %s; actual username: %s", this.username, entity.getUsername()));
-            }
-
-            if (!Collections.singletonList("space_manager").equals(entity.getSpaceRoles())) {
-                return Optional.of(String.format("expected space roles: %s; actual space roles: %s", Collections.singletonList("space_manager"), entity.getSpaceRoles()));
-            }
-
-            return Optional.empty();
-        };
-
         ScriptedSubscriber<UserSpaceRoleEntity> subscriber = ScriptedSubscriber.<UserSpaceRoleEntity>create()
-            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
-                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching entity")))
+            .consumeValueWith(entity -> {
+                assertThat(entity.getUsername()).isEqualTo(this.username);
+                assertThat(entity.getSpaceRoles()).containsExactly("space_manager");
+            })
             .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)

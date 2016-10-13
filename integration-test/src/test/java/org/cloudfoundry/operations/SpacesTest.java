@@ -26,6 +26,8 @@ import reactor.test.subscriber.ScriptedSubscriber;
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public final class SpacesTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -58,7 +60,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     @Test
     public void list() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<Long> subscriber = ScriptedSubscriber.<Long>create()
-            .expectValueWith(count -> count > 0, count -> String.format("expected count: 0; actual count: %d", count))
+            .consumeValueWith(count -> assertThat(count).isGreaterThan(0))
             .expectComplete();
 
         this.cloudFoundryOperations.spaces()

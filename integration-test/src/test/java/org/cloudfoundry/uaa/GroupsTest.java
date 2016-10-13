@@ -59,9 +59,10 @@ import reactor.util.function.Tuple2;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static reactor.core.publisher.Mono.when;
 
@@ -75,25 +76,12 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String baseDisplayName = this.nameFactory.getGroupName();
         String memberDisplayName = this.nameFactory.getGroupName();
 
-        Function<Tuple2<AddMemberResponse, String>, Optional<String>> assertion = function((response, memberGroupId) -> {
-            if (!memberGroupId.equals(response.getMemberId())) {
-                return Optional.of(String.format("expected group id: %s; actual group id: %s", memberGroupId, response.getMemberId()));
-            }
-
-            if (!Optional.of(memberDisplayName + "-origin").equals(response.getOrigin())) {
-                return Optional.of(String.format("expected origin: %s; actual origin: %s", Optional.of(memberDisplayName + "-origin"), response.getOrigin()));
-            }
-
-            if (!Optional.of(MemberType.GROUP).equals(response.getType())) {
-                return Optional.of(String.format("expected type: %s; actual type: %s", Optional.of(MemberType.GROUP), response.getType()));
-            }
-
-            return Optional.empty();
-        });
-
         ScriptedSubscriber<Tuple2<AddMemberResponse, String>> subscriber = ScriptedSubscriber.<Tuple2<AddMemberResponse, String>>create()
-            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
-                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching response")))
+            .consumeValueWith(consumer((response, memberGroupId) -> {
+                assertThat(response.getMemberId()).isEqualTo(memberGroupId);
+                assertThat(response.getOrigin()).isEqualTo(Optional.of(String.format("%s-origin", memberDisplayName)));
+                assertThat(response.getType()).isEqualTo(Optional.of(MemberType.GROUP));
+            }))
             .expectComplete();
 
         Mono
@@ -122,25 +110,12 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String displayName = this.nameFactory.getGroupName();
         String userName = this.nameFactory.getUserName();
 
-        Function<Tuple2<AddMemberResponse, String>, Optional<String>> assertion = function((response, userId) -> {
-            if (!userId.equals(response.getMemberId())) {
-                return Optional.of(String.format("expected member id: %s; actual member id: %s", userId, response.getMemberId()));
-            }
-
-            if (!Optional.of(userName + "-origin").equals(response.getOrigin())) {
-                return Optional.of(String.format("expected origin: %s; actual origin: %s", Optional.of(userName + "-origin"), response.getOrigin()));
-            }
-
-            if (!Optional.of(MemberType.USER).equals(response.getType())) {
-                return Optional.of(String.format("expected type: %s; actual type: %s", Optional.of(MemberType.USER), response.getType()));
-            }
-
-            return Optional.empty();
-        });
-
         ScriptedSubscriber<Tuple2<AddMemberResponse, String>> subscriber = ScriptedSubscriber.<Tuple2<AddMemberResponse, String>>create()
-            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
-                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching response")))
+            .consumeValueWith(consumer((response, userId) -> {
+                assertThat(response.getMemberId()).isEqualTo(userId);
+                assertThat(response.getOrigin()).isEqualTo(Optional.of(String.format("%s-origin", userName)));
+                assertThat(response.getType()).isEqualTo(Optional.of(MemberType.USER));
+            }))
             .expectComplete();
 
         when(
@@ -168,25 +143,12 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String displayName = this.nameFactory.getGroupName();
         String userName = this.nameFactory.getUserName();
 
-        Function<Tuple2<CheckMembershipResponse, String>, Optional<String>> assertion = function((response, userId) -> {
-            if (!userId.equals(response.getMemberId())) {
-                return Optional.of(String.format("expected member id: %s; actual member id: %s", userId, response.getMemberId()));
-            }
-
-            if (!Optional.of("test-origin").equals(response.getOrigin())) {
-                return Optional.of(String.format("expected origin: %s; actual origin: %s", Optional.of("test-origin"), response.getOrigin()));
-            }
-
-            if (!Optional.of(MemberType.USER).equals(response.getType())) {
-                return Optional.of(String.format("expected type: %s; actual type: %s", Optional.of(MemberType.USER), response.getType()));
-            }
-
-            return Optional.empty();
-        });
-
         ScriptedSubscriber<Tuple2<CheckMembershipResponse, String>> subscriber = ScriptedSubscriber.<Tuple2<CheckMembershipResponse, String>>create()
-            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
-                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching response")))
+            .consumeValueWith(consumer((response, userId) -> {
+                assertThat(response.getMemberId()).isEqualTo(userId);
+                assertThat(response.getOrigin()).isEqualTo(Optional.of("test-origin"));
+                assertThat(response.getType()).isEqualTo(Optional.of(MemberType.USER));
+            }))
             .expectComplete();
 
         createUserId(this.uaaClient, userName)
@@ -376,21 +338,11 @@ public final class GroupsTest extends AbstractIntegrationTest {
     public void mapExternalGroupMappings() {
         String displayName = this.nameFactory.getGroupName();
 
-        Function<ExternalGroupResource, Optional<String>> assertion = resource -> {
-            if (!(displayName + "-external-group").equals(resource.getExternalGroup())) {
-                return Optional.of(String.format("expected external group: %s; actual external group: %s", displayName + "-external-group", resource.getExternalGroup()));
-            }
-
-            if (!(displayName + "-origin").equals(resource.getOrigin())) {
-                return Optional.of(String.format("expected origin: %s; actual origin: %s", displayName + "-origin", resource.getOrigin()));
-            }
-
-            return Optional.empty();
-        };
-
         ScriptedSubscriber<ExternalGroupResource> subscriber = ScriptedSubscriber.<ExternalGroupResource>create()
-            .expectValueWith(actual -> !assertion.apply(actual).isPresent(),
-                actual -> assertion.apply(actual).orElseThrow(() -> new IllegalArgumentException("Cannot generate assertion message for matching response")))
+            .consumeValueWith(resource -> {
+                assertThat(resource.getExternalGroup()).isEqualTo(String.format("%s-external-group", displayName));
+                assertThat(resource.getOrigin()).isEqualTo(String.format("%s-origin", displayName));
+            })
             .expectComplete();
 
         createGroupId(this.uaaClient, displayName)

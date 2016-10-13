@@ -22,7 +22,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
 
