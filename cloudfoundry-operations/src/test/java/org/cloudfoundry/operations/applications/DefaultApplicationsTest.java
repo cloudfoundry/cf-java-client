@@ -1712,6 +1712,46 @@ public final class DefaultApplicationsTest {
 
     }
 
+    public static final class GetBuildpackError extends AbstractOperationsApiTest<ApplicationDetail> {
+
+        private static final int CF_BUILDPACK_COMPILED_FAILED = 170004;
+
+        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+            requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
+            requestStack(this.cloudFoundryClient, "test-application-stackId");
+            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+            requestApplicationInstancesError(this.cloudFoundryClient, "test-metadata-id", CF_BUILDPACK_COMPILED_FAILED);
+        }
+
+        @Override
+        protected ScriptedSubscriber<ApplicationDetail> expectations() {
+            return ScriptedSubscriber.<ApplicationDetail>create()
+                .expectValue(fill(ApplicationDetail.builder())
+                    .buildpack("test-application-summary-buildpack")
+                    .id("test-application-summary-id")
+                    .lastUploaded(new Date(0))
+                    .name("test-application-summary-name")
+                    .requestedState("test-application-summary-state")
+                    .stack("test-stack-entity-name")
+                    .url("test-route-host.test-domain-name")
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected Mono<ApplicationDetail> invoke() {
+            return this.applications
+                .get(GetApplicationRequest.builder()
+                    .name("test-app")
+                    .build());
+        }
+
+    }
+
     public static final class GetDetectedBuildpack extends AbstractOperationsApiTest<ApplicationDetail> {
 
         private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));

@@ -123,6 +123,8 @@ public final class DefaultApplications implements Applications {
 
     private static final int CF_APP_STOPPED_STATS_ERROR = 200003;
 
+    private static final int CF_BUILDPACK_COMPILED_FAILED = 170004;
+
     private static final int CF_INSTANCES_ERROR = 220001;
 
     private static final int CF_STAGING_NOT_FINISHED = 170002;
@@ -622,6 +624,7 @@ public final class DefaultApplications implements Applications {
 
     private static Mono<ApplicationInstancesResponse> getApplicationInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestApplicationInstances(cloudFoundryClient, applicationId)
+            .otherwise(ExceptionUtils.statusCode(CF_BUILDPACK_COMPILED_FAILED), t -> Mono.just(ApplicationInstancesResponse.builder().build()))
             .otherwise(ExceptionUtils.statusCode(CF_INSTANCES_ERROR), t -> Mono.just(ApplicationInstancesResponse.builder().build()))
             .otherwise(ExceptionUtils.statusCode(CF_STAGING_NOT_FINISHED), t -> Mono.just(ApplicationInstancesResponse.builder().build()));
     }
