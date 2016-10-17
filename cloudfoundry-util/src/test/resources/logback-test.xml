@@ -23,10 +23,7 @@
         </encoder>
     </appender>
 
-    <logger name="cloudfoundry-client.request"  level="${CLIENT_LOGGING_LEVEL:-INFO}"/>
-    <logger name="cloudfoundry-client.response" level="${CLIENT_LOGGING_LEVEL:-INFO}"/>
-    <logger name="okhttp3"                      level="WARN"/>
-    <logger name="reactor.ipc.netty"            level="INFO"/>
+    <logger name="cloudfoundry-client.delay"    level="${CLIENT_LOGGING_LEVEL:-INFO}"/>
     <logger name="stream"                       level="INFO"/>
 
     <root level="WARN">

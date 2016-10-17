@@ -72,9 +72,10 @@ public final class DelayUtils {
      * @return a delayed {@link Publisher}
      */
     public static Function<Flux<Long>, Publisher<?>> fixed(Duration duration) {
-        return iterations -> Mono
-            .delay(duration)
-            .doOnSubscribe(logDelay(duration));
+        return iterations -> iterations
+            .flatMap(iteration -> Mono
+                .delay(duration)
+                .doOnSubscribe(logDelay(duration)), 1);
     }
 
     /**
@@ -83,9 +84,10 @@ public final class DelayUtils {
      * @return an instant (no delay) {@link Publisher}
      */
     public static Function<Flux<Long>, Publisher<?>> instant() {
-        return iterations -> Mono
-            .just(0L)
-            .doOnSubscribe(logDelay(Duration.ZERO));
+        return iterations -> iterations
+            .flatMap(iteration -> Mono
+                .just(0L)
+                .doOnSubscribe(logDelay(Duration.ZERO)), 1);
     }
 
     private static Duration calculateDuration(Duration minimum, Duration maximum, Long iteration) {
@@ -104,7 +106,7 @@ public final class DelayUtils {
                 return Mono
                     .delay(delay)
                     .doOnSubscribe(logDelay(delay));
-            });
+            }, 1);
     }
 
     private static Consumer<Subscription> logDelay(Duration delay) {
