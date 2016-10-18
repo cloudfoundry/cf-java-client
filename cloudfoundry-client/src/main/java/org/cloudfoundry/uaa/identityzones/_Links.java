@@ -29,6 +29,13 @@ import org.immutables.value.Value;
 abstract class _Links {
 
     /**
+     * The URL redirect
+     */
+    @JsonProperty("homeRedirect")
+    @Nullable
+    abstract String getHomeRedirect();
+
+    /**
      * The logout link
      */
     @JsonProperty("logout")

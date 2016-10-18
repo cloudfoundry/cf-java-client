@@ -60,7 +60,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     @Test
     public void createInvalidDomain() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<Void> subscriber = ScriptedSubscriber.<Void>create()
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-DomainInvalid\\([0-9]+\\): The domain is invalid: name format"));
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-DomainInvalid\\([0-9]+\\): The domain is invalid.*"));
 
         this.cloudFoundryOperations.domains()
             .create(CreateDomainRequest.builder()
