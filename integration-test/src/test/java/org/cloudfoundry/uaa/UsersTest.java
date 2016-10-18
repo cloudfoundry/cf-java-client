@@ -159,7 +159,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     public void invite() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<Invite> subscriber = ScriptedSubscriber.<Invite>create()
             .consumeValueWith(invite -> {
-                assertThat(invite.getEmail()).isEqualTo("test-email-address");
+                assertThat(invite.getEmail()).isEqualTo("test@email.address");
                 assertThat(invite.getErrorCode()).isNull();
                 assertThat(invite.getSuccess()).isTrue();
             })
@@ -167,9 +167,10 @@ public final class UsersTest extends AbstractIntegrationTest {
 
         this.uaaClient.users()
             .invite(InviteUsersRequest.builder()
-                .email("test-email-address")
+                .email("test@email.address")
                 .redirectUri("test-redirect-uri")
                 .build())
+            .log("stream.invite")
             .flatMapIterable(InviteUsersResponse::getNewInvites)
             .single()
             .subscribe(subscriber);
