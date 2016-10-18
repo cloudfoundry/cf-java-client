@@ -194,7 +194,6 @@ public class IntegrationTestConfiguration {
 
         DefaultConnectionContext.Builder connectionContext = DefaultConnectionContext.builder()
             .apiHost(apiHost)
-            .problemHandler(new FailingDeserializationProblemHandler())  // Test-only problem handler
             .skipSslValidation(skipSslValidation)
             .sslHandshakeTimeout(Duration.ofSeconds(30));
 
