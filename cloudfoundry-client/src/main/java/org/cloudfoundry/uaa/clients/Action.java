@@ -16,28 +16,9 @@
 
 package org.cloudfoundry.uaa.clients;
 
-import org.junit.Test;
-
-public final class BatchDeleteClientsRequestTest {
-
-    @Test(expected = IllegalStateException.class)
-    public void emptyClientIds() {
-        BatchDeleteClientsRequest.builder()
-            .clientId()
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noClientIds() {
-        BatchDeleteClientsRequest.builder()
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        BatchDeleteClientsRequest.builder()
-            .clientId("test-client-id")
-            .build();
-    }
+/*
+* An interface that indicates the type of a UAA mixed action
+ */
+public interface Action {
 
 }

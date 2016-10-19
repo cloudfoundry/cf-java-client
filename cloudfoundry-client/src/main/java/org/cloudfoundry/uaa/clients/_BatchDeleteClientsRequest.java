@@ -21,7 +21,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import org.cloudfoundry.Nullable;
 import org.cloudfoundry.uaa.IdentityZoned;
 import org.immutables.value.Value;
 
@@ -38,7 +37,7 @@ abstract class _BatchDeleteClientsRequest implements IdentityZoned {
 
     @Value.Check
     void checkClientIds() {
-        if (this.getClientIds() == null) {
+        if (this.getClientIds().isEmpty()) {
             throw new IllegalStateException("Cannot build BatchDeleteClientsRequest, required attribute clientIds is not set");
         }
     }
@@ -46,7 +45,6 @@ abstract class _BatchDeleteClientsRequest implements IdentityZoned {
     /**
      * A list of identifiers of clients to delete
      */
-    @Nullable
     @JsonIgnore
     abstract List<String> getClientIds();
 

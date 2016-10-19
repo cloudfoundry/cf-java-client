@@ -28,37 +28,38 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * The request payload for the Batch Create Clients operation
+ * The request payload for the Batch Update Clients operation
  */
+@JsonSerialize(using = _MixedActionsRequest.MixedActionsSerializer.class)
 @Value.Immutable
-@JsonSerialize(using = _BatchCreateClientsRequest.BatchCreateClientsSerializer.class)
-abstract class _BatchCreateClientsRequest implements IdentityZoned {
+abstract class _MixedActionsRequest implements IdentityZoned {
 
     @Value.Check
-    void checkClients() {
-        if (this.getClients().isEmpty()) {
-            throw new IllegalStateException("Cannot build BatchCreateClientsRequest, required attribute clients is not set");
+    void checkActions() {
+        if (this.getActions().isEmpty()) {
+            throw new IllegalStateException("Cannot build MixedActionsRequest, required attribute actions is not set");
         }
     }
 
     /**
-     * A list of clients to create
+     * A list of actions to perform
      */
     @JsonIgnore
-    abstract List<CreateClient> getClients();
+    abstract List<Action> getActions();
 
-    static class BatchCreateClientsSerializer extends StdSerializer<BatchCreateClientsRequest> {
+    static class MixedActionsSerializer extends StdSerializer<MixedActionsRequest> {
 
-        private static final long serialVersionUID = 958714647149130533L;
+        private static final long serialVersionUID = 8507863382046380145L;
 
-        BatchCreateClientsSerializer() {
-            super(BatchCreateClientsRequest.class);
+        MixedActionsSerializer() {
+            super(MixedActionsRequest.class);
         }
 
         @Override
-        public void serialize(BatchCreateClientsRequest request, JsonGenerator gen, SerializerProvider provider) throws IOException {
-            gen.writeObject(request.getClients());
+        public void serialize(MixedActionsRequest request, JsonGenerator gen, SerializerProvider provider) throws IOException {
+            gen.writeObject(request.getActions());
         }
+
     }
 
 }

@@ -36,6 +36,13 @@ abstract class AbstractCreateClient {
     }
 
     /**
+     * The access token validity
+     */
+    @JsonProperty("access_token_validity")
+    @Nullable
+    abstract Long getAccessTokenValidity();
+
+    /**
      * A list of origin keys (alias) for identity providers the client is limited to. Null implies any identity provider is allowed.
      */
     @JsonProperty("allowedproviders")
@@ -103,6 +110,13 @@ abstract class AbstractCreateClient {
     @JsonProperty("redirect_uri")
     @Nullable
     abstract List<String> getRedirectUriPatterns();
+
+    /**
+     * The refresh token validity
+     */
+    @JsonProperty("refresh_token_validity")
+    @Nullable
+    abstract Long getRefreshTokenValidity();
 
     /**
      * Resources the client is allowed access to

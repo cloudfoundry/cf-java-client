@@ -30,8 +30,10 @@ import org.cloudfoundry.uaa.clients.ChangeSecretRequest;
 import org.cloudfoundry.uaa.clients.ChangeSecretResponse;
 import org.cloudfoundry.uaa.clients.Client;
 import org.cloudfoundry.uaa.clients.CreateClient;
+import org.cloudfoundry.uaa.clients.CreateClientAction;
 import org.cloudfoundry.uaa.clients.CreateClientRequest;
 import org.cloudfoundry.uaa.clients.CreateClientResponse;
+import org.cloudfoundry.uaa.clients.DeleteClientAction;
 import org.cloudfoundry.uaa.clients.DeleteClientRequest;
 import org.cloudfoundry.uaa.clients.GetClientRequest;
 import org.cloudfoundry.uaa.clients.GetClientResponse;
@@ -42,12 +44,15 @@ import org.cloudfoundry.uaa.clients.ListClientsResponse;
 import org.cloudfoundry.uaa.clients.ListMetadatasRequest;
 import org.cloudfoundry.uaa.clients.ListMetadatasResponse;
 import org.cloudfoundry.uaa.clients.Metadata;
+import org.cloudfoundry.uaa.clients.MixedActionsRequest;
 import org.cloudfoundry.uaa.clients.UpdateClient;
+import org.cloudfoundry.uaa.clients.UpdateClientAction;
 import org.cloudfoundry.uaa.clients.UpdateClientRequest;
 import org.cloudfoundry.uaa.clients.UpdateMetadataRequest;
 import org.cloudfoundry.uaa.clients.UpdateMetadataResponse;
+import org.cloudfoundry.uaa.clients.UpdateSecretAction;
+import org.cloudfoundry.uaa.clients.UpdateSecretClientAction;
 import org.cloudfoundry.util.PaginationUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
@@ -368,10 +373,56 @@ public final class ClientsTest extends AbstractIntegrationTest {
         subscriber.verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/125572641")
     @Test
-    public void mixedActions() {
-        //
+    public void mixedActions() throws TimeoutException, InterruptedException {
+        String clientId1 = this.nameFactory.getClientId();
+        String clientId2 = this.nameFactory.getClientId();
+        String clientSecret = this.nameFactory.getClientSecret();
+        String newClientSecret = this.nameFactory.getClientSecret();
+
+        ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
+            .consumeValueWith(client -> {
+                assertThat(client.getName()).isEqualTo("test-name-new");
+            })
+            .expectComplete();
+
+        this.uaaClient.clients()
+            .mixedActions(MixedActionsRequest.builder()
+                .action(CreateClientAction.builder()
+                    .authorizedGrantType(PASSWORD)
+                    .clientId(clientId1)
+                    .clientSecret(clientSecret)
+                    .name("test-name-old")
+                    .build())
+                .action(CreateClientAction.builder()
+                    .authorizedGrantType(PASSWORD)
+                    .clientId(clientId2)
+                    .clientSecret(clientSecret)
+                    .build())
+                .action(UpdateClientAction.builder()
+                    .authorizedGrantType(PASSWORD)
+                    .clientId(clientId1)
+                    .name("test-name-temporary")
+                    .build())
+                .action(UpdateSecretAction.builder()
+                    .clientId(clientId2)
+                    .secret(newClientSecret)
+                    .build())
+                .action(DeleteClientAction.builder()
+                    .clientId(clientId2)
+                    .build())
+                .action(UpdateSecretClientAction.builder()
+                    .authorizedGrantType(PASSWORD)
+                    .name("test-name-new")
+                    .clientId(clientId1)
+                    .secret(newClientSecret)
+                    .build())
+                .build())
+            .flatMap(ignore -> requestListClients(this.uaaClient))
+            .filter(client -> clientId1.equals(client.getClientId()))
+            .subscribe(subscriber);
+
+        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test

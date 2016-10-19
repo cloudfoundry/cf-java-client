@@ -16,28 +16,14 @@
 
 package org.cloudfoundry.uaa.clients;
 
-import org.junit.Test;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
-public final class BatchDeleteClientsRequestTest {
-
-    @Test(expected = IllegalStateException.class)
-    public void emptyClientIds() {
-        BatchDeleteClientsRequest.builder()
-            .clientId()
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noClientIds() {
-        BatchDeleteClientsRequest.builder()
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        BatchDeleteClientsRequest.builder()
-            .clientId("test-client-id")
-            .build();
-    }
+/**
+ * The resource in the list clients response
+ */
+@JsonDeserialize
+@Value.Immutable
+abstract class _ActionClient extends AbstractClient implements Action {
 
 }

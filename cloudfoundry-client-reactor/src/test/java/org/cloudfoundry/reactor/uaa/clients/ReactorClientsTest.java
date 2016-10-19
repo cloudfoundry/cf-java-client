@@ -21,6 +21,7 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
 import org.cloudfoundry.uaa.SortOrder;
+import org.cloudfoundry.uaa.clients.ActionClient;
 import org.cloudfoundry.uaa.clients.BatchChangeSecretRequest;
 import org.cloudfoundry.uaa.clients.BatchChangeSecretResponse;
 import org.cloudfoundry.uaa.clients.BatchCreateClientsRequest;
@@ -34,8 +35,10 @@ import org.cloudfoundry.uaa.clients.ChangeSecretRequest;
 import org.cloudfoundry.uaa.clients.ChangeSecretResponse;
 import org.cloudfoundry.uaa.clients.Client;
 import org.cloudfoundry.uaa.clients.CreateClient;
+import org.cloudfoundry.uaa.clients.CreateClientAction;
 import org.cloudfoundry.uaa.clients.CreateClientRequest;
 import org.cloudfoundry.uaa.clients.CreateClientResponse;
+import org.cloudfoundry.uaa.clients.DeleteClientAction;
 import org.cloudfoundry.uaa.clients.DeleteClientRequest;
 import org.cloudfoundry.uaa.clients.DeleteClientResponse;
 import org.cloudfoundry.uaa.clients.GetClientRequest;
@@ -47,11 +50,14 @@ import org.cloudfoundry.uaa.clients.ListClientsResponse;
 import org.cloudfoundry.uaa.clients.ListMetadatasRequest;
 import org.cloudfoundry.uaa.clients.ListMetadatasResponse;
 import org.cloudfoundry.uaa.clients.Metadata;
+import org.cloudfoundry.uaa.clients.MixedActionsRequest;
+import org.cloudfoundry.uaa.clients.MixedActionsResponse;
 import org.cloudfoundry.uaa.clients.UpdateClient;
 import org.cloudfoundry.uaa.clients.UpdateClientRequest;
 import org.cloudfoundry.uaa.clients.UpdateClientResponse;
 import org.cloudfoundry.uaa.clients.UpdateMetadataRequest;
 import org.cloudfoundry.uaa.clients.UpdateMetadataResponse;
+import org.cloudfoundry.uaa.clients.UpdateSecretAction;
 import reactor.core.publisher.Mono;
 import reactor.test.subscriber.ScriptedSubscriber;
 
@@ -534,6 +540,7 @@ public final class ReactorClientsTest {
                 .clientId("test-client-id")
                 .build();
         }
+
     }
 
     public static final class Deserialize extends AbstractUaaApiTest<ListClientsRequest, ListClientsResponse> {
@@ -807,6 +814,105 @@ public final class ReactorClientsTest {
             return ListMetadatasRequest.builder()
                 .build();
         }
+    }
+
+    public static final class MixedActions extends AbstractUaaApiTest<MixedActionsRequest, MixedActionsResponse> {
+
+        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+        @Override
+        protected ScriptedSubscriber<MixedActionsResponse> expectations() {
+            return ScriptedSubscriber.<MixedActionsResponse>create()
+                .expectValue(MixedActionsResponse.builder()
+                    .client(ActionClient.builder()
+                        .action("secret")
+                        .approvalsDeleted(false)
+                        .clientId("Zkgt1Y")
+                        .build())
+                    .client(ActionClient.builder()
+                        .accessTokenValidity(2700L)
+                        .action("delete")
+                        .allowedProvider("uaa", "ldap", "my-saml-provider")
+                        .approvalsDeleted(true)
+                        .authority("clients.read", "new.authority", "clients.write")
+                        .authorizedGrantType(CLIENT_CREDENTIALS)
+                        .autoApprove("true")
+                        .clientId("Xm43aH")
+                        .lastModified(1474923482302L)
+                        .name("My Client Name")
+                        .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                        .refreshTokenValidity(7000L)
+                        .resourceId("none")
+                        .scope("clients.read", "clients.write")
+                        .tokenSalt("WjlWvu")
+                        .build())
+                    .client(ActionClient.builder()
+                        .accessTokenValidity(2700L)
+                        .action("add")
+                        .allowedProvider("uaa", "ldap", "my-saml-provider")
+                        .authority("clients.read", "clients.write")
+                        .authorizedGrantType(CLIENT_CREDENTIALS)
+                        .autoApprove("true")
+                        .clientId("tlA1z5")
+                        .lastModified(1474923482727L)
+                        .name("My Client Name")
+                        .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                        .refreshTokenValidity(7000L)
+                        .resourceId("none")
+                        .scope("clients.read", "clients.write")
+                        .tokenSalt("UpzrHR")
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(POST).path("/oauth/clients/tx/modify")
+                    .payload("fixtures/uaa/clients/POST_tx_modify_request.json")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/uaa/clients/POST_tx_modify_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected Mono<MixedActionsResponse> invoke(MixedActionsRequest request) {
+            return this.clients.mixedActions(request);
+        }
+
+        @Override
+        protected MixedActionsRequest validRequest() {
+            return MixedActionsRequest.builder()
+                .action(UpdateSecretAction.builder()
+                    .clientId("Zkgt1Y")
+                    .secret("new_secret")
+                    .build())
+                .action(DeleteClientAction.builder()
+                    .clientId("Xm43aH")
+                    .build())
+                .action(CreateClientAction.builder()
+                    .accessTokenValidity(2700L)
+                    .allowedProvider("uaa", "ldap", "my-saml-provider")
+                    .authority("clients.read", "clients.write")
+                    .authorizedGrantType(CLIENT_CREDENTIALS)
+                    .autoApprove("true")
+                    .clientId("tlA1z5")
+                    .clientSecret("secret")
+                    .name("My Client Name")
+                    .redirectUriPattern("http://test1.com", "http*://ant.path.wildcard/**/passback/*")
+                    .refreshTokenValidity(7000L)
+                    .resourceId()
+                    .scope("clients.read", "clients.write")
+                    .tokenSalt("UpzrHR")
+                    .build())
+                .build();
+        }
+
     }
 
     public static final class Update extends AbstractUaaApiTest<UpdateClientRequest, UpdateClientResponse> {

@@ -27,7 +27,7 @@ public interface Clients {
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#batch-create">Batch Change Secret</a> request
      *
      * @param request the Batch Change Secret request
-     * @return the response to the Batch Change Secret Request
+     * @return the response to the Batch Change Secret request
      */
     Mono<BatchChangeSecretResponse> batchChangeSecret(BatchChangeSecretRequest request);
 
@@ -35,7 +35,7 @@ public interface Clients {
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#batch-create">Batch Create Client</a> request
      *
      * @param request the Batch Create Client request
-     * @return the response to the Batch Create Client Request
+     * @return the response to the Batch Create Client request
      */
     Mono<BatchCreateClientsResponse> batchCreate(BatchCreateClientsRequest request);
 
@@ -43,7 +43,7 @@ public interface Clients {
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#batch-delete">Batch Delete Clients</a> request
      *
      * @param request the Batch Delete Clients request
-     * @return the response to the Batch Delete Clients Request
+     * @return the response to the Batch Delete Clients request
      */
     Mono<BatchDeleteClientsResponse> batchDelete(BatchDeleteClientsRequest request);
 
@@ -51,7 +51,7 @@ public interface Clients {
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#batch-update">Batch Update Clients</a> request
      *
      * @param request the Batch Update Clients request
-     * @return the response to the Batch Update Clients Request
+     * @return the response to the Batch Update Clients request
      */
     Mono<BatchUpdateClientsResponse> batchUpdate(BatchUpdateClientsRequest request);
 
@@ -59,7 +59,7 @@ public interface Clients {
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#change-secret">Change Secret</a> request
      *
      * @param request the Change Secret request
-     * @return the response to the Change Secret Request
+     * @return the response to the Change Secret request
      */
     Mono<ChangeSecretResponse> changeSecret(ChangeSecretRequest request);
 
@@ -67,7 +67,7 @@ public interface Clients {
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#create76">Create Client</a> request
      *
      * @param request the Create Client request
-     * @return the response to the Create Client Request
+     * @return the response to the Create Client request
      */
     Mono<CreateClientResponse> create(CreateClientRequest request);
 
@@ -75,7 +75,7 @@ public interface Clients {
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#delete79">Delete Client</a> request
      *
      * @param request the Delete Client request
-     * @return the response to the Delete Client Request
+     * @return the response to the Delete Client request
      */
     Mono<DeleteClientResponse> delete(DeleteClientRequest request);
 
@@ -83,7 +83,7 @@ public interface Clients {
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#retrieve77">Retrieve Client</a> request
      *
      * @param request the Get Client request
-     * @return the response to the Get Client Request
+     * @return the response to the Get Client request
      */
     Mono<GetClientResponse> get(GetClientRequest request);
 
@@ -91,7 +91,7 @@ public interface Clients {
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#retrieve88">Retrieve Metadata</a> request
      *
      * @param request the Get Metadata request
-     * @return the response to the Get Metadata Request
+     * @return the response to the Get Metadata request
      */
     Mono<GetMetadataResponse> getMetadata(GetMetadataRequest request);
 
@@ -99,7 +99,7 @@ public interface Clients {
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#list81">List Clients</a> request
      *
      * @param request the List Clients request
-     * @return the response to the List Clients Request
+     * @return the response to the List Clients request
      */
     Mono<ListClientsResponse> list(ListClientsRequest request);
 
@@ -107,15 +107,23 @@ public interface Clients {
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#list89">List Metadatas</a> request
      *
      * @param request the List Metadatas request
-     * @return the response to the List Metadatas Request
+     * @return the response to the List Metadatas request
      */
     Mono<ListMetadatasResponse> listMetadatas(ListMetadatasRequest request);
+
+    /**
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#mixed-actions">Mixed Actions</a> request
+     *
+     * @param request the Mixed Actions request
+     * @return the response to the Mixed Actions request
+     */
+    Mono<MixedActionsResponse> mixedActions(MixedActionsRequest request);
 
     /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#update78">Update Client</a> request
      *
      * @param request the Update Client request
-     * @return the response to the Update Client Request
+     * @return the response to the Update Client request
      */
     Mono<UpdateClientResponse> update(UpdateClientRequest request);
 
@@ -123,7 +131,7 @@ public interface Clients {
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#update90">Update Metadata</a> request
      *
      * @param request the Update Metadata request
-     * @return the response to the Update Metadata Request
+     * @return the response to the Update Metadata request
      */
     Mono<UpdateMetadataResponse> updateMetadata(UpdateMetadataRequest request);
 

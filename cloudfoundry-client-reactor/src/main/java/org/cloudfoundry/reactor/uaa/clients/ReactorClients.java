@@ -42,6 +42,8 @@ import org.cloudfoundry.uaa.clients.ListClientsRequest;
 import org.cloudfoundry.uaa.clients.ListClientsResponse;
 import org.cloudfoundry.uaa.clients.ListMetadatasRequest;
 import org.cloudfoundry.uaa.clients.ListMetadatasResponse;
+import org.cloudfoundry.uaa.clients.MixedActionsRequest;
+import org.cloudfoundry.uaa.clients.MixedActionsResponse;
 import org.cloudfoundry.uaa.clients.UpdateClientRequest;
 import org.cloudfoundry.uaa.clients.UpdateClientResponse;
 import org.cloudfoundry.uaa.clients.UpdateMetadataRequest;
@@ -65,6 +67,11 @@ public final class ReactorClients extends AbstractUaaOperations implements Clien
     }
 
     @Override
+    public Mono<BatchChangeSecretResponse> batchChangeSecret(BatchChangeSecretRequest request) {
+        return post(request, BatchChangeSecretResponse.class, builder -> builder.pathSegment("oauth", "clients", "tx", "secret"));
+    }
+
+    @Override
     public Mono<BatchCreateClientsResponse> batchCreate(BatchCreateClientsRequest request) {
         return post(request, BatchCreateClientsResponse.class, builder -> builder.pathSegment("oauth", "clients", "tx"));
     }
@@ -77,11 +84,6 @@ public final class ReactorClients extends AbstractUaaOperations implements Clien
     @Override
     public Mono<BatchUpdateClientsResponse> batchUpdate(BatchUpdateClientsRequest request) {
         return put(request, BatchUpdateClientsResponse.class, builder -> builder.pathSegment("oauth", "clients", "tx"));
-    }
-
-    @Override
-    public Mono<BatchChangeSecretResponse> batchChangeSecret(BatchChangeSecretRequest request) {
-        return post(request, BatchChangeSecretResponse.class, builder -> builder.pathSegment("oauth", "clients", "tx", "secret"));
     }
 
     @Override
@@ -117,6 +119,11 @@ public final class ReactorClients extends AbstractUaaOperations implements Clien
     @Override
     public Mono<ListMetadatasResponse> listMetadatas(ListMetadatasRequest request) {
         return get(request, ListMetadatasResponse.class, builder -> builder.pathSegment("oauth", "clients", "meta"));
+    }
+
+    @Override
+    public Mono<MixedActionsResponse> mixedActions(MixedActionsRequest request) {
+        return post(request, MixedActionsResponse.class, builder -> builder.pathSegment("oauth", "clients", "tx", "modify"));
     }
 
     @Override

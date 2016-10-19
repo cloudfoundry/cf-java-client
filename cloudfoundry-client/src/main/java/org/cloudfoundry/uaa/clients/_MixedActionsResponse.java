@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.identityproviders;
-
+package org.cloudfoundry.uaa.clients;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -28,29 +27,29 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * The response from the list identity providers request
+ * The response from the Batch Update Clients request
  */
-@JsonDeserialize(using = _ListIdentityProvidersResponse.ListIdentityProvidersResponseDeserializer.class)
+@JsonDeserialize(using = _MixedActionsResponse.MixedActionsResponseDeserializer.class)
 @Value.Immutable
-abstract class _ListIdentityProvidersResponse {
+abstract class _MixedActionsResponse {
 
     /**
-     * The identity providers
+     * The updated clients
      */
-    abstract List<IdentityProvider> getIdentityProviders();
+    abstract List<ActionClient> getClients();
 
-    static final class ListIdentityProvidersResponseDeserializer extends StdDeserializer<ListIdentityProvidersResponse> {
+    static final class MixedActionsResponseDeserializer extends StdDeserializer<MixedActionsResponse> {
 
-        private static final long serialVersionUID = 8339177706697811314L;
+        private static final long serialVersionUID = -7915849788972763633L;
 
-        ListIdentityProvidersResponseDeserializer() {
-            super(ListIdentityProvidersResponse.class);
+        MixedActionsResponseDeserializer() {
+            super(MixedActionsResponse.class);
         }
 
         @Override
-        public ListIdentityProvidersResponse deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-            return ListIdentityProvidersResponse.builder()
-                .identityProviders(p.readValueAs(new TypeReference<List<IdentityProvider>>() {
+        public MixedActionsResponse deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+            return MixedActionsResponse.builder()
+                .clients(p.readValueAs(new TypeReference<List<ActionClient>>() {
 
                 }))
                 .build();

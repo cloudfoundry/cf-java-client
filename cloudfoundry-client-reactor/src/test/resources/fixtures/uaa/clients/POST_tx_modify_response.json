@@ -1,0 +1,83 @@
+[
+  {
+    "scope": [],
+    "client_id": "Zkgt1Y",
+    "resource_ids": [],
+    "authorized_grant_types": [],
+    "action": "secret",
+    "authorities": [],
+    "approvals_deleted": false
+  },
+  {
+    "scope": [
+      "clients.read",
+      "clients.write"
+    ],
+    "client_id": "Xm43aH",
+    "resource_ids": [
+      "none"
+    ],
+    "authorized_grant_types": [
+      "client_credentials"
+    ],
+    "redirect_uri": [
+      "http*://ant.path.wildcard/**/passback/*",
+      "http://test1.com"
+    ],
+    "autoapprove": [
+      "true"
+    ],
+    "access_token_validity": 2700,
+    "refresh_token_validity": 7000,
+    "action": "delete",
+    "authorities": [
+      "clients.read",
+      "new.authority",
+      "clients.write"
+    ],
+    "token_salt": "WjlWvu",
+    "allowedproviders": [
+      "uaa",
+      "ldap",
+      "my-saml-provider"
+    ],
+    "name": "My Client Name",
+    "lastModified": 1474923482302,
+    "approvals_deleted": true
+  },
+  {
+    "scope": [
+      "clients.read",
+      "clients.write"
+    ],
+    "client_id": "tlA1z5",
+    "resource_ids": [
+      "none"
+    ],
+    "authorized_grant_types": [
+      "client_credentials"
+    ],
+    "redirect_uri": [
+      "http*://ant.path.wildcard/**/passback/*",
+      "http://test1.com"
+    ],
+    "autoapprove": [
+      "true"
+    ],
+    "access_token_validity": 2700,
+    "refresh_token_validity": 7000,
+    "action": "add",
+    "authorities": [
+      "clients.read",
+      "clients.write"
+    ],
+    "token_salt": "UpzrHR",
+    "allowedproviders": [
+      "uaa",
+      "ldap",
+      "my-saml-provider"
+    ],
+    "name": "My Client Name",
+    "lastModified": 1474923482727
+  }
+]
