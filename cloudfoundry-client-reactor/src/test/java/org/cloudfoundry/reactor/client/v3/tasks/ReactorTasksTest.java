@@ -53,7 +53,7 @@ public final class ReactorTasksTest {
         @Override
         protected ScriptedSubscriber<CancelTaskResponse> expectations() {
             return ScriptedSubscriber.<CancelTaskResponse>create()
-                .expectValue(CancelTaskResponse.builder()
+                .expectNext(CancelTaskResponse.builder()
                     .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
                     .name("migrate")
                     .command("rake db:migrate")
@@ -109,7 +109,7 @@ public final class ReactorTasksTest {
         @Override
         protected ScriptedSubscriber<CreateTaskResponse> expectations() {
             return ScriptedSubscriber.<CreateTaskResponse>create()
-                .expectValue(CreateTaskResponse.builder()
+                .expectNext(CreateTaskResponse.builder()
                     .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
                     .name("migrate")
                     .command("rake db:migrate")
@@ -169,7 +169,7 @@ public final class ReactorTasksTest {
         @Override
         protected ScriptedSubscriber<GetTaskResponse> expectations() {
             return ScriptedSubscriber.<GetTaskResponse>create()
-                .expectValue(GetTaskResponse.builder()
+                .expectNext(GetTaskResponse.builder()
                     .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
                     .name("migrate")
                     .command("rake db:migrate")
@@ -225,7 +225,7 @@ public final class ReactorTasksTest {
         @Override
         protected ScriptedSubscriber<ListTasksResponse> expectations() {
             return ScriptedSubscriber.<ListTasksResponse>create()
-                .expectValue(ListTasksResponse.builder()
+                .expectNext(ListTasksResponse.builder()
                     .pagination(Pagination.builder()
                         .totalResults(3)
                         .first(Link.builder()

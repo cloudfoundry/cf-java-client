@@ -1607,7 +1607,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<ApplicationDetail> expectations() {
             return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectValue(fill(ApplicationDetail.builder())
+                .expectNext(fill(ApplicationDetail.builder())
                     .buildpack("test-application-summary-buildpack")
                     .id("test-application-summary-id")
                     .instanceDetail(fill(InstanceDetail.builder())
@@ -1647,7 +1647,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<ApplicationManifest> expectations() {
             return ScriptedSubscriber.<ApplicationManifest>create()
-                .expectValue(ApplicationManifest.builder()
+                .expectNext(ApplicationManifest.builder()
                     .buildpack("test-application-summary-buildpack")
                     .command("test-application-summary-command")
                     .disk(1)
@@ -1688,7 +1688,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<ApplicationManifest> expectations() {
             return ScriptedSubscriber.<ApplicationManifest>create()
-                .expectValue(ApplicationManifest.builder()
+                .expectNext(ApplicationManifest.builder()
                     .buildpack("test-application-summary-buildpack")
                     .command("test-application-summary-command")
                     .disk(1)
@@ -1730,7 +1730,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<ApplicationDetail> expectations() {
             return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectValue(fill(ApplicationDetail.builder())
+                .expectNext(fill(ApplicationDetail.builder())
                     .buildpack("test-application-summary-buildpack")
                     .id("test-application-summary-id")
                     .lastUploaded(new Date(0))
@@ -1768,7 +1768,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<ApplicationDetail> expectations() {
             return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectValue(fill(ApplicationDetail.builder())
+                .expectNext(fill(ApplicationDetail.builder())
                     .buildpack("test-application-summary-detectedBuildpack")
                     .id("test-application-summary-id")
                     .instanceDetail(fill(InstanceDetail.builder())
@@ -1807,7 +1807,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<ApplicationEnvironments> expectations() {
             return ScriptedSubscriber.<ApplicationEnvironments>create()
-                .expectValue(ApplicationEnvironments.builder()
+                .expectNext(ApplicationEnvironments.builder()
                     .running(FluentMap.<String, Object>builder()
                         .entry("running-env-name", "running-env-value")
                         .build())
@@ -1881,7 +1881,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<ApplicationEvent> expectations() {
             return ScriptedSubscriber.<ApplicationEvent>create()
-                .expectValue(ApplicationEvent.builder()
+                .expectNext(ApplicationEvent.builder()
                     .actor("test-event-actorName")
                     .description("instances: 1, memory: 2, state: test-state, environment_json: test-data")
                     .event("test-event-type")
@@ -1922,7 +1922,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<ApplicationEvent> expectations() {
             return ScriptedSubscriber.<ApplicationEvent>create()
-                .expectValue(ApplicationEvent.builder()
+                .expectNext(ApplicationEvent.builder()
                     .actor("test-event-actorName")
                     .description("memory: 2, state: test-state, environment_json: test-data")
                     .event("test-event-type")
@@ -2032,7 +2032,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<ApplicationEvent> expectations() {
             return ScriptedSubscriber.<ApplicationEvent>create()
-                .expectValues(ApplicationEvent.builder()
+                .expectNext(ApplicationEvent.builder()
                         .actor("test-event-actorName")
                         .description("instances: 1, memory: 2, state: test-state, environment_json: test-data")
                         .event("test-event-type")
@@ -2071,7 +2071,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<ApplicationHealthCheck> expectations() {
             return ScriptedSubscriber.<ApplicationHealthCheck>create()
-                .expectValue(ApplicationHealthCheck.PORT)
+                .expectNext(ApplicationHealthCheck.PORT)
                 .expectComplete();
         }
 
@@ -2103,7 +2103,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<ApplicationDetail> expectations() {
             return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectValue(fill(ApplicationDetail.builder())
+                .expectNext(fill(ApplicationDetail.builder())
                     .buildpack("test-application-summary-buildpack")
                     .id("test-application-summary-id")
                     .lastUploaded(new Date(0))
@@ -2141,7 +2141,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<ApplicationDetail> expectations() {
             return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectValue(fill(ApplicationDetail.builder())
+                .expectNext(fill(ApplicationDetail.builder())
                     .buildpack(null)
                     .id("test-application-summary-id")
                     .instanceDetail(fill(InstanceDetail.builder())
@@ -2185,7 +2185,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<ApplicationDetail> expectations() {
             return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectValue(fill(ApplicationDetail.builder())
+                .expectNext(fill(ApplicationDetail.builder())
                     .buildpack("test-application-summary-buildpack")
                     .id("test-application-summary-id")
                     .lastUploaded(new Date(0))
@@ -2225,7 +2225,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<ApplicationDetail> expectations() {
             return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectValue(fill(ApplicationDetail.builder())
+                .expectNext(fill(ApplicationDetail.builder())
                     .buildpack("test-application-summary-buildpack")
                     .id("test-application-summary-id")
                     .instanceDetail(InstanceDetail.builder()
@@ -2267,7 +2267,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<ApplicationDetail> expectations() {
             return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectValue(fill(ApplicationDetail.builder())
+                .expectNext(fill(ApplicationDetail.builder())
                     .buildpack("test-application-summary-buildpack")
                     .id("test-application-summary-id")
                     .instanceDetail(fill(InstanceDetail.builder())
@@ -2309,7 +2309,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<ApplicationDetail> expectations() {
             return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectValue(fill(ApplicationDetail.builder())
+                .expectNext(fill(ApplicationDetail.builder())
                     .buildpack("test-application-summary-buildpack")
                     .id("test-application-summary-id")
                     .instanceDetail(InstanceDetail.builder()
@@ -2351,7 +2351,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<ApplicationDetail> expectations() {
             return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectValue(fill(ApplicationDetail.builder())
+                .expectNext(fill(ApplicationDetail.builder())
                     .buildpack("test-application-summary-buildpack")
                     .id("test-application-summary-id")
                     .lastUploaded(new Date(0))
@@ -2389,7 +2389,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<ApplicationDetail> expectations() {
             return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectValue(fill(ApplicationDetail.builder())
+                .expectNext(fill(ApplicationDetail.builder())
                     .buildpack("test-application-summary-buildpack")
                     .id("test-application-summary-id")
                     .instanceDetail(InstanceDetail.builder()
@@ -2431,7 +2431,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<ApplicationDetail> expectations() {
             return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectValue(fill(ApplicationDetail.builder())
+                .expectNext(fill(ApplicationDetail.builder())
                     .buildpack("test-application-summary-buildpack")
                     .id("test-application-summary-id")
                     .instanceDetail(InstanceDetail.builder()
@@ -2471,7 +2471,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<ApplicationSummary> expectations() {
             return ScriptedSubscriber.<ApplicationSummary>create()
-                .expectValue(fill(ApplicationSummary.builder())
+                .expectNext(fill(ApplicationSummary.builder())
                     .id("test-application-summary-id")
                     .name("test-application-summary-name")
                     .requestedState("test-application-summary-state")
@@ -2499,7 +2499,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<LogMessage> expectations() {
             return ScriptedSubscriber.<LogMessage>create()
-                .expectValue(fill(LogMessage.builder(), "log-message-")
+                .expectNext(fill(LogMessage.builder(), "log-message-")
                     .build())
                 .expectComplete();
         }
@@ -2553,7 +2553,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<LogMessage> expectations() {
             return ScriptedSubscriber.<LogMessage>create()
-                .expectValue(fill(LogMessage.builder(), "log-message-")
+                .expectNext(fill(LogMessage.builder(), "log-message-")
                     .build())
                 .expectComplete();
         }
@@ -2582,7 +2582,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<LogMessage> expectations() {
             return ScriptedSubscriber.<LogMessage>create()
-                .expectValue(fill(LogMessage.builder(), "log-message-")
+                .expectNext(fill(LogMessage.builder(), "log-message-")
                     .build())
                 .expectComplete();
         }
@@ -4048,7 +4048,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected ScriptedSubscriber<Boolean> expectations() {
             return ScriptedSubscriber.<Boolean>create()
-                .expectValue(true)
+                .expectNext(true)
                 .expectComplete();
         }
 

@@ -68,7 +68,7 @@ public final class DefaultStacksTest {
         @Override
         protected ScriptedSubscriber<Stack> expectations() {
             return ScriptedSubscriber.<Stack>create()
-                .expectValue(fill(Stack.builder(), "stack-")
+                .expectNext(fill(Stack.builder(), "stack-")
                     .build())
                 .expectComplete();
         }
@@ -95,7 +95,7 @@ public final class DefaultStacksTest {
         @Override
         protected ScriptedSubscriber<Stack> expectations() {
             return ScriptedSubscriber.<Stack>create()
-                .expectValue(fill(Stack.builder(), "stack-")
+                .expectNext(fill(Stack.builder(), "stack-")
                     .build())
                 .expectComplete();
         }

@@ -59,7 +59,7 @@ public final class ReactorUserProvidedServiceInstancesTest {
         @Override
         protected ScriptedSubscriber<CreateUserProvidedServiceInstanceResponse> expectations() {
             return ScriptedSubscriber.<CreateUserProvidedServiceInstanceResponse>create()
-                .expectValue(CreateUserProvidedServiceInstanceResponse.builder()
+                .expectNext(CreateUserProvidedServiceInstanceResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:35Z")
                         .id("34d5500e-712d-49ef-8bbe-c9ac349532da")
@@ -153,7 +153,7 @@ public final class ReactorUserProvidedServiceInstancesTest {
         @Override
         protected ScriptedSubscriber<GetUserProvidedServiceInstanceResponse> expectations() {
             return ScriptedSubscriber.<GetUserProvidedServiceInstanceResponse>create()
-                .expectValue(GetUserProvidedServiceInstanceResponse.builder()
+                .expectNext(GetUserProvidedServiceInstanceResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:34Z")
                         .id("8c12fd06-6639-4844-b5e7-a6831cadbbcc")
@@ -206,7 +206,7 @@ public final class ReactorUserProvidedServiceInstancesTest {
         @Override
         protected ScriptedSubscriber<ListUserProvidedServiceInstancesResponse> expectations() {
             return ScriptedSubscriber.<ListUserProvidedServiceInstancesResponse>create()
-                .expectValue(ListUserProvidedServiceInstancesResponse.builder()
+                .expectNext(ListUserProvidedServiceInstancesResponse.builder()
                     .totalPages(1)
                     .totalResults(1)
                     .resource(UserProvidedServiceInstanceResource.builder()
@@ -263,7 +263,7 @@ public final class ReactorUserProvidedServiceInstancesTest {
         @Override
         protected ScriptedSubscriber<ListUserProvidedServiceInstanceServiceBindingsResponse> expectations() {
             return ScriptedSubscriber.<ListUserProvidedServiceInstanceServiceBindingsResponse>create()
-                .expectValue(ListUserProvidedServiceInstanceServiceBindingsResponse.builder()
+                .expectNext(ListUserProvidedServiceInstanceServiceBindingsResponse.builder()
                     .totalPages(1)
                     .totalResults(1)
                     .resource(ServiceBindingResource.builder()
@@ -321,7 +321,7 @@ public final class ReactorUserProvidedServiceInstancesTest {
         @Override
         protected ScriptedSubscriber<UpdateUserProvidedServiceInstanceResponse> expectations() {
             return ScriptedSubscriber.<UpdateUserProvidedServiceInstanceResponse>create()
-                .expectValue(UpdateUserProvidedServiceInstanceResponse.builder()
+                .expectNext(UpdateUserProvidedServiceInstanceResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2016-02-19T02:04:06Z")
                         .id("e2c198b1-fa15-414e-a9a4-31537996b39d")
@@ -377,7 +377,7 @@ public final class ReactorUserProvidedServiceInstancesTest {
         @Override
         protected ScriptedSubscriber<UpdateUserProvidedServiceInstanceResponse> expectations() {
             return ScriptedSubscriber.<UpdateUserProvidedServiceInstanceResponse>create()
-                .expectValue(UpdateUserProvidedServiceInstanceResponse.builder()
+                .expectNext(UpdateUserProvidedServiceInstanceResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2016-02-19T02:04:06Z")
                         .id("e2c198b1-fa15-414e-a9a4-31537996b39d")

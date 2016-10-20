@@ -64,7 +64,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
         String instanceName = this.nameFactory.getServiceInstanceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(instanceName)
+            .expectNext(instanceName)
             .expectComplete();
 
         this.spaceId
@@ -103,7 +103,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
         String instanceName = this.nameFactory.getServiceInstanceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(instanceName)
+            .expectNext(instanceName)
             .expectComplete();
 
         this.spaceId
@@ -123,7 +123,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
         String instanceName = this.nameFactory.getServiceInstanceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(instanceName)
+            .expectNext(instanceName)
             .expectComplete();
 
         this.spaceId
@@ -182,7 +182,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
 
         ScriptedSubscriber<Tuple2<UserProvidedServiceInstanceEntity, UserProvidedServiceInstanceEntity>> subscriber =
             ScriptedSubscriber.<Tuple2<UserProvidedServiceInstanceEntity, UserProvidedServiceInstanceEntity>>create()
-                .consumeValueWith(consumer((entity1, entity2) -> {
+                .consumeNextWith(consumer((entity1, entity2) -> {
                     assertThat(entity1.getName()).isEqualTo(newInstanceName);
                     assertThat(entity1.getCredentials()).containsEntry("test-cred", "some value");
                     assertThat(entity2.getCredentials()).isEmpty();
@@ -254,7 +254,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
 
     private static ScriptedSubscriber<Tuple3<String, String, ServiceBindingResource>> serviceBindingEquality() {
         return ScriptedSubscriber.<Tuple3<String, String, ServiceBindingResource>>create()
-            .consumeValueWith(consumer((applicationId, instanceId, resource) -> {
+            .consumeNextWith(consumer((applicationId, instanceId, resource) -> {
                 assertThat(resource.getEntity().getApplicationId()).isEqualTo(applicationId);
                 assertThat(resource.getEntity().getServiceInstanceId()).isEqualTo(instanceId);
             }))

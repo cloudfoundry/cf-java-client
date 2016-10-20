@@ -331,7 +331,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = this.nameFactory.getOrganizationName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(organizationName)
+            .expectNext(organizationName)
             .expectComplete();
 
         this.cloudFoundryClient.organizations()
@@ -389,7 +389,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = this.nameFactory.getOrganizationName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(organizationName)
+            .expectNext(organizationName)
             .expectComplete();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
@@ -409,7 +409,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = this.nameFactory.getOrganizationName();
 
         ScriptedSubscriber<Integer> subscriber = ScriptedSubscriber.<Integer>create()
-            .expectValue(0)
+            .expectNext(0)
             .expectComplete();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
@@ -428,7 +428,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = this.nameFactory.getOrganizationName();
 
         ScriptedSubscriber<Integer> subscriber = ScriptedSubscriber.<Integer>create()
-            .expectValue(0)
+            .expectNext(0)
             .expectComplete();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
@@ -464,7 +464,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void list() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
 
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>expectValueCount(1)
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectNextCount(1)
             .expectComplete();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
@@ -965,7 +966,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void listFilterByAuditorId() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
 
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>expectValueCount(1)
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectNextCount(1)
             .expectComplete();
 
         when(
@@ -985,7 +987,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void listFilterByBillingManagerId() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
 
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>expectValueCount(1)
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectNextCount(1)
             .expectComplete();
 
         when(
@@ -1005,7 +1008,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void listFilterByManagerId() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
 
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>expectValueCount(1)
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectNextCount(1)
             .expectComplete();
 
         when(
@@ -1025,7 +1029,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void listFilterByName() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
 
-        ScriptedSubscriber<OrganizationResource> subscriber = ScriptedSubscriber.<OrganizationResource>expectValueCount(1)
+        ScriptedSubscriber<OrganizationResource> subscriber = ScriptedSubscriber.<OrganizationResource>create()
+            .expectNextCount(1)
             .expectComplete();
 
         requestCreateOrganization(this.cloudFoundryClient, organizationName)
@@ -1065,7 +1070,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationStatus = "inactive";   // TODO: find a valid status other than "active" and re-instate this test
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(organizationName)
+            .expectNext(organizationName)
             .expectComplete();
 
         requestCreateOrganization(this.cloudFoundryClient, organizationName, builder -> builder.status(organizationStatus))
@@ -1083,7 +1088,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void listFilterByUserId() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
 
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>expectValueCount(1)
+        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
+            .expectNextCount(1)
             .expectComplete();
 
         when(
@@ -1414,7 +1420,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
 
-        ScriptedSubscriber<SpaceResource> subscriber = ScriptedSubscriber.<SpaceResource>expectValueCount(1)
+        ScriptedSubscriber<SpaceResource> subscriber = ScriptedSubscriber.<SpaceResource>create()
+            .expectNextCount(1)
             .expectComplete();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
@@ -1923,7 +1930,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = this.nameFactory.getOrganizationName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(organizationName)
+            .expectNext(organizationName)
             .expectComplete();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
@@ -1943,7 +1950,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName2 = this.nameFactory.getOrganizationName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(organizationName2)
+            .expectNext(organizationName2)
             .expectComplete();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)

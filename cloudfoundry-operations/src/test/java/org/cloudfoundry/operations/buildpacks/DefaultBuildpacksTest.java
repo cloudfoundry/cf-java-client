@@ -127,7 +127,7 @@ public final class DefaultBuildpacksTest {
         @Override
         protected ScriptedSubscriber<Buildpack> expectations() {
             return ScriptedSubscriber.<Buildpack>create()
-                .expectValue(Buildpack.builder()
+                .expectNext(Buildpack.builder()
                     .enabled(true)
                     .filename("test-buildpack-filename")
                     .id("test-buildpack-id")

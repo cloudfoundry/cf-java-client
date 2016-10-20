@@ -66,7 +66,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     @Test
     public void changePassword() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<ChangeUserPasswordResponse> subscriber = ScriptedSubscriber.<ChangeUserPasswordResponse>create()
-            .consumeValueWith(response -> {
+            .consumeNextWith(response -> {
                 assertThat(response.getMessage()).isEqualTo("password updated");
                 assertThat(response.getStatus()).isEqualTo("ok");
             })
@@ -89,7 +89,7 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         ScriptedSubscriber<CreateUserResponse> subscriber = ScriptedSubscriber.<CreateUserResponse>create()
-            .consumeValueWith(response -> {
+            .consumeNextWith(response -> {
                 assertThat(response.getExternalId()).isEqualTo("test-external-id");
                 assertThat(response.getUserName()).isEqualTo(userName);
             })
@@ -119,7 +119,7 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         ScriptedSubscriber<Integer> subscriber = ScriptedSubscriber.<Integer>create()
-            .expectValue(0)
+            .expectNext(0)
             .expectComplete();
 
         createUserId(this.uaaClient, userName)
@@ -140,7 +140,7 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .consumeValueWith(location -> assertThat(location).contains("/verify_user?code="))
+            .consumeNextWith(location -> assertThat(location).contains("/verify_user?code="))
             .expectComplete();
 
         createUserId(this.uaaClient, userName)
@@ -158,7 +158,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     @Test
     public void invite() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<Invite> subscriber = ScriptedSubscriber.<Invite>create()
-            .consumeValueWith(invite -> {
+            .consumeNextWith(invite -> {
                 assertThat(invite.getEmail()).isEqualTo("test@email.address");
                 assertThat(invite.getErrorCode()).isNull();
                 assertThat(invite.getSuccess()).isTrue();
@@ -183,7 +183,7 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(userName)
+            .expectNext(userName)
             .expectComplete();
 
         createUserId(this.uaaClient, userName)
@@ -203,7 +203,7 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(userName)
+            .expectNext(userName)
             .expectComplete();
 
         createUserId(this.uaaClient, userName)
@@ -223,7 +223,7 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue("test-email-2")
+            .expectNext("test-email-2")
             .expectComplete();
 
         createUserId(this.uaaClient, userName)
@@ -253,7 +253,7 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(userName)
+            .expectNext(userName)
             .expectComplete();
 
         createUserId(this.uaaClient, userName)

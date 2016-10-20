@@ -37,7 +37,7 @@ public final class ZipExpectations {
 
     public static ScriptedSubscriber<Tuple2<byte[], byte[]>> zipEquality() {
         return ScriptedSubscriber.<Tuple2<byte[], byte[]>>create()
-            .consumeValueWith(consumer((expected, actual) -> {
+            .consumeNextWith(consumer((expected, actual) -> {
                 List<Entry> expectedEntries = entries(expected);
                 List<Entry> actualEntries = entries(expected);
 

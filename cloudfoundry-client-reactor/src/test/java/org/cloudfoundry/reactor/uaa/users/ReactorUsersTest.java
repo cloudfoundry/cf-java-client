@@ -71,7 +71,7 @@ public final class ReactorUsersTest {
         @Override
         protected ScriptedSubscriber<ChangeUserPasswordResponse> expectations() {
             return ScriptedSubscriber.<ChangeUserPasswordResponse>create()
-                .expectValue(ChangeUserPasswordResponse.builder()
+                .expectNext(ChangeUserPasswordResponse.builder()
                     .status("ok")
                     .message("password updated")
                     .build())
@@ -115,7 +115,7 @@ public final class ReactorUsersTest {
         @Override
         protected ScriptedSubscriber<CreateUserResponse> expectations() {
             return ScriptedSubscriber.<CreateUserResponse>create()
-                .expectValue(CreateUserResponse.builder()
+                .expectNext(CreateUserResponse.builder()
                     .id("9d175c69-8f25-4460-82d7-be9657f87a68")
                     .externalId("test-user")
                     .meta(Meta.builder()
@@ -255,7 +255,7 @@ public final class ReactorUsersTest {
         @Override
         protected ScriptedSubscriber<DeleteUserResponse> expectations() {
             return ScriptedSubscriber.<DeleteUserResponse>create()
-                .expectValue(DeleteUserResponse.builder()
+                .expectNext(DeleteUserResponse.builder()
                     .id("421225f4-318e-4a4d-9219-4b6a0ed3678a")
                     .externalId("test-user")
                     .meta(Meta.builder()
@@ -399,7 +399,7 @@ public final class ReactorUsersTest {
         @Override
         protected ScriptedSubscriber<GetUserVerificationLinkResponse> expectations() {
             return ScriptedSubscriber.<GetUserVerificationLinkResponse>create()
-                .expectValue(GetUserVerificationLinkResponse.builder()
+                .expectNext(GetUserVerificationLinkResponse.builder()
                     .verifyLink("http://localhost/verify_user?code=nOGQWBqCx5")
                     .build())
                 .expectComplete();
@@ -440,7 +440,7 @@ public final class ReactorUsersTest {
         @Override
         protected ScriptedSubscriber<InviteUsersResponse> expectations() {
             return ScriptedSubscriber.<InviteUsersResponse>create()
-                .expectValue(InviteUsersResponse.builder()
+                .expectNext(InviteUsersResponse.builder()
                     .newInvite(Invite.builder()
                         .email("user1@pjy596.com")
                         .userId("68af461b-484e-464a-96ac-a336abed48ad")
@@ -497,7 +497,7 @@ public final class ReactorUsersTest {
         @Override
         protected ScriptedSubscriber<ListUsersResponse> expectations() {
             return ScriptedSubscriber.<ListUsersResponse>create()
-                .expectValue(ListUsersResponse.builder()
+                .expectNext(ListUsersResponse.builder()
                     .resource(User.builder()
                         .id("a94534d5-de08-41eb-8712-a51314e6a484")
                         .externalId("test-user")
@@ -642,7 +642,7 @@ public final class ReactorUsersTest {
         @Override
         protected ScriptedSubscriber<LookupUserIdsResponse> expectations() {
             return ScriptedSubscriber.<LookupUserIdsResponse>create()
-                .expectValue(LookupUserIdsResponse.builder()
+                .expectNext(LookupUserIdsResponse.builder()
                     .resource(UserId.builder()
                         .id("c1476587-5ec9-4b7e-9ed2-381e3133f07a")
                         .userName("dwayneSnbjBm@test.org")
@@ -701,7 +701,7 @@ public final class ReactorUsersTest {
         @Override
         protected ScriptedSubscriber<UpdateUserResponse> expectations() {
             return ScriptedSubscriber.<UpdateUserResponse>create()
-                .expectValue(UpdateUserResponse.builder()
+                .expectNext(UpdateUserResponse.builder()
                     .active(true)
                     .approval(Approval.builder()
                         .clientId("identity")
@@ -808,7 +808,7 @@ public final class ReactorUsersTest {
         @Override
         protected ScriptedSubscriber<VerifyUserResponse> expectations() {
             return ScriptedSubscriber.<VerifyUserResponse>create()
-                .expectValue(VerifyUserResponse.builder()
+                .expectNext(VerifyUserResponse.builder()
                     .id("c0d42e48-9b69-461d-a77b-f75d3a5948b6")
                     .meta(Meta.builder()
                         .version(12)

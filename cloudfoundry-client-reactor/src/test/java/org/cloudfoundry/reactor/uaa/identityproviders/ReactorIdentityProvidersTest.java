@@ -63,7 +63,7 @@ public final class ReactorIdentityProvidersTest {
         @Override
         protected ScriptedSubscriber<CreateIdentityProviderResponse> expectations() {
             return ScriptedSubscriber.<CreateIdentityProviderResponse>create()
-                .expectValue(CreateIdentityProviderResponse.builder()
+                .expectNext(CreateIdentityProviderResponse.builder()
                     .active(true)
                     .createdAt(1465001967988L)
                     .configuration(LdapConfiguration.builder()
@@ -142,7 +142,7 @@ public final class ReactorIdentityProvidersTest {
         @Override
         protected ScriptedSubscriber<CreateIdentityProviderResponse> expectations() {
             return ScriptedSubscriber.<CreateIdentityProviderResponse>create()
-                .expectValue(CreateIdentityProviderResponse.builder()
+                .expectNext(CreateIdentityProviderResponse.builder()
                     .active(true)
                     .createdAt(1465001966855L)
                     .configuration(OAuth2Configuration.builder()
@@ -220,7 +220,7 @@ public final class ReactorIdentityProvidersTest {
         @Override
         protected ScriptedSubscriber<CreateIdentityProviderResponse> expectations() {
             return ScriptedSubscriber.<CreateIdentityProviderResponse>create()
-                .expectValue(CreateIdentityProviderResponse.builder()
+                .expectNext(CreateIdentityProviderResponse.builder()
                     .active(true)
                     .createdAt(1465001965526L)
                     .configuration(SamlConfiguration.builder()
@@ -328,7 +328,7 @@ public final class ReactorIdentityProvidersTest {
         @Override
         protected ScriptedSubscriber<DeleteIdentityProviderResponse> expectations() {
             return ScriptedSubscriber.<DeleteIdentityProviderResponse>create()
-                .expectValue(DeleteIdentityProviderResponse.builder()
+                .expectNext(DeleteIdentityProviderResponse.builder()
                     .active(true)
                     .createdAt(1466035298319L)
                     .configuration(SamlConfiguration.builder()
@@ -406,7 +406,7 @@ public final class ReactorIdentityProvidersTest {
         @Override
         protected ScriptedSubscriber<GetIdentityProviderResponse> expectations() {
             return ScriptedSubscriber.<GetIdentityProviderResponse>create()
-                .expectValue(GetIdentityProviderResponse.builder()
+                .expectNext(GetIdentityProviderResponse.builder()
                     .active(true)
                     .createdAt(1465001966715L)
                     .configuration(SamlConfiguration.builder()
@@ -484,7 +484,7 @@ public final class ReactorIdentityProvidersTest {
         @Override
         protected ScriptedSubscriber<ListIdentityProvidersResponse> expectations() {
             return ScriptedSubscriber.<ListIdentityProvidersResponse>create()
-                .expectValue(ListIdentityProvidersResponse.builder()
+                .expectNext(ListIdentityProvidersResponse.builder()
                     .identityProvider(IdentityProvider.builder()
                         .active(true)
                         .createdAt(1465001965526L)
@@ -620,7 +620,7 @@ public final class ReactorIdentityProvidersTest {
         @Override
         protected ScriptedSubscriber<UpdateIdentityProviderResponse> expectations() {
             return ScriptedSubscriber.<UpdateIdentityProviderResponse>create()
-                .expectValue(UpdateIdentityProviderResponse.builder()
+                .expectNext(UpdateIdentityProviderResponse.builder()
                     .active(true)
                     .createdAt(946713600000L)
                     .configuration(InternalConfiguration.builder()

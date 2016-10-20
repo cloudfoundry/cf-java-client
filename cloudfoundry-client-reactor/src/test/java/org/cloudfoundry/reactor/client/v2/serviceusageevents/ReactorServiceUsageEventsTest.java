@@ -45,7 +45,7 @@ public final class ReactorServiceUsageEventsTest {
         @Override
         protected ScriptedSubscriber<GetServiceUsageEventResponse> expectations() {
             return ScriptedSubscriber.<GetServiceUsageEventResponse>create()
-                .expectValue(GetServiceUsageEventResponse.builder()
+                .expectNext(GetServiceUsageEventResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:30Z")
                         .id("9470627d-0488-4d9a-8564-f97571487893")
@@ -101,7 +101,7 @@ public final class ReactorServiceUsageEventsTest {
         @Override
         protected ScriptedSubscriber<ListServiceUsageEventsResponse> expectations() {
             return ScriptedSubscriber.<ListServiceUsageEventsResponse>create()
-                .expectValue(ListServiceUsageEventsResponse.builder()
+                .expectNext(ListServiceUsageEventsResponse.builder()
                     .totalPages(1)
                     .totalResults(1)
                     .resource(ServiceUsageEventResource.builder()

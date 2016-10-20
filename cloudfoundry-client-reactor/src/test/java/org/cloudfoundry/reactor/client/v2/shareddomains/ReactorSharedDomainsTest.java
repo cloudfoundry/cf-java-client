@@ -51,7 +51,7 @@ public final class ReactorSharedDomainsTest {
         @Override
         protected ScriptedSubscriber<CreateSharedDomainResponse> expectations() {
             return ScriptedSubscriber.<CreateSharedDomainResponse>create()
-                .expectValue(CreateSharedDomainResponse.builder()
+                .expectNext(CreateSharedDomainResponse.builder()
                     .metadata(Metadata.builder()
                         .id("d6c7d452-70bb-4edd-bbf1-a925dd51732c")
                         .url("/v2/shared_domains/d6c7d452-70bb-4edd-bbf1-a925dd51732c")
@@ -138,7 +138,7 @@ public final class ReactorSharedDomainsTest {
         @Override
         protected ScriptedSubscriber<DeleteSharedDomainResponse> expectations() {
             return ScriptedSubscriber.<DeleteSharedDomainResponse>create()
-                .expectValue(DeleteSharedDomainResponse.builder()
+                .expectNext(DeleteSharedDomainResponse.builder()
                     .metadata(Metadata.builder()
                         .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
                         .createdAt("2016-02-02T17:16:31Z")
@@ -187,7 +187,7 @@ public final class ReactorSharedDomainsTest {
         @Override
         protected ScriptedSubscriber<GetSharedDomainResponse> expectations() {
             return ScriptedSubscriber.<GetSharedDomainResponse>create()
-                .expectValue(GetSharedDomainResponse.builder()
+                .expectNext(GetSharedDomainResponse.builder()
                     .metadata(Metadata.builder()
                         .id("fa1385de-55ba-41d3-beb2-f83919c634d6")
                         .url("/v2/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6")
@@ -234,7 +234,7 @@ public final class ReactorSharedDomainsTest {
         @Override
         protected ScriptedSubscriber<ListSharedDomainsResponse> expectations() {
             return ScriptedSubscriber.<ListSharedDomainsResponse>create()
-                .expectValue(ListSharedDomainsResponse.builder()
+                .expectNext(ListSharedDomainsResponse.builder()
                     .totalResults(5)
                     .totalPages(1)
                     .resource(SharedDomainResource.builder()

@@ -62,7 +62,7 @@ public final class ReactorBuildpacksTest {
         @Override
         protected ScriptedSubscriber<CreateBuildpackResponse> expectations() {
             return ScriptedSubscriber.<CreateBuildpackResponse>create()
-                .expectValue(CreateBuildpackResponse.builder()
+                .expectNext(CreateBuildpackResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2016-03-17T21:41:28Z")
                         .id("9c38753c-960c-44aa-ac46-37ad61b87e35")
@@ -114,7 +114,7 @@ public final class ReactorBuildpacksTest {
         @Override
         protected ScriptedSubscriber<DeleteBuildpackResponse> expectations() {
             return ScriptedSubscriber.<DeleteBuildpackResponse>create()
-                .expectValue(DeleteBuildpackResponse.builder()
+                .expectNext(DeleteBuildpackResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:34Z")
                         .id("c900719e-c70a-4c75-9e6a-9535f118acc3")
@@ -163,7 +163,7 @@ public final class ReactorBuildpacksTest {
         @Override
         protected ScriptedSubscriber<GetBuildpackResponse> expectations() {
             return ScriptedSubscriber.<GetBuildpackResponse>create()
-                .expectValue(GetBuildpackResponse.builder()
+                .expectNext(GetBuildpackResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2016-03-17T21:41:28Z")
                         .id("35d3fa06-08db-4b9e-b2a7-58724a179687")
@@ -214,7 +214,7 @@ public final class ReactorBuildpacksTest {
         @Override
         protected ScriptedSubscriber<ListBuildpacksResponse> expectations() {
             return ScriptedSubscriber.<ListBuildpacksResponse>create()
-                .expectValue(ListBuildpacksResponse.builder()
+                .expectNext(ListBuildpacksResponse.builder()
                     .totalResults(3)
                     .totalPages(1)
                     .resource(BuildpackResource.builder()
@@ -298,7 +298,7 @@ public final class ReactorBuildpacksTest {
         @Override
         protected ScriptedSubscriber<UpdateBuildpackResponse> expectations() {
             return ScriptedSubscriber.<UpdateBuildpackResponse>create()
-                .expectValue(UpdateBuildpackResponse.builder()
+                .expectNext(UpdateBuildpackResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2016-03-17T21:41:28Z")
                         .id("edd64481-e13c-4193-b6cc-2a727a62e817")
@@ -351,7 +351,7 @@ public final class ReactorBuildpacksTest {
         @Override
         protected ScriptedSubscriber<UploadBuildpackResponse> expectations() {
             return ScriptedSubscriber.<UploadBuildpackResponse>create()
-                .expectValue(UploadBuildpackResponse.builder()
+                .expectNext(UploadBuildpackResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2016-04-21T08:51:39Z")
                         .id("353360ea-59bb-414b-a90e-100c37317a02")

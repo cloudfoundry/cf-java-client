@@ -57,7 +57,7 @@ public final class ReactorDomainsTest {
         @Override
         protected ScriptedSubscriber<CreateDomainResponse> expectations() {
             return ScriptedSubscriber.<CreateDomainResponse>create()
-                .expectValue(CreateDomainResponse.builder()
+                .expectNext(CreateDomainResponse.builder()
                     .metadata(Metadata.builder()
                         .id("abb8338f-eaea-4149-85c0-61888bac0737")
                         .url("/v2/domains/abb8338f-eaea-4149-85c0-61888bac0737")
@@ -145,7 +145,7 @@ public final class ReactorDomainsTest {
         @Override
         protected ScriptedSubscriber<DeleteDomainResponse> expectations() {
             return ScriptedSubscriber.<DeleteDomainResponse>create()
-                .expectValue(DeleteDomainResponse.builder()
+                .expectNext(DeleteDomainResponse.builder()
                     .metadata(Metadata.builder()
                         .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
                         .createdAt("2016-02-02T17:16:31Z")
@@ -193,7 +193,7 @@ public final class ReactorDomainsTest {
         @Override
         protected ScriptedSubscriber<GetDomainResponse> expectations() {
             return ScriptedSubscriber.<GetDomainResponse>create()
-                .expectValue(GetDomainResponse.builder()
+                .expectNext(GetDomainResponse.builder()
                     .metadata(Metadata.builder()
                         .id("7cd249aa-197c-425c-8831-57cbc24e8e26")
                         .url("/v2/domains/7cd249aa-197c-425c-8831-57cbc24e8e26")
@@ -240,7 +240,7 @@ public final class ReactorDomainsTest {
         @Override
         protected ScriptedSubscriber<ListDomainsResponse> expectations() {
             return ScriptedSubscriber.<ListDomainsResponse>create()
-                .expectValue(ListDomainsResponse.builder()
+                .expectNext(ListDomainsResponse.builder()
                     .totalResults(4)
                     .totalPages(1)
                     .resource(DomainResource.builder()
@@ -323,7 +323,7 @@ public final class ReactorDomainsTest {
         @Override
         protected ScriptedSubscriber<ListDomainSpacesResponse> expectations() {
             return ScriptedSubscriber.<ListDomainSpacesResponse>create()
-                .expectValue(ListDomainSpacesResponse.builder()
+                .expectNext(ListDomainSpacesResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(SpaceResource.builder()

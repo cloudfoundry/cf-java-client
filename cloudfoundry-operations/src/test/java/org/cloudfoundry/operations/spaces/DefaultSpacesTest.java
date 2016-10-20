@@ -800,7 +800,7 @@ public final class DefaultSpacesTest {
         @Override
         protected ScriptedSubscriber<SpaceDetail> expectations() {
             return ScriptedSubscriber.<SpaceDetail>create()
-                .expectValue(SpaceDetail.builder()
+                .expectNext(SpaceDetail.builder()
                     .application("test-application-name")
                     .domain("test-domain-name")
                     .id(TEST_SPACE_ID)
@@ -848,7 +848,7 @@ public final class DefaultSpacesTest {
         @Override
         protected ScriptedSubscriber<SpaceDetail> expectations() {
             return ScriptedSubscriber.<SpaceDetail>create()
-                .expectValue(SpaceDetail.builder()
+                .expectNext(SpaceDetail.builder()
                     .application("test-application-name")
                     .domain("test-domain-name")
                     .id(TEST_SPACE_ID)
@@ -891,7 +891,7 @@ public final class DefaultSpacesTest {
         @Override
         protected ScriptedSubscriber<SpaceDetail> expectations() {
             return ScriptedSubscriber.<SpaceDetail>create()
-                .expectValue(SpaceDetail.builder()
+                .expectNext(SpaceDetail.builder()
                     .application("test-application-name")
                     .domain("test-domain-name")
                     .id(TEST_SPACE_ID)
@@ -928,7 +928,7 @@ public final class DefaultSpacesTest {
         @Override
         protected ScriptedSubscriber<SpaceSummary> expectations() {
             return ScriptedSubscriber.<SpaceSummary>create()
-                .expectValue(fill(SpaceSummary.builder(), "space-")
+                .expectNext(fill(SpaceSummary.builder(), "space-")
                     .build())
                 .expectComplete();
         }
@@ -1006,7 +1006,7 @@ public final class DefaultSpacesTest {
         @Override
         protected ScriptedSubscriber<Boolean> expectations() {
             return ScriptedSubscriber.<Boolean>create()
-                .expectValue(true)
+                .expectNext(true)
                 .expectComplete();
         }
 

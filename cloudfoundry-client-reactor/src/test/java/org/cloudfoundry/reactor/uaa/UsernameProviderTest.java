@@ -70,7 +70,7 @@ public final class UsernameProviderTest {
         when(this.tokenProvider.getToken(this.connectionContext)).thenReturn(Mono.just(this.token));
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue("test-username")
+            .expectNext("test-username")
             .expectComplete();
 
         new UsernameProvider(this.connectionContext, this.tokenProvider, this.tokens)

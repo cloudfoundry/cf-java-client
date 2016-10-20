@@ -63,7 +63,7 @@ public final class ReactorRoutesTest {
         @Override
         protected ScriptedSubscriber<AssociateRouteApplicationResponse> expectations() {
             return ScriptedSubscriber.<AssociateRouteApplicationResponse>create()
-                .expectValue(AssociateRouteApplicationResponse.builder()
+                .expectNext(AssociateRouteApplicationResponse.builder()
                     .metadata(Metadata.builder()
                         .id("a05c94a3-e4b3-456e-b044-475270919ea7")
                         .url("/v2/routes/a05c94a3-e4b3-456e-b044-475270919ea7")
@@ -119,7 +119,7 @@ public final class ReactorRoutesTest {
         @Override
         protected ScriptedSubscriber<CreateRouteResponse> expectations() {
             return ScriptedSubscriber.<CreateRouteResponse>create()
-                .expectValue(CreateRouteResponse.builder()
+                .expectNext(CreateRouteResponse.builder()
                     .metadata(Metadata.builder()
                         .id("ad307f5b-efec-4034-8cf1-1f86515ee093")
                         .url("/v2/routes/ad307f5b-efec-4034-8cf1-1f86515ee093")
@@ -213,7 +213,7 @@ public final class ReactorRoutesTest {
         @Override
         protected ScriptedSubscriber<DeleteRouteResponse> expectations() {
             return ScriptedSubscriber.<DeleteRouteResponse>create()
-                .expectValue(DeleteRouteResponse.builder()
+                .expectNext(DeleteRouteResponse.builder()
                     .metadata(Metadata.builder()
                         .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
                         .createdAt("2016-02-02T17:16:31Z")
@@ -262,7 +262,7 @@ public final class ReactorRoutesTest {
         @Override
         protected ScriptedSubscriber<Boolean> expectations() {
             return ScriptedSubscriber.<Boolean>create()
-                .expectValue(true)
+                .expectNext(true)
                 .expectComplete();
         }
 
@@ -300,7 +300,7 @@ public final class ReactorRoutesTest {
         @Override
         protected ScriptedSubscriber<GetRouteResponse> expectations() {
             return ScriptedSubscriber.<GetRouteResponse>create()
-                .expectValue(GetRouteResponse.builder()
+                .expectNext(GetRouteResponse.builder()
                     .metadata(Metadata.builder()
                         .id("e6c3ae35-9083-4816-9432-ee8ad700fd03")
                         .url("/v2/routes/e6c3ae35-9083-4816-9432-ee8ad700fd03")
@@ -357,7 +357,7 @@ public final class ReactorRoutesTest {
         @Override
         protected ScriptedSubscriber<ListRoutesResponse> expectations() {
             return ScriptedSubscriber.<ListRoutesResponse>create()
-                .expectValue(ListRoutesResponse.builder()
+                .expectNext(ListRoutesResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(RouteResource.builder()
@@ -419,7 +419,7 @@ public final class ReactorRoutesTest {
         @Override
         protected ScriptedSubscriber<ListRouteApplicationsResponse> expectations() {
             return ScriptedSubscriber.<ListRouteApplicationsResponse>create()
-                .expectValue(ListRouteApplicationsResponse.builder()
+                .expectNext(ListRouteApplicationsResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(ApplicationResource.builder()
@@ -531,7 +531,7 @@ public final class ReactorRoutesTest {
         @Override
         protected ScriptedSubscriber<UpdateRouteResponse> expectations() {
             return ScriptedSubscriber.<UpdateRouteResponse>create()
-                .expectValue(UpdateRouteResponse.builder()
+                .expectNext(UpdateRouteResponse.builder()
                     .metadata(Metadata.builder()
                         .id("fc72a0ae-374b-4f06-b96d-38a3864ee91b")
                         .url("/v2/routes/fc72a0ae-374b-4f06-b96d-38a3864ee91b")

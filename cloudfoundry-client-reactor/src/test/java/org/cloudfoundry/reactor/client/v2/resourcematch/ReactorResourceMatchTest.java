@@ -38,7 +38,7 @@ public final class ReactorResourceMatchTest {
         @Override
         protected ScriptedSubscriber<ListMatchingResourcesResponse> expectations() {
             return ScriptedSubscriber.<ListMatchingResourcesResponse>create()
-                .expectValue(ListMatchingResourcesResponse.builder()
+                .expectNext(ListMatchingResourcesResponse.builder()
                     .resource(Resource.builder()
                         .hash("002d760bea1be268e27077412e11a320d0f164d3")
                         .size(36)

@@ -39,7 +39,7 @@ public final class InfoTest extends AbstractIntegrationTest {
     @Test
     public void info() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<GetInfoResponse> subscriber = ScriptedSubscriber.<GetInfoResponse>create()
-            .consumeValueWith(response -> {
+            .consumeNextWith(response -> {
                 Version expected = Version.valueOf(SUPPORTED_API_VERSION);
                 Version actual = Version.valueOf(response.getApiVersion());
 

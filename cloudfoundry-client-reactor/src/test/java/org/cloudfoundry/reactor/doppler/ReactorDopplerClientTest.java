@@ -42,7 +42,7 @@ public final class ReactorDopplerClientTest {
         @Override
         protected ScriptedSubscriber<Envelope> expectations() {
             return ScriptedSubscriber.<Envelope>create()
-                .expectValues(Envelope.builder()
+                .expectNext(Envelope.builder()
                         .containerMetric(ContainerMetric.builder()
                             .applicationId("1a95eadc-95c6-4675-aa07-8c02f80ea8a4")
                             .cpuPercentage(0.09530591690894699)
@@ -112,7 +112,7 @@ public final class ReactorDopplerClientTest {
         @Override
         protected ScriptedSubscriber<Envelope> expectations() {
             return ScriptedSubscriber.<Envelope>create()
-                .expectValues(Envelope.builder()
+                .expectNext(Envelope.builder()
                         .deployment("cf-cfapps-io2-diego")
                         .eventType(EventType.LOG_MESSAGE)
                         .index("33")

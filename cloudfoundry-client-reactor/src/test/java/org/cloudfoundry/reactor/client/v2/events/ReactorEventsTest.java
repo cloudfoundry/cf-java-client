@@ -44,7 +44,7 @@ public final class ReactorEventsTest {
         @Override
         protected ScriptedSubscriber<GetEventResponse> expectations() {
             return ScriptedSubscriber.<GetEventResponse>create()
-                .expectValue(GetEventResponse.builder()
+                .expectNext(GetEventResponse.builder()
                     .metadata(Metadata.builder()
                         .id("8f1366e5-1fe2-418c-ae33-38bf29ad857a")
                         .url("/v2/events/8f1366e5-1fe2-418c-ae33-38bf29ad857a")
@@ -101,7 +101,7 @@ public final class ReactorEventsTest {
         @Override
         protected ScriptedSubscriber<ListEventsResponse> expectations() {
             return ScriptedSubscriber.<ListEventsResponse>create()
-                .expectValue(ListEventsResponse.builder()
+                .expectNext(ListEventsResponse.builder()
                     .totalResults(3)
                     .totalPages(1)
                     .resource(EventResource.builder()

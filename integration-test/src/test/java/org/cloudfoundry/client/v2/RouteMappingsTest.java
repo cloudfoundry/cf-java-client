@@ -66,7 +66,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
 
         ScriptedSubscriber<Tuple3<String, String, RouteMappingEntity>> subscriber = ScriptedSubscriber.<Tuple3<String, String, RouteMappingEntity>>create()
-            .consumeValueWith(consumer((applicationId, routeId, entity) -> {
+            .consumeNextWith(consumer((applicationId, routeId, entity) -> {
                 assertThat(entity.getApplicationId()).isEqualTo(applicationId);
                 assertThat(entity.getRouteId()).isEqualTo(routeId);
             }))
@@ -170,7 +170,8 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
 
-        ScriptedSubscriber<RouteMappingResource> subscriber = ScriptedSubscriber.<RouteMappingResource>expectValueCount(1)
+        ScriptedSubscriber<RouteMappingResource> subscriber = ScriptedSubscriber.<RouteMappingResource>create()
+            .expectNextCount(1)
             .expectComplete();
 
         this.spaceId
@@ -203,7 +204,8 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
 
-        ScriptedSubscriber<RouteMappingResource> subscriber = ScriptedSubscriber.<RouteMappingResource>expectValueCount(1)
+        ScriptedSubscriber<RouteMappingResource> subscriber = ScriptedSubscriber.<RouteMappingResource>create()
+            .expectNextCount(1)
             .expectComplete();
 
         this.spaceId

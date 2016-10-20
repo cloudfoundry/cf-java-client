@@ -54,8 +54,8 @@ public final class PaginationUtilsTest {
         requestListSpaces(spaces, 2, 3);
         requestListSpaces(spaces, 3, 3);
 
-        ScriptedSubscriber<SpaceResource> subscriber = ScriptedSubscriber
-            .<SpaceResource>expectValueCount(3)
+        ScriptedSubscriber<SpaceResource> subscriber = ScriptedSubscriber.<SpaceResource>create()
+            .expectNextCount(3)
             .expectComplete();
 
         PaginationUtils
@@ -114,8 +114,8 @@ public final class PaginationUtilsTest {
         requestListPackages(packages, 2, 3);
         requestListPackages(packages, 3, 3);
 
-        ScriptedSubscriber<PackageResource> subscriber = ScriptedSubscriber
-            .<PackageResource>expectValueCount(3)
+        ScriptedSubscriber<PackageResource> subscriber = ScriptedSubscriber.<PackageResource>create()
+            .expectNextCount(3)
             .expectComplete();
 
         PaginationUtils
@@ -136,8 +136,8 @@ public final class PaginationUtilsTest {
         requestListUsers(users, 101, 100, 250);
         requestListUsers(users, 201, 100, 250);
 
-        ScriptedSubscriber<User> subscriber = ScriptedSubscriber
-            .<User>expectValueCount(3)
+        ScriptedSubscriber<User> subscriber = ScriptedSubscriber.<User>create()
+            .expectNextCount(3)
             .expectComplete();
 
         PaginationUtils

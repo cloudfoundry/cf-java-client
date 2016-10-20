@@ -95,7 +95,7 @@ public final class ReactorServicePlansTest {
         @Override
         protected ScriptedSubscriber<DeleteServicePlanResponse> expectations() {
             return ScriptedSubscriber.<DeleteServicePlanResponse>create()
-                .expectValue(DeleteServicePlanResponse.builder()
+                .expectNext(DeleteServicePlanResponse.builder()
                     .metadata(Metadata.builder()
                         .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
                         .createdAt("2016-02-02T17:16:31Z")
@@ -144,7 +144,7 @@ public final class ReactorServicePlansTest {
         @Override
         protected ScriptedSubscriber<GetServicePlanResponse> expectations() {
             return ScriptedSubscriber.<GetServicePlanResponse>create()
-                .expectValue(GetServicePlanResponse.builder()
+                .expectNext(GetServicePlanResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:16Z")
                         .id("f6ceb8a2-e6fc-43d5-a11b-7ced9e1b47c7")
@@ -198,7 +198,7 @@ public final class ReactorServicePlansTest {
         @Override
         protected ScriptedSubscriber<ListServicePlansResponse> expectations() {
             return ScriptedSubscriber.<ListServicePlansResponse>create()
-                .expectValue(ListServicePlansResponse.builder()
+                .expectNext(ListServicePlansResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(ServicePlanResource.builder()
@@ -257,7 +257,7 @@ public final class ReactorServicePlansTest {
         @Override
         protected ScriptedSubscriber<ListServicePlanServiceInstancesResponse> expectations() {
             return ScriptedSubscriber.<ListServicePlanServiceInstancesResponse>create()
-                .expectValue(ListServicePlanServiceInstancesResponse.builder()
+                .expectNext(ListServicePlanServiceInstancesResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(ServiceInstanceResource.builder()
@@ -319,7 +319,7 @@ public final class ReactorServicePlansTest {
         @Override
         protected ScriptedSubscriber<UpdateServicePlanResponse> expectations() {
             return ScriptedSubscriber.<UpdateServicePlanResponse>create()
-                .expectValue(UpdateServicePlanResponse.builder()
+                .expectNext(UpdateServicePlanResponse.builder()
                     .metadata(Metadata.builder()
                         .id("195f6bd5-0aa4-4a97-9c8d-5410e5e6d4b6")
                         .url("/v2/service_plans/195f6bd5-0aa4-4a97-9c8d-5410e5e6d4b6")

@@ -53,7 +53,7 @@ public final class ReactorServiceBrokersTest {
         @Override
         protected ScriptedSubscriber<CreateServiceBrokerResponse> expectations() {
             return ScriptedSubscriber.<CreateServiceBrokerResponse>create()
-                .expectValue(CreateServiceBrokerResponse.builder()
+                .expectNext(CreateServiceBrokerResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:23Z")
                         .id("1e86a649-e4a2-4bed-830d-b12435ed4cd9")
@@ -141,7 +141,7 @@ public final class ReactorServiceBrokersTest {
         @Override
         protected ScriptedSubscriber<GetServiceBrokerResponse> expectations() {
             return ScriptedSubscriber.<GetServiceBrokerResponse>create()
-                .expectValue(GetServiceBrokerResponse.builder()
+                .expectNext(GetServiceBrokerResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:23Z")
                         .id("1311f77f-cfb6-499e-bcba-82c7ef968ae6")
@@ -191,7 +191,7 @@ public final class ReactorServiceBrokersTest {
         @Override
         protected ScriptedSubscriber<ListServiceBrokersResponse> expectations() {
             return ScriptedSubscriber.<ListServiceBrokersResponse>create()
-                .expectValue(ListServiceBrokersResponse.builder()
+                .expectNext(ListServiceBrokersResponse.builder()
                     .totalResults(3)
                     .totalPages(1)
                     .resource(ServiceBrokerResource.builder()
@@ -270,7 +270,7 @@ public final class ReactorServiceBrokersTest {
         @Override
         protected ScriptedSubscriber<UpdateServiceBrokerResponse> expectations() {
             return ScriptedSubscriber.<UpdateServiceBrokerResponse>create()
-                .expectValue(UpdateServiceBrokerResponse.builder()
+                .expectNext(UpdateServiceBrokerResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:23Z")
                         .id("92b935f5-20e2-4377-a7e2-f15faa110eab")

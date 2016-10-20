@@ -166,7 +166,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         ScriptedSubscriber<Tuple2<String, ApplicationEntity>> subscriber = ScriptedSubscriber.<Tuple2<String, ApplicationEntity>>create()
-            .consumeValueWith(consumer((spaceId, entity) -> {
+            .consumeNextWith(consumer((spaceId, entity) -> {
                 assertThat(entity.getSpaceId()).isEqualTo(spaceId);
                 assertThat(entity.getName()).isEqualTo(applicationName);
             }))
@@ -707,7 +707,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(applicationName)
+            .expectNext(applicationName)
             .expectComplete();
 
         this.spaceId
@@ -729,7 +729,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(applicationName)
+            .expectNext(applicationName)
             .expectComplete();
 
         this.spaceId
@@ -768,8 +768,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void terminateInstance() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
 
-        ScriptedSubscriber<ApplicationInstanceInfo> subscriber = ScriptedSubscriber
-            .<ApplicationInstanceInfo>expectValueCount(1)
+        ScriptedSubscriber<ApplicationInstanceInfo> subscriber = ScriptedSubscriber.<ApplicationInstanceInfo>create()
+            .expectNextCount(1)
             .expectComplete();
 
         this.spaceId
@@ -797,7 +797,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName2 = this.nameFactory.getApplicationName();
 
         ScriptedSubscriber<Tuple2<ApplicationEntity, ApplicationEntity>> subscriber = ScriptedSubscriber.<Tuple2<ApplicationEntity, ApplicationEntity>>create()
-            .consumeValueWith(consumer((entity1, entity2) -> {
+            .consumeNextWith(consumer((entity1, entity2) -> {
                 assertThat(entity1.getName()).isEqualTo(applicationName2);
                 assertThat(entity1.getEnvironmentJsons()).containsEntry("test-var", "test-value");
                 assertThat(entity2.getEnvironmentJsons()).isEmpty();
@@ -875,7 +875,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         Assert.notNull(name, "name must not be null");
 
         return ScriptedSubscriber.<Tuple2<String, AbstractApplicationResource>>create()
-            .consumeValueWith(consumer((applicationId, resource) -> {
+            .consumeNextWith(consumer((applicationId, resource) -> {
                 assertThat(ResourceUtils.getId(resource)).isEqualTo(applicationId);
                 assertThat(ResourceUtils.getEntity(resource).getName()).isEqualTo(name);
             }))
@@ -953,7 +953,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     private static ScriptedSubscriber<byte[]> isTestApplicationDroplet() {
         return ScriptedSubscriber.<byte[]>create()
-            .consumeValueWith(bytes -> {
+            .consumeNextWith(bytes -> {
                 Set<String> names = new HashSet<>();
 
                 try (TarArchiveInputStream in = new TarArchiveInputStream(new GZIPInputStream(new ByteArrayInputStream(bytes)))) {

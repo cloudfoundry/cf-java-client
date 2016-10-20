@@ -70,7 +70,7 @@ public final class ReactorServiceInstancesTest {
         @Override
         protected ScriptedSubscriber<BindServiceInstanceToRouteResponse> expectations() {
             return ScriptedSubscriber.<BindServiceInstanceToRouteResponse>create()
-                .expectValue(BindServiceInstanceToRouteResponse.builder()
+                .expectNext(BindServiceInstanceToRouteResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-12-22T18:27:58Z")
                         .id("e7e5b08e-c530-4c1c-b420-fa0b09b3770d")
@@ -130,7 +130,7 @@ public final class ReactorServiceInstancesTest {
         @Override
         protected ScriptedSubscriber<CreateServiceInstanceResponse> expectations() {
             return ScriptedSubscriber.<CreateServiceInstanceResponse>create()
-                .expectValue(CreateServiceInstanceResponse.builder()
+                .expectNext(CreateServiceInstanceResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:08Z")
                         .id("8b2b3c5e-c1ba-41d0-ac87-08c776cfc25a")
@@ -239,7 +239,7 @@ public final class ReactorServiceInstancesTest {
         @Override
         protected ScriptedSubscriber<DeleteServiceInstanceResponse> expectations() {
             return ScriptedSubscriber.<DeleteServiceInstanceResponse>create()
-                .expectValue(DeleteServiceInstanceResponse.builder()
+                .expectNext(DeleteServiceInstanceResponse.builder()
                     .metadata(Metadata.builder()
                         .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
                         .createdAt("2016-02-02T17:16:31Z")
@@ -290,7 +290,7 @@ public final class ReactorServiceInstancesTest {
         @Override
         protected ScriptedSubscriber<GetServiceInstanceResponse> expectations() {
             return ScriptedSubscriber.<GetServiceInstanceResponse>create()
-                .expectValue(GetServiceInstanceResponse.builder()
+                .expectNext(GetServiceInstanceResponse.builder()
                     .metadata(Metadata.builder()
                         .id("24ec15f9-f6c7-434a-8893-51baab8408d8")
                         .url("/v2/service_instances/24ec15f9-f6c7-434a-8893-51baab8408d8")
@@ -356,7 +356,7 @@ public final class ReactorServiceInstancesTest {
         @Override
         protected ScriptedSubscriber<GetServiceInstancePermissionsResponse> expectations() {
             return ScriptedSubscriber.<GetServiceInstancePermissionsResponse>create()
-                .expectValue(GetServiceInstancePermissionsResponse.builder()
+                .expectNext(GetServiceInstancePermissionsResponse.builder()
                     .manage(true)
                     .build())
                 .expectComplete();
@@ -396,7 +396,7 @@ public final class ReactorServiceInstancesTest {
         @Override
         protected ScriptedSubscriber<ListServiceInstancesResponse> expectations() {
             return ScriptedSubscriber.<ListServiceInstancesResponse>create()
-                .expectValue(ListServiceInstancesResponse.builder()
+                .expectNext(ListServiceInstancesResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(ServiceInstanceResource.builder()
@@ -467,7 +467,7 @@ public final class ReactorServiceInstancesTest {
         @Override
         protected ScriptedSubscriber<ListServiceInstanceServiceBindingsResponse> expectations() {
             return ScriptedSubscriber.<ListServiceInstanceServiceBindingsResponse>create()
-                .expectValue(ListServiceInstanceServiceBindingsResponse.builder()
+                .expectNext(ListServiceInstanceServiceBindingsResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(ServiceBindingResource.builder()
@@ -526,7 +526,7 @@ public final class ReactorServiceInstancesTest {
         @Override
         protected ScriptedSubscriber<ListServiceInstanceServiceKeysResponse> expectations() {
             return ScriptedSubscriber.<ListServiceInstanceServiceKeysResponse>create()
-                .expectValue(ListServiceInstanceServiceKeysResponse.builder()
+                .expectNext(ListServiceInstanceServiceKeysResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(ServiceKeyResource.builder()
@@ -581,7 +581,7 @@ public final class ReactorServiceInstancesTest {
         @Override
         protected ScriptedSubscriber<UpdateServiceInstanceResponse> expectations() {
             return ScriptedSubscriber.<UpdateServiceInstanceResponse>create()
-                .expectValue(UpdateServiceInstanceResponse.builder()
+                .expectNext(UpdateServiceInstanceResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:08Z")
                         .id("2a80a0f7-cb9c-414a-8a6b-7cc3f811ad41")

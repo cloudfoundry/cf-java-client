@@ -117,7 +117,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(applicationName)
+            .expectNext(applicationName)
             .expectComplete();
 
         createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
@@ -136,7 +136,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         ScriptedSubscriber<ApplicationHealthCheck> subscriber = ScriptedSubscriber.<ApplicationHealthCheck>create()
-            .expectValue(ApplicationHealthCheck.PORT)
+            .expectNext(ApplicationHealthCheck.PORT)
             .expectComplete();
 
         createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, true)
@@ -154,7 +154,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(applicationName)
+            .expectNext(applicationName)
             .expectComplete();
 
         createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, true)
@@ -321,6 +321,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         subscriber.verify(Duration.ofMinutes(5));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void setEnvironmentVariable() throws IOException, TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
@@ -335,7 +336,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .build();
 
         ScriptedSubscriber<Map<String, Object>> subscriber = ScriptedSubscriber.<Map<String, Object>>create()
-            .expectValue(expected)
+            .expectNext(expected)
             .expectComplete();
 
         createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
@@ -395,6 +396,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         subscriber.verify(Duration.ofMinutes(5));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void unsetEnvironmentVariableComplete() throws IOException, TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
@@ -406,7 +408,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         Map<String, Object> expected = Collections.emptyMap();
 
         ScriptedSubscriber<Map<String, Object>> subscriber = ScriptedSubscriber.<Map<String, Object>>create()
-            .expectValue(expected)
+            .expectNext(expected)
             .expectComplete();
 
         createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)
@@ -442,6 +444,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         subscriber.verify(Duration.ofMinutes(5));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void unsetEnvironmentVariablePartial() throws IOException, TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
@@ -453,7 +456,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         Map<String, Object> expected = Collections.singletonMap(variableName2, variableValue2);
 
         ScriptedSubscriber<Map<String, Object>> subscriber = ScriptedSubscriber.<Map<String, Object>>create()
-            .expectValue(expected)
+            .expectNext(expected)
             .expectComplete();
 
         createApplication(this.cloudFoundryOperations, getApplicationPath(), applicationName, false)

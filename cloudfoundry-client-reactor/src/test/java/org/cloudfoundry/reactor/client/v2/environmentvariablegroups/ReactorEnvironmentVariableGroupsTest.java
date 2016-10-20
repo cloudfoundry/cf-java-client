@@ -47,7 +47,7 @@ public class ReactorEnvironmentVariableGroupsTest {
         @Override
         protected ScriptedSubscriber<GetRunningEnvironmentVariablesResponse> expectations() {
             return ScriptedSubscriber.<GetRunningEnvironmentVariablesResponse>create()
-                .expectValue(GetRunningEnvironmentVariablesResponse.builder()
+                .expectNext(GetRunningEnvironmentVariablesResponse.builder()
                     .environmentVariable("abc", 123)
                     .environmentVariable("do-re-me", "far-so-la-tee")
                     .build())
@@ -86,7 +86,7 @@ public class ReactorEnvironmentVariableGroupsTest {
         @Override
         protected ScriptedSubscriber<GetStagingEnvironmentVariablesResponse> expectations() {
             return ScriptedSubscriber.<GetStagingEnvironmentVariablesResponse>create()
-                .expectValue(GetStagingEnvironmentVariablesResponse.builder()
+                .expectNext(GetStagingEnvironmentVariablesResponse.builder()
                     .environmentVariable("abc", 123)
                     .environmentVariable("do-re-me", "far-so-la-tee")
                     .build())
@@ -125,7 +125,7 @@ public class ReactorEnvironmentVariableGroupsTest {
         @Override
         protected ScriptedSubscriber<UpdateRunningEnvironmentVariablesResponse> expectations() {
             return ScriptedSubscriber.<UpdateRunningEnvironmentVariablesResponse>create()
-                .expectValue(UpdateRunningEnvironmentVariablesResponse.builder()
+                .expectNext(UpdateRunningEnvironmentVariablesResponse.builder()
                     .environmentVariable("abc", 123)
                     .environmentVariable("do-re-me", "fa-so-la-tee")
                     .build())
@@ -167,7 +167,7 @@ public class ReactorEnvironmentVariableGroupsTest {
         @Override
         protected ScriptedSubscriber<UpdateRunningEnvironmentVariablesResponse> expectations() {
             return ScriptedSubscriber.<UpdateRunningEnvironmentVariablesResponse>create()
-                .expectValue(UpdateRunningEnvironmentVariablesResponse.builder()
+                .expectNext(UpdateRunningEnvironmentVariablesResponse.builder()
                     .environmentVariables(Collections.emptyMap())
                     .build())
                 .expectComplete();
@@ -207,7 +207,7 @@ public class ReactorEnvironmentVariableGroupsTest {
         @Override
         protected ScriptedSubscriber<UpdateStagingEnvironmentVariablesResponse> expectations() {
             return ScriptedSubscriber.<UpdateStagingEnvironmentVariablesResponse>create()
-                .expectValue(UpdateStagingEnvironmentVariablesResponse.builder()
+                .expectNext(UpdateStagingEnvironmentVariablesResponse.builder()
                     .environmentVariable("abc", 123)
                     .environmentVariable("do-re-me", "far-so-la-tee")
                     .build())
@@ -249,7 +249,7 @@ public class ReactorEnvironmentVariableGroupsTest {
         @Override
         protected ScriptedSubscriber<UpdateStagingEnvironmentVariablesResponse> expectations() {
             return ScriptedSubscriber.<UpdateStagingEnvironmentVariablesResponse>create()
-                .expectValue(UpdateStagingEnvironmentVariablesResponse.builder()
+                .expectNext(UpdateStagingEnvironmentVariablesResponse.builder()
                     .environmentVariables(Collections.emptyMap())
                     .build())
                 .expectComplete();

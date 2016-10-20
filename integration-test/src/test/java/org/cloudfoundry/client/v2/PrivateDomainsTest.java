@@ -152,7 +152,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
 
     private static <R extends AbstractPrivateDomainResource> ScriptedSubscriber<Tuple2<R, String>> domainNameAndOrganizationIdEquality(String domainName) {
         return ScriptedSubscriber.<Tuple2<R, String>>create()
-            .consumeValueWith(consumer((resource, organizationId) -> {
+            .consumeNextWith(consumer((resource, organizationId) -> {
                 assertThat(ResourceUtils.getEntity(resource).getName()).isEqualTo(domainName);
                 assertThat(ResourceUtils.getEntity(resource).getOwningOrganizationId()).isEqualTo(organizationId);
             }))
