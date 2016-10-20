@@ -1,17 +1,6 @@
 {
   "type": "uaa",
-  "config": {
-    "emailDomain": null,
-    "additionalConfiguration": null,
-    "providerDescription": null,
-    "passwordPolicy": null,
-    "lockoutPolicy": {
-      "lockoutPeriodSeconds": 8,
-      "lockoutAfterFailures": 8,
-      "countFailuresWithin": 8
-    },
-    "disableInternalUserManagement": false
-  },
+  "config": "{\"disableInternalUserManagement\":false,\"emailDomain\":null,\"lockoutPolicy\":{\"countFailuresWithin\":8,\"lockoutPeriodSeconds\":8,\"lockoutAfterFailures\":8},\"passwordPolicy\":null,\"providerDescription\":null}",
   "id": "test-identity-provider-id",
   "originKey": "uaa",
   "name": "uaa",

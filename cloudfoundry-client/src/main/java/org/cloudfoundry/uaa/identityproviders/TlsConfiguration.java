@@ -20,27 +20,18 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * The type of Identity provider in paylaod
+ * The file to be used for group integration.
  */
-public enum Type {
+public enum TlsConfiguration {
+    NONE("none"),
 
-    INTERNAL("uaa"),
+    SIMPLE("simple"),
 
-    LDAP("ldap"),
-
-    LOGIN_SERVER("login-server"),
-
-    KEYSTONE("keystone"),
-
-    OAUTH2("oauth2.0"),
-
-    OIDC("oidc1.0"),
-
-    SAML("saml");
+    EXTERNAL("external");
 
     private final String value;
 
-    Type(String value) {
+    TlsConfiguration(String value) {
         this.value = value;
     }
 
@@ -55,24 +46,16 @@ public enum Type {
     }
 
     @JsonCreator
-    static Type from(String s) {
+    static TlsConfiguration from(String s) {
         switch (s.toLowerCase()) {
-            case "uaa":
-                return INTERNAL;
-            case "keystone":
-                return KEYSTONE;
-            case "ldap":
-                return LDAP;
-            case "login-server":
-                return LOGIN_SERVER;
-            case "oauth2.0":
-                return OAUTH2;
-            case "oidc1.0":
-                return OIDC;
-            case "saml":
-                return SAML;
+            case "none":
+                return NONE;
+            case "simple":
+                return SIMPLE;
+            case "external":
+                return EXTERNAL;
             default:
-                throw new IllegalArgumentException(String.format("Unknown type: %s", s));
+                throw new IllegalArgumentException(String.format("Unknown TLS Configuration type: %s", s));
         }
     }
 

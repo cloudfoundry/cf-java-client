@@ -29,6 +29,13 @@ import org.immutables.value.Value;
 abstract class _LdapConfiguration extends AbstractExternalIdentityProviderConfiguration {
 
     /**
+     * Determines whether or not shadow users must be created before login by an administrator.
+     */
+    @JsonProperty("addShadowUserOnLogin")
+    @Nullable
+    abstract Boolean getAddShadowUserOnLogin();
+
+    /**
      * The auto add group flag
      */
     @JsonProperty("autoAddGroups")
@@ -165,6 +172,13 @@ abstract class _LdapConfiguration extends AbstractExternalIdentityProviderConfig
     @JsonProperty("skipSSLVerification")
     @Nullable
     abstract Boolean getSkipSSLVerification();
+
+    /**
+     * The StartTLS options
+     */
+    @JsonProperty("tlsConfiguration")
+    @Nullable
+    abstract TlsConfiguration getTlsConfiguration();
 
     /**
      * The user distinguished name pattern
