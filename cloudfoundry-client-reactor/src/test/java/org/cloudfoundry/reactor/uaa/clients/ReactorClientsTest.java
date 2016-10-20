@@ -66,7 +66,7 @@ public final class ReactorClientsTest {
         @Override
         protected ScriptedSubscriber<BatchCreateClientsResponse> expectations() {
             return ScriptedSubscriber.<BatchCreateClientsResponse>create()
-                .expectValue(BatchCreateClientsResponse.builder()
+                .expectNext(BatchCreateClientsResponse.builder()
                     .client(Client.builder()
                         .allowedProvider("uaa", "ldap", "my-saml-provider")
                         .authority("clients.read", "clients.write")
@@ -154,7 +154,7 @@ public final class ReactorClientsTest {
         @Override
         protected ScriptedSubscriber<BatchDeleteClientsResponse> expectations() {
             return ScriptedSubscriber.<BatchDeleteClientsResponse>create()
-                .expectValue(BatchDeleteClientsResponse.builder()
+                .expectNext(BatchDeleteClientsResponse.builder()
                     .client(Client.builder()
                         .approvalsDeleted(true)
                         .allowedProvider("uaa", "ldap", "my-saml-provider")
@@ -221,7 +221,7 @@ public final class ReactorClientsTest {
         @Override
         protected ScriptedSubscriber<CreateClientResponse> expectations() {
             return ScriptedSubscriber.<CreateClientResponse>create()
-                .expectValue(CreateClientResponse.builder()
+                .expectNext(CreateClientResponse.builder()
                     .allowedProvider("uaa", "ldap", "my-saml-provider")
                     .authority("clients.read", "clients.write")
                     .authorizedGrantType(CLIENT_CREDENTIALS)
@@ -280,7 +280,7 @@ public final class ReactorClientsTest {
         @Override
         protected ScriptedSubscriber<DeleteClientResponse> expectations() {
             return ScriptedSubscriber.<DeleteClientResponse>create()
-                .expectValue(DeleteClientResponse.builder()
+                .expectNext(DeleteClientResponse.builder()
                     .allowedProvider("uaa", "ldap", "my-saml-provider")
                     .authority("clients.read", "clients.write")
                     .authorizedGrantType(CLIENT_CREDENTIALS)
@@ -329,7 +329,7 @@ public final class ReactorClientsTest {
         @Override
         protected ScriptedSubscriber<ListClientsResponse> expectations() {
             return ScriptedSubscriber.<ListClientsResponse>create()
-                .expectValue(ListClientsResponse.builder()
+                .expectNext(ListClientsResponse.builder()
                     .resource(Client.builder()
                         .action("none")
                         .authority("uaa.none")
@@ -391,7 +391,7 @@ public final class ReactorClientsTest {
         @Override
         protected ScriptedSubscriber<GetClientResponse> expectations() {
             return ScriptedSubscriber.<GetClientResponse>create()
-                .expectValue(GetClientResponse.builder()
+                .expectNext(GetClientResponse.builder()
                     .allowedProvider("uaa", "ldap", "my-saml-provider")
                     .authority("clients.read", "clients.write")
                     .authorizedGrantType(CLIENT_CREDENTIALS)
@@ -440,7 +440,7 @@ public final class ReactorClientsTest {
         @Override
         protected ScriptedSubscriber<GetMetadataResponse> expectations() {
             return ScriptedSubscriber.<GetMetadataResponse>create()
-                .expectValue(GetMetadataResponse.builder()
+                .expectNext(GetMetadataResponse.builder()
                     .appIcon("aWNvbiBmb3IgY2xpZW50IDQ=")
                     .appLaunchUrl("http://myloginpage.com")
                     .clientId("P4vuAaSe")
@@ -482,7 +482,7 @@ public final class ReactorClientsTest {
         @Override
         protected ScriptedSubscriber<ListClientsResponse> expectations() {
             return ScriptedSubscriber.<ListClientsResponse>create()
-                .expectValue(ListClientsResponse.builder()
+                .expectNext(ListClientsResponse.builder()
                     .resource(Client.builder()
                         .allowedProvider("uaa", "ldap", "my-saml-provider")
                         .authority("clients.read", "clients.write")
@@ -541,7 +541,7 @@ public final class ReactorClientsTest {
         @Override
         protected ScriptedSubscriber<ListMetadatasResponse> expectations() {
             return ScriptedSubscriber.<ListMetadatasResponse>create()
-                .expectValue(ListMetadatasResponse.builder()
+                .expectNext(ListMetadatasResponse.builder()
                     .metadata(Metadata.builder()
                         .appIcon("Y2xpZW50IDMgaWNvbg==")
                         .appLaunchUrl("http://client3.com/app")
@@ -602,7 +602,7 @@ public final class ReactorClientsTest {
         @Override
         protected ScriptedSubscriber<UpdateClientResponse> expectations() {
             return ScriptedSubscriber.<UpdateClientResponse>create()
-                .expectValue(UpdateClientResponse.builder()
+                .expectNext(UpdateClientResponse.builder()
                     .allowedProvider("uaa", "ldap", "my-saml-provider")
                     .authority("clients.read", "clients.write")
                     .authorizedGrantType(CLIENT_CREDENTIALS)
@@ -655,7 +655,7 @@ public final class ReactorClientsTest {
         @Override
         protected ScriptedSubscriber<UpdateMetadataResponse> expectations() {
             return ScriptedSubscriber.<UpdateMetadataResponse>create()
-                .expectValue(UpdateMetadataResponse.builder()
+                .expectNext(UpdateMetadataResponse.builder()
                     .appLaunchUrl("http://changed.app.launch/url")
                     .appIcon("")
                     .clientId("RpFRZpY3")

@@ -51,7 +51,7 @@ public final class ReactorPrivateDomainsTest {
         @Override
         protected ScriptedSubscriber<CreatePrivateDomainResponse> expectations() {
             return ScriptedSubscriber.<CreatePrivateDomainResponse>create()
-                .expectValue(CreatePrivateDomainResponse.builder()
+                .expectNext(CreatePrivateDomainResponse.builder()
                     .metadata(Metadata.builder()
                         .id("4af3234e-813d-453f-b3ae-fcdecfd87a47")
                         .url("/v2/private_domains/4af3234e-813d-453f-b3ae-fcdecfd87a47")
@@ -138,7 +138,7 @@ public final class ReactorPrivateDomainsTest {
         @Override
         protected ScriptedSubscriber<DeletePrivateDomainResponse> expectations() {
             return ScriptedSubscriber.<DeletePrivateDomainResponse>create()
-                .expectValue(DeletePrivateDomainResponse.builder()
+                .expectNext(DeletePrivateDomainResponse.builder()
                     .metadata(Metadata.builder()
                         .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
                         .createdAt("2016-02-02T17:16:31Z")
@@ -187,7 +187,7 @@ public final class ReactorPrivateDomainsTest {
         @Override
         protected ScriptedSubscriber<GetPrivateDomainResponse> expectations() {
             return ScriptedSubscriber.<GetPrivateDomainResponse>create()
-                .expectValue(GetPrivateDomainResponse.builder()
+                .expectNext(GetPrivateDomainResponse.builder()
                     .metadata(Metadata.builder()
                         .id("3de9db5f-8e3b-4d10-a8c9-8137caafe43d")
                         .url("/v2/private_domains/3de9db5f-8e3b-4d10-a8c9-8137caafe43d")
@@ -237,7 +237,7 @@ public final class ReactorPrivateDomainsTest {
         @Override
         protected ScriptedSubscriber<ListPrivateDomainsResponse> expectations() {
             return ScriptedSubscriber.<ListPrivateDomainsResponse>create()
-                .expectValue(ListPrivateDomainsResponse.builder()
+                .expectNext(ListPrivateDomainsResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(PrivateDomainResource.builder()

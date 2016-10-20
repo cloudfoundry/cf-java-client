@@ -57,7 +57,7 @@ public final class ReactorServicePlanVisibilitiesTest {
         @Override
         protected ScriptedSubscriber<CreateServicePlanVisibilityResponse> expectations() {
             return ScriptedSubscriber.<CreateServicePlanVisibilityResponse>create()
-                .expectValue(CreateServicePlanVisibilityResponse.builder()
+                .expectNext(CreateServicePlanVisibilityResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:28Z")
                         .id("28a22749-25f4-44bd-a371-c37e2ee53175")
@@ -143,7 +143,7 @@ public final class ReactorServicePlanVisibilitiesTest {
         @Override
         protected ScriptedSubscriber<DeleteServicePlanVisibilityResponse> expectations() {
             return ScriptedSubscriber.<DeleteServicePlanVisibilityResponse>create()
-                .expectValue(DeleteServicePlanVisibilityResponse.builder()
+                .expectNext(DeleteServicePlanVisibilityResponse.builder()
                     .metadata(Metadata.builder()
                         .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
                         .createdAt("2016-02-02T17:16:31Z")
@@ -191,7 +191,7 @@ public final class ReactorServicePlanVisibilitiesTest {
         @Override
         protected ScriptedSubscriber<GetServicePlanVisibilityResponse> expectations() {
             return ScriptedSubscriber.<GetServicePlanVisibilityResponse>create()
-                .expectValue(GetServicePlanVisibilityResponse.builder()
+                .expectNext(GetServicePlanVisibilityResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:28Z")
                         .id("18365c25-898b-4365-911d-6f6a09154297")
@@ -240,7 +240,7 @@ public final class ReactorServicePlanVisibilitiesTest {
         @Override
         protected ScriptedSubscriber<ListServicePlanVisibilitiesResponse> expectations() {
             return ScriptedSubscriber.<ListServicePlanVisibilitiesResponse>create()
-                .expectValue(ListServicePlanVisibilitiesResponse.builder()
+                .expectNext(ListServicePlanVisibilitiesResponse.builder()
                     .totalPages(1)
                     .totalResults(1)
                     .resource(ServicePlanVisibilityResource.builder()
@@ -294,7 +294,7 @@ public final class ReactorServicePlanVisibilitiesTest {
         @Override
         protected ScriptedSubscriber<UpdateServicePlanVisibilityResponse> expectations() {
             return ScriptedSubscriber.<UpdateServicePlanVisibilityResponse>create()
-                .expectValue(UpdateServicePlanVisibilityResponse.builder()
+                .expectNext(UpdateServicePlanVisibilityResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:28Z")
                         .id("5f1514f9-66ee-4799-9de2-69f2ec3cb5f1")

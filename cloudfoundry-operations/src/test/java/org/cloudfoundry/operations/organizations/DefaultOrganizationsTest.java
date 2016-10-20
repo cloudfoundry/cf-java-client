@@ -453,7 +453,7 @@ public final class DefaultOrganizationsTest {
         @Override
         protected ScriptedSubscriber<OrganizationDetail> expectations() {
             return ScriptedSubscriber.<OrganizationDetail>create()
-                .expectValue(fill(OrganizationDetail.builder())
+                .expectNext(fill(OrganizationDetail.builder())
                     .domain("test-name")
                     .id("test-organization-id")
                     .name("test-organization-name")
@@ -489,7 +489,7 @@ public final class DefaultOrganizationsTest {
         @Override
         protected ScriptedSubscriber<OrganizationSummary> expectations() {
             return ScriptedSubscriber.<OrganizationSummary>create()
-                .expectValue(fill(OrganizationSummary.builder(), "organization-")
+                .expectNext(fill(OrganizationSummary.builder(), "organization-")
                     .build())
                 .expectComplete();
         }

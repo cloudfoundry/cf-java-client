@@ -132,7 +132,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<AssociateSpaceAuditorResponse> expectations() {
             return ScriptedSubscriber.<AssociateSpaceAuditorResponse>create()
-                .expectValue(AssociateSpaceAuditorResponse.builder()
+                .expectNext(AssociateSpaceAuditorResponse.builder()
                     .metadata(Metadata.builder()
                         .id("9639c996-9005-4b70-b852-d40f346d58dc")
                         .url("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc")
@@ -193,7 +193,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<AssociateSpaceAuditorByUsernameResponse> expectations() {
             return ScriptedSubscriber.<AssociateSpaceAuditorByUsernameResponse>create()
-                .expectValue(AssociateSpaceAuditorByUsernameResponse.builder()
+                .expectNext(AssociateSpaceAuditorByUsernameResponse.builder()
                     .metadata(Metadata.builder()
                         .id("873193ee-878c-436f-80bd-10d68927937d")
                         .url("/v2/spaces/873193ee-878c-436f-80bd-10d68927937d")
@@ -255,7 +255,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<AssociateSpaceDeveloperResponse> expectations() {
             return ScriptedSubscriber.<AssociateSpaceDeveloperResponse>create()
-                .expectValue(AssociateSpaceDeveloperResponse.builder()
+                .expectNext(AssociateSpaceDeveloperResponse.builder()
                     .metadata(Metadata.builder()
                         .id("6f8f8e0d-54f2-4736-a08e-1044fcf061d3")
                         .url("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3")
@@ -316,7 +316,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<AssociateSpaceManagerResponse> expectations() {
             return ScriptedSubscriber.<AssociateSpaceManagerResponse>create()
-                .expectValue(AssociateSpaceManagerResponse.builder()
+                .expectNext(AssociateSpaceManagerResponse.builder()
                     .metadata(Metadata.builder()
                         .id("542943ff-a40b-4004-9559-434b0169508c")
                         .url("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c")
@@ -377,7 +377,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<AssociateSpaceSecurityGroupResponse> expectations() {
             return ScriptedSubscriber.<AssociateSpaceSecurityGroupResponse>create()
-                .expectValue(AssociateSpaceSecurityGroupResponse.builder()
+                .expectNext(AssociateSpaceSecurityGroupResponse.builder()
                     .metadata(Metadata.builder()
                         .id("c9424692-395b-403b-90e6-10049bbd9e23")
                         .url("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23")
@@ -438,7 +438,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<AssociateSpaceDeveloperByUsernameResponse> expectations() {
             return ScriptedSubscriber.<AssociateSpaceDeveloperByUsernameResponse>create()
-                .expectValue(AssociateSpaceDeveloperByUsernameResponse.builder()
+                .expectNext(AssociateSpaceDeveloperByUsernameResponse.builder()
                     .metadata(Metadata.builder()
                         .id("b6d11f17-1cea-4c00-a951-fef3223b8c84")
                         .url("/v2/spaces/b6d11f17-1cea-4c00-a951-fef3223b8c84")
@@ -500,7 +500,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<AssociateSpaceManagerByUsernameResponse> expectations() {
             return ScriptedSubscriber.<AssociateSpaceManagerByUsernameResponse>create()
-                .expectValue(AssociateSpaceManagerByUsernameResponse.builder()
+                .expectNext(AssociateSpaceManagerByUsernameResponse.builder()
                     .metadata(Metadata.builder()
                         .id("4351f97b-3485-4738-821b-5bf77bed44eb")
                         .url("/v2/spaces/4351f97b-3485-4738-821b-5bf77bed44eb")
@@ -562,7 +562,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<CreateSpaceResponse> expectations() {
             return ScriptedSubscriber.<CreateSpaceResponse>create()
-                .expectValue(CreateSpaceResponse.builder()
+                .expectNext(CreateSpaceResponse.builder()
                     .metadata(Metadata.builder()
                         .id("d29dc30c-793c-49a6-97fe-9aff75dcbd12")
                         .url("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12")
@@ -660,7 +660,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<DeleteSpaceResponse> expectations() {
             return ScriptedSubscriber.<DeleteSpaceResponse>create()
-                .expectValue(DeleteSpaceResponse.builder()
+                .expectNext(DeleteSpaceResponse.builder()
                     .metadata(Metadata.builder()
                         .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
                         .createdAt("2016-02-02T17:16:31Z")
@@ -709,7 +709,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<GetSpaceResponse> expectations() {
             return ScriptedSubscriber.<GetSpaceResponse>create()
-                .expectValue(GetSpaceResponse.builder()
+                .expectNext(GetSpaceResponse.builder()
                     .metadata(Metadata.builder()
                         .id("0f102457-c1fc-42e5-9c81-c7be2bc65dcd")
                         .url("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd")
@@ -770,7 +770,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<GetSpaceSummaryResponse> expectations() {
             return ScriptedSubscriber.<GetSpaceSummaryResponse>create()
-                .expectValue(GetSpaceSummaryResponse.builder()
+                .expectNext(GetSpaceSummaryResponse.builder()
                     .id("c6473a38-92f4-4595-9462-01af4c4b1893")
                     .name("name-159")
                     .application(SpaceApplicationSummary.builder()
@@ -866,7 +866,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<ListSpacesResponse> expectations() {
             return ScriptedSubscriber.<ListSpacesResponse>create()
-                .expectValue(ListSpacesResponse.builder()
+                .expectNext(ListSpacesResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(SpaceResource.builder()
@@ -932,7 +932,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<ListSpaceApplicationsResponse> expectations() {
             return ScriptedSubscriber.<ListSpaceApplicationsResponse>create()
-                .expectValue(ListSpaceApplicationsResponse.builder()
+                .expectNext(ListSpaceApplicationsResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(ApplicationResource.builder()
@@ -1008,7 +1008,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<ListSpaceAuditorsResponse> expectations() {
             return ScriptedSubscriber.<ListSpaceAuditorsResponse>create()
-                .expectValue(ListSpaceAuditorsResponse.builder()
+                .expectNext(ListSpaceAuditorsResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(UserResource.builder()
@@ -1069,7 +1069,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<ListSpaceDevelopersResponse> expectations() {
             return ScriptedSubscriber.<ListSpaceDevelopersResponse>create()
-                .expectValue(ListSpaceDevelopersResponse.builder()
+                .expectNext(ListSpaceDevelopersResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(UserResource.builder()
@@ -1131,7 +1131,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<ListSpaceDomainsResponse> expectations() {
             return ScriptedSubscriber.<ListSpaceDomainsResponse>create()
-                .expectValue(ListSpaceDomainsResponse.builder()
+                .expectNext(ListSpaceDomainsResponse.builder()
                     .totalResults(2)
                     .totalPages(1)
                     .resource(DomainResource.builder()
@@ -1192,7 +1192,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<ListSpaceEventsResponse> expectations() {
             return ScriptedSubscriber.<ListSpaceEventsResponse>create()
-                .expectValue(ListSpaceEventsResponse.builder()
+                .expectNext(ListSpaceEventsResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(EventResource.builder()
@@ -1256,7 +1256,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<ListSpaceManagersResponse> expectations() {
             return ScriptedSubscriber.<ListSpaceManagersResponse>create()
-                .expectValue(ListSpaceManagersResponse.builder()
+                .expectNext(ListSpaceManagersResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(UserResource.builder()
@@ -1318,7 +1318,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<ListSpaceRoutesResponse> expectations() {
             return ScriptedSubscriber.<ListSpaceRoutesResponse>create()
-                .expectValue(ListSpaceRoutesResponse.builder()
+                .expectNext(ListSpaceRoutesResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(RouteResource.builder()
@@ -1378,7 +1378,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<ListSpaceSecurityGroupsResponse> expectations() {
             return ScriptedSubscriber.<ListSpaceSecurityGroupsResponse>create()
-                .expectValue(ListSpaceSecurityGroupsResponse.builder()
+                .expectNext(ListSpaceSecurityGroupsResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(SecurityGroupResource.builder()
@@ -1438,7 +1438,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<ListSpaceServiceInstancesResponse> expectations() {
             return ScriptedSubscriber.<ListSpaceServiceInstancesResponse>create()
-                .expectValue(ListSpaceServiceInstancesResponse.builder()
+                .expectNext(ListSpaceServiceInstancesResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(UnionServiceInstanceResource.builder()
@@ -1502,7 +1502,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<ListSpaceServicesResponse> expectations() {
             return ScriptedSubscriber.<ListSpaceServicesResponse>create()
-                .expectValue(ListSpaceServicesResponse.builder()
+                .expectNext(ListSpaceServicesResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(ServiceResource.builder()
@@ -1563,7 +1563,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<ListSpaceUserRolesResponse> expectations() {
             return ScriptedSubscriber.<ListSpaceUserRolesResponse>create()
-                .expectValue(ListSpaceUserRolesResponse.builder()
+                .expectNext(ListSpaceUserRolesResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(UserSpaceRoleResource.builder()
@@ -1665,7 +1665,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<RemoveSpaceAuditorByUsernameResponse> expectations() {
             return ScriptedSubscriber.<RemoveSpaceAuditorByUsernameResponse>create()
-                .expectValue(RemoveSpaceAuditorByUsernameResponse.builder()
+                .expectNext(RemoveSpaceAuditorByUsernameResponse.builder()
                     .metadata(Metadata.builder()
                         .id("6ee704bb-fc88-40f6-9ab9-02fe8df35730")
                         .url("/v2/spaces/6ee704bb-fc88-40f6-9ab9-02fe8df35730")
@@ -1763,7 +1763,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<RemoveSpaceDeveloperByUsernameResponse> expectations() {
             return ScriptedSubscriber.<RemoveSpaceDeveloperByUsernameResponse>create()
-                .expectValue(RemoveSpaceDeveloperByUsernameResponse.builder()
+                .expectNext(RemoveSpaceDeveloperByUsernameResponse.builder()
                     .metadata(Metadata.builder()
                         .id("998375df-21ec-4d73-a0fd-83c11b7c7c1d")
                         .url("/v2/spaces/998375df-21ec-4d73-a0fd-83c11b7c7c1d")
@@ -1862,7 +1862,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<RemoveSpaceManagerByUsernameResponse> expectations() {
             return ScriptedSubscriber.<RemoveSpaceManagerByUsernameResponse>create()
-                .expectValue(RemoveSpaceManagerByUsernameResponse.builder()
+                .expectNext(RemoveSpaceManagerByUsernameResponse.builder()
                     .metadata(Metadata.builder()
                         .id("9f29c6d5-10cf-4d2c-a934-b0f2ea054bd2")
                         .url("/v2/spaces/9f29c6d5-10cf-4d2c-a934-b0f2ea054bd2")
@@ -1961,7 +1961,7 @@ public final class ReactorSpacesTest {
         @Override
         protected ScriptedSubscriber<UpdateSpaceResponse> expectations() {
             return ScriptedSubscriber.<UpdateSpaceResponse>create()
-                .expectValue(UpdateSpaceResponse.builder()
+                .expectNext(UpdateSpaceResponse.builder()
                     .metadata(Metadata.builder()
                         .id("e7b9e252-88cb-415c-ace4-2864922e550c")
                         .url("/v2/spaces/e7b9e252-88cb-415c-ace4-2864922e550c")

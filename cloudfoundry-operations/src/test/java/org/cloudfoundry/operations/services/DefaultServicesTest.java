@@ -1249,7 +1249,7 @@ public final class DefaultServicesTest {
         @Override
         protected ScriptedSubscriber<ServiceInstance> expectations() {
             return ScriptedSubscriber.<ServiceInstance>create()
-                .expectValue(fill(ServiceInstance.builder())
+                .expectNext(fill(ServiceInstance.builder())
                     .application("test-application")
                     .documentationUrl("test-documentation-url")
                     .id("test-service-instance-id")
@@ -1311,7 +1311,7 @@ public final class DefaultServicesTest {
         @Override
         protected ScriptedSubscriber<ServiceInstance> expectations() {
             return ScriptedSubscriber.<ServiceInstance>create()
-                .expectValue(ServiceInstance.builder()
+                .expectNext(ServiceInstance.builder()
                     .application("test-application")
                     .id("test-service-instance-id")
                     .name("test-service-instance-name")
@@ -1343,7 +1343,7 @@ public final class DefaultServicesTest {
         @Override
         protected ScriptedSubscriber<ServiceKey> expectations() {
             return ScriptedSubscriber.<ServiceKey>create()
-                .expectValue(ServiceKey.builder()
+                .expectNext(ServiceKey.builder()
                     .credential("key", "val")
                     .id("test-service-key-id")
                     .name("test-service-key-name")
@@ -1407,7 +1407,7 @@ public final class DefaultServicesTest {
         @Override
         protected ScriptedSubscriber<ServiceInstance> expectations() {
             return ScriptedSubscriber.<ServiceInstance>create()
-                .expectValues(ServiceInstance.builder()
+                .expectNext(ServiceInstance.builder()
                         .name("test-service-instance1")
                         .id("test-service-instance1-id")
                         .type(ServiceInstanceType.USER_PROVIDED)
@@ -1469,7 +1469,7 @@ public final class DefaultServicesTest {
         @Override
         protected ScriptedSubscriber<ServiceKey> expectations() {
             return ScriptedSubscriber.<ServiceKey>create()
-                .expectValue(ServiceKey.builder()
+                .expectNext(ServiceKey.builder()
                     .credential("key", "val")
                     .id("test-service-key-id")
                     .name("test-service-key-entity-name")
@@ -1552,7 +1552,7 @@ public final class DefaultServicesTest {
         @Override
         protected ScriptedSubscriber<ServiceOffering> expectations() {
             return ScriptedSubscriber.<ServiceOffering>create()
-                .expectValues(ServiceOffering.builder()
+                .expectNext(ServiceOffering.builder()
                         .description("test-service1-description")
                         .id("test-service1-id")
                         .label("test-service1")
@@ -1598,7 +1598,7 @@ public final class DefaultServicesTest {
         @Override
         protected ScriptedSubscriber<ServiceOffering> expectations() {
             return ScriptedSubscriber.<ServiceOffering>create()
-                .expectValue(ServiceOffering.builder()
+                .expectNext(ServiceOffering.builder()
                     .description("test-service-description")
                     .id("test-service-id")
                     .label("test-service")

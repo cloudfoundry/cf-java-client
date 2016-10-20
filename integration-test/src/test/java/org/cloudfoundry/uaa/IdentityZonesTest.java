@@ -44,7 +44,8 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String subdomainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<IdentityZone> subscriber = ScriptedSubscriber.<IdentityZone>expectValueCount(1)
+        ScriptedSubscriber<IdentityZone> subscriber = ScriptedSubscriber.<IdentityZone>create()
+            .expectNextCount(1)
             .expectComplete();
 
         this.uaaClient.identityZones()
@@ -87,7 +88,7 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
         String subdomainName = this.nameFactory.getDomainName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(identityZoneName)
+            .expectNext(identityZoneName)
             .expectComplete();
 
         getIdentityZoneId(this.uaaClient, identityZoneName, subdomainName)
@@ -106,7 +107,8 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String subdomainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<IdentityZone> subscriber = ScriptedSubscriber.<IdentityZone>expectValueCount(1)
+        ScriptedSubscriber<IdentityZone> subscriber = ScriptedSubscriber.<IdentityZone>create()
+            .expectNextCount(1)
             .expectComplete();
 
         requestCreateIdentityZone(this.uaaClient, identityZoneName, subdomainName)
@@ -126,7 +128,8 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
         String baseSubdomainName = this.nameFactory.getDomainName();
         String newSubdomainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<IdentityZone> subscriber = ScriptedSubscriber.<IdentityZone>expectValueCount(1)
+        ScriptedSubscriber<IdentityZone> subscriber = ScriptedSubscriber.<IdentityZone>create()
+            .expectNextCount(1)
             .expectComplete();
 
         getIdentityZoneId(this.uaaClient, identityZoneName, baseSubdomainName)

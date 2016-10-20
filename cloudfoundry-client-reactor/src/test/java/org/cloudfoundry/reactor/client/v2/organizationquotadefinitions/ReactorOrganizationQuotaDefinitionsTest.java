@@ -55,7 +55,7 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
         @Override
         protected ScriptedSubscriber<CreateOrganizationQuotaDefinitionResponse> expectations() {
             return ScriptedSubscriber.<CreateOrganizationQuotaDefinitionResponse>create()
-                .expectValue(CreateOrganizationQuotaDefinitionResponse.builder()
+                .expectNext(CreateOrganizationQuotaDefinitionResponse.builder()
                     .metadata(Metadata.builder()
                         .id("27a0466e-53c0-439a-ab9f-3e56854302f9")
                         .url("/v2/quota_definitions/27a0466e-53c0-439a-ab9f-3e56854302f9")
@@ -157,7 +157,7 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
         @Override
         protected ScriptedSubscriber<GetOrganizationQuotaDefinitionResponse> expectations() {
             return ScriptedSubscriber.<GetOrganizationQuotaDefinitionResponse>create()
-                .expectValue(GetOrganizationQuotaDefinitionResponse.builder()
+                .expectNext(GetOrganizationQuotaDefinitionResponse.builder()
                     .metadata(Metadata.builder()
                         .id("c1b8a422-e2b2-4e28-8a16-90ebef2a6922")
                         .url("/v2/quota_definitions/c1b8a422-e2b2-4e28-8a16-90ebef2a6922")
@@ -215,7 +215,7 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
         @Override
         protected ScriptedSubscriber<ListOrganizationQuotaDefinitionsResponse> expectations() {
             return ScriptedSubscriber.<ListOrganizationQuotaDefinitionsResponse>create()
-                .expectValue(ListOrganizationQuotaDefinitionsResponse.builder()
+                .expectNext(ListOrganizationQuotaDefinitionsResponse.builder()
                     .totalPages(1)
                     .totalResults(1)
                     .resource(OrganizationQuotaDefinitionResource.builder()
@@ -277,7 +277,7 @@ public final class ReactorOrganizationQuotaDefinitionsTest {
         @Override
         protected ScriptedSubscriber<UpdateOrganizationQuotaDefinitionResponse> expectations() {
             return ScriptedSubscriber.<UpdateOrganizationQuotaDefinitionResponse>create()
-                .expectValue(UpdateOrganizationQuotaDefinitionResponse.builder()
+                .expectNext(UpdateOrganizationQuotaDefinitionResponse.builder()
                     .metadata(Metadata.builder()
                         .id("cd10a1dd-f372-4b19-8ff6-60214b265f6f")
                         .url("/v2/quota_definitions/cd10a1dd-f372-4b19-8ff6-60214b265f6f")

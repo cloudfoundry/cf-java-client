@@ -352,7 +352,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     private static ScriptedSubscriber<Tuple2<DomainEntity, String>> domainNameAndOrganizationIdEquality(String domainName) {
         return ScriptedSubscriber.<Tuple2<DomainEntity, String>>create()
-            .consumeValueWith(consumer((entity, organizationId) -> {
+            .consumeNextWith(consumer((entity, organizationId) -> {
                 assertThat(entity.getName()).isEqualTo(domainName);
                 assertThat(entity.getOwningOrganizationId()).isEqualTo(organizationId);
             }))

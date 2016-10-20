@@ -105,7 +105,7 @@ public final class ReactorApplicationsV3Test {
         @Override
         protected ScriptedSubscriber<AssignApplicationDropletResponse> expectations() {
             return ScriptedSubscriber.<AssignApplicationDropletResponse>create()
-                .expectValue(AssignApplicationDropletResponse.builder()
+                .expectNext(AssignApplicationDropletResponse.builder()
                     .id("guid-a08fd981-137f-4a8f-9c32-6be10007edde")
                     .name("name1")
                     .desiredState("STOPPED")
@@ -193,7 +193,7 @@ public final class ReactorApplicationsV3Test {
         @Override
         protected ScriptedSubscriber<CancelApplicationTaskResponse> expectations() {
             return ScriptedSubscriber.<CancelApplicationTaskResponse>create()
-                .expectValue(CancelApplicationTaskResponse.builder()
+                .expectNext(CancelApplicationTaskResponse.builder()
                     .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
                     .name("migrate")
                     .command("rake db:migrate")
@@ -250,7 +250,7 @@ public final class ReactorApplicationsV3Test {
         @Override
         protected ScriptedSubscriber<CreateApplicationResponse> expectations() {
             return ScriptedSubscriber.<CreateApplicationResponse>create()
-                .expectValue(CreateApplicationResponse.builder()
+                .expectNext(CreateApplicationResponse.builder()
                     .id("a1aef47a-600b-4b2b-a2f6-f5dc5344f886")
                     .name("my_app")
                     .desiredState("STOPPED")
@@ -420,7 +420,7 @@ public final class ReactorApplicationsV3Test {
         @Override
         protected ScriptedSubscriber<GetApplicationResponse> expectations() {
             return ScriptedSubscriber.<GetApplicationResponse>create()
-                .expectValue(GetApplicationResponse.builder()
+                .expectNext(GetApplicationResponse.builder()
                     .id("guid-cad6a8b6-a0dc-4bb1-a5a8-095dd29cb6d6")
                     .name("my_app")
                     .desiredState("STOPPED")
@@ -505,7 +505,7 @@ public final class ReactorApplicationsV3Test {
         @Override
         protected ScriptedSubscriber<GetApplicationProcessStatisticsResponse> expectations() {
             return ScriptedSubscriber.<GetApplicationProcessStatisticsResponse>create()
-                .expectValue(GetApplicationProcessStatisticsResponse.builder()
+                .expectNext(GetApplicationProcessStatisticsResponse.builder()
                     .resource(ProcessStatisticsResource.builder()
                         .type("web")
                         .index(0)
@@ -565,7 +565,7 @@ public final class ReactorApplicationsV3Test {
         @Override
         protected ScriptedSubscriber<GetApplicationEnvironmentResponse> expectations() {
             return ScriptedSubscriber.<GetApplicationEnvironmentResponse>create()
-                .expectValue(GetApplicationEnvironmentResponse.builder()
+                .expectNext(GetApplicationEnvironmentResponse.builder()
                     .environmentVariable("SOME_KEY", "some_val")
                     .stagingEnvironmentVariable("STAGING_ENV", "staging_value")
                     .runningEnvironmentVariable("RUNNING_ENV", "running_value")
@@ -619,7 +619,7 @@ public final class ReactorApplicationsV3Test {
         @Override
         protected ScriptedSubscriber<GetApplicationProcessResponse> expectations() {
             return ScriptedSubscriber.<GetApplicationProcessResponse>create()
-                .expectValue(GetApplicationProcessResponse.builder()
+                .expectNext(GetApplicationProcessResponse.builder()
                     .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
                     .type("web")
                     .command("rackup")
@@ -686,7 +686,7 @@ public final class ReactorApplicationsV3Test {
         @Override
         protected ScriptedSubscriber<GetApplicationTaskResponse> expectations() {
             return ScriptedSubscriber.<GetApplicationTaskResponse>create()
-                .expectValue(GetApplicationTaskResponse.builder()
+                .expectNext(GetApplicationTaskResponse.builder()
                     .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
                     .name("migrate")
                     .command("rake db:migrate")
@@ -743,7 +743,7 @@ public final class ReactorApplicationsV3Test {
         @Override
         protected ScriptedSubscriber<ListApplicationsResponse> expectations() {
             return ScriptedSubscriber.<ListApplicationsResponse>create()
-                .expectValue(ListApplicationsResponse.builder()
+                .expectNext(ListApplicationsResponse.builder()
                     .pagination(Pagination.builder()
                         .totalResults(3)
                         .first(Link.builder()
@@ -886,7 +886,7 @@ public final class ReactorApplicationsV3Test {
         @Override
         protected ScriptedSubscriber<ListApplicationDropletsResponse> expectations() {
             return ScriptedSubscriber.<ListApplicationDropletsResponse>create()
-                .expectValue(ListApplicationDropletsResponse.builder()
+                .expectNext(ListApplicationDropletsResponse.builder()
                     .pagination(Pagination.builder()
                         .totalResults(2)
                         .totalPages(1)
@@ -1007,7 +1007,7 @@ public final class ReactorApplicationsV3Test {
         @Override
         protected ScriptedSubscriber<ListApplicationPackagesResponse> expectations() {
             return ScriptedSubscriber.<ListApplicationPackagesResponse>create()
-                .expectValue(ListApplicationPackagesResponse.builder()
+                .expectNext(ListApplicationPackagesResponse.builder()
                     .pagination(Pagination.builder()
                         .totalResults(1)
                         .first(Link.builder()
@@ -1085,7 +1085,7 @@ public final class ReactorApplicationsV3Test {
         @Override
         protected ScriptedSubscriber<ListApplicationProcessesResponse> expectations() {
             return ScriptedSubscriber.<ListApplicationProcessesResponse>create()
-                .expectValue(ListApplicationProcessesResponse.builder()
+                .expectNext(ListApplicationProcessesResponse.builder()
                     .pagination(Pagination.builder()
                         .totalResults(3)
                         .first(Link.builder()
@@ -1195,7 +1195,7 @@ public final class ReactorApplicationsV3Test {
         @Override
         protected ScriptedSubscriber<ListApplicationTasksResponse> expectations() {
             return ScriptedSubscriber.<ListApplicationTasksResponse>create()
-                .expectValue(ListApplicationTasksResponse.builder()
+                .expectNext(ListApplicationTasksResponse.builder()
                     .pagination(Pagination.builder()
                         .totalResults(3)
                         .first(Link.builder()
@@ -1286,7 +1286,7 @@ public final class ReactorApplicationsV3Test {
         @Override
         protected ScriptedSubscriber<ScaleApplicationResponse> expectations() {
             return ScriptedSubscriber.<ScaleApplicationResponse>create()
-                .expectValue(ScaleApplicationResponse.builder()
+                .expectNext(ScaleApplicationResponse.builder()
                     .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
                     .type("web")
                     .command("rackup")
@@ -1357,7 +1357,7 @@ public final class ReactorApplicationsV3Test {
         @Override
         protected ScriptedSubscriber<StartApplicationResponse> expectations() {
             return ScriptedSubscriber.<StartApplicationResponse>create()
-                .expectValue(StartApplicationResponse.builder()
+                .expectNext(StartApplicationResponse.builder()
                     .id("guid-76956e3e-9905-42f9-b2c1-f9b53ef24ac0")
                     .name("original_name")
                     .desiredState("STARTED")
@@ -1443,7 +1443,7 @@ public final class ReactorApplicationsV3Test {
         @Override
         protected ScriptedSubscriber<StopApplicationResponse> expectations() {
             return ScriptedSubscriber.<StopApplicationResponse>create()
-                .expectValue(StopApplicationResponse.builder()
+                .expectNext(StopApplicationResponse.builder()
                     .id("guid-11e8e36d-71f5-4be8-9487-c6d1a187e439")
                     .name("original_name")
                     .desiredState("STOPPED")
@@ -1529,7 +1529,7 @@ public final class ReactorApplicationsV3Test {
         @Override
         protected ScriptedSubscriber<UpdateApplicationResponse> expectations() {
             return ScriptedSubscriber.<UpdateApplicationResponse>create()
-                .expectValue(UpdateApplicationResponse.builder()
+                .expectNext(UpdateApplicationResponse.builder()
                     .id("guid-003fabe4-542f-487d-b9b7-8b1bffdd0ca9")
                     .name("new_name")
                     .desiredState("STOPPED")

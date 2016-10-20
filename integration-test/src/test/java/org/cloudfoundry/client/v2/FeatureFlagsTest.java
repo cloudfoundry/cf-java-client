@@ -66,7 +66,7 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
     @Test
     public void getEach() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<List<Tuple2<String, GetFeatureFlagResponse>>> subscriber = ScriptedSubscriber.<List<Tuple2<String, GetFeatureFlagResponse>>>create()
-            .consumeValueWith(list -> list.forEach(consumer((name, entity) -> assertThat(entity.getName()).isEqualTo(name))))
+            .consumeNextWith(list -> list.forEach(consumer((name, entity) -> assertThat(entity.getName()).isEqualTo(name))))
             .expectComplete();
 
         Flux
@@ -85,7 +85,7 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
     @Test
     public void list() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<ListFeatureFlagsResponse> subscriber = ScriptedSubscriber.<ListFeatureFlagsResponse>create()
-            .consumeValueWith(response -> {
+            .consumeNextWith(response -> {
                 Set<String> returnedFlagSet = flagNameSetFrom(response.getFeatureFlags());
                 assertThat(returnedFlagSet).containsAll(coreFeatureFlagNameList);
             })
@@ -103,7 +103,7 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
     public void setAndResetEach() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<List<Tuple3<GetFeatureFlagResponse, SetFeatureFlagResponse, SetFeatureFlagResponse>>> subscriber =
             ScriptedSubscriber.<List<Tuple3<GetFeatureFlagResponse, SetFeatureFlagResponse, SetFeatureFlagResponse>>>create()
-                .consumeValueWith(list -> {
+                .consumeNextWith(list -> {
                     list.forEach(consumer((getResponse, setResponse, resetResponse) -> {
                         assertThat(setResponse.getEnabled()).isNotEqualTo(getResponse.getEnabled());
                         assertThat(resetResponse.getEnabled()).isEqualTo(getResponse.getEnabled());

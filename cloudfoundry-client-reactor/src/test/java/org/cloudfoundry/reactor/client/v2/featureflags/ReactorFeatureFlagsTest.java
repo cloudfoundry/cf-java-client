@@ -43,7 +43,7 @@ public final class ReactorFeatureFlagsTest {
         @Override
         protected ScriptedSubscriber<GetFeatureFlagResponse> expectations() {
             return ScriptedSubscriber.<GetFeatureFlagResponse>create()
-                .expectValue(GetFeatureFlagResponse.builder()
+                .expectNext(GetFeatureFlagResponse.builder()
                     .name("app_scaling")
                     .enabled(true)
                     .url("/v2/config/feature_flags/app_scaling")
@@ -85,7 +85,7 @@ public final class ReactorFeatureFlagsTest {
         @Override
         protected ScriptedSubscriber<GetFeatureFlagResponse> expectations() {
             return ScriptedSubscriber.<GetFeatureFlagResponse>create()
-                .expectValue(GetFeatureFlagResponse.builder()
+                .expectNext(GetFeatureFlagResponse.builder()
                     .name("set_roles_by_username")
                     .enabled(true)
                     .url("/v2/config/feature_flags/set_roles_by_username")
@@ -127,7 +127,7 @@ public final class ReactorFeatureFlagsTest {
         @Override
         protected ScriptedSubscriber<ListFeatureFlagsResponse> expectations() {
             return ScriptedSubscriber.<ListFeatureFlagsResponse>create()
-                .expectValue(ListFeatureFlagsResponse.builder()
+                .expectNext(ListFeatureFlagsResponse.builder()
                     .featureFlag(FeatureFlagEntity.builder()
                         .name("user_org_creation")
                         .enabled(false)
@@ -237,7 +237,7 @@ public final class ReactorFeatureFlagsTest {
         @Override
         protected ScriptedSubscriber<SetFeatureFlagResponse> expectations() {
             return ScriptedSubscriber.<SetFeatureFlagResponse>create()
-                .expectValue(SetFeatureFlagResponse.builder()
+                .expectNext(SetFeatureFlagResponse.builder()
                     .name("user_org_creation")
                     .enabled(true)
                     .url("/v2/config/feature_flags/user_org_creation")

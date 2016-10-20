@@ -41,7 +41,7 @@ public final class ReactorAuthorizationsTest {
         @Override
         protected ScriptedSubscriber<String> expectations() {
             return ScriptedSubscriber.<String>create()
-                .expectValue("O6A5eT")
+                .expectNext("O6A5eT")
                 .expectComplete();
         }
 
@@ -80,7 +80,7 @@ public final class ReactorAuthorizationsTest {
         @Override
         protected ScriptedSubscriber<String> expectations() {
             return ScriptedSubscriber.<String>create()
-                .expectValue("http://redirect.to/login")
+                .expectNext("http://redirect.to/login")
                 .expectComplete();
         }
 
@@ -120,7 +120,7 @@ public final class ReactorAuthorizationsTest {
         @Override
         protected ScriptedSubscriber<String> expectations() {
             return ScriptedSubscriber.<String>create()
-                .expectValue("http://localhost:8080/app/#token_type=bearer&" +
+                .expectNext("http://localhost:8080/app/#token_type=bearer&" +
                     "access_token=eyJhbGciOiJIUzI1NiIsImtpZCI6ImxlZ2FjeS10b2tlbi1rZXkiLCJ0eXAiOiJKV1QifQ.eyJqdGkiOiJlNzI4Y2UxZjUyZjE0NTU2YjViNGNiOThkMmY1ZmRiZCIsInN1YiI6IjIzOTJhMzIwLTQzZWUtNDV" +
                     "expires_in=43199&" +
                     "jti=e728ce1f52f14556b5b4cb98d2f5fdbd")
@@ -165,7 +165,7 @@ public final class ReactorAuthorizationsTest {
         @Override
         protected ScriptedSubscriber<String> expectations() {
             return ScriptedSubscriber.<String>create()
-                .expectValue("http://redirect.to/login")
+                .expectNext("http://redirect.to/login")
                 .expectComplete();
         }
 
@@ -204,7 +204,7 @@ public final class ReactorAuthorizationsTest {
         @Override
         protected ScriptedSubscriber<String> expectations() {
             return ScriptedSubscriber.<String>create()
-                .expectValue("http://localhost:8080/app/#token_type=bearer" +
+                .expectNext("http://localhost:8080/app/#token_type=bearer" +
                     "&id_token=eyJhbGciOiJIUzI1NiIsImtpZCI6ImxlZ2FjeS10b2tlbi1rZXkiLCJ0eXAiOiJKV1QifQ" +
                     ".eyJzdWIiOiIyMzkyYTMyMC00M2VlLTQ1ZTgtODdhNC1iYTkzYTIwMTZmODciLCJ1c2VyX25hbWUiOiJtYXJpc3NhIiwib3JpZ2l" +
                     "uIjoidWFhIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3VhYS9vYXV0aC90b2tlbiIsImNsaWVudF9pZCI6ImFwcCIsImF1ZCI6WyJhcHAiXSwiemlkIjoidWFhIiwidXNlcl9pZCI6IjIzOTJhMzIwLTQzZWUtNDVlOC04N2E0LWJ" +
@@ -256,7 +256,7 @@ public final class ReactorAuthorizationsTest {
         @Override
         protected ScriptedSubscriber<String> expectations() {
             return ScriptedSubscriber.<String>create()
-                .expectValue("http://redirect.to/login")
+                .expectNext("http://redirect.to/login")
                 .expectComplete();
         }
 

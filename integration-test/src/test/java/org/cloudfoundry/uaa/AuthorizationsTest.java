@@ -43,7 +43,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
     @Test
     public void authorizeByAuthorizationCodeGrantApi() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .consumeValueWith(actual -> assertThat(actual).hasSize(6))
+            .consumeNextWith(actual -> assertThat(actual).hasSize(6))
             .expectComplete();
 
         this.uaaClient.authorizations()
@@ -130,7 +130,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
 
     private static ScriptedSubscriber<String> startsWithExpectation(String prefix) {
         return ScriptedSubscriber.<String>create()
-            .consumeValueWith(actual -> assertThat(actual).startsWith(prefix))
+            .consumeNextWith(actual -> assertThat(actual).startsWith(prefix))
             .expectComplete();
     }
 

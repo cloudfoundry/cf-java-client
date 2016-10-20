@@ -40,7 +40,7 @@ public final class ReactorUsersTest {
         @Override
         protected ScriptedSubscriber<ListUsersResponse> expectations() {
             return ScriptedSubscriber.<ListUsersResponse>create()
-                .expectValue(ListUsersResponse.builder()
+                .expectNext(ListUsersResponse.builder()
                     .totalResults(2)
                     .totalPages(1)
                     .resource(UserResource.builder()

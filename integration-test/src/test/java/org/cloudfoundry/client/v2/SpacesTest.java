@@ -141,7 +141,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(this.username)
+            .expectNext(this.username)
             .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
@@ -191,7 +191,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(this.username)
+            .expectNext(this.username)
             .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
@@ -241,7 +241,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(this.username)
+            .expectNext(this.username)
             .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
@@ -269,7 +269,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(spaceName)
+            .expectNext(spaceName)
             .expectComplete();
 
         this.organizationId
@@ -336,7 +336,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(spaceName)
+            .expectNext(spaceName)
             .expectComplete();
 
         this.organizationId
@@ -357,7 +357,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(spaceName)
+            .expectNext(spaceName)
             .expectComplete();
 
         this.organizationId
@@ -398,7 +398,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(applicationName)
+            .expectNext(applicationName)
             .expectComplete();
 
         this.organizationId
@@ -419,7 +419,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(applicationName)
+            .expectNext(applicationName)
             .expectComplete();
 
         this.organizationId
@@ -464,7 +464,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(applicationName)
+            .expectNext(applicationName)
             .expectComplete();
 
         this.organizationId
@@ -487,7 +487,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(applicationName)
+            .expectNext(applicationName)
             .expectComplete();
 
         this.organizationId
@@ -518,7 +518,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(this.username)
+            .expectNext(this.username)
             .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
@@ -546,7 +546,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(this.username)
+            .expectNext(this.username)
             .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
@@ -573,7 +573,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
         String spaceName = this.nameFactory.getSpaceName();
 
-        ScriptedSubscriber<DomainResource> subscriber = ScriptedSubscriber.<DomainResource>expectValueCount(1)
+        ScriptedSubscriber<DomainResource> subscriber = ScriptedSubscriber.<DomainResource>create()
+            .expectNextCount(1)
             .expectComplete();
 
         this.organizationId
@@ -595,7 +596,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(domainName)
+            .expectNext(domainName)
             .expectComplete();
 
         this.organizationId
@@ -617,7 +618,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(domainName)
+            .expectNext(domainName)
             .expectComplete();
 
         Mono
@@ -655,7 +656,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue("audit.space.create")
+            .expectNext("audit.space.create")
             .expectComplete();
 
         this.organizationId
@@ -673,7 +674,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue("audit.space.create")
+            .expectNext("audit.space.create")
             .expectComplete();
 
         this.organizationId
@@ -692,7 +693,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String timestamp = getPastTimestamp();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue("audit.space.create")
+            .expectNext("audit.space.create")
             .expectComplete();
 
         this.organizationId
@@ -799,7 +800,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(this.username)
+            .expectNext(this.username)
             .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
@@ -818,7 +819,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(this.username)
+            .expectNext(this.username)
             .expectComplete();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
@@ -848,7 +849,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(this.username)
+            .expectNext(this.username)
             .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
@@ -934,7 +935,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(this.username)
+            .expectNext(this.username)
             .expectComplete();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
@@ -1157,7 +1158,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ScriptedSubscriber<UserSpaceRoleEntity> subscriber = ScriptedSubscriber.<UserSpaceRoleEntity>create()
-            .consumeValueWith(entity -> {
+            .consumeNextWith(entity -> {
                 assertThat(entity.getUsername()).isEqualTo(this.username);
                 assertThat(entity.getSpaceRoles()).containsExactly("space_manager");
             })
@@ -1348,7 +1349,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName2 = this.nameFactory.getSpaceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(spaceName2)
+            .expectNext(spaceName2)
             .expectComplete();
 
         this.organizationId

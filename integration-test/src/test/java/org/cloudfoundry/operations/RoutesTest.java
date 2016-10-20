@@ -66,7 +66,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = this.nameFactory.getPath();
 
         ScriptedSubscriber<Boolean> subscriber = ScriptedSubscriber.<Boolean>create()
-            .expectValue(false)
+            .expectNext(false)
             .expectComplete();
 
         this.cloudFoundryOperations.routes()
@@ -88,7 +88,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = this.nameFactory.getPath();
 
         ScriptedSubscriber<Boolean> subscriber = ScriptedSubscriber.<Boolean>create()
-            .expectValue(true)
+            .expectNext(true)
             .expectComplete();
 
         createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
@@ -109,7 +109,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = this.nameFactory.getPath();
 
         ScriptedSubscriber<Boolean> subscriber = ScriptedSubscriber.<Boolean>create()
-            .expectValue(true)
+            .expectNext(true)
             .expectComplete();
 
         createSharedDomainAndRoute(this.cloudFoundryOperations, this.spaceName, domainName, hostName, path)
@@ -131,7 +131,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = this.nameFactory.getPath();
 
         ScriptedSubscriber<Boolean> subscriber = ScriptedSubscriber.<Boolean>create()
-            .expectValue(true)
+            .expectNext(true)
             .expectComplete();
 
         createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
@@ -174,7 +174,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = this.nameFactory.getPath();
 
         ScriptedSubscriber<Boolean> subscriber = ScriptedSubscriber.<Boolean>create()
-            .expectValue(false)
+            .expectNext(false)
             .expectComplete();
 
         createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
@@ -222,7 +222,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = this.nameFactory.getPath();
 
         ScriptedSubscriber<Boolean> subscriber = ScriptedSubscriber.<Boolean>create()
-            .expectValue(false)
+            .expectNext(false)
             .expectComplete();
 
         createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
@@ -245,7 +245,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
 
-        ScriptedSubscriber<Route> subscriber = ScriptedSubscriber.<Route>expectValueCount(1)
+        ScriptedSubscriber<Route> subscriber = ScriptedSubscriber.<Route>create()
+            .expectNextCount(1)
             .expectComplete();
 
         createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
@@ -265,7 +266,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
 
-        ScriptedSubscriber<Route> subscriber = ScriptedSubscriber.<Route>expectValueCount(1)
+        ScriptedSubscriber<Route> subscriber = ScriptedSubscriber.<Route>create()
+            .expectNextCount(1)
             .expectComplete();
 
         createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
@@ -286,7 +288,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
 
-        ScriptedSubscriber<Route> subscriber = ScriptedSubscriber.<Route>expectValueCount(1)
+        ScriptedSubscriber<Route> subscriber = ScriptedSubscriber.<Route>create()
+            .expectNextCount(1)
             .expectComplete();
 
         Mono
@@ -318,7 +321,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = null;
         String path = this.nameFactory.getPath();
 
-        ScriptedSubscriber<Route> subscriber = ScriptedSubscriber.<Route>expectValueCount(1)
+        ScriptedSubscriber<Route> subscriber = ScriptedSubscriber.<Route>create()
+            .expectNextCount(1)
             .expectComplete();
 
         Mono
@@ -350,7 +354,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
         String path = null;
 
-        ScriptedSubscriber<Route> subscriber = ScriptedSubscriber.<Route>expectValueCount(1)
+        ScriptedSubscriber<Route> subscriber = ScriptedSubscriber.<Route>create()
+            .expectNextCount(1)
             .expectComplete();
 
         Mono

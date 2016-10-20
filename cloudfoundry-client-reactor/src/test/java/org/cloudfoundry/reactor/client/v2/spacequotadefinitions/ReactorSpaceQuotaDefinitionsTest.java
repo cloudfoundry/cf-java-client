@@ -57,7 +57,7 @@ public final class ReactorSpaceQuotaDefinitionsTest {
         @Override
         protected ScriptedSubscriber<AssociateSpaceQuotaDefinitionResponse> expectations() {
             return ScriptedSubscriber.<AssociateSpaceQuotaDefinitionResponse>create()
-                .expectValue(AssociateSpaceQuotaDefinitionResponse.builder()
+                .expectNext(AssociateSpaceQuotaDefinitionResponse.builder()
                     .metadata(Metadata.builder()
                         .id("ea82f16c-c21a-4a8a-947a-f7606e7f63fa")
                         .url("/v2/space_quota_definitions/ea82f16c-c21a-4a8a-947a-f7606e7f63fa")
@@ -113,7 +113,7 @@ public final class ReactorSpaceQuotaDefinitionsTest {
         @Override
         protected ScriptedSubscriber<CreateSpaceQuotaDefinitionResponse> expectations() {
             return ScriptedSubscriber.<CreateSpaceQuotaDefinitionResponse>create()
-                .expectValue(CreateSpaceQuotaDefinitionResponse.builder()
+                .expectNext(CreateSpaceQuotaDefinitionResponse.builder()
                     .metadata(Metadata.builder()
                         .id("17f055b8-b4c8-47cf-8737-0220d5706b4a")
                         .url("/v2/space_quota_definitions/17f055b8-b4c8-47cf-8737-0220d5706b4a")
@@ -213,7 +213,7 @@ public final class ReactorSpaceQuotaDefinitionsTest {
         @Override
         protected ScriptedSubscriber<DeleteSpaceQuotaDefinitionResponse> expectations() {
             return ScriptedSubscriber.<DeleteSpaceQuotaDefinitionResponse>create()
-                .expectValue(DeleteSpaceQuotaDefinitionResponse.builder()
+                .expectNext(DeleteSpaceQuotaDefinitionResponse.builder()
                     .metadata(Metadata.builder()
                         .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
                         .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
@@ -261,7 +261,7 @@ public final class ReactorSpaceQuotaDefinitionsTest {
         @Override
         protected ScriptedSubscriber<GetSpaceQuotaDefinitionResponse> expectations() {
             return ScriptedSubscriber.<GetSpaceQuotaDefinitionResponse>create()
-                .expectValue(GetSpaceQuotaDefinitionResponse.builder()
+                .expectNext(GetSpaceQuotaDefinitionResponse.builder()
                     .metadata(Metadata.builder()
                         .id("4b8e7d14-71bd-4abb-b474-183375c75c84")
                         .url("/v2/space_quota_definitions/4b8e7d14-71bd-4abb-b474-183375c75c84")
@@ -317,7 +317,7 @@ public final class ReactorSpaceQuotaDefinitionsTest {
         @Override
         protected ScriptedSubscriber<ListSpaceQuotaDefinitionsResponse> expectations() {
             return ScriptedSubscriber.<ListSpaceQuotaDefinitionsResponse>create()
-                .expectValue(ListSpaceQuotaDefinitionsResponse.builder()
+                .expectNext(ListSpaceQuotaDefinitionsResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(SpaceQuotaDefinitionResource.builder()

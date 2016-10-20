@@ -98,7 +98,7 @@ public final class ReactorProcessesTest {
         @Override
         protected ScriptedSubscriber<GetProcessResponse> expectations() {
             return ScriptedSubscriber.<GetProcessResponse>create()
-                .expectValue(GetProcessResponse.builder()
+                .expectNext(GetProcessResponse.builder()
                     .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
                     .type("web")
                     .command("rackup")
@@ -164,7 +164,7 @@ public final class ReactorProcessesTest {
         @Override
         protected ScriptedSubscriber<GetProcessStatisticsResponse> expectations() {
             return ScriptedSubscriber.<GetProcessStatisticsResponse>create()
-                .expectValue(GetProcessStatisticsResponse.builder()
+                .expectNext(GetProcessStatisticsResponse.builder()
                     .resource(ProcessStatisticsResource.builder()
                         .type("web")
                         .index(0)
@@ -223,7 +223,7 @@ public final class ReactorProcessesTest {
         @Override
         protected ScriptedSubscriber<ListProcessesResponse> expectations() {
             return ScriptedSubscriber.<ListProcessesResponse>create()
-                .expectValue(ListProcessesResponse.builder()
+                .expectNext(ListProcessesResponse.builder()
                     .pagination(Pagination.builder()
                         .totalResults(3)
                         .first(Link.builder()
@@ -333,7 +333,7 @@ public final class ReactorProcessesTest {
         @Override
         protected ScriptedSubscriber<ScaleProcessResponse> expectations() {
             return ScriptedSubscriber.<ScaleProcessResponse>create()
-                .expectValue(ScaleProcessResponse.builder()
+                .expectNext(ScaleProcessResponse.builder()
                     .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
                     .type("web")
                     .command("rackup")
@@ -402,7 +402,7 @@ public final class ReactorProcessesTest {
         @Override
         protected ScriptedSubscriber<UpdateProcessResponse> expectations() {
             return ScriptedSubscriber.<UpdateProcessResponse>create()
-                .expectValue(UpdateProcessResponse.builder()
+                .expectNext(UpdateProcessResponse.builder()
                     .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
                     .type("web")
                     .command("rackup")

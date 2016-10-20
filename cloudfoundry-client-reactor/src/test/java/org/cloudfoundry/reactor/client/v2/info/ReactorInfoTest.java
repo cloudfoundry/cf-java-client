@@ -38,7 +38,7 @@ public final class ReactorInfoTest {
         @Override
         protected ScriptedSubscriber<GetInfoResponse> expectations() {
             return ScriptedSubscriber.<GetInfoResponse>create()
-                .expectValue(GetInfoResponse.builder()
+                .expectNext(GetInfoResponse.builder()
                     .name("vcap")
                     .buildNumber("2222")
                     .support("http://support.cloudfoundry.com")

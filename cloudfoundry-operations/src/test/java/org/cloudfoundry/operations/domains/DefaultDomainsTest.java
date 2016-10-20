@@ -270,7 +270,7 @@ public final class DefaultDomainsTest {
         @Override
         protected ScriptedSubscriber<Domain> expectations() {
             return ScriptedSubscriber.<Domain>create()
-                .expectValues(Domain.builder()
+                .expectNext(Domain.builder()
                         .id("test-private-domain-id")
                         .name("test-private-domain-name")
                         .status(Status.OWNED)
@@ -304,7 +304,7 @@ public final class DefaultDomainsTest {
         @Override
         protected ScriptedSubscriber<Domain> expectations() {
             return ScriptedSubscriber.<Domain>create()
-                .expectValue(Domain.builder()
+                .expectNext(Domain.builder()
                     .id("test-private-domain-id")
                     .name("test-private-domain-name")
                     .status(Status.OWNED)
@@ -333,7 +333,7 @@ public final class DefaultDomainsTest {
         @Override
         protected ScriptedSubscriber<Domain> expectations() {
             return ScriptedSubscriber.<Domain>create()
-                .expectValue(Domain.builder()
+                .expectNext(Domain.builder()
                     .id("test-shared-domain-id")
                     .name("test-shared-domain-name")
                     .status(Status.SHARED)

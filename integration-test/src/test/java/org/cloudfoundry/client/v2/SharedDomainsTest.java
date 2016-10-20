@@ -50,7 +50,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(domainName)
+            .expectNext(domainName)
             .expectComplete();
 
         this.cloudFoundryClient.sharedDomains()
@@ -111,7 +111,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(domainName)
+            .expectNext(domainName)
             .expectComplete();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)
@@ -131,7 +131,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(domainName)
+            .expectNext(domainName)
             .expectComplete();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)

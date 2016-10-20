@@ -55,7 +55,7 @@ public final class PackagesTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         ScriptedSubscriber<State> subscriber = ScriptedSubscriber.<State>create()
-            .consumeValueWith(state -> assertThat(state).isIn(PROCESSING_UPLOAD, READY))
+            .consumeNextWith(state -> assertThat(state).isIn(PROCESSING_UPLOAD, READY))
             .expectComplete();
 
         this.spaceId

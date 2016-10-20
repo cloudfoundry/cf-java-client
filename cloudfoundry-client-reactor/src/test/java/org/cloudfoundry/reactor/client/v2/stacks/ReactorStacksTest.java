@@ -42,7 +42,7 @@ public final class ReactorStacksTest {
         @Override
         protected ScriptedSubscriber<GetStackResponse> expectations() {
             return ScriptedSubscriber.<GetStackResponse>create()
-                .expectValue(GetStackResponse.builder()
+                .expectNext(GetStackResponse.builder()
                     .metadata(Metadata.builder()
                         .id("fe4999cf-a207-4d40-bb03-f4bbf697edac")
                         .url("/v2/stacks/fe4999cf-a207-4d40-bb03-f4bbf697edac")
@@ -90,7 +90,7 @@ public final class ReactorStacksTest {
         @Override
         protected ScriptedSubscriber<ListStacksResponse> expectations() {
             return ScriptedSubscriber.<ListStacksResponse>create()
-                .expectValue(ListStacksResponse.builder()
+                .expectNext(ListStacksResponse.builder()
                     .totalResults(3)
                     .totalPages(1)
                     .resource(StackResource.builder()

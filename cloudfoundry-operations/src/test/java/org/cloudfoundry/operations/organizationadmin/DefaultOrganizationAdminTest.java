@@ -199,7 +199,7 @@ public final class DefaultOrganizationAdminTest {
         @Override
         protected ScriptedSubscriber<OrganizationQuota> expectations() {
             return ScriptedSubscriber.<OrganizationQuota>create()
-                .expectValue(OrganizationQuota.builder()
+                .expectNext(OrganizationQuota.builder()
                     .allowPaidServicePlans(true)
                     .applicationInstanceLimit(-1)
                     .id("test-quota-id")
@@ -260,7 +260,7 @@ public final class DefaultOrganizationAdminTest {
         @Override
         protected ScriptedSubscriber<OrganizationQuota> expectations() {
             return ScriptedSubscriber.<OrganizationQuota>create()
-                .expectValue(OrganizationQuota.builder()
+                .expectNext(OrganizationQuota.builder()
                     .allowPaidServicePlans(true)
                     .applicationInstanceLimit(1)
                     .id("test-quota-id")
@@ -317,7 +317,7 @@ public final class DefaultOrganizationAdminTest {
         @Override
         protected ScriptedSubscriber<OrganizationQuota> expectations() {
             return ScriptedSubscriber.<OrganizationQuota>create()
-                .expectValue(OrganizationQuota.builder()
+                .expectNext(OrganizationQuota.builder()
                     .allowPaidServicePlans(true)
                     .applicationInstanceLimit(1)
                     .id("test-quota-id")
@@ -427,7 +427,7 @@ public final class DefaultOrganizationAdminTest {
         @Override
         protected ScriptedSubscriber<OrganizationQuota> expectations() {
             return ScriptedSubscriber.<OrganizationQuota>create()
-                .expectValue(OrganizationQuota.builder()
+                .expectNext(OrganizationQuota.builder()
                     .allowPaidServicePlans(true)
                     .applicationInstanceLimit(-1)
                     .id("test-quota-id")

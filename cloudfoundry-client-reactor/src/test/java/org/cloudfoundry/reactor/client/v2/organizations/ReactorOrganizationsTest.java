@@ -125,7 +125,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<AssociateOrganizationAuditorResponse> expectations() {
             return ScriptedSubscriber.<AssociateOrganizationAuditorResponse>create()
-                .expectValue(AssociateOrganizationAuditorResponse.builder()
+                .expectNext(AssociateOrganizationAuditorResponse.builder()
                     .metadata(Metadata.builder()
                         .id("83c4fac5-cd9e-41ee-96df-b4f50fff4aef")
                         .url("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef")
@@ -186,7 +186,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<AssociateOrganizationAuditorByUsernameResponse> expectations() {
             return ScriptedSubscriber.<AssociateOrganizationAuditorByUsernameResponse>create()
-                .expectValue(AssociateOrganizationAuditorByUsernameResponse.builder()
+                .expectNext(AssociateOrganizationAuditorByUsernameResponse.builder()
                     .metadata(Metadata.builder()
                         .id("50dfb04d-cd49-477d-a54c-32e00e180022")
                         .url("/v2/organizations/50dfb04d-cd49-477d-a54c-32e00e180022")
@@ -248,7 +248,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<AssociateOrganizationBillingManagerResponse> expectations() {
             return ScriptedSubscriber.<AssociateOrganizationBillingManagerResponse>create()
-                .expectValue(AssociateOrganizationBillingManagerResponse.builder()
+                .expectNext(AssociateOrganizationBillingManagerResponse.builder()
                     .entity(OrganizationEntity.builder()
                         .applicationEventsUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/app_events")
                         .auditorsUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/auditors")
@@ -310,7 +310,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<AssociateOrganizationBillingManagerByUsernameResponse> expectations() {
             return ScriptedSubscriber.<AssociateOrganizationBillingManagerByUsernameResponse>create()
-                .expectValue(AssociateOrganizationBillingManagerByUsernameResponse.builder()
+                .expectNext(AssociateOrganizationBillingManagerByUsernameResponse.builder()
                     .metadata(Metadata.builder()
                         .id("c8d4f13c-8880-4859-8e03-fc690efd8f48")
                         .url("/v2/organizations/c8d4f13c-8880-4859-8e03-fc690efd8f48")
@@ -372,7 +372,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<AssociateOrganizationManagerResponse> expectations() {
             return ScriptedSubscriber.<AssociateOrganizationManagerResponse>create()
-                .expectValue(AssociateOrganizationManagerResponse.builder()
+                .expectNext(AssociateOrganizationManagerResponse.builder()
                     .metadata(Metadata.builder()
                         .id("cc7c5224-f973-4358-a95a-dd72decbb20f")
                         .url("/v2/organizations/cc7c5224-f973-4358-a95a-dd72decbb20f")
@@ -433,7 +433,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<AssociateOrganizationManagerByUsernameResponse> expectations() {
             return ScriptedSubscriber.<AssociateOrganizationManagerByUsernameResponse>create()
-                .expectValue(AssociateOrganizationManagerByUsernameResponse.builder()
+                .expectNext(AssociateOrganizationManagerByUsernameResponse.builder()
                     .metadata(Metadata.builder()
                         .id("8d2238e2-2fb3-4ede-b188-1fd3a533c4b4")
                         .url("/v2/organizations/8d2238e2-2fb3-4ede-b188-1fd3a533c4b4")
@@ -495,7 +495,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<AssociateOrganizationUserResponse> expectations() {
             return ScriptedSubscriber.<AssociateOrganizationUserResponse>create()
-                .expectValue(AssociateOrganizationUserResponse.builder()
+                .expectNext(AssociateOrganizationUserResponse.builder()
                     .metadata(Metadata.builder()
                         .id("584664d0-e5bb-449b-bfe5-0136c30c4ff8")
                         .url("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8")
@@ -556,7 +556,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<AssociateOrganizationUserByUsernameResponse> expectations() {
             return ScriptedSubscriber.<AssociateOrganizationUserByUsernameResponse>create()
-                .expectValue(AssociateOrganizationUserByUsernameResponse.builder()
+                .expectNext(AssociateOrganizationUserByUsernameResponse.builder()
                     .metadata(Metadata.builder()
                         .id("1a93417a-811a-46c7-85fa-4a0507c53f08")
                         .url("/v2/organizations/1a93417a-811a-46c7-85fa-4a0507c53f08")
@@ -618,7 +618,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<AssociateOrganizationPrivateDomainResponse> expectations() {
             return ScriptedSubscriber.<AssociateOrganizationPrivateDomainResponse>create()
-                .expectValue(AssociateOrganizationPrivateDomainResponse.builder()
+                .expectNext(AssociateOrganizationPrivateDomainResponse.builder()
                     .entity(OrganizationEntity.builder()
                         .name("name-228")
                         .billingEnabled(false)
@@ -679,7 +679,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<CreateOrganizationResponse> expectations() {
             return ScriptedSubscriber.<CreateOrganizationResponse>create()
-                .expectValue(CreateOrganizationResponse.builder()
+                .expectNext(CreateOrganizationResponse.builder()
                     .metadata(Metadata.builder()
                         .id("137bfc86-5a2f-4759-9c0c-59ef614cd0be")
                         .url("/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be")
@@ -777,7 +777,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<DeleteOrganizationResponse> expectations() {
             return ScriptedSubscriber.<DeleteOrganizationResponse>create()
-                .expectValue(DeleteOrganizationResponse.builder()
+                .expectNext(DeleteOrganizationResponse.builder()
                     .metadata(Metadata.builder()
                         .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
                         .createdAt("2016-02-02T17:16:31Z")
@@ -826,7 +826,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<GetOrganizationResponse> expectations() {
             return ScriptedSubscriber.<GetOrganizationResponse>create()
-                .expectValue(GetOrganizationResponse.builder()
+                .expectNext(GetOrganizationResponse.builder()
                     .metadata(Metadata.builder()
                         .id("027616f3-66c4-412c-8214-7e43db2d587b")
                         .url("/v2/organizations/027616f3-66c4-412c-8214-7e43db2d587b")
@@ -886,7 +886,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<GetOrganizationInstanceUsageResponse> expectations() {
             return ScriptedSubscriber.<GetOrganizationInstanceUsageResponse>create()
-                .expectValue(GetOrganizationInstanceUsageResponse.builder()
+                .expectNext(GetOrganizationInstanceUsageResponse.builder()
                     .instanceUsage(3)
                     .build())
                 .expectComplete();
@@ -926,7 +926,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<GetOrganizationMemoryUsageResponse> expectations() {
             return ScriptedSubscriber.<GetOrganizationMemoryUsageResponse>create()
-                .expectValue(GetOrganizationMemoryUsageResponse.builder()
+                .expectNext(GetOrganizationMemoryUsageResponse.builder()
                     .memoryUsageInMb(0)
                     .build())
                 .expectComplete();
@@ -966,7 +966,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<GetOrganizationUserRolesResponse> expectations() {
             return ScriptedSubscriber.<GetOrganizationUserRolesResponse>create()
-                .expectValue(GetOrganizationUserRolesResponse.builder()
+                .expectNext(GetOrganizationUserRolesResponse.builder()
                     .totalResults(2)
                     .totalPages(2)
                     .nextUrl("/v2/organizations/6fd1790e-0785-41ec-aff0-99915ce000c1/user_roles?order-direction=asc&page=2&results-per-page=1")
@@ -1033,7 +1033,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<ListOrganizationsResponse> expectations() {
             return ScriptedSubscriber.<ListOrganizationsResponse>create()
-                .expectValue(ListOrganizationsResponse.builder()
+                .expectNext(ListOrganizationsResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(OrganizationResource.builder()
@@ -1098,7 +1098,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<ListOrganizationAuditorsResponse> expectations() {
             return ScriptedSubscriber.<ListOrganizationAuditorsResponse>create()
-                .expectValue(ListOrganizationAuditorsResponse.builder()
+                .expectNext(ListOrganizationAuditorsResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(UserResource.builder()
@@ -1160,7 +1160,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<ListOrganizationBillingManagersResponse> expectations() {
             return ScriptedSubscriber.<ListOrganizationBillingManagersResponse>create()
-                .expectValue(ListOrganizationBillingManagersResponse.builder()
+                .expectNext(ListOrganizationBillingManagersResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(UserResource.builder()
@@ -1222,7 +1222,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<ListOrganizationDomainsResponse> expectations() {
             return ScriptedSubscriber.<ListOrganizationDomainsResponse>create()
-                .expectValue(ListOrganizationDomainsResponse.builder()
+                .expectNext(ListOrganizationDomainsResponse.builder()
                     .totalResults(2)
                     .totalPages(1)
                     .resource(DomainResource.builder()
@@ -1284,7 +1284,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<ListOrganizationManagersResponse> expectations() {
             return ScriptedSubscriber.<ListOrganizationManagersResponse>create()
-                .expectValue(ListOrganizationManagersResponse.builder()
+                .expectNext(ListOrganizationManagersResponse.builder()
                     .totalResults(2)
                     .totalPages(1)
                     .resource(UserResource.builder()
@@ -1365,7 +1365,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<ListOrganizationPrivateDomainsResponse> expectations() {
             return ScriptedSubscriber.<ListOrganizationPrivateDomainsResponse>create()
-                .expectValue(ListOrganizationPrivateDomainsResponse.builder()
+                .expectNext(ListOrganizationPrivateDomainsResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(PrivateDomainResource.builder()
@@ -1421,7 +1421,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<ListOrganizationServicesResponse> expectations() {
             return ScriptedSubscriber.<ListOrganizationServicesResponse>create()
-                .expectValue(ListOrganizationServicesResponse.builder()
+                .expectNext(ListOrganizationServicesResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(ServiceResource.builder()
@@ -1482,7 +1482,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<ListOrganizationSpaceQuotaDefinitionsResponse> expectations() {
             return ScriptedSubscriber.<ListOrganizationSpaceQuotaDefinitionsResponse>create()
-                .expectValue(ListOrganizationSpaceQuotaDefinitionsResponse.builder()
+                .expectNext(ListOrganizationSpaceQuotaDefinitionsResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(SpaceQuotaDefinitionResource.builder()
@@ -1542,7 +1542,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<ListOrganizationSpacesResponse> expectations() {
             return ScriptedSubscriber.<ListOrganizationSpacesResponse>create()
-                .expectValue(ListOrganizationSpacesResponse.builder()
+                .expectNext(ListOrganizationSpacesResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(SpaceResource.builder()
@@ -1608,7 +1608,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<ListOrganizationUsersResponse> expectations() {
             return ScriptedSubscriber.<ListOrganizationUsersResponse>create()
-                .expectValue(ListOrganizationUsersResponse.builder()
+                .expectNext(ListOrganizationUsersResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(UserResource.builder()
@@ -2005,7 +2005,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<SummaryOrganizationResponse> expectations() {
             return ScriptedSubscriber.<SummaryOrganizationResponse>create()
-                .expectValue(SummaryOrganizationResponse.builder()
+                .expectNext(SummaryOrganizationResponse.builder()
                     .id("525a6450-9202-4ea1-beca-6fdda210710e")
                     .name("name-357")
                     .status("active")
@@ -2055,7 +2055,7 @@ public final class ReactorOrganizationsTest {
         @Override
         protected ScriptedSubscriber<UpdateOrganizationResponse> expectations() {
             return ScriptedSubscriber.<UpdateOrganizationResponse>create()
-                .expectValue(UpdateOrganizationResponse.builder()
+                .expectNext(UpdateOrganizationResponse.builder()
                     .metadata(Metadata.builder()
                         .id("31a539be-dbfd-4db6-aec1-6565ebe975ed")
                         .url("/v2/organizations/31a539be-dbfd-4db6-aec1-6565ebe975ed")

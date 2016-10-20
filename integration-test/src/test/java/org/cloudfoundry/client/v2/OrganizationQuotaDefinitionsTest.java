@@ -51,7 +51,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
         String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
 
         ScriptedSubscriber<OrganizationQuotaDefinitionEntity> subscriber = ScriptedSubscriber.<OrganizationQuotaDefinitionEntity>create()
-            .expectValue(OrganizationQuotaDefinitionEntity.builder()
+            .expectNext(OrganizationQuotaDefinitionEntity.builder()
                 .applicationInstanceLimit(-1)
                 .applicationTaskLimit(-1)
                 .instanceMemoryLimit(1024)
@@ -109,7 +109,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
         String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
 
         ScriptedSubscriber<OrganizationQuotaDefinitionEntity> subscriber = ScriptedSubscriber.<OrganizationQuotaDefinitionEntity>create()
-            .expectValue(OrganizationQuotaDefinitionEntity.builder()
+            .expectNext(OrganizationQuotaDefinitionEntity.builder()
                 .applicationInstanceLimit(-1)
                 .applicationTaskLimit(-1)
                 .instanceMemoryLimit(50)
@@ -142,7 +142,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
         String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(quotaDefinitionName)
+            .expectNext(quotaDefinitionName)
             .expectComplete();
 
         requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)
@@ -167,7 +167,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
         String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
 
         ScriptedSubscriber<OrganizationQuotaDefinitionEntity> subscriber = ScriptedSubscriber.<OrganizationQuotaDefinitionEntity>create()
-            .expectValue(OrganizationQuotaDefinitionEntity.builder()
+            .expectNext(OrganizationQuotaDefinitionEntity.builder()
                 .applicationInstanceLimit(-1)
                 .applicationTaskLimit(-1)
                 .instanceMemoryLimit(50)

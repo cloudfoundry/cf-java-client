@@ -59,7 +59,7 @@ public final class ReactorIdentityZonesTest {
         @Override
         protected ScriptedSubscriber<CreateIdentityZoneResponse> expectations() {
             return ScriptedSubscriber.<CreateIdentityZoneResponse>create()
-                .expectValue(CreateIdentityZoneResponse.builder()
+                .expectNext(CreateIdentityZoneResponse.builder()
                     .createdAt(1463595920184L)
                     .description("Like the Twilight Zone but tastier.")
                     .id("twiglet-create")
@@ -195,7 +195,7 @@ public final class ReactorIdentityZonesTest {
         @Override
         protected ScriptedSubscriber<DeleteIdentityZoneResponse> expectations() {
             return ScriptedSubscriber.<DeleteIdentityZoneResponse>create()
-                .expectValue(DeleteIdentityZoneResponse.builder()
+                .expectNext(DeleteIdentityZoneResponse.builder()
                     .createdAt(1463595919906L)
                     .description("Like the Twilight Zone but tastier.")
                     .id("twiglet-delete")
@@ -283,7 +283,7 @@ public final class ReactorIdentityZonesTest {
         @Override
         protected ScriptedSubscriber<GetIdentityZoneResponse> expectations() {
             return ScriptedSubscriber.<GetIdentityZoneResponse>create()
-                .expectValue(GetIdentityZoneResponse.builder()
+                .expectNext(GetIdentityZoneResponse.builder()
                     .createdAt(1463595920104L)
                     .id("twiglet-get")
                     .lastModified(1463595920104L)
@@ -370,7 +370,7 @@ public final class ReactorIdentityZonesTest {
         @Override
         protected ScriptedSubscriber<ListIdentityZonesResponse> expectations() {
             return ScriptedSubscriber.<ListIdentityZonesResponse>create()
-                .expectValue(ListIdentityZonesResponse.builder()
+                .expectNext(ListIdentityZonesResponse.builder()
                     .identityZone(IdentityZone.builder()
                         .createdAt(1463595916851L)
                         .id("twiglet-list-1")
@@ -510,7 +510,7 @@ public final class ReactorIdentityZonesTest {
         @Override
         protected ScriptedSubscriber<UpdateIdentityZoneResponse> expectations() {
             return ScriptedSubscriber.<UpdateIdentityZoneResponse>create()
-                .expectValue(UpdateIdentityZoneResponse.builder()
+                .expectNext(UpdateIdentityZoneResponse.builder()
                     .createdAt(1463595920023L)
                     .description("Like the Twilight Zone but not tastier.")
                     .id("twiglet-update")

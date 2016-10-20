@@ -48,7 +48,7 @@ public final class DefaultAdvancedTest {
         @Override
         protected ScriptedSubscriber<String> expectations() {
             return ScriptedSubscriber.<String>create()
-                .expectValue("test-code")
+                .expectNext("test-code")
                 .expectComplete();
         }
 

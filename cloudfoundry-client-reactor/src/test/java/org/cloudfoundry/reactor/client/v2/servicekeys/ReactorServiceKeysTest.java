@@ -49,7 +49,7 @@ public final class ReactorServiceKeysTest {
         @Override
         protected ScriptedSubscriber<CreateServiceKeyResponse> expectations() {
             return ScriptedSubscriber.<CreateServiceKeyResponse>create()
-                .expectValue(CreateServiceKeyResponse.builder()
+                .expectNext(CreateServiceKeyResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:22Z")
                         .id("79aa4b11-99f3-484b-adfc-a63fa818c4d1")
@@ -135,7 +135,7 @@ public final class ReactorServiceKeysTest {
         @Override
         protected ScriptedSubscriber<GetServiceKeyResponse> expectations() {
             return ScriptedSubscriber.<GetServiceKeyResponse>create()
-                .expectValue(GetServiceKeyResponse.builder()
+                .expectNext(GetServiceKeyResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:22Z")
                         .id("7f1f30d3-bed3-4ba7-bf88-fd3a678ff4f5")
@@ -184,7 +184,7 @@ public final class ReactorServiceKeysTest {
         @Override
         protected ScriptedSubscriber<ListServiceKeysResponse> expectations() {
             return ScriptedSubscriber.<ListServiceKeysResponse>create()
-                .expectValue(ListServiceKeysResponse.builder()
+                .expectNext(ListServiceKeysResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(ServiceKeyResource.builder()

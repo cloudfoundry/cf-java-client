@@ -39,7 +39,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(serviceInstanceName)
+            .expectNext(serviceInstanceName)
             .expectComplete();
 
         this.cloudFoundryOperations.services()

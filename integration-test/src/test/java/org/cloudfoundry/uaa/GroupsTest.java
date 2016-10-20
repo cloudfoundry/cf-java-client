@@ -77,7 +77,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String memberDisplayName = this.nameFactory.getGroupName();
 
         ScriptedSubscriber<Tuple2<AddMemberResponse, String>> subscriber = ScriptedSubscriber.<Tuple2<AddMemberResponse, String>>create()
-            .consumeValueWith(consumer((response, memberGroupId) -> {
+            .consumeNextWith(consumer((response, memberGroupId) -> {
                 assertThat(response.getMemberId()).isEqualTo(memberGroupId);
                 assertThat(response.getOrigin()).isEqualTo(Optional.of(String.format("%s-origin", memberDisplayName)));
                 assertThat(response.getType()).isEqualTo(Optional.of(MemberType.GROUP));
@@ -111,7 +111,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         ScriptedSubscriber<Tuple2<AddMemberResponse, String>> subscriber = ScriptedSubscriber.<Tuple2<AddMemberResponse, String>>create()
-            .consumeValueWith(consumer((response, userId) -> {
+            .consumeNextWith(consumer((response, userId) -> {
                 assertThat(response.getMemberId()).isEqualTo(userId);
                 assertThat(response.getOrigin()).isEqualTo(Optional.of(String.format("%s-origin", userName)));
                 assertThat(response.getType()).isEqualTo(Optional.of(MemberType.USER));
@@ -144,7 +144,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         ScriptedSubscriber<Tuple2<CheckMembershipResponse, String>> subscriber = ScriptedSubscriber.<Tuple2<CheckMembershipResponse, String>>create()
-            .consumeValueWith(consumer((response, userId) -> {
+            .consumeNextWith(consumer((response, userId) -> {
                 assertThat(response.getMemberId()).isEqualTo(userId);
                 assertThat(response.getOrigin()).isEqualTo(Optional.of("test-origin"));
                 assertThat(response.getType()).isEqualTo(Optional.of(MemberType.USER));
@@ -176,7 +176,8 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String displayName = this.nameFactory.getGroupName();
         String userName = this.nameFactory.getUserName();
 
-        ScriptedSubscriber<Group> subscriber = ScriptedSubscriber.<Group>expectValueCount(1)
+        ScriptedSubscriber<Group> subscriber = ScriptedSubscriber.<Group>create()
+            .expectNextCount(1)
             .expectComplete();
 
         createUserId(this.uaaClient, userName)
@@ -200,7 +201,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String displayName = this.nameFactory.getGroupName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(displayName)
+            .expectNext(displayName)
             .expectComplete();
 
         createGroupId(this.uaaClient, displayName)
@@ -219,7 +220,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String displayName = this.nameFactory.getGroupName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(displayName)
+            .expectNext(displayName)
             .expectComplete();
 
         createGroupId(this.uaaClient, displayName)
@@ -238,7 +239,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String displayName = this.nameFactory.getGroupName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(displayName)
+            .expectNext(displayName)
             .expectComplete();
 
         createGroupId(this.uaaClient, displayName)
@@ -260,7 +261,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String displayName = this.nameFactory.getGroupName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(displayName + "-external-group")
+            .expectNext(displayName + "-external-group")
             .expectComplete();
 
         createGroupId(this.uaaClient, displayName)
@@ -313,7 +314,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(userName)
+            .expectNext(userName)
             .expectComplete();
 
         createUserId(this.uaaClient, userName)
@@ -339,7 +340,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String displayName = this.nameFactory.getGroupName();
 
         ScriptedSubscriber<ExternalGroupResource> subscriber = ScriptedSubscriber.<ExternalGroupResource>create()
-            .consumeValueWith(resource -> {
+            .consumeNextWith(resource -> {
                 assertThat(resource.getExternalGroup()).isEqualTo(String.format("%s-external-group", displayName));
                 assertThat(resource.getOrigin()).isEqualTo(String.format("%s-origin", displayName));
             })
@@ -434,7 +435,8 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String baseDisplayName = this.nameFactory.getGroupName();
         String newDisplayName = this.nameFactory.getGroupName();
 
-        ScriptedSubscriber<Group> subscriber = ScriptedSubscriber.<Group>expectValueCount(1)
+        ScriptedSubscriber<Group> subscriber = ScriptedSubscriber.<Group>create()
+            .expectNextCount(1)
             .expectComplete();
 
         createGroupId(this.uaaClient, baseDisplayName)

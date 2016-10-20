@@ -103,7 +103,7 @@ public final class ReactorApplicationsV2Test {
         @Override
         protected ScriptedSubscriber<AssociateApplicationRouteResponse> expectations() {
             return ScriptedSubscriber.<AssociateApplicationRouteResponse>create()
-                .expectValue(AssociateApplicationRouteResponse.builder()
+                .expectNext(AssociateApplicationRouteResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:19Z")
                         .id("638e90b6-502f-47a8-a3bf-b18fdf3fb70a")
@@ -176,7 +176,7 @@ public final class ReactorApplicationsV2Test {
         @Override
         protected ScriptedSubscriber<CopyApplicationResponse> expectations() {
             return ScriptedSubscriber.<CopyApplicationResponse>create()
-                .expectValue(CopyApplicationResponse.builder()
+                .expectNext(CopyApplicationResponse.builder()
                     .entity(JobEntity.builder()
                         .id("c900719e-c70a-4c75-9e6a-9535f118acc3")
                         .status("queued")
@@ -226,7 +226,7 @@ public final class ReactorApplicationsV2Test {
         @Override
         protected ScriptedSubscriber<CreateApplicationResponse> expectations() {
             return ScriptedSubscriber.<CreateApplicationResponse>create()
-                .expectValue(CreateApplicationResponse.builder()
+                .expectNext(CreateApplicationResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:20Z")
                         .id("78d1a119-2ded-405f-8675-421d8dade602")
@@ -337,7 +337,7 @@ public final class ReactorApplicationsV2Test {
         @Override
         protected ScriptedSubscriber<byte[]> expectations() {
             return ScriptedSubscriber.<byte[]>create()
-                .consumeValueWith(actual -> assertThat(actual).isEqualTo(getBytes("fixtures/client/v2/apps/GET_{id}_download_response.bin")))
+                .consumeNextWith(actual -> assertThat(actual).isEqualTo(getBytes("fixtures/client/v2/apps/GET_{id}_download_response.bin")))
                 .expectComplete();
         }
 
@@ -376,7 +376,7 @@ public final class ReactorApplicationsV2Test {
         @Override
         protected ScriptedSubscriber<byte[]> expectations() {
             return ScriptedSubscriber.<byte[]>create()
-                .consumeValueWith(actual -> assertThat(actual).isEqualTo(getBytes("fixtures/client/v2/apps/GET_{id}_download_response.bin")))
+                .consumeNextWith(actual -> assertThat(actual).isEqualTo(getBytes("fixtures/client/v2/apps/GET_{id}_download_response.bin")))
                 .expectComplete();
         }
 
@@ -415,7 +415,7 @@ public final class ReactorApplicationsV2Test {
         @Override
         protected ScriptedSubscriber<ApplicationEnvironmentResponse> expectations() {
             return ScriptedSubscriber.<ApplicationEnvironmentResponse>create()
-                .expectValue(ApplicationEnvironmentResponse.builder()
+                .expectNext(ApplicationEnvironmentResponse.builder()
                     .stagingEnvironmentJson("STAGING_ENV", "staging_value")
                     .runningEnvironmentJson("RUNNING_ENV", "running_value")
                     .environmentJson("env_var", "env_val")
@@ -476,7 +476,7 @@ public final class ReactorApplicationsV2Test {
         @Override
         protected ScriptedSubscriber<GetApplicationResponse> expectations() {
             return ScriptedSubscriber.<GetApplicationResponse>create()
-                .expectValue(GetApplicationResponse.builder()
+                .expectNext(GetApplicationResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:20Z")
                         .id("03f286bb-f17c-42b4-8dcd-b818b0b798af")
@@ -546,7 +546,7 @@ public final class ReactorApplicationsV2Test {
         @Override
         protected ScriptedSubscriber<ApplicationInstancesResponse> expectations() {
             return ScriptedSubscriber.<ApplicationInstancesResponse>create()
-                .expectValue(ApplicationInstancesResponse.builder()
+                .expectNext(ApplicationInstancesResponse.builder()
                     .instance("0", ApplicationInstanceInfo.builder()
                         .since(1403140717.984577d)
                         .state("RUNNING")
@@ -590,7 +590,7 @@ public final class ReactorApplicationsV2Test {
         @Override
         protected ScriptedSubscriber<ListApplicationsResponse> expectations() {
             return ScriptedSubscriber.<ListApplicationsResponse>create()
-                .expectValue(ListApplicationsResponse.builder()
+                .expectNext(ListApplicationsResponse.builder()
                     .totalResults(3)
                     .totalPages(1)
                     .resource(ApplicationResource.builder()
@@ -734,7 +734,7 @@ public final class ReactorApplicationsV2Test {
         @Override
         protected ScriptedSubscriber<ListApplicationRoutesResponse> expectations() {
             return ScriptedSubscriber.<ListApplicationRoutesResponse>create()
-                .expectValue(ListApplicationRoutesResponse.builder()
+                .expectNext(ListApplicationRoutesResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(RouteResource.builder()
@@ -794,7 +794,7 @@ public final class ReactorApplicationsV2Test {
         @Override
         protected ScriptedSubscriber<ListApplicationServiceBindingsResponse> expectations() {
             return ScriptedSubscriber.<ListApplicationServiceBindingsResponse>create()
-                .expectValue(ListApplicationServiceBindingsResponse.builder()
+                .expectNext(ListApplicationServiceBindingsResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(ServiceBindingResource.builder()
@@ -927,7 +927,7 @@ public final class ReactorApplicationsV2Test {
         @Override
         protected ScriptedSubscriber<RestageApplicationResponse> expectations() {
             return ScriptedSubscriber.<RestageApplicationResponse>create()
-                .expectValue(RestageApplicationResponse.builder()
+                .expectNext(RestageApplicationResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:33Z")
                         .id("2c6b3d3c-47bb-4060-be49-a56496ab57d4")
@@ -993,7 +993,7 @@ public final class ReactorApplicationsV2Test {
         @Override
         protected ScriptedSubscriber<ApplicationStatisticsResponse> expectations() {
             return ScriptedSubscriber.<ApplicationStatisticsResponse>create()
-                .expectValue(ApplicationStatisticsResponse.builder()
+                .expectNext(ApplicationStatisticsResponse.builder()
                     .instance("0", InstanceStatistics.builder()
                         .state("RUNNING")
                         .statistics(org.cloudfoundry.client.v2.applications.Statistics.builder()
@@ -1052,7 +1052,7 @@ public final class ReactorApplicationsV2Test {
         @Override
         protected ScriptedSubscriber<SummaryApplicationResponse> expectations() {
             return ScriptedSubscriber.<SummaryApplicationResponse>create()
-                .expectValue(SummaryApplicationResponse.builder()
+                .expectNext(SummaryApplicationResponse.builder()
                     .id("2ee5ef3f-3884-4240-ab99-c747ea21663b")
                     .name("name-1136")
                     .route(Route.builder()
@@ -1184,7 +1184,7 @@ public final class ReactorApplicationsV2Test {
         @Override
         protected ScriptedSubscriber<UpdateApplicationResponse> expectations() {
             return ScriptedSubscriber.<UpdateApplicationResponse>create()
-                .expectValue(UpdateApplicationResponse.builder()
+                .expectNext(UpdateApplicationResponse.builder()
                     .entity(ApplicationEntity.builder()
                         .name("new_name")
                         .production(false)
@@ -1259,7 +1259,7 @@ public final class ReactorApplicationsV2Test {
         @Override
         protected ScriptedSubscriber<UploadApplicationResponse> expectations() {
             return ScriptedSubscriber.<UploadApplicationResponse>create()
-                .expectValue(UploadApplicationResponse.builder()
+                .expectNext(UploadApplicationResponse.builder()
                     .entity(JobEntity.builder()
                         .id("eff6a47e-67a1-4e3b-99a5-4f9bcab7620a")
                         .status("queued")
