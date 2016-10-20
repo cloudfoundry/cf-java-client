@@ -55,7 +55,7 @@ public final class ReactorServiceBindingsV2Test {
         @Override
         protected ScriptedSubscriber<CreateServiceBindingResponse> expectations() {
             return ScriptedSubscriber.<CreateServiceBindingResponse>create()
-                .expectValue(CreateServiceBindingResponse.builder()
+                .expectNext(CreateServiceBindingResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:20Z")
                         .id("42eda707-fe4d-4eed-9b39-7cb5e665c226")
@@ -147,7 +147,7 @@ public final class ReactorServiceBindingsV2Test {
         @Override
         protected ScriptedSubscriber<DeleteServiceBindingResponse> expectations() {
             return ScriptedSubscriber.<DeleteServiceBindingResponse>create()
-                .expectValue(DeleteServiceBindingResponse.builder()
+                .expectNext(DeleteServiceBindingResponse.builder()
                     .metadata(Metadata.builder()
                         .id("c4faac01-5bbd-494f-8849-256a3bab06b8")
                         .createdAt("2016-03-14T22:30:51Z")
@@ -196,7 +196,7 @@ public final class ReactorServiceBindingsV2Test {
         @Override
         protected ScriptedSubscriber<GetServiceBindingResponse> expectations() {
             return ScriptedSubscriber.<GetServiceBindingResponse>create()
-                .expectValue(GetServiceBindingResponse.builder()
+                .expectNext(GetServiceBindingResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-11-03T00:53:50Z")
                         .id("925d8848-4808-47cf-a3e8-049aa0163328")
@@ -250,7 +250,7 @@ public final class ReactorServiceBindingsV2Test {
         @Override
         protected ScriptedSubscriber<ListServiceBindingsResponse> expectations() {
             return ScriptedSubscriber.<ListServiceBindingsResponse>create()
-                .expectValue(ListServiceBindingsResponse.builder()
+                .expectNext(ListServiceBindingsResponse.builder()
                     .totalResults(3)
                     .totalPages(1)
                     .resource(ServiceBindingResource.builder()

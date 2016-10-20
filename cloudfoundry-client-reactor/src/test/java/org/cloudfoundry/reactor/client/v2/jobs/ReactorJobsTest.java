@@ -40,7 +40,7 @@ public final class ReactorJobsTest {
         @Override
         protected ScriptedSubscriber<GetJobResponse> expectations() {
             return ScriptedSubscriber.<GetJobResponse>create()
-                .expectValue(GetJobResponse.builder()
+                .expectNext(GetJobResponse.builder()
                     .metadata(Metadata.builder()
                         .id("e86ffe00-a243-48f7-be05-8f1f41bee864")
                         .createdAt("2015-11-30T23:38:44Z")

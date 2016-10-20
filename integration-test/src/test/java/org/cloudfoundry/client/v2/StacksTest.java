@@ -45,7 +45,7 @@ public final class StacksTest extends AbstractIntegrationTest {
     @Test
     public void get() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(this.stackName)
+            .expectNext(this.stackName)
             .expectComplete();
 
         getStackId(this.cloudFoundryClient, this.stackName)
@@ -62,7 +62,7 @@ public final class StacksTest extends AbstractIntegrationTest {
     @Test
     public void list() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(this.stackName)
+            .expectNext(this.stackName)
             .expectComplete();
 
         getStackId(this.cloudFoundryClient, this.stackName)
@@ -82,7 +82,7 @@ public final class StacksTest extends AbstractIntegrationTest {
     @Test
     public void listFilterByName() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue(this.stackName)
+            .expectNext(this.stackName)
             .expectComplete();
 
         requestClientV2Resources(page -> this.cloudFoundryClient.stacks()

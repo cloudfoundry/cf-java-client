@@ -54,7 +54,7 @@ public final class ReactorServiceBindingsV3Test {
         @Override
         protected ScriptedSubscriber<CreateServiceBindingResponse> expectations() {
             return ScriptedSubscriber.<CreateServiceBindingResponse>create()
-                .expectValue(CreateServiceBindingResponse.builder()
+                .expectNext(CreateServiceBindingResponse.builder()
                     .id("dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
                     .type("app")
                     .data(ServiceBindingData.builder()
@@ -157,7 +157,7 @@ public final class ReactorServiceBindingsV3Test {
         @Override
         protected ScriptedSubscriber<GetServiceBindingResponse> expectations() {
             return ScriptedSubscriber.<GetServiceBindingResponse>create()
-                .expectValue(GetServiceBindingResponse.builder()
+                .expectNext(GetServiceBindingResponse.builder()
                     .id("dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
                     .type("app")
                     .data(ServiceBindingData.builder()
@@ -212,7 +212,7 @@ public final class ReactorServiceBindingsV3Test {
         @Override
         protected ScriptedSubscriber<ListServiceBindingsResponse> expectations() {
             return ScriptedSubscriber.<ListServiceBindingsResponse>create()
-                .expectValue(ListServiceBindingsResponse.builder()
+                .expectNext(ListServiceBindingsResponse.builder()
                     .pagination(Pagination.builder()
                         .totalResults(3)
                         .first(Link.builder()

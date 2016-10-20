@@ -45,7 +45,7 @@ public final class ReactorApplicationUsageEventsTest {
         @Override
         protected ScriptedSubscriber<GetApplicationUsageEventResponse> expectations() {
             return ScriptedSubscriber.<GetApplicationUsageEventResponse>create()
-                .expectValue(GetApplicationUsageEventResponse.builder()
+                .expectNext(GetApplicationUsageEventResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2016-03-17T21:41:21Z")
                         .id("caac0ed4-febf-48a4-951f-c0a7fadf6a68")
@@ -102,7 +102,7 @@ public final class ReactorApplicationUsageEventsTest {
         @Override
         protected ScriptedSubscriber<ListApplicationUsageEventsResponse> expectations() {
             return ScriptedSubscriber.<ListApplicationUsageEventsResponse>create()
-                .expectValue(ListApplicationUsageEventsResponse.builder()
+                .expectNext(ListApplicationUsageEventsResponse.builder()
                     .nextUrl("/v2/app_usage_events?after_guid=f1d8ddec-d36a-4670-acb8-6082a1f1a95f&order-direction=asc&page=2&results-per-page=1")
                     .totalPages(2)
                     .totalResults(2)

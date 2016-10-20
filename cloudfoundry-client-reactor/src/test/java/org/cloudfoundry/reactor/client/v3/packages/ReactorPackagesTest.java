@@ -73,7 +73,7 @@ public final class ReactorPackagesTest {
         @Override
         protected ScriptedSubscriber<CopyPackageResponse> expectations() {
             return ScriptedSubscriber.<CopyPackageResponse>create()
-                .expectValue(CopyPackageResponse.builder()
+                .expectNext(CopyPackageResponse.builder()
                     .id("041af871-9d09-45de-ad2d-df8c4771a1ee")
                     .type(PackageType.DOCKER)
                     .data(DockerData.builder()
@@ -130,7 +130,7 @@ public final class ReactorPackagesTest {
         @Override
         protected ScriptedSubscriber<CreatePackageResponse> expectations() {
             return ScriptedSubscriber.<CreatePackageResponse>create()
-                .expectValue(CreatePackageResponse.builder()
+                .expectNext(CreatePackageResponse.builder()
                     .id("909affe0-4aa1-42f4-b399-1a67cb5a90fa")
                     .type(PackageType.DOCKER)
                     .data(DockerData.builder()
@@ -227,7 +227,7 @@ public final class ReactorPackagesTest {
         @Override
         protected ScriptedSubscriber<byte[]> expectations() {
             return ScriptedSubscriber.<byte[]>create()
-                .consumeValueWith(actual -> assertThat(actual).isEqualTo(getBytes("fixtures/client/v3/packages/GET_{id}_download_response.bin")))
+                .consumeNextWith(actual -> assertThat(actual).isEqualTo(getBytes("fixtures/client/v3/packages/GET_{id}_download_response.bin")))
                 .expectComplete();
         }
 
@@ -266,7 +266,7 @@ public final class ReactorPackagesTest {
         @Override
         protected ScriptedSubscriber<GetPackageResponse> expectations() {
             return ScriptedSubscriber.<GetPackageResponse>create()
-                .expectValue(GetPackageResponse.builder()
+                .expectNext(GetPackageResponse.builder()
                     .id("guid-ebaae129-a8ee-43cf-a0a6-734c7ed0d1b4")
                     .type(PackageType.BITS)
                     .data(BitsData.builder()
@@ -332,7 +332,7 @@ public final class ReactorPackagesTest {
         @Override
         protected ScriptedSubscriber<ListPackagesResponse> expectations() {
             return ScriptedSubscriber.<ListPackagesResponse>create()
-                .expectValue(ListPackagesResponse.builder()
+                .expectNext(ListPackagesResponse.builder()
                     .pagination(Pagination.builder()
                         .totalResults(3)
                         .first(Link.builder()
@@ -430,7 +430,7 @@ public final class ReactorPackagesTest {
         @Override
         protected ScriptedSubscriber<StagePackageResponse> expectations() {
             return ScriptedSubscriber.<StagePackageResponse>create()
-                .expectValue(StagePackageResponse.builder()
+                .expectNext(StagePackageResponse.builder()
                     .id("whatuuid")
                     .state(org.cloudfoundry.client.v3.droplets.State.PENDING)
                     .lifecycle(Lifecycle.builder()
@@ -523,7 +523,7 @@ public final class ReactorPackagesTest {
         @Override
         protected ScriptedSubscriber<UploadPackageResponse> expectations() {
             return ScriptedSubscriber.<UploadPackageResponse>create()
-                .expectValue(UploadPackageResponse.builder()
+                .expectNext(UploadPackageResponse.builder()
                     .id("guid-f582d3d1-320c-4524-9c4f-480252ab5bff")
                     .type(PackageType.BITS)
                     .data(BitsData.builder()

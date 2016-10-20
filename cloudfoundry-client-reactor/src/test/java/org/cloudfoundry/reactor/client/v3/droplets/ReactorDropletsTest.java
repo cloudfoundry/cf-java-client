@@ -91,7 +91,7 @@ public final class ReactorDropletsTest {
         @Override
         protected ScriptedSubscriber<GetDropletResponse> expectations() {
             return ScriptedSubscriber.<GetDropletResponse>create()
-                .expectValue(GetDropletResponse.builder()
+                .expectNext(GetDropletResponse.builder()
                     .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
                     .state(State.STAGED)
                     .lifecycle(Lifecycle.builder()
@@ -185,7 +185,7 @@ public final class ReactorDropletsTest {
         @Override
         protected ScriptedSubscriber<ListDropletsResponse> expectations() {
             return ScriptedSubscriber.<ListDropletsResponse>create()
-                .expectValue(ListDropletsResponse.builder()
+                .expectNext(ListDropletsResponse.builder()
                     .pagination(Pagination.builder()
                         .totalResults(2)
                         .totalPages(1)

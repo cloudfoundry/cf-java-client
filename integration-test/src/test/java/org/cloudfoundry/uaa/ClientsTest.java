@@ -86,7 +86,8 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String newClientSecret1 = this.nameFactory.getClientSecret();
         String newClientSecret2 = this.nameFactory.getClientSecret();
 
-        ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>expectValueCount(2)
+        ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
+            .expectNextCount(2)
             .expectComplete();
 
         requestCreateClient(this.uaaClient, clientId1, clientSecret)
@@ -117,7 +118,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientSecret = this.nameFactory.getClientSecret();
 
         ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
-            .consumeValueWith(response -> {
+            .consumeNextWith(response -> {
                 assertThat(response.getAuthorizedGrantTypes()).containsExactly(PASSWORD, REFRESH_TOKEN);
                 assertThat(response.getClientId()).isEqualTo(clientId1);
                 assertThat(response.getScopes()).containsExactly("client.read", "client.write");
@@ -182,7 +183,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientSecret = this.nameFactory.getClientSecret();
 
         ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
-            .consumeValueWith(response -> {
+            .consumeNextWith(response -> {
                 assertThat(response.getAuthorizedGrantTypes()).containsExactly(IMPLICIT, CLIENT_CREDENTIALS);
                 assertThat(response.getClientId()).isEqualTo(clientId1);
                 assertThat(response.getName()).isEqualTo("test-name");
@@ -250,7 +251,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientSecret = this.nameFactory.getClientSecret();
 
         ScriptedSubscriber<CreateClientResponse> subscriber = ScriptedSubscriber.<CreateClientResponse>create()
-            .consumeValueWith(response -> {
+            .consumeNextWith(response -> {
                 assertThat(response.getAuthorizedGrantTypes()).containsExactly(PASSWORD, REFRESH_TOKEN);
                 assertThat(response.getClientId()).isEqualTo(clientId);
                 assertThat(response.getScopes()).containsExactly("client.read", "client.write");
@@ -298,7 +299,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientSecret = this.nameFactory.getClientSecret();
 
         ScriptedSubscriber<GetClientResponse> subscriber = ScriptedSubscriber.<GetClientResponse>create()
-            .consumeValueWith(response -> {
+            .consumeNextWith(response -> {
                 assertThat(response.getAuthorizedGrantTypes()).containsExactly(PASSWORD, REFRESH_TOKEN);
                 assertThat(response.getClientId()).isEqualTo(clientId);
             })
@@ -317,7 +318,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     @Test
     public void getMetadata() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<GetMetadataResponse> subscriber = ScriptedSubscriber.<GetMetadataResponse>create()
-            .consumeValueWith(metadata -> {
+            .consumeNextWith(metadata -> {
                 assertThat(metadata.getAppLaunchUrl()).isEqualTo("http://test.get.url");
                 assertThat(metadata.getClientId()).isEqualTo(this.clientId);
             })
@@ -338,7 +339,8 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
 
-        ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>expectValueCount(1)
+        ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
+            .expectNextCount(1)
             .expectComplete();
 
         requestCreateClient(this.uaaClient, clientId, clientSecret)
@@ -355,7 +357,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     @Test
     public void listMetadatas() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<Metadata> subscriber = ScriptedSubscriber.<Metadata>create()
-            .consumeValueWith(metadata -> {
+            .consumeNextWith(metadata -> {
                 assertThat(metadata.getAppLaunchUrl()).isEqualTo("http://test.list.url");
                 assertThat(metadata.getClientId()).isEqualTo(this.clientId);
             })
@@ -381,9 +383,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String newClientSecret = this.nameFactory.getClientSecret();
 
         ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
-            .consumeValueWith(client -> {
-                assertThat(client.getName()).isEqualTo("test-name-new");
-            })
+            .consumeNextWith(client -> assertThat(client.getName()).isEqualTo("test-name-new"))
             .expectComplete();
 
         this.uaaClient.clients()
@@ -431,7 +431,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientSecret = this.nameFactory.getClientSecret();
 
         ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
-            .consumeValueWith(response -> {
+            .consumeNextWith(response -> {
                 assertThat(response.getAuthorizedGrantTypes()).containsExactly(CLIENT_CREDENTIALS);
                 assertThat(response.getClientId()).isEqualTo(clientId);
                 assertThat(response.getName()).isEqualTo("test-name");
@@ -457,7 +457,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String appIcon = Base64.getEncoder().encodeToString(new AsciiString("test-image").toByteArray());
 
         ScriptedSubscriber<GetMetadataResponse> subscriber = ScriptedSubscriber.<GetMetadataResponse>create()
-            .consumeValueWith(metadata -> {
+            .consumeNextWith(metadata -> {
                 assertThat(metadata.getAppIcon()).isEqualTo(appIcon);
                 assertThat(metadata.getAppLaunchUrl()).isEqualTo("http://test.app.launch.url");
                 assertThat(metadata.getClientId()).isEqualTo(this.clientId);

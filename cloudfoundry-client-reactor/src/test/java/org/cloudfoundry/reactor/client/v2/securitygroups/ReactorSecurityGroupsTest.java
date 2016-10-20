@@ -61,7 +61,7 @@ public final class ReactorSecurityGroupsTest {
         @Override
         protected ScriptedSubscriber<CreateSecurityGroupResponse> expectations() {
             return ScriptedSubscriber.<CreateSecurityGroupResponse>create()
-                .expectValue(CreateSecurityGroupResponse.builder()
+                .expectNext(CreateSecurityGroupResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2016-05-12T00:45:26Z")
                         .id("966e7ac0-1c1a-4ca9-8a5f-77c96576beb7")
@@ -190,7 +190,7 @@ public final class ReactorSecurityGroupsTest {
         @Override
         protected ScriptedSubscriber<DeleteSecurityGroupResponse> expectations() {
             return ScriptedSubscriber.<DeleteSecurityGroupResponse>create()
-                .expectValue(DeleteSecurityGroupResponse.builder()
+                .expectNext(DeleteSecurityGroupResponse.builder()
                     .metadata(Metadata.builder()
                         .id("260ba675-47b6-4094-be7a-349d58e3d36a")
                         .createdAt("2016-02-02T17:16:31Z")
@@ -311,7 +311,7 @@ public final class ReactorSecurityGroupsTest {
         @Override
         protected ScriptedSubscriber<ListSecurityGroupsResponse> expectations() {
             return ScriptedSubscriber.<ListSecurityGroupsResponse>create()
-                .expectValue(ListSecurityGroupsResponse.builder()
+                .expectNext(ListSecurityGroupsResponse.builder()
                     .totalResults(5)
                     .totalPages(1)
                     .resource(SecurityGroupResource.builder()
@@ -432,7 +432,7 @@ public final class ReactorSecurityGroupsTest {
         @Override
         protected ScriptedSubscriber<ListSecurityGroupRunningDefaultsResponse> expectations() {
             return ScriptedSubscriber.<ListSecurityGroupRunningDefaultsResponse>create()
-                .expectValue(ListSecurityGroupRunningDefaultsResponse.builder()
+                .expectNext(ListSecurityGroupRunningDefaultsResponse.builder()
                     .totalPages(1)
                     .totalResults(1)
                     .resource(SecurityGroupResource.builder()
@@ -488,7 +488,7 @@ public final class ReactorSecurityGroupsTest {
         @Override
         protected ScriptedSubscriber<ListSecurityGroupStagingDefaultsResponse> expectations() {
             return ScriptedSubscriber.<ListSecurityGroupStagingDefaultsResponse>create()
-                .expectValue(ListSecurityGroupStagingDefaultsResponse.builder()
+                .expectNext(ListSecurityGroupStagingDefaultsResponse.builder()
                     .totalPages(1)
                     .totalResults(1)
                     .resource(SecurityGroupResource.builder()
@@ -544,7 +544,7 @@ public final class ReactorSecurityGroupsTest {
         @Override
         protected ScriptedSubscriber<SetSecurityGroupRunningDefaultResponse> expectations() {
             return ScriptedSubscriber.<SetSecurityGroupRunningDefaultResponse>create()
-                .expectValue(SetSecurityGroupRunningDefaultResponse.builder()
+                .expectNext(SetSecurityGroupRunningDefaultResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2016-04-06T00:17:17Z")
                         .id("9aa7ab9c-997f-4f87-be50-87105521881a")
@@ -599,7 +599,7 @@ public final class ReactorSecurityGroupsTest {
         @Override
         protected ScriptedSubscriber<SetSecurityGroupStagingDefaultResponse> expectations() {
             return ScriptedSubscriber.<SetSecurityGroupStagingDefaultResponse>create()
-                .expectValue(SetSecurityGroupStagingDefaultResponse.builder()
+                .expectNext(SetSecurityGroupStagingDefaultResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2016-04-16T01:23:52Z")
                         .id("50165fce-6c41-4c35-a4d8-3858ee217d36")

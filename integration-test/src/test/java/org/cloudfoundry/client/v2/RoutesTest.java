@@ -72,7 +72,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<ApplicationResource> subscriber = ScriptedSubscriber.<ApplicationResource>expectValueCount(1)
+        ScriptedSubscriber<ApplicationResource> subscriber = ScriptedSubscriber.<ApplicationResource>create()
+            .expectNextCount(1)
             .expectComplete();
 
         Mono
@@ -181,7 +182,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
 
         ScriptedSubscriber<Boolean> subscriber = ScriptedSubscriber.<Boolean>create()
-            .expectValue(true)
+            .expectNext(true)
             .expectComplete();
 
         Mono
@@ -213,7 +214,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName2 = this.nameFactory.getHostName();
 
         ScriptedSubscriber<Boolean> subscriber = ScriptedSubscriber.<Boolean>create()
-            .expectValue(false)
+            .expectNext(false)
             .expectComplete();
 
         Mono
@@ -276,7 +277,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<ApplicationResource> subscriber = ScriptedSubscriber.<ApplicationResource>expectValueCount(1)
+        ScriptedSubscriber<ApplicationResource> subscriber = ScriptedSubscriber.<ApplicationResource>create()
+            .expectNextCount(1)
             .expectComplete();
 
         Mono
@@ -306,7 +308,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<ApplicationResource> subscriber = ScriptedSubscriber.<ApplicationResource>expectValueCount(1)
+        ScriptedSubscriber<ApplicationResource> subscriber = ScriptedSubscriber.<ApplicationResource>create()
+            .expectNextCount(1)
             .expectComplete();
 
         Mono
@@ -337,7 +340,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<ApplicationResource> subscriber = ScriptedSubscriber.<ApplicationResource>expectValueCount(1)
+        ScriptedSubscriber<ApplicationResource> subscriber = ScriptedSubscriber.<ApplicationResource>create()
+            .expectNextCount(1)
             .expectComplete();
 
         Mono
@@ -368,7 +372,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<ApplicationResource> subscriber = ScriptedSubscriber.<ApplicationResource>expectValueCount(1)
+        ScriptedSubscriber<ApplicationResource> subscriber = ScriptedSubscriber.<ApplicationResource>create()
+            .expectNextCount(1)
             .expectComplete();
 
         this.organizationId
@@ -402,7 +407,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<ApplicationResource> subscriber = ScriptedSubscriber.<ApplicationResource>expectValueCount(1)
+        ScriptedSubscriber<ApplicationResource> subscriber = ScriptedSubscriber.<ApplicationResource>create()
+            .expectNextCount(1)
             .expectComplete();
 
         Mono
@@ -434,7 +440,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<ApplicationResource> subscriber = ScriptedSubscriber.<ApplicationResource>expectValueCount(1)
+        ScriptedSubscriber<ApplicationResource> subscriber = ScriptedSubscriber.<ApplicationResource>create()
+            .expectNextCount(1)
             .expectComplete();
 
         Mono
@@ -468,7 +475,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void listFilterByDomainId() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<RouteResource> subscriber = ScriptedSubscriber.<RouteResource>expectValueCount(1)
+        ScriptedSubscriber<RouteResource> subscriber = ScriptedSubscriber.<RouteResource>create()
+            .expectNextCount(1)
             .expectComplete();
 
         Mono
@@ -494,7 +502,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
         String host = this.nameFactory.getHostName();
 
-        ScriptedSubscriber<RouteResource> subscriber = ScriptedSubscriber.<RouteResource>expectValueCount(1)
+        ScriptedSubscriber<RouteResource> subscriber = ScriptedSubscriber.<RouteResource>create()
+            .expectNextCount(1)
             .expectComplete();
 
         Mono
@@ -525,7 +534,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         ScriptedSubscriber<Long> subscriber = ScriptedSubscriber.<Long>create()
-            .consumeValueWith(count -> assertThat(count).isGreaterThan(0))
+            .consumeNextWith(count -> assertThat(count).isGreaterThan(0))
             .expectComplete();
 
         this.organizationId
@@ -553,7 +562,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
         String path = this.nameFactory.getPath();
 
-        ScriptedSubscriber<RouteResource> subscriber = ScriptedSubscriber.<RouteResource>expectValueCount(1)
+        ScriptedSubscriber<RouteResource> subscriber = ScriptedSubscriber.<RouteResource>create()
+            .expectNextCount(1)
             .expectComplete();
 
         Mono
@@ -619,7 +629,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue("test-host")
+            .expectNext("test-host")
             .expectComplete();
 
         Mono
@@ -669,7 +679,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     private static ScriptedSubscriber<Tuple3<String, String, RouteEntity>> domainIdSpaceIdEquality() {
         return ScriptedSubscriber.<Tuple3<String, String, RouteEntity>>create()
-            .consumeValueWith(consumer((domainId, spaceId, entity) -> {
+            .consumeNextWith(consumer((domainId, spaceId, entity) -> {
                 assertThat(entity.getDomainId()).isEqualTo(domainId);
                 assertThat(entity.getSpaceId()).isEqualTo(spaceId);
             }))

@@ -68,7 +68,7 @@ public final class DefaultSpaceAdminTest {
         @Override
         protected ScriptedSubscriber<SpaceQuota> expectations() {
             return ScriptedSubscriber.<SpaceQuota>create()
-                .expectValue(fill(SpaceQuota.builder(), "space-quota-definition-")
+                .expectNext(fill(SpaceQuota.builder(), "space-quota-definition-")
                     .build())
                 .expectComplete();
         }
@@ -120,7 +120,7 @@ public final class DefaultSpaceAdminTest {
         @Override
         protected ScriptedSubscriber<SpaceQuota> expectations() {
             return ScriptedSubscriber.<SpaceQuota>create()
-                .expectValue(fill(SpaceQuota.builder(), "space-quota-definition-")
+                .expectNext(fill(SpaceQuota.builder(), "space-quota-definition-")
                     .build())
                 .expectComplete();
         }

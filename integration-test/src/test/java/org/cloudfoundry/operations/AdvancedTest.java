@@ -34,7 +34,7 @@ public final class AdvancedTest extends AbstractIntegrationTest {
     @Test
     public void sshCode() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .consumeValueWith(actual -> assertThat(actual).hasSize(6))
+            .consumeNextWith(actual -> assertThat(actual).hasSize(6))
             .expectComplete();
 
         this.cloudFoundryOperations.advanced()

@@ -60,7 +60,7 @@ public final class ReactorTokensTest {
         @Override
         protected ScriptedSubscriber<CheckTokenResponse> expectations() {
             return ScriptedSubscriber.<CheckTokenResponse>create()
-                .expectValue(CheckTokenResponse.builder()
+                .expectNext(CheckTokenResponse.builder()
                     .userId("ae77988e-1b25-4e02-87f2-81f98293a356")
                     .userName("marissa")
                     .email("marissa@test.org")
@@ -123,7 +123,7 @@ public final class ReactorTokensTest {
         @Override
         protected ScriptedSubscriber<GetTokenKeyResponse> expectations() {
             return ScriptedSubscriber.<GetTokenKeyResponse>create()
-                .expectValue(GetTokenKeyResponse.builder()
+                .expectNext(GetTokenKeyResponse.builder()
                     .id("testKey")
                     .algorithm("SHA256withRSA")
                     .value("-----BEGIN PUBLIC KEY-----\n" +
@@ -178,7 +178,7 @@ public final class ReactorTokensTest {
         @Override
         protected ScriptedSubscriber<GetTokenByAuthorizationCodeResponse> expectations() {
             return ScriptedSubscriber.<GetTokenByAuthorizationCodeResponse>create()
-                .expectValue(GetTokenByAuthorizationCodeResponse.builder()
+                .expectNext(GetTokenByAuthorizationCodeResponse.builder()
                     .accessToken("555e2047bbc849628ff8cbfa7b342274")
                     .tokenType("bearer")
                     .refreshToken("555e2047bbc849628ff8cbfa7b342274-r")
@@ -230,7 +230,7 @@ public final class ReactorTokensTest {
         @Override
         protected ScriptedSubscriber<GetTokenByClientCredentialsResponse> expectations() {
             return ScriptedSubscriber.<GetTokenByClientCredentialsResponse>create()
-                .expectValue(GetTokenByClientCredentialsResponse.builder()
+                .expectNext(GetTokenByClientCredentialsResponse.builder()
                     .accessToken("f87f93a2666d4e6eaa54e34df86d160c")
                     .tokenType("bearer")
                     .expiresInSeconds(43199)
@@ -278,7 +278,7 @@ public final class ReactorTokensTest {
         @Override
         protected ScriptedSubscriber<GetTokenByOneTimePasscodeResponse> expectations() {
             return ScriptedSubscriber.<GetTokenByOneTimePasscodeResponse>create()
-                .expectValue(GetTokenByOneTimePasscodeResponse.builder()
+                .expectNext(GetTokenByOneTimePasscodeResponse.builder()
                     .accessToken("0ddcada64ef742a28badaf4750ef435f")
                     .tokenType("bearer")
                     .refreshToken("0ddcada64ef742a28badaf4750ef435f-r")
@@ -328,7 +328,7 @@ public final class ReactorTokensTest {
         @Override
         protected ScriptedSubscriber<GetTokenByOpenIdResponse> expectations() {
             return ScriptedSubscriber.<GetTokenByOpenIdResponse>create()
-                .expectValue(GetTokenByOpenIdResponse.builder()
+                .expectNext(GetTokenByOpenIdResponse.builder()
                     .accessToken("53a58e6581ee49d08f9e572f673bc8db")
                     .tokenType("bearer")
                     .openIdToken("eyJhbGciOiJIUzI1NiIsImtpZCI6ImxlZ2FjeS10b2tlbi1rZXkiLC")
@@ -381,7 +381,7 @@ public final class ReactorTokensTest {
         @Override
         protected ScriptedSubscriber<GetTokenByPasswordResponse> expectations() {
             return ScriptedSubscriber.<GetTokenByPasswordResponse>create()
-                .expectValue(GetTokenByPasswordResponse.builder()
+                .expectNext(GetTokenByPasswordResponse.builder()
                     .accessToken("cd37a35114084fafb83d21c6f2af0e84")
                     .tokenType("bearer")
                     .refreshToken("cd37a35114084fafb83d21c6f2af0e84-r")
@@ -433,7 +433,7 @@ public final class ReactorTokensTest {
         @Override
         protected ScriptedSubscriber<ListTokenKeysResponse> expectations() {
             return ScriptedSubscriber.<ListTokenKeysResponse>create()
-                .expectValue(ListTokenKeysResponse.builder()
+                .expectNext(ListTokenKeysResponse.builder()
                     .key(TokenKey.builder()
                         .id("testKey")
                         .algorithm("SHA256withRSA")
@@ -489,7 +489,7 @@ public final class ReactorTokensTest {
         @Override
         protected ScriptedSubscriber<RefreshTokenResponse> expectations() {
             return ScriptedSubscriber.<RefreshTokenResponse>create()
-                .expectValue(RefreshTokenResponse.builder()
+                .expectNext(RefreshTokenResponse.builder()
                     .accessToken("eyJhbGciOiJIUzI1NiIsImtpZCI6Imx")
                     .tokenType("bearer")
                     .refreshToken("eyJhbGciOiJIUzI1NiIsImtpZCI6Imx_E")

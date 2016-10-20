@@ -91,7 +91,8 @@ public final class TokensTest extends AbstractIntegrationTest {
     @Ignore("TODO: use test authorizationCode")
     @Test
     public void getTokenByAuthorizationCode() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<GetTokenByAuthorizationCodeResponse> subscriber = ScriptedSubscriber.<GetTokenByAuthorizationCodeResponse>expectValueCount(1)
+        ScriptedSubscriber<GetTokenByAuthorizationCodeResponse> subscriber = ScriptedSubscriber.<GetTokenByAuthorizationCodeResponse>create()
+            .expectNextCount(1)
             .expectComplete();
 
         this.uaaClient.tokens()
@@ -108,7 +109,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     @Test
     public void getTokenByClientCredentials() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue("bearer")
+            .expectNext("bearer")
             .expectComplete();
 
         this.uaaClient.tokens()
@@ -127,7 +128,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     @Test
     public void getTokenByOneTimePasscode() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue("bearer")
+            .expectNext("bearer")
             .expectComplete();
 
         this.uaaClient.tokens()
@@ -147,7 +148,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     @Test
     public void getTokenByOpenId() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue("bearer")
+            .expectNext("bearer")
             .expectComplete();
 
         this.uaaClient.tokens()
@@ -167,7 +168,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     @Test
     public void getTokenByPassword() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectValue("bearer")
+            .expectNext("bearer")
             .expectComplete();
 
         this.uaaClient.tokens()
@@ -186,7 +187,8 @@ public final class TokensTest extends AbstractIntegrationTest {
 
     @Test
     public void getTokenKey() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<GetTokenKeyResponse> subscriber = ScriptedSubscriber.<GetTokenKeyResponse>expectValueCount(1)
+        ScriptedSubscriber<GetTokenKeyResponse> subscriber = ScriptedSubscriber.<GetTokenKeyResponse>create()
+            .expectNextCount(1)
             .expectComplete();
 
         this.uaaClient.tokens()
@@ -224,7 +226,8 @@ public final class TokensTest extends AbstractIntegrationTest {
     @Ignore("TODO: use test refresh token")
     @Test
     public void refreshToken() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<RefreshTokenResponse> subscriber = ScriptedSubscriber.<RefreshTokenResponse>expectValueCount(1)
+        ScriptedSubscriber<RefreshTokenResponse> subscriber = ScriptedSubscriber.<RefreshTokenResponse>create()
+            .expectNextCount(1)
             .expectComplete();
 
         this.uaaClient.tokens()

@@ -78,7 +78,7 @@ public abstract class AbstractIntegrationTest {
 
     protected static <T> ScriptedSubscriber<Tuple2<T, T>> tupleEquality() {
         return ScriptedSubscriber.<Tuple2<T, T>>create()
-            .consumeValueWith(consumer((expected, actual) -> assertThat(actual).isEqualTo(expected)))
+            .consumeNextWith(consumer((expected, actual) -> assertThat(actual).isEqualTo(expected)))
             .expectComplete();
     }
 

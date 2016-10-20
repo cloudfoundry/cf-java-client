@@ -292,7 +292,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
 
     private static <T extends AbstractServiceBindingResource> ScriptedSubscriber<Tuple3<String, String, T>> serviceBindingEquality() {
         return ScriptedSubscriber.<Tuple3<String, String, T>>create()
-            .consumeValueWith(consumer((serviceInstanceId, applicationId, resource) -> {
+            .consumeNextWith(consumer((serviceInstanceId, applicationId, resource) -> {
                 assertThat(ResourceUtils.getEntity(resource).getServiceInstanceId()).isEqualTo(serviceInstanceId);
                 assertThat(ResourceUtils.getEntity(resource).getApplicationId()).isEqualTo(applicationId);
             }))

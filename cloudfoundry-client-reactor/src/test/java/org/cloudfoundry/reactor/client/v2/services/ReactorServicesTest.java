@@ -92,7 +92,7 @@ public final class ReactorServicesTest {
         @Override
         protected ScriptedSubscriber<DeleteServiceResponse> expectations() {
             return ScriptedSubscriber.<DeleteServiceResponse>create()
-                .expectValue(DeleteServiceResponse.builder()
+                .expectNext(DeleteServiceResponse.builder()
                     .metadata(Metadata.builder()
                         .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
                         .createdAt("2016-02-02T17:16:31Z")
@@ -141,7 +141,7 @@ public final class ReactorServicesTest {
         @Override
         protected ScriptedSubscriber<GetServiceResponse> expectations() {
             return ScriptedSubscriber.<GetServiceResponse>create()
-                .expectValue(GetServiceResponse.builder()
+                .expectNext(GetServiceResponse.builder()
                     .metadata(Metadata.builder()
                         .id("58eb36ad-0636-428b-b4ed-afc14e48d926")
                         .url("/v2/services/58eb36ad-0636-428b-b4ed-afc14e48d926")
@@ -195,7 +195,7 @@ public final class ReactorServicesTest {
         @Override
         protected ScriptedSubscriber<ListServicesResponse> expectations() {
             return ScriptedSubscriber.<ListServicesResponse>create()
-                .expectValue(ListServicesResponse.builder()
+                .expectNext(ListServicesResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(ServiceResource.builder()
@@ -256,7 +256,7 @@ public final class ReactorServicesTest {
         @Override
         protected ScriptedSubscriber<ListServiceServicePlansResponse> expectations() {
             return ScriptedSubscriber.<ListServiceServicePlansResponse>create()
-                .expectValue(ListServiceServicePlansResponse.builder()
+                .expectNext(ListServiceServicePlansResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
                     .resource(ServicePlanResource.builder()

@@ -53,7 +53,7 @@ public final class ReactorRouteMappingsTest {
         @Override
         protected ScriptedSubscriber<CreateRouteMappingResponse> expectations() {
             return ScriptedSubscriber.<CreateRouteMappingResponse>create()
-                .expectValue(CreateRouteMappingResponse.builder()
+                .expectNext(CreateRouteMappingResponse.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2016-01-19T19:40:59Z")
                         .id("ca9cdd28-53c4-4b8e-a7e0-1838f69b8f91")
@@ -141,7 +141,7 @@ public final class ReactorRouteMappingsTest {
         @Override
         protected ScriptedSubscriber<DeleteRouteMappingResponse> expectations() {
             return ScriptedSubscriber.<DeleteRouteMappingResponse>create()
-                .expectValue(DeleteRouteMappingResponse.builder()
+                .expectNext(DeleteRouteMappingResponse.builder()
                     .metadata(Metadata.builder()
                         .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
                         .createdAt("2016-02-02T17:16:31Z")
@@ -190,7 +190,7 @@ public final class ReactorRouteMappingsTest {
         @Override
         protected ScriptedSubscriber<GetRouteMappingResponse> expectations() {
             return ScriptedSubscriber.<GetRouteMappingResponse>create()
-                .expectValue(GetRouteMappingResponse.builder()
+                .expectNext(GetRouteMappingResponse.builder()
                     .metadata(Metadata.builder()
                         .id("304bead7-ad5a-4f6e-a093-f2a85d30c54a")
                         .createdAt("2016-04-06T00:17:40Z")
@@ -240,7 +240,7 @@ public final class ReactorRouteMappingsTest {
         @Override
         protected ScriptedSubscriber<ListRouteMappingsResponse> expectations() {
             return ScriptedSubscriber.<ListRouteMappingsResponse>create()
-                .expectValue(ListRouteMappingsResponse.builder()
+                .expectNext(ListRouteMappingsResponse.builder()
                     .totalPages(1)
                     .totalResults(1)
                     .resource(RouteMappingResource.builder()

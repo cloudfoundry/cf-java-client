@@ -501,7 +501,7 @@ public final class DefaultRoutesTest {
         @Override
         protected ScriptedSubscriber<Boolean> expectations() {
             return ScriptedSubscriber.<Boolean>create()
-                .expectValue(false)
+                .expectNext(false)
                 .expectComplete();
         }
 
@@ -529,7 +529,7 @@ public final class DefaultRoutesTest {
         @Override
         protected ScriptedSubscriber<Boolean> expectations() {
             return ScriptedSubscriber.<Boolean>create()
-                .expectValue(false)
+                .expectNext(false)
                 .expectComplete();
         }
 
@@ -558,7 +558,7 @@ public final class DefaultRoutesTest {
         @Override
         protected ScriptedSubscriber<Boolean> expectations() {
             return ScriptedSubscriber.<Boolean>create()
-                .expectValue(true)
+                .expectNext(true)
                 .expectComplete();
         }
 
@@ -588,7 +588,7 @@ public final class DefaultRoutesTest {
         @Override
         protected ScriptedSubscriber<Boolean> expectations() {
             return ScriptedSubscriber.<Boolean>create()
-                .expectValue(true)
+                .expectNext(true)
                 .expectComplete();
         }
 
@@ -955,7 +955,7 @@ public final class DefaultRoutesTest {
         @Override
         protected ScriptedSubscriber<Route> expectations() {
             return ScriptedSubscriber.<Route>create()
-                .expectValue(fill(Route.builder())
+                .expectNext(fill(Route.builder())
                     .application("test-application-name")
                     .domain("test-shared-domain-name")
                     .host("test-route-entity-host")
@@ -1019,7 +1019,7 @@ public final class DefaultRoutesTest {
         @Override
         protected ScriptedSubscriber<Route> expectations() {
             return ScriptedSubscriber.<Route>create()
-                .expectValue(fill(Route.builder())
+                .expectNext(fill(Route.builder())
                     .application("test-application-name")
                     .domain("test-shared-domain-name")
                     .host("test-route-entity-host")

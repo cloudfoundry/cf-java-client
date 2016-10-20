@@ -40,7 +40,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void create() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
 
-        ScriptedSubscriber<OrganizationSummary> subscriber = ScriptedSubscriber.<OrganizationSummary>expectValueCount(1)
+        ScriptedSubscriber<OrganizationSummary> subscriber = ScriptedSubscriber.<OrganizationSummary>create()
+            .expectNextCount(1)
             .expectComplete();
 
         this.cloudFoundryOperations.organizations()
@@ -57,7 +58,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void list() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<OrganizationSummary> subscriber = ScriptedSubscriber.<OrganizationSummary>expectValueCount(1)
+        ScriptedSubscriber<OrganizationSummary> subscriber = ScriptedSubscriber.<OrganizationSummary>create()
+            .expectNextCount(1)
             .expectComplete();
 
         this.organizationId

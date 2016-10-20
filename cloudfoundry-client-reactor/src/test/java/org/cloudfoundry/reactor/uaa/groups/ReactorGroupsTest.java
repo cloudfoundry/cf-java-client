@@ -77,7 +77,7 @@ public final class ReactorGroupsTest {
         @Override
         protected ScriptedSubscriber<AddMemberResponse> expectations() {
             return ScriptedSubscriber.<AddMemberResponse>create()
-                .expectValue(AddMemberResponse.builder()
+                .expectNext(AddMemberResponse.builder()
                     .origin("uaa")
                     .type(MemberType.USER)
                     .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
@@ -122,7 +122,7 @@ public final class ReactorGroupsTest {
         @Override
         protected ScriptedSubscriber<CheckMembershipResponse> expectations() {
             return ScriptedSubscriber.<CheckMembershipResponse>create()
-                .expectValue(CheckMembershipResponse.builder()
+                .expectNext(CheckMembershipResponse.builder()
                     .origin("uaa")
                     .type(MemberType.USER)
                     .memberId("test-member-id")
@@ -164,7 +164,7 @@ public final class ReactorGroupsTest {
         @Override
         protected ScriptedSubscriber<CreateGroupResponse> expectations() {
             return ScriptedSubscriber.<CreateGroupResponse>create()
-                .expectValue(CreateGroupResponse.builder()
+                .expectNext(CreateGroupResponse.builder()
                     .id("46081184-7ca9-453d-9bf8-74da7113bec6")
                     .metadata(Metadata.builder()
                         .created("2016-06-03T17:59:30.527Z")
@@ -226,7 +226,7 @@ public final class ReactorGroupsTest {
         @Override
         protected ScriptedSubscriber<DeleteGroupResponse> expectations() {
             return ScriptedSubscriber.<DeleteGroupResponse>create()
-                .expectValue(DeleteGroupResponse.builder()
+                .expectNext(DeleteGroupResponse.builder()
                     .id("test-group-id")
                     .metadata(Metadata.builder()
                         .created("2016-06-03T17:59:30.527Z")
@@ -281,7 +281,7 @@ public final class ReactorGroupsTest {
         @Override
         protected ScriptedSubscriber<GetGroupResponse> expectations() {
             return ScriptedSubscriber.<GetGroupResponse>create()
-                .expectValue(GetGroupResponse.builder()
+                .expectNext(GetGroupResponse.builder()
                     .id("test-group-id")
                     .metadata(Metadata.builder()
                         .created("2016-06-03T17:59:30.527Z")
@@ -334,7 +334,7 @@ public final class ReactorGroupsTest {
         @Override
         protected ScriptedSubscriber<ListGroupsResponse> expectations() {
             return ScriptedSubscriber.<ListGroupsResponse>create()
-                .expectValue(ListGroupsResponse.builder()
+                .expectNext(ListGroupsResponse.builder()
                     .resource(Group.builder()
                         .id("f87c557a-8ddc-43d3-98fb-e420ebc7f0f1")
                         .metadata(Metadata.builder()
@@ -400,7 +400,7 @@ public final class ReactorGroupsTest {
         @Override
         protected ScriptedSubscriber<ListExternalGroupMappingsResponse> expectations() {
             return ScriptedSubscriber.<ListExternalGroupMappingsResponse>create()
-                .expectValue(ListExternalGroupMappingsResponse.builder()
+                .expectNext(ListExternalGroupMappingsResponse.builder()
                     .resource(ExternalGroupResource.builder()
                         .groupId("c4a41861-6c83-45a7-995e-64fb66565dce")
                         .displayName("Group For Testing Retrieving External Group Mappings")
@@ -452,7 +452,7 @@ public final class ReactorGroupsTest {
         @Override
         protected ScriptedSubscriber<ListMembersResponse> expectations() {
             return ScriptedSubscriber.<ListMembersResponse>create()
-                .expectValue(ListMembersResponse.builder()
+                .expectNext(ListMembersResponse.builder()
                     .member(Member.builder()
                         .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
                         .type(MemberType.USER)
@@ -522,7 +522,7 @@ public final class ReactorGroupsTest {
         @Override
         protected ScriptedSubscriber<ListMembersResponse> expectations() {
             return ScriptedSubscriber.<ListMembersResponse>create()
-                .expectValue(ListMembersResponse.builder()
+                .expectNext(ListMembersResponse.builder()
                     .member(Member.builder()
                         .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
                         .type(MemberType.USER)
@@ -567,7 +567,7 @@ public final class ReactorGroupsTest {
         @Override
         protected ScriptedSubscriber<MapExternalGroupResponse> expectations() {
             return ScriptedSubscriber.<MapExternalGroupResponse>create()
-                .expectValue(MapExternalGroupResponse.builder()
+                .expectNext(MapExternalGroupResponse.builder()
                     .groupId("76937b62-346c-4848-953c-d790b87ec80a")
                     .displayName("Group For Testing Creating External Group Mapping")
                     .origin("ldap")
@@ -617,7 +617,7 @@ public final class ReactorGroupsTest {
         @Override
         protected ScriptedSubscriber<RemoveMemberResponse> expectations() {
             return ScriptedSubscriber.<RemoveMemberResponse>create()
-                .expectValue(RemoveMemberResponse.builder()
+                .expectNext(RemoveMemberResponse.builder()
                     .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
                     .type(MemberType.USER)
                     .origin("uaa")
@@ -659,7 +659,7 @@ public final class ReactorGroupsTest {
         @Override
         protected ScriptedSubscriber<UnmapExternalGroupByGroupDisplayNameResponse> expectations() {
             return ScriptedSubscriber.<UnmapExternalGroupByGroupDisplayNameResponse>create()
-                .expectValue(UnmapExternalGroupByGroupDisplayNameResponse.builder()
+                .expectNext(UnmapExternalGroupByGroupDisplayNameResponse.builder()
                     .groupId("f8f0048f-de32-4d20-b41d-5820b690063d")
                     .displayName("Group For Testing Deleting External Group Mapping By Name")
                     .origin("ldap")
@@ -709,7 +709,7 @@ public final class ReactorGroupsTest {
         @Override
         protected ScriptedSubscriber<UnmapExternalGroupByGroupIdResponse> expectations() {
             return ScriptedSubscriber.<UnmapExternalGroupByGroupIdResponse>create()
-                .expectValue(UnmapExternalGroupByGroupIdResponse.builder()
+                .expectNext(UnmapExternalGroupByGroupIdResponse.builder()
                     .groupId("d68167b4-81b3-490d-9838-94092d5c89f6")
                     .displayName("Group For Testing Deleting External Group Mapping")
                     .origin("ldap")
@@ -759,7 +759,7 @@ public final class ReactorGroupsTest {
         @Override
         protected ScriptedSubscriber<UpdateGroupResponse> expectations() {
             return ScriptedSubscriber.<UpdateGroupResponse>create()
-                .expectValue(UpdateGroupResponse.builder()
+                .expectNext(UpdateGroupResponse.builder()
                     .id("test-group-id")
                     .metadata(Metadata.builder()
                         .created("2016-06-03T17:59:30.527Z")

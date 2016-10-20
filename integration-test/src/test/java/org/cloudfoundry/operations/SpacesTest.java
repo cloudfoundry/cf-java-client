@@ -40,8 +40,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void create() throws TimeoutException, InterruptedException {
         String spaceName = this.nameFactory.getSpaceName();
 
-        ScriptedSubscriber<SpaceSummary> subscriber = ScriptedSubscriber
-            .<SpaceSummary>expectValueCount(1)
+        ScriptedSubscriber<SpaceSummary> subscriber = ScriptedSubscriber.<SpaceSummary>create()
+            .expectNextCount(1)
             .expectComplete();
 
         this.cloudFoundryOperations.spaces()
@@ -60,7 +60,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     @Test
     public void list() throws TimeoutException, InterruptedException {
         ScriptedSubscriber<Long> subscriber = ScriptedSubscriber.<Long>create()
-            .consumeValueWith(count -> assertThat(count).isGreaterThan(0))
+            .consumeNextWith(count -> assertThat(count).isGreaterThan(0))
             .expectComplete();
 
         this.cloudFoundryOperations.spaces()

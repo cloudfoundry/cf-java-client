@@ -227,7 +227,7 @@ public final class DefaultServiceAdminTest {
         @Override
         protected ScriptedSubscriber<ServiceBroker> expectations() {
             return ScriptedSubscriber.<ServiceBroker>create()
-                .expectValue(ServiceBroker.builder()
+                .expectNext(ServiceBroker.builder()
                     .id("test-service-broker-id")
                     .name("test-service-broker-resource-name")
                     .url("test-service-broker-resource-brokerUrl")

@@ -38,7 +38,8 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
     public void createBuildpack() throws Exception {
         String buildpackName = this.nameFactory.getBuildpackName();
 
-        ScriptedSubscriber<Buildpack> subscriber = ScriptedSubscriber.<Buildpack>expectValueCount(1)
+        ScriptedSubscriber<Buildpack> subscriber = ScriptedSubscriber.<Buildpack>create()
+            .expectNextCount(1)
             .expectComplete();
 
         this.cloudFoundryOperations.buildpacks()
