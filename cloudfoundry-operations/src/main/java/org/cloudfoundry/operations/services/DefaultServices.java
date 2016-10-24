@@ -23,6 +23,8 @@ import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
+import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingRequest;
@@ -54,6 +56,8 @@ import org.cloudfoundry.client.v2.services.GetServiceRequest;
 import org.cloudfoundry.client.v2.services.GetServiceResponse;
 import org.cloudfoundry.client.v2.services.ServiceEntity;
 import org.cloudfoundry.client.v2.services.ServiceResource;
+import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
+import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServicesRequest;
@@ -110,6 +114,49 @@ public final class DefaultServices implements Services {
                 )))
             .then(function((cloudFoundryClient, applicationId, serviceInstanceId) -> createServiceBinding(cloudFoundryClient, applicationId, serviceInstanceId, request.getParameters())))
             .then();
+    }
+
+    @Override
+    public Mono<Void> bindRoute(BindRouteServiceInstanceRequest request) {
+        return null;
+
+    }
+
+    private static Mono<String> getDomainId(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
+            return getPrivateDomainId(cloudFoundryClient, domain, organizationId)
+                .otherwiseIfEmpty(getSharedDomainId(cloudFoundryClient, domain))
+                .otherwiseIfEmpty(ExceptionUtils.illegalArgument("Domain %s not found", domain));
+    }
+
+    private static Mono<String> getPrivateDomainId(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
+        return requestPrivateDomain(cloudFoundryClient, domain, organizationId)
+            .map(ResourceUtils::getId)
+            .singleOrEmpty();
+    }
+
+    private static Flux<PrivateDomainResource> requestPrivateDomain(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
+                .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
+                    .name(domain)
+                    .organizationId(organizationId)
+                    .page(page)
+                    .build()));
+    }
+
+    private static Mono<String> getSharedDomainId(CloudFoundryClient cloudFoundryClient, String domain) {
+        return requestSharedDomain(cloudFoundryClient, domain)
+            .map(ResourceUtils::getId)
+            .singleOrEmpty();
+    }
+
+    private static Flux<SharedDomainResource> requestSharedDomain(CloudFoundryClient cloudFoundryClient, String domain) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
+                .list(ListSharedDomainsRequest.builder()
+                    .name(domain)
+                    .page(page)
+                    .build()));
     }
 
     @Override

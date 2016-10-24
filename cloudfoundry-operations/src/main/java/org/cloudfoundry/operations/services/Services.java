@@ -33,6 +33,14 @@ public interface Services {
     Mono<Void> bind(BindServiceInstanceRequest request);
 
     /**
+     * Bind a service instance to a route
+     *
+     * @param request the bind service instance to a route request
+     * @return a completion indicator
+     */
+    Mono<Void> bindRoute(BindRouteServiceInstanceRequest request);
+
+    /**
      * Create a service instance
      *
      * @param request the create service instance request
