@@ -24,6 +24,15 @@ import reactor.core.publisher.Mono;
 public interface UserProvidedServiceInstances {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/associate_route_with_the_user_provided_service_instance.html">Associate Route with the User
+     * Provided Service Instance</a> request
+     *
+     * @param request the Associate Route With User Provided Service Instance request
+     * @return the response from the Associate Route With User Provided Service Instance request
+     */
+    Mono<AssociateUserProvidedServiceInstanceRouteResponse> associateRoute(AssociateUserProvidedServiceInstanceRouteRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/creating_a_user_provided_service_instance.html">Create User Provided Service Instance</a>
      * request
      *

@@ -1,0 +1,21 @@
+{
+  "metadata": {
+    "guid": "5badd282-6e07-4fc6-a8c4-78be99040774",
+    "url": "/v2/user_provided_service_instances/5badd282-6e07-4fc6-a8c4-78be99040774",
+    "created_at": "2016-06-08T16:41:33Z",
+    "updated_at": null
+  },
+  "entity": {
+    "name": "name-1676",
+    "credentials": {
+      "creds-key-52": "creds-val-52"
+    },
+    "space_guid": "91b53184-6430-4891-8d4b-fabbe96a84f6",
+    "type": "user_provided_service_instance",
+    "syslog_drain_url": "https://foo.com/url-93",
+    "route_service_url": "https://foo.com/url-92",
+    "space_url": "/v2/spaces/91b53184-6430-4891-8d4b-fabbe96a84f6",
+    "service_bindings_url": "/v2/user_provided_service_instances/5badd282-6e07-4fc6-a8c4-78be99040774/service_bindings",
+    "routes_url": "/v2/user_provided_service_instances/5badd282-6e07-4fc6-a8c4-78be99040774/routes"
+  }
+}
