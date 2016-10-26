@@ -19,6 +19,8 @@ package org.cloudfoundry.reactor.client.v2.userprovidedserviceinstances;
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.AssociateUserProvidedServiceInstanceRouteRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.AssociateUserProvidedServiceInstanceRouteResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
@@ -51,6 +53,61 @@ import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorUserProvidedServiceInstancesTest {
+
+    public static final class AssociateRoute extends AbstractClientApiTest<AssociateUserProvidedServiceInstanceRouteRequest, AssociateUserProvidedServiceInstanceRouteResponse> {
+
+        private final ReactorUserProvidedServiceInstances userProvidedServiceInstances = new ReactorUserProvidedServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+        @Override
+        protected ScriptedSubscriber<AssociateUserProvidedServiceInstanceRouteResponse> expectations() {
+            return ScriptedSubscriber.<AssociateUserProvidedServiceInstanceRouteResponse>create()
+                .expectNext(AssociateUserProvidedServiceInstanceRouteResponse.builder()
+                    .metadata(Metadata.builder()
+                        .createdAt("2016-06-08T16:41:33Z")
+                        .id("5badd282-6e07-4fc6-a8c4-78be99040774")
+                        .url("/v2/user_provided_service_instances/5badd282-6e07-4fc6-a8c4-78be99040774")
+                        .build())
+                    .entity(UserProvidedServiceInstanceEntity.builder()
+                        .credential("creds-key-52", "creds-val-52")
+                        .name("name-1676")
+                        .routeServiceUrl("https://foo.com/url-92")
+                        .routesUrl("/v2/user_provided_service_instances/5badd282-6e07-4fc6-a8c4-78be99040774/routes")
+                        .serviceBindingsUrl("/v2/user_provided_service_instances/5badd282-6e07-4fc6-a8c4-78be99040774/service_bindings")
+                        .spaceId("91b53184-6430-4891-8d4b-fabbe96a84f6")
+                        .spaceUrl("/v2/spaces/91b53184-6430-4891-8d4b-fabbe96a84f6")
+                        .syslogDrainUrl("https://foo.com/url-93")
+                        .type("user_provided_service_instance")
+                        .build())
+                    .build())
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(PUT).path("/v2/user_provided_service_instances/5badd282-6e07-4fc6-a8c4-78be99040774/routes/237d9236-7997-4b1a-be8d-2aaf2d85421a")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(OK)
+                    .payload("fixtures/client/v2/user_provided_service_instances/PUT_{id}_route_response.json")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected Mono<AssociateUserProvidedServiceInstanceRouteResponse> invoke(AssociateUserProvidedServiceInstanceRouteRequest request) {
+            return this.userProvidedServiceInstances.associateRoute(request);
+        }
+
+        @Override
+        protected AssociateUserProvidedServiceInstanceRouteRequest validRequest() {
+            return AssociateUserProvidedServiceInstanceRouteRequest.builder()
+                .routeId("237d9236-7997-4b1a-be8d-2aaf2d85421a")
+                .userProvidedServiceInstanceId("5badd282-6e07-4fc6-a8c4-78be99040774")
+                .build();
+        }
+    }
 
     public static final class Create extends AbstractClientApiTest<CreateUserProvidedServiceInstanceRequest, CreateUserProvidedServiceInstanceResponse> {
 

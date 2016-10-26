@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.reactor.client.v2.userprovidedserviceinstances;
 
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.AssociateUserProvidedServiceInstanceRouteRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.AssociateUserProvidedServiceInstanceRouteResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
@@ -47,6 +49,12 @@ public final class ReactorUserProvidedServiceInstances extends AbstractClientV2O
      */
     public ReactorUserProvidedServiceInstances(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider);
+    }
+
+    @Override
+    public Mono<AssociateUserProvidedServiceInstanceRouteResponse> associateRoute(AssociateUserProvidedServiceInstanceRouteRequest request) {
+        return put(request, AssociateUserProvidedServiceInstanceRouteResponse.class, builder -> builder.pathSegment("v2", "user_provided_service_instances", request
+            .getUserProvidedServiceInstanceId(), "routes", request.getRouteId()));
     }
 
     @Override
