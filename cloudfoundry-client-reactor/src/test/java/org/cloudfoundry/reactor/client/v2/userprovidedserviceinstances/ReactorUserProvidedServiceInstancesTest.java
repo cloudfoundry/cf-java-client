@@ -30,6 +30,7 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedS
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceServiceBindingsResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesResponse;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.RemoveUserProvidedServiceInstanceRouteRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceEntity;
@@ -199,6 +200,42 @@ public final class ReactorUserProvidedServiceInstancesTest {
         protected DeleteUserProvidedServiceInstanceRequest validRequest() {
             return DeleteUserProvidedServiceInstanceRequest.builder()
                 .userProvidedServiceInstanceId("5b6b45c8-89be-48d2-affd-f64346ad4d93")
+                .build();
+        }
+    }
+
+    public static final class RemoveRoute extends AbstractClientApiTest<RemoveUserProvidedServiceInstanceRouteRequest, Void> {
+
+        private final ReactorUserProvidedServiceInstances userProvidedServiceInstances = new ReactorUserProvidedServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+        @Override
+        protected ScriptedSubscriber<Void> expectations() {
+            return ScriptedSubscriber.<Void>create()
+                .expectComplete();
+        }
+
+        @Override
+        protected InteractionContext interactionContext() {
+            return InteractionContext.builder()
+                .request(TestRequest.builder()
+                    .method(DELETE).path("/v2/user_provided_service_instances/fd195229-117c-4bbe-9418-c5df97131eae/routes/c3bc74b0-9465-413d-b5e6-3b305fb439cc")
+                    .build())
+                .response(TestResponse.builder()
+                    .status(NO_CONTENT)
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected Mono<Void> invoke(RemoveUserProvidedServiceInstanceRouteRequest request) {
+            return this.userProvidedServiceInstances.removeRoute(request);
+        }
+
+        @Override
+        protected RemoveUserProvidedServiceInstanceRouteRequest validRequest() {
+            return RemoveUserProvidedServiceInstanceRouteRequest.builder()
+                .routeId("c3bc74b0-9465-413d-b5e6-3b305fb439cc")
+                .userProvidedServiceInstanceId("fd195229-117c-4bbe-9418-c5df97131eae")
                 .build();
         }
     }

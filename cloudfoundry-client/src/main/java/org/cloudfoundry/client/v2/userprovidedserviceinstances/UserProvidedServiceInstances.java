@@ -78,6 +78,15 @@ public interface UserProvidedServiceInstances {
     Mono<ListUserProvidedServiceInstanceServiceBindingsResponse> listServiceBindings(ListUserProvidedServiceInstanceServiceBindingsRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/remove_route_from_the_user_provided_service_instance.html">Remove Route from the User Provided
+     * Service Instance</a> request
+     *
+     * @param request the Remove Route from the User Provided Service Instance request
+     * @return the response from the Remove Route from the User Provided Service Instance request
+     */
+    Mono<Void> removeRoute(RemoveUserProvidedServiceInstanceRouteRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/updating_a_user_provided_service_instance.html">Update User Provided Service Instance</a>
      * request
      *

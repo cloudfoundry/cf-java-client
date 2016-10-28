@@ -27,6 +27,7 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedS
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceServiceBindingsResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesResponse;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.RemoveUserProvidedServiceInstanceRouteRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstances;
@@ -53,8 +54,8 @@ public final class ReactorUserProvidedServiceInstances extends AbstractClientV2O
 
     @Override
     public Mono<AssociateUserProvidedServiceInstanceRouteResponse> associateRoute(AssociateUserProvidedServiceInstanceRouteRequest request) {
-        return put(request, AssociateUserProvidedServiceInstanceRouteResponse.class, builder -> builder.pathSegment("v2", "user_provided_service_instances", request
-            .getUserProvidedServiceInstanceId(), "routes", request.getRouteId()));
+        return put(request, AssociateUserProvidedServiceInstanceRouteResponse.class,
+            builder -> builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId(), "routes", request.getRouteId()));
     }
 
     @Override
@@ -81,6 +82,11 @@ public final class ReactorUserProvidedServiceInstances extends AbstractClientV2O
     public Mono<ListUserProvidedServiceInstanceServiceBindingsResponse> listServiceBindings(ListUserProvidedServiceInstanceServiceBindingsRequest request) {
         return get(request, ListUserProvidedServiceInstanceServiceBindingsResponse.class,
             builder -> builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId(), "service_bindings"));
+    }
+
+    @Override
+    public Mono<Void> removeRoute(RemoveUserProvidedServiceInstanceRouteRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId(), "routes", request.getRouteId()));
     }
 
     @Override
