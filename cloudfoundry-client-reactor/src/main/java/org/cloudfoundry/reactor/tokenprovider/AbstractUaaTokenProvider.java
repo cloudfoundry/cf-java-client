@@ -118,7 +118,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
                     .addHeader(HttpHeaderNames.AUTHORIZATION, getAuthorizationValue())
                     .removeTransferEncodingChunked()
                     .sendHeaders())
-                .doOnSubscribe(NetworkLogging.get(uri))
+                .doOnSubscribe(NetworkLogging.post(uri))
                 .compose(NetworkLogging.response(uri)))
             .then(i -> i.receive().aggregate().toInputStream())
             .map(JsonCodec.decode(connectionContext.getObjectMapper(), Map.class))
