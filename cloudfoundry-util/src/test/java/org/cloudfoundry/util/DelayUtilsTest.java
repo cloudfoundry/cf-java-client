@@ -19,9 +19,9 @@ package org.cloudfoundry.util;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.scheduler.VirtualTimeScheduler;
 import reactor.test.subscriber.ScriptedSubscriber;
 
 import java.time.Duration;
@@ -30,22 +30,22 @@ public final class DelayUtilsTest {
 
     @After
     public void disableVirtualTime() throws Exception {
-        ScriptedSubscriber.disableVirtualTime();
+        VirtualTimeScheduler.reset();
     }
 
     @Before
     public void enableVirtualTime() {
-        ScriptedSubscriber.enableVirtualTime();
+        VirtualTimeScheduler.enable(true);
     }
 
     @Test
     public void exponentialBackOff() {
         ScriptedSubscriber<Object> subscriber = ScriptedSubscriber.create()
-            .advanceTimeBy(Duration.ofSeconds(2))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(2)))
             .expectNext(0L)
-            .advanceTimeBy(Duration.ofSeconds(4))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(4)))
             .expectNext(0L)
-            .advanceTimeBy(Duration.ofSeconds(8))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(8)))
             .expectNext(0L)
             .expectComplete();
 
@@ -59,11 +59,11 @@ public final class DelayUtilsTest {
     @Test
     public void exponentialBackOffError() {
         ScriptedSubscriber<Object> subscriber = ScriptedSubscriber.create()
-            .advanceTimeBy(Duration.ofSeconds(2))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(2)))
             .expectNext(0L)
-            .advanceTimeBy(Duration.ofSeconds(4))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(4)))
             .expectNext(0L)
-            .advanceTimeBy(Duration.ofSeconds(8))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(8)))
             .expectNext(0L)
             .expectComplete();
 
@@ -77,11 +77,11 @@ public final class DelayUtilsTest {
     @Test
     public void exponentialBackOffErrorMaximum() {
         ScriptedSubscriber<Object> subscriber = ScriptedSubscriber.create()
-            .advanceTimeBy(Duration.ofSeconds(1))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
             .expectNext(0L)
-            .advanceTimeBy(Duration.ofSeconds(1))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
             .expectNext(0L)
-            .advanceTimeBy(Duration.ofSeconds(1))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
             .expectNext(0L)
             .expectComplete();
 
@@ -94,7 +94,7 @@ public final class DelayUtilsTest {
 
     @Test
     public void exponentialBackOffErrorTimeout() {
-        ScriptedSubscriber.disableVirtualTime();
+        VirtualTimeScheduler.reset();
 
         ScriptedSubscriber<Object> subscriber = ScriptedSubscriber.create()
             .expectError(DelayTimeoutException.class);
@@ -110,11 +110,11 @@ public final class DelayUtilsTest {
     @Test
     public void exponentialBackOffMaximum() {
         ScriptedSubscriber<Object> subscriber = ScriptedSubscriber.create()
-            .advanceTimeBy(Duration.ofSeconds(1))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
             .expectNext(0L)
-            .advanceTimeBy(Duration.ofSeconds(1))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
             .expectNext(0L)
-            .advanceTimeBy(Duration.ofSeconds(1))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
             .expectNext(0L)
             .expectComplete();
 
@@ -127,7 +127,7 @@ public final class DelayUtilsTest {
 
     @Test
     public void exponentialBackOffTimeout() {
-        ScriptedSubscriber.disableVirtualTime();
+        VirtualTimeScheduler.reset();
 
         ScriptedSubscriber<Object> subscriber = ScriptedSubscriber.create()
             .expectError(DelayTimeoutException.class);
@@ -142,13 +142,12 @@ public final class DelayUtilsTest {
 
     @Test
     public void fixed() {
-
         ScriptedSubscriber<Object> subscriber = ScriptedSubscriber.create()
-            .advanceTimeBy(Duration.ofSeconds(1))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
             .expectNext(0L)
-            .advanceTimeBy(Duration.ofSeconds(1))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
             .expectNext(0L)
-            .advanceTimeBy(Duration.ofSeconds(1))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
             .expectNext(0L)
             .expectComplete();
 

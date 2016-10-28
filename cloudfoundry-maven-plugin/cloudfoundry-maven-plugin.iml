@@ -17,7 +17,7 @@
     <orderEntry type="library" name="Maven: io.jsonwebtoken:jjwt:0.6.0" level="project" />
     <orderEntry type="library" name="Maven: io.projectreactor.ipc:reactor-netty:0.5.1.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: io.projectreactor.ipc:reactor-ipc:0.5.1.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: io.projectreactor:reactor-core:3.0.3.BUILD-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: io.projectreactor:reactor-core:3.0.3.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.reactivestreams:reactive-streams:1.0.0" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-all:4.1.5.Final" level="project" />
     <orderEntry type="module" module-name="cloudfoundry-client" />
