@@ -244,7 +244,6 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     public void deleteOrphanedRoutesAssociatedApplication() {
         requestSpaceRoutes(this.cloudFoundryClient, TEST_SPACE_ID);
         requestApplications(this.cloudFoundryClient, "test-route-id");
-        requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
 
         this.routes
             .deleteOrphanedRoutes()
@@ -254,7 +253,19 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteOrphanedRoutesNoAssociatedApplications() {
+    public void deleteOrphanedRoutesAssociatedService() {
+
+        requestSpaceRoutesService(this.cloudFoundryClient, TEST_SPACE_ID);
+
+        this.routes
+            .deleteOrphanedRoutes()
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void deleteOrphanedRoutesNoAssociations() {
         requestSpaceRoutes(this.cloudFoundryClient, TEST_SPACE_ID);
         requestApplicationsEmpty(this.cloudFoundryClient, "test-route-id");
         requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
@@ -268,7 +279,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteOrphanedRoutesNoAssociatedApplicationsFailure() {
+    public void deleteOrphanedRoutesNoAssociationsFailure() {
         requestSpaceRoutes(this.cloudFoundryClient, TEST_SPACE_ID);
         requestApplicationsEmpty(this.cloudFoundryClient, "test-route-id");
         requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
@@ -980,6 +991,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                     .resource(fill(RouteResource.builder(), "route-")
                         .entity(fill(RouteEntity.builder(), "route-entity-")
                             .domainId("test-domain-id")
+                            .serviceInstanceId(null)
                             .build())
                         .build())
                     .build()));
@@ -993,6 +1005,23 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListSpaceRoutesResponse.builder())
+                    .build()));
+    }
+
+    private static void requestSpaceRoutesService(CloudFoundryClient cloudFoundryClient, String spaceId) {
+        when(cloudFoundryClient.spaces()
+            .listRoutes(ListSpaceRoutesRequest.builder()
+                .page(1)
+                .spaceId(spaceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListSpaceRoutesResponse.builder())
+                    .resource(fill(RouteResource.builder(), "route-")
+                        .entity(fill(RouteEntity.builder(), "route-entity-")
+                            .domainId("test-domain-id")
+                            .serviceInstanceId("test-service-instance-id")
+                            .build())
+                        .build())
                     .build()));
     }
 
