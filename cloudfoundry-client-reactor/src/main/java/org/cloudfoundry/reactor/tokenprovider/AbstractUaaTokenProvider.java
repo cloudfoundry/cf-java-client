@@ -113,9 +113,9 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
             .map(this::getTokenUri)
             .then(uri -> connectionContext.getHttpClient()
                 .post(uri, outbound -> outbound
-                    .addHeader("Content-Length", "0")
-                    .addHeader(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED)
-                    .addHeader(HttpHeaderNames.AUTHORIZATION, getAuthorizationValue())
+                    .header(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED)
+                    .header(HttpHeaderNames.AUTHORIZATION, getAuthorizationValue())
+                    .header(HttpHeaderNames.ACCEPT, HttpHeaderValues.APPLICATION_JSON)
                     .removeTransferEncodingChunked()
                     .sendHeaders())
                 .doOnSubscribe(NetworkLogging.post(uri))
