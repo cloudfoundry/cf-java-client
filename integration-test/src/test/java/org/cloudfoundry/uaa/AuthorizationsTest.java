@@ -25,10 +25,11 @@ import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithIdTokenRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithImplicitGrantRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,97 +43,86 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void authorizeByAuthorizationCodeGrantApi() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .consumeNextWith(actual -> assertThat(actual).hasSize(6))
-            .expectComplete();
-
         this.uaaClient.authorizations()
             .authorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest.builder()
                 .clientId(this.clientId)
                 .build())
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(actual -> assertThat(actual).hasSize(6))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void authorizeByAuthorizationCodeGrantBrowser() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<String> subscriber = startsWithExpectation("https://uaa.");
-
         this.uaaClient.authorizations()
             .authorizationCodeGrantBrowser(AuthorizeByAuthorizationCodeGrantBrowserRequest.builder()
                 .clientId(this.clientId)
                 .redirectUri("http://redirect.to/app")
                 .build())
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(startsWithExpectation("https://uaa."))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void authorizeByImplicitGrantBrowser() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<String> subscriber = startsWithExpectation("https://uaa.");
-
         this.uaaClient.authorizations()
             .implicitGrantBrowser(AuthorizeByImplicitGrantBrowserRequest.builder()
                 .clientId(this.clientId)
                 .redirectUri("http://redirect.to/app")
                 .build())
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(startsWithExpectation("https://uaa."))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void authorizeByOpenIdWithAuthorizationCodeGrant() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<String> subscriber = startsWithExpectation("https://uaa.");
-
         this.uaaClient.authorizations()
             .openIdWithAuthorizationCodeGrant(AuthorizeByOpenIdWithAuthorizationCodeGrantRequest.builder()
                 .clientId("app")
                 .redirectUri("http://redirect.to/app")
                 .scope("openid")
                 .build())
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(startsWithExpectation("https://uaa."))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void authorizeByOpenIdWithIdToken() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<String> subscriber = startsWithExpectation("https://uaa.");
-
         this.uaaClient.authorizations()
             .openIdWithIdToken(AuthorizeByOpenIdWithIdTokenRequest.builder()
                 .clientId("app")
                 .redirectUri("http://redirect.to/app")
                 .scope("open-id")
                 .build())
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(startsWithExpectation("https://uaa."))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void authorizeByOpenIdWithImplicitGrant() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<String> subscriber = startsWithExpectation("https://uaa.");
-
         this.uaaClient.authorizations()
             .openIdWithImplicitGrant(AuthorizeByOpenIdWithImplicitGrantRequest.builder()
                 .clientId("app")
                 .redirectUri("http://redirect.to/app")
                 .scope("openid")
                 .build())
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(startsWithExpectation("https://uaa."))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    private static ScriptedSubscriber<String> startsWithExpectation(String prefix) {
-        return ScriptedSubscriber.<String>create()
-            .consumeNextWith(actual -> assertThat(actual).startsWith(prefix))
-            .expectComplete();
+    private static Consumer<String> startsWithExpectation(String prefix) {
+        return actual -> assertThat(actual).startsWith(prefix);
     }
-
 
 }

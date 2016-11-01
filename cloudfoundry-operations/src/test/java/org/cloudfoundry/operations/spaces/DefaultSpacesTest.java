@@ -64,13 +64,13 @@ import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceResponse;
-import org.cloudfoundry.operations.AbstractOperationsApiTest;
+import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.cloudfoundry.operations.spaceadmin.SpaceQuota;
-import org.junit.Before;
-import org.reactivestreams.Publisher;
+import org.junit.Test;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Optional;
@@ -81,7 +81,384 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
-public final class DefaultSpacesTest {
+public final class DefaultSpacesTest extends AbstractOperationsTest {
+
+    private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_USERNAME));
+
+    @Test
+    public void allowSsh() {
+        requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", "test-space-spaceQuotaDefinitionId");
+        requestUpdateSpaceSsh(this.cloudFoundryClient, "test-space-id", true);
+
+        this.spaces
+            .allowSsh(AllowSpaceSshRequest.builder()
+                .name("test-space-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void allowSshAlreadyAllowed() {
+        requestOrganizationSpacesWithSsh(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", true);
+
+        this.spaces
+            .allowSsh(AllowSpaceSshRequest.builder()
+                .name("test-space-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void allowSshNoSpace() {
+        requestOrganizationSpacesEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
+
+        this.spaces
+            .allowSsh(AllowSpaceSshRequest.builder()
+                .name("test-space-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space test-space-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void createNoOrgNoQuota() {
+        requestCreateSpace(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", null, "test-space-id");
+        requestAssociateOrganizationUserByUsername(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_USERNAME);
+        requestAssociateSpaceManagerByUsername(this.cloudFoundryClient, "test-space-id", TEST_USERNAME);
+        requestAssociateSpaceDeveloperByUsername(this.cloudFoundryClient, "test-space-id", TEST_USERNAME);
+
+        this.spaces
+            .create(CreateSpaceRequest.builder()
+                .name("test-space-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void createNoOrgQuota() {
+        requestOrganizationSpaceQuotas(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-quota", "test-space-quota-id");
+        requestCreateSpace(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", "test-space-quota-id", "test-space-id");
+        requestAssociateOrganizationUserByUsername(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_USERNAME);
+        requestAssociateSpaceManagerByUsername(this.cloudFoundryClient, "test-space-id", TEST_USERNAME);
+        requestAssociateSpaceDeveloperByUsername(this.cloudFoundryClient, "test-space-id", TEST_USERNAME);
+
+        this.spaces
+            .create(CreateSpaceRequest.builder()
+                .name("test-space-name")
+                .spaceQuota("test-space-quota")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void createNoOrgQuotaNotFound() {
+        requestOrganizationSpaceQuotas(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-quota", null);
+
+        this.spaces
+            .create(CreateSpaceRequest.builder()
+                .name("test-space-name")
+                .spaceQuota("test-space-quota")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space quota definition test-space-quota does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void createOrgNotFound() {
+        requestOrganizations(this.cloudFoundryClient, "test-other-organization", null);
+
+        this.spaces
+            .create(CreateSpaceRequest.builder()
+                .name("test-space-name")
+                .spaceQuota("test-space-quota")
+                .organization("test-other-organization")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Organization test-other-organization does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void createOrgQuota() {
+        requestOrganizations(this.cloudFoundryClient, "test-other-organization", "test-other-organization-id");
+        requestOrganizationSpaceQuotas(this.cloudFoundryClient, "test-other-organization-id", "test-space-quota", "test-space-quota-id");
+        requestCreateSpace(this.cloudFoundryClient, "test-other-organization-id", "test-space-name", "test-space-quota-id", "test-space-id");
+        requestAssociateOrganizationUserByUsername(this.cloudFoundryClient, "test-other-organization-id", TEST_USERNAME);
+        requestAssociateSpaceManagerByUsername(this.cloudFoundryClient, "test-space-id", TEST_USERNAME);
+        requestAssociateSpaceDeveloperByUsername(this.cloudFoundryClient, "test-space-id", TEST_USERNAME);
+
+        this.spaces
+            .create(CreateSpaceRequest.builder()
+                .name("test-space-name")
+                .organization("test-other-organization")
+                .spaceQuota("test-space-quota")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void delete() {
+        requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", "test-space-spaceQuotaDefinitionId");
+        requestDeleteSpace(this.cloudFoundryClient, "test-space-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-id");
+
+        this.spaces
+            .delete(DeleteSpaceRequest.builder()
+                .name("test-space-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void deleteFailure() {
+        requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", "test-space-spaceQuotaDefinitionId");
+        requestDeleteSpace(this.cloudFoundryClient, "test-space-id");
+        requestJobFailure(this.cloudFoundryClient, "test-id");
+
+        this.spaces
+            .delete(DeleteSpaceRequest.builder()
+                .name("test-space-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void deleteInvalidSpace() {
+        requestOrganizationSpacesEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
+
+        this.spaces
+            .delete(DeleteSpaceRequest.builder()
+                .name("test-space-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space test-space-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void disallowSsh() {
+        requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", "test-space-spaceQuotaDefinitionId");
+        requestUpdateSpaceSsh(this.cloudFoundryClient, "test-space-id", false);
+
+        this.spaces
+            .disallowSsh(DisallowSpaceSshRequest.builder()
+                .name("test-space-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void disallowSshAlreadyDisallowed() {
+        requestOrganizationSpacesWithSsh(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", false);
+
+        this.spaces
+            .disallowSsh(DisallowSpaceSshRequest.builder()
+                .name("test-space-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void disallowSshNoSpace() {
+        requestOrganizationSpacesEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
+
+        this.spaces
+            .disallowSsh(DisallowSpaceSshRequest.builder()
+                .name("test-space-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space test-space-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void get() {
+        requestOrganization(this.cloudFoundryClient, "test-space-organizationId");
+        requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME, "test-space-spaceQuotaDefinitionId");
+        requestSpaceApplications(this.cloudFoundryClient, TEST_SPACE_ID);
+        requestSpaceDomains(this.cloudFoundryClient, TEST_SPACE_ID);
+        requestSpaceSecurityGroups(this.cloudFoundryClient, TEST_SPACE_ID);
+        requestSpaceServices(this.cloudFoundryClient, TEST_SPACE_ID);
+        requestSpaceQuotaDefinition(this.cloudFoundryClient, "test-space-spaceQuotaDefinitionId");
+
+        this.spaces
+            .get(GetSpaceRequest.builder()
+                .name("test-space-name")
+                .securityGroupRules(true)
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(SpaceDetail.builder()
+                .application("test-application-name")
+                .domain("test-domain-name")
+                .id(TEST_SPACE_ID)
+                .name(TEST_SPACE_NAME)
+                .organization("test-organization-name")
+                .securityGroup(SecurityGroup.builder()
+                    .name("test-security-group-name")
+                    .rule(fill(Rule.builder(), "security-group-")
+                        .build())
+                    .build())
+                .service("test-service-label")
+                .spaceQuota(Optional
+                    .of(fill(SpaceQuota.builder(), "space-quota-definition-")
+                        .build()))
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getNoSecurityGroupRules() {
+        requestOrganization(this.cloudFoundryClient, "test-space-organizationId");
+        requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME, "test-space-spaceQuotaDefinitionId");
+        requestSpaceApplications(this.cloudFoundryClient, TEST_SPACE_ID);
+        requestSpaceDomains(this.cloudFoundryClient, TEST_SPACE_ID);
+        requestSpaceSecurityGroups(this.cloudFoundryClient, TEST_SPACE_ID);
+        requestSpaceServices(this.cloudFoundryClient, TEST_SPACE_ID);
+        requestSpaceQuotaDefinition(this.cloudFoundryClient, "test-space-spaceQuotaDefinitionId");
+
+        this.spaces
+            .get(GetSpaceRequest.builder()
+                .name(TEST_SPACE_NAME)
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(SpaceDetail.builder()
+                .application("test-application-name")
+                .domain("test-domain-name")
+                .id(TEST_SPACE_ID)
+                .name(TEST_SPACE_NAME)
+                .organization("test-organization-name")
+                .securityGroup(SecurityGroup.builder()
+                    .name("test-security-group-name")
+                    .build())
+                .service("test-service-label")
+                .spaceQuota(Optional
+                    .of(fill(SpaceQuota.builder(), "space-quota-definition-")
+                        .build()))
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getSpaceQuotaNull() {
+        requestOrganization(this.cloudFoundryClient, "test-space-organizationId");
+        requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME, null);
+        requestSpaceApplications(this.cloudFoundryClient, TEST_SPACE_ID);
+        requestSpaceDomains(this.cloudFoundryClient, TEST_SPACE_ID);
+        requestSpaceSecurityGroups(this.cloudFoundryClient, TEST_SPACE_ID);
+        requestSpaceServices(this.cloudFoundryClient, TEST_SPACE_ID);
+
+        this.spaces
+            .get(GetSpaceRequest.builder()
+                .name(TEST_SPACE_NAME)
+                .securityGroupRules(false)
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(SpaceDetail.builder()
+                .application("test-application-name")
+                .domain("test-domain-name")
+                .id(TEST_SPACE_ID)
+                .name(TEST_SPACE_NAME)
+                .organization("test-organization-name")
+                .securityGroup(SecurityGroup.builder()
+                    .name("test-security-group-name")
+                    .build())
+                .service("test-service-label")
+                .spaceQuota(Optional.empty())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void list() {
+        requestSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+
+        this.spaces
+            .list()
+            .as(StepVerifier::create)
+            .expectNext(fill(SpaceSummary.builder(), "space-")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void rename() {
+        requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", "test-space-spaceQuotaDefinitionId");
+        requestUpdateSpace(this.cloudFoundryClient, "test-space-id", "test-new-space-name");
+
+        this.spaces
+            .rename(RenameSpaceRequest.builder()
+                .name("test-space-name")
+                .newName("test-new-space-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void renameNoSpace() {
+        requestOrganizationSpacesEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
+
+        this.spaces
+            .rename(RenameSpaceRequest.builder()
+                .name("test-space-name")
+                .newName("test-new-space-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space test-space-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void sshAllowed() {
+        requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", "test-space-spaceQuotaDefinitionId");
+
+        this.spaces
+            .sshAllowed(SpaceSshAllowedRequest.builder()
+                .name("test-space-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(true)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void sshAllowedNoSpace() {
+        requestOrganizationSpacesEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
+
+        this.spaces
+            .sshAllowed(SpaceSshAllowedRequest.builder()
+                .name("test-space-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space test-space-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
 
     private static void requestAssociateOrganizationUserByUsername(CloudFoundryClient cloudFoundryClient, String organizationId, String username) {
         when(cloudFoundryClient.organizations()
@@ -406,643 +783,6 @@ public final class DefaultSpacesTest {
                     .entity(fill(SpaceEntity.builder(), "space-entity-")
                         .build())
                     .build()));
-    }
-
-    public static final class AllowSsh extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
-
-        @Before
-        public void setUp() throws Exception {
-            requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", "test-space-spaceQuotaDefinitionId");
-            requestUpdateSpaceSsh(this.cloudFoundryClient, "test-space-id", true);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.spaces
-                .allowSsh(AllowSpaceSshRequest.builder()
-                    .name("test-space-name")
-                    .build());
-        }
-
-    }
-
-    public static final class AllowSshAlreadyAllowed extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
-
-        @Before
-        public void setUp() throws Exception {
-            requestOrganizationSpacesWithSsh(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", true);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.spaces
-                .allowSsh(AllowSpaceSshRequest.builder()
-                    .name("test-space-name")
-                    .build());
-        }
-
-    }
-
-    public static final class AllowSshNoSpace extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
-
-        @Before
-        public void setUp() throws Exception {
-            requestOrganizationSpacesEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space test-space-name does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.spaces
-                .allowSsh(AllowSpaceSshRequest.builder()
-                    .name("test-space-name")
-                    .build());
-        }
-
-    }
-
-    public static final class CreateNoOrgNoQuota extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_USERNAME));
-
-        @Before
-        public void setUp() {
-            requestCreateSpace(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", null, "test-space-id");
-            requestAssociateOrganizationUserByUsername(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_USERNAME);
-            requestAssociateSpaceManagerByUsername(this.cloudFoundryClient, "test-space-id", TEST_USERNAME);
-            requestAssociateSpaceDeveloperByUsername(this.cloudFoundryClient, "test-space-id", TEST_USERNAME);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.spaces
-                .create(CreateSpaceRequest.builder()
-                    .name("test-space-name")
-                    .build());
-        }
-
-    }
-
-    public static final class CreateNoOrgQuota extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_USERNAME));
-
-        @Before
-        public void setUp() {
-            requestOrganizationSpaceQuotas(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-quota", "test-space-quota-id");
-            requestCreateSpace(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", "test-space-quota-id", "test-space-id");
-            requestAssociateOrganizationUserByUsername(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_USERNAME);
-            requestAssociateSpaceManagerByUsername(this.cloudFoundryClient, "test-space-id", TEST_USERNAME);
-            requestAssociateSpaceDeveloperByUsername(this.cloudFoundryClient, "test-space-id", TEST_USERNAME);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.spaces
-                .create(CreateSpaceRequest.builder()
-                    .name("test-space-name")
-                    .spaceQuota("test-space-quota")
-                    .build());
-        }
-
-    }
-
-    public static final class CreateNoOrgQuotaNotFound extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_USERNAME));
-
-        @Before
-        public void setUp() {
-            requestOrganizationSpaceQuotas(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-quota", null);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space quota definition test-space-quota does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.spaces
-                .create(CreateSpaceRequest.builder()
-                    .name("test-space-name")
-                    .spaceQuota("test-space-quota")
-                    .build());
-        }
-
-    }
-
-    public static final class CreateOrgNotFound extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_USERNAME));
-
-        @Before
-        public void setUp() {
-            requestOrganizations(this.cloudFoundryClient, "test-other-organization", null);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Organization test-other-organization does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.spaces
-                .create(CreateSpaceRequest.builder()
-                    .name("test-space-name")
-                    .spaceQuota("test-space-quota")
-                    .organization("test-other-organization")
-                    .build());
-        }
-
-    }
-
-    public static final class CreateOrgQuota extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_USERNAME));
-
-        @Before
-        public void setUp() {
-            requestOrganizations(this.cloudFoundryClient, "test-other-organization", "test-other-organization-id");
-            requestOrganizationSpaceQuotas(this.cloudFoundryClient, "test-other-organization-id", "test-space-quota", "test-space-quota-id");
-            requestCreateSpace(this.cloudFoundryClient, "test-other-organization-id", "test-space-name", "test-space-quota-id", "test-space-id");
-            requestAssociateOrganizationUserByUsername(this.cloudFoundryClient, "test-other-organization-id", TEST_USERNAME);
-            requestAssociateSpaceManagerByUsername(this.cloudFoundryClient, "test-space-id", TEST_USERNAME);
-            requestAssociateSpaceDeveloperByUsername(this.cloudFoundryClient, "test-space-id", TEST_USERNAME);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.spaces
-                .create(CreateSpaceRequest.builder()
-                    .name("test-space-name")
-                    .organization("test-other-organization")
-                    .spaceQuota("test-space-quota")
-                    .build());
-        }
-
-    }
-
-    public static final class Delete extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
-
-        @Before
-        public void setUp() {
-            requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", "test-space-spaceQuotaDefinitionId");
-            requestDeleteSpace(this.cloudFoundryClient, "test-space-id");
-            requestJobSuccess(this.cloudFoundryClient, "test-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.spaces
-                .delete(DeleteSpaceRequest.builder()
-                    .name("test-space-name")
-                    .build());
-        }
-
-    }
-
-    public static final class DeleteFailure extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
-
-        @Before
-        public void setUp() {
-            requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", "test-space-spaceQuotaDefinitionId");
-            requestDeleteSpace(this.cloudFoundryClient, "test-space-id");
-            requestJobFailure(this.cloudFoundryClient, "test-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.spaces
-                .delete(DeleteSpaceRequest.builder()
-                    .name("test-space-name")
-                    .build());
-        }
-
-    }
-
-    public static final class DeleteInvalidSpace extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
-
-        @Before
-        public void setUp() {
-            requestOrganizationSpacesEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space test-space-name does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.spaces
-                .delete(DeleteSpaceRequest.builder()
-                    .name("test-space-name")
-                    .build());
-        }
-
-    }
-
-    public static final class DisallowSsh extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
-
-        @Before
-        public void setUp() throws Exception {
-            requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", "test-space-spaceQuotaDefinitionId");
-            requestUpdateSpaceSsh(this.cloudFoundryClient, "test-space-id", false);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.spaces
-                .disallowSsh(DisallowSpaceSshRequest.builder()
-                    .name("test-space-name")
-                    .build());
-        }
-
-    }
-
-    public static final class DisallowSshAlreadyDisallowed extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
-
-        @Before
-        public void setUp() throws Exception {
-            requestOrganizationSpacesWithSsh(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", false);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.spaces
-                .disallowSsh(DisallowSpaceSshRequest.builder()
-                    .name("test-space-name")
-                    .build());
-        }
-
-    }
-
-    public static final class DisallowSshNoSpace extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
-
-        @Before
-        public void setUp() throws Exception {
-            requestOrganizationSpacesEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space test-space-name does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.spaces
-                .disallowSsh(DisallowSpaceSshRequest.builder()
-                    .name("test-space-name")
-                    .build());
-        }
-
-    }
-
-    public static final class Get extends AbstractOperationsApiTest<SpaceDetail> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
-
-        @Before
-        public void setUp() throws Exception {
-            requestOrganization(this.cloudFoundryClient, "test-space-organizationId");
-            requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME, "test-space-spaceQuotaDefinitionId");
-            requestSpaceApplications(this.cloudFoundryClient, TEST_SPACE_ID);
-            requestSpaceDomains(this.cloudFoundryClient, TEST_SPACE_ID);
-            requestSpaceSecurityGroups(this.cloudFoundryClient, TEST_SPACE_ID);
-            requestSpaceServices(this.cloudFoundryClient, TEST_SPACE_ID);
-            requestSpaceQuotaDefinition(this.cloudFoundryClient, "test-space-spaceQuotaDefinitionId");
-        }
-
-        @Override
-        protected ScriptedSubscriber<SpaceDetail> expectations() {
-            return ScriptedSubscriber.<SpaceDetail>create()
-                .expectNext(SpaceDetail.builder()
-                    .application("test-application-name")
-                    .domain("test-domain-name")
-                    .id(TEST_SPACE_ID)
-                    .name(TEST_SPACE_NAME)
-                    .organization("test-organization-name")
-                    .securityGroup(SecurityGroup.builder()
-                        .name("test-security-group-name")
-                        .rule(fill(Rule.builder(), "security-group-")
-                            .build())
-                        .build())
-                    .service("test-service-label")
-                    .spaceQuota(Optional
-                        .of(fill(SpaceQuota.builder(), "space-quota-definition-")
-                            .build()))
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<SpaceDetail> invoke() {
-            return this.spaces
-                .get(GetSpaceRequest.builder()
-                    .name("test-space-name")
-                    .securityGroupRules(true)
-                    .build());
-        }
-
-    }
-
-    public static final class GetNoSecurityGroupRules extends AbstractOperationsApiTest<SpaceDetail> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
-
-        @Before
-        public void setUp() throws Exception {
-            requestOrganization(this.cloudFoundryClient, "test-space-organizationId");
-            requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME, "test-space-spaceQuotaDefinitionId");
-            requestSpaceApplications(this.cloudFoundryClient, TEST_SPACE_ID);
-            requestSpaceDomains(this.cloudFoundryClient, TEST_SPACE_ID);
-            requestSpaceSecurityGroups(this.cloudFoundryClient, TEST_SPACE_ID);
-            requestSpaceServices(this.cloudFoundryClient, TEST_SPACE_ID);
-            requestSpaceQuotaDefinition(this.cloudFoundryClient, "test-space-spaceQuotaDefinitionId");
-        }
-
-        @Override
-        protected ScriptedSubscriber<SpaceDetail> expectations() {
-            return ScriptedSubscriber.<SpaceDetail>create()
-                .expectNext(SpaceDetail.builder()
-                    .application("test-application-name")
-                    .domain("test-domain-name")
-                    .id(TEST_SPACE_ID)
-                    .name(TEST_SPACE_NAME)
-                    .organization("test-organization-name")
-                    .securityGroup(SecurityGroup.builder()
-                        .name("test-security-group-name")
-                        .build())
-                    .service("test-service-label")
-                    .spaceQuota(Optional
-                        .of(fill(SpaceQuota.builder(), "space-quota-definition-")
-                            .build()))
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<SpaceDetail> invoke() {
-            return this.spaces
-                .get(GetSpaceRequest.builder()
-                    .name(TEST_SPACE_NAME)
-                    .build());
-        }
-    }
-
-    public static final class GetSpaceQuotaNull extends AbstractOperationsApiTest<SpaceDetail> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
-
-        @Before
-        public void setUp() throws Exception {
-            requestOrganization(this.cloudFoundryClient, "test-space-organizationId");
-            requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME, null);
-            requestSpaceApplications(this.cloudFoundryClient, TEST_SPACE_ID);
-            requestSpaceDomains(this.cloudFoundryClient, TEST_SPACE_ID);
-            requestSpaceSecurityGroups(this.cloudFoundryClient, TEST_SPACE_ID);
-            requestSpaceServices(this.cloudFoundryClient, TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<SpaceDetail> expectations() {
-            return ScriptedSubscriber.<SpaceDetail>create()
-                .expectNext(SpaceDetail.builder()
-                    .application("test-application-name")
-                    .domain("test-domain-name")
-                    .id(TEST_SPACE_ID)
-                    .name(TEST_SPACE_NAME)
-                    .organization("test-organization-name")
-                    .securityGroup(SecurityGroup.builder()
-                        .name("test-security-group-name")
-                        .build())
-                    .service("test-service-label")
-                    .spaceQuota(Optional.empty())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<SpaceDetail> invoke() {
-            return this.spaces
-                .get(GetSpaceRequest.builder()
-                    .name(TEST_SPACE_NAME)
-                    .securityGroupRules(false)
-                    .build());
-        }
-    }
-
-    public static final class List extends AbstractOperationsApiTest<SpaceSummary> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
-
-        @Before
-        public void setUp() throws Exception {
-            requestSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<SpaceSummary> expectations() {
-            return ScriptedSubscriber.<SpaceSummary>create()
-                .expectNext(fill(SpaceSummary.builder(), "space-")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<SpaceSummary> invoke() {
-            return this.spaces
-                .list();
-        }
-
-    }
-
-    public static final class Rename extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
-
-        @Before
-        public void setUp() throws Exception {
-            requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", "test-space-spaceQuotaDefinitionId");
-            requestUpdateSpace(this.cloudFoundryClient, "test-space-id", "test-new-space-name");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<Void> invoke() {
-            return this.spaces
-                .rename(RenameSpaceRequest.builder()
-                    .name("test-space-name")
-                    .newName("test-new-space-name")
-                    .build());
-        }
-
-    }
-
-    public static final class RenameNoSpace extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
-
-        @Before
-        public void setUp() throws Exception {
-            requestOrganizationSpacesEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space test-space-name does not exist"));
-        }
-
-        @Override
-        protected Publisher<Void> invoke() {
-            return this.spaces
-                .rename(RenameSpaceRequest.builder()
-                    .name("test-space-name")
-                    .newName("test-new-space-name")
-                    .build());
-        }
-
-    }
-
-    public static final class SshAllowed extends AbstractOperationsApiTest<Boolean> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
-
-        @Before
-        public void setUp() throws Exception {
-            requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", "test-space-spaceQuotaDefinitionId");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Boolean> expectations() {
-            return ScriptedSubscriber.<Boolean>create()
-                .expectNext(true)
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Boolean> invoke() {
-            return this.spaces
-                .sshAllowed(SpaceSshAllowedRequest.builder()
-                    .name("test-space-name")
-                    .build());
-        }
-
-    }
-
-    public static final class SshAllowedNoSpace extends AbstractOperationsApiTest<Boolean> {
-
-        private final DefaultSpaces spaces = new DefaultSpaces(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), MISSING_USERNAME);
-
-        @Before
-        public void setUp() throws Exception {
-            requestOrganizationSpacesEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Boolean> expectations() {
-            return ScriptedSubscriber.<Boolean>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space test-space-name does not exist"));
-        }
-
-        @Override
-        protected Mono<Boolean> invoke() {
-            return this.spaces
-                .sshAllowed(SpaceSshAllowedRequest.builder()
-                    .name("test-space-name")
-                    .build());
-        }
-
     }
 
 }

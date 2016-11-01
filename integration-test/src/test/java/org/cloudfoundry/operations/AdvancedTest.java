@@ -19,7 +19,7 @@ package org.cloudfoundry.operations;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
@@ -33,15 +33,12 @@ public final class AdvancedTest extends AbstractIntegrationTest {
 
     @Test
     public void sshCode() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .consumeNextWith(actual -> assertThat(actual).hasSize(6))
-            .expectComplete();
-
         this.cloudFoundryOperations.advanced()
             .sshCode()
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(actual -> assertThat(actual).hasSize(6))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
 }

@@ -22,63 +22,51 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import org.junit.Test;
+import reactor.test.StepVerifier;
+
+import java.time.Duration;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 
-public final class ReactorInfoTest {
+public final class ReactorInfoTest extends AbstractClientApiTest {
 
-    public static final class Get extends AbstractClientApiTest<GetInfoRequest, GetInfoResponse> {
+    private final ReactorInfo info = new ReactorInfo(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
-        private final ReactorInfo info = new ReactorInfo(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    @Test
+    public void get() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/info")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/info/GET_response.json")
+                .build())
+            .build());
 
-        @Override
-        protected ScriptedSubscriber<GetInfoResponse> expectations() {
-            return ScriptedSubscriber.<GetInfoResponse>create()
-                .expectNext(GetInfoResponse.builder()
-                    .name("vcap")
-                    .buildNumber("2222")
-                    .support("http://support.cloudfoundry.com")
-                    .version(2)
-                    .description("Cloud Foundry sponsored by Pivotal")
-                    .authorizationEndpoint("http://localhost:8080/uaa")
-                    .tokenEndpoint("http://localhost:8080/uaa")
-                    .apiVersion("2.44.0")
-                    .applicationSshEndpoint("ssh.system.domain.example.com:2222")
-                    .applicationSshHostKeyFingerprint("47:0d:d1:c8:c3:3d:0a:36:d1:49:2f:f2:90:27:31:d0")
-                    .routingEndpoint("http://localhost:3000")
-                    .loggingEndpoint("ws://loggregator.vcap.me:80")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/v2/info")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/info/GET_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<GetInfoResponse> invoke(GetInfoRequest request) {
-            return this.info.get(request);
-        }
-
-        @Override
-        protected GetInfoRequest validRequest() {
-            return GetInfoRequest.builder()
-                .build();
-        }
-
+        this.info
+            .get(GetInfoRequest.builder()
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetInfoResponse.builder()
+                .name("vcap")
+                .buildNumber("2222")
+                .support("http://support.cloudfoundry.com")
+                .version(2)
+                .description("Cloud Foundry sponsored by Pivotal")
+                .authorizationEndpoint("http://localhost:8080/uaa")
+                .tokenEndpoint("http://localhost:8080/uaa")
+                .apiVersion("2.44.0")
+                .applicationSshEndpoint("ssh.system.domain.example.com:2222")
+                .applicationSshHostKeyFingerprint("47:0d:d1:c8:c3:3d:0a:36:d1:49:2f:f2:90:27:31:d0")
+                .routingEndpoint("http://localhost:3000")
+                .loggingEndpoint("ws://loggregator.vcap.me:80")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
 }

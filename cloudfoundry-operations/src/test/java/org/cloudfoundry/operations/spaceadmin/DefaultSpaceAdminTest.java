@@ -20,17 +20,61 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
-import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.junit.Before;
-import org.reactivestreams.Publisher;
+import org.cloudfoundry.operations.AbstractOperationsTest;
+import org.junit.Test;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
+
+import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
-public final class DefaultSpaceAdminTest {
+public final class DefaultSpaceAdminTest extends AbstractOperationsTest {
+
+    private final DefaultSpaceAdmin spaceAdmin = new DefaultSpaceAdmin(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID));
+
+    @Test
+    public void get() {
+        requestSpaceQuotaDefinitions(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+
+        this.spaceAdmin
+            .get(GetSpaceQuotaRequest.builder()
+                .name("test-space-quota-definition-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(fill(SpaceQuota.builder(), "space-quota-definition-")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getNotFound() {
+        requestSpaceQuotaDefinitionsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+
+        this.spaceAdmin
+            .get(GetSpaceQuotaRequest.builder()
+                .name("test-space-quota-definition-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space Quota test-space-quota-definition-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void list() {
+        requestSpaceQuotaDefinitions(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+
+        this.spaceAdmin
+            .listQuotas()
+            .as(StepVerifier::create)
+            .expectNext(fill(SpaceQuota.builder(), "space-quota-definition-")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     private static void requestSpaceQuotaDefinitions(CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient.organizations()
@@ -54,83 +98,6 @@ public final class DefaultSpaceAdminTest {
             .thenReturn(Mono
                 .just(fill(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
                     .build()));
-    }
-
-    public static final class Get extends AbstractOperationsApiTest<SpaceQuota> {
-
-        private final DefaultSpaceAdmin spaceAdmin = new DefaultSpaceAdmin(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestSpaceQuotaDefinitions(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<SpaceQuota> expectations() {
-            return ScriptedSubscriber.<SpaceQuota>create()
-                .expectNext(fill(SpaceQuota.builder(), "space-quota-definition-")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<SpaceQuota> invoke() {
-            return this.spaceAdmin
-                .get(GetSpaceQuotaRequest.builder()
-                    .name("test-space-quota-definition-name")
-                    .build());
-        }
-
-    }
-
-    public static final class GetNotFound extends AbstractOperationsApiTest<SpaceQuota> {
-
-        private final DefaultSpaceAdmin spaceAdmin = new DefaultSpaceAdmin(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestSpaceQuotaDefinitionsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<SpaceQuota> expectations() {
-            return ScriptedSubscriber.<SpaceQuota>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space Quota test-space-quota-definition-name does not exist"));
-        }
-
-        @Override
-        protected Mono<SpaceQuota> invoke() {
-            return this.spaceAdmin
-                .get(GetSpaceQuotaRequest.builder()
-                    .name("test-space-quota-definition-name")
-                    .build());
-        }
-
-    }
-
-    public static final class List extends AbstractOperationsApiTest<SpaceQuota> {
-
-        private final DefaultSpaceAdmin spaceAdmin = new DefaultSpaceAdmin(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestSpaceQuotaDefinitions(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<SpaceQuota> expectations() {
-            return ScriptedSubscriber.<SpaceQuota>create()
-                .expectNext(fill(SpaceQuota.builder(), "space-quota-definition-")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<SpaceQuota> invoke() {
-            return this.spaceAdmin
-                .listQuotas();
-        }
-
     }
 
 }

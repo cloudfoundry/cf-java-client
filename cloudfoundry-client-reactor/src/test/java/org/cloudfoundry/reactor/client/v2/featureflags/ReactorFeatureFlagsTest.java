@@ -27,251 +27,192 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import org.junit.Test;
+import reactor.test.StepVerifier;
+
+import java.time.Duration;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorFeatureFlagsTest {
+public final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
 
-    public static final class GetAppScaling extends AbstractClientApiTest<GetFeatureFlagRequest, GetFeatureFlagResponse> {
+    private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
-        private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    @Test
+    public void getAppScaling() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/config/feature_flags/app_scaling")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/feature_flags/GET_app_scaling_flag_response.json")
+                .build())
+            .build());
 
-        @Override
-        protected ScriptedSubscriber<GetFeatureFlagResponse> expectations() {
-            return ScriptedSubscriber.<GetFeatureFlagResponse>create()
-                .expectNext(GetFeatureFlagResponse.builder()
+        this.featureFlags
+            .get(GetFeatureFlagRequest.builder()
+                .name("app_scaling")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetFeatureFlagResponse.builder()
+                .name("app_scaling")
+                .enabled(true)
+                .url("/v2/config/feature_flags/app_scaling")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getUserRoles() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/config/feature_flags/set_roles_by_username")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/feature_flags/GET_set_user_roles_flag_response.json")
+                .build())
+            .build());
+
+        this.featureFlags
+            .get(GetFeatureFlagRequest.builder()
+                .name("set_roles_by_username")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetFeatureFlagResponse.builder()
+                .name("set_roles_by_username")
+                .enabled(true)
+                .url("/v2/config/feature_flags/set_roles_by_username")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void list() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/config/feature_flags")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/feature_flags/GET_response.json")
+                .build())
+            .build());
+
+        this.featureFlags
+            .list(ListFeatureFlagsRequest.builder()
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListFeatureFlagsResponse.builder()
+                .featureFlag(FeatureFlagEntity.builder()
+                    .name("user_org_creation")
+                    .enabled(false)
+                    .url("/v2/config/feature_flags/user_org_creation")
+                    .build()
+                )
+                .featureFlag(FeatureFlagEntity.builder()
+                    .name("private_domain_creation")
+                    .enabled(false)
+                    .errorMessage("foobar")
+                    .url("/v2/config/feature_flags/private_domain_creation")
+                    .build()
+                )
+                .featureFlag(FeatureFlagEntity.builder()
+                    .name("app_bits_upload")
+                    .enabled(true)
+                    .url("/v2/config/feature_flags/app_bits_upload")
+                    .build()
+                )
+                .featureFlag(FeatureFlagEntity.builder()
                     .name("app_scaling")
                     .enabled(true)
                     .url("/v2/config/feature_flags/app_scaling")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/v2/config/feature_flags/app_scaling")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/feature_flags/GET_app_scaling_flag_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<GetFeatureFlagResponse> invoke(GetFeatureFlagRequest request) {
-            return this.featureFlags.get(request);
-        }
-
-        @Override
-        protected GetFeatureFlagRequest validRequest() {
-            return GetFeatureFlagRequest.builder()
-                .name("app_scaling")
-                .build();
-        }
-
-    }
-
-    public static final class GetUserRoles extends AbstractClientApiTest<GetFeatureFlagRequest, GetFeatureFlagResponse> {
-
-        private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<GetFeatureFlagResponse> expectations() {
-            return ScriptedSubscriber.<GetFeatureFlagResponse>create()
-                .expectNext(GetFeatureFlagResponse.builder()
+                    .build()
+                )
+                .featureFlag(FeatureFlagEntity.builder()
+                    .name("route_creation")
+                    .enabled(true)
+                    .url("/v2/config/feature_flags/route_creation")
+                    .build()
+                )
+                .featureFlag(FeatureFlagEntity.builder()
+                    .name("service_instance_creation")
+                    .enabled(true)
+                    .url("/v2/config/feature_flags/service_instance_creation")
+                    .build()
+                )
+                .featureFlag(FeatureFlagEntity.builder()
+                    .name("diego_docker")
+                    .enabled(false)
+                    .url("/v2/config/feature_flags/diego_docker")
+                    .build()
+                )
+                .featureFlag(FeatureFlagEntity.builder()
                     .name("set_roles_by_username")
                     .enabled(true)
                     .url("/v2/config/feature_flags/set_roles_by_username")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/v2/config/feature_flags/set_roles_by_username")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/feature_flags/GET_set_user_roles_flag_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<GetFeatureFlagResponse> invoke(GetFeatureFlagRequest request) {
-            return this.featureFlags.get(request);
-        }
-
-        @Override
-        protected GetFeatureFlagRequest validRequest() {
-            return GetFeatureFlagRequest.builder()
-                .name("set_roles_by_username")
-                .build();
-        }
-
-    }
-
-    public static final class List extends AbstractClientApiTest<ListFeatureFlagsRequest, ListFeatureFlagsResponse> {
-
-        private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<ListFeatureFlagsResponse> expectations() {
-            return ScriptedSubscriber.<ListFeatureFlagsResponse>create()
-                .expectNext(ListFeatureFlagsResponse.builder()
-                    .featureFlag(FeatureFlagEntity.builder()
-                        .name("user_org_creation")
-                        .enabled(false)
-                        .url("/v2/config/feature_flags/user_org_creation")
-                        .build()
-                    )
-                    .featureFlag(FeatureFlagEntity.builder()
-                        .name("private_domain_creation")
-                        .enabled(false)
-                        .errorMessage("foobar")
-                        .url("/v2/config/feature_flags/private_domain_creation")
-                        .build()
-                    )
-                    .featureFlag(FeatureFlagEntity.builder()
-                        .name("app_bits_upload")
-                        .enabled(true)
-                        .url("/v2/config/feature_flags/app_bits_upload")
-                        .build()
-                    )
-                    .featureFlag(FeatureFlagEntity.builder()
-                        .name("app_scaling")
-                        .enabled(true)
-                        .url("/v2/config/feature_flags/app_scaling")
-                        .build()
-                    )
-                    .featureFlag(FeatureFlagEntity.builder()
-                        .name("route_creation")
-                        .enabled(true)
-                        .url("/v2/config/feature_flags/route_creation")
-                        .build()
-                    )
-                    .featureFlag(FeatureFlagEntity.builder()
-                        .name("service_instance_creation")
-                        .enabled(true)
-                        .url("/v2/config/feature_flags/service_instance_creation")
-                        .build()
-                    )
-                    .featureFlag(FeatureFlagEntity.builder()
-                        .name("diego_docker")
-                        .enabled(false)
-                        .url("/v2/config/feature_flags/diego_docker")
-                        .build()
-                    )
-                    .featureFlag(FeatureFlagEntity.builder()
-                        .name("set_roles_by_username")
-                        .enabled(true)
-                        .url("/v2/config/feature_flags/set_roles_by_username")
-                        .build()
-                    )
-                    .featureFlag(FeatureFlagEntity.builder()
-                        .name("unset_roles_by_username")
-                        .enabled(true)
-                        .url("/v2/config/feature_flags/unset_roles_by_username")
-                        .build()
-                    )
-                    .featureFlag(FeatureFlagEntity.builder()
-                        .name("task_creation")
-                        .enabled(false)
-                        .url("/v2/config/feature_flags/task_creation")
-                        .build()
-                    )
-                    .featureFlag(FeatureFlagEntity.builder()
-                        .name("space_scoped_private_broker_creation")
-                        .enabled(true)
-                        .url("/v2/config/feature_flags/space_scoped_private_broker_creation")
-                        .build()
-                    )
-                    .featureFlag(FeatureFlagEntity.builder()
-                        .name("space_developer_env_var_visibility")
-                        .enabled(true)
-                        .url("/v2/config/feature_flags/space_developer_env_var_visibility")
-                        .build()
-                    )
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/v2/config/feature_flags")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/feature_flags/GET_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<ListFeatureFlagsResponse> invoke(ListFeatureFlagsRequest request) {
-            return this.featureFlags.list(request);
-        }
-
-        @Override
-        protected ListFeatureFlagsRequest validRequest() {
-            return ListFeatureFlagsRequest.builder().build();
-        }
-
-    }
-
-    public static final class Set extends AbstractClientApiTest<SetFeatureFlagRequest, SetFeatureFlagResponse> {
-
-        private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<SetFeatureFlagResponse> expectations() {
-            return ScriptedSubscriber.<SetFeatureFlagResponse>create()
-                .expectNext(SetFeatureFlagResponse.builder()
-                    .name("user_org_creation")
+                    .build()
+                )
+                .featureFlag(FeatureFlagEntity.builder()
+                    .name("unset_roles_by_username")
                     .enabled(true)
-                    .url("/v2/config/feature_flags/user_org_creation")
-                    .build())
-                .expectComplete();
-        }
+                    .url("/v2/config/feature_flags/unset_roles_by_username")
+                    .build()
+                )
+                .featureFlag(FeatureFlagEntity.builder()
+                    .name("task_creation")
+                    .enabled(false)
+                    .url("/v2/config/feature_flags/task_creation")
+                    .build()
+                )
+                .featureFlag(FeatureFlagEntity.builder()
+                    .name("space_scoped_private_broker_creation")
+                    .enabled(true)
+                    .url("/v2/config/feature_flags/space_scoped_private_broker_creation")
+                    .build()
+                )
+                .featureFlag(FeatureFlagEntity.builder()
+                    .name("space_developer_env_var_visibility")
+                    .enabled(true)
+                    .url("/v2/config/feature_flags/space_developer_env_var_visibility")
+                    .build()
+                )
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(PUT).path("/v2/config/feature_flags/user_org_creation")
-                    .payload("fixtures/client/v2/feature_flags/PUT_user_org_creation_request.json")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/feature_flags/PUT_user_org_creation_response.json")
-                    .build())
-                .build();
-        }
+    @Test
+    public void set() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PUT).path("/v2/config/feature_flags/user_org_creation")
+                .payload("fixtures/client/v2/feature_flags/PUT_user_org_creation_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/feature_flags/PUT_user_org_creation_response.json")
+                .build())
+            .build());
 
-        @Override
-        protected Mono<SetFeatureFlagResponse> invoke(SetFeatureFlagRequest request) {
-            return this.featureFlags.set(request);
-        }
-
-        @Override
-        protected SetFeatureFlagRequest validRequest() {
-            return SetFeatureFlagRequest.builder()
+        this.featureFlags
+            .set(SetFeatureFlagRequest.builder()
                 .enabled(true)
                 .name("user_org_creation")
-                .build();
-        }
-
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(SetFeatureFlagResponse.builder()
+                .name("user_org_creation")
+                .enabled(true)
+                .url("/v2/config/feature_flags/user_org_creation")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
 }

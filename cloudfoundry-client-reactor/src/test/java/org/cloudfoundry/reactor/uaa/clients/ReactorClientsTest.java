@@ -44,8 +44,10 @@ import org.cloudfoundry.uaa.clients.UpdateClientRequest;
 import org.cloudfoundry.uaa.clients.UpdateClientResponse;
 import org.cloudfoundry.uaa.clients.UpdateMetadataRequest;
 import org.cloudfoundry.uaa.clients.UpdateMetadataResponse;
-import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import org.junit.Test;
+import reactor.test.StepVerifier;
+
+import java.time.Duration;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -57,68 +59,25 @@ import static org.cloudfoundry.uaa.tokens.GrantType.AUTHORIZATION_CODE;
 import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
 import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
 
-public final class ReactorClientsTest {
+public final class ReactorClientsTest extends AbstractUaaApiTest {
 
-    public static final class BatchCreate extends AbstractUaaApiTest<BatchCreateClientsRequest, BatchCreateClientsResponse> {
+    private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
-        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    @Test
+    public void batchCreate() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(POST).path("/oauth/clients/tx")
+                .payload("fixtures/uaa/clients/POST_tx_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(CREATED)
+                .payload("fixtures/uaa/clients/POST_tx_response.json")
+                .build())
+            .build());
 
-        @Override
-        protected ScriptedSubscriber<BatchCreateClientsResponse> expectations() {
-            return ScriptedSubscriber.<BatchCreateClientsResponse>create()
-                .expectNext(BatchCreateClientsResponse.builder()
-                    .client(Client.builder()
-                        .allowedProvider("uaa", "ldap", "my-saml-provider")
-                        .authority("clients.read", "clients.write")
-                        .authorizedGrantType(CLIENT_CREDENTIALS)
-                        .autoApprove("true")
-                        .clientId("14pnUs")
-                        .lastModified(1468364444218L)
-                        .name("My Client Name")
-                        .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
-                        .resourceId("none")
-                        .scope("clients.read", "clients.write")
-                        .tokenSalt("erRsWH")
-                        .build())
-                    .client(Client.builder()
-                        .allowedProvider("uaa", "ldap", "my-saml-provider")
-                        .authority("clients.read", "clients.write")
-                        .authorizedGrantType(CLIENT_CREDENTIALS)
-                        .autoApprove("true")
-                        .clientId("0Tgnfy")
-                        .lastModified(1468364444318L)
-                        .name("My Client Name")
-                        .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
-                        .resourceId("none")
-                        .scope("clients.read", "clients.write")
-                        .tokenSalt("4wMTwN")
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(POST).path("/oauth/clients/tx")
-                    .payload("fixtures/uaa/clients/POST_tx_request.json")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(CREATED)
-                    .payload("fixtures/uaa/clients/POST_tx_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<BatchCreateClientsResponse> invoke(BatchCreateClientsRequest request) {
-            return this.clients.batchCreate(request);
-        }
-
-        @Override
-        protected BatchCreateClientsRequest validRequest() {
-            return BatchCreateClientsRequest.builder()
+        this.clients
+            .batchCreate(BatchCreateClientsRequest.builder()
                 .client(CreateClient.builder()
                     .allowedProvider("uaa", "ldap", "my-saml-provider")
                     .authority("clients.read", "clients.write")
@@ -143,122 +102,107 @@ public final class ReactorClientsTest {
                     .scope("clients.read", "clients.write")
                     .tokenSalt("4wMTwN")
                     .build())
-                .build();
-        }
-    }
-
-    public static final class BatchDelete extends AbstractUaaApiTest<BatchDeleteClientsRequest, BatchDeleteClientsResponse> {
-
-        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<BatchDeleteClientsResponse> expectations() {
-            return ScriptedSubscriber.<BatchDeleteClientsResponse>create()
-                .expectNext(BatchDeleteClientsResponse.builder()
-                    .client(Client.builder()
-                        .approvalsDeleted(true)
-                        .allowedProvider("uaa", "ldap", "my-saml-provider")
-                        .authority("clients.read", "clients.write")
-                        .authorizedGrantType(CLIENT_CREDENTIALS)
-                        .autoApprove("true")
-                        .clientId("14pnUs")
-                        .lastModified(1468364444461L)
-                        .name("My Client Name")
-                        .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
-                        .resourceId("none")
-                        .scope("clients.read", "clients.write")
-                        .tokenSalt("erRsWH")
-                        .build())
-                    .client(Client.builder()
-                        .approvalsDeleted(true)
-                        .allowedProvider("uaa", "ldap", "my-saml-provider")
-                        .authority("clients.read", "clients.write")
-                        .authorizedGrantType(CLIENT_CREDENTIALS)
-                        .autoApprove("true")
-                        .clientId("qECLyr")
-                        .lastModified(1468364444868L)
-                        .name("My Client Name")
-                        .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
-                        .resourceId("none")
-                        .scope("clients.read", "clients.write")
-                        .tokenSalt("48TIsq")
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(POST).path("/oauth/clients/tx/delete")
-                    .payload("fixtures/uaa/clients/POST_tx_delete_request.json")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/uaa/clients/POST_tx_delete_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<BatchDeleteClientsResponse> invoke(BatchDeleteClientsRequest request) {
-            return this.clients.batchDelete(request);
-        }
-
-        @Override
-        protected BatchDeleteClientsRequest validRequest() {
-            return BatchDeleteClientsRequest.builder()
-                .clientId("14pnUs", "qECLyr")
-                .build();
-        }
-    }
-
-    public static final class Create extends AbstractUaaApiTest<CreateClientRequest, CreateClientResponse> {
-
-        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<CreateClientResponse> expectations() {
-            return ScriptedSubscriber.<CreateClientResponse>create()
-                .expectNext(CreateClientResponse.builder()
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(BatchCreateClientsResponse.builder()
+                .client(Client.builder()
                     .allowedProvider("uaa", "ldap", "my-saml-provider")
                     .authority("clients.read", "clients.write")
                     .authorizedGrantType(CLIENT_CREDENTIALS)
                     .autoApprove("true")
-                    .clientId("aPq3I1")
-                    .lastModified(1468364445109L)
+                    .clientId("14pnUs")
+                    .lastModified(1468364444218L)
                     .name("My Client Name")
                     .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
                     .resourceId("none")
                     .scope("clients.read", "clients.write")
-                    .tokenSalt("hRZ21X")
+                    .tokenSalt("erRsWH")
                     .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(POST).path("/oauth/clients")
-                    .payload("fixtures/uaa/clients/POST_request.json")
+                .client(Client.builder()
+                    .allowedProvider("uaa", "ldap", "my-saml-provider")
+                    .authority("clients.read", "clients.write")
+                    .authorizedGrantType(CLIENT_CREDENTIALS)
+                    .autoApprove("true")
+                    .clientId("0Tgnfy")
+                    .lastModified(1468364444318L)
+                    .name("My Client Name")
+                    .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                    .resourceId("none")
+                    .scope("clients.read", "clients.write")
+                    .tokenSalt("4wMTwN")
                     .build())
-                .response(TestResponse.builder()
-                    .status(CREATED)
-                    .payload("fixtures/uaa/clients/POST_response.json")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void batchDelete() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(POST).path("/oauth/clients/tx/delete")
+                .payload("fixtures/uaa/clients/POST_tx_delete_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/uaa/clients/POST_tx_delete_response.json")
+                .build())
+            .build());
+
+        this.clients
+            .batchDelete(BatchDeleteClientsRequest.builder()
+                .clientId("14pnUs", "qECLyr")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(BatchDeleteClientsResponse.builder()
+                .client(Client.builder()
+                    .approvalsDeleted(true)
+                    .allowedProvider("uaa", "ldap", "my-saml-provider")
+                    .authority("clients.read", "clients.write")
+                    .authorizedGrantType(CLIENT_CREDENTIALS)
+                    .autoApprove("true")
+                    .clientId("14pnUs")
+                    .lastModified(1468364444461L)
+                    .name("My Client Name")
+                    .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                    .resourceId("none")
+                    .scope("clients.read", "clients.write")
+                    .tokenSalt("erRsWH")
                     .build())
-                .build();
-        }
+                .client(Client.builder()
+                    .approvalsDeleted(true)
+                    .allowedProvider("uaa", "ldap", "my-saml-provider")
+                    .authority("clients.read", "clients.write")
+                    .authorizedGrantType(CLIENT_CREDENTIALS)
+                    .autoApprove("true")
+                    .clientId("qECLyr")
+                    .lastModified(1468364444868L)
+                    .name("My Client Name")
+                    .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                    .resourceId("none")
+                    .scope("clients.read", "clients.write")
+                    .tokenSalt("48TIsq")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
-        @Override
-        protected Mono<CreateClientResponse> invoke(CreateClientRequest request) {
-            return this.clients.create(request);
-        }
+    @Test
+    public void create() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(POST).path("/oauth/clients")
+                .payload("fixtures/uaa/clients/POST_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(CREATED)
+                .payload("fixtures/uaa/clients/POST_response.json")
+                .build())
+            .build());
 
-        @Override
-        protected CreateClientRequest validRequest() {
-            return CreateClientRequest.builder()
+        this.clients
+            .create(CreateClientRequest.builder()
                 .allowedProvider("uaa", "ldap", "my-saml-provider")
                 .authority("clients.read", "clients.write")
                 .authorizedGrantType(CLIENT_CREDENTIALS)
@@ -269,428 +213,323 @@ public final class ReactorClientsTest {
                 .redirectUriPattern("http://test1.com", "http*://ant.path.wildcard/**/passback/*")
                 .scope("clients.read", "clients.write")
                 .tokenSalt("hRZ21X")
-                .build();
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(CreateClientResponse.builder()
+                .allowedProvider("uaa", "ldap", "my-saml-provider")
+                .authority("clients.read", "clients.write")
+                .authorizedGrantType(CLIENT_CREDENTIALS)
+                .autoApprove("true")
+                .clientId("aPq3I1")
+                .lastModified(1468364445109L)
+                .name("My Client Name")
+                .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                .resourceId("none")
+                .scope("clients.read", "clients.write")
+                .tokenSalt("hRZ21X")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class Delete extends AbstractUaaApiTest<DeleteClientRequest, DeleteClientResponse> {
+    @Test
+    public void delete() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/oauth/clients/test-client-id")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/uaa/clients/DELETE_{id}_response.json")
+                .build())
+            .build());
 
-        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<DeleteClientResponse> expectations() {
-            return ScriptedSubscriber.<DeleteClientResponse>create()
-                .expectNext(DeleteClientResponse.builder()
-                    .allowedProvider("uaa", "ldap", "my-saml-provider")
-                    .authority("clients.read", "clients.write")
-                    .authorizedGrantType(CLIENT_CREDENTIALS)
-                    .autoApprove("true")
-                    .clientId("Gieovr")
-                    .lastModified(1468364443957L)
-                    .name("My Client Name")
-                    .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
-                    .resourceId("none")
-                    .scope("clients.read", "clients.write")
-                    .tokenSalt("a4mzKu")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(DELETE).path("/oauth/clients/test-client-id")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/uaa/clients/DELETE_{id}_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<DeleteClientResponse> invoke(DeleteClientRequest request) {
-            return this.clients.delete(request);
-        }
-
-        @Override
-        protected DeleteClientRequest validRequest() {
-            return DeleteClientRequest.builder()
+        this.clients
+            .delete(DeleteClientRequest.builder()
                 .clientId("test-client-id")
-                .build();
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(DeleteClientResponse.builder()
+                .allowedProvider("uaa", "ldap", "my-saml-provider")
+                .authority("clients.read", "clients.write")
+                .authorizedGrantType(CLIENT_CREDENTIALS)
+                .autoApprove("true")
+                .clientId("Gieovr")
+                .lastModified(1468364443957L)
+                .name("My Client Name")
+                .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                .resourceId("none")
+                .scope("clients.read", "clients.write")
+                .tokenSalt("a4mzKu")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class Deserialize extends AbstractUaaApiTest<ListClientsRequest, ListClientsResponse> {
+    @Test
+    public void deserialize() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/oauth/clients")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/uaa/clients/GET_response_deserialize.json")
+                .build())
+            .build());
 
-        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<ListClientsResponse> expectations() {
-            return ScriptedSubscriber.<ListClientsResponse>create()
-                .expectNext(ListClientsResponse.builder()
-                    .resource(Client.builder()
-                        .action("none")
-                        .authority("uaa.none")
-                        .authorizedGrantType(AUTHORIZATION_CODE, REFRESH_TOKEN)
-                        .autoApprove("true")
-                        .clientId("ssh-proxy")
-                        .lastModified(1469112324000L)
-                        .redirectUriPattern("/login")
-                        .resourceId("none")
-                        .scope("openid", "cloud_controller.read", "cloud_controller.write")
-                        .build())
-                    .resource(Client.builder()
-                        .action("none")
-                        .authority("routing.routes.write", "routing.routes.read")
-                        .authorizedGrantType(CLIENT_CREDENTIALS, REFRESH_TOKEN)
-                        .autoApprove("routing.routes.write", "routing.routes.read")
-                        .clientId("tcp_emitter")
-                        .lastModified(1469112324000L)
-                        .resourceId("none")
-                        .scope("uaa.none")
-                        .build())
-                    .startIndex(1)
-                    .itemsPerPage(2)
-                    .totalResults(2)
-                    .schema("http://cloudfoundry.org/schema/scim/oauth-clients-1.0")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/oauth/clients")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/uaa/clients/GET_response_deserialize.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<ListClientsResponse> invoke(ListClientsRequest request) {
-            return this.clients.list(request);
-        }
-
-        @Override
-        protected ListClientsRequest validRequest() {
-            return ListClientsRequest.builder()
-                .build();
-        }
-    }
-
-    public static final class Get extends AbstractUaaApiTest<GetClientRequest, GetClientResponse> {
-
-        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<GetClientResponse> expectations() {
-            return ScriptedSubscriber.<GetClientResponse>create()
-                .expectNext(GetClientResponse.builder()
-                    .allowedProvider("uaa", "ldap", "my-saml-provider")
-                    .authority("clients.read", "clients.write")
-                    .authorizedGrantType(CLIENT_CREDENTIALS)
+        this.clients
+            .list(ListClientsRequest.builder()
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListClientsResponse.builder()
+                .resource(Client.builder()
+                    .action("none")
+                    .authority("uaa.none")
+                    .authorizedGrantType(AUTHORIZATION_CODE, REFRESH_TOKEN)
                     .autoApprove("true")
-                    .clientId("4Z3t1r")
-                    .lastModified(1468364445592L)
-                    .name("My Client Name")
-                    .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                    .clientId("ssh-proxy")
+                    .lastModified(1469112324000L)
+                    .redirectUriPattern("/login")
                     .resourceId("none")
-                    .scope("clients.read", "clients.write")
-                    .tokenSalt("mr80UZ")
+                    .scope("openid", "cloud_controller.read", "cloud_controller.write")
                     .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/oauth/clients/test-client-id")
+                .resource(Client.builder()
+                    .action("none")
+                    .authority("routing.routes.write", "routing.routes.read")
+                    .authorizedGrantType(CLIENT_CREDENTIALS, REFRESH_TOKEN)
+                    .autoApprove("routing.routes.write", "routing.routes.read")
+                    .clientId("tcp_emitter")
+                    .lastModified(1469112324000L)
+                    .resourceId("none")
+                    .scope("uaa.none")
                     .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/uaa/clients/GET_{id}_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<GetClientResponse> invoke(GetClientRequest request) {
-            return this.clients.get(request);
-        }
-
-        @Override
-        protected GetClientRequest validRequest() {
-            return GetClientRequest.builder()
-                .clientId("test-client-id")
-                .build();
-        }
+                .startIndex(1)
+                .itemsPerPage(2)
+                .totalResults(2)
+                .schema("http://cloudfoundry.org/schema/scim/oauth-clients-1.0")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class GetMetadata extends AbstractUaaApiTest<GetMetadataRequest, GetMetadataResponse> {
+    @Test
+    public void get() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/oauth/clients/test-client-id")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/uaa/clients/GET_{id}_response.json")
+                .build())
+            .build());
 
-        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+        this.clients
+            .get(GetClientRequest.builder()
+                .clientId("test-client-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetClientResponse.builder()
+                .allowedProvider("uaa", "ldap", "my-saml-provider")
+                .authority("clients.read", "clients.write")
+                .authorizedGrantType(CLIENT_CREDENTIALS)
+                .autoApprove("true")
+                .clientId("4Z3t1r")
+                .lastModified(1468364445592L)
+                .name("My Client Name")
+                .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                .resourceId("none")
+                .scope("clients.read", "clients.write")
+                .tokenSalt("mr80UZ")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
-        @Override
-        protected ScriptedSubscriber<GetMetadataResponse> expectations() {
-            return ScriptedSubscriber.<GetMetadataResponse>create()
-                .expectNext(GetMetadataResponse.builder()
-                    .appIcon("aWNvbiBmb3IgY2xpZW50IDQ=")
-                    .appLaunchUrl("http://myloginpage.com")
-                    .clientId("P4vuAaSe")
-                    .showOnHomePage(true)
-                    .build())
-                .expectComplete();
-        }
+    @Test
+    public void getMetadata() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/oauth/clients/P4vuAaSe/meta")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/uaa/clients/GET_{id}_meta_response.json")
+                .build())
+            .build());
 
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/oauth/clients/P4vuAaSe/meta")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/uaa/clients/GET_{id}_meta_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<GetMetadataResponse> invoke(GetMetadataRequest request) {
-            return this.clients.getMetadata(request);
-        }
-
-        @Override
-        protected GetMetadataRequest validRequest() {
-            return GetMetadataRequest.builder()
+        this.clients
+            .getMetadata(GetMetadataRequest.builder()
                 .clientId("P4vuAaSe")
-                .build();
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetMetadataResponse.builder()
+                .appIcon("aWNvbiBmb3IgY2xpZW50IDQ=")
+                .appLaunchUrl("http://myloginpage.com")
+                .clientId("P4vuAaSe")
+                .showOnHomePage(true)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class List extends AbstractUaaApiTest<ListClientsRequest, ListClientsResponse> {
+    @Test
+    public void list() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/oauth/clients?count=10&filter=client_id%2Beq%2B%22EGgNW3%22&sortBy=client_id&sortOrder=descending&startIndex=1")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/uaa/clients/GET_response.json")
+                .build())
+            .build());
 
-        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<ListClientsResponse> expectations() {
-            return ScriptedSubscriber.<ListClientsResponse>create()
-                .expectNext(ListClientsResponse.builder()
-                    .resource(Client.builder()
-                        .allowedProvider("uaa", "ldap", "my-saml-provider")
-                        .authority("clients.read", "clients.write")
-                        .authorizedGrantType(CLIENT_CREDENTIALS)
-                        .autoApprove("true")
-                        .clientId("EGgNW3")
-                        .lastModified(1468364445334L)
-                        .name("My Client Name")
-                        .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
-                        .resourceId("none")
-                        .scope("clients.read", "clients.write")
-                        .tokenSalt("7uDPJX")
-                        .build())
-                    .startIndex(1)
-                    .itemsPerPage(1)
-                    .totalResults(1)
-                    .schema("http://cloudfoundry.org/schema/scim/oauth-clients-1.0")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/oauth/clients?count=10&filter=client_id%2Beq%2B%22EGgNW3%22&sortBy=client_id&sortOrder=descending&startIndex=1")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/uaa/clients/GET_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<ListClientsResponse> invoke(ListClientsRequest request) {
-            return this.clients.list(request);
-        }
-
-        @Override
-        protected ListClientsRequest validRequest() {
-            return ListClientsRequest.builder()
+        this.clients
+            .list(ListClientsRequest.builder()
                 .count(10)
                 .filter("client_id+eq+\"EGgNW3\"")
                 .sortBy("client_id")
                 .sortOrder(SortOrder.DESCENDING)
                 .startIndex(1)
-                .build();
-        }
-    }
-
-    public static final class ListMetadatas extends AbstractUaaApiTest<ListMetadatasRequest, ListMetadatasResponse> {
-
-        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<ListMetadatasResponse> expectations() {
-            return ScriptedSubscriber.<ListMetadatasResponse>create()
-                .expectNext(ListMetadatasResponse.builder()
-                    .metadata(Metadata.builder()
-                        .appIcon("Y2xpZW50IDMgaWNvbg==")
-                        .appLaunchUrl("http://client3.com/app")
-                        .clientId("9134O7y4")
-                        .showOnHomePage(true)
-                        .build())
-                    .metadata(Metadata.builder()
-                        .appIcon("")
-                        .appLaunchUrl("http://changed.app.launch/url")
-                        .clientId("RpFRZpY3")
-                        .showOnHomePage(false)
-                        .build())
-                    .metadata(Metadata.builder()
-                        .appIcon("aWNvbiBmb3IgY2xpZW50IDQ=")
-                        .appLaunchUrl("http://client4.com/app")
-                        .clientId("ewegZo0R")
-                        .showOnHomePage(false)
-                        .build())
-                    .metadata(Metadata.builder()
-                        .appIcon("aWNvbiBmb3IgY2xpZW50IDQ=")
-                        .appLaunchUrl("http://myloginpage.com")
-                        .clientId("lqhK1n8q")
-                        .showOnHomePage(true)
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/oauth/clients/meta")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/uaa/clients/GET_meta_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<ListMetadatasResponse> invoke(ListMetadatasRequest request) {
-            return this.clients.listMetadatas(request);
-        }
-
-        @Override
-        protected ListMetadatasRequest validRequest() {
-            return ListMetadatasRequest.builder()
-                .build();
-        }
-    }
-
-    public static final class Update extends AbstractUaaApiTest<UpdateClientRequest, UpdateClientResponse> {
-
-        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<UpdateClientResponse> expectations() {
-            return ScriptedSubscriber.<UpdateClientResponse>create()
-                .expectNext(UpdateClientResponse.builder()
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListClientsResponse.builder()
+                .resource(Client.builder()
                     .allowedProvider("uaa", "ldap", "my-saml-provider")
                     .authority("clients.read", "clients.write")
                     .authorizedGrantType(CLIENT_CREDENTIALS)
-                    .autoApprove("clients.autoapprove")
-                    .clientId("55pTMX")
-                    .lastModified(1468364443857L)
+                    .autoApprove("true")
+                    .clientId("EGgNW3")
+                    .lastModified(1468364445334L)
                     .name("My Client Name")
                     .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
                     .resourceId("none")
-                    .scope("clients.new", "clients.autoapprove")
-                    .tokenSalt("8mwCEy")
+                    .scope("clients.read", "clients.write")
+                    .tokenSalt("7uDPJX")
                     .build())
-                .expectComplete();
-        }
+                .startIndex(1)
+                .itemsPerPage(1)
+                .totalResults(1)
+                .schema("http://cloudfoundry.org/schema/scim/oauth-clients-1.0")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(PUT).path("/oauth/clients/55pTMX")
-                    .payload("fixtures/uaa/clients/PUT_{id}_request.json")
+    @Test
+    public void listMetadatas() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/oauth/clients/meta")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/uaa/clients/GET_meta_response.json")
+                .build())
+            .build());
+
+        this.clients
+            .listMetadatas(ListMetadatasRequest.builder()
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListMetadatasResponse.builder()
+                .metadata(Metadata.builder()
+                    .appIcon("Y2xpZW50IDMgaWNvbg==")
+                    .appLaunchUrl("http://client3.com/app")
+                    .clientId("9134O7y4")
+                    .showOnHomePage(true)
                     .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/uaa/clients/PUT_{id}_response.json")
+                .metadata(Metadata.builder()
+                    .appIcon("")
+                    .appLaunchUrl("http://changed.app.launch/url")
+                    .clientId("RpFRZpY3")
+                    .showOnHomePage(false)
                     .build())
-                .build();
-        }
+                .metadata(Metadata.builder()
+                    .appIcon("aWNvbiBmb3IgY2xpZW50IDQ=")
+                    .appLaunchUrl("http://client4.com/app")
+                    .clientId("ewegZo0R")
+                    .showOnHomePage(false)
+                    .build())
+                .metadata(Metadata.builder()
+                    .appIcon("aWNvbiBmb3IgY2xpZW50IDQ=")
+                    .appLaunchUrl("http://myloginpage.com")
+                    .clientId("lqhK1n8q")
+                    .showOnHomePage(true)
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
-        @Override
-        protected Mono<UpdateClientResponse> invoke(UpdateClientRequest request) {
-            return this.clients.update(request);
-        }
+    @Test
+    public void update() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PUT).path("/oauth/clients/55pTMX")
+                .payload("fixtures/uaa/clients/PUT_{id}_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/uaa/clients/PUT_{id}_response.json")
+                .build())
+            .build());
 
-        @Override
-        protected UpdateClientRequest validRequest() {
-            return UpdateClientRequest.builder()
+        this.clients
+            .update(UpdateClientRequest.builder()
                 .authorizedGrantType(CLIENT_CREDENTIALS)
                 .autoApprove("clients.autoapprove")
                 .clientId("55pTMX")
                 .scope("clients.new", "clients.autoapprove")
-                .build();
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(UpdateClientResponse.builder()
+                .allowedProvider("uaa", "ldap", "my-saml-provider")
+                .authority("clients.read", "clients.write")
+                .authorizedGrantType(CLIENT_CREDENTIALS)
+                .autoApprove("clients.autoapprove")
+                .clientId("55pTMX")
+                .lastModified(1468364443857L)
+                .name("My Client Name")
+                .redirectUriPattern("http*://ant.path.wildcard/**/passback/*", "http://test1.com")
+                .resourceId("none")
+                .scope("clients.new", "clients.autoapprove")
+                .tokenSalt("8mwCEy")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class UpdateMetadata extends AbstractUaaApiTest<UpdateMetadataRequest, UpdateMetadataResponse> {
+    @Test
+    public void updateMetadata() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PUT).path("/oauth/clients/RpFRZpY3/meta")
+                .payload("fixtures/uaa/clients/PUT_{id}_meta_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/uaa/clients/PUT_{id}_meta_response.json")
+                .build())
+            .build());
 
-        private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<UpdateMetadataResponse> expectations() {
-            return ScriptedSubscriber.<UpdateMetadataResponse>create()
-                .expectNext(UpdateMetadataResponse.builder()
-                    .appLaunchUrl("http://changed.app.launch/url")
-                    .appIcon("")
-                    .clientId("RpFRZpY3")
-                    .showOnHomePage(false)
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(PUT).path("/oauth/clients/RpFRZpY3/meta")
-                    .payload("fixtures/uaa/clients/PUT_{id}_meta_request.json")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/uaa/clients/PUT_{id}_meta_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<UpdateMetadataResponse> invoke(UpdateMetadataRequest request) {
-            return this.clients.updateMetadata(request);
-        }
-
-        @Override
-        protected UpdateMetadataRequest validRequest() {
-            return UpdateMetadataRequest.builder()
+        this.clients
+            .updateMetadata(UpdateMetadataRequest.builder()
                 .appLaunchUrl("http://changed.app.launch/url")
                 .clientId("RpFRZpY3")
                 .showOnHomePage(false)
-                .build();
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(UpdateMetadataResponse.builder()
+                .appLaunchUrl("http://changed.app.launch/url")
+                .appIcon("")
+                .clientId("RpFRZpY3")
+                .showOnHomePage(false)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
 }

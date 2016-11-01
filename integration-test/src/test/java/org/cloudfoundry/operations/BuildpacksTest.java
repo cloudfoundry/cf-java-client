@@ -17,16 +17,13 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
-import org.cloudfoundry.operations.buildpacks.Buildpack;
 import org.cloudfoundry.operations.buildpacks.CreateBuildpackRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
-import reactor.core.Exceptions;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.time.Duration;
 
 public final class BuildpacksTest extends AbstractIntegrationTest {
@@ -35,16 +32,12 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
     private CloudFoundryOperations cloudFoundryOperations;
 
     @Test
-    public void createBuildpack() throws Exception {
+    public void createBuildpack() throws IOException {
         String buildpackName = this.nameFactory.getBuildpackName();
-
-        ScriptedSubscriber<Buildpack> subscriber = ScriptedSubscriber.<Buildpack>create()
-            .expectNextCount(1)
-            .expectComplete();
 
         this.cloudFoundryOperations.buildpacks()
             .create(CreateBuildpackRequest.builder()
-                .buildpack(getBuildpackPath())
+                .buildpack(new ClassPathResource("test-buildpack.zip").getFile().toPath())
                 .fileName("test-buildpack.zip")
                 .name(buildpackName)
                 .position(Integer.MAX_VALUE)
@@ -52,17 +45,10 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
             .thenMany(this.cloudFoundryOperations.buildpacks()
                 .list())
             .filter(buildpack -> buildpackName.equals(buildpack.getName()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
-    }
-
-    private static Path getBuildpackPath() {
-        try {
-            return new ClassPathResource("test-buildpack.zip").getFile().toPath();
-        } catch (IOException e) {
-            throw Exceptions.propagate(e);
-        }
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
 }

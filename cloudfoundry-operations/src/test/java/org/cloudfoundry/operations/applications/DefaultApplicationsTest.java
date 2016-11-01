@@ -100,14 +100,13 @@ import org.cloudfoundry.doppler.EventType;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
-import org.cloudfoundry.operations.AbstractOperationsApiTest;
+import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.FluentMap;
-import org.junit.Before;
-import org.reactivestreams.Publisher;
+import org.junit.Test;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -128,7 +127,2051 @@ import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public final class DefaultApplicationsTest {
+public final class DefaultApplicationsTest extends AbstractOperationsTest {
+
+    private InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
+
+    private RandomWords randomWords = mock(RandomWords.class, RETURNS_SMART_NULLS);
+
+    private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
+        this.randomWords);
+
+    @Test
+    public void copySourceNoRestartOrgSpace() {
+        requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, "test-organization-id");
+        requestOrganizations(this.cloudFoundryClient, "test-target-organization");
+        requestOrganizationSpacesByName(this.cloudFoundryClient, "test-organization-resource-metadata-id", "test-target-space");
+        requestApplications(this.cloudFoundryClient, "test-target-application-name", "test-space-resource-metadata-id", "test-metadata-id");
+        requestCopyBits(this.cloudFoundryClient, "test-metadata-id", "test-metadata-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-copy-bits-id");
+
+        this.applications
+            .copySource(CopySourceApplicationRequest.builder()
+                .name("test-application-name")
+                .targetName("test-target-application-name")
+                .targetSpace("test-target-space")
+                .targetOrganization("test-target-organization")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void copySourceNoRestartSpace() {
+        requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, "test-organization-id");
+        requestOrganizationSpacesByName(this.cloudFoundryClient, "test-organization-id", "test-target-space");
+        requestApplications(this.cloudFoundryClient, "test-target-application-name", "test-space-resource-metadata-id", "test-metadata-id");
+        requestCopyBits(this.cloudFoundryClient, "test-metadata-id", "test-metadata-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-copy-bits-id");
+
+        this.applications
+            .copySource(CopySourceApplicationRequest.builder()
+                .name("test-application-name")
+                .targetName("test-target-application-name")
+                .targetSpace("test-target-space")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void copySourceOrganizationNotFound() {
+        requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, "test-organization-id");
+        requestOrganizationsNotFound(this.cloudFoundryClient, "test-target-organization");
+
+        this.applications
+            .copySource(CopySourceApplicationRequest.builder()
+                .name("test-application-name")
+                .targetName("test-target-application-name")
+                .targetOrganization("test-target-organization")
+                .targetSpace("test-target-space")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Organization test-target-organization not found"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void copySourceRestart() {
+        requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, "test-organization-id");
+        requestApplications(this.cloudFoundryClient, "test-target-application-name", TEST_SPACE_ID, "test-metadata-id");
+        requestCopyBits(this.cloudFoundryClient, "test-metadata-id", "test-metadata-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-copy-bits-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-metadata-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-metadata-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-metadata-id");
+
+        this.applications
+            .copySource(CopySourceApplicationRequest.builder()
+                .name("test-application-name")
+                .targetName("test-target-application-name")
+                .restart(true)
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void copySourceSpaceNotFound() {
+        requestApplications(this.cloudFoundryClient, "test-application-name", "test-space-id", "test-metadata-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, "test-organization-id");
+        requestOrganizationSpacesByNameNotFound(this.cloudFoundryClient, "test-organization-id", "test-target-space");
+
+        this.applications
+            .copySource(CopySourceApplicationRequest.builder()
+                .name("test-application-name")
+                .targetName("test-target-application-name")
+                .targetSpace("test-target-space")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space test-target-space not found"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void deleteAndDeleteRoutes() {
+        requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+        requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
+        requestApplicationServiceBindingsEmpty(this.cloudFoundryClient, "test-metadata-id");
+        requestDeleteApplication(this.cloudFoundryClient, "test-metadata-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-id");
+
+        this.applications
+            .delete(DeleteApplicationRequest.builder()
+                .deleteRoutes(true)
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void deleteAndDeleteRoutesFailure() {
+        requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+        requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
+        requestDeleteApplication(this.cloudFoundryClient, "test-metadata-id");
+        requestJobFailure(this.cloudFoundryClient, "test-id");
+
+        this.applications
+            .delete(DeleteApplicationRequest.builder()
+                .deleteRoutes(true)
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void deleteAndDoNotDeleteRoutes() {
+        requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationServiceBindingsEmpty(this.cloudFoundryClient, "test-metadata-id");
+        requestDeleteApplication(this.cloudFoundryClient, "test-metadata-id");
+
+        this.applications
+            .delete(DeleteApplicationRequest.builder()
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void deleteWithBoundRoutes() {
+        requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+        requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
+        requestApplicationServiceBindings(this.cloudFoundryClient, "test-metadata-id");
+        requestRemoveServiceBinding(this.cloudFoundryClient, "test-metadata-id", "test-service-binding-id");
+        requestDeleteApplication(this.cloudFoundryClient, "test-metadata-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-id");
+
+        this.applications
+            .delete(DeleteApplicationRequest.builder()
+                .deleteRoutes(true)
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void disableSsh() {
+        requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
+        requestUpdateApplicationSsh(this.cloudFoundryClient, "test-metadata-id", false);
+
+        this.applications
+            .disableSsh(DisableApplicationSshRequest.builder()
+                .name("test-app-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void disableSshAlreadyDisabled() {
+        requestApplicationsWithSsh(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, false);
+
+        this.applications
+            .disableSsh(DisableApplicationSshRequest.builder()
+                .name("test-app-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void disableSshNoApp() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+
+        this.applications
+            .disableSsh(DisableApplicationSshRequest.builder()
+                .name("test-app-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void enableSsh() {
+        requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
+        requestUpdateApplicationSsh(this.cloudFoundryClient, "test-application-id", true);
+
+        this.applications
+            .enableSsh(EnableApplicationSshRequest.builder()
+                .name("test-app-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void enableSshAlreadyEnabled() {
+        requestApplicationsWithSsh(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, true);
+
+        this.applications
+            .enableSsh(EnableApplicationSshRequest.builder()
+                .name("test-app-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void enableSshNoApp() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+
+        this.applications
+            .enableSsh(EnableApplicationSshRequest.builder()
+                .name("test-app-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void get() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
+        requestStack(this.cloudFoundryClient, "test-application-stackId");
+        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
+
+        this.applications
+            .get(GetApplicationRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(fill(ApplicationDetail.builder())
+                .buildpack("test-application-summary-buildpack")
+                .id("test-application-summary-id")
+                .instanceDetail(fill(InstanceDetail.builder())
+                    .since(new Date(1000))
+                    .state("test-application-instance-info-state")
+                    .build())
+                .lastUploaded(new Date(0))
+                .name("test-application-summary-name")
+                .requestedState("test-application-summary-state")
+                .stack("test-stack-entity-name")
+                .url("test-route-host.test-domain-name")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getApplicationManifest() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+        requestStack(this.cloudFoundryClient, "test-application-summary-stackId");
+
+        this.applications
+            .getApplicationManifest(GetApplicationManifestRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ApplicationManifest.builder()
+                .buildpack("test-application-summary-buildpack")
+                .command("test-application-summary-command")
+                .disk(1)
+                .domain("test-domain-name")
+                .environmentVariables(Collections.emptyMap())
+                .host("test-route-host")
+                .instances(1)
+                .memory(1)
+                .name("test-application-summary-name")
+                .service("test-service-instance-name")
+                .stack("test-stack-entity-name")
+                .timeout(1)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getApplicationManifestNoRoutes() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationSummaryNoRoutes(this.cloudFoundryClient, "test-metadata-id");
+        requestStack(this.cloudFoundryClient, "test-application-summary-stackId");
+
+        this.applications
+            .getApplicationManifest(GetApplicationManifestRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ApplicationManifest.builder()
+                .buildpack("test-application-summary-buildpack")
+                .command("test-application-summary-command")
+                .disk(1)
+                .environmentVariables(Collections.emptyMap())
+                .instances(1)
+                .memory(1)
+                .name("test-application-summary-name")
+                .stack("test-stack-entity-name")
+                .timeout(1)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getBuildpackError() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
+        requestStack(this.cloudFoundryClient, "test-application-stackId");
+        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationInstancesError(this.cloudFoundryClient, "test-metadata-id", 170004);
+
+        this.applications
+            .get(GetApplicationRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(fill(ApplicationDetail.builder())
+                .buildpack("test-application-summary-buildpack")
+                .id("test-application-summary-id")
+                .lastUploaded(new Date(0))
+                .name("test-application-summary-name")
+                .requestedState("test-application-summary-state")
+                .stack("test-stack-entity-name")
+                .url("test-route-host.test-domain-name")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getDetectedBuildpack() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
+        requestStack(this.cloudFoundryClient, "test-application-stackId");
+        requestApplicationSummaryDetectedBuildpack(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
+
+        this.applications
+            .get(GetApplicationRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(fill(ApplicationDetail.builder())
+                .buildpack("test-application-summary-detectedBuildpack")
+                .id("test-application-summary-id")
+                .instanceDetail(fill(InstanceDetail.builder())
+                    .since(new Date(1000))
+                    .state("test-application-instance-info-state")
+                    .build())
+                .lastUploaded(new Date(0))
+                .name("test-application-summary-name")
+                .requestedState("test-application-summary-state")
+                .stack("test-stack-entity-name")
+                .url("test-route-host.test-domain-name")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getEnvironments() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationEnvironment(this.cloudFoundryClient, "test-metadata-id");
+
+        this.applications
+            .getEnvironments(GetApplicationEnvironmentsRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ApplicationEnvironments.builder()
+                .running(FluentMap.<String, Object>builder()
+                    .entry("running-env-name", "running-env-value")
+                    .build())
+                .staging(FluentMap.<String, Object>builder()
+                    .entry("staging-env-name", "staging-env-value")
+                    .build())
+                .systemProvided(FluentMap.<String, Object>builder()
+                    .entry("system-env-name", "system-env-value")
+                    .build())
+                .userProvided(FluentMap.<String, Object>builder()
+                    .entry("env-name", "env-value")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getEnvironmentsNoApp() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+
+        this.applications
+            .getEnvironments(GetApplicationEnvironmentsRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getEvents() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestEvents(this.cloudFoundryClient, "test-metadata-id",
+            fill(EventEntity.builder(), "event-")
+                .timestamp("2016-02-08T15:45:59Z")
+                .metadata("request", Optional.of(FluentMap.builder()
+                    .entry("instances", 1)
+                    .entry("memory", 2)
+                    .entry("environment_json", "test-data")
+                    .entry("state", "test-state")
+                    .build()))
+                .build());
+
+        this.applications
+            .getEvents(GetApplicationEventsRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ApplicationEvent.builder()
+                .actor("test-event-actorName")
+                .description("instances: 1, memory: 2, state: test-state, environment_json: test-data")
+                .event("test-event-type")
+                .id("test-event-id")
+                .time(DateUtils.parseFromIso8601("2016-02-08T15:45:59Z"))
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getEventsBadTimeSparseMetadata() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestEvents(this.cloudFoundryClient, "test-metadata-id",
+            fill(EventEntity.builder(), "event-")
+                .timestamp("BAD-TIMESTAMP")
+                .metadata("request", Optional.of(FluentMap.builder()
+                    .entry("memory", 2)
+                    .entry("environment_json", "test-data")
+                    .entry("state", "test-state")
+                    .build()))
+                .build());
+
+        this.applications
+            .getEvents(GetApplicationEventsRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ApplicationEvent.builder()
+                .actor("test-event-actorName")
+                .description("memory: 2, state: test-state, environment_json: test-data")
+                .event("test-event-type")
+                .id("test-event-id")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getEventsFoundZero() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestEvents(this.cloudFoundryClient, "test-metadata-id");
+
+        this.applications
+            .getEvents(GetApplicationEventsRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getEventsLimitZero() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestEvents(this.cloudFoundryClient, "test-metadata-id",
+            fill(EventEntity.builder(), "event-")
+                .timestamp("2016-02-08T15:45:59Z")
+                .metadata("request", Optional.of(FluentMap.builder()
+                    .entry("instances", 1)
+                    .entry("memory", 2)
+                    .entry("environment_json", "test-data")
+                    .entry("state", "test-state")
+                    .build()))
+                .build());
+
+        this.applications
+            .getEvents(GetApplicationEventsRequest.builder()
+                .name("test-app")
+                .maxNumberOfEvents(0)
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getEventsTwo() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestEvents(this.cloudFoundryClient, "test-metadata-id",
+            fill(EventEntity.builder(), "event-")
+                .timestamp("2016-02-08T15:45:59Z")
+                .metadata("request", Optional.of(FluentMap.builder()
+                    .entry("instances", 1)
+                    .entry("memory", 2)
+                    .entry("environment_json", "test-data")
+                    .entry("state", "test-state")
+                    .build()))
+                .build(),
+            fill(EventEntity.builder(), "event-")
+                .timestamp("2016-02-08T15:49:07Z")
+                .metadata("request", Optional.of(FluentMap.builder()
+                    .entry("state", "test-state-two")
+                    .build()))
+                .build()
+        );
+
+        this.applications
+            .getEvents(GetApplicationEventsRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ApplicationEvent.builder()
+                    .actor("test-event-actorName")
+                    .description("instances: 1, memory: 2, state: test-state, environment_json: test-data")
+                    .event("test-event-type")
+                    .id("test-event-id")
+                    .time(DateUtils.parseFromIso8601("2016-02-08T15:45:59Z"))
+                    .build(),
+                ApplicationEvent.builder()
+                    .actor("test-event-actorName")
+                    .description("state: test-state-two")
+                    .event("test-event-type")
+                    .id("test-event-id")
+                    .time(DateUtils.parseFromIso8601("2016-02-08T15:49:07Z"))
+                    .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getHealthCheck() {
+        requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
+
+        this.applications
+            .getHealthCheck(GetApplicationHealthCheckRequest.builder()
+                .name("test-application-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ApplicationHealthCheck.PORT)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getInstancesError() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
+        requestStack(this.cloudFoundryClient, "test-application-stackId");
+        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationInstancesError(this.cloudFoundryClient, "test-metadata-id", 220001);
+
+        this.applications
+            .get(GetApplicationRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(fill(ApplicationDetail.builder())
+                .buildpack("test-application-summary-buildpack")
+                .id("test-application-summary-id")
+                .lastUploaded(new Date(0))
+                .name("test-application-summary-name")
+                .requestedState("test-application-summary-state")
+                .stack("test-stack-entity-name")
+                .url("test-route-host.test-domain-name")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getNoBuildpack() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
+        requestStack(this.cloudFoundryClient, "test-application-stackId");
+        requestApplicationSummaryNoBuildpack(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
+
+        this.applications
+            .get(GetApplicationRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(fill(ApplicationDetail.builder())
+                .buildpack(null)
+                .id("test-application-summary-id")
+                .instanceDetail(fill(InstanceDetail.builder())
+                    .since(new Date(1000))
+                    .state("test-application-instance-info-state")
+                    .build())
+                .lastUploaded(new Date(0))
+                .name("test-application-summary-name")
+                .requestedState("test-application-summary-state")
+                .stack("test-stack-entity-name")
+                .url("test-route-host.test-domain-name")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getStagingError() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
+        requestStack(this.cloudFoundryClient, "test-application-stackId");
+        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationInstancesError(this.cloudFoundryClient, "test-metadata-id", 170002);
+
+        this.applications
+            .get(GetApplicationRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(fill(ApplicationDetail.builder())
+                .buildpack("test-application-summary-buildpack")
+                .id("test-application-summary-id")
+                .lastUploaded(new Date(0))
+                .name("test-application-summary-name")
+                .requestedState("test-application-summary-state")
+                .stack("test-stack-entity-name")
+                .url("test-route-host.test-domain-name")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getStoppedError() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationStatisticsError(this.cloudFoundryClient, "test-metadata-id", 200003);
+        requestStack(this.cloudFoundryClient, "test-application-stackId");
+        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
+
+        this.applications
+            .get(GetApplicationRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(fill(ApplicationDetail.builder())
+                .buildpack("test-application-summary-buildpack")
+                .id("test-application-summary-id")
+                .instanceDetail(InstanceDetail.builder()
+                    .since(new Date(1000))
+                    .state("test-application-instance-info-state")
+                    .build())
+                .lastUploaded(new Date(0))
+                .name("test-application-summary-name")
+                .requestedState("test-application-summary-state")
+                .stack("test-stack-entity-name")
+                .url("test-route-host.test-domain-name")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getWithEmptyInstance() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
+        requestStack(this.cloudFoundryClient, "test-application-stackId");
+        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationEmptyInstance(this.cloudFoundryClient, "test-metadata-id");
+
+        this.applications
+            .get(GetApplicationRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(fill(ApplicationDetail.builder())
+                .buildpack("test-application-summary-buildpack")
+                .id("test-application-summary-id")
+                .instanceDetail(fill(InstanceDetail.builder())
+                    .since(null)
+                    .state(null)
+                    .build())
+                .lastUploaded(new Date(0))
+                .name("test-application-summary-name")
+                .requestedState("test-application-summary-state")
+                .stack("test-stack-entity-name")
+                .url("test-route-host.test-domain-name")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getWithEmptyInstanceStats() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationEmptyStats(this.cloudFoundryClient, "test-metadata-id");
+        requestStack(this.cloudFoundryClient, "test-application-stackId");
+        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
+
+        this.applications
+            .get(GetApplicationRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(fill(ApplicationDetail.builder())
+                .buildpack("test-application-summary-buildpack")
+                .id("test-application-summary-id")
+                .instanceDetail(InstanceDetail.builder()
+                    .since(new Date(1000))
+                    .state("test-application-instance-info-state")
+                    .build())
+                .lastUploaded(new Date(0))
+                .name("test-application-summary-name")
+                .requestedState("test-application-summary-state")
+                .stack("test-stack-entity-name")
+                .url("test-route-host.test-domain-name")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getWithNoInstances() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
+        requestStack(this.cloudFoundryClient, "test-application-stackId");
+        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationNoInstances(this.cloudFoundryClient, "test-metadata-id");
+
+        this.applications
+            .get(GetApplicationRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(fill(ApplicationDetail.builder())
+                .buildpack("test-application-summary-buildpack")
+                .id("test-application-summary-id")
+                .lastUploaded(new Date(0))
+                .name("test-application-summary-name")
+                .requestedState("test-application-summary-state")
+                .stack("test-stack-entity-name")
+                .url("test-route-host.test-domain-name")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getWithNullStats() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationNullStats(this.cloudFoundryClient, "test-metadata-id");
+        requestStack(this.cloudFoundryClient, "test-application-stackId");
+        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
+
+        this.applications
+            .get(GetApplicationRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(fill(ApplicationDetail.builder())
+                .buildpack("test-application-summary-buildpack")
+                .id("test-application-summary-id")
+                .instanceDetail(InstanceDetail.builder()
+                    .since(new Date(1000))
+                    .state("test-application-instance-info-state")
+                    .build())
+                .lastUploaded(new Date(0))
+                .name("test-application-summary-name")
+                .requestedState("test-application-summary-state")
+                .stack("test-stack-entity-name")
+                .url("test-route-host.test-domain-name")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getWithNullUsage() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationNullUsage(this.cloudFoundryClient, "test-metadata-id");
+        requestStack(this.cloudFoundryClient, "test-application-stackId");
+        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
+
+        this.applications
+            .get(GetApplicationRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(fill(ApplicationDetail.builder())
+                .buildpack("test-application-summary-buildpack")
+                .id("test-application-summary-id")
+                .instanceDetail(InstanceDetail.builder()
+                    .diskQuota(1L)
+                    .memoryQuota(1L)
+                    .since(new Date(1000))
+                    .state("test-application-instance-info-state")
+                    .build())
+                .lastUploaded(new Date(0))
+                .name("test-application-summary-name")
+                .requestedState("test-application-summary-state")
+                .stack("test-stack-entity-name")
+                .url("test-route-host.test-domain-name")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void list() {
+        requestSpaceSummary(this.cloudFoundryClient, TEST_SPACE_ID);
+
+        this.applications.list()
+            .as(StepVerifier::create)
+            .expectNext(fill(ApplicationSummary.builder())
+                .id("test-application-summary-id")
+                .name("test-application-summary-name")
+                .requestedState("test-application-summary-state")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void logs() {
+        requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
+        requestLogsStream(this.dopplerClient, "test-metadata-id");
+
+        this.applications
+            .logs(LogsRequest.builder()
+                .name("test-application-name")
+                .recent(false)
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(fill(LogMessage.builder(), "log-message-")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void logsNoApp() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+
+        this.applications
+            .logs(LogsRequest.builder()
+                .name("test-application-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-application-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void logsRecent() {
+        requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
+        requestLogsRecent(this.dopplerClient, "test-metadata-id");
+
+        this.applications
+            .logs(LogsRequest.builder()
+                .name("test-application-name")
+                .recent(true)
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(fill(LogMessage.builder(), "log-message-")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void logsRecentNotSet() {
+        requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
+        requestLogsStream(this.dopplerClient, "test-metadata-id");
+
+        this.applications
+            .logs(LogsRequest.builder()
+                .name("test-application-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(fill(LogMessage.builder(), "log-message-")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushDocker() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateDockerApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+            .dockerImage("cloudfoundry/lattice-app")
+            .domain("test-domain")
+            .name("test-name")
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
+        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .push(PushApplicationRequest.builder()
+                .dockerImage("cloudfoundry/lattice-app")
+                .domain("test-domain")
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushDomainNotFound() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+            .application(Paths.get("test-application"))
+            .domain("test-domain")
+            .name("test-name")
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomainNotFound(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID);
+        requestSharedDomainNotFound(this.cloudFoundryClient, "test-domain");
+
+        this.applications
+            .push(PushApplicationRequest.builder()
+                .application(Paths.get("test-application"))
+                .domain("test-domain")
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Domain test-domain not found"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushExistingApplication() {
+        requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-application-id");
+        requestUpdateApplication(this.cloudFoundryClient, "test-application-id", PushApplicationRequest.builder()
+            .application(Paths.get("test-application"))
+            .domain("test-domain")
+            .name("test-name")
+            .build(), null);
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
+        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .push(PushApplicationRequest.builder()
+                .application(Paths.get("test-application"))
+                .domain("test-domain")
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushExistingRouteWithHost() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+            .application(Paths.get("test-application"))
+            .domain("test-domain")
+            .host("test-host")
+            .name("test-name")
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
+        requestRoutes(this.cloudFoundryClient, "test-domain-id", "test-host", null, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .push(PushApplicationRequest.builder()
+                .application(Paths.get("test-application"))
+                .domain("test-domain")
+                .host("test-host")
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushExistingRouteWithNoHost() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+            .application(Paths.get("test-application"))
+            .domain("test-domain")
+            .noHostname(true)
+            .name("test-name")
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
+        requestRoutes(this.cloudFoundryClient, "test-domain-id", null, null, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .push(PushApplicationRequest.builder()
+                .application(Paths.get("test-application"))
+                .domain("test-domain")
+                .noHostname(true)
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushInvalidStack() {
+        requestStackIdEmpty(this.cloudFoundryClient, "invalid-stack");
+
+        this.applications
+            .push(PushApplicationRequest.builder()
+                .application(Paths.get("test-application"))
+                .name("test-name")
+                .stack("invalid-stack")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Stack invalid-stack does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushNewApplication() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+            .application(Paths.get("test-application"))
+            .domain("test-domain")
+            .name("test-name")
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
+        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .push(PushApplicationRequest.builder()
+                .application(Paths.get("test-application"))
+                .domain("test-domain")
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushNewRouteWithHost() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+            .application(Paths.get("test-application"))
+            .domain("test-domain")
+            .host("test-host")
+            .name("test-name")
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-host", null);
+        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-host", null, TEST_SPACE_ID, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .push(PushApplicationRequest.builder()
+                .application(Paths.get("test-application"))
+                .domain("test-domain")
+                .host("test-host")
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushNewRouteWithNoHost() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+            .application(Paths.get("test-application"))
+            .domain("test-domain")
+            .noHostname(true)
+            .name("test-name")
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", null, null);
+        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", null, null, TEST_SPACE_ID, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .push(PushApplicationRequest.builder()
+                .application(Paths.get("test-application"))
+                .domain("test-domain")
+                .noHostname(true)
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushNoDomainNoneFound() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+            .application(Paths.get("test-application"))
+            .name("test-name")
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestSharedDomainsEmpty(this.cloudFoundryClient);
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+
+        this.applications
+            .push(PushApplicationRequest.builder()
+                .application(Paths.get("test-application"))
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Domain not found"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushNoDomainPrivate() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+            .application(Paths.get("test-application"))
+            .name("test-name")
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestSharedDomainsEmpty(this.cloudFoundryClient);
+        requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
+        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .push(PushApplicationRequest.builder()
+                .application(Paths.get("test-application"))
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushNoDomainShared() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+            .application(Paths.get("test-application"))
+            .name("test-name")
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
+        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .push(PushApplicationRequest.builder()
+                .application(Paths.get("test-application"))
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushNoRoute() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+            .application(Paths.get("test-application"))
+            .noRoute(true)
+            .name("test-name")
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-domain-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .push(PushApplicationRequest.builder()
+                .application(Paths.get("test-application"))
+                .noRoute(true)
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushNoStart() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+            .application(Paths.get("test-application"))
+            .name("test-name")
+            .noStart(true)
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
+        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+
+        this.applications
+            .push(PushApplicationRequest.builder()
+                .application(Paths.get("test-application"))
+                .name("test-name")
+                .noStart(true)
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushRandomRoute() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+            .application(Paths.get("test-application"))
+            .domain("test-domain")
+            .name("test-name")
+            .randomRoute(true)
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
+        provideRandomWords(this.randomWords);
+        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name-test-adjective-test-noun", null);
+        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name-test-adjective-test-noun", null, TEST_SPACE_ID, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .push(PushApplicationRequest.builder()
+                .application(Paths.get("test-application"))
+                .domain("test-domain")
+                .name("test-name")
+                .randomRoute(true)
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushSharedDomain() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+            .application(Paths.get("test-application"))
+            .domain("test-domain")
+            .name("test-name")
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomainNotFound(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID);
+        requestSharedDomain(this.cloudFoundryClient, "test-domain", "test-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
+        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .push(PushApplicationRequest.builder()
+                .application(Paths.get("test-application"))
+                .domain("test-domain")
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushStartFailsRunning() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+            .application(Paths.get("test-application"))
+            .domain("test-domain")
+            .name("test-name")
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
+        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesFailingTotal(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .push(PushApplicationRequest.builder()
+                .application(Paths.get("test-application"))
+                .domain("test-domain")
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-name failed during start"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushStartFailsStaging() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+            .application(Paths.get("test-application"))
+            .domain("test-domain")
+            .name("test-name")
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
+        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplicationFailing(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .push(PushApplicationRequest.builder()
+                .application(Paths.get("test-application"))
+                .domain("test-domain")
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-name failed during staging"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushUploadFails() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+            .application(Paths.get("test-application"))
+            .domain("test-domain")
+            .name("test-name")
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
+        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestJobFailure(this.cloudFoundryClient, "test-job-id");
+
+        this.applications
+            .push(PushApplicationRequest.builder()
+                .application(Paths.get("test-application"))
+                .domain("test-domain")
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void rename() {
+        requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
+        requestUpdateApplicationRename(this.cloudFoundryClient, "test-metadata-id", "test-new-app-name");
+
+        this.applications
+            .rename(RenameApplicationRequest.builder()
+                .name("test-app-name")
+                .newName("test-new-app-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void renameNoApp() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+
+        this.applications
+            .rename(RenameApplicationRequest.builder()
+                .name("test-app-name")
+                .newName("test-new-app-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void restage() {
+        requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
+        requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
+        requestGetApplication(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-metadata-id");
+
+        this.applications
+            .restage(RestageApplicationRequest.builder()
+                .name("test-application-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void restageInvalidApplication() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+
+        this.applications
+            .restage(RestageApplicationRequest.builder()
+                .name("test-application-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-application-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void restageStagingFailure() {
+        requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
+        requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
+        requestGetApplicationFailing(this.cloudFoundryClient, "test-metadata-id");
+
+        this.applications
+            .restage(RestageApplicationRequest.builder()
+                .name("test-application-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-application-name failed during staging"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void restageStartingFailurePartial() {
+        requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
+        requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
+        requestGetApplication(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationInstancesFailingPartial(this.cloudFoundryClient, "test-metadata-id");
+
+        this.applications
+            .restage(RestageApplicationRequest.builder()
+                .name("test-application-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void restageStartingFailureTotal() {
+        requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
+        requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
+        requestGetApplication(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationInstancesFailingTotal(this.cloudFoundryClient, "test-metadata-id");
+
+        this.applications
+            .restage(RestageApplicationRequest.builder()
+                .name("test-application-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-application-name failed during start"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void restageTimeout() {
+        requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
+        requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
+        requestGetApplicationTimeout(this.cloudFoundryClient, "test-metadata-id");
+
+        this.applications
+            .restage(RestageApplicationRequest.builder()
+                .name("test-application-name")
+                .stagingTimeout(Duration.ofSeconds(1))
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-application-name timed out during staging"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void restartFailurePartial() {
+        requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STARTED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesFailingPartial(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .restart(RestartApplicationRequest.builder()
+                .name("test-app-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void restartFailureTotal() {
+        requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STARTED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesFailingTotal(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .restart(RestartApplicationRequest.builder()
+                .name("test-app-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-app-name failed during start"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void restartInstance() {
+        requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
+        requestTerminateApplicationInstance(this.cloudFoundryClient, "test-metadata-id", "0");
+
+        this.applications
+            .restartInstance(RestartApplicationInstanceRequest.builder()
+                .name("test-application-name")
+                .instanceIndex(0)
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void restartNoApp() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-non-existent-app-name", TEST_SPACE_ID);
+
+        this.applications
+            .restart(RestartApplicationRequest.builder()
+                .name("test-non-existent-app-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-non-existent-app-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void restartNotStartedAndNotStopped() {
+        requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "unknown-state");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .restart(RestartApplicationRequest.builder()
+                .name("test-app-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void restartStarted() {
+        requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STARTED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .restart(RestartApplicationRequest.builder()
+                .name("test-app-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void restartStopped() {
+        requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .restart(RestartApplicationRequest.builder()
+                .name("test-app-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void scaleDiskAndInstancesNotStarted() {
+        requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STOPPED");
+        requestUpdateApplicationScale(this.cloudFoundryClient, "test-application-id", 2048, 2, null);
+
+        this.applications
+            .scale(ScaleApplicationRequest.builder()
+                .name("test-app-name")
+                .instances(2)
+                .diskLimit(2048)
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void scaleDiskAndInstancesStarted() {
+        requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STARTED");
+        requestUpdateApplicationScale(this.cloudFoundryClient, "test-application-id", 2048, 2, null);
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+
+        this.applications
+            .scale(ScaleApplicationRequest.builder()
+                .name("test-app-name")
+                .instances(2)
+                .diskLimit(2048)
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void scaleInstances() {
+        requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
+        requestUpdateApplicationScale(this.cloudFoundryClient, "test-metadata-id", null, 2, null);
+
+        this.applications
+            .scale(ScaleApplicationRequest.builder()
+                .name("test-app-name")
+                .instances(2)
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void scaleInstancesNoApp() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+
+        this.applications
+            .scale(ScaleApplicationRequest.builder()
+                .name("test-app-name")
+                .instances(2)
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void scaleNoChange() {
+        requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
+
+        this.applications
+            .scale(ScaleApplicationRequest.builder()
+                .name("test-app-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void setEnvironmentVariable() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id",
+            FluentMap.<String, Object>builder()
+                .entry("test-var", "test-value")
+                .entry("test-var2", "test-value2")
+                .build());
+        requestUpdateApplicationEnvironment(this.cloudFoundryClient, "test-metadata-id",
+            FluentMap.<String, Object>builder()
+                .entry("test-var", "test-value")
+                .entry("test-var2", "test-value2")
+                .entry("test-var-name", "test-var-value")
+                .build()
+        );
+
+        this.applications
+            .setEnvironmentVariable(SetEnvironmentVariableApplicationRequest.builder()
+                .name("test-app")
+                .variableName("test-var-name")
+                .variableValue("test-var-value")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void setEnvironmentVariableNoApp() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+
+        this.applications
+            .setEnvironmentVariable(SetEnvironmentVariableApplicationRequest.builder()
+                .name("test-app")
+                .variableName("test-var-name")
+                .variableValue("test-var-value")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void setHealthCheck() {
+        requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-application-id");
+        requestUpdateApplicationHealthCheck(this.cloudFoundryClient, "test-application-id", ApplicationHealthCheck.PORT);
+
+        this.applications
+            .setHealthCheck(SetApplicationHealthCheckRequest.builder()
+                .name("test-application-name")
+                .type(ApplicationHealthCheck.PORT)
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void sshEnabled() {
+        requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
+
+        this.applications
+            .sshEnabled(ApplicationSshEnabledRequest.builder()
+                .name("test-app-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(true)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void sshEnabledNoApp() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+
+        this.applications
+            .sshEnabled(ApplicationSshEnabledRequest.builder()
+                .name("test-app-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void startApplicationFailurePartial() {
+        requestApplicationsSpecificState(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesFailingPartial(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .start(StartApplicationRequest.builder()
+                .name("test-application-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void startApplicationFailureTotal() {
+        requestApplicationsSpecificState(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesFailingTotal(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .start(StartApplicationRequest.builder()
+                .name("test-application-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-application-name failed during start"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void startApplicationTimeout() {
+        requestApplicationsSpecificState(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesTimeout(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .start(StartApplicationRequest.builder()
+                .name("test-application-name")
+                .startupTimeout(Duration.ofSeconds(1))
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-application-name timed out during start"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void startInvalidApplication() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+
+        this.applications
+            .start(StartApplicationRequest.builder()
+                .name("test-application-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-application-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void startStartedApplication() {
+        requestApplicationsSpecificState(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STARTED");
+
+        this.applications
+            .start(StartApplicationRequest.builder()
+                .name("test-application-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void startStoppedApplication() {
+        requestApplicationsSpecificState(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .start(StartApplicationRequest.builder()
+                .name("test-application-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void stopInvalidApplication() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+
+        this.applications
+            .stop(StopApplicationRequest.builder()
+                .name("test-application-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-application-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void stopStartedApplication() {
+        requestApplicationsSpecificState(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STARTED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+
+        this.applications
+            .stop(StopApplicationRequest.builder()
+                .name("test-application-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void stopStoppedApplication() {
+        requestApplicationsSpecificState(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
+
+        this.applications
+            .stop(StopApplicationRequest.builder()
+                .name("test-application-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void unsetEnvironmentVariable() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id",
+            FluentMap.<String, Object>builder()
+                .entry("test-var", "test-value")
+                .entry("test-var2", "test-value2")
+                .entry("test-var-name", "test-var-value")
+                .build());
+        requestUpdateApplicationEnvironment(this.cloudFoundryClient, "test-metadata-id",
+            FluentMap.<String, Object>builder()
+                .entry("test-var2", "test-value2")
+                .entry("test-var-name", "test-var-value")
+                .build());
+
+        this.applications
+            .unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest.builder()
+                .name("test-app")
+                .variableName("test-var")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void unsetEnvironmentVariableNoApp() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+
+        this.applications
+            .unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest.builder()
+                .name("test-app")
+                .variableName("test-var")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
 
     private static void provideRandomWords(RandomWords randomWords) {
         when(randomWords.getAdjective()).thenReturn("test-adjective");
@@ -1156,3236 +3199,6 @@ public final class DefaultApplicationsTest {
                     .entity(fill(JobEntity.builder(), "job-entity-")
                         .build())
                     .build()));
-    }
-
-    public static final class CopySourceNoRestartOrgSpace extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, "test-organization-id");
-            requestOrganizations(this.cloudFoundryClient, "test-target-organization");
-            requestOrganizationSpacesByName(this.cloudFoundryClient, "test-organization-resource-metadata-id", "test-target-space");
-            requestApplications(this.cloudFoundryClient, "test-target-application-name", "test-space-resource-metadata-id", "test-metadata-id");
-            requestCopyBits(this.cloudFoundryClient, "test-metadata-id", "test-metadata-id");
-            requestJobSuccess(this.cloudFoundryClient, "test-copy-bits-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .copySource(CopySourceApplicationRequest.builder()
-                    .name("test-application-name")
-                    .targetName("test-target-application-name")
-                    .targetSpace("test-target-space")
-                    .targetOrganization("test-target-organization")
-                    .build());
-        }
-
-    }
-
-    public static final class CopySourceNoRestartSpace extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, "test-organization-id");
-            requestOrganizationSpacesByName(this.cloudFoundryClient, "test-organization-id", "test-target-space");
-            requestApplications(this.cloudFoundryClient, "test-target-application-name", "test-space-resource-metadata-id", "test-metadata-id");
-            requestCopyBits(this.cloudFoundryClient, "test-metadata-id", "test-metadata-id");
-            requestJobSuccess(this.cloudFoundryClient, "test-copy-bits-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .copySource(CopySourceApplicationRequest.builder()
-                    .name("test-application-name")
-                    .targetName("test-target-application-name")
-                    .targetSpace("test-target-space")
-                    .build());
-        }
-
-    }
-
-    public static final class CopySourceOrganizationNotFound extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, "test-organization-id");
-            requestOrganizationsNotFound(this.cloudFoundryClient, "test-target-organization");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Organization test-target-organization not found"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .copySource(CopySourceApplicationRequest.builder()
-                    .name("test-application-name")
-                    .targetName("test-target-application-name")
-                    .targetOrganization("test-target-organization")
-                    .targetSpace("test-target-space")
-                    .build());
-        }
-
-    }
-
-    public static final class CopySourceRestart extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, "test-organization-id");
-            requestApplications(this.cloudFoundryClient, "test-target-application-name", TEST_SPACE_ID, "test-metadata-id");
-            requestCopyBits(this.cloudFoundryClient, "test-metadata-id", "test-metadata-id");
-            requestJobSuccess(this.cloudFoundryClient, "test-copy-bits-id");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-metadata-id", "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-metadata-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-metadata-id");
-            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .copySource(CopySourceApplicationRequest.builder()
-                    .name("test-application-name")
-                    .targetName("test-target-application-name")
-                    .restart(true)
-                    .build());
-        }
-
-    }
-
-    public static final class CopySourceSpaceNotFound extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", "test-space-id", "test-metadata-id");
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, "test-organization-id");
-            requestOrganizationSpacesByNameNotFound(this.cloudFoundryClient, "test-organization-id", "test-target-space");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Space test-target-space not found"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .copySource(CopySourceApplicationRequest.builder()
-                    .name("test-application-name")
-                    .targetName("test-target-application-name")
-                    .targetSpace("test-target-space")
-                    .build());
-        }
-
-    }
-
-    public static final class DeleteAndDeleteRoutes extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-            requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-            requestApplicationServiceBindingsEmpty(this.cloudFoundryClient, "test-metadata-id");
-            requestDeleteApplication(this.cloudFoundryClient, "test-metadata-id");
-            requestJobSuccess(this.cloudFoundryClient, "test-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .delete(DeleteApplicationRequest.builder()
-                    .deleteRoutes(true)
-                    .name("test-name")
-                    .build());
-        }
-
-    }
-
-    public static final class DeleteAndDeleteRoutesFailure extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-            requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-            requestDeleteApplication(this.cloudFoundryClient, "test-metadata-id");
-            requestJobFailure(this.cloudFoundryClient, "test-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .delete(DeleteApplicationRequest.builder()
-                    .deleteRoutes(true)
-                    .name("test-name")
-                    .build());
-        }
-
-    }
-
-    public static final class DeleteAndDoNotDeleteRoutes extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-            requestApplicationServiceBindingsEmpty(this.cloudFoundryClient, "test-metadata-id");
-            requestDeleteApplication(this.cloudFoundryClient, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .delete(DeleteApplicationRequest.builder()
-                    .name("test-name")
-                    .build());
-        }
-
-    }
-
-    public static final class DeleteWithBoundRoutes extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-            requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-            requestApplicationServiceBindings(this.cloudFoundryClient, "test-metadata-id");
-            requestRemoveServiceBinding(this.cloudFoundryClient, "test-metadata-id", "test-service-binding-id");
-            requestDeleteApplication(this.cloudFoundryClient, "test-metadata-id");
-            requestJobSuccess(this.cloudFoundryClient, "test-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .delete(DeleteApplicationRequest.builder()
-                    .deleteRoutes(true)
-                    .name("test-name")
-                    .build());
-        }
-
-    }
-
-    public static final class DisableSsh extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
-            requestUpdateApplicationSsh(this.cloudFoundryClient, "test-metadata-id", false);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .disableSsh(DisableApplicationSshRequest.builder()
-                    .name("test-app-name")
-                    .build());
-        }
-
-    }
-
-    public static final class DisableSshAlreadyDisabled extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsWithSsh(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, false);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .disableSsh(DisableApplicationSshRequest.builder()
-                    .name("test-app-name")
-                    .build());
-        }
-
-    }
-
-    public static final class DisableSshNoApp extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app-name does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .disableSsh(DisableApplicationSshRequest.builder()
-                    .name("test-app-name")
-                    .build());
-        }
-
-    }
-
-    public static final class EnableSsh extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
-            requestUpdateApplicationSsh(this.cloudFoundryClient, "test-application-id", true);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .enableSsh(EnableApplicationSshRequest.builder()
-                    .name("test-app-name")
-                    .build());
-        }
-
-    }
-
-    public static final class EnableSshAlreadyEnabled extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsWithSsh(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, true);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .enableSsh(EnableApplicationSshRequest.builder()
-                    .name("test-app-name")
-                    .build());
-        }
-
-    }
-
-    public static final class EnableSshNoApp extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app-name does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .enableSsh(EnableApplicationSshRequest.builder()
-                    .name("test-app-name")
-                    .build());
-        }
-
-    }
-
-    public static final class Get extends AbstractOperationsApiTest<ApplicationDetail> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
-            requestStack(this.cloudFoundryClient, "test-application-stackId");
-            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-            requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationDetail> expectations() {
-            return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectNext(fill(ApplicationDetail.builder())
-                    .buildpack("test-application-summary-buildpack")
-                    .id("test-application-summary-id")
-                    .instanceDetail(fill(InstanceDetail.builder())
-                        .since(new Date(1000))
-                        .state("test-application-instance-info-state")
-                        .build())
-                    .lastUploaded(new Date(0))
-                    .name("test-application-summary-name")
-                    .requestedState("test-application-summary-state")
-                    .stack("test-stack-entity-name")
-                    .url("test-route-host.test-domain-name")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<ApplicationDetail> invoke() {
-            return this.applications
-                .get(GetApplicationRequest.builder()
-                    .name("test-app")
-                    .build());
-        }
-
-    }
-
-    public static final class GetApplicationManifest extends AbstractOperationsApiTest<ApplicationManifest> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-            requestStack(this.cloudFoundryClient, "test-application-summary-stackId");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationManifest> expectations() {
-            return ScriptedSubscriber.<ApplicationManifest>create()
-                .expectNext(ApplicationManifest.builder()
-                    .buildpack("test-application-summary-buildpack")
-                    .command("test-application-summary-command")
-                    .disk(1)
-                    .domain("test-domain-name")
-                    .environmentVariables(Collections.emptyMap())
-                    .host("test-route-host")
-                    .instances(1)
-                    .memory(1)
-                    .name("test-application-summary-name")
-                    .service("test-service-instance-name")
-                    .stack("test-stack-entity-name")
-                    .timeout(1)
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<ApplicationManifest> invoke() {
-            return this.applications
-                .getApplicationManifest(GetApplicationManifestRequest.builder()
-                    .name("test-app")
-                    .build());
-        }
-
-    }
-
-    public static final class GetApplicationManifestNoRoutes extends AbstractOperationsApiTest<ApplicationManifest> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationSummaryNoRoutes(this.cloudFoundryClient, "test-metadata-id");
-            requestStack(this.cloudFoundryClient, "test-application-summary-stackId");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationManifest> expectations() {
-            return ScriptedSubscriber.<ApplicationManifest>create()
-                .expectNext(ApplicationManifest.builder()
-                    .buildpack("test-application-summary-buildpack")
-                    .command("test-application-summary-command")
-                    .disk(1)
-                    .environmentVariables(Collections.emptyMap())
-                    .instances(1)
-                    .memory(1)
-                    .name("test-application-summary-name")
-                    .stack("test-stack-entity-name")
-                    .timeout(1)
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<ApplicationManifest> invoke() {
-            return this.applications
-                .getApplicationManifest(GetApplicationManifestRequest.builder()
-                    .name("test-app")
-                    .build());
-        }
-
-    }
-
-    public static final class GetBuildpackError extends AbstractOperationsApiTest<ApplicationDetail> {
-
-        private static final int CF_BUILDPACK_COMPILED_FAILED = 170004;
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
-            requestStack(this.cloudFoundryClient, "test-application-stackId");
-            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-            requestApplicationInstancesError(this.cloudFoundryClient, "test-metadata-id", CF_BUILDPACK_COMPILED_FAILED);
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationDetail> expectations() {
-            return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectNext(fill(ApplicationDetail.builder())
-                    .buildpack("test-application-summary-buildpack")
-                    .id("test-application-summary-id")
-                    .lastUploaded(new Date(0))
-                    .name("test-application-summary-name")
-                    .requestedState("test-application-summary-state")
-                    .stack("test-stack-entity-name")
-                    .url("test-route-host.test-domain-name")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<ApplicationDetail> invoke() {
-            return this.applications
-                .get(GetApplicationRequest.builder()
-                    .name("test-app")
-                    .build());
-        }
-
-    }
-
-    public static final class GetDetectedBuildpack extends AbstractOperationsApiTest<ApplicationDetail> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
-            requestStack(this.cloudFoundryClient, "test-application-stackId");
-            requestApplicationSummaryDetectedBuildpack(this.cloudFoundryClient, "test-metadata-id");
-            requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationDetail> expectations() {
-            return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectNext(fill(ApplicationDetail.builder())
-                    .buildpack("test-application-summary-detectedBuildpack")
-                    .id("test-application-summary-id")
-                    .instanceDetail(fill(InstanceDetail.builder())
-                        .since(new Date(1000))
-                        .state("test-application-instance-info-state")
-                        .build())
-                    .lastUploaded(new Date(0))
-                    .name("test-application-summary-name")
-                    .requestedState("test-application-summary-state")
-                    .stack("test-stack-entity-name")
-                    .url("test-route-host.test-domain-name")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<ApplicationDetail> invoke() {
-            return this.applications
-                .get(GetApplicationRequest.builder()
-                    .name("test-app")
-                    .build());
-        }
-
-    }
-
-    public static final class GetEnvironments extends AbstractOperationsApiTest<ApplicationEnvironments> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationEnvironment(this.cloudFoundryClient, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationEnvironments> expectations() {
-            return ScriptedSubscriber.<ApplicationEnvironments>create()
-                .expectNext(ApplicationEnvironments.builder()
-                    .running(FluentMap.<String, Object>builder()
-                        .entry("running-env-name", "running-env-value")
-                        .build())
-                    .staging(FluentMap.<String, Object>builder()
-                        .entry("staging-env-name", "staging-env-value")
-                        .build())
-                    .systemProvided(FluentMap.<String, Object>builder()
-                        .entry("system-env-name", "system-env-value")
-                        .build())
-                    .userProvided(FluentMap.<String, Object>builder()
-                        .entry("env-name", "env-value")
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<ApplicationEnvironments> invoke() {
-            return this.applications
-                .getEnvironments(GetApplicationEnvironmentsRequest.builder()
-                    .name("test-app")
-                    .build());
-        }
-
-    }
-
-    public static final class GetEnvironmentsNoApp extends AbstractOperationsApiTest<ApplicationEnvironments> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationEnvironments> expectations() {
-            return ScriptedSubscriber.<ApplicationEnvironments>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app does not exist"));
-        }
-
-        @Override
-        protected Publisher<ApplicationEnvironments> invoke() {
-            return this.applications
-                .getEnvironments(GetApplicationEnvironmentsRequest.builder()
-                    .name("test-app")
-                    .build());
-        }
-
-    }
-
-    public static final class GetEvents extends AbstractOperationsApiTest<ApplicationEvent> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestEvents(this.cloudFoundryClient, "test-metadata-id",
-                fill(EventEntity.builder(), "event-")
-                    .timestamp("2016-02-08T15:45:59Z")
-                    .metadata("request", Optional.of(FluentMap.builder()
-                        .entry("instances", 1)
-                        .entry("memory", 2)
-                        .entry("environment_json", "test-data")
-                        .entry("state", "test-state")
-                        .build()))
-                    .build());
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationEvent> expectations() {
-            return ScriptedSubscriber.<ApplicationEvent>create()
-                .expectNext(ApplicationEvent.builder()
-                    .actor("test-event-actorName")
-                    .description("instances: 1, memory: 2, state: test-state, environment_json: test-data")
-                    .event("test-event-type")
-                    .id("test-event-id")
-                    .time(DateUtils.parseFromIso8601("2016-02-08T15:45:59Z"))
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<ApplicationEvent> invoke() {
-            return this.applications
-                .getEvents(GetApplicationEventsRequest.builder()
-                    .name("test-app")
-                    .build());
-        }
-
-    }
-
-    public static final class GetEventsBadTimeSparseMetadata extends AbstractOperationsApiTest<ApplicationEvent> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestEvents(this.cloudFoundryClient, "test-metadata-id",
-                fill(EventEntity.builder(), "event-")
-                    .timestamp("BAD-TIMESTAMP")
-                    .metadata("request", Optional.of(FluentMap.builder()
-                        .entry("memory", 2)
-                        .entry("environment_json", "test-data")
-                        .entry("state", "test-state")
-                        .build()))
-                    .build());
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationEvent> expectations() {
-            return ScriptedSubscriber.<ApplicationEvent>create()
-                .expectNext(ApplicationEvent.builder()
-                    .actor("test-event-actorName")
-                    .description("memory: 2, state: test-state, environment_json: test-data")
-                    .event("test-event-type")
-                    .id("test-event-id")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<ApplicationEvent> invoke() {
-            return this.applications
-                .getEvents(GetApplicationEventsRequest.builder()
-                    .name("test-app")
-                    .build());
-        }
-
-    }
-
-    public static final class GetEventsFoundZero extends AbstractOperationsApiTest<ApplicationEvent> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestEvents(this.cloudFoundryClient, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationEvent> expectations() {
-            return ScriptedSubscriber.<ApplicationEvent>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<ApplicationEvent> invoke() {
-            return this.applications
-                .getEvents(GetApplicationEventsRequest.builder()
-                    .name("test-app")
-                    .build());
-        }
-
-    }
-
-    public static final class GetEventsLimitZero extends AbstractOperationsApiTest<ApplicationEvent> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestEvents(this.cloudFoundryClient, "test-metadata-id",
-                fill(EventEntity.builder(), "event-")
-                    .timestamp("2016-02-08T15:45:59Z")
-                    .metadata("request", Optional.of(FluentMap.builder()
-                        .entry("instances", 1)
-                        .entry("memory", 2)
-                        .entry("environment_json", "test-data")
-                        .entry("state", "test-state")
-                        .build()))
-                    .build());
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationEvent> expectations() {
-            return ScriptedSubscriber.<ApplicationEvent>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<ApplicationEvent> invoke() {
-            return this.applications
-                .getEvents(GetApplicationEventsRequest.builder()
-                    .name("test-app")
-                    .maxNumberOfEvents(0)
-                    .build());
-        }
-
-    }
-
-    public static final class GetEventsTwo extends AbstractOperationsApiTest<ApplicationEvent> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestEvents(this.cloudFoundryClient, "test-metadata-id",
-                fill(EventEntity.builder(), "event-")
-                    .timestamp("2016-02-08T15:45:59Z")
-                    .metadata("request", Optional.of(FluentMap.builder()
-                        .entry("instances", 1)
-                        .entry("memory", 2)
-                        .entry("environment_json", "test-data")
-                        .entry("state", "test-state")
-                        .build()))
-                    .build(),
-                fill(EventEntity.builder(), "event-")
-                    .timestamp("2016-02-08T15:49:07Z")
-                    .metadata("request", Optional.of(FluentMap.builder()
-                        .entry("state", "test-state-two")
-                        .build()))
-                    .build()
-            );
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationEvent> expectations() {
-            return ScriptedSubscriber.<ApplicationEvent>create()
-                .expectNext(ApplicationEvent.builder()
-                        .actor("test-event-actorName")
-                        .description("instances: 1, memory: 2, state: test-state, environment_json: test-data")
-                        .event("test-event-type")
-                        .id("test-event-id")
-                        .time(DateUtils.parseFromIso8601("2016-02-08T15:45:59Z"))
-                        .build(),
-                    ApplicationEvent.builder()
-                        .actor("test-event-actorName")
-                        .description("state: test-state-two")
-                        .event("test-event-type")
-                        .id("test-event-id")
-                        .time(DateUtils.parseFromIso8601("2016-02-08T15:49:07Z"))
-                        .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<ApplicationEvent> invoke() {
-            return this.applications
-                .getEvents(GetApplicationEventsRequest.builder()
-                    .name("test-app")
-                    .build());
-        }
-
-    }
-
-    public static final class GetHealthCheck extends AbstractOperationsApiTest<ApplicationHealthCheck> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationHealthCheck> expectations() {
-            return ScriptedSubscriber.<ApplicationHealthCheck>create()
-                .expectNext(ApplicationHealthCheck.PORT)
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<ApplicationHealthCheck> invoke() {
-            return this.applications
-                .getHealthCheck(GetApplicationHealthCheckRequest.builder()
-                    .name("test-application-name")
-                    .build());
-        }
-
-    }
-
-    public static final class GetInstancesError extends AbstractOperationsApiTest<ApplicationDetail> {
-
-        private static final int CF_INSTANCES_ERROR = 220001;
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
-            requestStack(this.cloudFoundryClient, "test-application-stackId");
-            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-            requestApplicationInstancesError(this.cloudFoundryClient, "test-metadata-id", CF_INSTANCES_ERROR);
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationDetail> expectations() {
-            return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectNext(fill(ApplicationDetail.builder())
-                    .buildpack("test-application-summary-buildpack")
-                    .id("test-application-summary-id")
-                    .lastUploaded(new Date(0))
-                    .name("test-application-summary-name")
-                    .requestedState("test-application-summary-state")
-                    .stack("test-stack-entity-name")
-                    .url("test-route-host.test-domain-name")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<ApplicationDetail> invoke() {
-            return this.applications
-                .get(GetApplicationRequest.builder()
-                    .name("test-app")
-                    .build());
-        }
-
-    }
-
-    public static final class GetNoBuildpack extends AbstractOperationsApiTest<ApplicationDetail> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
-            requestStack(this.cloudFoundryClient, "test-application-stackId");
-            requestApplicationSummaryNoBuildpack(this.cloudFoundryClient, "test-metadata-id");
-            requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationDetail> expectations() {
-            return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectNext(fill(ApplicationDetail.builder())
-                    .buildpack(null)
-                    .id("test-application-summary-id")
-                    .instanceDetail(fill(InstanceDetail.builder())
-                        .since(new Date(1000))
-                        .state("test-application-instance-info-state")
-                        .build())
-                    .lastUploaded(new Date(0))
-                    .name("test-application-summary-name")
-                    .requestedState("test-application-summary-state")
-                    .stack("test-stack-entity-name")
-                    .url("test-route-host.test-domain-name")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<ApplicationDetail> invoke() {
-            return this.applications
-                .get(GetApplicationRequest.builder()
-                    .name("test-app")
-                    .build());
-        }
-
-    }
-
-    public static final class GetStagingError extends AbstractOperationsApiTest<ApplicationDetail> {
-
-        private static final int CF_STAGING_NOT_FINISHED = 170002;
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
-            requestStack(this.cloudFoundryClient, "test-application-stackId");
-            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-            requestApplicationInstancesError(this.cloudFoundryClient, "test-metadata-id", CF_STAGING_NOT_FINISHED);
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationDetail> expectations() {
-            return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectNext(fill(ApplicationDetail.builder())
-                    .buildpack("test-application-summary-buildpack")
-                    .id("test-application-summary-id")
-                    .lastUploaded(new Date(0))
-                    .name("test-application-summary-name")
-                    .requestedState("test-application-summary-state")
-                    .stack("test-stack-entity-name")
-                    .url("test-route-host.test-domain-name")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<ApplicationDetail> invoke() {
-            return this.applications
-                .get(GetApplicationRequest.builder()
-                    .name("test-app")
-                    .build());
-        }
-
-    }
-
-    public static final class GetStoppedError extends AbstractOperationsApiTest<ApplicationDetail> {
-
-        private static final int CF_APP_STOPPED_STATS_ERROR = 200003;
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationStatisticsError(this.cloudFoundryClient, "test-metadata-id", CF_APP_STOPPED_STATS_ERROR);
-            requestStack(this.cloudFoundryClient, "test-application-stackId");
-            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-            requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationDetail> expectations() {
-            return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectNext(fill(ApplicationDetail.builder())
-                    .buildpack("test-application-summary-buildpack")
-                    .id("test-application-summary-id")
-                    .instanceDetail(InstanceDetail.builder()
-                        .since(new Date(1000))
-                        .state("test-application-instance-info-state")
-                        .build())
-                    .lastUploaded(new Date(0))
-                    .name("test-application-summary-name")
-                    .requestedState("test-application-summary-state")
-                    .stack("test-stack-entity-name")
-                    .url("test-route-host.test-domain-name")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<ApplicationDetail> invoke() {
-            return this.applications
-                .get(GetApplicationRequest.builder()
-                    .name("test-app")
-                    .build());
-        }
-
-    }
-
-    public static final class GetWithEmptyInstance extends AbstractOperationsApiTest<ApplicationDetail> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
-            requestStack(this.cloudFoundryClient, "test-application-stackId");
-            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-            requestApplicationEmptyInstance(this.cloudFoundryClient, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationDetail> expectations() {
-            return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectNext(fill(ApplicationDetail.builder())
-                    .buildpack("test-application-summary-buildpack")
-                    .id("test-application-summary-id")
-                    .instanceDetail(fill(InstanceDetail.builder())
-                        .since(null)
-                        .state(null)
-                        .build())
-                    .lastUploaded(new Date(0))
-                    .name("test-application-summary-name")
-                    .requestedState("test-application-summary-state")
-                    .stack("test-stack-entity-name")
-                    .url("test-route-host.test-domain-name")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<ApplicationDetail> invoke() {
-            return this.applications
-                .get(GetApplicationRequest.builder()
-                    .name("test-app")
-                    .build());
-        }
-
-    }
-
-    public static final class GetWithEmptyInstanceStats extends AbstractOperationsApiTest<ApplicationDetail> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationEmptyStats(this.cloudFoundryClient, "test-metadata-id");
-            requestStack(this.cloudFoundryClient, "test-application-stackId");
-            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-            requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationDetail> expectations() {
-            return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectNext(fill(ApplicationDetail.builder())
-                    .buildpack("test-application-summary-buildpack")
-                    .id("test-application-summary-id")
-                    .instanceDetail(InstanceDetail.builder()
-                        .since(new Date(1000))
-                        .state("test-application-instance-info-state")
-                        .build())
-                    .lastUploaded(new Date(0))
-                    .name("test-application-summary-name")
-                    .requestedState("test-application-summary-state")
-                    .stack("test-stack-entity-name")
-                    .url("test-route-host.test-domain-name")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<ApplicationDetail> invoke() {
-            return this.applications
-                .get(GetApplicationRequest.builder()
-                    .name("test-app")
-                    .build());
-        }
-
-    }
-
-    public static final class GetWithNoInstances extends AbstractOperationsApiTest<ApplicationDetail> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
-            requestStack(this.cloudFoundryClient, "test-application-stackId");
-            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-            requestApplicationNoInstances(this.cloudFoundryClient, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationDetail> expectations() {
-            return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectNext(fill(ApplicationDetail.builder())
-                    .buildpack("test-application-summary-buildpack")
-                    .id("test-application-summary-id")
-                    .lastUploaded(new Date(0))
-                    .name("test-application-summary-name")
-                    .requestedState("test-application-summary-state")
-                    .stack("test-stack-entity-name")
-                    .url("test-route-host.test-domain-name")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<ApplicationDetail> invoke() {
-            return this.applications
-                .get(GetApplicationRequest.builder()
-                    .name("test-app")
-                    .build());
-        }
-
-    }
-
-    public static final class GetWithNullStats extends AbstractOperationsApiTest<ApplicationDetail> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationNullStats(this.cloudFoundryClient, "test-metadata-id");
-            requestStack(this.cloudFoundryClient, "test-application-stackId");
-            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-            requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationDetail> expectations() {
-            return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectNext(fill(ApplicationDetail.builder())
-                    .buildpack("test-application-summary-buildpack")
-                    .id("test-application-summary-id")
-                    .instanceDetail(InstanceDetail.builder()
-                        .since(new Date(1000))
-                        .state("test-application-instance-info-state")
-                        .build())
-                    .lastUploaded(new Date(0))
-                    .name("test-application-summary-name")
-                    .requestedState("test-application-summary-state")
-                    .stack("test-stack-entity-name")
-                    .url("test-route-host.test-domain-name")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<ApplicationDetail> invoke() {
-            return this.applications
-                .get(GetApplicationRequest.builder()
-                    .name("test-app")
-                    .build());
-        }
-
-    }
-
-    public static final class GetWithNullUsage extends AbstractOperationsApiTest<ApplicationDetail> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-            requestApplicationNullUsage(this.cloudFoundryClient, "test-metadata-id");
-            requestStack(this.cloudFoundryClient, "test-application-stackId");
-            requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-            requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationDetail> expectations() {
-            return ScriptedSubscriber.<ApplicationDetail>create()
-                .expectNext(fill(ApplicationDetail.builder())
-                    .buildpack("test-application-summary-buildpack")
-                    .id("test-application-summary-id")
-                    .instanceDetail(InstanceDetail.builder()
-                        .diskQuota(1L)
-                        .memoryQuota(1L)
-                        .since(new Date(1000))
-                        .state("test-application-instance-info-state")
-                        .build())
-                    .lastUploaded(new Date(0))
-                    .name("test-application-summary-name")
-                    .requestedState("test-application-summary-state")
-                    .stack("test-stack-entity-name")
-                    .url("test-route-host.test-domain-name")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<ApplicationDetail> invoke() {
-            return this.applications
-                .get(GetApplicationRequest.builder()
-                    .name("test-app")
-                    .build());
-        }
-
-    }
-
-    public static final class List extends AbstractOperationsApiTest<ApplicationSummary> {
-
-        private final Applications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestSpaceSummary(this.cloudFoundryClient, TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<ApplicationSummary> expectations() {
-            return ScriptedSubscriber.<ApplicationSummary>create()
-                .expectNext(fill(ApplicationSummary.builder())
-                    .id("test-application-summary-id")
-                    .name("test-application-summary-name")
-                    .requestedState("test-application-summary-state")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<ApplicationSummary> invoke() {
-            return this.applications.list();
-        }
-
-    }
-
-    public static final class Logs extends AbstractOperationsApiTest<LogMessage> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
-            requestLogsStream(this.dopplerClient, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<LogMessage> expectations() {
-            return ScriptedSubscriber.<LogMessage>create()
-                .expectNext(fill(LogMessage.builder(), "log-message-")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<LogMessage> invoke() {
-            return this.applications
-                .logs(LogsRequest.builder()
-                    .name("test-application-name")
-                    .recent(false)
-                    .build());
-        }
-
-    }
-
-    public static final class LogsNoApp extends AbstractOperationsApiTest<LogMessage> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<LogMessage> expectations() {
-            return ScriptedSubscriber.<LogMessage>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-application-name does not exist"));
-        }
-
-        @Override
-        protected Publisher<LogMessage> invoke() {
-            return this.applications
-                .logs(LogsRequest.builder()
-                    .name("test-application-name")
-                    .build());
-        }
-
-    }
-
-    public static final class LogsRecent extends AbstractOperationsApiTest<LogMessage> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
-            requestLogsRecent(this.dopplerClient, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<LogMessage> expectations() {
-            return ScriptedSubscriber.<LogMessage>create()
-                .expectNext(fill(LogMessage.builder(), "log-message-")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<LogMessage> invoke() {
-            return this.applications
-                .logs(LogsRequest.builder()
-                    .name("test-application-name")
-                    .recent(true)
-                    .build());
-        }
-
-    }
-
-    public static final class LogsRecentNotSet extends AbstractOperationsApiTest<LogMessage> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
-            requestLogsStream(this.dopplerClient, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<LogMessage> expectations() {
-            return ScriptedSubscriber.<LogMessage>create()
-                .expectNext(fill(LogMessage.builder(), "log-message-")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<LogMessage> invoke() {
-            return this.applications
-                .logs(LogsRequest.builder()
-                    .name("test-application-name")
-                    .build());
-        }
-
-    }
-
-    public static final class PushDocker extends AbstractOperationsApiTest<Void> {
-
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
-            new WordListRandomWords());
-
-        private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .dockerImage("cloudfoundry/lattice-app")
-            .domain("test-domain")
-            .name("test-name")
-            .build();
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-            requestCreateDockerApplication(this.cloudFoundryClient, this.pushApplicationRequest, TEST_SPACE_ID, null, "test-application-id");
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-            requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
-            requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
-            requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
-            requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .push(this.pushApplicationRequest);
-        }
-
-    }
-
-    public static final class PushDomainNotFound extends AbstractOperationsApiTest<Void> {
-
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
-            new WordListRandomWords());
-
-        private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(Paths.get("test-application"))
-            .domain("test-domain")
-            .name("test-name")
-            .build();
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-            requestCreateApplication(this.cloudFoundryClient, this.pushApplicationRequest, TEST_SPACE_ID, null, "test-application-id");
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-            requestPrivateDomainNotFound(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID);
-            requestSharedDomainNotFound(this.cloudFoundryClient, "test-domain");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Domain test-domain not found"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .push(this.pushApplicationRequest);
-        }
-
-    }
-
-    public static final class PushExistingApplication extends AbstractOperationsApiTest<Void> {
-
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
-            new WordListRandomWords());
-
-        private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(Paths.get("test-application"))
-            .domain("test-domain")
-            .name("test-name")
-            .build();
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-application-id");
-            requestUpdateApplication(this.cloudFoundryClient, "test-application-id", this.pushApplicationRequest, null);
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-            requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
-            requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
-            requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
-            requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-            requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
-            requestJobSuccess(this.cloudFoundryClient, "test-job-id");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .push(this.pushApplicationRequest);
-        }
-
-    }
-
-    public static final class PushExistingRouteWithHost extends AbstractOperationsApiTest<Void> {
-
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
-            new WordListRandomWords());
-
-        private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(Paths.get("test-application"))
-            .domain("test-domain")
-            .host("test-host")
-            .name("test-name")
-            .build();
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-            requestCreateApplication(this.cloudFoundryClient, this.pushApplicationRequest, TEST_SPACE_ID, null, "test-application-id");
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-            requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
-            requestRoutes(this.cloudFoundryClient, "test-domain-id", "test-host", null, "test-route-id");
-            requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-            requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
-            requestJobSuccess(this.cloudFoundryClient, "test-job-id");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .push(this.pushApplicationRequest);
-        }
-
-    }
-
-    public static final class PushExistingRouteWithNoHost extends AbstractOperationsApiTest<Void> {
-
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
-            new WordListRandomWords());
-
-        private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(Paths.get("test-application"))
-            .domain("test-domain")
-            .noHostname(true)
-            .name("test-name")
-            .build();
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-            requestCreateApplication(this.cloudFoundryClient, this.pushApplicationRequest, TEST_SPACE_ID, null, "test-application-id");
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-            requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
-            requestRoutes(this.cloudFoundryClient, "test-domain-id", null, null, "test-route-id");
-            requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-            requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
-            requestJobSuccess(this.cloudFoundryClient, "test-job-id");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .push(this.pushApplicationRequest);
-        }
-
-    }
-
-    public static final class PushInvalidStack extends AbstractOperationsApiTest<Void> {
-
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
-            new WordListRandomWords());
-
-        @Before
-        public void setUp() throws Exception {
-            requestStackIdEmpty(this.cloudFoundryClient, "invalid-stack");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Stack invalid-stack does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .push(PushApplicationRequest.builder()
-                    .application(Paths.get("test-application"))
-                    .name("test-name")
-                    .stack("invalid-stack")
-                    .build());
-        }
-
-    }
-
-    public static final class PushNewApplication extends AbstractOperationsApiTest<Void> {
-
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
-            new WordListRandomWords());
-
-        private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(Paths.get("test-application"))
-            .domain("test-domain")
-            .name("test-name")
-            .build();
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-            requestCreateApplication(this.cloudFoundryClient, this.pushApplicationRequest, TEST_SPACE_ID, null, "test-application-id");
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-            requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
-            requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
-            requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
-            requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-            requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
-            requestJobSuccess(this.cloudFoundryClient, "test-job-id");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .push(this.pushApplicationRequest);
-        }
-
-    }
-
-    public static final class PushNewRouteWithHost extends AbstractOperationsApiTest<Void> {
-
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
-            new WordListRandomWords());
-
-        private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(Paths.get("test-application"))
-            .domain("test-domain")
-            .host("test-host")
-            .name("test-name")
-            .build();
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-            requestCreateApplication(this.cloudFoundryClient, this.pushApplicationRequest, TEST_SPACE_ID, null, "test-application-id");
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-            requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
-            requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-host", null);
-            requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-host", null, TEST_SPACE_ID, "test-route-id");
-            requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-            requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
-            requestJobSuccess(this.cloudFoundryClient, "test-job-id");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .push(this.pushApplicationRequest);
-        }
-
-    }
-
-    public static final class PushNewRouteWithNoHost extends AbstractOperationsApiTest<Void> {
-
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
-            new WordListRandomWords());
-
-        private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(Paths.get("test-application"))
-            .domain("test-domain")
-            .noHostname(true)
-            .name("test-name")
-            .build();
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-            requestCreateApplication(this.cloudFoundryClient, this.pushApplicationRequest, TEST_SPACE_ID, null, "test-application-id");
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-            requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
-            requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", null, null);
-            requestCreateRoute(this.cloudFoundryClient, "test-domain-id", null, null, TEST_SPACE_ID, "test-route-id");
-            requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-            requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
-            requestJobSuccess(this.cloudFoundryClient, "test-job-id");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .push(this.pushApplicationRequest);
-        }
-
-    }
-
-    public static final class PushNoDomainNoneFound extends AbstractOperationsApiTest<Void> {
-
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
-            new WordListRandomWords());
-
-        private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(Paths.get("test-application"))
-            .name("test-name")
-            .build();
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-            requestCreateApplication(this.cloudFoundryClient, this.pushApplicationRequest, TEST_SPACE_ID, null, "test-application-id");
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-            requestSharedDomainsEmpty(this.cloudFoundryClient);
-            requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Domain not found"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .push(this.pushApplicationRequest);
-        }
-
-    }
-
-    public static final class PushNoDomainPrivate extends AbstractOperationsApiTest<Void> {
-
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
-            new WordListRandomWords());
-
-        private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(Paths.get("test-application"))
-            .name("test-name")
-            .build();
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-            requestCreateApplication(this.cloudFoundryClient, this.pushApplicationRequest, TEST_SPACE_ID, null, "test-application-id");
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-            requestSharedDomainsEmpty(this.cloudFoundryClient);
-            requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain-id");
-            requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
-            requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
-            requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-            requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
-            requestJobSuccess(this.cloudFoundryClient, "test-job-id");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .push(this.pushApplicationRequest);
-        }
-
-    }
-
-    public static final class PushNoDomainShared extends AbstractOperationsApiTest<Void> {
-
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
-            new WordListRandomWords());
-
-        private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(Paths.get("test-application"))
-            .name("test-name")
-            .build();
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-            requestCreateApplication(this.cloudFoundryClient, this.pushApplicationRequest, TEST_SPACE_ID, null, "test-application-id");
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-            requestSharedDomains(this.cloudFoundryClient, "test-domain-id");
-            requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
-            requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
-            requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-            requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
-            requestJobSuccess(this.cloudFoundryClient, "test-job-id");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .push(this.pushApplicationRequest);
-        }
-
-    }
-
-    public static final class PushNoRoute extends AbstractOperationsApiTest<Void> {
-
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
-            new WordListRandomWords());
-
-        private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(Paths.get("test-application"))
-            .noRoute(true)
-            .name("test-name")
-            .build();
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-            requestCreateApplication(this.cloudFoundryClient, this.pushApplicationRequest, TEST_SPACE_ID, null, "test-application-id");
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-            requestSharedDomains(this.cloudFoundryClient, "test-domain-id");
-            requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
-            requestJobSuccess(this.cloudFoundryClient, "test-job-id");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .push(this.pushApplicationRequest);
-        }
-
-    }
-
-    public static final class PushNoStart extends AbstractOperationsApiTest<Void> {
-
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
-            new WordListRandomWords());
-
-        private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(Paths.get("test-application"))
-            .name("test-name")
-            .noStart(true)
-            .build();
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-            requestCreateApplication(this.cloudFoundryClient, this.pushApplicationRequest, TEST_SPACE_ID, null, "test-application-id");
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-            requestSharedDomains(this.cloudFoundryClient, "test-domain-id");
-            requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
-            requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
-            requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-            requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
-            requestJobSuccess(this.cloudFoundryClient, "test-job-id");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .push(this.pushApplicationRequest);
-        }
-
-    }
-
-    public static final class PushRandomRoute extends AbstractOperationsApiTest<Void> {
-
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
-
-        private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(Paths.get("test-application"))
-            .domain("test-domain")
-            .name("test-name")
-            .randomRoute(true)
-            .build();
-
-        private final RandomWords randomWords = mock(RandomWords.class, RETURNS_SMART_NULLS);
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
-            this.randomWords);
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-            requestCreateApplication(this.cloudFoundryClient, this.pushApplicationRequest, TEST_SPACE_ID, null, "test-application-id");
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-            requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
-            provideRandomWords(this.randomWords);
-            requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name-test-adjective-test-noun", null);
-            requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name-test-adjective-test-noun", null, TEST_SPACE_ID, "test-route-id");
-            requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-            requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
-            requestJobSuccess(this.cloudFoundryClient, "test-job-id");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .push(this.pushApplicationRequest);
-        }
-
-    }
-
-    public static final class PushSharedDomain extends AbstractOperationsApiTest<Void> {
-
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
-            new WordListRandomWords());
-
-        private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(Paths.get("test-application"))
-            .domain("test-domain")
-            .name("test-name")
-            .build();
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-            requestCreateApplication(this.cloudFoundryClient, this.pushApplicationRequest, TEST_SPACE_ID, null, "test-application-id");
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-            requestPrivateDomainNotFound(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID);
-            requestSharedDomain(this.cloudFoundryClient, "test-domain", "test-domain-id");
-            requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
-            requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
-            requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-            requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
-            requestJobSuccess(this.cloudFoundryClient, "test-job-id");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .push(this.pushApplicationRequest);
-        }
-
-    }
-
-    public static final class PushStartFailsRunning extends AbstractOperationsApiTest<Void> {
-
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
-            new WordListRandomWords());
-
-        private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(Paths.get("test-application"))
-            .domain("test-domain")
-            .name("test-name")
-            .build();
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-            requestCreateApplication(this.cloudFoundryClient, this.pushApplicationRequest, TEST_SPACE_ID, null, "test-application-id");
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-            requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
-            requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
-            requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
-            requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-            requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
-            requestJobSuccess(this.cloudFoundryClient, "test-job-id");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesFailingTotal(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-name failed during start"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .push(this.pushApplicationRequest);
-        }
-
-    }
-
-    public static final class PushStartFailsStaging extends AbstractOperationsApiTest<Void> {
-
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
-            new WordListRandomWords());
-
-        private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(Paths.get("test-application"))
-            .domain("test-domain")
-            .name("test-name")
-            .build();
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-            requestCreateApplication(this.cloudFoundryClient, this.pushApplicationRequest, TEST_SPACE_ID, null, "test-application-id");
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-            requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
-            requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
-            requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
-            requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-            requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
-            requestJobSuccess(this.cloudFoundryClient, "test-job-id");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplicationFailing(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-name failed during staging"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .push(this.pushApplicationRequest);
-        }
-
-    }
-
-    public static final class PushUploadFails extends AbstractOperationsApiTest<Void> {
-
-        private final InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
-            new WordListRandomWords());
-
-        private final PushApplicationRequest pushApplicationRequest = PushApplicationRequest.builder()
-            .application(Paths.get("test-application"))
-            .domain("test-domain")
-            .name("test-name")
-            .build();
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-            requestCreateApplication(this.cloudFoundryClient, this.pushApplicationRequest, TEST_SPACE_ID, null, "test-application-id");
-            requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-            requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
-            requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
-            requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
-            requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-            requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
-            requestJobFailure(this.cloudFoundryClient, "test-job-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .push(this.pushApplicationRequest);
-        }
-
-    }
-
-    public static final class Rename extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
-            requestUpdateApplicationRename(this.cloudFoundryClient, "test-metadata-id", "test-new-app-name");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .rename(RenameApplicationRequest.builder()
-                    .name("test-app-name")
-                    .newName("test-new-app-name")
-                    .build());
-        }
-
-    }
-
-    public static final class RenameNoApp extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app-name does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .rename(RenameApplicationRequest.builder()
-                    .name("test-app-name")
-                    .newName("test-new-app-name")
-                    .build());
-        }
-
-    }
-
-    public static final class Restage extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
-            requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
-            requestGetApplication(this.cloudFoundryClient, "test-metadata-id");
-            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .restage(RestageApplicationRequest.builder()
-                    .name("test-application-name")
-                    .build());
-        }
-
-    }
-
-    public static final class RestageInvalidApplication extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-application-name does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .restage(RestageApplicationRequest.builder()
-                    .name("test-application-name")
-                    .build());
-        }
-
-    }
-
-    public static final class RestageStagingFailure extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
-            requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
-            requestGetApplicationFailing(this.cloudFoundryClient, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-application-name failed during staging"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .restage(RestageApplicationRequest.builder()
-                    .name("test-application-name")
-                    .build());
-        }
-
-    }
-
-    public static final class RestageStartingFailurePartial extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
-            requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
-            requestGetApplication(this.cloudFoundryClient, "test-metadata-id");
-            requestApplicationInstancesFailingPartial(this.cloudFoundryClient, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .restage(RestageApplicationRequest.builder()
-                    .name("test-application-name")
-                    .build());
-        }
-
-    }
-
-    public static final class RestageStartingFailureTotal extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
-            requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
-            requestGetApplication(this.cloudFoundryClient, "test-metadata-id");
-            requestApplicationInstancesFailingTotal(this.cloudFoundryClient, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-application-name failed during start"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .restage(RestageApplicationRequest.builder()
-                    .name("test-application-name")
-                    .build());
-        }
-
-    }
-
-    public static final class RestageTimeout extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
-            requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
-            requestGetApplicationTimeout(this.cloudFoundryClient, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-application-name timed out during staging"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .restage(RestageApplicationRequest.builder()
-                    .name("test-application-name")
-                    .stagingTimeout(Duration.ofSeconds(1))
-                    .build());
-        }
-
-    }
-
-    public static final class RestartFailurePartial extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STARTED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesFailingPartial(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .restart(RestartApplicationRequest.builder()
-                    .name("test-app-name")
-                    .build());
-        }
-
-    }
-
-    public static final class RestartFailureTotal extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STARTED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesFailingTotal(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-app-name failed during start"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .restart(RestartApplicationRequest.builder()
-                    .name("test-app-name")
-                    .build());
-        }
-
-    }
-
-    public static final class RestartInstance extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
-            requestTerminateApplicationInstance(this.cloudFoundryClient, "test-metadata-id", "0");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .restartInstance(RestartApplicationInstanceRequest.builder()
-                    .name("test-application-name")
-                    .instanceIndex(0)
-                    .build());
-        }
-
-    }
-
-    public static final class RestartNoApp extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-non-existent-app-name", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-non-existent-app-name does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .restart(RestartApplicationRequest.builder()
-                    .name("test-non-existent-app-name")
-                    .build());
-        }
-
-    }
-
-    public static final class RestartNotStartedAndNotStopped extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "unknown-state");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .restart(RestartApplicationRequest.builder()
-                    .name("test-app-name")
-                    .build());
-        }
-
-    }
-
-    public static final class RestartStarted extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STARTED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .restart(RestartApplicationRequest.builder()
-                    .name("test-app-name")
-                    .build());
-        }
-
-    }
-
-    public static final class RestartStopped extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .restart(RestartApplicationRequest.builder()
-                    .name("test-app-name")
-                    .build());
-        }
-
-    }
-
-    public static final class ScaleDiskAndInstancesNotStarted extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STOPPED");
-            requestUpdateApplicationScale(this.cloudFoundryClient, "test-application-id", 2048, 2, null);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .scale(ScaleApplicationRequest.builder()
-                    .name("test-app-name")
-                    .instances(2)
-                    .diskLimit(2048)
-                    .build());
-        }
-
-    }
-
-    public static final class ScaleDiskAndInstancesStarted extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STARTED");
-            requestUpdateApplicationScale(this.cloudFoundryClient, "test-application-id", 2048, 2, null);
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .scale(ScaleApplicationRequest.builder()
-                    .name("test-app-name")
-                    .instances(2)
-                    .diskLimit(2048)
-                    .build());
-        }
-
-    }
-
-    public static final class ScaleInstances extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
-            requestUpdateApplicationScale(this.cloudFoundryClient, "test-metadata-id", null, 2, null);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .scale(ScaleApplicationRequest.builder()
-                    .name("test-app-name")
-                    .instances(2)
-                    .build());
-        }
-
-    }
-
-    public static final class ScaleInstancesNoApp extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app-name does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .scale(ScaleApplicationRequest.builder()
-                    .name("test-app-name")
-                    .instances(2)
-                    .build());
-        }
-
-    }
-
-    public static final class ScaleNoChange extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .scale(ScaleApplicationRequest.builder()
-                    .name("test-app-name")
-                    .build());
-        }
-
-    }
-
-    public static final class SetEnvironmentVariable extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id",
-                FluentMap.<String, Object>builder()
-                    .entry("test-var", "test-value")
-                    .entry("test-var2", "test-value2")
-                    .build());
-            requestUpdateApplicationEnvironment(this.cloudFoundryClient, "test-metadata-id",
-                FluentMap.<String, Object>builder()
-                    .entry("test-var", "test-value")
-                    .entry("test-var2", "test-value2")
-                    .entry("test-var-name", "test-var-value")
-                    .build()
-            );
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .setEnvironmentVariable(SetEnvironmentVariableApplicationRequest.builder()
-                    .name("test-app")
-                    .variableName("test-var-name")
-                    .variableValue("test-var-value")
-                    .build());
-        }
-
-    }
-
-    public static final class SetEnvironmentVariableNoApp extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .setEnvironmentVariable(SetEnvironmentVariableApplicationRequest.builder()
-                    .name("test-app")
-                    .variableName("test-var-name")
-                    .variableValue("test-var-value")
-                    .build());
-        }
-
-    }
-
-    public static final class SetHealthCheck extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-application-id");
-            requestUpdateApplicationHealthCheck(this.cloudFoundryClient, "test-application-id", ApplicationHealthCheck.PORT);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .setHealthCheck(SetApplicationHealthCheckRequest.builder()
-                    .name("test-application-name")
-                    .type(ApplicationHealthCheck.PORT)
-                    .build());
-        }
-
-    }
-
-    public static final class SshEnabled extends AbstractOperationsApiTest<Boolean> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Boolean> expectations() {
-            return ScriptedSubscriber.<Boolean>create()
-                .expectNext(true)
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Boolean> invoke() {
-            return this.applications
-                .sshEnabled(ApplicationSshEnabledRequest.builder()
-                    .name("test-app-name")
-                    .build());
-        }
-
-    }
-
-    public static final class SshEnabledNoApp extends AbstractOperationsApiTest<Boolean> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Boolean> expectations() {
-            return ScriptedSubscriber.<Boolean>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app-name does not exist"));
-        }
-
-        @Override
-        protected Mono<Boolean> invoke() {
-            return this.applications
-                .sshEnabled(ApplicationSshEnabledRequest.builder()
-                    .name("test-app-name")
-                    .build());
-        }
-
-    }
-
-    public static final class StartApplicationFailurePartial extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsSpecificState(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesFailingPartial(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .start(StartApplicationRequest.builder()
-                    .name("test-application-name")
-                    .build());
-        }
-
-    }
-
-    public static final class StartApplicationFailureTotal extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsSpecificState(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesFailingTotal(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-application-name failed during start"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .start(StartApplicationRequest.builder()
-                    .name("test-application-name")
-                    .build());
-        }
-
-    }
-
-    public static final class StartApplicationTimeout extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsSpecificState(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesTimeout(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-application-name timed out during start"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .start(StartApplicationRequest.builder()
-                    .name("test-application-name")
-                    .startupTimeout(Duration.ofSeconds(1))
-                    .build());
-        }
-
-    }
-
-    public static final class StartInvalidApplication extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-application-name does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .start(StartApplicationRequest.builder()
-                    .name("test-application-name")
-                    .build());
-        }
-
-    }
-
-    public static final class StartStartedApplication extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsSpecificState(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STARTED");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .start(StartApplicationRequest.builder()
-                    .name("test-application-name")
-                    .build());
-        }
-
-    }
-
-    public static final class StartStoppedApplication extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsSpecificState(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id");
-            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .start(StartApplicationRequest.builder()
-                    .name("test-application-name")
-                    .build());
-        }
-
-    }
-
-    public static final class StopInvalidApplication extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-application-name does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .stop(StopApplicationRequest.builder()
-                    .name("test-application-name")
-                    .build());
-        }
-
-    }
-
-    public static final class StopStartedApplication extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsSpecificState(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STARTED");
-            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .stop(StopApplicationRequest.builder()
-                    .name("test-application-name")
-                    .build());
-        }
-
-    }
-
-    public static final class StopStoppedApplication extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsSpecificState(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .stop(StopApplicationRequest.builder()
-                    .name("test-application-name")
-                    .build());
-        }
-
-    }
-
-    public static final class UnsetEnvironmentVariable extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id",
-                FluentMap.<String, Object>builder()
-                    .entry("test-var", "test-value")
-                    .entry("test-var2", "test-value2")
-                    .entry("test-var-name", "test-var-value")
-                    .build());
-            requestUpdateApplicationEnvironment(this.cloudFoundryClient, "test-metadata-id",
-                FluentMap.<String, Object>builder()
-                    .entry("test-var2", "test-value2")
-                    .entry("test-var-name", "test-var-value")
-                    .build());
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest.builder()
-                    .name("test-app")
-                    .variableName("test-var")
-                    .build());
-        }
-
-    }
-
-    public static final class UnsetEnvironmentVariableNoApp extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-app does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest.builder()
-                    .name("test-app")
-                    .variableName("test-var")
-                    .build());
-        }
-
     }
 
 }

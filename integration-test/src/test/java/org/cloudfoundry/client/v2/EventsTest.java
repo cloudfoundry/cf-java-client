@@ -26,8 +26,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
-import reactor.util.function.Tuple2;
+import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
@@ -39,8 +38,6 @@ public final class EventsTest extends AbstractIntegrationTest {
 
     @Test
     public void get() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
-
         getFirstEvent(this.cloudFoundryClient)
             .then(resource -> Mono.when(
                 Mono.just(resource)
@@ -51,15 +48,14 @@ public final class EventsTest extends AbstractIntegrationTest {
                         .build())
                     .map(ResourceUtils::getId)
             ))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void list() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<Tuple2<EventResource, EventResource>> subscriber = tupleEquality();
-
         getFirstEvent(this.cloudFoundryClient)
             .then(resource -> Mono.when(
                 Mono.just(resource),
@@ -69,15 +65,14 @@ public final class EventsTest extends AbstractIntegrationTest {
                     .flatMap(ResourceUtils::getResources)
                     .next()
             ))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listFilterByActee() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<Tuple2<EventResource, EventResource>> subscriber = tupleEquality();
-
         getFirstEvent(this.cloudFoundryClient)
             .then(resource -> Mono.when(
                 Mono.just(resource),
@@ -88,15 +83,14 @@ public final class EventsTest extends AbstractIntegrationTest {
                     .flatMap(ResourceUtils::getResources)
                     .next()
             ))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listFilterByTimestamp() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<Tuple2<EventResource, EventResource>> subscriber = tupleEquality();
-
         getFirstEvent(this.cloudFoundryClient)
             .then(resource -> Mono.when(
                 Mono.just(resource),
@@ -107,15 +101,14 @@ public final class EventsTest extends AbstractIntegrationTest {
                     .flatMap(ResourceUtils::getResources)
                     .next()
             ))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listFilterByType() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<Tuple2<EventResource, EventResource>> subscriber = tupleEquality();
-
         getFirstEvent(this.cloudFoundryClient)
             .then(resource -> Mono.when(
                 Mono.just(resource),
@@ -126,9 +119,10 @@ public final class EventsTest extends AbstractIntegrationTest {
                     .flatMap(ResourceUtils::getResources)
                     .next()
             ))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     private static Mono<EventResource> getFirstEvent(CloudFoundryClient cloudFoundryClient) {

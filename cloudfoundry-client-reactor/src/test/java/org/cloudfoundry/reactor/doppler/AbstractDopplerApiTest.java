@@ -16,8 +16,8 @@
 
 package org.cloudfoundry.reactor.doppler;
 
-import org.cloudfoundry.reactor.AbstractApiTest;
+import org.cloudfoundry.reactor.AbstractRestTest;
 
-abstract class AbstractDopplerApiTest<REQ, RSP> extends AbstractApiTest<REQ, RSP> {
+abstract class AbstractDopplerApiTest extends AbstractRestTest {
 
 }

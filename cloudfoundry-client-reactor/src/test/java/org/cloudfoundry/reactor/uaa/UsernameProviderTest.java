@@ -27,7 +27,7 @@ import org.cloudfoundry.uaa.tokens.KeyType;
 import org.cloudfoundry.uaa.tokens.Tokens;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -69,15 +69,12 @@ public final class UsernameProviderTest {
         requestTokenKey(this.tokens, this.publicKey);
         when(this.tokenProvider.getToken(this.connectionContext)).thenReturn(Mono.just(this.token));
 
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectNext("test-username")
-            .expectComplete();
-
         new UsernameProvider(this.connectionContext, this.tokenProvider, this.tokens)
             .get()
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofSeconds(1));
+            .as(StepVerifier::create)
+            .expectNext("test-username")
+            .expectComplete()
+            .verify(Duration.ofSeconds(1));
     }
 
     private static String getPublicKey(PublicKey publicKey) {

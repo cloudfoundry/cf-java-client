@@ -23,52 +23,33 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import org.junit.Test;
+import reactor.test.StepVerifier;
+
+import java.time.Duration;
 
 import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorResourceMatchTest {
+public final class ReactorResourceMatchTest extends AbstractClientApiTest {
 
-    public static final class List extends AbstractClientApiTest<ListMatchingResourcesRequest, ListMatchingResourcesResponse> {
+    private final ReactorResourceMatch resourceMatch = new ReactorResourceMatch(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
-        private final ReactorResourceMatch resourceMatch = new ReactorResourceMatch(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    @Test
+    public void list() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PUT).path("/v2/resource_match")
+                .payload("fixtures/client/v2/resource_match/PUT_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/resource_match/PUT_response.json")
+                .build())
+            .build());
 
-        @Override
-        protected ScriptedSubscriber<ListMatchingResourcesResponse> expectations() {
-            return ScriptedSubscriber.<ListMatchingResourcesResponse>create()
-                .expectNext(ListMatchingResourcesResponse.builder()
-                    .resource(Resource.builder()
-                        .hash("002d760bea1be268e27077412e11a320d0f164d3")
-                        .size(36)
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(PUT).path("/v2/resource_match")
-                    .payload("fixtures/client/v2/resource_match/PUT_request.json")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/resource_match/PUT_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<ListMatchingResourcesResponse> invoke(ListMatchingResourcesRequest request) {
-            return this.resourceMatch.list(request);
-        }
-
-        @Override
-        protected ListMatchingResourcesRequest validRequest() {
-            return ListMatchingResourcesRequest.builder()
+        this.resourceMatch
+            .list(ListMatchingResourcesRequest.builder()
                 .resource(Resource.builder()
                     .hash("002d760bea1be268e27077412e11a320d0f164d3")
                     .size(36)
@@ -77,8 +58,16 @@ public final class ReactorResourceMatchTest {
                     .hash("a9993e364706816aba3e25717850c26c9cd0d89d")
                     .size(1)
                     .build())
-                .build();
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListMatchingResourcesResponse.builder()
+                .resource(Resource.builder()
+                    .hash("002d760bea1be268e27077412e11a320d0f164d3")
+                    .size(36)
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
 }

@@ -24,6 +24,7 @@ import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
+import org.junit.After;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
@@ -72,7 +73,8 @@ public abstract class AbstractRestTest {
         });
     }
 
-    protected final void verify() {
+    @After
+    public final void verify() {
         if (this.interactionContext != null) {
             assertThat(this.interactionContext.isDone()).as("Expected request not received").isTrue();
         }

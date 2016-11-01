@@ -17,7 +17,6 @@
 package org.cloudfoundry.client;
 
 import reactor.core.Exceptions;
-import reactor.test.subscriber.ScriptedSubscriber;
 import reactor.util.function.Tuple2;
 
 import java.io.ByteArrayInputStream;
@@ -27,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -35,22 +35,20 @@ import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 
 public final class ZipExpectations {
 
-    public static ScriptedSubscriber<Tuple2<byte[], byte[]>> zipEquality() {
-        return ScriptedSubscriber.<Tuple2<byte[], byte[]>>create()
-            .consumeNextWith(consumer((expected, actual) -> {
-                List<Entry> expectedEntries = entries(expected);
-                List<Entry> actualEntries = entries(expected);
+    public static Consumer<Tuple2<byte[], byte[]>> zipEquality() {
+        return consumer((expected, actual) -> {
+            List<Entry> expectedEntries = entries(expected);
+            List<Entry> actualEntries = entries(expected);
 
-                assertThat(expectedEntries).hasSameSizeAs(actualEntries);
+            assertThat(expectedEntries).hasSameSizeAs(actualEntries);
 
-                Iterator<Entry> expectedIterator = expectedEntries.iterator();
-                Iterator<Entry> actualIterator = actualEntries.iterator();
+            Iterator<Entry> expectedIterator = expectedEntries.iterator();
+            Iterator<Entry> actualIterator = actualEntries.iterator();
 
-                while (actualIterator.hasNext()) {
-                    assertThat(actualIterator.next()).isEqualToComparingOnlyGivenFields(expectedIterator.next(), "compressedSize", "contents", "crc", "directory", "name", "size");
-                }
-            }))
-            .expectComplete();
+            while (actualIterator.hasNext()) {
+                assertThat(actualIterator.next()).isEqualToComparingOnlyGivenFields(expectedIterator.next(), "compressedSize", "contents", "crc", "directory", "name", "size");
+            }
+        });
     }
 
     private static byte[] content(InputStream in, int length) throws IOException {

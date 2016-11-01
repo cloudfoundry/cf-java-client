@@ -19,12 +19,11 @@ package org.cloudfoundry.client.v2;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsRequest;
-import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.util.PaginationUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
@@ -57,17 +56,14 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
     @Ignore("TODO: finish story https://www.pivotaltracker.com/story/show/101527366")
     @Test
     public void list() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<SpaceQuotaDefinitionResource> subscriber = ScriptedSubscriber.<SpaceQuotaDefinitionResource>create()
-            .expectComplete();
-
         PaginationUtils
             .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
                 .list(ListSpaceQuotaDefinitionsRequest.builder()
                     .page(page)
                     .build()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Ignore("TODO: finish story https://www.pivotaltracker.com/story/show/101527372")

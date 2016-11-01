@@ -34,7 +34,7 @@ import org.cloudfoundry.uaa.users.User;
 import org.cloudfoundry.uaa.users.Users;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -54,18 +54,15 @@ public final class PaginationUtilsTest {
         requestListSpaces(spaces, 2, 3);
         requestListSpaces(spaces, 3, 3);
 
-        ScriptedSubscriber<SpaceResource> subscriber = ScriptedSubscriber.<SpaceResource>create()
-            .expectNextCount(3)
-            .expectComplete();
-
         PaginationUtils
             .requestClientV2Resources(page -> spaces
                 .list(ListSpacesRequest.builder()
                     .page(page)
                     .build()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofSeconds(1));
+            .as(StepVerifier::create)
+            .expectNextCount(3)
+            .expectComplete()
+            .verify(Duration.ofSeconds(1));
     }
 
     @Test
@@ -74,17 +71,14 @@ public final class PaginationUtilsTest {
 
         requestListSpacesEmpty(spaces);
 
-        ScriptedSubscriber<SpaceResource> subscriber = ScriptedSubscriber.<SpaceResource>create()
-            .expectComplete();
-
         PaginationUtils
             .requestClientV2Resources(page -> spaces
                 .list(ListSpacesRequest.builder()
                     .page(page)
                     .build()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofSeconds(1));
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(1));
     }
 
     @Test
@@ -93,17 +87,14 @@ public final class PaginationUtilsTest {
 
         requestListPackagesEmpty(packages);
 
-        ScriptedSubscriber<PackageResource> subscriber = ScriptedSubscriber.<PackageResource>create()
-            .expectComplete();
-
         PaginationUtils
             .requestClientV3Resources(page -> packages
                 .list(ListPackagesRequest.builder()
                     .page(page)
                     .build()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofSeconds(1));
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(1));
     }
 
     @Test
@@ -114,18 +105,15 @@ public final class PaginationUtilsTest {
         requestListPackages(packages, 2, 3);
         requestListPackages(packages, 3, 3);
 
-        ScriptedSubscriber<PackageResource> subscriber = ScriptedSubscriber.<PackageResource>create()
-            .expectNextCount(3)
-            .expectComplete();
-
         PaginationUtils
             .requestClientV3Resources(page -> packages
                 .list(ListPackagesRequest.builder()
                     .page(page)
                     .build()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofSeconds(1));
+            .as(StepVerifier::create)
+            .expectNextCount(3)
+            .expectComplete()
+            .verify(Duration.ofSeconds(1));
     }
 
     @Test
@@ -136,18 +124,15 @@ public final class PaginationUtilsTest {
         requestListUsers(users, 101, 100, 250);
         requestListUsers(users, 201, 100, 250);
 
-        ScriptedSubscriber<User> subscriber = ScriptedSubscriber.<User>create()
-            .expectNextCount(3)
-            .expectComplete();
-
         PaginationUtils
             .requestUaaResources(startIndex -> users
                 .list(ListUsersRequest.builder()
                     .startIndex(startIndex)
                     .build()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofSeconds(1));
+            .as(StepVerifier::create)
+            .expectNextCount(3)
+            .expectComplete()
+            .verify(Duration.ofSeconds(1));
     }
 
     @Test
@@ -156,17 +141,14 @@ public final class PaginationUtilsTest {
 
         requestListUsersEmpty(users, 1, 100);
 
-        ScriptedSubscriber<User> subscriber = ScriptedSubscriber.<User>create()
-            .expectComplete();
-
         PaginationUtils
             .requestUaaResources(startIndex -> users
                 .list(ListUsersRequest.builder()
                     .startIndex(startIndex)
                     .build()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofSeconds(1));
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(1));
     }
 
     private static void requestListPackages(Packages packages, Integer page, Integer totalPages) {

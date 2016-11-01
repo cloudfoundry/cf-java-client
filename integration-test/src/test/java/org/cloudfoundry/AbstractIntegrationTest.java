@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
 import reactor.util.function.Tuple2;
 
 import java.io.ByteArrayOutputStream;
@@ -35,6 +34,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
@@ -76,10 +76,8 @@ public abstract class AbstractIntegrationTest {
         }
     }
 
-    protected static <T> ScriptedSubscriber<Tuple2<T, T>> tupleEquality() {
-        return ScriptedSubscriber.<Tuple2<T, T>>create()
-            .consumeNextWith(consumer((expected, actual) -> assertThat(actual).isEqualTo(expected)))
-            .expectComplete();
+    protected static <T> Consumer<Tuple2<T, T>> tupleEquality() {
+        return consumer((expected, actual) -> assertThat(actual).isEqualTo(expected));
     }
 
     private String getTestName() {

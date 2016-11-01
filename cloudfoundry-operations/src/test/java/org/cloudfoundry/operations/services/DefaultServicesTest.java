@@ -74,12 +74,12 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvide
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceEntity;
-import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.junit.Before;
-import org.reactivestreams.Publisher;
+import org.cloudfoundry.operations.AbstractOperationsTest;
+import org.junit.Test;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -92,7 +92,746 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
-public final class DefaultServicesTest {
+public final class DefaultServicesTest extends AbstractOperationsTest {
+
+    private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+
+    @Test
+    public void bindServiceInstance() {
+        requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+        requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+        requestCreateServiceBinding(this.cloudFoundryClient, "test-application-id", "test-service-instance-id", Collections.singletonMap("test-parameter-key", "test-parameter-value"));
+
+        this.services
+            .bind(BindServiceInstanceRequest.builder()
+                .applicationName("test-application-name")
+                .serviceInstanceName("test-service-instance-name")
+                .parameter("test-parameter-key", "test-parameter-value")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void bindServiceInstanceAlreadyBound() {
+        requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+        requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+        requestCreateServiceBindingError(this.cloudFoundryClient, "test-application-id", "test-service-instance-id", Collections.singletonMap("test-parameter-key", "test-parameter-value"), 90003);
+
+        this.services
+            .bind(BindServiceInstanceRequest.builder()
+                .applicationName("test-application-name")
+                .serviceInstanceName("test-service-instance-name")
+                .parameter("test-parameter-key", "test-parameter-value")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void bindServiceInstanceNoApplication() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+        requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+
+        this.services
+            .bind(BindServiceInstanceRequest.builder()
+                .applicationName("test-application-name")
+                .serviceInstanceName("test-service-instance-name")
+                .parameter("test-parameter-key", "test-parameter-value")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-application-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void bindServiceInstanceNoServiceInstance() {
+        requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+        requestListServiceInstancesEmpty(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+
+        this.services
+            .bind(BindServiceInstanceRequest.builder()
+                .applicationName("test-application-name")
+                .serviceInstanceName("test-service-instance-name")
+                .parameter("test-parameter-key", "test-parameter-value")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service instance test-service-instance-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void createServiceInstanceDelay() {
+        requestListServices(this.cloudFoundryClient, TEST_SPACE_ID, "test-service");
+        requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
+        requestCreateServiceInstance(this.cloudFoundryClient, TEST_SPACE_ID, "test-plan-id", "test-service-instance", null, null, "test-service-instance-id", "in progress");
+        requestGetServiceInstance(this.cloudFoundryClient, "test-service-instance-id", "successful");
+
+        this.services
+            .createInstance(CreateServiceInstanceRequest.builder()
+                .serviceInstanceName("test-service-instance")
+                .serviceName("test-service")
+                .planName("test-plan")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void createServiceInstanceInstant() {
+        requestListServices(this.cloudFoundryClient, TEST_SPACE_ID, "test-service");
+        requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
+        requestCreateServiceInstance(this.cloudFoundryClient, TEST_SPACE_ID, "test-plan-id", "test-service-instance", Collections.singletonMap("test-parameter-key", "test-parameter-value"),
+            Collections.singletonList("test-tag"), "test-service-instance-id", "successful");
+
+        this.services
+            .createInstance(CreateServiceInstanceRequest.builder()
+                .serviceInstanceName("test-service-instance")
+                .serviceName("test-service")
+                .planName("test-plan")
+                .parameter("test-parameter-key", "test-parameter-value")
+                .tag("test-tag")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void createServiceKey() {
+        requestListServiceInstances(this.cloudFoundryClient, "test-service-instance", TEST_SPACE_ID);
+        requestCreateServiceKey(this.cloudFoundryClient, "test-service-instance-id", "test-service-key",
+            Collections.singletonMap("test-parameter-key", "test-parameter-value"));
+
+        this.services
+            .createServiceKey(CreateServiceKeyRequest.builder()
+                .serviceInstanceName("test-service-instance")
+                .serviceKeyName("test-service-key")
+                .parameter("test-parameter-key", "test-parameter-value")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void createServiceKeyNoServiceInstance() {
+        requestListServiceInstancesEmpty(this.cloudFoundryClient, "test-service-instance-does-not-exist", TEST_SPACE_ID);
+
+        this.services
+            .createServiceKey(CreateServiceKeyRequest.builder()
+                .serviceInstanceName("test-service-instance-does-not-exist")
+                .serviceKeyName("test-service-key")
+                .parameter("test-parameter-key", "test-parameter-value")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service instance test-service-instance-does-not-exist does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void createUserProvidedServiceInstance() {
+        requestCreateUserProvidedServiceInstance(this.cloudFoundryClient, TEST_SPACE_ID, "test-user-provided-service-instance",
+            Collections.singletonMap("test-credential-key", "test-credential-value"), "test-route-url", "test-syslog-url", "test-user-provided-service-instance-id");
+
+        this.services
+            .createUserProvidedInstance(CreateUserProvidedServiceInstanceRequest.builder()
+                .name("test-user-provided-service-instance")
+                .credential("test-credential-key", "test-credential-value")
+                .routeServiceUrl("test-route-url")
+                .syslogDrainUrl("test-syslog-url")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void deleteServiceInstance() {
+        requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+        requestDeleteServiceInstance(this.cloudFoundryClient, "test-service-instance-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-id");
+
+        this.services
+            .deleteInstance(DeleteServiceInstanceRequest.builder()
+                .name("test-service-instance-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void deleteServiceInstanceNotFound() {
+        requestListServiceInstancesEmpty(this.cloudFoundryClient, "test-invalid-name", TEST_SPACE_ID);
+
+        this.services
+            .deleteInstance(DeleteServiceInstanceRequest.builder()
+                .name("test-invalid-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service instance test-invalid-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void deleteServiceKey() {
+        requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+        requestListServiceInstanceServiceKeys(this.cloudFoundryClient, "test-service-instance-id", "test-service-key-name", "key", "val");
+        requestDeleteServiceKey(this.cloudFoundryClient, "test-service-key-id");
+
+        this.services
+            .deleteServiceKey(DeleteServiceKeyRequest.builder()
+                .serviceInstanceName("test-service-instance-name")
+                .serviceKeyName("test-service-key-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void deleteServiceKeyNoServiceInstance() {
+        requestListServiceInstancesEmpty(this.cloudFoundryClient, "test-service-instance", TEST_SPACE_ID);
+
+        this.services
+            .deleteServiceKey(DeleteServiceKeyRequest.builder()
+                .serviceInstanceName("test-service-instance")
+                .serviceKeyName("test-service-key")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service instance test-service-instance does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void deleteServiceKeyNoServiceKey() {
+        requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+        requestListServiceInstanceServiceKeysEmpty(this.cloudFoundryClient, "test-service-instance-id", "test-service-key-not-found");
+
+        this.services
+            .deleteServiceKey(DeleteServiceKeyRequest.builder()
+                .serviceInstanceName("test-service-instance-name")
+                .serviceKeyName("test-service-key-not-found")
+                .build()).as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service key test-service-key-not-found does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void deleteUserProvidedServiceInstance() {
+        requestListServiceInstancesUserProvided(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+        requestDeleteUserProvidedServiceInstance(this.cloudFoundryClient, "test-service-instance-id");
+
+        this.services
+            .deleteInstance(DeleteServiceInstanceRequest.builder()
+                .name("test-service-instance-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getServiceInstanceManaged() {
+        requestListServiceInstancesManaged(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+        requestGetServicePlan(this.cloudFoundryClient, "test-service-plan-id", "test-service-plan", "test-service-id");
+        requestListServiceBindings(this.cloudFoundryClient, "test-service-instance-id", "test-application-id");
+        requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id", "test-application");
+
+        this.services
+            .getInstance(GetServiceInstanceRequest.builder()
+                .name("test-service-instance-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(fill(ServiceInstance.builder())
+                .application("test-application")
+                .documentationUrl("test-documentation-url")
+                .id("test-service-instance-id")
+                .lastOperation("test-type")
+                .plan("test-service-plan")
+                .name("test-service-instance-name")
+                .tag("test-tag")
+                .type(ServiceInstanceType.MANAGED)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getServiceInstanceNoInstances() {
+        requestListServiceInstancesEmpty(this.cloudFoundryClient, "test-invalid-name", TEST_SPACE_ID);
+
+        this.services
+            .getInstance(GetServiceInstanceRequest.builder()
+                .name("test-invalid-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service instance test-invalid-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getServiceInstanceUserProvided() {
+        requestListServiceInstancesUserProvided(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+        requestListServiceBindings(this.cloudFoundryClient, "test-service-instance-id", "test-application-id");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id", "test-application");
+
+        this.services
+            .getInstance(GetServiceInstanceRequest.builder()
+                .name("test-service-instance-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ServiceInstance.builder()
+                .application("test-application")
+                .id("test-service-instance-id")
+                .name("test-service-instance-name")
+                .type(ServiceInstanceType.USER_PROVIDED)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getServiceKey() {
+        requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+        requestListServiceInstanceServiceKeys(this.cloudFoundryClient, "test-service-instance-id", "test-service-key-name", "key", "val");
+
+        this.services
+            .getServiceKey(GetServiceKeyRequest.builder()
+                .serviceInstanceName("test-service-instance-name")
+                .serviceKeyName("test-service-key-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ServiceKey.builder()
+                .credential("key", "val")
+                .id("test-service-key-id")
+                .name("test-service-key-name")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getServiceKeyNoKeys() {
+        requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+        requestListServiceInstanceServiceKeysEmpty(this.cloudFoundryClient, "test-service-instance-id", "test-service-key-not-found");
+
+        this.services
+            .getServiceKey(GetServiceKeyRequest.builder()
+                .serviceInstanceName("test-service-instance-name")
+                .serviceKeyName("test-service-key-not-found")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service key test-service-key-not-found does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listInstances() {
+        requestListServiceInstancesTwo(this.cloudFoundryClient, TEST_SPACE_ID, "test-service-instance1", "test-service-instance2");
+        requestListServiceBindingsEmpty(this.cloudFoundryClient, "test-service-instance1-id");
+        requestListServiceBindings(this.cloudFoundryClient, "test-service-instance2-id", "test-application-id");
+        requestGetServicePlan(this.cloudFoundryClient, "test-service-instance1-plan-id", "test-service-plan", "test-service-id");
+        requestGetServicePlan(this.cloudFoundryClient, "test-service-instance2-plan-id", "test-service-plan", "test-service-id");
+        requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id", "test-application");
+
+        this.services
+            .listInstances()
+            .as(StepVerifier::create)
+            .expectNext(ServiceInstance.builder()
+                    .name("test-service-instance1")
+                    .id("test-service-instance1-id")
+                    .type(ServiceInstanceType.USER_PROVIDED)
+                    .build(),
+                fill(ServiceInstance.builder())
+                    .application("test-application")
+                    .documentationUrl("test-documentation-url")
+                    .id("test-service-instance2-id")
+                    .lastOperation("test-type")
+                    .plan("test-service-plan")
+                    .name("test-service-instance2")
+                    .tag("test-tag")
+                    .type(ServiceInstanceType.MANAGED)
+                    .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listInstancesNoInstances() {
+        requestListServiceInstancesEmpty(this.cloudFoundryClient, TEST_SPACE_ID);
+
+        this.services
+            .listInstances()
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listServiceKeys() {
+        requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+        requestListServiceInstanceServiceKeys(this.cloudFoundryClient, "test-service-instance-id", "key", "val");
+
+        this.services
+            .listServiceKeys(ListServiceKeysRequest.builder()
+                .serviceInstanceName("test-service-instance-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ServiceKey.builder()
+                .credential("key", "val")
+                .id("test-service-key-id")
+                .name("test-service-key-entity-name")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listServiceKeysEmpty() {
+        requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+        requestListServiceInstanceServiceKeysEmpty(this.cloudFoundryClient, "test-service-instance-id");
+
+        this.services
+            .listServiceKeys(ListServiceKeysRequest.builder()
+                .serviceInstanceName("test-service-instance-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listServiceKeysNoServiceInstance() {
+        requestListServiceInstancesEmpty(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+
+        this.services
+            .listServiceKeys(ListServiceKeysRequest.builder()
+                .serviceInstanceName("test-service-instance-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service instance test-service-instance-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listServiceOfferings() {
+        requestListServicesTwo(this.cloudFoundryClient, TEST_SPACE_ID, "test-service1", "test-service2");
+        requestListServicePlans(this.cloudFoundryClient, "test-service1-id", "test-service1-plan", "test-service1-plan-id");
+        requestListServicePlans(this.cloudFoundryClient, "test-service2-id", "test-service2-plan", "test-service2-plan-id");
+
+        this.services
+            .listServiceOfferings(ListServiceOfferingsRequest.builder()
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ServiceOffering.builder()
+                    .description("test-service1-description")
+                    .id("test-service1-id")
+                    .label("test-service1")
+                    .servicePlan(ServicePlan.builder()
+                        .description("test-description")
+                        .free(true)
+                        .id("test-service1-plan-id")
+                        .name("test-service1-plan")
+                        .build())
+                    .build(),
+                ServiceOffering.builder()
+                    .description("test-service2-description")
+                    .id("test-service2-id")
+                    .label("test-service2")
+                    .servicePlan(ServicePlan.builder()
+                        .description("test-description")
+                        .free(true)
+                        .id("test-service2-plan-id")
+                        .name("test-service2-plan")
+                        .build())
+                    .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listServiceOfferingsSingle() {
+        requestListServices(this.cloudFoundryClient, TEST_SPACE_ID, "test-service");
+        requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-service-plan", "test-service-plan-id");
+
+        this.services
+            .listServiceOfferings(ListServiceOfferingsRequest.builder()
+                .serviceName("test-service")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ServiceOffering.builder()
+                .description("test-service-description")
+                .id("test-service-id")
+                .label("test-service")
+                .servicePlan(ServicePlan.builder()
+                    .description("test-description")
+                    .free(true)
+                    .id("test-service-plan-id")
+                    .name("test-service-plan")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void renameServiceInstance() {
+        requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+        requestRenameServiceInstance(this.cloudFoundryClient, "test-service-instance-id", "test-service-instance-new-name");
+
+        this.services
+            .renameInstance(RenameServiceInstanceRequest.builder()
+                .name("test-service-instance-name")
+                .newName("test-service-instance-new-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void unbindServiceInstance() {
+        requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+        requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+        requestApplicationsListServiceBindings(this.cloudFoundryClient, "test-application-id", "test-service-instance-id");
+        requestDeleteServiceBinding(this.cloudFoundryClient, "test-service-binding-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-id");
+
+        this.services
+            .unbind(UnbindServiceInstanceRequest.builder()
+                .applicationName("test-application-name")
+                .serviceInstanceName("test-service-instance-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void unbindServiceInstanceFailure() {
+        requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+        requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+        requestApplicationsListServiceBindings(this.cloudFoundryClient, "test-application-id", "test-service-instance-id");
+        requestDeleteServiceBinding(this.cloudFoundryClient, "test-service-binding-id");
+        requestJobFailure(this.cloudFoundryClient, "test-id");
+
+        this.services
+            .unbind(UnbindServiceInstanceRequest.builder()
+                .applicationName("test-application-name")
+                .serviceInstanceName("test-service-instance-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void updateService() {
+        requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-service-plan-id");
+        requestGetServicePlan(this.cloudFoundryClient, "test-service-plan-id", "test-service-plan", "test-service-id");
+        requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
+        requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
+        requestUpdateServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-parameter-key", "test-parameter-value"), "test-service-instance-id", "test-plan-id",
+            Collections.singletonList("test-tag"));
+
+        this.services
+            .updateInstance(UpdateServiceInstanceRequest.builder()
+                .planName("test-plan")
+                .parameter("test-parameter-key", "test-parameter-value")
+                .serviceInstanceName("test-service")
+                .tag("test-tag")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void updateServiceNewPlanDoesNotExist() {
+        requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-service-plan-id");
+        requestGetServicePlan(this.cloudFoundryClient, "test-service-plan-id", "test-service-plan", "test-service-id");
+        requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
+        requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-other-plan-not-this-one", "test-plan-id");
+
+        this.services
+            .updateInstance(UpdateServiceInstanceRequest.builder()
+                .planName("test-plan")
+                .parameter("test-parameter-key", "test-parameter-value")
+                .serviceInstanceName("test-service")
+                .tag("test-tag")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("New service plan test-plan not found"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void updateServiceNoParameters() {
+        requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-service-plan-id");
+        requestGetServicePlan(this.cloudFoundryClient, "test-service-plan-id", "test-service-plan", "test-service-id");
+        requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
+        requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-service-plan-id");
+        requestUpdateServiceInstance(this.cloudFoundryClient, null, "test-service-instance-id", "test-service-plan-id", Collections.singletonList("test-tag"));
+
+        this.services
+            .updateInstance(UpdateServiceInstanceRequest.builder()
+                .planName("test-plan")
+                .serviceInstanceName("test-service")
+                .tag("test-tag")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void updateServiceNoPlan() {
+        requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID);
+        requestUpdateServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-parameter-key", "test-parameter-value"), "test-service-instance-id", null,
+            Collections.singletonList("test-tag"));
+
+        this.services
+            .updateInstance(UpdateServiceInstanceRequest.builder()
+                .parameter("test-parameter-key", "test-parameter-value")
+                .serviceInstanceName("test-service")
+                .tag("test-tag")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void updateServiceNoPlanExists() {
+        requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, null);
+
+        this.services
+            .updateInstance(UpdateServiceInstanceRequest.builder()
+                .planName("test-plan")
+                .parameter("test-parameter-key", "test-parameter-value")
+                .serviceInstanceName("test-service")
+                .tag("test-tag")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Plan does not exist for the test-name service"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void updateServiceNoTags() {
+        requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-service-plan-id");
+        requestGetServicePlan(this.cloudFoundryClient, "test-service-plan-id", "test-service-plan", "test-service-id");
+        requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
+        requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
+        requestUpdateServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-parameter-key", "test-parameter-value"), "test-service-instance-id", "test-plan-id", null);
+
+        this.services
+            .updateInstance(UpdateServiceInstanceRequest.builder()
+                .planName("test-plan")
+                .parameter("test-parameter-key", "test-parameter-value")
+                .serviceInstanceName("test-service")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void updateServiceNotPublic() {
+        requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-plan-id");
+        requestGetServicePlan(this.cloudFoundryClient, "test-plan-id", "test-service-plan", "test-service-id");
+        requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
+        requestListServicePlansNotPublic(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
+        requestListServicePlanVisibilities(this.cloudFoundryClient, "test-organization-id", "test-plan-id");
+        requestUpdateServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-parameter-key", "test-parameter-value"), "test-service-instance-id", "test-plan-id",
+            Collections.singletonList("test-tag"));
+
+        this.services
+            .updateInstance(UpdateServiceInstanceRequest.builder()
+                .planName("test-plan")
+                .parameter("test-parameter-key", "test-parameter-value")
+                .serviceInstanceName("test-service")
+                .tag("test-tag")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void updateServiceNotVisible() {
+        requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-plan-id");
+        requestGetServicePlan(this.cloudFoundryClient, "test-plan-id", "test-service-plan", "test-service-id");
+        requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
+        requestListServicePlansNotPublic(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
+        requestListServicePlanVisibilitiesEmpty(this.cloudFoundryClient, "test-organization-id", "test-plan-id");
+
+        this.services
+            .updateInstance(UpdateServiceInstanceRequest.builder()
+                .planName("test-plan")
+                .parameter("test-parameter-key", "test-parameter-value")
+                .serviceInstanceName("test-service")
+                .tag("test-tag")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service Plan test-plan is not visible to your organization"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void updateServicePlanNotUpdateable() {
+        requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-service-plan-id");
+        requestGetServicePlan(this.cloudFoundryClient, "test-service-plan-id", "test-service-plan", "test-service-id");
+        requestGetServiceNotPlanUpdateable(this.cloudFoundryClient, "test-service-id", "test-service");
+
+        this.services
+            .updateInstance(UpdateServiceInstanceRequest.builder()
+                .parameter("test-parameter-key", "test-parameter-value")
+                .serviceInstanceName("test-service")
+                .tag("test-tag")
+                .planName("test-plan")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Plan for the test-name service cannot be updated"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void updateUserProvidedService() {
+        requestListServiceInstancesUserProvided(this.cloudFoundryClient, "test-service", TEST_SPACE_ID);
+        requestUpdateUserProvidedServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-credential-key", "test-credential-value"), "syslog-url",
+            "test-service-instance-id");
+
+        this.services
+            .updateUserProvidedInstance(UpdateUserProvidedServiceInstanceRequest.builder()
+                .userProvidedServiceInstanceName("test-service")
+                .credential("test-credential-key", "test-credential-value")
+                .syslogDrainUrl("syslog-url")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void updateUserProvidedServiceNotUserProvided() {
+        requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID);
+
+        this.services
+            .updateUserProvidedInstance(UpdateUserProvidedServiceInstanceRequest.builder()
+                .userProvidedServiceInstanceName("test-service")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("User provided service instance test-service does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
 
     private static void requestApplications(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
         when(cloudFoundryClient.spaces()
@@ -804,1242 +1543,6 @@ public final class DefaultServicesTest {
             .thenReturn(Mono
                 .just(fill(UpdateUserProvidedServiceInstanceResponse.builder())
                     .build()));
-    }
-
-    public static final class BindServiceInstance extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
-            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-            requestCreateServiceBinding(this.cloudFoundryClient, "test-application-id", "test-service-instance-id", Collections.singletonMap("test-parameter-key", "test-parameter-value"));
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .bind(BindServiceInstanceRequest.builder()
-                    .applicationName("test-application-name")
-                    .serviceInstanceName("test-service-instance-name")
-                    .parameter("test-parameter-key", "test-parameter-value")
-                    .build());
-        }
-
-    }
-
-    public static final class BindServiceInstanceAlreadyBound extends AbstractOperationsApiTest<Void> {
-
-        private static final int CF_SERVICE_ALREADY_BOUND = 90003;
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
-            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-            requestCreateServiceBindingError(this.cloudFoundryClient, "test-application-id", "test-service-instance-id", Collections.singletonMap("test-parameter-key", "test-parameter-value"),
-                CF_SERVICE_ALREADY_BOUND);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .bind(BindServiceInstanceRequest.builder()
-                    .applicationName("test-application-name")
-                    .serviceInstanceName("test-service-instance-name")
-                    .parameter("test-parameter-key", "test-parameter-value")
-                    .build());
-        }
-
-    }
-
-    public static final class BindServiceInstanceNoApplication extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
-            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Application test-application-name does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .bind(BindServiceInstanceRequest.builder()
-                    .applicationName("test-application-name")
-                    .serviceInstanceName("test-service-instance-name")
-                    .parameter("test-parameter-key", "test-parameter-value")
-                    .build());
-        }
-
-    }
-
-    public static final class BindServiceInstanceNoServiceInstance extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
-            requestListServiceInstancesEmpty(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service instance test-service-instance-name does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .bind(BindServiceInstanceRequest.builder()
-                    .applicationName("test-application-name")
-                    .serviceInstanceName("test-service-instance-name")
-                    .parameter("test-parameter-key", "test-parameter-value")
-                    .build());
-        }
-
-    }
-
-    public static final class CreateServiceInstanceDelay extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServices(this.cloudFoundryClient, TEST_SPACE_ID, "test-service");
-            requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
-            requestCreateServiceInstance(this.cloudFoundryClient, TEST_SPACE_ID, "test-plan-id", "test-service-instance", null, null, "test-service-instance-id", "in progress");
-            requestGetServiceInstance(this.cloudFoundryClient, "test-service-instance-id", "successful");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .createInstance(CreateServiceInstanceRequest.builder()
-                    .serviceInstanceName("test-service-instance")
-                    .serviceName("test-service")
-                    .planName("test-plan")
-                    .build());
-        }
-
-    }
-
-    public static final class CreateServiceInstanceInstant extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServices(this.cloudFoundryClient, TEST_SPACE_ID, "test-service");
-            requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
-            requestCreateServiceInstance(this.cloudFoundryClient, TEST_SPACE_ID, "test-plan-id", "test-service-instance", Collections.singletonMap("test-parameter-key", "test-parameter-value"),
-                Collections.singletonList("test-tag"), "test-service-instance-id", "successful");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .createInstance(CreateServiceInstanceRequest.builder()
-                    .serviceInstanceName("test-service-instance")
-                    .serviceName("test-service")
-                    .planName("test-plan")
-                    .parameter("test-parameter-key", "test-parameter-value")
-                    .tag("test-tag")
-                    .build());
-        }
-
-    }
-
-    public static final class CreateServiceKey extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance", TEST_SPACE_ID);
-            requestCreateServiceKey(this.cloudFoundryClient, "test-service-instance-id", "test-service-key",
-                Collections.singletonMap("test-parameter-key", "test-parameter-value"));
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .createServiceKey(CreateServiceKeyRequest.builder()
-                    .serviceInstanceName("test-service-instance")
-                    .serviceKeyName("test-service-key")
-                    .parameter("test-parameter-key", "test-parameter-value")
-                    .build());
-        }
-
-    }
-
-    public static final class CreateServiceKeyNoServiceInstance extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstancesEmpty(this.cloudFoundryClient, "test-service-instance-does-not-exist", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service instance test-service-instance-does-not-exist does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .createServiceKey(CreateServiceKeyRequest.builder()
-                    .serviceInstanceName("test-service-instance-does-not-exist")
-                    .serviceKeyName("test-service-key")
-                    .parameter("test-parameter-key", "test-parameter-value")
-                    .build());
-        }
-
-    }
-
-    public static final class CreateUserProvidedServiceInstance extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestCreateUserProvidedServiceInstance(this.cloudFoundryClient,
-                TEST_SPACE_ID,
-                "test-user-provided-service-instance",
-                Collections.singletonMap("test-credential-key", "test-credential-value"),
-                "test-route-url",
-                "test-syslog-url",
-                "test-user-provided-service-instance-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .createUserProvidedInstance(CreateUserProvidedServiceInstanceRequest.builder()
-                    .name("test-user-provided-service-instance")
-                    .credential("test-credential-key", "test-credential-value")
-                    .routeServiceUrl("test-route-url")
-                    .syslogDrainUrl("test-syslog-url")
-                    .build());
-        }
-
-    }
-
-    public static final class DeleteServiceInstance extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-            requestDeleteServiceInstance(this.cloudFoundryClient, "test-service-instance-id");
-            requestJobSuccess(this.cloudFoundryClient, "test-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .deleteInstance(DeleteServiceInstanceRequest.builder()
-                    .name("test-service-instance-name")
-                    .build());
-        }
-
-    }
-
-    public static final class DeleteServiceInstanceNotFound extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstancesEmpty(this.cloudFoundryClient, "test-invalid-name", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service instance test-invalid-name does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .deleteInstance(DeleteServiceInstanceRequest.builder()
-                    .name("test-invalid-name")
-                    .build());
-        }
-    }
-
-    public static final class DeleteServiceKey extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-            requestListServiceInstanceServiceKeys(this.cloudFoundryClient, "test-service-instance-id", "test-service-key-name", "key", "val");
-            requestDeleteServiceKey(this.cloudFoundryClient, "test-service-key-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .deleteServiceKey(DeleteServiceKeyRequest.builder()
-                    .serviceInstanceName("test-service-instance-name")
-                    .serviceKeyName("test-service-key-name")
-                    .build());
-        }
-
-    }
-
-    public static final class DeleteServiceKeyNoServiceInstance extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstancesEmpty(this.cloudFoundryClient, "test-service-instance", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service instance test-service-instance does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .deleteServiceKey(DeleteServiceKeyRequest.builder()
-                    .serviceInstanceName("test-service-instance")
-                    .serviceKeyName("test-service-key")
-                    .build());
-        }
-
-    }
-
-    public static final class DeleteServiceKeyNoServiceKey extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-            requestListServiceInstanceServiceKeysEmpty(this.cloudFoundryClient, "test-service-instance-id", "test-service-key-not-found");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service key test-service-key-not-found does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .deleteServiceKey(DeleteServiceKeyRequest.builder()
-                    .serviceInstanceName("test-service-instance-name")
-                    .serviceKeyName("test-service-key-not-found")
-                    .build());
-        }
-
-    }
-
-    public static final class DeleteUserProvidedServiceInstance extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstancesUserProvided(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-            requestDeleteUserProvidedServiceInstance(this.cloudFoundryClient, "test-service-instance-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .deleteInstance(DeleteServiceInstanceRequest.builder()
-                    .name("test-service-instance-name")
-                    .build());
-        }
-
-    }
-
-    public static final class GetServiceInstanceManaged extends AbstractOperationsApiTest<ServiceInstance> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstancesManaged(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-            requestGetServicePlan(this.cloudFoundryClient, "test-service-plan-id", "test-service-plan", "test-service-id");
-            requestListServiceBindings(this.cloudFoundryClient, "test-service-instance-id", "test-application-id");
-            requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id", "test-application");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ServiceInstance> expectations() {
-            return ScriptedSubscriber.<ServiceInstance>create()
-                .expectNext(fill(ServiceInstance.builder())
-                    .application("test-application")
-                    .documentationUrl("test-documentation-url")
-                    .id("test-service-instance-id")
-                    .lastOperation("test-type")
-                    .plan("test-service-plan")
-                    .name("test-service-instance-name")
-                    .tag("test-tag")
-                    .type(ServiceInstanceType.MANAGED)
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<ServiceInstance> invoke() {
-            return this.services
-                .getInstance(GetServiceInstanceRequest.builder()
-                    .name("test-service-instance-name")
-                    .build());
-        }
-
-    }
-
-    public static final class GetServiceInstanceNoInstances extends AbstractOperationsApiTest<ServiceInstance> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstancesEmpty(this.cloudFoundryClient, "test-invalid-name", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<ServiceInstance> expectations() {
-            return ScriptedSubscriber.<ServiceInstance>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service instance test-invalid-name does not exist"));
-        }
-
-        @Override
-        protected Publisher<ServiceInstance> invoke() {
-            return this.services
-                .getInstance(GetServiceInstanceRequest.builder()
-                    .name("test-invalid-name")
-                    .build());
-        }
-
-    }
-
-    public static final class GetServiceInstanceUserProvided extends AbstractOperationsApiTest<ServiceInstance> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstancesUserProvided(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-            requestListServiceBindings(this.cloudFoundryClient, "test-service-instance-id", "test-application-id");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id", "test-application");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ServiceInstance> expectations() {
-            return ScriptedSubscriber.<ServiceInstance>create()
-                .expectNext(ServiceInstance.builder()
-                    .application("test-application")
-                    .id("test-service-instance-id")
-                    .name("test-service-instance-name")
-                    .type(ServiceInstanceType.USER_PROVIDED)
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<ServiceInstance> invoke() {
-            return this.services
-                .getInstance(GetServiceInstanceRequest.builder()
-                    .name("test-service-instance-name")
-                    .build());
-        }
-
-    }
-
-    public static final class GetServiceKey extends AbstractOperationsApiTest<ServiceKey> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-            requestListServiceInstanceServiceKeys(this.cloudFoundryClient, "test-service-instance-id", "test-service-key-name", "key", "val");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ServiceKey> expectations() {
-            return ScriptedSubscriber.<ServiceKey>create()
-                .expectNext(ServiceKey.builder()
-                    .credential("key", "val")
-                    .id("test-service-key-id")
-                    .name("test-service-key-name")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<ServiceKey> invoke() {
-            return this.services
-                .getServiceKey(GetServiceKeyRequest.builder()
-                    .serviceInstanceName("test-service-instance-name")
-                    .serviceKeyName("test-service-key-name")
-                    .build());
-        }
-
-    }
-
-    public static final class GetServiceKeyNoKeys extends AbstractOperationsApiTest<ServiceKey> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-            requestListServiceInstanceServiceKeysEmpty(this.cloudFoundryClient, "test-service-instance-id", "test-service-key-not-found");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ServiceKey> expectations() {
-            return ScriptedSubscriber.<ServiceKey>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service key test-service-key-not-found does not exist"));
-        }
-
-        @Override
-        protected Publisher<ServiceKey> invoke() {
-            return this.services
-                .getServiceKey(GetServiceKeyRequest.builder()
-                    .serviceInstanceName("test-service-instance-name")
-                    .serviceKeyName("test-service-key-not-found")
-                    .build());
-        }
-
-    }
-
-    public static final class ListInstances extends AbstractOperationsApiTest<ServiceInstance> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstancesTwo(this.cloudFoundryClient, TEST_SPACE_ID, "test-service-instance1", "test-service-instance2");
-            requestListServiceBindingsEmpty(this.cloudFoundryClient, "test-service-instance1-id");
-            requestListServiceBindings(this.cloudFoundryClient, "test-service-instance2-id", "test-application-id");
-            requestGetServicePlan(this.cloudFoundryClient, "test-service-instance1-plan-id", "test-service-plan", "test-service-id");
-            requestGetServicePlan(this.cloudFoundryClient, "test-service-instance2-plan-id", "test-service-plan", "test-service-id");
-            requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
-            requestGetApplication(this.cloudFoundryClient, "test-application-id", "test-application");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ServiceInstance> expectations() {
-            return ScriptedSubscriber.<ServiceInstance>create()
-                .expectNext(ServiceInstance.builder()
-                        .name("test-service-instance1")
-                        .id("test-service-instance1-id")
-                        .type(ServiceInstanceType.USER_PROVIDED)
-                        .build(),
-                    fill(ServiceInstance.builder())
-                        .application("test-application")
-                        .documentationUrl("test-documentation-url")
-                        .id("test-service-instance2-id")
-                        .lastOperation("test-type")
-                        .plan("test-service-plan")
-                        .name("test-service-instance2")
-                        .tag("test-tag")
-                        .type(ServiceInstanceType.MANAGED)
-                        .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<ServiceInstance> invoke() {
-            return this.services
-                .listInstances();
-        }
-
-    }
-
-    public static final class ListInstancesNoInstances extends AbstractOperationsApiTest<ServiceInstance> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstancesEmpty(this.cloudFoundryClient, TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<ServiceInstance> expectations() {
-            return ScriptedSubscriber.<ServiceInstance>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<ServiceInstance> invoke() {
-            return this.services
-                .listInstances();
-        }
-
-    }
-
-    public static final class ListServiceKeys extends AbstractOperationsApiTest<ServiceKey> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-            requestListServiceInstanceServiceKeys(this.cloudFoundryClient, "test-service-instance-id", "key", "val");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ServiceKey> expectations() {
-            return ScriptedSubscriber.<ServiceKey>create()
-                .expectNext(ServiceKey.builder()
-                    .credential("key", "val")
-                    .id("test-service-key-id")
-                    .name("test-service-key-entity-name")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<ServiceKey> invoke() {
-            return this.services
-                .listServiceKeys(ListServiceKeysRequest.builder()
-                    .serviceInstanceName("test-service-instance-name")
-                    .build());
-        }
-
-    }
-
-    public static final class ListServiceKeysEmpty extends AbstractOperationsApiTest<ServiceKey> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-            requestListServiceInstanceServiceKeysEmpty(this.cloudFoundryClient, "test-service-instance-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ServiceKey> expectations() {
-            return ScriptedSubscriber.<ServiceKey>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<ServiceKey> invoke() {
-            return this.services
-                .listServiceKeys(ListServiceKeysRequest.builder()
-                    .serviceInstanceName("test-service-instance-name")
-                    .build());
-        }
-
-    }
-
-    public static final class ListServiceKeysNoServiceInstance extends AbstractOperationsApiTest<ServiceKey> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstancesEmpty(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<ServiceKey> expectations() {
-            return ScriptedSubscriber.<ServiceKey>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service instance test-service-instance-name does not exist"));
-        }
-
-        @Override
-        protected Publisher<ServiceKey> invoke() {
-            return this.services
-                .listServiceKeys(ListServiceKeysRequest.builder()
-                    .serviceInstanceName("test-service-instance-name")
-                    .build());
-        }
-
-    }
-
-    public static final class ListServiceOfferings extends AbstractOperationsApiTest<ServiceOffering> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServicesTwo(this.cloudFoundryClient, TEST_SPACE_ID, "test-service1", "test-service2");
-            requestListServicePlans(this.cloudFoundryClient, "test-service1-id", "test-service1-plan", "test-service1-plan-id");
-            requestListServicePlans(this.cloudFoundryClient, "test-service2-id", "test-service2-plan", "test-service2-plan-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ServiceOffering> expectations() {
-            return ScriptedSubscriber.<ServiceOffering>create()
-                .expectNext(ServiceOffering.builder()
-                        .description("test-service1-description")
-                        .id("test-service1-id")
-                        .label("test-service1")
-                        .servicePlan(ServicePlan.builder()
-                            .description("test-description")
-                            .free(true)
-                            .id("test-service1-plan-id")
-                            .name("test-service1-plan")
-                            .build())
-                        .build(),
-                    ServiceOffering.builder()
-                        .description("test-service2-description")
-                        .id("test-service2-id")
-                        .label("test-service2")
-                        .servicePlan(ServicePlan.builder()
-                            .description("test-description")
-                            .free(true)
-                            .id("test-service2-plan-id")
-                            .name("test-service2-plan")
-                            .build())
-                        .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<ServiceOffering> invoke() {
-            return this.services
-                .listServiceOfferings(ListServiceOfferingsRequest.builder().build());
-        }
-
-    }
-
-    public static final class ListServiceOfferingsSingle extends AbstractOperationsApiTest<ServiceOffering> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServices(this.cloudFoundryClient, TEST_SPACE_ID, "test-service");
-            requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-service-plan", "test-service-plan-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<ServiceOffering> expectations() {
-            return ScriptedSubscriber.<ServiceOffering>create()
-                .expectNext(ServiceOffering.builder()
-                    .description("test-service-description")
-                    .id("test-service-id")
-                    .label("test-service")
-                    .servicePlan(ServicePlan.builder()
-                        .description("test-description")
-                        .free(true)
-                        .id("test-service-plan-id")
-                        .name("test-service-plan")
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<ServiceOffering> invoke() {
-            return this.services
-                .listServiceOfferings(ListServiceOfferingsRequest.builder()
-                    .serviceName("test-service")
-                    .build());
-        }
-
-    }
-
-    public static final class RenameServiceInstance extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-            requestRenameServiceInstance(this.cloudFoundryClient, "test-service-instance-id", "test-service-instance-new-name");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .renameInstance(RenameServiceInstanceRequest.builder()
-                    .name("test-service-instance-name")
-                    .newName("test-service-instance-new-name")
-                    .build());
-        }
-
-    }
-
-    public static final class UnbindServiceInstance extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
-            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-            requestApplicationsListServiceBindings(this.cloudFoundryClient, "test-application-id", "test-service-instance-id");
-            requestDeleteServiceBinding(this.cloudFoundryClient, "test-service-binding-id");
-            requestJobSuccess(this.cloudFoundryClient, "test-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .unbind(UnbindServiceInstanceRequest.builder()
-                    .applicationName("test-application-name")
-                    .serviceInstanceName("test-service-instance-name")
-                    .build());
-        }
-
-    }
-
-    public static final class UnbindServiceInstanceFailure extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
-            requestListServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-            requestApplicationsListServiceBindings(this.cloudFoundryClient, "test-application-id", "test-service-instance-id");
-            requestDeleteServiceBinding(this.cloudFoundryClient, "test-service-binding-id");
-            requestJobFailure(this.cloudFoundryClient, "test-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .unbind(UnbindServiceInstanceRequest.builder()
-                    .applicationName("test-application-name")
-                    .serviceInstanceName("test-service-instance-name")
-                    .build());
-        }
-
-    }
-
-    public static final class UpdateService extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-service-plan-id");
-            requestGetServicePlan(this.cloudFoundryClient, "test-service-plan-id", "test-service-plan", "test-service-id");
-            requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
-            requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
-            requestUpdateServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-parameter-key", "test-parameter-value"), "test-service-instance-id", "test-plan-id",
-                Collections.singletonList("test-tag"));
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .updateInstance(UpdateServiceInstanceRequest.builder()
-                    .planName("test-plan")
-                    .parameter("test-parameter-key", "test-parameter-value")
-                    .serviceInstanceName("test-service")
-                    .tag("test-tag")
-                    .build());
-        }
-
-    }
-
-    public static final class UpdateServiceNewPlanDoesNotExist extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-service-plan-id");
-            requestGetServicePlan(this.cloudFoundryClient, "test-service-plan-id", "test-service-plan", "test-service-id");
-            requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
-            requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-other-plan-not-this-one", "test-plan-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("New service plan test-plan not found"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .updateInstance(UpdateServiceInstanceRequest.builder()
-                    .planName("test-plan")
-                    .parameter("test-parameter-key", "test-parameter-value")
-                    .serviceInstanceName("test-service")
-                    .tag("test-tag")
-                    .build());
-        }
-
-    }
-
-    public static final class UpdateServiceNoParameters extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-service-plan-id");
-            requestGetServicePlan(this.cloudFoundryClient, "test-service-plan-id", "test-service-plan", "test-service-id");
-            requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
-            requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-service-plan-id");
-            requestUpdateServiceInstance(this.cloudFoundryClient, null, "test-service-instance-id", "test-service-plan-id", Collections.singletonList("test-tag"));
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .updateInstance(UpdateServiceInstanceRequest.builder()
-                    .planName("test-plan")
-                    .serviceInstanceName("test-service")
-                    .tag("test-tag")
-                    .build());
-        }
-
-    }
-
-    public static final class UpdateServiceNoPlan extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID);
-            requestUpdateServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-parameter-key", "test-parameter-value"), "test-service-instance-id", null,
-                Collections.singletonList("test-tag"));
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .updateInstance(UpdateServiceInstanceRequest.builder()
-                    .parameter("test-parameter-key", "test-parameter-value")
-                    .serviceInstanceName("test-service")
-                    .tag("test-tag")
-                    .build());
-        }
-
-    }
-
-    public static final class UpdateServiceNoPlanExists extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, null);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Plan does not exist for the test-name service"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .updateInstance(UpdateServiceInstanceRequest.builder()
-                    .planName("test-plan")
-                    .parameter("test-parameter-key", "test-parameter-value")
-                    .serviceInstanceName("test-service")
-                    .tag("test-tag")
-                    .build());
-        }
-
-    }
-
-    public static final class UpdateServiceNoTags extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-service-plan-id");
-            requestGetServicePlan(this.cloudFoundryClient, "test-service-plan-id", "test-service-plan", "test-service-id");
-            requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
-            requestListServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
-            requestUpdateServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-parameter-key", "test-parameter-value"), "test-service-instance-id", "test-plan-id", null);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .updateInstance(UpdateServiceInstanceRequest.builder()
-                    .planName("test-plan")
-                    .parameter("test-parameter-key", "test-parameter-value")
-                    .serviceInstanceName("test-service")
-                    .build());
-        }
-
-    }
-
-    public static final class UpdateServiceNotPublic extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-plan-id");
-            requestGetServicePlan(this.cloudFoundryClient, "test-plan-id", "test-service-plan", "test-service-id");
-            requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
-            requestListServicePlansNotPublic(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
-            requestListServicePlanVisibilities(this.cloudFoundryClient, "test-organization-id", "test-plan-id");
-            requestUpdateServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-parameter-key", "test-parameter-value"), "test-service-instance-id", "test-plan-id",
-                Collections.singletonList("test-tag"));
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .updateInstance(UpdateServiceInstanceRequest.builder()
-                    .planName("test-plan")
-                    .parameter("test-parameter-key", "test-parameter-value")
-                    .serviceInstanceName("test-service")
-                    .tag("test-tag")
-                    .build());
-        }
-
-    }
-
-    public static final class UpdateServiceNotVisible extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-plan-id");
-            requestGetServicePlan(this.cloudFoundryClient, "test-plan-id", "test-service-plan", "test-service-id");
-            requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
-            requestListServicePlansNotPublic(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
-            requestListServicePlanVisibilitiesEmpty(this.cloudFoundryClient, "test-organization-id", "test-plan-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service Plan test-plan is not visible to your organization"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .updateInstance(UpdateServiceInstanceRequest.builder()
-                    .planName("test-plan")
-                    .parameter("test-parameter-key", "test-parameter-value")
-                    .serviceInstanceName("test-service")
-                    .tag("test-tag")
-                    .build());
-        }
-
-    }
-
-    public static final class UpdateServicePlanNotUpdateable extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-service-plan-id");
-            requestGetServicePlan(this.cloudFoundryClient, "test-service-plan-id", "test-service-plan", "test-service-id");
-            requestGetServiceNotPlanUpdateable(this.cloudFoundryClient, "test-service-id", "test-service");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Plan for the test-name service cannot be updated"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .updateInstance(UpdateServiceInstanceRequest.builder()
-                    .parameter("test-parameter-key", "test-parameter-value")
-                    .serviceInstanceName("test-service")
-                    .tag("test-tag")
-                    .planName("test-plan")
-                    .build());
-        }
-
-    }
-
-    public static final class UpdateUserProvidedService extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstancesUserProvided(this.cloudFoundryClient, "test-service", TEST_SPACE_ID);
-            requestUpdateUserProvidedServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-credential-key", "test-credential-value"), "syslog-url",
-                "test-service-instance-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .updateUserProvidedInstance(UpdateUserProvidedServiceInstanceRequest.builder()
-                    .userProvidedServiceInstanceName("test-service")
-                    .credential("test-credential-key", "test-credential-value")
-                    .syslogDrainUrl("syslog-url")
-                    .build());
-        }
-
-    }
-
-    public static final class UpdateUserProvidedServiceNotUserProvided extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("User provided service instance test-service does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.services
-                .updateUserProvidedInstance(UpdateUserProvidedServiceInstanceRequest.builder()
-                    .userProvidedServiceInstanceName("test-service")
-                    .build());
-        }
-
     }
 
 }

@@ -35,9 +35,10 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import org.junit.Test;
+import reactor.test.StepVerifier;
+
+import java.time.Duration;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -48,118 +49,66 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorSpaceQuotaDefinitionsTest {
+public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTest {
 
-    public static final class AssociateSpace extends AbstractClientApiTest<AssociateSpaceQuotaDefinitionRequest, AssociateSpaceQuotaDefinitionResponse> {
+    private final ReactorSpaceQuotaDefinitions spaceQuotaDefinitions = new ReactorSpaceQuotaDefinitions(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
-        private final ReactorSpaceQuotaDefinitions spaceQuotaDefinitions = new ReactorSpaceQuotaDefinitions(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    @Test
+    public void associateSpace() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PUT).path("/v2/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/space_quota_definitions/PUT_{id}_spaces_{id}_response.json")
+                .build())
+            .build());
 
-        @Override
-        protected ScriptedSubscriber<AssociateSpaceQuotaDefinitionResponse> expectations() {
-            return ScriptedSubscriber.<AssociateSpaceQuotaDefinitionResponse>create()
-                .expectNext(AssociateSpaceQuotaDefinitionResponse.builder()
-                    .metadata(Metadata.builder()
-                        .id("ea82f16c-c21a-4a8a-947a-f7606e7f63fa")
-                        .url("/v2/space_quota_definitions/ea82f16c-c21a-4a8a-947a-f7606e7f63fa")
-                        .createdAt("2015-11-30T23:38:46Z")
-                        .build())
-                    .entity(SpaceQuotaDefinitionEntity.builder()
-                        .name("name-1887")
-                        .organizationId("e188543a-cb71-4786-8703-9addbebc5bbf")
-                        .nonBasicServicesAllowed(true)
-                        .totalServices(60)
-                        .totalRoutes(1000)
-                        .memoryLimit(20480)
-                        .instanceMemoryLimit(-1)
-                        .applicationInstanceLimit(-1)
-                        .organizationUrl("/v2/organizations/e188543a-cb71-4786-8703-9addbebc5bbf")
-                        .spacesUrl("/v2/space_quota_definitions/ea82f16c-c21a-4a8a-947a-f7606e7f63fa/spaces")
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(PUT).path("/v2/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/space_quota_definitions/PUT_{id}_spaces_{id}_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Publisher<AssociateSpaceQuotaDefinitionResponse> invoke(AssociateSpaceQuotaDefinitionRequest request) {
-            return this.spaceQuotaDefinitions.associateSpace(request);
-        }
-
-        @Override
-        protected AssociateSpaceQuotaDefinitionRequest validRequest() {
-            return AssociateSpaceQuotaDefinitionRequest.builder()
+        this.spaceQuotaDefinitions
+            .associateSpace(AssociateSpaceQuotaDefinitionRequest.builder()
                 .spaceId("test-space-id")
                 .spaceQuotaDefinitionId("test-space-quota-definition-id")
-                .build();
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(AssociateSpaceQuotaDefinitionResponse.builder()
+                .metadata(Metadata.builder()
+                    .id("ea82f16c-c21a-4a8a-947a-f7606e7f63fa")
+                    .url("/v2/space_quota_definitions/ea82f16c-c21a-4a8a-947a-f7606e7f63fa")
+                    .createdAt("2015-11-30T23:38:46Z")
+                    .build())
+                .entity(SpaceQuotaDefinitionEntity.builder()
+                    .name("name-1887")
+                    .organizationId("e188543a-cb71-4786-8703-9addbebc5bbf")
+                    .nonBasicServicesAllowed(true)
+                    .totalServices(60)
+                    .totalRoutes(1000)
+                    .memoryLimit(20480)
+                    .instanceMemoryLimit(-1)
+                    .applicationInstanceLimit(-1)
+                    .organizationUrl("/v2/organizations/e188543a-cb71-4786-8703-9addbebc5bbf")
+                    .spacesUrl("/v2/space_quota_definitions/ea82f16c-c21a-4a8a-947a-f7606e7f63fa/spaces")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class Create extends AbstractClientApiTest<CreateSpaceQuotaDefinitionRequest, CreateSpaceQuotaDefinitionResponse> {
+    @Test
+    public void create() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(POST).path("/v2/space_quota_definitions")
+                .payload("fixtures/client/v2/space_quota_definitions/POST_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(CREATED)
+                .payload("fixtures/client/v2/space_quota_definitions/POST_response.json")
+                .build())
+            .build());
 
-        private final ReactorSpaceQuotaDefinitions spaceQuotaDefinitions = new ReactorSpaceQuotaDefinitions(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<CreateSpaceQuotaDefinitionResponse> expectations() {
-            return ScriptedSubscriber.<CreateSpaceQuotaDefinitionResponse>create()
-                .expectNext(CreateSpaceQuotaDefinitionResponse.builder()
-                    .metadata(Metadata.builder()
-                        .id("17f055b8-b4c8-47cf-8737-0220d5706b4a")
-                        .url("/v2/space_quota_definitions/17f055b8-b4c8-47cf-8737-0220d5706b4a")
-                        .createdAt("2016-06-08T16:41:29Z")
-                        .build())
-                    .entity(SpaceQuotaDefinitionEntity.builder()
-                        .name("gold_quota")
-                        .organizationId("c9b4ac17-ab4b-4368-b3e2-5cbf09b17a24")
-                        .nonBasicServicesAllowed(true)
-                        .totalServices(-1)
-                        .totalRoutes(10)
-                        .memoryLimit(5120)
-                        .instanceMemoryLimit(-1)
-                        .applicationInstanceLimit(-1)
-                        .applicationTaskLimit(5)
-                        .totalServiceKeys(-1)
-                        .totalReservedRoutePorts(5)
-                        .organizationUrl("/v2/organizations/c9b4ac17-ab4b-4368-b3e2-5cbf09b17a24")
-                        .spacesUrl("/v2/space_quota_definitions/17f055b8-b4c8-47cf-8737-0220d5706b4a/spaces")
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(POST).path("/v2/space_quota_definitions")
-                    .payload("fixtures/client/v2/space_quota_definitions/POST_request.json")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(CREATED)
-                    .payload("fixtures/client/v2/space_quota_definitions/POST_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Publisher<CreateSpaceQuotaDefinitionResponse> invoke(CreateSpaceQuotaDefinitionRequest request) {
-            return this.spaceQuotaDefinitions.create(request);
-        }
-
-        @Override
-        protected CreateSpaceQuotaDefinitionRequest validRequest() {
-            return CreateSpaceQuotaDefinitionRequest.builder()
+        this.spaceQuotaDefinitions
+            .create(CreateSpaceQuotaDefinitionRequest.builder()
                 .name("gold_quota")
                 .nonBasicServicesAllowed(true)
                 .totalServices(-1)
@@ -167,244 +116,190 @@ public final class ReactorSpaceQuotaDefinitionsTest {
                 .memoryLimit(5120)
                 .organizationId("c9b4ac17-ab4b-4368-b3e2-5cbf09b17a24")
                 .totalReservedRoutePorts(5)
-                .build();
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(CreateSpaceQuotaDefinitionResponse.builder()
+                .metadata(Metadata.builder()
+                    .id("17f055b8-b4c8-47cf-8737-0220d5706b4a")
+                    .url("/v2/space_quota_definitions/17f055b8-b4c8-47cf-8737-0220d5706b4a")
+                    .createdAt("2016-06-08T16:41:29Z")
+                    .build())
+                .entity(SpaceQuotaDefinitionEntity.builder()
+                    .name("gold_quota")
+                    .organizationId("c9b4ac17-ab4b-4368-b3e2-5cbf09b17a24")
+                    .nonBasicServicesAllowed(true)
+                    .totalServices(-1)
+                    .totalRoutes(10)
+                    .memoryLimit(5120)
+                    .instanceMemoryLimit(-1)
+                    .applicationInstanceLimit(-1)
+                    .applicationTaskLimit(5)
+                    .totalServiceKeys(-1)
+                    .totalReservedRoutePorts(5)
+                    .organizationUrl("/v2/organizations/c9b4ac17-ab4b-4368-b3e2-5cbf09b17a24")
+                    .spacesUrl("/v2/space_quota_definitions/17f055b8-b4c8-47cf-8737-0220d5706b4a/spaces")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class Delete extends AbstractClientApiTest<DeleteSpaceQuotaDefinitionRequest, DeleteSpaceQuotaDefinitionResponse> {
+    @Test
+    public void delete() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/v2/space_quota_definitions/test-space-quota-definition-id")
+                .build())
+            .response(TestResponse.builder()
+                .status(NO_CONTENT)
+                .build())
+            .build());
 
-        private final ReactorSpaceQuotaDefinitions spaceQuotaDefinitions = new ReactorSpaceQuotaDefinitions(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<DeleteSpaceQuotaDefinitionResponse> expectations() {
-            return ScriptedSubscriber.<DeleteSpaceQuotaDefinitionResponse>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(DELETE).path("/v2/space_quota_definitions/test-space-quota-definition-id")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(NO_CONTENT)
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Publisher<DeleteSpaceQuotaDefinitionResponse> invoke(DeleteSpaceQuotaDefinitionRequest request) {
-            return this.spaceQuotaDefinitions.delete(request);
-        }
-
-        @Override
-        protected DeleteSpaceQuotaDefinitionRequest validRequest() {
-            return DeleteSpaceQuotaDefinitionRequest.builder()
+        this.spaceQuotaDefinitions
+            .delete(DeleteSpaceQuotaDefinitionRequest.builder()
                 .spaceQuotaDefinitionId("test-space-quota-definition-id")
-                .build();
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class DeleteAsync extends AbstractClientApiTest<DeleteSpaceQuotaDefinitionRequest, DeleteSpaceQuotaDefinitionResponse> {
+    @Test
+    public void deleteAsync() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/v2/space_quota_definitions/test-space-quota-definition-id?async=true")
+                .build())
+            .response(TestResponse.builder()
+                .status(ACCEPTED)
+                .payload("fixtures/client/v2/space_quota_definitions/DELETE_{id}_async_response.json")
+                .build())
+            .build());
 
-        private final ReactorSpaceQuotaDefinitions spaceQuotaDefinitions = new ReactorSpaceQuotaDefinitions(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<DeleteSpaceQuotaDefinitionResponse> expectations() {
-            return ScriptedSubscriber.<DeleteSpaceQuotaDefinitionResponse>create()
-                .expectNext(DeleteSpaceQuotaDefinitionResponse.builder()
-                    .metadata(Metadata.builder()
-                        .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
-                        .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
-                        .createdAt("2016-02-02T17:16:31Z")
-                        .build())
-                    .entity(JobEntity.builder()
-                        .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
-                        .status("queued")
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(DELETE).path("/v2/space_quota_definitions/test-space-quota-definition-id?async=true")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(ACCEPTED)
-                    .payload("fixtures/client/v2/space_quota_definitions/DELETE_{id}_async_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Publisher<DeleteSpaceQuotaDefinitionResponse> invoke(DeleteSpaceQuotaDefinitionRequest request) {
-            return this.spaceQuotaDefinitions.delete(request);
-        }
-
-        @Override
-        protected DeleteSpaceQuotaDefinitionRequest validRequest() {
-            return DeleteSpaceQuotaDefinitionRequest.builder()
+        this.spaceQuotaDefinitions
+            .delete(DeleteSpaceQuotaDefinitionRequest.builder()
                 .spaceQuotaDefinitionId("test-space-quota-definition-id")
                 .async(true)
-                .build();
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(DeleteSpaceQuotaDefinitionResponse.builder()
+                .metadata(Metadata.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .createdAt("2016-02-02T17:16:31Z")
+                    .build())
+                .entity(JobEntity.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .status("queued")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class GetSpaceQuotaDefinition extends AbstractClientApiTest<GetSpaceQuotaDefinitionRequest, GetSpaceQuotaDefinitionResponse> {
+    @Test
+    public void getSpaceQuotaDefinition() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/space_quota_definitions/test-space-quota-definition-id")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/space_quota_definitions/GET_{id}_response.json")
+                .build())
+            .build());
 
-        private final ReactorSpaceQuotaDefinitions spaceQuotaDefinitions = new ReactorSpaceQuotaDefinitions(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+        this.spaceQuotaDefinitions
+            .get(GetSpaceQuotaDefinitionRequest.builder()
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetSpaceQuotaDefinitionResponse.builder()
+                .metadata(Metadata.builder()
+                    .id("4b8e7d14-71bd-4abb-b474-183375c75c84")
+                    .url("/v2/space_quota_definitions/4b8e7d14-71bd-4abb-b474-183375c75c84")
+                    .createdAt("2015-11-30T23:38:46Z")
+                    .build())
+                .entity(SpaceQuotaDefinitionEntity.builder()
+                    .name("name-1892")
+                    .organizationId("0dbbac8c-16ac-4ba5-8f59-3d3a79874f5d")
+                    .nonBasicServicesAllowed(true)
+                    .totalServices(60)
+                    .totalRoutes(1000)
+                    .memoryLimit(20480)
+                    .instanceMemoryLimit(-1)
+                    .applicationInstanceLimit(-1)
+                    .organizationUrl("/v2/organizations/0dbbac8c-16ac-4ba5-8f59-3d3a79874f5d")
+                    .spacesUrl("/v2/space_quota_definitions/4b8e7d14-71bd-4abb-b474-183375c75c84/spaces")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
-        @Override
-        protected ScriptedSubscriber<GetSpaceQuotaDefinitionResponse> expectations() {
-            return ScriptedSubscriber.<GetSpaceQuotaDefinitionResponse>create()
-                .expectNext(GetSpaceQuotaDefinitionResponse.builder()
+    @Test
+    public void list() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/space_quota_definitions?page=-1")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/space_quota_definitions/GET_response.json")
+                .build())
+            .build());
+
+        this.spaceQuotaDefinitions
+            .list(ListSpaceQuotaDefinitionsRequest.builder()
+                .page(-1)
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListSpaceQuotaDefinitionsResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(SpaceQuotaDefinitionResource.builder()
                     .metadata(Metadata.builder()
-                        .id("4b8e7d14-71bd-4abb-b474-183375c75c84")
-                        .url("/v2/space_quota_definitions/4b8e7d14-71bd-4abb-b474-183375c75c84")
-                        .createdAt("2015-11-30T23:38:46Z")
+                        .id("be2d5c01-3413-43db-bea2-49b0b60ec74d")
+                        .url("/v2/space_quota_definitions/be2d5c01-3413-43db-bea2-49b0b60ec74d")
+                        .createdAt("2015-07-27T22:43:32Z")
                         .build())
                     .entity(SpaceQuotaDefinitionEntity.builder()
-                        .name("name-1892")
-                        .organizationId("0dbbac8c-16ac-4ba5-8f59-3d3a79874f5d")
+                        .name("name-2236")
+                        .organizationId("a81d5218-b473-474e-9afb-3223a8b2ae9f")
                         .nonBasicServicesAllowed(true)
                         .totalServices(60)
                         .totalRoutes(1000)
                         .memoryLimit(20480)
                         .instanceMemoryLimit(-1)
-                        .applicationInstanceLimit(-1)
-                        .organizationUrl("/v2/organizations/0dbbac8c-16ac-4ba5-8f59-3d3a79874f5d")
-                        .spacesUrl("/v2/space_quota_definitions/4b8e7d14-71bd-4abb-b474-183375c75c84/spaces")
+                        .organizationUrl("/v2/organizations/a81d5218-b473-474e-9afb-3223a8b2ae9f")
+                        .spacesUrl
+                            ("/v2/space_quota_definitions/be2d5c01-3413-43db-bea2-49b0b60ec74d/spaces")
                         .build())
                     .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/v2/space_quota_definitions/test-space-quota-definition-id")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/space_quota_definitions/GET_{id}_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<GetSpaceQuotaDefinitionResponse> invoke(GetSpaceQuotaDefinitionRequest request) {
-            return this.spaceQuotaDefinitions.get(request);
-        }
-
-        @Override
-        protected GetSpaceQuotaDefinitionRequest validRequest() {
-            return GetSpaceQuotaDefinitionRequest.builder()
-                .spaceQuotaDefinitionId("test-space-quota-definition-id")
-                .build();
-        }
-
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class List extends AbstractClientApiTest<ListSpaceQuotaDefinitionsRequest, ListSpaceQuotaDefinitionsResponse> {
+    @Test
+    public void removeSpace() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/v2/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
+                .build())
+            .response(TestResponse.builder()
+                .status(NO_CONTENT)
+                .build())
+            .build());
 
-        private final ReactorSpaceQuotaDefinitions spaceQuotaDefinitions = new ReactorSpaceQuotaDefinitions(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<ListSpaceQuotaDefinitionsResponse> expectations() {
-            return ScriptedSubscriber.<ListSpaceQuotaDefinitionsResponse>create()
-                .expectNext(ListSpaceQuotaDefinitionsResponse.builder()
-                    .totalResults(1)
-                    .totalPages(1)
-                    .resource(SpaceQuotaDefinitionResource.builder()
-                        .metadata(Metadata.builder()
-                            .id("be2d5c01-3413-43db-bea2-49b0b60ec74d")
-                            .url("/v2/space_quota_definitions/be2d5c01-3413-43db-bea2-49b0b60ec74d")
-                            .createdAt("2015-07-27T22:43:32Z")
-                            .build())
-                        .entity(SpaceQuotaDefinitionEntity.builder()
-                            .name("name-2236")
-                            .organizationId("a81d5218-b473-474e-9afb-3223a8b2ae9f")
-                            .nonBasicServicesAllowed(true)
-                            .totalServices(60)
-                            .totalRoutes(1000)
-                            .memoryLimit(20480)
-                            .instanceMemoryLimit(-1)
-                            .organizationUrl("/v2/organizations/a81d5218-b473-474e-9afb-3223a8b2ae9f")
-                            .spacesUrl
-                                ("/v2/space_quota_definitions/be2d5c01-3413-43db-bea2-49b0b60ec74d/spaces")
-                            .build())
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/v2/space_quota_definitions?page=-1")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/space_quota_definitions/GET_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<ListSpaceQuotaDefinitionsResponse> invoke(ListSpaceQuotaDefinitionsRequest request) {
-            return this.spaceQuotaDefinitions.list(request);
-        }
-
-        @Override
-        protected ListSpaceQuotaDefinitionsRequest validRequest() {
-            return ListSpaceQuotaDefinitionsRequest.builder()
-                .page(-1)
-                .build();
-        }
-
-    }
-
-    public static final class RemoveSpace extends AbstractClientApiTest<RemoveSpaceQuotaDefinitionRequest, Void> {
-
-        private final ReactorSpaceQuotaDefinitions spaceQuotaDefinitions = new ReactorSpaceQuotaDefinitions(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(DELETE).path("/v2/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(NO_CONTENT)
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<Void> invoke(RemoveSpaceQuotaDefinitionRequest request) {
-            return this.spaceQuotaDefinitions.removeSpace(request);
-        }
-
-        @Override
-        protected RemoveSpaceQuotaDefinitionRequest validRequest() {
-            return RemoveSpaceQuotaDefinitionRequest.builder()
+        this.spaceQuotaDefinitions
+            .removeSpace(RemoveSpaceQuotaDefinitionRequest.builder()
                 .spaceId("test-space-id")
                 .spaceQuotaDefinitionId("test-space-quota-definition-id")
-                .build();
-        }
-
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
 }

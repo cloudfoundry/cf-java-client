@@ -22,20 +22,61 @@ import org.cloudfoundry.client.v2.buildpacks.CreateBuildpackResponse;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksResponse;
 import org.cloudfoundry.client.v2.buildpacks.UploadBuildpackResponse;
-import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.junit.Before;
-import org.reactivestreams.Publisher;
+import org.cloudfoundry.operations.AbstractOperationsTest;
+import org.junit.Test;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.file.Paths;
+import java.time.Duration;
 
 import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
-public final class DefaultBuildpacksTest {
+public final class DefaultBuildpacksTest extends AbstractOperationsTest {
+
+    private final ByteArrayInputStream stream = new ByteArrayInputStream(new byte[0]);
+
+    private final DefaultBuildpacks buildpacks = new DefaultBuildpacks(Mono.just(this.cloudFoundryClient), p -> this.stream);
+
+    @Test
+    public void create() {
+        requestCreateBuildpack(this.cloudFoundryClient, "test-buildpack", 1, true);
+        requestUploadBuildpack(this.cloudFoundryClient, "test-buildpack-id", this.stream, "test-buildpack.zip");
+
+        this.buildpacks
+            .create(CreateBuildpackRequest.builder()
+                .buildpack(Paths.get("test-buildpack"))
+                .fileName("test-buildpack.zip")
+                .name("test-buildpack")
+                .enable(true)
+                .position(1)
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void list() {
+        requestBuildpacks(this.cloudFoundryClient);
+
+        this.buildpacks
+            .list()
+            .as(StepVerifier::create)
+            .expectNext(Buildpack.builder()
+                .enabled(true)
+                .filename("test-buildpack-filename")
+                .id("test-buildpack-id")
+                .locked(true)
+                .name("test-buildpack-name")
+                .position(1)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     private static void requestBuildpacks(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.buildpacks()
@@ -71,77 +112,6 @@ public final class DefaultBuildpacksTest {
             .thenReturn(Mono
                 .just(fill(UploadBuildpackResponse.builder())
                     .build()));
-    }
-
-    public static final class Create extends AbstractOperationsApiTest<Void> {
-
-        private static final String BUILDPACK_ID = "test-buildpack-id";
-
-        private static final String BUILDPACK_NAME = "go-buildpack";
-
-        private static final ByteArrayInputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[0]);
-
-        private static final Boolean ENABLE = true;
-
-        private static final String FILE_NAME = "gobuildpack.zip";
-
-        private static final Integer POSITION = 1;
-
-        private final DefaultBuildpacks buildpacks = new DefaultBuildpacks(Mono.just(this.cloudFoundryClient), p -> EMPTY_STREAM);
-
-        @Before
-        public void setUp() throws Exception {
-            requestCreateBuildpack(this.cloudFoundryClient, BUILDPACK_NAME, POSITION, ENABLE);
-            requestUploadBuildpack(this.cloudFoundryClient, BUILDPACK_ID, EMPTY_STREAM, FILE_NAME);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<Void> invoke() {
-            return this.buildpacks
-                .create(CreateBuildpackRequest.builder()
-                    .buildpack(Paths.get("test-buildpack"))
-                    .fileName(FILE_NAME)
-                    .name(BUILDPACK_NAME)
-                    .enable(ENABLE)
-                    .position(POSITION)
-                    .build());
-        }
-
-    }
-
-    public static final class List extends AbstractOperationsApiTest<Buildpack> {
-
-        private final DefaultBuildpacks buildpacks = new DefaultBuildpacks(Mono.just(this.cloudFoundryClient), p -> null);
-
-        @Before
-        public void setUp() throws Exception {
-            requestBuildpacks(this.cloudFoundryClient);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Buildpack> expectations() {
-            return ScriptedSubscriber.<Buildpack>create()
-                .expectNext(Buildpack.builder()
-                    .enabled(true)
-                    .filename("test-buildpack-filename")
-                    .id("test-buildpack-id")
-                    .locked(true)
-                    .name("test-buildpack-name")
-                    .position(1)
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<Buildpack> invoke() {
-            return this.buildpacks.list();
-        }
     }
 
 }

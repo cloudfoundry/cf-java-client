@@ -34,11 +34,12 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
 import reactor.util.function.Tuple2;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
@@ -56,24 +57,20 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     public void create() throws TimeoutException, InterruptedException {
         String privateDomainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<Tuple2<CreatePrivateDomainResponse, String>> subscriber = domainNameAndOrganizationIdEquality(privateDomainName);
-
         this.organizationId
             .then(organizationId -> Mono.when(
                 requestCreatePrivateDomain(this.cloudFoundryClient, organizationId, privateDomainName),
                 Mono.just(organizationId)
             ))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(domainNameAndOrganizationIdEquality(privateDomainName))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void delete() throws TimeoutException, InterruptedException {
         String privateDomainName = this.nameFactory.getDomainName();
-
-        ScriptedSubscriber<GetPrivateDomainResponse> subscriber = ScriptedSubscriber.<GetPrivateDomainResponse>create()
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"));
 
         this.organizationId
             .then(organizationId -> requestCreatePrivateDomain(this.cloudFoundryClient, organizationId, privateDomainName))
@@ -81,16 +78,14 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
                 .then(jobResource -> JobUtils.waitForCompletion(this.cloudFoundryClient, jobResource))
                 .then(Mono.just(privateDomainResource)))
             .then(privateDomainResource -> requestGetPrivateDomain(this.cloudFoundryClient, ResourceUtils.getId(privateDomainResource)))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"))
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void get() throws TimeoutException, InterruptedException {
         String privateDomainName = this.nameFactory.getDomainName();
-
-        ScriptedSubscriber<Tuple2<GetPrivateDomainResponse, String>> subscriber = domainNameAndOrganizationIdEquality(privateDomainName);
 
         this.organizationId
             .then(organizationId -> Mono.when(
@@ -101,16 +96,15 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
                 requestGetPrivateDomain(this.cloudFoundryClient, ResourceUtils.getId(privateDomainResource)),
                 Mono.just(organizationId)
             )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(domainNameAndOrganizationIdEquality(privateDomainName))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void list() throws TimeoutException, InterruptedException {
         String privateDomainName = this.nameFactory.getDomainName();
-
-        ScriptedSubscriber<Tuple2<PrivateDomainResource, String>> subscriber = domainNameAndOrganizationIdEquality(privateDomainName);
 
         this.organizationId
             .then(organizationId -> Mono.when(
@@ -123,16 +117,15 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
                     .single(),
                 Mono.just(organizationId)
             )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(domainNameAndOrganizationIdEquality(privateDomainName))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listFilterByName() throws TimeoutException, InterruptedException {
         String privateDomainName = this.nameFactory.getDomainName();
-
-        ScriptedSubscriber<Tuple2<PrivateDomainResource, String>> subscriber = domainNameAndOrganizationIdEquality(privateDomainName);
 
         this.organizationId
             .then(organizationId -> Mono.when(
@@ -145,18 +138,17 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
                     .single(),
                 Mono.just(organizationId)
             )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(domainNameAndOrganizationIdEquality(privateDomainName))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    private static <R extends AbstractPrivateDomainResource> ScriptedSubscriber<Tuple2<R, String>> domainNameAndOrganizationIdEquality(String domainName) {
-        return ScriptedSubscriber.<Tuple2<R, String>>create()
-            .consumeNextWith(consumer((resource, organizationId) -> {
-                assertThat(ResourceUtils.getEntity(resource).getName()).isEqualTo(domainName);
-                assertThat(ResourceUtils.getEntity(resource).getOwningOrganizationId()).isEqualTo(organizationId);
-            }))
-            .expectComplete();
+    private static <R extends AbstractPrivateDomainResource> Consumer<Tuple2<R, String>> domainNameAndOrganizationIdEquality(String domainName) {
+        return consumer((resource, organizationId) -> {
+            assertThat(ResourceUtils.getEntity(resource).getName()).isEqualTo(domainName);
+            assertThat(ResourceUtils.getEntity(resource).getOwningOrganizationId()).isEqualTo(organizationId);
+        });
     }
 
     private static Flux<PrivateDomainResource> listPrivateDomains(CloudFoundryClient cloudFoundryClient, String privateDomainName) {

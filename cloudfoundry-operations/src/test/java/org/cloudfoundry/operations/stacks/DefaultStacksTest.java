@@ -20,16 +20,46 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksResponse;
 import org.cloudfoundry.client.v2.stacks.StackResource;
-import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.junit.Before;
-import org.reactivestreams.Publisher;
+import org.cloudfoundry.operations.AbstractOperationsTest;
+import org.junit.Test;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
+
+import java.time.Duration;
 
 import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
-public final class DefaultStacksTest {
+public final class DefaultStacksTest extends AbstractOperationsTest {
+
+    private final DefaultStacks stacks = new DefaultStacks(Mono.just(this.cloudFoundryClient));
+
+    @Test
+    public void getStack() {
+        requestStacks(this.cloudFoundryClient, "test-stack-name");
+
+        this.stacks
+            .get(GetStackRequest.builder()
+                .name("test-stack-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(fill(Stack.builder(), "stack-")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listStacks() {
+        requestStacks(this.cloudFoundryClient);
+
+        this.stacks.list()
+            .as(StepVerifier::create)
+            .expectNext(fill(Stack.builder(), "stack-")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     private static void requestStacks(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.stacks()
@@ -54,57 +84,6 @@ public final class DefaultStacksTest {
                     .resource(fill(StackResource.builder(), "stack-")
                         .build())
                     .build()));
-    }
-
-    public static final class GetStack extends AbstractOperationsApiTest<Stack> {
-
-        private final DefaultStacks stacks = new DefaultStacks(Mono.just(this.cloudFoundryClient));
-
-        @Before
-        public void setUp() throws Exception {
-            requestStacks(this.cloudFoundryClient, "test-stack-name");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Stack> expectations() {
-            return ScriptedSubscriber.<Stack>create()
-                .expectNext(fill(Stack.builder(), "stack-")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<Stack> invoke() {
-            return this.stacks
-                .get(GetStackRequest.builder()
-                    .name("test-stack-name")
-                    .build());
-        }
-
-    }
-
-    public static final class ListStacks extends AbstractOperationsApiTest<Stack> {
-
-        private final DefaultStacks stacks = new DefaultStacks(Mono.just(this.cloudFoundryClient));
-
-        @Before
-        public void setUp() throws Exception {
-            requestStacks(this.cloudFoundryClient);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Stack> expectations() {
-            return ScriptedSubscriber.<Stack>create()
-                .expectNext(fill(Stack.builder(), "stack-")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<Stack> invoke() {
-            return this.stacks.list();
-        }
-
     }
 
 }

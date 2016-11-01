@@ -16,16 +16,32 @@
 
 package org.cloudfoundry.operations.advanced;
 
-import org.cloudfoundry.operations.AbstractOperationsApiTest;
+import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
-import org.junit.Before;
+import org.junit.Test;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
+
+import java.time.Duration;
 
 import static org.mockito.Mockito.when;
 
-public final class DefaultAdvancedTest {
+public final class DefaultAdvancedTest extends AbstractOperationsTest {
+
+    private final DefaultAdvanced advanced = new DefaultAdvanced(Mono.just(this.uaaClient));
+
+    @Test
+    public void sshCode() {
+        requestAuthorizeByAuthorizationCodeGrantApi(this.uaaClient);
+
+        this.advanced
+            .sshCode()
+            .as(StepVerifier::create)
+            .expectNext("test-code")
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     private static void requestAuthorizeByAuthorizationCodeGrantApi(UaaClient uaaClient) {
         when(uaaClient.authorizations()
@@ -33,31 +49,6 @@ public final class DefaultAdvancedTest {
                 .clientId("ssh-proxy")
                 .build()))
             .thenReturn(Mono.just("test-code"));
-    }
-
-    public static final class SshCode extends AbstractOperationsApiTest<String> {
-
-        private final DefaultAdvanced advanced = new DefaultAdvanced(Mono.just(this.uaaClient));
-
-        @Before
-        public void setUp() throws Exception {
-            requestAuthorizeByAuthorizationCodeGrantApi(this.uaaClient);
-
-        }
-
-        @Override
-        protected ScriptedSubscriber<String> expectations() {
-            return ScriptedSubscriber.<String>create()
-                .expectNext("test-code")
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<String> invoke() {
-            return this.advanced
-                .sshCode();
-        }
-
     }
 
 }

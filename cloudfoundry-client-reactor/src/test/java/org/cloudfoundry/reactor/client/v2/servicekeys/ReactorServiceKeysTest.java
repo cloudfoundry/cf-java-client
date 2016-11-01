@@ -30,8 +30,10 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import org.junit.Test;
+import reactor.test.StepVerifier;
+
+import java.time.Duration;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -40,195 +42,137 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorServiceKeysTest {
+public final class ReactorServiceKeysTest extends AbstractClientApiTest {
 
-    public static final class Create extends AbstractClientApiTest<CreateServiceKeyRequest, CreateServiceKeyResponse> {
+    private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
-        private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    @Test
+    public void create() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(POST).path("/v2/service_keys")
+                .payload("fixtures/client/v2/service_keys/POST_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(CREATED)
+                .payload("fixtures/client/v2/service_keys/POST_response.json")
+                .build())
+            .build());
 
-        @Override
-        protected ScriptedSubscriber<CreateServiceKeyResponse> expectations() {
-            return ScriptedSubscriber.<CreateServiceKeyResponse>create()
-                .expectNext(CreateServiceKeyResponse.builder()
-                    .metadata(Metadata.builder()
-                        .createdAt("2015-07-27T22:43:22Z")
-                        .id("79aa4b11-99f3-484b-adfc-a63fa818c4d1")
-                        .url("/v2/service_keys/79aa4b11-99f3-484b-adfc-a63fa818c4d1")
-                        .build())
-                    .entity(ServiceKeyEntity.builder()
-                        .credential("creds-key-392", "creds-val-392")
-                        .name("name-960")
-                        .serviceInstanceId("132944c8-c31d-4bb8-9155-ae4e2ebe1a0c")
-                        .serviceInstanceUrl("/v2/service_instances/132944c8-c31d-4bb8-9155-ae4e2ebe1a0c")
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(POST).path("/v2/service_keys")
-                    .payload("fixtures/client/v2/service_keys/POST_request.json")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(CREATED)
-                    .payload("fixtures/client/v2/service_keys/POST_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<CreateServiceKeyResponse> invoke(CreateServiceKeyRequest request) {
-            return this.serviceKeys.create(request);
-        }
-
-        @Override
-        protected CreateServiceKeyRequest validRequest() {
-            return CreateServiceKeyRequest.builder()
+        this.serviceKeys
+            .create(CreateServiceKeyRequest.builder()
                 .name("name-960")
                 .serviceInstanceId("132944c8-c31d-4bb8-9155-ae4e2ebe1a0c")
-                .build();
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(CreateServiceKeyResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2015-07-27T22:43:22Z")
+                    .id("79aa4b11-99f3-484b-adfc-a63fa818c4d1")
+                    .url("/v2/service_keys/79aa4b11-99f3-484b-adfc-a63fa818c4d1")
+                    .build())
+                .entity(ServiceKeyEntity.builder()
+                    .credential("creds-key-392", "creds-val-392")
+                    .name("name-960")
+                    .serviceInstanceId("132944c8-c31d-4bb8-9155-ae4e2ebe1a0c")
+                    .serviceInstanceUrl("/v2/service_instances/132944c8-c31d-4bb8-9155-ae4e2ebe1a0c")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class Delete extends AbstractClientApiTest<DeleteServiceKeyRequest, Void> {
+    @Test
+    public void delete() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/v2/service_keys/test-service-key-id")
+                .build())
+            .response(TestResponse.builder()
+                .status(NO_CONTENT)
+                .build())
+            .build());
 
-        private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(DELETE).path("/v2/service_keys/test-service-key-id")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(NO_CONTENT)
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<Void> invoke(DeleteServiceKeyRequest request) {
-            return this.serviceKeys.delete(request);
-        }
-
-        @Override
-        protected DeleteServiceKeyRequest validRequest() {
-            return DeleteServiceKeyRequest.builder()
+        this.serviceKeys
+            .delete(DeleteServiceKeyRequest.builder()
                 .serviceKeyId("test-service-key-id")
-                .build();
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class Get extends AbstractClientApiTest<GetServiceKeyRequest, GetServiceKeyResponse> {
+    @Test
+    public void get() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/service_keys/test-service-key-id")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/service_keys/GET_{id}_response.json")
+                .build())
+            .build());
 
-        private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<GetServiceKeyResponse> expectations() {
-            return ScriptedSubscriber.<GetServiceKeyResponse>create()
-                .expectNext(GetServiceKeyResponse.builder()
-                    .metadata(Metadata.builder()
-                        .createdAt("2015-07-27T22:43:22Z")
-                        .id("7f1f30d3-bed3-4ba7-bf88-fd3a678ff4f5")
-                        .url("/v2/service_keys/7f1f30d3-bed3-4ba7-bf88-fd3a678ff4f5")
-                        .build())
-                    .entity(ServiceKeyEntity.builder()
-                        .credential("creds-key-388", "creds-val-388")
-                        .name("name-947")
-                        .serviceInstanceId("011457da-c205-4415-a578-de5df82b15a8")
-                        .serviceInstanceUrl("/v2/service_instances/011457da-c205-4415-a578-de5df82b15a8")
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/v2/service_keys/test-service-key-id")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/service_keys/GET_{id}_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<GetServiceKeyResponse> invoke(GetServiceKeyRequest request) {
-            return this.serviceKeys.get(request);
-        }
-
-        @Override
-        protected GetServiceKeyRequest validRequest() {
-            return GetServiceKeyRequest.builder()
+        this.serviceKeys
+            .get(GetServiceKeyRequest.builder()
                 .serviceKeyId("test-service-key-id")
-                .build();
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetServiceKeyResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2015-07-27T22:43:22Z")
+                    .id("7f1f30d3-bed3-4ba7-bf88-fd3a678ff4f5")
+                    .url("/v2/service_keys/7f1f30d3-bed3-4ba7-bf88-fd3a678ff4f5")
+                    .build())
+                .entity(ServiceKeyEntity.builder()
+                    .credential("creds-key-388", "creds-val-388")
+                    .name("name-947")
+                    .serviceInstanceId("011457da-c205-4415-a578-de5df82b15a8")
+                    .serviceInstanceUrl("/v2/service_instances/011457da-c205-4415-a578-de5df82b15a8")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class List extends AbstractClientApiTest<ListServiceKeysRequest, ListServiceKeysResponse> {
+    @Test
+    public void list() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/service_keys?q=name%20IN%20test-name&page=-1")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/service_keys/GET_response.json")
+                .build())
+            .build());
 
-        private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<ListServiceKeysResponse> expectations() {
-            return ScriptedSubscriber.<ListServiceKeysResponse>create()
-                .expectNext(ListServiceKeysResponse.builder()
-                    .totalResults(1)
-                    .totalPages(1)
-                    .resource(ServiceKeyResource.builder()
-                        .metadata(Metadata.builder()
-                            .createdAt("2015-07-27T22:43:22Z")
-                            .id("3936801c-9d3f-4b9f-8465-aa3bd263612e")
-                            .url("/v2/service_keys/3936801c-9d3f-4b9f-8465-aa3bd263612e")
-                            .build())
-                        .entity(ServiceKeyEntity.builder()
-                            .credential("creds-key-383", "creds-val-383")
-                            .name("name-934")
-                            .serviceInstanceId("84d384d9-42c2-4e4b-a8c6-865e9446e024")
-                            .serviceInstanceUrl("/v2/service_instances/84d384d9-42c2-4e4b-a8c6-865e9446e024")
-                            .build())
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/v2/service_keys?q=name%20IN%20test-name&page=-1")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/service_keys/GET_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<ListServiceKeysResponse> invoke(ListServiceKeysRequest request) {
-            return this.serviceKeys.list(request);
-        }
-
-        @Override
-        protected ListServiceKeysRequest validRequest() {
-            return ListServiceKeysRequest.builder()
+        this.serviceKeys
+            .list(ListServiceKeysRequest.builder()
                 .name("test-name")
                 .page(-1)
-                .build();
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListServiceKeysResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(ServiceKeyResource.builder()
+                    .metadata(Metadata.builder()
+                        .createdAt("2015-07-27T22:43:22Z")
+                        .id("3936801c-9d3f-4b9f-8465-aa3bd263612e")
+                        .url("/v2/service_keys/3936801c-9d3f-4b9f-8465-aa3bd263612e")
+                        .build())
+                    .entity(ServiceKeyEntity.builder()
+                        .credential("creds-key-383", "creds-val-383")
+                        .name("name-934")
+                        .serviceInstanceId("84d384d9-42c2-4e4b-a8c6-865e9446e024")
+                        .serviceInstanceUrl("/v2/service_instances/84d384d9-42c2-4e4b-a8c6-865e9446e024")
+                        .build())
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
 }
