@@ -25,14 +25,13 @@ import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.Package;
 import org.cloudfoundry.client.v3.packages.PackageType;
-import org.cloudfoundry.client.v3.packages.State;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -53,10 +52,6 @@ public final class PackagesTest extends AbstractIntegrationTest {
     @Test
     public void upload() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
-
-        ScriptedSubscriber<State> subscriber = ScriptedSubscriber.<State>create()
-            .consumeNextWith(state -> assertThat(state).isIn(PROCESSING_UPLOAD, READY))
-            .expectComplete();
 
         this.spaceId
             .then(spaceId -> this.cloudFoundryClient.applicationsV3()
@@ -92,9 +87,10 @@ public final class PackagesTest extends AbstractIntegrationTest {
                     .packageId(packageId)
                     .build()))
             .map(Package::getState)
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(state -> assertThat(state).isIn(PROCESSING_UPLOAD, READY))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
 }

@@ -16,161 +16,120 @@
 
 package org.cloudfoundry.util;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import reactor.test.scheduler.VirtualTimeScheduler;
-import reactor.test.subscriber.ScriptedSubscriber;
 
 import java.time.Duration;
 
 public final class DelayUtilsTest {
 
-    @After
-    public void disableVirtualTime() throws Exception {
-        VirtualTimeScheduler.reset();
-    }
-
-    @Before
-    public void enableVirtualTime() {
-        VirtualTimeScheduler.enable(true);
-    }
-
+    @SuppressWarnings("unchecked")
     @Test
     public void exponentialBackOff() {
-        ScriptedSubscriber<Object> subscriber = ScriptedSubscriber.create()
+        StepVerifier.with(() -> (Publisher<Long>) DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(5), Duration.ofSeconds(5))
+            .apply(Flux.just(1L, 2L, 3L)))
             .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(2)))
             .expectNext(0L)
             .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(4)))
             .expectNext(0L)
             .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(8)))
             .expectNext(0L)
-            .expectComplete();
-
-        DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(5), Duration.ofSeconds(5))
-            .apply(Flux.just(1L, 2L, 3L))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofSeconds(5));
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void exponentialBackOffError() {
-        ScriptedSubscriber<Object> subscriber = ScriptedSubscriber.create()
+        StepVerifier.with(() -> (Publisher<Long>) DelayUtils.exponentialBackOffError(Duration.ofSeconds(1), Duration.ofSeconds(5), Duration.ofSeconds(5))
+            .apply(Flux.just(new RuntimeException(), new RuntimeException(), new RuntimeException())))
             .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(2)))
             .expectNext(0L)
             .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(4)))
             .expectNext(0L)
             .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(8)))
             .expectNext(0L)
-            .expectComplete();
-
-        DelayUtils.exponentialBackOffError(Duration.ofSeconds(1), Duration.ofSeconds(5), Duration.ofSeconds(5))
-            .apply(Flux.just(new RuntimeException(), new RuntimeException(), new RuntimeException()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofSeconds(5));
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void exponentialBackOffErrorMaximum() {
-        ScriptedSubscriber<Object> subscriber = ScriptedSubscriber.create()
+        StepVerifier.with(() -> (Publisher<Long>) DelayUtils.exponentialBackOffError(Duration.ofSeconds(1), Duration.ofSeconds(1), Duration.ofSeconds(5))
+            .apply(Flux.just(new RuntimeException(), new RuntimeException(), new RuntimeException())))
             .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
             .expectNext(0L)
             .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
             .expectNext(0L)
             .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
             .expectNext(0L)
-            .expectComplete();
-
-        DelayUtils.exponentialBackOffError(Duration.ofSeconds(1), Duration.ofSeconds(1), Duration.ofSeconds(5))
-            .apply(Flux.just(new RuntimeException(), new RuntimeException(), new RuntimeException()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofSeconds(5));
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void exponentialBackOffErrorTimeout() {
-        VirtualTimeScheduler.reset();
-
-        ScriptedSubscriber<Object> subscriber = ScriptedSubscriber.create()
-            .expectError(DelayTimeoutException.class);
-
-        DelayUtils.exponentialBackOffError(Duration.ofMillis(500), Duration.ofMillis(500), Duration.ofMillis(100))
+        StepVerifier.create(DelayUtils.exponentialBackOffError(Duration.ofMillis(500), Duration.ofMillis(500), Duration.ofMillis(100))
             .apply(Mono.delay(Duration.ofMillis(200))
-                .thenMany(Flux.just(new RuntimeException())))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofSeconds(5));
+                .thenMany(Flux.just(new RuntimeException()))))
+            .expectError(DelayTimeoutException.class)
+            .verify(Duration.ofSeconds(5));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void exponentialBackOffMaximum() {
-        ScriptedSubscriber<Object> subscriber = ScriptedSubscriber.create()
+        StepVerifier.with(() -> (Publisher<Long>) DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(1), Duration.ofSeconds(5))
+            .apply(Flux.just(1L, 2L, 3L)))
             .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
             .expectNext(0L)
             .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
             .expectNext(0L)
             .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
             .expectNext(0L)
-            .expectComplete();
-
-        DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(1), Duration.ofSeconds(5))
-            .apply(Flux.just(1L, 2L, 3L))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofSeconds(5));
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void exponentialBackOffTimeout() {
-        VirtualTimeScheduler.reset();
-
-        ScriptedSubscriber<Object> subscriber = ScriptedSubscriber.create()
-            .expectError(DelayTimeoutException.class);
-
-        DelayUtils.exponentialBackOff(Duration.ofMillis(500), Duration.ofMillis(500), Duration.ofMillis(100))
+        StepVerifier.create(DelayUtils.exponentialBackOff(Duration.ofMillis(500), Duration.ofMillis(500), Duration.ofMillis(100))
             .apply(Mono.delay(Duration.ofMillis(200))
-                .thenMany(Flux.just(1L)))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofSeconds(5));
+                .thenMany(Flux.just(1L))))
+            .expectError(DelayTimeoutException.class)
+            .verify(Duration.ofSeconds(5));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void fixed() {
-        ScriptedSubscriber<Object> subscriber = ScriptedSubscriber.create()
+        StepVerifier.with(() -> (Publisher<Long>) DelayUtils.fixed(Duration.ofSeconds(1))
+            .apply(Flux.just(1L, 2L, 3L)))
             .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
             .expectNext(0L)
             .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
             .expectNext(0L)
             .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
             .expectNext(0L)
-            .expectComplete();
-
-        DelayUtils.fixed(Duration.ofSeconds(1))
-            .apply(Flux.just(1L, 2L, 3L))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofSeconds(5));
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void instant() {
-        ScriptedSubscriber<Object> subscriber = ScriptedSubscriber.create()
+        StepVerifier.with(() -> (Publisher<Long>) DelayUtils.instant()
+            .apply(Flux.just(1L, 2L, 3L)))
             .expectNext(0L)
             .expectNext(0L)
             .expectNext(0L)
-            .expectComplete();
-
-        DelayUtils.instant()
-            .apply(Flux.just(1L, 2L, 3L))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofSeconds(5));
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
 }

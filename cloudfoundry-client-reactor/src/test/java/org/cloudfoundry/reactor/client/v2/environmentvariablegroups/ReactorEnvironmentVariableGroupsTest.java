@@ -28,9 +28,10 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import org.junit.Test;
+import reactor.test.StepVerifier;
 
+import java.time.Duration;
 import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -38,248 +39,160 @@ import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 
-public class ReactorEnvironmentVariableGroupsTest {
+public class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest {
 
-    public static final class GetRunningEnvironmentVariables extends AbstractClientApiTest<GetRunningEnvironmentVariablesRequest, GetRunningEnvironmentVariablesResponse> {
+    private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
-        private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    @Test
+    public void getRunningEnvironmentVariables() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/config/environment_variable_groups/running")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/environment_variable_groups/GET_running_response.json")
+                .build())
+            .build());
 
-        @Override
-        protected ScriptedSubscriber<GetRunningEnvironmentVariablesResponse> expectations() {
-            return ScriptedSubscriber.<GetRunningEnvironmentVariablesResponse>create()
-                .expectNext(GetRunningEnvironmentVariablesResponse.builder()
-                    .environmentVariable("abc", 123)
-                    .environmentVariable("do-re-me", "far-so-la-tee")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/v2/config/environment_variable_groups/running")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/environment_variable_groups/GET_running_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<GetRunningEnvironmentVariablesResponse> invoke(GetRunningEnvironmentVariablesRequest request) {
-            return this.environmentVariableGroups.getRunningEnvironmentVariables(request);
-        }
-
-        @Override
-        protected GetRunningEnvironmentVariablesRequest validRequest() {
-            return GetRunningEnvironmentVariablesRequest.builder()
-                .build();
-        }
-    }
-
-    public static final class GetStagingEnvironmentVariables extends AbstractClientApiTest<GetStagingEnvironmentVariablesRequest, GetStagingEnvironmentVariablesResponse> {
-
-        private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<GetStagingEnvironmentVariablesResponse> expectations() {
-            return ScriptedSubscriber.<GetStagingEnvironmentVariablesResponse>create()
-                .expectNext(GetStagingEnvironmentVariablesResponse.builder()
-                    .environmentVariable("abc", 123)
-                    .environmentVariable("do-re-me", "far-so-la-tee")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/v2/config/environment_variable_groups/staging")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/environment_variable_groups/GET_staging_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<GetStagingEnvironmentVariablesResponse> invoke(GetStagingEnvironmentVariablesRequest request) {
-            return this.environmentVariableGroups.getStagingEnvironmentVariables(request);
-        }
-
-        @Override
-        protected GetStagingEnvironmentVariablesRequest validRequest() {
-            return GetStagingEnvironmentVariablesRequest.builder()
-                .build();
-        }
-    }
-
-    public static final class UpdateRunningEnvironmentVariables extends AbstractClientApiTest<UpdateRunningEnvironmentVariablesRequest, UpdateRunningEnvironmentVariablesResponse> {
-
-        private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<UpdateRunningEnvironmentVariablesResponse> expectations() {
-            return ScriptedSubscriber.<UpdateRunningEnvironmentVariablesResponse>create()
-                .expectNext(UpdateRunningEnvironmentVariablesResponse.builder()
-                    .environmentVariable("abc", 123)
-                    .environmentVariable("do-re-me", "fa-so-la-tee")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(PUT).path("/v2/config/environment_variable_groups/running")
-                    .payload("fixtures/client/v2/environment_variable_groups/PUT_running_request.json")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/environment_variable_groups/PUT_running_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<UpdateRunningEnvironmentVariablesResponse> invoke(UpdateRunningEnvironmentVariablesRequest request) {
-            return this.environmentVariableGroups.updateRunningEnvironmentVariables(request);
-        }
-
-        @Override
-        protected UpdateRunningEnvironmentVariablesRequest validRequest() {
-            return UpdateRunningEnvironmentVariablesRequest.builder()
-                .environmentVariable("abc", 123)
-                .environmentVariable("do-re-me", "fa-so-la-tee")
-                .build();
-        }
-    }
-
-    public static final class UpdateRunningEnvironmentVariablesEmpty extends AbstractClientApiTest<UpdateRunningEnvironmentVariablesRequest, UpdateRunningEnvironmentVariablesResponse> {
-
-        private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<UpdateRunningEnvironmentVariablesResponse> expectations() {
-            return ScriptedSubscriber.<UpdateRunningEnvironmentVariablesResponse>create()
-                .expectNext(UpdateRunningEnvironmentVariablesResponse.builder()
-                    .environmentVariables(Collections.emptyMap())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(PUT).path("/v2/config/environment_variable_groups/running")
-                    .payload("fixtures/client/v2/environment_variable_groups/PUT_running_request_empty.json")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/environment_variable_groups/PUT_running_response_empty.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<UpdateRunningEnvironmentVariablesResponse> invoke(UpdateRunningEnvironmentVariablesRequest request) {
-            return this.environmentVariableGroups.updateRunningEnvironmentVariables(request);
-        }
-
-        @Override
-        protected UpdateRunningEnvironmentVariablesRequest validRequest() {
-            return UpdateRunningEnvironmentVariablesRequest.builder()
-                .environmentVariables(Collections.emptyMap())
-                .build();
-        }
-    }
-
-    public static final class UpdateStagingEnvironmentVariables extends AbstractClientApiTest<UpdateStagingEnvironmentVariablesRequest, UpdateStagingEnvironmentVariablesResponse> {
-
-        private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<UpdateStagingEnvironmentVariablesResponse> expectations() {
-            return ScriptedSubscriber.<UpdateStagingEnvironmentVariablesResponse>create()
-                .expectNext(UpdateStagingEnvironmentVariablesResponse.builder()
-                    .environmentVariable("abc", 123)
-                    .environmentVariable("do-re-me", "far-so-la-tee")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(PUT).path("/v2/config/environment_variable_groups/staging")
-                    .payload("fixtures/client/v2/environment_variable_groups/PUT_staging_request.json")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/environment_variable_groups/PUT_staging_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<UpdateStagingEnvironmentVariablesResponse> invoke(UpdateStagingEnvironmentVariablesRequest request) {
-            return this.environmentVariableGroups.updateStagingEnvironmentVariables(request);
-        }
-
-        @Override
-        protected UpdateStagingEnvironmentVariablesRequest validRequest() {
-            return UpdateStagingEnvironmentVariablesRequest.builder()
+        this.environmentVariableGroups
+            .getRunningEnvironmentVariables(GetRunningEnvironmentVariablesRequest.builder()
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetRunningEnvironmentVariablesResponse.builder()
                 .environmentVariable("abc", 123)
                 .environmentVariable("do-re-me", "far-so-la-tee")
-                .build();
-        }
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class UpdateStagingEnvironmentVariablesEmpty extends AbstractClientApiTest<UpdateStagingEnvironmentVariablesRequest, UpdateStagingEnvironmentVariablesResponse> {
+    @Test
+    public void getStagingEnvironmentVariables() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/config/environment_variable_groups/staging")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/environment_variable_groups/GET_staging_response.json")
+                .build())
+            .build());
 
-        private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+        this.environmentVariableGroups
+            .getStagingEnvironmentVariables(GetStagingEnvironmentVariablesRequest.builder()
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetStagingEnvironmentVariablesResponse.builder()
+                .environmentVariable("abc", 123)
+                .environmentVariable("do-re-me", "far-so-la-tee")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
-        @Override
-        protected ScriptedSubscriber<UpdateStagingEnvironmentVariablesResponse> expectations() {
-            return ScriptedSubscriber.<UpdateStagingEnvironmentVariablesResponse>create()
-                .expectNext(UpdateStagingEnvironmentVariablesResponse.builder()
-                    .environmentVariables(Collections.emptyMap())
-                    .build())
-                .expectComplete();
-        }
+    @Test
+    public void updateRunningEnvironmentVariables() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PUT).path("/v2/config/environment_variable_groups/running")
+                .payload("fixtures/client/v2/environment_variable_groups/PUT_running_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/environment_variable_groups/PUT_running_response.json")
+                .build())
+            .build());
 
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(PUT).path("/v2/config/environment_variable_groups/staging")
-                    .payload("fixtures/client/v2/environment_variable_groups/PUT_staging_request_empty.json")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/environment_variable_groups/PUT_staging_response_empty.json")
-                    .build())
-                .build();
-        }
+        this.environmentVariableGroups
+            .updateRunningEnvironmentVariables(UpdateRunningEnvironmentVariablesRequest.builder()
+                .environmentVariable("abc", 123)
+                .environmentVariable("do-re-me", "fa-so-la-tee")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(UpdateRunningEnvironmentVariablesResponse.builder()
+                .environmentVariable("abc", 123)
+                .environmentVariable("do-re-me", "fa-so-la-tee")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
-        @Override
-        protected Mono<UpdateStagingEnvironmentVariablesResponse> invoke(UpdateStagingEnvironmentVariablesRequest request) {
-            return this.environmentVariableGroups.updateStagingEnvironmentVariables(request);
-        }
+    @Test
+    public void updateRunningEnvironmentVariablesEmpty() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PUT).path("/v2/config/environment_variable_groups/running")
+                .payload("fixtures/client/v2/environment_variable_groups/PUT_running_request_empty.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/environment_variable_groups/PUT_running_response_empty.json")
+                .build())
+            .build());
 
-        @Override
-        protected UpdateStagingEnvironmentVariablesRequest validRequest() {
-            return UpdateStagingEnvironmentVariablesRequest.builder()
+        this.environmentVariableGroups
+            .updateRunningEnvironmentVariables(UpdateRunningEnvironmentVariablesRequest.builder()
                 .environmentVariables(Collections.emptyMap())
-                .build();
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(UpdateRunningEnvironmentVariablesResponse.builder()
+                .environmentVariables(Collections.emptyMap())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void updateStagingEnvironmentVariables() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PUT).path("/v2/config/environment_variable_groups/staging")
+                .payload("fixtures/client/v2/environment_variable_groups/PUT_staging_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/environment_variable_groups/PUT_staging_response.json")
+                .build())
+            .build());
+
+        this.environmentVariableGroups
+            .updateStagingEnvironmentVariables(UpdateStagingEnvironmentVariablesRequest.builder()
+                .environmentVariable("abc", 123)
+                .environmentVariable("do-re-me", "far-so-la-tee")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(UpdateStagingEnvironmentVariablesResponse.builder()
+                .environmentVariable("abc", 123)
+                .environmentVariable("do-re-me", "far-so-la-tee")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void updateStagingEnvironmentVariablesEmpty() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PUT).path("/v2/config/environment_variable_groups/staging")
+                .payload("fixtures/client/v2/environment_variable_groups/PUT_staging_request_empty.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/environment_variable_groups/PUT_staging_response_empty.json")
+                .build())
+            .build());
+
+        this.environmentVariableGroups
+            .updateStagingEnvironmentVariables(UpdateStagingEnvironmentVariablesRequest.builder()
+                .environmentVariables(Collections.emptyMap())
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(UpdateStagingEnvironmentVariablesResponse.builder()
+                .environmentVariables(Collections.emptyMap())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
 }

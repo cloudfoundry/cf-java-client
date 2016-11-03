@@ -22,17 +22,108 @@ import org.cloudfoundry.client.v2.servicebrokers.ListServiceBrokersRequest;
 import org.cloudfoundry.client.v2.servicebrokers.ListServiceBrokersResponse;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokerEntity;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokerResource;
-import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.junit.Before;
-import org.reactivestreams.Publisher;
+import org.cloudfoundry.operations.AbstractOperationsTest;
+import org.junit.Test;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
+
+import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
-public final class DefaultServiceAdminTest {
+public final class DefaultServiceAdminTest extends AbstractOperationsTest {
+
+    private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(Mono.just(this.cloudFoundryClient), Mono.just(TEST_SPACE_ID));
+
+    @Test
+    public void createServiceBroker() {
+        requestCreateServiceBroker(this.cloudFoundryClient, "test-service-broker-name", "test-service-broker-url", "test-service-broker-username", "test-service-broker-password", null);
+
+        this.serviceAdmin
+            .create(CreateServiceBrokerRequest.builder()
+                .name("test-service-broker-name")
+                .url("test-service-broker-url")
+                .username("test-service-broker-username")
+                .password("test-service-broker-password")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void createServiceBrokerWithSpaceScope() {
+        requestCreateServiceBroker(this.cloudFoundryClient, "test-service-broker-name", "test-service-broker-url", "test-service-broker-username", "test-service-broker-password", TEST_SPACE_ID);
+
+        this.serviceAdmin
+            .create(CreateServiceBrokerRequest.builder()
+                .name("test-service-broker-name")
+                .url("test-service-broker-url")
+                .username("test-service-broker-username")
+                .password("test-service-broker-password")
+                .spaceScoped(true)
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void deleteServiceBroker() {
+        requestListServiceBrokers(this.cloudFoundryClient, "test-service-broker-name");
+        requestDeleteServiceBroker(this.cloudFoundryClient, "test-service-broker-id");
+
+        this.serviceAdmin
+            .delete(DeleteServiceBrokerRequest.builder()
+                .name("test-service-broker-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void deleteServiceBrokerNoServiceBroker() {
+        requestListServiceBrokersEmpty(this.cloudFoundryClient, "test-service-broker-name");
+        requestDeleteServiceBroker(this.cloudFoundryClient, "test-service-broker-id");
+
+        this.serviceAdmin
+            .delete(DeleteServiceBrokerRequest.builder()
+                .name("test-service-broker-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service Broker test-service-broker-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listServiceBrokers() {
+        requestListServiceBrokers(this.cloudFoundryClient);
+
+        this.serviceAdmin
+            .list()
+            .as(StepVerifier::create)
+            .expectNext(ServiceBroker.builder()
+                .id("test-service-broker-id")
+                .name("test-service-broker-resource-name")
+                .url("test-service-broker-resource-brokerUrl")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listServiceBrokersNoBrokers() {
+        requestListServiceBrokersEmpty(this.cloudFoundryClient);
+
+        this.serviceAdmin
+            .list()
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     private static void requestCreateServiceBroker(CloudFoundryClient cloudFoundryClient, String name, String url, String username, String password, String spaceId) {
         when(cloudFoundryClient.serviceBrokers()
@@ -104,166 +195,6 @@ public final class DefaultServiceAdminTest {
             .thenReturn(Mono
                 .just(fill(ListServiceBrokersResponse.builder())
                     .build()));
-    }
-
-    public static final class CreateServiceBroker extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(Mono.just(this.cloudFoundryClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestCreateServiceBroker(this.cloudFoundryClient, "test-service-broker-name", "test-service-broker-url", "test-service-broker-username", "test-service-broker-password", null);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.serviceAdmin
-                .create(CreateServiceBrokerRequest.builder()
-                    .name("test-service-broker-name")
-                    .url("test-service-broker-url")
-                    .username("test-service-broker-username")
-                    .password("test-service-broker-password")
-                    .build());
-        }
-
-    }
-
-    public static final class CreateServiceBrokerWithSpaceScope extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(Mono.just(this.cloudFoundryClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestCreateServiceBroker(this.cloudFoundryClient, "test-service-broker-name", "test-service-broker-url", "test-service-broker-username", "test-service-broker-password", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.serviceAdmin
-                .create(CreateServiceBrokerRequest.builder()
-                    .name("test-service-broker-name")
-                    .url("test-service-broker-url")
-                    .username("test-service-broker-username")
-                    .password("test-service-broker-password")
-                    .spaceScoped(true)
-                    .build());
-        }
-
-    }
-
-    public static final class DeleteServiceBroker extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(Mono.just(this.cloudFoundryClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceBrokers(this.cloudFoundryClient, "test-service-broker-name");
-            requestDeleteServiceBroker(this.cloudFoundryClient, "test-service-broker-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.serviceAdmin
-                .delete(DeleteServiceBrokerRequest.builder()
-                    .name("test-service-broker-name")
-                    .build());
-        }
-
-    }
-
-    public static final class DeleteServiceBrokerNoServiceBroker extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(Mono.just(this.cloudFoundryClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceBrokersEmpty(this.cloudFoundryClient, "test-service-broker-name");
-            requestDeleteServiceBroker(this.cloudFoundryClient, "test-service-broker-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service Broker test-service-broker-name does not exist"));
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.serviceAdmin
-                .delete(DeleteServiceBrokerRequest.builder()
-                    .name("test-service-broker-name")
-                    .build());
-        }
-
-    }
-
-    public static final class ListServiceBrokers extends AbstractOperationsApiTest<ServiceBroker> {
-
-        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(Mono.just(this.cloudFoundryClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceBrokers(this.cloudFoundryClient);
-        }
-
-        @Override
-        protected ScriptedSubscriber<ServiceBroker> expectations() {
-            return ScriptedSubscriber.<ServiceBroker>create()
-                .expectNext(ServiceBroker.builder()
-                    .id("test-service-broker-id")
-                    .name("test-service-broker-resource-name")
-                    .url("test-service-broker-resource-brokerUrl")
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<ServiceBroker> invoke() {
-            return this.serviceAdmin
-                .list();
-        }
-
-    }
-
-    public static final class ListServiceBrokersNoBrokers extends AbstractOperationsApiTest<ServiceBroker> {
-
-        private final DefaultServiceAdmin serviceAdmin = new DefaultServiceAdmin(Mono.just(this.cloudFoundryClient), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListServiceBrokersEmpty(this.cloudFoundryClient);
-        }
-
-        @Override
-        protected ScriptedSubscriber<ServiceBroker> expectations() {
-            return ScriptedSubscriber.<ServiceBroker>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<ServiceBroker> invoke() {
-            return this.serviceAdmin
-                .list();
-        }
-
     }
 
 }

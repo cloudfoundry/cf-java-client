@@ -20,18 +20,13 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.featureflags.FeatureFlagEntity;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagRequest;
-import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagResponse;
 import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsRequest;
-import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsResponse;
 import org.cloudfoundry.client.v2.featureflags.SetFeatureFlagRequest;
-import org.cloudfoundry.client.v2.featureflags.SetFeatureFlagResponse;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuple3;
+import reactor.test.StepVerifier;
 import reactor.util.function.Tuples;
 
 import java.time.Duration;
@@ -44,7 +39,6 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
-import static reactor.core.publisher.Flux.fromIterable;
 
 public final class FeatureFlagsTest extends AbstractIntegrationTest {
 
@@ -65,10 +59,6 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
 
     @Test
     public void getEach() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<List<Tuple2<String, GetFeatureFlagResponse>>> subscriber = ScriptedSubscriber.<List<Tuple2<String, GetFeatureFlagResponse>>>create()
-            .consumeNextWith(list -> list.forEach(consumer((name, entity) -> assertThat(entity.getName()).isEqualTo(name))))
-            .expectComplete();
-
         Flux
             .fromIterable(coreFeatureFlagNameList)
             .flatMap(flagName -> this.cloudFoundryClient.featureFlags()
@@ -77,41 +67,29 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
                     .build())
                 .map(response -> Tuples.of(flagName, response)))
             .collectList()
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(list -> list.forEach(consumer((name, entity) -> assertThat(entity.getName()).isEqualTo(name))))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void list() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<ListFeatureFlagsResponse> subscriber = ScriptedSubscriber.<ListFeatureFlagsResponse>create()
+        this.cloudFoundryClient.featureFlags()
+            .list(ListFeatureFlagsRequest.builder()
+                .build())
+            .as(StepVerifier::create)
             .consumeNextWith(response -> {
                 Set<String> returnedFlagSet = flagNameSetFrom(response.getFeatureFlags());
                 assertThat(returnedFlagSet).containsAll(coreFeatureFlagNameList);
             })
-            .expectComplete();
-
-        this.cloudFoundryClient.featureFlags()
-            .list(ListFeatureFlagsRequest.builder()
-                .build())
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void setAndResetEach() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<List<Tuple3<GetFeatureFlagResponse, SetFeatureFlagResponse, SetFeatureFlagResponse>>> subscriber =
-            ScriptedSubscriber.<List<Tuple3<GetFeatureFlagResponse, SetFeatureFlagResponse, SetFeatureFlagResponse>>>create()
-                .consumeNextWith(list -> {
-                    list.forEach(consumer((getResponse, setResponse, resetResponse) -> {
-                        assertThat(setResponse.getEnabled()).isNotEqualTo(getResponse.getEnabled());
-                        assertThat(resetResponse.getEnabled()).isEqualTo(getResponse.getEnabled());
-                    }));
-                })
-                .expectComplete();
-
-        fromIterable(coreFeatureFlagNameList)
+        Flux.fromIterable(coreFeatureFlagNameList)
             .flatMap(flagName -> this.cloudFoundryClient.featureFlags()
                 .get(GetFeatureFlagRequest.builder()
                     .name(flagName)
@@ -135,9 +113,15 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
                                 .build())
                     ))))
             .collectList()
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(list -> {
+                list.forEach(consumer((getResponse, setResponse, resetResponse) -> {
+                    assertThat(setResponse.getEnabled()).isNotEqualTo(getResponse.getEnabled());
+                    assertThat(resetResponse.getEnabled()).isEqualTo(getResponse.getEnabled());
+                }));
+            })
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     private static Set<String> flagNameSetFrom(List<FeatureFlagEntity> listFlags) {

@@ -22,14 +22,13 @@ import org.cloudfoundry.uaa.identityzones.CreateIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzones.DeleteIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzones.GetIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzones.GetIdentityZoneResponse;
-import org.cloudfoundry.uaa.identityzones.IdentityZone;
 import org.cloudfoundry.uaa.identityzones.ListIdentityZonesRequest;
 import org.cloudfoundry.uaa.identityzones.ListIdentityZonesResponse;
 import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
@@ -44,10 +43,6 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String subdomainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<IdentityZone> subscriber = ScriptedSubscriber.<IdentityZone>create()
-            .expectNextCount(1)
-            .expectComplete();
-
         this.uaaClient.identityZones()
             .create(CreateIdentityZoneRequest.builder()
                 .subdomain(subdomainName)
@@ -56,18 +51,16 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
             .then(requestListIdentityZones(this.uaaClient))
             .flatMapIterable(ListIdentityZonesResponse::getIdentityZones)
             .filter(resource -> identityZoneName.equals(resource.getName()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void delete() throws TimeoutException, InterruptedException {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String subdomainName = this.nameFactory.getDomainName();
-
-        ScriptedSubscriber<IdentityZone> subscriber = ScriptedSubscriber.<IdentityZone>create()
-            .expectComplete();
 
         getIdentityZoneId(this.uaaClient, identityZoneName, subdomainName)
             .then(identityZoneId -> this.uaaClient.identityZones()
@@ -77,9 +70,9 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
             .then(requestListIdentityZones(this.uaaClient))
             .flatMapIterable(ListIdentityZonesResponse::getIdentityZones)
             .filter(resource -> identityZoneName.equals(resource.getName()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -87,19 +80,16 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String subdomainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectNext(identityZoneName)
-            .expectComplete();
-
         getIdentityZoneId(this.uaaClient, identityZoneName, subdomainName)
             .then(identityZoneId -> this.uaaClient.identityZones()
                 .get(GetIdentityZoneRequest.builder()
                     .identityZoneId(identityZoneId)
                     .build()))
             .map(GetIdentityZoneResponse::getName)
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNext(identityZoneName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -107,19 +97,16 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String subdomainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<IdentityZone> subscriber = ScriptedSubscriber.<IdentityZone>create()
-            .expectNextCount(1)
-            .expectComplete();
-
         requestCreateIdentityZone(this.uaaClient, identityZoneName, subdomainName)
             .then(this.uaaClient.identityZones()
                 .list(ListIdentityZonesRequest.builder()
                     .build()))
             .flatMapIterable(ListIdentityZonesResponse::getIdentityZones)
             .filter(resource -> identityZoneName.equals(resource.getName()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -127,10 +114,6 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String baseSubdomainName = this.nameFactory.getDomainName();
         String newSubdomainName = this.nameFactory.getDomainName();
-
-        ScriptedSubscriber<IdentityZone> subscriber = ScriptedSubscriber.<IdentityZone>create()
-            .expectNextCount(1)
-            .expectComplete();
 
         getIdentityZoneId(this.uaaClient, identityZoneName, baseSubdomainName)
             .then(identityZoneId -> this.uaaClient.identityZones()
@@ -142,9 +125,10 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
             .then(requestListIdentityZones(this.uaaClient))
             .flatMapIterable(ListIdentityZonesResponse::getIdentityZones)
             .filter(resource -> newSubdomainName.equals(resource.getSubdomain()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     private static Mono<String> getIdentityZoneId(UaaClient uaaClient, String identityZoneName, String subdomainName) {

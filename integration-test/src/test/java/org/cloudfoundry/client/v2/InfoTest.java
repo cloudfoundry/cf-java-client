@@ -20,10 +20,9 @@ import com.github.zafarkhaja.semver.Version;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
-import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
@@ -38,21 +37,18 @@ public final class InfoTest extends AbstractIntegrationTest {
 
     @Test
     public void info() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<GetInfoResponse> subscriber = ScriptedSubscriber.<GetInfoResponse>create()
+        this.cloudFoundryClient.info()
+            .get(GetInfoRequest.builder()
+                .build())
+            .as(StepVerifier::create)
             .consumeNextWith(response -> {
                 Version expected = Version.valueOf(SUPPORTED_API_VERSION);
                 Version actual = Version.valueOf(response.getApiVersion());
 
                 assertThat(actual).isLessThanOrEqualTo(expected);
             })
-            .expectComplete();
-
-        this.cloudFoundryClient.info()
-            .get(GetInfoRequest.builder()
-                .build())
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
 }

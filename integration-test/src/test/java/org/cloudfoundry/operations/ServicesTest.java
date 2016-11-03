@@ -23,7 +23,7 @@ import org.cloudfoundry.operations.services.ServiceInstance;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
@@ -38,10 +38,6 @@ public final class ServicesTest extends AbstractIntegrationTest {
     public void getManagedService() throws TimeoutException, InterruptedException {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectNext(serviceInstanceName)
-            .expectComplete();
-
         this.cloudFoundryOperations.services()
             .createInstance(CreateServiceInstanceRequest.builder()
                 .planName("shared-vm") //TODO: Replace with derived value
@@ -53,9 +49,10 @@ public final class ServicesTest extends AbstractIntegrationTest {
                     .name(serviceInstanceName)
                     .build()))
             .map(ServiceInstance::getName)
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNext(serviceInstanceName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
 }

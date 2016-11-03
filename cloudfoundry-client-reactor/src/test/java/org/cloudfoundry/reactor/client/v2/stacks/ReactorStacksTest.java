@@ -27,22 +27,72 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import org.junit.Test;
+import reactor.test.StepVerifier;
+
+import java.time.Duration;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorStacksTest {
+public final class ReactorStacksTest extends AbstractClientApiTest {
 
-    public static final class Get extends AbstractClientApiTest<GetStackRequest, GetStackResponse> {
+    private final ReactorStacks stacks = new ReactorStacks(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
-        private final ReactorStacks stacks = new ReactorStacks(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    @Test
+    public void get() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/stacks/test-stack-id")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/stacks/GET_{id}_response.json")
+                .build())
+            .build());
 
-        @Override
-        protected ScriptedSubscriber<GetStackResponse> expectations() {
-            return ScriptedSubscriber.<GetStackResponse>create()
-                .expectNext(GetStackResponse.builder()
+        this.stacks
+            .get(GetStackRequest.builder()
+                .stackId("test-stack-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetStackResponse.builder()
+                .metadata(Metadata.builder()
+                    .id("fe4999cf-a207-4d40-bb03-f4bbf697edac")
+                    .url("/v2/stacks/fe4999cf-a207-4d40-bb03-f4bbf697edac")
+                    .createdAt("2015-12-22T18:27:59Z")
+                    .build())
+                .entity(StackEntity.builder()
+                    .name("cflinuxfs2")
+                    .description("cflinuxfs2")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void list() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/stacks?q=name%20IN%20test-name&page=-1")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/stacks/GET_response.json")
+                .build())
+            .build());
+
+        this.stacks
+            .list(ListStacksRequest.builder()
+                .name("test-name")
+                .page(-1)
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListStacksResponse.builder()
+                .totalResults(3)
+                .totalPages(1)
+                .resource(StackResource.builder()
                     .metadata(Metadata.builder()
                         .id("fe4999cf-a207-4d40-bb03-f4bbf697edac")
                         .url("/v2/stacks/fe4999cf-a207-4d40-bb03-f4bbf697edac")
@@ -53,109 +103,31 @@ public final class ReactorStacksTest {
                         .description("cflinuxfs2")
                         .build())
                     .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/v2/stacks/test-stack-id")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/stacks/GET_{id}_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<GetStackResponse> invoke(GetStackRequest request) {
-            return this.stacks.get(request);
-        }
-
-        @Override
-        protected GetStackRequest validRequest() {
-            return GetStackRequest.builder()
-                .stackId("test-stack-id")
-                .build();
-        }
-
-    }
-
-    public static final class List extends AbstractClientApiTest<ListStacksRequest, ListStacksResponse> {
-
-        private final ReactorStacks stacks = new ReactorStacks(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<ListStacksResponse> expectations() {
-            return ScriptedSubscriber.<ListStacksResponse>create()
-                .expectNext(ListStacksResponse.builder()
-                    .totalResults(3)
-                    .totalPages(1)
-                    .resource(StackResource.builder()
-                        .metadata(Metadata.builder()
-                            .id("fe4999cf-a207-4d40-bb03-f4bbf697edac")
-                            .url("/v2/stacks/fe4999cf-a207-4d40-bb03-f4bbf697edac")
-                            .createdAt("2015-12-22T18:27:59Z")
-                            .build())
-                        .entity(StackEntity.builder()
-                            .name("cflinuxfs2")
-                            .description("cflinuxfs2")
-                            .build())
+                .resource(StackResource.builder()
+                    .metadata(Metadata.builder()
+                        .id("ff0f87c9-9add-477a-8674-c11c012667a6")
+                        .url("/v2/stacks/ff0f87c9-9add-477a-8674-c11c012667a6")
+                        .createdAt("2015-12-22T18:27:59Z")
                         .build())
-                    .resource(StackResource.builder()
-                        .metadata(Metadata.builder()
-                            .id("ff0f87c9-9add-477a-8674-c11c012667a6")
-                            .url("/v2/stacks/ff0f87c9-9add-477a-8674-c11c012667a6")
-                            .createdAt("2015-12-22T18:27:59Z")
-                            .build())
-                        .entity(StackEntity.builder()
-                            .name("default-stack-name")
-                            .description("default-stack-description")
-                            .build())
-                        .build())
-                    .resource(StackResource.builder()
-                        .metadata(Metadata.builder()
-                            .id("01bd93b4-f252-4517-a4a5-191eb4c7fc7e")
-                            .url("/v2/stacks/01bd93b4-f252-4517-a4a5-191eb4c7fc7e")
-                            .createdAt("2015-12-22T18:27:59Z")
-                            .build())
-                        .entity(StackEntity.builder()
-                            .name("cider")
-                            .description("cider-description")
-                            .build())
+                    .entity(StackEntity.builder()
+                        .name("default-stack-name")
+                        .description("default-stack-description")
                         .build())
                     .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/v2/stacks?q=name%20IN%20test-name&page=-1")
+                .resource(StackResource.builder()
+                    .metadata(Metadata.builder()
+                        .id("01bd93b4-f252-4517-a4a5-191eb4c7fc7e")
+                        .url("/v2/stacks/01bd93b4-f252-4517-a4a5-191eb4c7fc7e")
+                        .createdAt("2015-12-22T18:27:59Z")
+                        .build())
+                    .entity(StackEntity.builder()
+                        .name("cider")
+                        .description("cider-description")
+                        .build())
                     .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/stacks/GET_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<ListStacksResponse> invoke(ListStacksRequest request) {
-            return this.stacks.list(request);
-        }
-
-        @Override
-        protected ListStacksRequest validRequest() {
-            return ListStacksRequest.builder()
-                .name("test-name")
-                .page(-1)
-                .build();
-        }
-
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
 }

@@ -49,17 +49,17 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
 import reactor.util.function.Tuple2;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
-import static reactor.core.publisher.Mono.when;
 
 public final class DomainsTest extends AbstractIntegrationTest {
 
@@ -79,115 +79,105 @@ public final class DomainsTest extends AbstractIntegrationTest {
     public void create() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<Tuple2<DomainEntity, String>> subscriber = domainNameAndOrganizationIdEquality(domainName);
-
         this.organizationId
-            .then(organizationId -> when(
+            .then(organizationId -> Mono.when(
                 createDomainEntity(this.cloudFoundryClient, organizationId, domainName),
                 Mono.just(organizationId)
             ))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(domainNameAndOrganizationIdEquality(domainName))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void delete() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<GetDomainResponse> subscriber = ScriptedSubscriber.<GetDomainResponse>create()
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"));
-
         this.organizationId
             .then(organizationId -> createDomainId(this.cloudFoundryClient, domainName, organizationId))
             .as(thenKeep(domainId -> requestDeleteDomain(this.cloudFoundryClient, domainId)
                 .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))))
             .then(domainId -> requestGetDomain(this.cloudFoundryClient, domainId))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"))
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void deleteNotAsync() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<GetDomainResponse> subscriber = ScriptedSubscriber.<GetDomainResponse>create()
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"));
-
         this.organizationId
             .then(organizationId -> createDomainId(this.cloudFoundryClient, domainName, organizationId))
             .as(thenKeep(domainId -> requestDeleteDomainAsyncFalse(this.cloudFoundryClient, domainId)))
             .then(domainId -> requestGetDomain(this.cloudFoundryClient, domainId))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"))
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void get() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<Tuple2<DomainEntity, String>> subscriber = domainNameAndOrganizationIdEquality(domainName);
-
         this.organizationId
-            .then(organizationId -> when(
+            .then(organizationId -> Mono.when(
                 Mono.just(organizationId),
                 createDomainId(this.cloudFoundryClient, domainName, organizationId)
             ))
-            .then(function((organizationId, domainId) -> when(
+            .then(function((organizationId, domainId) -> Mono.when(
                 getDomainEntity(this.cloudFoundryClient, domainId),
                 Mono.just(organizationId)
             )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(domainNameAndOrganizationIdEquality(domainName))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void list() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<Tuple2<DomainEntity, String>> subscriber = domainNameAndOrganizationIdEquality(domainName);
-
         this.organizationId
-            .then(organizationId -> when(
+            .then(organizationId -> Mono.when(
                 Mono.just(organizationId),
                 createDomainId(this.cloudFoundryClient, domainName, organizationId)
             ))
-            .then(function((organizationId, domainId) -> when(
+            .then(function((organizationId, domainId) -> Mono.when(
                 requestListDomains(this.cloudFoundryClient)
                     .filter(resource -> domainId.equals(ResourceUtils.getId(resource)))
                     .single()
                     .map(ResourceUtils::getEntity),
                 Mono.just(organizationId)
             )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(domainNameAndOrganizationIdEquality(domainName))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listDomainSpaces() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
-
-        when(this.organizationId, this.spaceId)
-            .then(function((organizationId, spaceId) -> when(
+        Mono.when(this.organizationId, this.spaceId)
+            .then(function((organizationId, spaceId) -> Mono.when(
                 createDomainId(this.cloudFoundryClient, domainName, organizationId),
                 Mono.just(spaceId)
             )))
-            .then(function((domainId, spaceId) -> when(
+            .then(function((domainId, spaceId) -> Mono.when(
                 requestListDomainSpaces(this.cloudFoundryClient, domainId)
                     .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
                     .single()
                     .map(ResourceUtils::getId),
                 Mono.just(spaceId)
             )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -195,12 +185,10 @@ public final class DomainsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
-
         this.organizationId
             .then(organizationId -> createDomainId(this.cloudFoundryClient, domainName, organizationId))
             .and(this.spaceId)
-            .then(function((domainId, spaceId) -> when(
+            .then(function((domainId, spaceId) -> Mono.when(
                 Mono.just(domainId),
                 Mono.just(spaceId),
                 getApplicationId(this.cloudFoundryClient, applicationName, spaceId),
@@ -208,26 +196,25 @@ public final class DomainsTest extends AbstractIntegrationTest {
             )))
             .as(thenKeep(function((domainId, spaceId, applicationId, routeId) -> requestAssociateRouteApplication(this.cloudFoundryClient, applicationId, routeId)
             )))
-            .then(function((domainId, spaceId, applicationId, routeId) -> when(
+            .then(function((domainId, spaceId, applicationId, routeId) -> Mono.when(
                 requestListDomainSpacesByApplicationId(this.cloudFoundryClient, applicationId, domainId)
                     .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
                     .single()
                     .map(ResourceUtils::getId),
                 Mono.just(spaceId)
             )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listDomainSpacesFilterByDeveloperId() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
-
-        when(this.spaceId, this.organizationId, this.userId)
-            .then(function((spaceId, organizationId, userId) -> when(
+        Mono.when(this.spaceId, this.organizationId, this.userId)
+            .then(function((spaceId, organizationId, userId) -> Mono.when(
                 createDomainId(this.cloudFoundryClient, domainName, organizationId),
                 requestAssociateOrganizationUser(this.cloudFoundryClient, organizationId, userId),
                 Mono.just(spaceId),
@@ -239,41 +226,39 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .single()
                 .map(ResourceUtils::getId)
                 .and(Mono.just(spaceId))))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listDomainSpacesFilterByName() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
-
-        when(this.organizationId, this.spaceId)
+        Mono.when(this.organizationId, this.spaceId)
             .then(function((organizationId, spaceId) ->
-                when(
+                Mono.when(
                     Mono.just(spaceId),
                     getSpaceName(this.cloudFoundryClient, spaceId),
                     createDomainId(this.cloudFoundryClient, domainName, organizationId)
                 )))
-            .then(function((spaceId, spaceName, domainId) -> when(
+            .then(function((spaceId, spaceName, domainId) -> Mono.when(
                 requestListDomainSpacesBySpaceName(this.cloudFoundryClient, domainId, spaceName)
                     .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
                     .single()
                     .map(ResourceUtils::getId),
                 Mono.just(spaceId)
             )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listDomainSpacesFilterByOrganizationId() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
-
-        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
 
         Mono
             .when(this.organizationId, this.spaceId)
@@ -289,55 +274,54 @@ public final class DomainsTest extends AbstractIntegrationTest {
                     .map(ResourceUtils::getId),
                 Mono.just(spaceId)
             )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listFilterByName() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<Tuple2<DomainEntity, String>> subscriber = domainNameAndOrganizationIdEquality(domainName);
-
         this.organizationId
-            .then(organizationId -> when(
+            .then(organizationId -> Mono.when(
                 Mono.just(organizationId),
                 createDomainId(this.cloudFoundryClient, domainName, organizationId)
             ))
-            .then(function((organizationId, domainId) -> when(
+            .then(function((organizationId, domainId) -> Mono.when(
                 requestListDomains(this.cloudFoundryClient, domainName)
                     .filter(resource -> domainId.equals(ResourceUtils.getId(resource)))
                     .single()
                     .map(ResourceUtils::getEntity),
                 Mono.just(organizationId)
             )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(domainNameAndOrganizationIdEquality(domainName))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listFilterByOwningOrganizationId() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<Tuple2<DomainEntity, String>> subscriber = domainNameAndOrganizationIdEquality(domainName);
-
         this.organizationId
-            .then(organizationId -> when(
+            .then(organizationId -> Mono.when(
                 Mono.just(organizationId),
                 createDomainId(this.cloudFoundryClient, domainName, organizationId)
             ))
-            .then(function((organizationId, domainId) -> when(
+            .then(function((organizationId, domainId) -> Mono.when(
                 requestListDomainsByOwningOrganization(this.cloudFoundryClient, organizationId)
                     .filter(resource -> domainId.equals(ResourceUtils.getId(resource)))
                     .single()
                     .map(ResourceUtils::getEntity),
                 Mono.just(organizationId)
             )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(domainNameAndOrganizationIdEquality(domainName))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     private static Mono<DomainEntity> createDomainEntity(CloudFoundryClient cloudFoundryClient, String organizationId, String domainName) {
@@ -350,13 +334,11 @@ public final class DomainsTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getId);
     }
 
-    private static ScriptedSubscriber<Tuple2<DomainEntity, String>> domainNameAndOrganizationIdEquality(String domainName) {
-        return ScriptedSubscriber.<Tuple2<DomainEntity, String>>create()
-            .consumeNextWith(consumer((entity, organizationId) -> {
-                assertThat(entity.getName()).isEqualTo(domainName);
-                assertThat(entity.getOwningOrganizationId()).isEqualTo(organizationId);
-            }))
-            .expectComplete();
+    private static Consumer<Tuple2<DomainEntity, String>> domainNameAndOrganizationIdEquality(String domainName) {
+        return consumer((entity, organizationId) -> {
+            assertThat(entity.getName()).isEqualTo(domainName);
+            assertThat(entity.getOwningOrganizationId()).isEqualTo(organizationId);
+        });
     }
 
     private static Mono<String> getApplicationId(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {

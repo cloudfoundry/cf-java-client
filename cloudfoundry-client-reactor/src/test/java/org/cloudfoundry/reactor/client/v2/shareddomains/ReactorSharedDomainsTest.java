@@ -32,8 +32,10 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import org.junit.Test;
+import reactor.test.StepVerifier;
+
+import java.time.Duration;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -42,151 +44,186 @@ import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorSharedDomainsTest {
+public final class ReactorSharedDomainsTest extends AbstractClientApiTest {
 
-    public static final class Create extends AbstractClientApiTest<CreateSharedDomainRequest, CreateSharedDomainResponse> {
+    private final ReactorSharedDomains sharedDomains = new ReactorSharedDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
-        private final ReactorSharedDomains sharedDomains = new ReactorSharedDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    @Test
+    public void create() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(POST).path("/v2/shared_domains")
+                .payload("fixtures/client/v2/shared_domains/POST_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/shared_domains/POST_response.json")
+                .build())
+            .build());
 
-        @Override
-        protected ScriptedSubscriber<CreateSharedDomainResponse> expectations() {
-            return ScriptedSubscriber.<CreateSharedDomainResponse>create()
-                .expectNext(CreateSharedDomainResponse.builder()
-                    .metadata(Metadata.builder()
-                        .id("d6c7d452-70bb-4edd-bbf1-a925dd51732c")
-                        .url("/v2/shared_domains/d6c7d452-70bb-4edd-bbf1-a925dd51732c")
-                        .createdAt("2016-04-22T19:33:17Z")
-                        .build())
-                    .entity(SharedDomainEntity.builder()
-                        .name("example.com")
-                        .routerGroupId("my-random-guid")
-                        .routerGroupType("tcp")
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(POST).path("/v2/shared_domains")
-                    .payload("fixtures/client/v2/shared_domains/POST_request.json")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/shared_domains/POST_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<CreateSharedDomainResponse> invoke(CreateSharedDomainRequest request) {
-            return this.sharedDomains.create(request);
-        }
-
-        @Override
-        protected CreateSharedDomainRequest validRequest() {
-            return CreateSharedDomainRequest.builder()
+        this.sharedDomains
+            .create(CreateSharedDomainRequest.builder()
                 .name("shared-domain.com")
                 .routerGroupId("random-guid")
-                .build();
-        }
-
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(CreateSharedDomainResponse.builder()
+                .metadata(Metadata.builder()
+                    .id("d6c7d452-70bb-4edd-bbf1-a925dd51732c")
+                    .url("/v2/shared_domains/d6c7d452-70bb-4edd-bbf1-a925dd51732c")
+                    .createdAt("2016-04-22T19:33:17Z")
+                    .build())
+                .entity(SharedDomainEntity.builder()
+                    .name("example.com")
+                    .routerGroupId("my-random-guid")
+                    .routerGroupType("tcp")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class Delete extends AbstractClientApiTest<DeleteSharedDomainRequest, DeleteSharedDomainResponse> {
+    @Test
+    public void delete() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/v2/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6")
+                .build())
+            .response(TestResponse.builder()
+                .status(NO_CONTENT)
+                .build())
+            .build());
 
-        private final ReactorSharedDomains sharedDomains = new ReactorSharedDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<DeleteSharedDomainResponse> expectations() {
-            return ScriptedSubscriber.<DeleteSharedDomainResponse>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(DELETE).path("/v2/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(NO_CONTENT)
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<DeleteSharedDomainResponse> invoke(DeleteSharedDomainRequest request) {
-            return this.sharedDomains.delete(request);
-        }
-
-        @Override
-        protected DeleteSharedDomainRequest validRequest() {
-            return DeleteSharedDomainRequest.builder()
+        this.sharedDomains
+            .delete(DeleteSharedDomainRequest.builder()
                 .sharedDomainId("fa1385de-55ba-41d3-beb2-f83919c634d6")
-                .build();
-        }
-
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class DeleteAsync extends AbstractClientApiTest<DeleteSharedDomainRequest, DeleteSharedDomainResponse> {
+    @Test
+    public void deleteAsync() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/v2/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6?async=true")
+                .build())
+            .response(TestResponse.builder()
+                .status(ACCEPTED)
+                .payload("fixtures/client/v2/shared_domains/DELETE_{id}_async_response.json")
+                .build())
+            .build());
 
-        private final ReactorSharedDomains sharedDomains = new ReactorSharedDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<DeleteSharedDomainResponse> expectations() {
-            return ScriptedSubscriber.<DeleteSharedDomainResponse>create()
-                .expectNext(DeleteSharedDomainResponse.builder()
-                    .metadata(Metadata.builder()
-                        .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
-                        .createdAt("2016-02-02T17:16:31Z")
-                        .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
-                        .build())
-                    .entity(JobEntity.builder()
-                        .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
-                        .status("queued")
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(DELETE).path("/v2/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6?async=true")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(ACCEPTED)
-                    .payload("fixtures/client/v2/shared_domains/DELETE_{id}_async_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<DeleteSharedDomainResponse> invoke(DeleteSharedDomainRequest request) {
-            return this.sharedDomains.delete(request);
-        }
-
-        @Override
-        protected DeleteSharedDomainRequest validRequest() {
-            return DeleteSharedDomainRequest.builder()
+        this.sharedDomains
+            .delete(DeleteSharedDomainRequest.builder()
                 .async(true)
                 .sharedDomainId("fa1385de-55ba-41d3-beb2-f83919c634d6")
-                .build();
-        }
-
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(DeleteSharedDomainResponse.builder()
+                .metadata(Metadata.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .createdAt("2016-02-02T17:16:31Z")
+                    .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .build())
+                .entity(JobEntity.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .status("queued")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class Get extends AbstractClientApiTest<GetSharedDomainRequest, GetSharedDomainResponse> {
+    @Test
+    public void listSharedDomains() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/shared_domains?page=-1")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/shared_domains/GET_response.json")
+                .build())
+            .build());
+
+        this.sharedDomains
+            .list(ListSharedDomainsRequest.builder()
+                .page(-1)
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListSharedDomainsResponse.builder()
+                .totalResults(5)
+                .totalPages(1)
+                .resource(SharedDomainResource.builder()
+                    .metadata(Metadata.builder()
+                        .id("f01b174d-c750-46b0-9ddf-3aeb2064d796")
+                        .url("/v2/shared_domains/f01b174d-c750-46b0-9ddf-3aeb2064d796")
+                        .createdAt("2015-11-30T23:38:35Z")
+                        .build())
+                    .entity(SharedDomainEntity.builder()
+                        .name("customer-app-domain1.com")
+                        .build())
+                    .build())
+                .resource(SharedDomainResource.builder()
+                    .metadata(Metadata.builder()
+                        .id("3595f6cb-81cf-424e-a546-533877ccccfd")
+                        .url("/v2/shared_domains/3595f6cb-81cf-424e-a546-533877ccccfd")
+                        .createdAt("2015-11-30T23:38:35Z")
+                        .build())
+                    .entity(SharedDomainEntity.builder()
+                        .name("customer-app-domain2.com")
+                        .build())
+                    .build())
+                .resource(SharedDomainResource.builder()
+                    .metadata(Metadata.builder()
+                        .id("d0d28c59-86ee-4415-9269-500976f18e72")
+                        .url("/v2/shared_domains/d0d28c59-86ee-4415-9269-500976f18e72")
+                        .createdAt("2015-11-30T23:38:35Z")
+                        .build())
+                    .entity(SharedDomainEntity.builder()
+                        .name("domain-19.example.com")
+                        .build())
+                    .build())
+                .resource(SharedDomainResource.builder()
+                    .metadata(Metadata.builder()
+                        .id("b7242cdb-f81a-4469-b897-d5a218470fdf")
+                        .url("/v2/shared_domains/b7242cdb-f81a-4469-b897-d5a218470fdf")
+                        .createdAt("2015-11-30T23:38:35Z")
+                        .build())
+                    .entity(SharedDomainEntity.builder()
+                        .name("domain-20.example.com")
+                        .build())
+                    .build())
+                .resource(SharedDomainResource.builder()
+                    .metadata(Metadata.builder()
+                        .id("130c193c-c1c6-41c9-98c2-4a0e16a948bf")
+                        .url("/v2/shared_domains/130c193c-c1c6-41c9-98c2-4a0e16a948bf")
+                        .createdAt("2015-11-30T23:38:35Z")
+                        .build())
+                    .entity(SharedDomainEntity.builder()
+                        .name("domain-21.example.com")
+                        .build())
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    public static final class Get extends AbstractClientApiTest {
 
         private final ReactorSharedDomains sharedDomains = new ReactorSharedDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
-        @Override
-        protected ScriptedSubscriber<GetSharedDomainResponse> expectations() {
-            return ScriptedSubscriber.<GetSharedDomainResponse>create()
+        @Test
+        public void get() {
+            mockRequest(interactionContext());
+
+            this.sharedDomains
+                .get(GetSharedDomainRequest.builder()
+                    .sharedDomainId("fa1385de-55ba-41d3-beb2-f83919c634d6")
+                    .build())
+                .as(StepVerifier::create)
                 .expectNext(GetSharedDomainResponse.builder()
                     .metadata(Metadata.builder()
                         .id("fa1385de-55ba-41d3-beb2-f83919c634d6")
@@ -197,11 +234,11 @@ public final class ReactorSharedDomainsTest {
                         .name("customer-app-domain1.com")
                         .build())
                     .build())
-                .expectComplete();
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
         }
 
-        @Override
-        protected InteractionContext interactionContext() {
+        public InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
                     .method(GET).path("/v2/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6")
@@ -210,109 +247,6 @@ public final class ReactorSharedDomainsTest {
                     .status(OK)
                     .payload("fixtures/client/v2/shared_domains/GET_{id}_response.json")
                     .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<GetSharedDomainResponse> invoke(GetSharedDomainRequest request) {
-            return this.sharedDomains.get(request);
-        }
-
-        @Override
-        protected GetSharedDomainRequest validRequest() {
-            return GetSharedDomainRequest.builder()
-                .sharedDomainId("fa1385de-55ba-41d3-beb2-f83919c634d6")
-                .build();
-        }
-
-    }
-
-    public static final class ListSharedDomains extends AbstractClientApiTest<ListSharedDomainsRequest, ListSharedDomainsResponse> {
-
-        private final ReactorSharedDomains sharedDomains = new ReactorSharedDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<ListSharedDomainsResponse> expectations() {
-            return ScriptedSubscriber.<ListSharedDomainsResponse>create()
-                .expectNext(ListSharedDomainsResponse.builder()
-                    .totalResults(5)
-                    .totalPages(1)
-                    .resource(SharedDomainResource.builder()
-                        .metadata(Metadata.builder()
-                            .id("f01b174d-c750-46b0-9ddf-3aeb2064d796")
-                            .url("/v2/shared_domains/f01b174d-c750-46b0-9ddf-3aeb2064d796")
-                            .createdAt("2015-11-30T23:38:35Z")
-                            .build())
-                        .entity(SharedDomainEntity.builder()
-                            .name("customer-app-domain1.com")
-                            .build())
-                        .build())
-                    .resource(SharedDomainResource.builder()
-                        .metadata(Metadata.builder()
-                            .id("3595f6cb-81cf-424e-a546-533877ccccfd")
-                            .url("/v2/shared_domains/3595f6cb-81cf-424e-a546-533877ccccfd")
-                            .createdAt("2015-11-30T23:38:35Z")
-                            .build())
-                        .entity(SharedDomainEntity.builder()
-                            .name("customer-app-domain2.com")
-                            .build())
-                        .build())
-                    .resource(SharedDomainResource.builder()
-                        .metadata(Metadata.builder()
-                            .id("d0d28c59-86ee-4415-9269-500976f18e72")
-                            .url("/v2/shared_domains/d0d28c59-86ee-4415-9269-500976f18e72")
-                            .createdAt("2015-11-30T23:38:35Z")
-                            .build())
-                        .entity(SharedDomainEntity.builder()
-                            .name("domain-19.example.com")
-                            .build())
-                        .build())
-                    .resource(SharedDomainResource.builder()
-                        .metadata(Metadata.builder()
-                            .id("b7242cdb-f81a-4469-b897-d5a218470fdf")
-                            .url("/v2/shared_domains/b7242cdb-f81a-4469-b897-d5a218470fdf")
-                            .createdAt("2015-11-30T23:38:35Z")
-                            .build())
-                        .entity(SharedDomainEntity.builder()
-                            .name("domain-20.example.com")
-                            .build())
-                        .build())
-                    .resource(SharedDomainResource.builder()
-                        .metadata(Metadata.builder()
-                            .id("130c193c-c1c6-41c9-98c2-4a0e16a948bf")
-                            .url("/v2/shared_domains/130c193c-c1c6-41c9-98c2-4a0e16a948bf")
-                            .createdAt("2015-11-30T23:38:35Z")
-                            .build())
-                        .entity(SharedDomainEntity.builder()
-                            .name("domain-21.example.com")
-                            .build())
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/v2/shared_domains?page=-1")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/shared_domains/GET_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<ListSharedDomainsResponse> invoke(ListSharedDomainsRequest request) {
-            return this.sharedDomains.list(request);
-        }
-
-        @Override
-        protected ListSharedDomainsRequest validRequest() {
-            return ListSharedDomainsRequest.builder()
-                .page(-1)
                 .build();
         }
 

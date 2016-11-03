@@ -36,9 +36,10 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import org.junit.Test;
+import reactor.test.StepVerifier;
 
+import java.time.Duration;
 import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
@@ -50,380 +51,277 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorUserProvidedServiceInstancesTest {
+public final class ReactorUserProvidedServiceInstancesTest extends AbstractClientApiTest {
 
-    public static final class Create extends AbstractClientApiTest<CreateUserProvidedServiceInstanceRequest, CreateUserProvidedServiceInstanceResponse> {
+    private final ReactorUserProvidedServiceInstances userProvidedServiceInstances = new ReactorUserProvidedServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
-        private final ReactorUserProvidedServiceInstances userProvidedServiceInstances = new ReactorUserProvidedServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    @Test
+    public void create() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(POST).path("/v2/user_provided_service_instances")
+                .payload("fixtures/client/v2/user_provided_service_instances/POST_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(CREATED)
+                .payload("fixtures/client/v2/user_provided_service_instances/POST_response.json")
+                .build())
+            .build());
 
-        @Override
-        protected ScriptedSubscriber<CreateUserProvidedServiceInstanceResponse> expectations() {
-            return ScriptedSubscriber.<CreateUserProvidedServiceInstanceResponse>create()
-                .expectNext(CreateUserProvidedServiceInstanceResponse.builder()
-                    .metadata(Metadata.builder()
-                        .createdAt("2015-07-27T22:43:35Z")
-                        .id("34d5500e-712d-49ef-8bbe-c9ac349532da")
-                        .url("/v2/user_provided_service_instances/34d5500e-712d-49ef-8bbe-c9ac349532da")
-                        .build())
-                    .entity(UserProvidedServiceInstanceEntity.builder()
-                        .name("my-user-provided-instance")
-                        .credential("somekey", "somevalue")
-                        .spaceId("0d45d43f-7d50-43c6-9981-b32ce8d5a373")
-                        .type("user_provided_service_instance")
-                        .syslogDrainUrl("syslog://example.com")
-                        .routeServiceUrl("https://logger.example.com")
-                        .spaceUrl("/v2/spaces/0d45d43f-7d50-43c6-9981-b32ce8d5a373")
-                        .serviceBindingsUrl("/v2/user_provided_service_instances/34d5500e-712d-49ef-8bbe-c9ac349532da/service_bindings")
-                        .routesUrl("/v2/user_provided_service_instances/34d5500e-712d-49ef-8bbe-c9ac349532da/routes")
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(POST).path("/v2/user_provided_service_instances")
-                    .payload("fixtures/client/v2/user_provided_service_instances/POST_request.json")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(CREATED)
-                    .payload("fixtures/client/v2/user_provided_service_instances/POST_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<CreateUserProvidedServiceInstanceResponse> invoke(CreateUserProvidedServiceInstanceRequest request) {
-            return this.userProvidedServiceInstances.create(request);
-        }
-
-        @Override
-        protected CreateUserProvidedServiceInstanceRequest validRequest() {
-            return CreateUserProvidedServiceInstanceRequest.builder()
+        this.userProvidedServiceInstances
+            .create(CreateUserProvidedServiceInstanceRequest.builder()
                 .spaceId("0d45d43f-7d50-43c6-9981-b32ce8d5a373")
                 .name("my-user-provided-instance")
                 .credential("somekey", "somevalue")
                 .routeServiceUrl("https://logger.example.com")
                 .syslogDrainUrl("syslog://example.com")
-                .build();
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(CreateUserProvidedServiceInstanceResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2015-07-27T22:43:35Z")
+                    .id("34d5500e-712d-49ef-8bbe-c9ac349532da")
+                    .url("/v2/user_provided_service_instances/34d5500e-712d-49ef-8bbe-c9ac349532da")
+                    .build())
+                .entity(UserProvidedServiceInstanceEntity.builder()
+                    .name("my-user-provided-instance")
+                    .credential("somekey", "somevalue")
+                    .spaceId("0d45d43f-7d50-43c6-9981-b32ce8d5a373")
+                    .type("user_provided_service_instance")
+                    .syslogDrainUrl("syslog://example.com")
+                    .routeServiceUrl("https://logger.example.com")
+                    .spaceUrl("/v2/spaces/0d45d43f-7d50-43c6-9981-b32ce8d5a373")
+                    .serviceBindingsUrl("/v2/user_provided_service_instances/34d5500e-712d-49ef-8bbe-c9ac349532da/service_bindings")
+                    .routesUrl("/v2/user_provided_service_instances/34d5500e-712d-49ef-8bbe-c9ac349532da/routes")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class Delete extends AbstractClientApiTest<DeleteUserProvidedServiceInstanceRequest, Void> {
+    @Test
+    public void delete() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/v2/user_provided_service_instances/5b6b45c8-89be-48d2-affd-f64346ad4d93")
+                .build())
+            .response(TestResponse.builder()
+                .status(NO_CONTENT)
+                .build())
+            .build());
 
-        private final ReactorUserProvidedServiceInstances userProvidedServiceInstances = new ReactorUserProvidedServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(DELETE).path("/v2/user_provided_service_instances/5b6b45c8-89be-48d2-affd-f64346ad4d93")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(NO_CONTENT)
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<Void> invoke(DeleteUserProvidedServiceInstanceRequest request) {
-            return this.userProvidedServiceInstances.delete(request);
-        }
-
-        @Override
-        protected DeleteUserProvidedServiceInstanceRequest validRequest() {
-            return DeleteUserProvidedServiceInstanceRequest.builder()
+        this.userProvidedServiceInstances
+            .delete(DeleteUserProvidedServiceInstanceRequest.builder()
                 .userProvidedServiceInstanceId("5b6b45c8-89be-48d2-affd-f64346ad4d93")
-                .build();
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class Get extends AbstractClientApiTest<GetUserProvidedServiceInstanceRequest, GetUserProvidedServiceInstanceResponse> {
+    @Test
+    public void get() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/user_provided_service_instances/GET_{id}_response.json")
+                .build())
+            .build());
 
-        private final ReactorUserProvidedServiceInstances userProvidedServiceInstances = new ReactorUserProvidedServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+        this.userProvidedServiceInstances
+            .get(GetUserProvidedServiceInstanceRequest.builder()
+                .userProvidedServiceInstanceId("8c12fd06-6639-4844-b5e7-a6831cadbbcc")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetUserProvidedServiceInstanceResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2015-07-27T22:43:34Z")
+                    .id("8c12fd06-6639-4844-b5e7-a6831cadbbcc")
+                    .url("/v2/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc")
+                    .build())
+                .entity(UserProvidedServiceInstanceEntity.builder()
+                    .name("name-2361")
+                    .credential("creds-key-662", "creds-val-662")
+                    .spaceId("cebb3962-4e5b-4204-b117-3140ec4a62d9")
+                    .type("user_provided_service_instance")
+                    .syslogDrainUrl("https://foo.com/url-89")
+                    .spaceUrl("/v2/spaces/cebb3962-4e5b-4204-b117-3140ec4a62d9")
+                    .serviceBindingsUrl("/v2/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc/service_bindings")
+                    .routesUrl("/v2/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc/routes")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
-        @Override
-        protected ScriptedSubscriber<GetUserProvidedServiceInstanceResponse> expectations() {
-            return ScriptedSubscriber.<GetUserProvidedServiceInstanceResponse>create()
-                .expectNext(GetUserProvidedServiceInstanceResponse.builder()
+    @Test
+    public void list() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/user_provided_service_instances?page=-1")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/user_provided_service_instances/GET_response.json")
+                .build())
+            .build());
+
+        this.userProvidedServiceInstances
+            .list(ListUserProvidedServiceInstancesRequest.builder()
+                .page(-1)
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListUserProvidedServiceInstancesResponse.builder()
+                .totalPages(1)
+                .totalResults(1)
+                .resource(UserProvidedServiceInstanceResource.builder()
                     .metadata(Metadata.builder()
                         .createdAt("2015-07-27T22:43:34Z")
-                        .id("8c12fd06-6639-4844-b5e7-a6831cadbbcc")
-                        .url("/v2/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc")
+                        .id("8db6d37b-1ca8-4d0a-b1d3-2a6aaceae866")
+                        .url("/v2/user_provided_service_instances/8db6d37b-1ca8-4d0a-b1d3-2a6aaceae866")
                         .build())
                     .entity(UserProvidedServiceInstanceEntity.builder()
-                        .name("name-2361")
-                        .credential("creds-key-662", "creds-val-662")
-                        .spaceId("cebb3962-4e5b-4204-b117-3140ec4a62d9")
+                        .name("name-2365")
+                        .credential("creds-key-665", "creds-val-665")
+                        .spaceId("2fff6e71-d329-4991-9c89-7fa8abca70df")
                         .type("user_provided_service_instance")
-                        .syslogDrainUrl("https://foo.com/url-89")
-                        .spaceUrl("/v2/spaces/cebb3962-4e5b-4204-b117-3140ec4a62d9")
-                        .serviceBindingsUrl("/v2/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc/service_bindings")
-                        .routesUrl("/v2/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc/routes")
+                        .syslogDrainUrl("https://foo.com/url-90")
+                        .spaceUrl("/v2/spaces/2fff6e71-d329-4991-9c89-7fa8abca70df")
+                        .serviceBindingsUrl("/v2/user_provided_service_instances/8db6d37b-1ca8-4d0a-b1d3-2a6aaceae866/service_bindings")
+                        .routesUrl("/v2/user_provided_service_instances/8db6d37b-1ca8-4d0a-b1d3-2a6aaceae866/routes")
                         .build())
                     .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/v2/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/user_provided_service_instances/GET_{id}_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<GetUserProvidedServiceInstanceResponse> invoke(GetUserProvidedServiceInstanceRequest request) {
-            return this.userProvidedServiceInstances.get(request);
-        }
-
-        @Override
-        protected GetUserProvidedServiceInstanceRequest validRequest() {
-            return GetUserProvidedServiceInstanceRequest.builder()
-                .userProvidedServiceInstanceId("8c12fd06-6639-4844-b5e7-a6831cadbbcc")
-                .build();
-        }
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class List extends AbstractClientApiTest<ListUserProvidedServiceInstancesRequest, ListUserProvidedServiceInstancesResponse> {
+    @Test
+    public void listServiceBindings() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/user_provided_service_instances/test-user-provided-service-instance-id/service_bindings?page=-1")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/user_provided_service_instances/GET_{id}_service_bindings_response.json")
+                .build())
+            .build());
 
-        private final ReactorUserProvidedServiceInstances userProvidedServiceInstances = new ReactorUserProvidedServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<ListUserProvidedServiceInstancesResponse> expectations() {
-            return ScriptedSubscriber.<ListUserProvidedServiceInstancesResponse>create()
-                .expectNext(ListUserProvidedServiceInstancesResponse.builder()
-                    .totalPages(1)
-                    .totalResults(1)
-                    .resource(UserProvidedServiceInstanceResource.builder()
-                        .metadata(Metadata.builder()
-                            .createdAt("2015-07-27T22:43:34Z")
-                            .id("8db6d37b-1ca8-4d0a-b1d3-2a6aaceae866")
-                            .url("/v2/user_provided_service_instances/8db6d37b-1ca8-4d0a-b1d3-2a6aaceae866")
-                            .build())
-                        .entity(UserProvidedServiceInstanceEntity.builder()
-                            .name("name-2365")
-                            .credential("creds-key-665", "creds-val-665")
-                            .spaceId("2fff6e71-d329-4991-9c89-7fa8abca70df")
-                            .type("user_provided_service_instance")
-                            .syslogDrainUrl("https://foo.com/url-90")
-                            .spaceUrl("/v2/spaces/2fff6e71-d329-4991-9c89-7fa8abca70df")
-                            .serviceBindingsUrl("/v2/user_provided_service_instances/8db6d37b-1ca8-4d0a-b1d3-2a6aaceae866/service_bindings")
-                            .routesUrl("/v2/user_provided_service_instances/8db6d37b-1ca8-4d0a-b1d3-2a6aaceae866/routes")
-                            .build())
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/v2/user_provided_service_instances?page=-1")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/user_provided_service_instances/GET_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<ListUserProvidedServiceInstancesResponse> invoke(ListUserProvidedServiceInstancesRequest request) {
-            return this.userProvidedServiceInstances.list(request);
-        }
-
-        @Override
-        protected ListUserProvidedServiceInstancesRequest validRequest() {
-            return ListUserProvidedServiceInstancesRequest.builder()
-                .page(-1)
-                .build();
-        }
-    }
-
-    public static final class ListServiceBindings extends AbstractClientApiTest<ListUserProvidedServiceInstanceServiceBindingsRequest, ListUserProvidedServiceInstanceServiceBindingsResponse> {
-
-        private final ReactorUserProvidedServiceInstances userProvidedServiceInstances = new ReactorUserProvidedServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<ListUserProvidedServiceInstanceServiceBindingsResponse> expectations() {
-            return ScriptedSubscriber.<ListUserProvidedServiceInstanceServiceBindingsResponse>create()
-                .expectNext(ListUserProvidedServiceInstanceServiceBindingsResponse.builder()
-                    .totalPages(1)
-                    .totalResults(1)
-                    .resource(ServiceBindingResource.builder()
-                        .metadata(Metadata.builder()
-                            .createdAt("2016-01-26T22:20:16Z")
-                            .id("e6b8d548-e009-47d4-ab79-675e3da6bb52")
-                            .url("/v2/service_bindings/e6b8d548-e009-47d4-ab79-675e3da6bb52")
-                            .build()
-                        )
-                        .entity(ServiceBindingEntity.builder()
-                            .applicationId("a9bbd896-7500-45be-a75a-25e3d254f67c")
-                            .serviceInstanceId("16c81612-6a63-4faa-8cd5-acc80771b562")
-                            .credential("creds-key-29", "creds-val-29")
-                            .bindingOptions(Collections.emptyMap())
-                            .gatewayName("")
-                            .applicationUrl("/v2/apps/a9bbd896-7500-45be-a75a-25e3d254f67c")
-                            .serviceInstanceUrl("/v2/user_provided_service_instances/16c81612-6a63-4faa-8cd5-acc80771b562")
-                            .build())
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/v2/user_provided_service_instances/test-user-provided-service-instance-id/service_bindings?page=-1")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/user_provided_service_instances/GET_{id}_service_bindings_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<ListUserProvidedServiceInstanceServiceBindingsResponse> invoke(ListUserProvidedServiceInstanceServiceBindingsRequest request) {
-            return this.userProvidedServiceInstances.listServiceBindings(request);
-        }
-
-        @Override
-        protected ListUserProvidedServiceInstanceServiceBindingsRequest validRequest() {
-            return ListUserProvidedServiceInstanceServiceBindingsRequest.builder()
+        this.userProvidedServiceInstances
+            .listServiceBindings(ListUserProvidedServiceInstanceServiceBindingsRequest.builder()
                 .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
                 .page(-1)
-                .build();
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListUserProvidedServiceInstanceServiceBindingsResponse.builder()
+                .totalPages(1)
+                .totalResults(1)
+                .resource(ServiceBindingResource.builder()
+                    .metadata(Metadata.builder()
+                        .createdAt("2016-01-26T22:20:16Z")
+                        .id("e6b8d548-e009-47d4-ab79-675e3da6bb52")
+                        .url("/v2/service_bindings/e6b8d548-e009-47d4-ab79-675e3da6bb52")
+                        .build()
+                    )
+                    .entity(ServiceBindingEntity.builder()
+                        .applicationId("a9bbd896-7500-45be-a75a-25e3d254f67c")
+                        .serviceInstanceId("16c81612-6a63-4faa-8cd5-acc80771b562")
+                        .credential("creds-key-29", "creds-val-29")
+                        .bindingOptions(Collections.emptyMap())
+                        .gatewayName("")
+                        .applicationUrl("/v2/apps/a9bbd896-7500-45be-a75a-25e3d254f67c")
+                        .serviceInstanceUrl("/v2/user_provided_service_instances/16c81612-6a63-4faa-8cd5-acc80771b562")
+                        .build())
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class Update extends AbstractClientApiTest<UpdateUserProvidedServiceInstanceRequest, UpdateUserProvidedServiceInstanceResponse> {
+    @Test
+    public void update() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PUT).path("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d")
+                .payload("fixtures/client/v2/user_provided_service_instances/PUT_{id}_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(ACCEPTED)
+                .payload("fixtures/client/v2/user_provided_service_instances/PUT_{id}_response.json")
+                .build())
+            .build());
 
-        private final ReactorUserProvidedServiceInstances userProvidedServiceInstances = new ReactorUserProvidedServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<UpdateUserProvidedServiceInstanceResponse> expectations() {
-            return ScriptedSubscriber.<UpdateUserProvidedServiceInstanceResponse>create()
-                .expectNext(UpdateUserProvidedServiceInstanceResponse.builder()
-                    .metadata(Metadata.builder()
-                        .createdAt("2016-02-19T02:04:06Z")
-                        .id("e2c198b1-fa15-414e-a9a4-31537996b39d")
-                        .updatedAt("2016-02-19T02:04:06Z")
-                        .url("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d")
-                        .build())
-                    .entity(UserProvidedServiceInstanceEntity.builder()
-                        .name("name-2565")
-                        .credential("somekey", "somenewvalue")
-                        .spaceId("438b5923-fe7a-4459-bbcd-a7c27332bad3")
-                        .type("user_provided_service_instance")
-                        .syslogDrainUrl("https://foo.com/url-91")
-                        .spaceUrl("/v2/spaces/438b5923-fe7a-4459-bbcd-a7c27332bad3")
-                        .serviceBindingsUrl("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d/service_bindings")
-                        .routesUrl("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d/routes")
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(PUT).path("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d")
-                    .payload("fixtures/client/v2/user_provided_service_instances/PUT_{id}_request.json")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(ACCEPTED)
-                    .payload("fixtures/client/v2/user_provided_service_instances/PUT_{id}_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<UpdateUserProvidedServiceInstanceResponse> invoke(UpdateUserProvidedServiceInstanceRequest request) {
-            return this.userProvidedServiceInstances.update(request);
-        }
-
-        @Override
-        protected UpdateUserProvidedServiceInstanceRequest validRequest() {
-            return UpdateUserProvidedServiceInstanceRequest.builder()
+        this.userProvidedServiceInstances
+            .update(UpdateUserProvidedServiceInstanceRequest.builder()
                 .credential("somekey", "somenewvalue")
                 .userProvidedServiceInstanceId("e2c198b1-fa15-414e-a9a4-31537996b39d")
-                .build();
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(UpdateUserProvidedServiceInstanceResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2016-02-19T02:04:06Z")
+                    .id("e2c198b1-fa15-414e-a9a4-31537996b39d")
+                    .updatedAt("2016-02-19T02:04:06Z")
+                    .url("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d")
+                    .build())
+                .entity(UserProvidedServiceInstanceEntity.builder()
+                    .name("name-2565")
+                    .credential("somekey", "somenewvalue")
+                    .spaceId("438b5923-fe7a-4459-bbcd-a7c27332bad3")
+                    .type("user_provided_service_instance")
+                    .syslogDrainUrl("https://foo.com/url-91")
+                    .spaceUrl("/v2/spaces/438b5923-fe7a-4459-bbcd-a7c27332bad3")
+                    .serviceBindingsUrl("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d/service_bindings")
+                    .routesUrl("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d/routes")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class UpdateWithEmptyCredentials extends AbstractClientApiTest<UpdateUserProvidedServiceInstanceRequest, UpdateUserProvidedServiceInstanceResponse> {
+    @Test
+    public void updateWithEmptyCredentials() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PUT).path("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d")
+                .payload("fixtures/client/v2/user_provided_service_instances/PUT_{id}_empty_creds_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(ACCEPTED)
+                .payload("fixtures/client/v2/user_provided_service_instances/PUT_{id}_empty_creds_response.json")
+                .build())
+            .build());
 
-        private final ReactorUserProvidedServiceInstances userProvidedServiceInstances = new ReactorUserProvidedServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<UpdateUserProvidedServiceInstanceResponse> expectations() {
-            return ScriptedSubscriber.<UpdateUserProvidedServiceInstanceResponse>create()
-                .expectNext(UpdateUserProvidedServiceInstanceResponse.builder()
-                    .metadata(Metadata.builder()
-                        .createdAt("2016-02-19T02:04:06Z")
-                        .id("e2c198b1-fa15-414e-a9a4-31537996b39d")
-                        .updatedAt("2016-02-19T02:04:06Z")
-                        .url("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d")
-                        .build())
-                    .entity(UserProvidedServiceInstanceEntity.builder()
-                        .credentials(Collections.emptyMap())
-                        .name("name-2565")
-                        .spaceId("438b5923-fe7a-4459-bbcd-a7c27332bad3")
-                        .type("user_provided_service_instance")
-                        .syslogDrainUrl("https://foo.com/url-91")
-                        .spaceUrl("/v2/spaces/438b5923-fe7a-4459-bbcd-a7c27332bad3")
-                        .serviceBindingsUrl("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d/service_bindings")
-                        .routesUrl("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d/routes")
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(PUT).path("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d")
-                    .payload("fixtures/client/v2/user_provided_service_instances/PUT_{id}_empty_creds_request.json")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(ACCEPTED)
-                    .payload("fixtures/client/v2/user_provided_service_instances/PUT_{id}_empty_creds_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<UpdateUserProvidedServiceInstanceResponse> invoke(UpdateUserProvidedServiceInstanceRequest request) {
-            return this.userProvidedServiceInstances.update(request);
-        }
-
-        @Override
-        protected UpdateUserProvidedServiceInstanceRequest validRequest() {
-            return UpdateUserProvidedServiceInstanceRequest.builder()
+        this.userProvidedServiceInstances
+            .update(UpdateUserProvidedServiceInstanceRequest.builder()
                 .credentials(Collections.emptyMap())
                 .userProvidedServiceInstanceId("e2c198b1-fa15-414e-a9a4-31537996b39d")
-                .build();
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(UpdateUserProvidedServiceInstanceResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2016-02-19T02:04:06Z")
+                    .id("e2c198b1-fa15-414e-a9a4-31537996b39d")
+                    .updatedAt("2016-02-19T02:04:06Z")
+                    .url("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d")
+                    .build())
+                .entity(UserProvidedServiceInstanceEntity.builder()
+                    .credentials(Collections.emptyMap())
+                    .name("name-2565")
+                    .spaceId("438b5923-fe7a-4459-bbcd-a7c27332bad3")
+                    .type("user_provided_service_instance")
+                    .syslogDrainUrl("https://foo.com/url-91")
+                    .spaceUrl("/v2/spaces/438b5923-fe7a-4459-bbcd-a7c27332bad3")
+                    .serviceBindingsUrl("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d/service_bindings")
+                    .routesUrl("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d/routes")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
 }
