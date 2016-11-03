@@ -30,7 +30,6 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedS
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceResponse;
-import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceEntity;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceResource;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
@@ -38,13 +37,13 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
-import reactor.util.function.Tuple2;
+import reactor.test.StepVerifier;
 import reactor.util.function.Tuple3;
 
 import java.time.Duration;
 import java.util.Collections;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
@@ -63,10 +62,6 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
     public void create() throws TimeoutException, InterruptedException {
         String instanceName = this.nameFactory.getServiceInstanceName();
 
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectNext(instanceName)
-            .expectComplete();
-
         this.spaceId
             .then(spaceId -> this.cloudFoundryClient.userProvidedServiceInstances()
                 .create(CreateUserProvidedServiceInstanceRequest.builder()
@@ -74,17 +69,15 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                     .spaceId(spaceId)
                     .build()))
             .map(response -> ResourceUtils.getEntity(response).getName())
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNext(instanceName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void delete() throws TimeoutException, InterruptedException {
         String instanceName = this.nameFactory.getServiceInstanceName();
-
-        ScriptedSubscriber<UserProvidedServiceInstanceResource> subscriber = ScriptedSubscriber.<UserProvidedServiceInstanceResource>create()
-            .expectComplete();
 
         this.spaceId
             .then(spaceId -> getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))
@@ -93,18 +86,14 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                     .userProvidedServiceInstanceId(instanceId)
                     .build()))
             .thenMany(requestListUserProvidedServiceInstances(this.cloudFoundryClient, instanceName))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void get() throws TimeoutException, InterruptedException {
         String instanceName = this.nameFactory.getServiceInstanceName();
-
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectNext(instanceName)
-            .expectComplete();
 
         this.spaceId
             .then(spaceId -> getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))
@@ -113,18 +102,15 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                     .userProvidedServiceInstanceId(instanceId)
                     .build()))
             .map(response -> ResourceUtils.getEntity(response).getName())
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNext(instanceName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void list() throws TimeoutException, InterruptedException {
         String instanceName = this.nameFactory.getServiceInstanceName();
-
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectNext(instanceName)
-            .expectComplete();
 
         this.spaceId
             .then(spaceId -> requestCreateUserProvidedServiceInstance(this.cloudFoundryClient, instanceName, spaceId))
@@ -136,17 +122,16 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                         .build())))
             .single()
             .map(response -> ResourceUtils.getEntity(response).getName())
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNext(instanceName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listServiceBindings() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String instanceName = this.nameFactory.getServiceInstanceName();
-
-        ScriptedSubscriber<Tuple3<String, String, ServiceBindingResource>> subscriber = serviceBindingEquality();
 
         this.spaceId
             .then(spaceId -> Mono.when(
@@ -170,24 +155,16 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                                 .userProvidedServiceInstanceId(instanceId)
                                 .build()))
                         .single())))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(serviceBindingEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void update() throws TimeoutException, InterruptedException {
         String instanceName = this.nameFactory.getServiceInstanceName();
         String newInstanceName = this.nameFactory.getServiceInstanceName();
-
-        ScriptedSubscriber<Tuple2<UserProvidedServiceInstanceEntity, UserProvidedServiceInstanceEntity>> subscriber =
-            ScriptedSubscriber.<Tuple2<UserProvidedServiceInstanceEntity, UserProvidedServiceInstanceEntity>>create()
-                .consumeNextWith(consumer((entity1, entity2) -> {
-                    assertThat(entity1.getName()).isEqualTo(newInstanceName);
-                    assertThat(entity1.getCredentials()).containsEntry("test-cred", "some value");
-                    assertThat(entity2.getCredentials()).isEmpty();
-                }))
-                .expectComplete();
 
         this.spaceId
             .then(spaceId -> getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))
@@ -212,9 +189,14 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                             .build())
                         .map(UpdateUserProvidedServiceInstanceResponse::getEntity)
                 )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(consumer((entity1, entity2) -> {
+                assertThat(entity1.getName()).isEqualTo(newInstanceName);
+                assertThat(entity1.getCredentials()).containsEntry("test-cred", "some value");
+                assertThat(entity2.getCredentials()).isEmpty();
+            }))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     private static Mono<String> getCreateApplicationId(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
@@ -252,13 +234,11 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                     .build()));
     }
 
-    private static ScriptedSubscriber<Tuple3<String, String, ServiceBindingResource>> serviceBindingEquality() {
-        return ScriptedSubscriber.<Tuple3<String, String, ServiceBindingResource>>create()
-            .consumeNextWith(consumer((applicationId, instanceId, resource) -> {
-                assertThat(resource.getEntity().getApplicationId()).isEqualTo(applicationId);
-                assertThat(resource.getEntity().getServiceInstanceId()).isEqualTo(instanceId);
-            }))
-            .expectComplete();
+    private static Consumer<Tuple3<String, String, ServiceBindingResource>> serviceBindingEquality() {
+        return consumer((applicationId, instanceId, resource) -> {
+            assertThat(resource.getEntity().getApplicationId()).isEqualTo(applicationId);
+            assertThat(resource.getEntity().getServiceInstanceId()).isEqualTo(instanceId);
+        });
     }
 
 }

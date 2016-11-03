@@ -20,9 +20,7 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.uaa.tokens.CheckTokenRequest;
-import org.cloudfoundry.uaa.tokens.CheckTokenResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeRequest;
-import org.cloudfoundry.uaa.tokens.GetTokenByAuthorizationCodeResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenByClientCredentialsRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenByClientCredentialsResponse;
 import org.cloudfoundry.uaa.tokens.GetTokenByOneTimePasscodeRequest;
@@ -35,7 +33,6 @@ import org.cloudfoundry.uaa.tokens.GetTokenKeyRequest;
 import org.cloudfoundry.uaa.tokens.GetTokenKeyResponse;
 import org.cloudfoundry.uaa.tokens.ListTokenKeysRequest;
 import org.cloudfoundry.uaa.tokens.RefreshTokenRequest;
-import org.cloudfoundry.uaa.tokens.RefreshTokenResponse;
 import org.cloudfoundry.uaa.tokens.TokenFormat;
 import org.cloudfoundry.uaa.tokens.TokenKey;
 import org.junit.Ignore;
@@ -44,8 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.HttpException;
-import reactor.test.subscriber.ScriptedSubscriber;
-import reactor.util.function.Tuple2;
+import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
@@ -71,9 +67,6 @@ public final class TokensTest extends AbstractIntegrationTest {
 
     @Test
     public void checkTokenNotAuthorized() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<CheckTokenResponse> subscriber = ScriptedSubscriber.<CheckTokenResponse>create()
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(HttpException.class).hasMessage("HTTP request failed with code: 403"));
-
         this.tokenProvider.getToken(this.connectionContext)
             .then(token -> this.uaaClient.tokens()
                 .check(CheckTokenRequest.builder()
@@ -83,35 +76,28 @@ public final class TokensTest extends AbstractIntegrationTest {
                     .scope("password.write")
                     .scope("scim.userids")
                     .build()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(HttpException.class).hasMessage("HTTP request failed with code: 403"))
+            .verify(Duration.ofMinutes(5));
     }
 
     @Ignore("TODO: use test authorizationCode")
     @Test
     public void getTokenByAuthorizationCode() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<GetTokenByAuthorizationCodeResponse> subscriber = ScriptedSubscriber.<GetTokenByAuthorizationCodeResponse>create()
-            .expectNextCount(1)
-            .expectComplete();
-
         this.uaaClient.tokens()
             .getByAuthorizationCode(GetTokenByAuthorizationCodeRequest.builder()
                 .authorizationCode("some auth code")
                 .clientId(this.clientId)
                 .clientSecret(this.clientSecret)
                 .build())
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void getTokenByClientCredentials() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectNext("bearer")
-            .expectComplete();
-
         this.uaaClient.tokens()
             .getByClientCredentials(GetTokenByClientCredentialsRequest.builder()
                 .clientId(this.clientId)
@@ -119,18 +105,15 @@ public final class TokensTest extends AbstractIntegrationTest {
                 .tokenFormat(TokenFormat.OPAQUE)
                 .build())
             .map(GetTokenByClientCredentialsResponse::getTokenType)
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNext("bearer")
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Ignore("TODO: use test one-time passcode")
     @Test
     public void getTokenByOneTimePasscode() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectNext("bearer")
-            .expectComplete();
-
         this.uaaClient.tokens()
             .getByOneTimePasscode(GetTokenByOneTimePasscodeRequest.builder()
                 .passcode("Some passcode")
@@ -139,18 +122,14 @@ public final class TokensTest extends AbstractIntegrationTest {
                 .tokenFormat(TokenFormat.OPAQUE)
                 .build())
             .map(GetTokenByOneTimePasscodeResponse::getTokenType)
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNext("bearer")
+            .expectComplete();
     }
 
     @Ignore("TODO: use test openid authorizationCode")
     @Test
     public void getTokenByOpenId() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectNext("bearer")
-            .expectComplete();
-
         this.uaaClient.tokens()
             .getByOpenId(GetTokenByOpenIdRequest.builder()
                 .authorizationCode("Some authorization code")
@@ -159,18 +138,15 @@ public final class TokensTest extends AbstractIntegrationTest {
                 .tokenFormat(TokenFormat.OPAQUE)
                 .build())
             .map(GetTokenByOpenIdResponse::getTokenType)
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNext("bearer")
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Ignore("TODO: use test username and password")
     @Test
     public void getTokenByPassword() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectNext("bearer")
-            .expectComplete();
-
         this.uaaClient.tokens()
             .getByPassword(GetTokenByPasswordRequest.builder()
                 .password("a-password")
@@ -180,29 +156,25 @@ public final class TokensTest extends AbstractIntegrationTest {
                 .tokenFormat(TokenFormat.OPAQUE)
                 .build())
             .map(GetTokenByPasswordResponse::getTokenType)
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNext("bearer")
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void getTokenKey() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<GetTokenKeyResponse> subscriber = ScriptedSubscriber.<GetTokenKeyResponse>create()
-            .expectNextCount(1)
-            .expectComplete();
-
         this.uaaClient.tokens()
             .getKey(GetTokenKeyRequest.builder()
                 .build())
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listTokenKeys() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
-
         this.uaaClient.tokens()
             .getKey(GetTokenKeyRequest.builder()
                 .build())
@@ -218,18 +190,15 @@ public final class TokensTest extends AbstractIntegrationTest {
                     Mono.just(getKey)
                         .map(GetTokenKeyResponse::getId)
                 ))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Ignore("TODO: use test refresh token")
     @Test
     public void refreshToken() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<RefreshTokenResponse> subscriber = ScriptedSubscriber.<RefreshTokenResponse>create()
-            .expectNextCount(1)
-            .expectComplete();
-
         this.uaaClient.tokens()
             .refresh(RefreshTokenRequest.builder()
                 .tokenFormat(TokenFormat.OPAQUE)
@@ -237,9 +206,10 @@ public final class TokensTest extends AbstractIntegrationTest {
                 .clientSecret(this.clientSecret)
                 .refreshToken("a-refresh-token")
                 .build())
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
 }

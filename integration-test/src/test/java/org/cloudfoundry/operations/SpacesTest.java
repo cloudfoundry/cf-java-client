@@ -18,10 +18,9 @@ package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.operations.spaces.CreateSpaceRequest;
-import org.cloudfoundry.operations.spaces.SpaceSummary;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
@@ -40,10 +39,6 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void create() throws TimeoutException, InterruptedException {
         String spaceName = this.nameFactory.getSpaceName();
 
-        ScriptedSubscriber<SpaceSummary> subscriber = ScriptedSubscriber.<SpaceSummary>create()
-            .expectNextCount(1)
-            .expectComplete();
-
         this.cloudFoundryOperations.spaces()
             .create(CreateSpaceRequest.builder()
                 .name(spaceName)
@@ -52,23 +47,21 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .thenMany(this.cloudFoundryOperations.spaces()
                 .list())
             .filter(spaceSummary -> spaceName.equals(spaceSummary.getName()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void list() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<Long> subscriber = ScriptedSubscriber.<Long>create()
-            .consumeNextWith(count -> assertThat(count).isGreaterThan(0))
-            .expectComplete();
-
         this.cloudFoundryOperations.spaces()
             .list()
             .count()
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(count -> assertThat(count).isGreaterThan(0))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
 }

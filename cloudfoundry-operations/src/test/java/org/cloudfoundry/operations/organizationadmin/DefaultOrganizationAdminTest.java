@@ -32,17 +32,198 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationResponse;
-import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.junit.Before;
-import org.reactivestreams.Publisher;
+import org.cloudfoundry.operations.AbstractOperationsTest;
+import org.junit.Test;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
+
+import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
-public final class DefaultOrganizationAdminTest {
+public final class DefaultOrganizationAdminTest extends AbstractOperationsTest {
+
+    private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(Mono.just(this.cloudFoundryClient));
+
+    @Test
+    public void createQuota() {
+        requestCreateOrganizationQuota(this.cloudFoundryClient, 3, 4, "test-quota", true, 1, 2, "test-quota-id");
+
+        this.organizationAdmin.createQuota(CreateQuotaRequest.builder()
+            .name("test-quota")
+            .allowPaidServicePlans(true)
+            .totalRoutes(1)
+            .totalServices(2)
+            .instanceMemoryLimit(3)
+            .memoryLimit(4)
+            .build())
+            .as(StepVerifier::create)
+            .expectNext(OrganizationQuota.builder()
+                .allowPaidServicePlans(true)
+                .applicationInstanceLimit(-1)
+                .id("test-quota-id")
+                .instanceMemoryLimit(3)
+                .memoryLimit(4)
+                .name("test-quota")
+                .totalRoutes(1)
+                .totalServices(2)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void createQuotaError() {
+        requestCreateOrganizationQuotaError(this.cloudFoundryClient, "test-quota-error");
+
+        this.organizationAdmin.createQuota(CreateQuotaRequest.builder()
+            .name("test-quota-error")
+            .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessage("test-exception-errorCode(999): test-exception-description"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getQuota() {
+        requestListOrganizationQuotas(this.cloudFoundryClient, "test-quota");
+
+        this.organizationAdmin.getQuota(GetQuotaRequest.builder()
+            .name("test-quota")
+            .build())
+            .as(StepVerifier::create)
+            .expectNext(OrganizationQuota.builder()
+                .allowPaidServicePlans(true)
+                .applicationInstanceLimit(1)
+                .id("test-quota-id")
+                .instanceMemoryLimit(1)
+                .memoryLimit(1)
+                .name("test-quota-name")
+                .totalRoutes(1)
+                .totalServices(1)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getQuotaNotFound() {
+        requestListOrganizationQuotasEmpty(this.cloudFoundryClient, "test-quota-not-found");
+
+        this.organizationAdmin.getQuota(GetQuotaRequest.builder()
+            .name("test-quota-not-found")
+            .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Quota test-quota-not-found does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listQuotas() {
+        requestListOrganizationQuotas(this.cloudFoundryClient);
+
+        this.organizationAdmin.listQuotas()
+            .as(StepVerifier::create)
+            .expectNext(OrganizationQuota.builder()
+                .allowPaidServicePlans(true)
+                .applicationInstanceLimit(1)
+                .id("test-quota-id")
+                .instanceMemoryLimit(1)
+                .memoryLimit(1)
+                .name("test-quota-name")
+                .totalRoutes(1)
+                .totalServices(1)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void setQuota() {
+        requestListOrganizationQuotas(this.cloudFoundryClient, "test-quota");
+        requestListOrganizations(this.cloudFoundryClient, "test-organization");
+        requestUpdateOrganization(this.cloudFoundryClient, "test-organization-id", "test-quota-id");
+
+        this.organizationAdmin.setQuota(SetQuotaRequest.builder()
+            .organizationName("test-organization")
+            .quotaName("test-quota")
+            .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void setQuotaOrganizationNotFound() {
+        requestListOrganizationQuotas(this.cloudFoundryClient, "test-quota");
+        requestListOrganizationEmpty(this.cloudFoundryClient, "test-organization-not-found");
+
+        this.organizationAdmin.setQuota(SetQuotaRequest.builder()
+            .organizationName("test-organization-not-found")
+            .quotaName("test-quota")
+            .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Organization test-organization-not-found does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void setQuotaQuotaNotFound() {
+        requestListOrganizationQuotasEmpty(this.cloudFoundryClient, "test-quota-not-found");
+        requestListOrganizations(this.cloudFoundryClient, "test-organization");
+
+        this.organizationAdmin.setQuota(SetQuotaRequest.builder()
+            .organizationName("test-organization")
+            .quotaName("test-quota-not-found")
+            .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Quota test-quota-not-found does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void updateQuota() {
+        requestListOrganizationQuotas(this.cloudFoundryClient, "test-quota");
+        requestUpdateOrganizationQuota(this.cloudFoundryClient, "test-quota-id", 3, 4, "new-test-quota", true, 1, 2);
+
+        this.organizationAdmin.updateQuota(UpdateQuotaRequest.builder()
+            .name("test-quota")
+            .allowPaidServicePlans(true)
+            .newName("new-test-quota")
+            .totalRoutes(1)
+            .totalServices(2)
+            .instanceMemoryLimit(3)
+            .memoryLimit(4)
+            .build())
+            .as(StepVerifier::create)
+            .expectNext(OrganizationQuota.builder()
+                .allowPaidServicePlans(true)
+                .applicationInstanceLimit(-1)
+                .id("test-quota-id")
+                .instanceMemoryLimit(3)
+                .memoryLimit(4)
+                .name("new-test-quota")
+                .totalRoutes(1)
+                .totalServices(2)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void updateQuotaNotFound() {
+        requestListOrganizationQuotasEmpty(this.cloudFoundryClient, "test-quota-not-found");
+
+        this.organizationAdmin.updateQuota(UpdateQuotaRequest.builder()
+            .name("test-quota-not-found")
+            .newName("new-test-quota")
+            .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Quota test-quota-not-found does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
 
     private static void requestCreateOrganizationQuota(CloudFoundryClient cloudFoundryClient, Integer instanceMemoryLimit, Integer memoryLimit, String name, Boolean nonBasicServicesAllowed,
                                                        Integer totalRoutes, Integer totalServices, String quotaDefinitionId) {
@@ -185,297 +366,6 @@ public final class DefaultOrganizationAdminTest {
                         .totalServices(totalServices)
                         .build())
                     .build()));
-    }
-
-    public static final class CreateQuota extends AbstractOperationsApiTest<OrganizationQuota> {
-
-        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(Mono.just(this.cloudFoundryClient));
-
-        @Before
-        public void setUp() throws Exception {
-            requestCreateOrganizationQuota(this.cloudFoundryClient, 3, 4, "test-quota", true, 1, 2, "test-quota-id");
-        }
-
-        @Override
-        protected ScriptedSubscriber<OrganizationQuota> expectations() {
-            return ScriptedSubscriber.<OrganizationQuota>create()
-                .expectNext(OrganizationQuota.builder()
-                    .allowPaidServicePlans(true)
-                    .applicationInstanceLimit(-1)
-                    .id("test-quota-id")
-                    .instanceMemoryLimit(3)
-                    .memoryLimit(4)
-                    .name("test-quota")
-                    .totalRoutes(1)
-                    .totalServices(2)
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<OrganizationQuota> invoke() {
-            return this.organizationAdmin.createQuota(CreateQuotaRequest.builder()
-                .name("test-quota")
-                .allowPaidServicePlans(true)
-                .totalRoutes(1)
-                .totalServices(2)
-                .instanceMemoryLimit(3)
-                .memoryLimit(4)
-                .build());
-        }
-    }
-
-    public static final class CreateQuotaError extends AbstractOperationsApiTest<OrganizationQuota> {
-
-        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(Mono.just(this.cloudFoundryClient));
-
-        @Before
-        public void setUp() throws Exception {
-            requestCreateOrganizationQuotaError(this.cloudFoundryClient, "test-quota-error");
-        }
-
-        @Override
-        protected ScriptedSubscriber<OrganizationQuota> expectations() {
-            return ScriptedSubscriber.<OrganizationQuota>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessage("test-exception-errorCode(999): test-exception-description"));
-        }
-
-        @Override
-        protected Publisher<OrganizationQuota> invoke() {
-            return this.organizationAdmin.createQuota(CreateQuotaRequest.builder()
-                .name("test-quota-error")
-                .build());
-        }
-    }
-
-    public static final class GetQuota extends AbstractOperationsApiTest<OrganizationQuota> {
-
-        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(Mono.just(this.cloudFoundryClient));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListOrganizationQuotas(this.cloudFoundryClient, "test-quota");
-        }
-
-        @Override
-        protected ScriptedSubscriber<OrganizationQuota> expectations() {
-            return ScriptedSubscriber.<OrganizationQuota>create()
-                .expectNext(OrganizationQuota.builder()
-                    .allowPaidServicePlans(true)
-                    .applicationInstanceLimit(1)
-                    .id("test-quota-id")
-                    .instanceMemoryLimit(1)
-                    .memoryLimit(1)
-                    .name("test-quota-name")
-                    .totalRoutes(1)
-                    .totalServices(1)
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<OrganizationQuota> invoke() {
-            return this.organizationAdmin.getQuota(GetQuotaRequest.builder()
-                .name("test-quota")
-                .build());
-        }
-    }
-
-    public static final class GetQuotaNotFound extends AbstractOperationsApiTest<OrganizationQuota> {
-
-        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(Mono.just(this.cloudFoundryClient));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListOrganizationQuotasEmpty(this.cloudFoundryClient, "test-quota-not-found");
-        }
-
-        @Override
-        protected ScriptedSubscriber<OrganizationQuota> expectations() {
-            return ScriptedSubscriber.<OrganizationQuota>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Quota test-quota-not-found does not exist"));
-        }
-
-        @Override
-        protected Mono<OrganizationQuota> invoke() {
-            return this.organizationAdmin.getQuota(GetQuotaRequest.builder()
-                .name("test-quota-not-found")
-                .build());
-        }
-
-    }
-
-    public static final class ListQuotas extends AbstractOperationsApiTest<OrganizationQuota> {
-
-        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(Mono.just(this.cloudFoundryClient));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListOrganizationQuotas(this.cloudFoundryClient);
-        }
-
-        @Override
-        protected ScriptedSubscriber<OrganizationQuota> expectations() {
-            return ScriptedSubscriber.<OrganizationQuota>create()
-                .expectNext(OrganizationQuota.builder()
-                    .allowPaidServicePlans(true)
-                    .applicationInstanceLimit(1)
-                    .id("test-quota-id")
-                    .instanceMemoryLimit(1)
-                    .memoryLimit(1)
-                    .name("test-quota-name")
-                    .totalRoutes(1)
-                    .totalServices(1)
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<OrganizationQuota> invoke() {
-            return this.organizationAdmin.listQuotas();
-        }
-    }
-
-    public static final class SetQuota extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(Mono.just(this.cloudFoundryClient));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListOrganizationQuotas(this.cloudFoundryClient, "test-quota");
-            requestListOrganizations(this.cloudFoundryClient, "test-organization");
-            requestUpdateOrganization(this.cloudFoundryClient, "test-organization-id", "test-quota-id");
-
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<Void> invoke() {
-            return this.organizationAdmin.setQuota(SetQuotaRequest.builder()
-                .organizationName("test-organization")
-                .quotaName("test-quota")
-                .build());
-        }
-    }
-
-    public static final class SetQuotaOrganizationNotFound extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(Mono.just(this.cloudFoundryClient));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListOrganizationQuotas(this.cloudFoundryClient, "test-quota");
-            requestListOrganizationEmpty(this.cloudFoundryClient, "test-organization-not-found");
-
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Organization test-organization-not-found does not exist"));
-        }
-
-        @Override
-        protected Publisher<Void> invoke() {
-            return this.organizationAdmin.setQuota(SetQuotaRequest.builder()
-                .organizationName("test-organization-not-found")
-                .quotaName("test-quota")
-                .build());
-        }
-    }
-
-    public static final class SetQuotaQuotaNotFound extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(Mono.just(this.cloudFoundryClient));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListOrganizationQuotasEmpty(this.cloudFoundryClient, "test-quota-not-found");
-            requestListOrganizations(this.cloudFoundryClient, "test-organization");
-        }
-
-        @Override
-        protected ScriptedSubscriber<Void> expectations() {
-            return ScriptedSubscriber.<Void>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Quota test-quota-not-found does not exist"));
-        }
-
-        @Override
-        protected Publisher<Void> invoke() {
-            return this.organizationAdmin.setQuota(SetQuotaRequest.builder()
-                .organizationName("test-organization")
-                .quotaName("test-quota-not-found")
-                .build());
-        }
-    }
-
-    public static final class UpdateQuota extends AbstractOperationsApiTest<OrganizationQuota> {
-
-        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(Mono.just(this.cloudFoundryClient));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListOrganizationQuotas(this.cloudFoundryClient, "test-quota");
-            requestUpdateOrganizationQuota(this.cloudFoundryClient, "test-quota-id", 3, 4, "new-test-quota", true, 1, 2);
-        }
-
-        @Override
-        protected ScriptedSubscriber<OrganizationQuota> expectations() {
-            return ScriptedSubscriber.<OrganizationQuota>create()
-                .expectNext(OrganizationQuota.builder()
-                    .allowPaidServicePlans(true)
-                    .applicationInstanceLimit(-1)
-                    .id("test-quota-id")
-                    .instanceMemoryLimit(3)
-                    .memoryLimit(4)
-                    .name("new-test-quota")
-                    .totalRoutes(1)
-                    .totalServices(2)
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected Publisher<OrganizationQuota> invoke() {
-            return this.organizationAdmin.updateQuota(UpdateQuotaRequest.builder()
-                .name("test-quota")
-                .allowPaidServicePlans(true)
-                .newName("new-test-quota")
-                .totalRoutes(1)
-                .totalServices(2)
-                .instanceMemoryLimit(3)
-                .memoryLimit(4)
-                .build());
-        }
-    }
-
-    public static final class UpdateQuotaNotFound extends AbstractOperationsApiTest<OrganizationQuota> {
-
-        private final DefaultOrganizationAdmin organizationAdmin = new DefaultOrganizationAdmin(Mono.just(this.cloudFoundryClient));
-
-        @Before
-        public void setUp() throws Exception {
-            requestListOrganizationQuotasEmpty(this.cloudFoundryClient, "test-quota-not-found");
-        }
-
-        @Override
-        protected ScriptedSubscriber<OrganizationQuota> expectations() {
-            return ScriptedSubscriber.<OrganizationQuota>create()
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Quota test-quota-not-found does not exist"));
-        }
-
-        @Override
-        protected Publisher<OrganizationQuota> invoke() {
-            return this.organizationAdmin.updateQuota(UpdateQuotaRequest.builder()
-                .name("test-quota-not-found")
-                .newName("new-test-quota")
-                .build());
-        }
     }
 
 }

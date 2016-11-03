@@ -27,12 +27,10 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
-
-import static org.cloudfoundry.util.PaginationUtils.requestClientV2Resources;
 
 public final class StacksTest extends AbstractIntegrationTest {
 
@@ -44,56 +42,47 @@ public final class StacksTest extends AbstractIntegrationTest {
 
     @Test
     public void get() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectNext(this.stackName)
-            .expectComplete();
-
         getStackId(this.cloudFoundryClient, this.stackName)
             .then(stackId -> this.cloudFoundryClient.stacks()
                 .get(GetStackRequest.builder()
                     .stackId(stackId)
                     .build()))
             .map(resource -> resource.getEntity().getName())
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNext(this.stackName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void list() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectNext(this.stackName)
-            .expectComplete();
-
         getStackId(this.cloudFoundryClient, this.stackName)
-            .flatMap(stackId ->
-                PaginationUtils
-                    .requestClientV2Resources(page -> this.cloudFoundryClient.stacks()
-                        .list(ListStacksRequest.builder()
-                            .page(page)
-                            .build()))
-                    .filter(resource -> ResourceUtils.getId(resource).equals(stackId)))
+            .flatMap(stackId -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.stacks()
+                    .list(ListStacksRequest.builder()
+                        .page(page)
+                        .build()))
+                .filter(resource -> ResourceUtils.getId(resource).equals(stackId)))
             .map(resource -> resource.getEntity().getName())
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNext(this.stackName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listFilterByName() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectNext(this.stackName)
-            .expectComplete();
-
-        requestClientV2Resources(page -> this.cloudFoundryClient.stacks()
-            .list(ListStacksRequest.builder()
-                .name(this.stackName)
-                .page(page)
-                .build()))
+        PaginationUtils
+            .requestClientV2Resources(page -> this.cloudFoundryClient.stacks()
+                .list(ListStacksRequest.builder()
+                    .name(this.stackName)
+                    .page(page)
+                    .build()))
             .map(resource -> resource.getEntity().getName())
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNext(this.stackName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     private static Mono<String> getStackId(CloudFoundryClient cloudFoundryClient, String stackName) {
@@ -103,8 +92,8 @@ public final class StacksTest extends AbstractIntegrationTest {
     }
 
     private static Flux<StackResource> requestListStacks(CloudFoundryClient cloudFoundryClient, String stackName) {
-        return
-            requestClientV2Resources(page -> cloudFoundryClient.stacks()
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.stacks()
                 .list(ListStacksRequest.builder()
                     .name(stackName)
                     .page(page)

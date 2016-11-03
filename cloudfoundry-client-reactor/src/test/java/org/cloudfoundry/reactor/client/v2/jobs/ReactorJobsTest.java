@@ -25,66 +25,54 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import org.junit.Test;
+import reactor.test.StepVerifier;
+
+import java.time.Duration;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorJobsTest {
+public final class ReactorJobsTest extends AbstractClientApiTest {
 
-    public static final class Get extends AbstractClientApiTest<GetJobRequest, GetJobResponse> {
+    private final ReactorJobs jobs = new ReactorJobs(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
-        private final ReactorJobs jobs = new ReactorJobs(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    @Test
+    public void get() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/jobs/test-job-id")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/jobs/GET_{id}_response.json")
+                .build())
+            .build());
 
-        @Override
-        protected ScriptedSubscriber<GetJobResponse> expectations() {
-            return ScriptedSubscriber.<GetJobResponse>create()
-                .expectNext(GetJobResponse.builder()
-                    .metadata(Metadata.builder()
-                        .id("e86ffe00-a243-48f7-be05-8f1f41bee864")
-                        .createdAt("2015-11-30T23:38:44Z")
-                        .url("/v2/jobs/e86ffe00-a243-48f7-be05-8f1f41bee864")
-                        .build())
-                    .entity(JobEntity.builder()
-                        .id("e86ffe00-a243-48f7-be05-8f1f41bee864")
-                        .status("failed")
-                        .error("Use of entity>error is deprecated in favor of entity>error_details.")
-                        .errorDetails(ErrorDetails.builder()
-                            .errorCode("UnknownError")
-                            .description("An unknown error occurred.")
-                            .code(10001)
-                            .build())
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/v2/jobs/test-job-id")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/jobs/GET_{id}_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<GetJobResponse> invoke(GetJobRequest request) {
-            return this.jobs.get(request);
-        }
-
-        @Override
-        protected GetJobRequest validRequest() {
-            return GetJobRequest.builder()
+        this.jobs
+            .get(GetJobRequest.builder()
                 .jobId("test-job-id")
-                .build();
-        }
-
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetJobResponse.builder()
+                .metadata(Metadata.builder()
+                    .id("e86ffe00-a243-48f7-be05-8f1f41bee864")
+                    .createdAt("2015-11-30T23:38:44Z")
+                    .url("/v2/jobs/e86ffe00-a243-48f7-be05-8f1f41bee864")
+                    .build())
+                .entity(JobEntity.builder()
+                    .id("e86ffe00-a243-48f7-be05-8f1f41bee864")
+                    .status("failed")
+                    .error("Use of entity>error is deprecated in favor of entity>error_details.")
+                    .errorDetails(ErrorDetails.builder()
+                        .errorCode("UnknownError")
+                        .description("An unknown error occurred.")
+                        .code(10001)
+                        .build())
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
 }

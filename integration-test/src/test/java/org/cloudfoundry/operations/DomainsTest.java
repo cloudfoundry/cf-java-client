@@ -25,7 +25,7 @@ import org.cloudfoundry.operations.organizations.CreateOrganizationRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
@@ -44,41 +44,32 @@ public final class DomainsTest extends AbstractIntegrationTest {
     public void create() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<Void> subscriber = ScriptedSubscriber.<Void>create()
-            .expectComplete();
-
         this.cloudFoundryOperations.domains()
             .create(CreateDomainRequest.builder()
                 .domain(domainName)
                 .organization(this.organizationName)
                 .build())
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void createInvalidDomain() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<Void> subscriber = ScriptedSubscriber.<Void>create()
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-DomainInvalid\\([0-9]+\\): The domain is invalid.*"));
-
         this.cloudFoundryOperations.domains()
             .create(CreateDomainRequest.builder()
                 .domain("invalid-domain")
                 .organization(this.organizationName)
                 .build())
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-DomainInvalid\\([0-9]+\\): The domain is invalid.*"))
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void share() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
         String targetOrganizationName = this.nameFactory.getOrganizationName();
-
-        ScriptedSubscriber<Void> subscriber = ScriptedSubscriber.<Void>create()
-            .expectComplete();
 
         requestCreateOrganization(this.cloudFoundryOperations, targetOrganizationName)
             .then(requestCreateDomain(this.cloudFoundryOperations, domainName, this.organizationName))
@@ -87,18 +78,15 @@ public final class DomainsTest extends AbstractIntegrationTest {
                     .domain(domainName)
                     .organization(targetOrganizationName)
                     .build()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void unshare() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
         String targetOrganizationName = this.nameFactory.getOrganizationName();
-
-        ScriptedSubscriber<Void> subscriber = ScriptedSubscriber.<Void>create()
-            .expectComplete();
 
         requestCreateOrganization(this.cloudFoundryOperations, targetOrganizationName)
             .then(requestCreateDomain(this.cloudFoundryOperations, domainName, this.organizationName))
@@ -108,9 +96,9 @@ public final class DomainsTest extends AbstractIntegrationTest {
                     .domain(domainName)
                     .organization(targetOrganizationName)
                     .build()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     private static Mono<Void> requestCreateDomain(CloudFoundryOperations cloudFoundryOperations, String domainName, String organizationName) {

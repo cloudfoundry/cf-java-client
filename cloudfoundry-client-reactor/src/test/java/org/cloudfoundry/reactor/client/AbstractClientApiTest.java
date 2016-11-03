@@ -17,39 +17,21 @@
 package org.cloudfoundry.reactor.client;
 
 import okhttp3.Headers;
-import org.cloudfoundry.client.v2.CloudFoundryException;
-import org.cloudfoundry.reactor.AbstractApiTest;
-import org.junit.Test;
-import reactor.test.subscriber.ScriptedSubscriber;
+import org.cloudfoundry.reactor.AbstractRestTest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.Duration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public abstract class AbstractClientApiTest<REQ, RSP> extends AbstractApiTest<REQ, RSP> {
+public abstract class AbstractClientApiTest extends AbstractRestTest {
 
     private static final Pattern BOUNDARY = Pattern.compile("multipart/form-data; boundary=(.+)");
-
-    @Test
-    public final void error() throws Exception {
-        mockRequest(interactionContext().getErrorResponse());
-
-        ScriptedSubscriber<RSP> subscriber = ScriptedSubscriber.<RSP>create()
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class)
-                .hasMessage("CF-UnprocessableEntity(10008): The request is semantically invalid: space_guid and name unique"));
-
-        invoke(validRequest()).subscribe(subscriber);
-        subscriber.verify(Duration.ofSeconds(5));
-
-        verify();
-    }
 
     protected static String extractBoundary(Headers headers) {
         String contentType = headers.get("Content-Type");

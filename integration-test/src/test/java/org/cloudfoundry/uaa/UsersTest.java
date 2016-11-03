@@ -18,7 +18,6 @@ package org.cloudfoundry.uaa;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.uaa.users.ChangeUserPasswordRequest;
-import org.cloudfoundry.uaa.users.ChangeUserPasswordResponse;
 import org.cloudfoundry.uaa.users.CreateUserRequest;
 import org.cloudfoundry.uaa.users.CreateUserResponse;
 import org.cloudfoundry.uaa.users.DeleteUserRequest;
@@ -26,7 +25,6 @@ import org.cloudfoundry.uaa.users.DeleteUserResponse;
 import org.cloudfoundry.uaa.users.Email;
 import org.cloudfoundry.uaa.users.GetUserVerificationLinkRequest;
 import org.cloudfoundry.uaa.users.GetUserVerificationLinkResponse;
-import org.cloudfoundry.uaa.users.Invite;
 import org.cloudfoundry.uaa.users.InviteUsersRequest;
 import org.cloudfoundry.uaa.users.InviteUsersResponse;
 import org.cloudfoundry.uaa.users.ListUsersRequest;
@@ -44,7 +42,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
@@ -65,13 +63,6 @@ public final class UsersTest extends AbstractIntegrationTest {
     @Ignore("TODO: Refresh token after password change")
     @Test
     public void changePassword() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<ChangeUserPasswordResponse> subscriber = ScriptedSubscriber.<ChangeUserPasswordResponse>create()
-            .consumeNextWith(response -> {
-                assertThat(response.getMessage()).isEqualTo("password updated");
-                assertThat(response.getStatus()).isEqualTo("ok");
-            })
-            .expectComplete();
-
         getUserIdByUsername(this.uaaClient, this.username)
             .then(userId -> this.uaaClient.users()
                 .changePassword(ChangeUserPasswordRequest.builder()
@@ -79,21 +70,18 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .password("test-new-password")
                     .userId(userId)
                     .build()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(response -> {
+                assertThat(response.getMessage()).isEqualTo("password updated");
+                assertThat(response.getStatus()).isEqualTo("ok");
+            })
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void create() throws TimeoutException, InterruptedException {
         String userName = this.nameFactory.getUserName();
-
-        ScriptedSubscriber<CreateUserResponse> subscriber = ScriptedSubscriber.<CreateUserResponse>create()
-            .consumeNextWith(response -> {
-                assertThat(response.getExternalId()).isEqualTo("test-external-id");
-                assertThat(response.getUserName()).isEqualTo(userName);
-            })
-            .expectComplete();
 
         this.uaaClient.users()
             .create(CreateUserRequest.builder()
@@ -109,18 +97,18 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .password("test-password")
                 .userName(userName)
                 .build())
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(response -> {
+                assertThat(response.getExternalId()).isEqualTo("test-external-id");
+                assertThat(response.getUserName()).isEqualTo(userName);
+            })
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void delete() throws TimeoutException, InterruptedException {
         String userName = this.nameFactory.getUserName();
-
-        ScriptedSubscriber<Integer> subscriber = ScriptedSubscriber.<Integer>create()
-            .expectNext(0)
-            .expectComplete();
 
         createUserId(this.uaaClient, userName)
             .then(userId -> this.uaaClient.users()
@@ -130,18 +118,15 @@ public final class UsersTest extends AbstractIntegrationTest {
             .map(DeleteUserResponse::getId)
             .then(userId -> requestListUsers(this.uaaClient, userId))
             .map(ListUsersResponse::getTotalResults)
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNext(0)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void getVerificationLink() throws TimeoutException, InterruptedException {
         String userName = this.nameFactory.getUserName();
-
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .consumeNextWith(location -> assertThat(location).contains("/verify_user?code="))
-            .expectComplete();
 
         createUserId(this.uaaClient, userName)
             .then(userId -> this.uaaClient.users()
@@ -150,21 +135,13 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .userId(userId)
                     .build()))
             .map(GetUserVerificationLinkResponse::getVerifyLink)
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(location -> assertThat(location).contains("/verify_user?code="))
+            .expectComplete();
     }
 
     @Test
     public void invite() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<Invite> subscriber = ScriptedSubscriber.<Invite>create()
-            .consumeNextWith(invite -> {
-                assertThat(invite.getEmail()).isEqualTo("test@email.address");
-                assertThat(invite.getErrorCode()).isNull();
-                assertThat(invite.getSuccess()).isTrue();
-            })
-            .expectComplete();
-
         this.uaaClient.users()
             .invite(InviteUsersRequest.builder()
                 .email("test@email.address")
@@ -173,18 +150,19 @@ public final class UsersTest extends AbstractIntegrationTest {
             .log("stream.invite")
             .flatMapIterable(InviteUsersResponse::getNewInvites)
             .single()
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(invite -> {
+                assertThat(invite.getEmail()).isEqualTo("test@email.address");
+                assertThat(invite.getErrorCode()).isNull();
+                assertThat(invite.getSuccess()).isTrue();
+            })
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void list() throws TimeoutException, InterruptedException {
         String userName = this.nameFactory.getUserName();
-
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectNext(userName)
-            .expectComplete();
 
         createUserId(this.uaaClient, userName)
             .then(userId -> this.uaaClient.users()
@@ -193,18 +171,15 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .build()))
             .flatMapIterable(ListUsersResponse::getResources)
             .map(User::getUserName)
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNext(userName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void lookup() throws TimeoutException, InterruptedException {
         String userName = this.nameFactory.getUserName();
-
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectNext(userName)
-            .expectComplete();
 
         createUserId(this.uaaClient, userName)
             .then(userId -> this.uaaClient.users()
@@ -213,18 +188,15 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .build()))
             .flatMapIterable(LookupUserIdsResponse::getResources)
             .map(UserId::getUserName)
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNext(userName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void update() throws TimeoutException, InterruptedException {
         String userName = this.nameFactory.getUserName();
-
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectNext("test-email-2")
-            .expectComplete();
 
         createUserId(this.uaaClient, userName)
             .then(userId -> this.uaaClient.users()
@@ -243,18 +215,15 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .build()))
             .flatMap(response -> Flux.fromIterable(response.getEmail())
                 .map(Email::getValue))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNext("test-email-2")
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void verifyUser() throws TimeoutException, InterruptedException {
         String userName = this.nameFactory.getUserName();
-
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectNext(userName)
-            .expectComplete();
 
         createUserId(this.uaaClient, userName)
             .then(userId -> this.uaaClient.users()
@@ -262,9 +231,10 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .userId(userId)
                     .build()))
             .map(VerifyUserResponse::getUserName)
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNext(userName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     private static Mono<String> createUserId(UaaClient uaaClient, String userName) {

@@ -21,7 +21,6 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.AbstractApplicationResource;
-import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
@@ -59,6 +58,7 @@ import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
+import org.cloudfoundry.util.DelayUtils;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.OperationUtils;
 import org.cloudfoundry.util.PaginationUtils;
@@ -70,7 +70,7 @@ import org.springframework.util.Assert;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
 import reactor.util.function.Tuple2;
 
 import java.io.ByteArrayInputStream;
@@ -83,15 +83,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 import java.util.zip.GZIPInputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.ZipExpectations.zipEquality;
-import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
-import static reactor.core.publisher.Mono.when;
 
 public final class ApplicationsTest extends AbstractIntegrationTest {
 
@@ -112,8 +111,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
-
         Mono
             .when(this.organizationId, this.spaceId)
             .then(function((organizationId, spaceId) -> Mono.when(
@@ -126,9 +123,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 getSingleRouteId(this.cloudFoundryClient, applicationId),
                 Mono.just(routeId)
             )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -136,10 +134,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String copyApplicationName = this.nameFactory.getApplicationName();
 
-        ScriptedSubscriber<Tuple2<byte[], byte[]>> subscriber = tupleEquality();
-
         this.spaceId
-            .then(spaceId -> when(
+            .then(spaceId -> Mono.when(
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
                     .as(thenKeep(applicationId -> uploadApplication(this.cloudFoundryClient, applicationId))),
                 requestCreateApplication(this.cloudFoundryClient, spaceId, copyApplicationName)
@@ -152,43 +148,38 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build())
                 .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))
             )))
-            .then(function((sourceId, targetId) -> when(
+            .then(function((sourceId, targetId) -> Mono.when(
                 downloadApplication(this.cloudFoundryClient, sourceId),
                 downloadApplication(this.cloudFoundryClient, targetId)
             )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void create() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
 
-        ScriptedSubscriber<Tuple2<String, ApplicationEntity>> subscriber = ScriptedSubscriber.<Tuple2<String, ApplicationEntity>>create()
-            .consumeNextWith(consumer((spaceId, entity) -> {
-                assertThat(entity.getSpaceId()).isEqualTo(spaceId);
-                assertThat(entity.getName()).isEqualTo(applicationName);
-            }))
-            .expectComplete();
-
         this.spaceId
-            .then(spaceId -> when(
+            .then(spaceId -> Mono.when(
                 Mono.just(spaceId),
                 requestCreateApplication(this.cloudFoundryClient, spaceId, applicationName)
                     .map(ResourceUtils::getEntity)
             ))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(consumer((spaceId, entity) -> {
+                assertThat(entity.getSpaceId()).isEqualTo(spaceId);
+                assertThat(entity.getName()).isEqualTo(applicationName);
+            }))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void delete() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
-
-        ScriptedSubscriber<AbstractApplicationResource> subscriber = ScriptedSubscriber.<AbstractApplicationResource>create()
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-AppNotFound\\([0-9]+\\): The app could not be found: .*"));
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
@@ -197,16 +188,14 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .applicationId(applicationId)
                     .build())))
             .then(applicationId -> requestGetApplication(this.cloudFoundryClient, applicationId))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-AppNotFound\\([0-9]+\\): The app could not be found: .*"))
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void downloadDroplet() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
-
-        ScriptedSubscriber<byte[]> subscriber = isTestApplicationDroplet();
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
@@ -216,58 +205,55 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .applicationId(applicationId)
                     .build())
                 .as(OperationUtils::collectByteArray))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(isTestApplicationDroplet())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void environment() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
 
-        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
-
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .then(applicationId -> when(
+            .then(applicationId -> Mono.when(
                 Mono.just(applicationId),
                 this.cloudFoundryClient.applicationsV2()
                     .environment(ApplicationEnvironmentRequest.builder()
                         .applicationId(applicationId)
                         .build())
-                    .map(response -> getStringApplicationEnvValue(response.getApplicationEnvironmentJsons(), "VCAP_APPLICATION", "application_id")))
-            )
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+                    .map(response -> getStringApplicationEnvValue(response.getApplicationEnvironmentJsons(), "VCAP_APPLICATION", "application_id"))
+            ))
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void get() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
 
-        ScriptedSubscriber<Tuple2<String, AbstractApplicationResource>> subscriber = applicationIdAndNameEquality(applicationName);
-
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .then(applicationId -> when(
+            .then(applicationId -> Mono.when(
                 Mono.just(applicationId),
                 requestGetApplication(this.cloudFoundryClient, applicationId)
             ))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(applicationIdAndNameEquality(applicationName))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void list() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
 
-        ScriptedSubscriber<Tuple2<String, AbstractApplicationResource>> subscriber = applicationIdAndNameEquality(applicationName);
-
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .then(applicationId -> when(
+            .then(applicationId -> Mono.when(
                 Mono.just(applicationId),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -278,20 +264,19 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .single()
                     .cast(AbstractApplicationResource.class)
             ))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(applicationIdAndNameEquality(applicationName))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listFilterByDiego() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
 
-        ScriptedSubscriber<Tuple2<String, AbstractApplicationResource>> subscriber = applicationIdAndNameEquality(applicationName);
-
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .then(applicationId -> when(
+            .then(applicationId -> Mono.when(
                 Mono.just(applicationId),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -303,20 +288,19 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .single()
                     .cast(AbstractApplicationResource.class)
             ))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(applicationIdAndNameEquality(applicationName))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listFilterByName() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
 
-        ScriptedSubscriber<Tuple2<String, AbstractApplicationResource>> subscriber = applicationIdAndNameEquality(applicationName);
-
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .then(applicationId -> when(
+            .then(applicationId -> Mono.when(
                 Mono.just(applicationId),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -328,23 +312,22 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .single()
                     .cast(AbstractApplicationResource.class)
             ))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(applicationIdAndNameEquality(applicationName))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listFilterByOrganizationId() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
 
-        ScriptedSubscriber<Tuple2<String, AbstractApplicationResource>> subscriber = applicationIdAndNameEquality(applicationName);
-
-        when(
+        Mono.when(
             this.organizationId,
             this.spaceId
                 .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
         )
-            .then(function((organizationId, applicationId) -> when(
+            .then(function((organizationId, applicationId) -> Mono.when(
                 Mono.just(applicationId),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -356,23 +339,22 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .single()
                     .cast(AbstractApplicationResource.class)
             )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(applicationIdAndNameEquality(applicationName))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listFilterBySpaceId() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
 
-        ScriptedSubscriber<Tuple2<String, AbstractApplicationResource>> subscriber = applicationIdAndNameEquality(applicationName);
-
         this.spaceId
-            .then(spaceId -> when(
+            .then(spaceId -> Mono.when(
                 Mono.just(spaceId),
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
             ))
-            .then(function((spaceId, applicationId) -> when(
+            .then(function((spaceId, applicationId) -> Mono.when(
                 Mono.just(applicationId),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -384,23 +366,22 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .single()
                     .cast(AbstractApplicationResource.class)
             )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(applicationIdAndNameEquality(applicationName))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listFilterByStackId() {
         String applicationName = this.nameFactory.getApplicationName();
 
-        ScriptedSubscriber<Tuple2<String, AbstractApplicationResource>> subscriber = applicationIdAndNameEquality(applicationName);
-
-        when(
+        Mono.when(
             this.stackId,
             this.spaceId
                 .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
         )
-            .then(function((stackId, applicationId) -> when(
+            .then(function((stackId, applicationId) -> Mono.when(
                 Mono.just(applicationId),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -412,7 +393,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .single()
                     .cast(AbstractApplicationResource.class)
             )))
-            .subscribe(subscriber);
+            .as(StepVerifier::create)
+            .consumeNextWith(applicationIdAndNameEquality(applicationName))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -420,19 +404,17 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
-
-        when(this.organizationId, this.spaceId)
-            .then(function((organizationId, spaceId) -> when(
+        Mono.when(this.organizationId, this.spaceId)
+            .then(function((organizationId, spaceId) -> Mono.when(
                 Mono.just(organizationId),
                 Mono.just(spaceId),
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
             )))
-            .then(function((organizationId, spaceId, applicationId) -> when(
+            .then(function((organizationId, spaceId, applicationId) -> Mono.when(
                 Mono.just(applicationId),
                 createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
             )))
-            .then(function((applicationId, routeResponse) -> when(
+            .then(function((applicationId, routeResponse) -> Mono.when(
                 Mono.just(ResourceUtils.getId(routeResponse)),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -443,9 +425,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .single()
                     .map(ResourceUtils::getId)
             )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -453,19 +436,17 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
-
-        when(this.organizationId, this.spaceId)
-            .then(function((organizationId, spaceId) -> when(
+        Mono.when(this.organizationId, this.spaceId)
+            .then(function((organizationId, spaceId) -> Mono.when(
                 Mono.just(organizationId),
                 Mono.just(spaceId),
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
             )))
-            .then(function((organizationId, spaceId, applicationId) -> when(
+            .then(function((organizationId, spaceId, applicationId) -> Mono.when(
                 Mono.just(applicationId),
                 createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
             )))
-            .then(function((applicationId, routeResponse) -> when(
+            .then(function((applicationId, routeResponse) -> Mono.when(
                 Mono.just(ResourceUtils.getId(routeResponse)),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -477,9 +458,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .single()
                     .map(ResourceUtils::getId)
             )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -487,19 +469,17 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
-
-        when(this.organizationId, this.spaceId)
-            .then(function((organizationId, spaceId) -> when(
+        Mono.when(this.organizationId, this.spaceId)
+            .then(function((organizationId, spaceId) -> Mono.when(
                 Mono.just(organizationId),
                 Mono.just(spaceId),
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
             )))
-            .then(function((organizationId, spaceId, applicationId) -> when(
+            .then(function((organizationId, spaceId, applicationId) -> Mono.when(
                 Mono.just(applicationId),
                 createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
             )))
-            .then(function((applicationId, routeResponse) -> when(
+            .then(function((applicationId, routeResponse) -> Mono.when(
                 Mono.just(ResourceUtils.getId(routeResponse)),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -511,9 +491,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .single()
                     .map(ResourceUtils::getId)
             )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -521,19 +502,17 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
-
-        when(this.organizationId, this.spaceId)
-            .then(function((organizationId, spaceId) -> when(
+        Mono.when(this.organizationId, this.spaceId)
+            .then(function((organizationId, spaceId) -> Mono.when(
                 Mono.just(organizationId),
                 Mono.just(spaceId),
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
             )))
-            .then(function((organizationId, spaceId, applicationId) -> when(
+            .then(function((organizationId, spaceId, applicationId) -> Mono.when(
                 Mono.just(applicationId),
                 createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
             )))
-            .then(function((applicationId, routeResponse) -> when(
+            .then(function((applicationId, routeResponse) -> Mono.when(
                 Mono.just(ResourceUtils.getId(routeResponse)),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -545,9 +524,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .single()
                     .map(ResourceUtils::getId)
             )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -555,19 +535,17 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
-
-        when(this.organizationId, this.spaceId)
-            .then(function((organizationId, spaceId) -> when(
+        Mono.when(this.organizationId, this.spaceId)
+            .then(function((organizationId, spaceId) -> Mono.when(
                 Mono.just(organizationId),
                 Mono.just(spaceId),
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
             )))
-            .then(function((organizationId, spaceId, applicationId) -> when(
+            .then(function((organizationId, spaceId, applicationId) -> Mono.when(
                 Mono.just(applicationId),
                 createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
             )))
-            .then(function((applicationId, routeResponse) -> when(
+            .then(function((applicationId, routeResponse) -> Mono.when(
                 Mono.just(ResourceUtils.getId(routeResponse)),
                 PaginationUtils
                     .requestClientV2Resources(page -> {
@@ -584,9 +562,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .single()
                     .map(ResourceUtils::getId)
             )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -594,21 +573,20 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
-        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
-
         this.spaceId
-            .then(spaceId -> when(
+            .then(spaceId -> Mono.when(
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
                 createUserServiceInstanceId(this.cloudFoundryClient, spaceId, serviceInstanceName)
             ))
             .as(thenKeep(function((applicationId, serviceInstanceId) -> createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId))))
-            .then(function((applicationId, serviceInstanceId) -> when(
+            .then(function((applicationId, serviceInstanceId) -> Mono.when(
                 Mono.just(serviceInstanceId),
                 getSingleServiceBindingInstanceId(this.cloudFoundryClient, applicationId)
             )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -616,19 +594,17 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
-        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
-
         this.spaceId
-            .then(spaceId -> when(
+            .then(spaceId -> Mono.when(
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
                 createUserServiceInstanceId(this.cloudFoundryClient, spaceId, serviceInstanceName)
             ))
-            .then(function((applicationId, serviceInstanceId) -> when(
+            .then(function((applicationId, serviceInstanceId) -> Mono.when(
                 Mono.just(applicationId),
                 Mono.just(serviceInstanceId),
                 createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)
             )))
-            .then(function((applicationId, serviceInstanceId, serviceBindingId) -> when(
+            .then(function((applicationId, serviceInstanceId, serviceBindingId) -> Mono.when(
                 Mono.just(serviceBindingId),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -640,9 +616,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .single()
                     .map(ResourceUtils::getId)
             )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -650,16 +627,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        ScriptedSubscriber<RouteResource> subscriber = ScriptedSubscriber.<RouteResource>create()
-            .expectComplete();
-
-        when(this.organizationId, this.spaceId)
-            .then(function((organizationId, spaceId) -> when(
+        Mono.when(this.organizationId, this.spaceId)
+            .then(function((organizationId, spaceId) -> Mono.when(
                 Mono.just(organizationId),
                 Mono.just(spaceId),
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
             )))
-            .then(function((organizationId, spaceId, applicationId) -> when(
+            .then(function((organizationId, spaceId, applicationId) -> Mono.when(
                 Mono.just(applicationId),
                 createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
             )))
@@ -669,9 +643,9 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .routeId(ResourceUtils.getId(routeResponse))
                     .build()))))
             .flatMap(function((applicationId, routeResponse) -> requestRoutes(this.cloudFoundryClient, applicationId)))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -679,15 +653,12 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
-        ScriptedSubscriber<ServiceBindingResource> subscriber = ScriptedSubscriber.<ServiceBindingResource>create()
-            .expectComplete();
-
         this.spaceId
-            .then(spaceId -> when(
+            .then(spaceId -> Mono.when(
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
                 createUserServiceInstanceId(this.cloudFoundryClient, spaceId, serviceInstanceName)
             ))
-            .then(function((applicationId, serviceInstanceId) -> when(
+            .then(function((applicationId, serviceInstanceId) -> Mono.when(
                 Mono.just(applicationId),
                 createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)
             )))
@@ -697,18 +668,14 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .serviceBindingId(serviceBindingId)
                     .build()))))
             .flatMap(function((applicationId, serviceBindingId) -> requestServiceBindings(this.cloudFoundryClient, applicationId)))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void restage() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
-
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectNext(applicationName)
-            .expectComplete();
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
@@ -719,18 +686,15 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build())))
             .then(applicationId -> waitForStagingApplication(this.cloudFoundryClient, applicationId))
             .map(resource -> ResourceUtils.getEntity(resource).getName())
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNext(applicationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void statistics() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
-
-        ScriptedSubscriber<String> subscriber = ScriptedSubscriber.<String>create()
-            .expectNext(applicationName)
-            .expectComplete();
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
@@ -740,16 +704,15 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .applicationId(applicationId)
                     .build())
                 .map(instanceStatistics -> instanceStatistics.getInstances().get("0").getStatistics().getName()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNext(applicationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void summary() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
-
-        ScriptedSubscriber<Tuple2<String, String>> subscriber = tupleEquality();
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
@@ -759,23 +722,20 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build())
                 .map(SummaryApplicationResponse::getId)
                 .and(Mono.just(applicationId)))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void terminateInstance() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
 
-        ScriptedSubscriber<ApplicationInstanceInfo> subscriber = ScriptedSubscriber.<ApplicationInstanceInfo>create()
-            .expectNextCount(1)
-            .expectComplete();
-
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
             .as(thenKeep(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId)))
-            .then(applicationId -> when(
+            .then(applicationId -> Mono.when(
                 Mono.just(applicationId),
                 getInstanceInfo(this.cloudFoundryClient, applicationId, "0")
                     .map(info -> Optional.ofNullable(info.getSince()))
@@ -786,23 +746,16 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .index("0")
                     .build()))))
             .then(function((applicationId, optionalSince) -> waitForInstanceRestart(this.cloudFoundryClient, applicationId, "0", optionalSince)))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void update() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
         String applicationName2 = this.nameFactory.getApplicationName();
-
-        ScriptedSubscriber<Tuple2<ApplicationEntity, ApplicationEntity>> subscriber = ScriptedSubscriber.<Tuple2<ApplicationEntity, ApplicationEntity>>create()
-            .consumeNextWith(consumer((entity1, entity2) -> {
-                assertThat(entity1.getName()).isEqualTo(applicationName2);
-                assertThat(entity1.getEnvironmentJsons()).containsEntry("test-var", "test-value");
-                assertThat(entity2.getEnvironmentJsons()).isEmpty();
-            }))
-            .expectComplete();
 
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
@@ -814,13 +767,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build())
                 .map(ResourceUtils::getId))
             .then(applicationId ->
-                when(
+                Mono.when(
                     Mono.just(applicationId),
                     requestGetApplication(this.cloudFoundryClient, applicationId)
                         .map(ResourceUtils::getEntity)
                 ))
             .then(function((applicationId, entity1) ->
-                when(
+                Mono.when(
                     Mono.just(entity1),
                     this.cloudFoundryClient.applicationsV2()
                         .update(UpdateApplicationRequest.builder()
@@ -830,56 +783,57 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .then(requestGetApplication(this.cloudFoundryClient, applicationId)
                             .map(ResourceUtils::getEntity))
                 )))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(consumer((entity1, entity2) -> {
+                assertThat(entity1.getName()).isEqualTo(applicationName2);
+                assertThat(entity1.getEnvironmentJsons()).containsEntry("test-var", "test-value");
+                assertThat(entity2.getEnvironmentJsons()).isEmpty();
+            }))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void uploadAndDownload() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
 
-        ScriptedSubscriber<Tuple2<byte[], byte[]>> subscriber = zipEquality();
-
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
             .as(thenKeep(applicationId -> uploadApplication(this.cloudFoundryClient, applicationId)))
-            .then(applicationId -> when(
+            .then(applicationId -> Mono.when(
                 downloadApplication(this.cloudFoundryClient, applicationId),
                 getBytes("test-application.zip")
             ))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(zipEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void uploadAndDownloadAsyncFalse() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
 
-        ScriptedSubscriber<Tuple2<byte[], byte[]>> subscriber = zipEquality();
-
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
             .as(thenKeep(applicationId -> uploadApplicationAsyncFalse(this.cloudFoundryClient, applicationId)))
-            .then(applicationId -> when(
+            .then(applicationId -> Mono.when(
                 downloadApplication(this.cloudFoundryClient, applicationId),
                 getBytes("test-application.zip")
             ))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(zipEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    private static ScriptedSubscriber<Tuple2<String, AbstractApplicationResource>> applicationIdAndNameEquality(String name) {
+    private static Consumer<Tuple2<String, AbstractApplicationResource>> applicationIdAndNameEquality(String name) {
         Assert.notNull(name, "name must not be null");
 
-        return ScriptedSubscriber.<Tuple2<String, AbstractApplicationResource>>create()
-            .consumeNextWith(consumer((applicationId, resource) -> {
-                assertThat(ResourceUtils.getId(resource)).isEqualTo(applicationId);
-                assertThat(ResourceUtils.getEntity(resource).getName()).isEqualTo(name);
-            }))
-            .expectComplete();
+        return consumer((applicationId, resource) -> {
+            assertThat(ResourceUtils.getId(resource)).isEqualTo(applicationId);
+            assertThat(ResourceUtils.getEntity(resource).getName()).isEqualTo(name);
+        });
     }
 
     private static Mono<String> createApplicationId(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
@@ -951,23 +905,21 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         return expected == null ? actual == null : expected.equals(actual);
     }
 
-    private static ScriptedSubscriber<byte[]> isTestApplicationDroplet() {
-        return ScriptedSubscriber.<byte[]>create()
-            .consumeNextWith(bytes -> {
-                Set<String> names = new HashSet<>();
+    private static Consumer<byte[]> isTestApplicationDroplet() {
+        return bytes -> {
+            Set<String> names = new HashSet<>();
 
-                try (TarArchiveInputStream in = new TarArchiveInputStream(new GZIPInputStream(new ByteArrayInputStream(bytes)))) {
-                    TarArchiveEntry entry;
-                    while ((entry = in.getNextTarEntry()) != null) {
-                        names.add(entry.getName());
-                    }
-                } catch (IOException e) {
-                    throw Exceptions.propagate(e);
+            try (TarArchiveInputStream in = new TarArchiveInputStream(new GZIPInputStream(new ByteArrayInputStream(bytes)))) {
+                TarArchiveEntry entry;
+                while ((entry = in.getNextTarEntry()) != null) {
+                    names.add(entry.getName());
                 }
+            } catch (IOException e) {
+                throw Exceptions.propagate(e);
+            }
 
-                assertThat(names).contains("./app/Staticfile", "./app/public/index.html");
-            })
-            .expectComplete();
+            assertThat(names).contains("./app/Staticfile", "./app/public/index.html");
+        };
     }
 
     private static Mono<AssociateApplicationRouteResponse> requestAssociateRoute(CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
@@ -1093,13 +1045,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     private static Mono<ApplicationInstanceInfo> waitForInstanceRestart(CloudFoundryClient cloudFoundryClient, String applicationId, String instanceName, Optional<Double> optionalSince) {
         return getInstanceInfo(cloudFoundryClient, applicationId, instanceName)
             .filter(info -> !isIdentical(info.getSince(), optionalSince.orElse(null)))
-            .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
+            .repeatWhenEmpty(DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
     }
 
     private static Mono<AbstractApplicationResource> waitForStagingApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestGetApplication(cloudFoundryClient, applicationId)
             .filter(response -> "STAGED".equals(response.getEntity().getPackageState()))
-            .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
+            .repeatWhenEmpty(DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
     }
 
     private static Mono<ApplicationInstanceInfo> waitForStartingInstanceInfo(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -1110,7 +1062,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .flatMap(response -> Flux.fromIterable(response.getInstances().values()))
             .filter(applicationInstanceInfo -> "RUNNING".equals(applicationInstanceInfo.getState()))
             .next()
-            .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
+            .repeatWhenEmpty(DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
     }
 
     private Mono<byte[]> downloadApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {

@@ -36,9 +36,10 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import reactor.core.publisher.Mono;
-import reactor.test.subscriber.ScriptedSubscriber;
+import org.junit.Test;
+import reactor.test.StepVerifier;
 
+import java.time.Duration;
 import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
@@ -50,323 +51,232 @@ import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 
-public final class ReactorServicePlansTest {
+public final class ReactorServicePlansTest extends AbstractClientApiTest {
 
-    public static final class Delete extends AbstractClientApiTest<DeleteServicePlanRequest, DeleteServicePlanResponse> {
+    private final ReactorServicePlans servicePlans = new ReactorServicePlans(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
-        private final ReactorServicePlans servicePlans = new ReactorServicePlans(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    @Test
+    public void delete() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/v2/service_plans/test-service-plan-id")
+                .build())
+            .response(TestResponse.builder()
+                .status(NO_CONTENT)
+                .build())
+            .build());
 
-        @Override
-        protected ScriptedSubscriber<DeleteServicePlanResponse> expectations() {
-            return ScriptedSubscriber.<DeleteServicePlanResponse>create()
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(DELETE).path("/v2/service_plans/test-service-plan-id")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(NO_CONTENT)
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<DeleteServicePlanResponse> invoke(DeleteServicePlanRequest request) {
-            return this.servicePlans.delete(request);
-        }
-
-        @Override
-        protected DeleteServicePlanRequest validRequest() {
-            return DeleteServicePlanRequest.builder()
+        this.servicePlans
+            .delete(DeleteServicePlanRequest.builder()
                 .servicePlanId("test-service-plan-id")
-                .build();
-
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class DeleteAsync extends AbstractClientApiTest<DeleteServicePlanRequest, DeleteServicePlanResponse> {
+    @Test
+    public void deleteAsync() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/v2/service_plans/test-service-plan-id?async=true")
+                .build())
+            .response(TestResponse.builder()
+                .status(ACCEPTED)
+                .payload("fixtures/client/v2/service_plans/DELETE_{id}_async_response.json")
+                .build())
+            .build());
 
-        private final ReactorServicePlans servicePlans = new ReactorServicePlans(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<DeleteServicePlanResponse> expectations() {
-            return ScriptedSubscriber.<DeleteServicePlanResponse>create()
-                .expectNext(DeleteServicePlanResponse.builder()
-                    .metadata(Metadata.builder()
-                        .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
-                        .createdAt("2016-02-02T17:16:31Z")
-                        .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
-                        .build())
-                    .entity(JobEntity.builder()
-                        .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
-                        .status("queued")
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(DELETE).path("/v2/service_plans/test-service-plan-id?async=true")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(ACCEPTED)
-                    .payload("fixtures/client/v2/service_plans/DELETE_{id}_async_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<DeleteServicePlanResponse> invoke(DeleteServicePlanRequest request) {
-            return this.servicePlans.delete(request);
-        }
-
-        @Override
-        protected DeleteServicePlanRequest validRequest() {
-            return DeleteServicePlanRequest.builder()
+        this.servicePlans
+            .delete(DeleteServicePlanRequest.builder()
                 .async(true)
                 .servicePlanId("test-service-plan-id")
-                .build();
-
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(DeleteServicePlanResponse.builder()
+                .metadata(Metadata.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .createdAt("2016-02-02T17:16:31Z")
+                    .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .build())
+                .entity(JobEntity.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .status("queued")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class Get extends AbstractClientApiTest<GetServicePlanRequest, GetServicePlanResponse> {
+    @Test
+    public void get() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/service_plans/test-service-plan-id")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/service_plans/GET_{id}_response.json")
+                .build())
+            .build());
 
-        private final ReactorServicePlans servicePlans = new ReactorServicePlans(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<GetServicePlanResponse> expectations() {
-            return ScriptedSubscriber.<GetServicePlanResponse>create()
-                .expectNext(GetServicePlanResponse.builder()
-                    .metadata(Metadata.builder()
-                        .createdAt("2015-07-27T22:43:16Z")
-                        .id("f6ceb8a2-e6fc-43d5-a11b-7ced9e1b47c7")
-                        .url("/v2/service_plans/f6ceb8a2-e6fc-43d5-a11b-7ced9e1b47c7")
-                        .build())
-                    .entity(ServicePlanEntity.builder()
-                        .name("name-462")
-                        .free(false)
-                        .description("desc-52")
-                        .serviceId("8ac39757-0f9d-4295-9b6f-e626f7ee3cd4")
-                        .uniqueId("2aa0162c-9c88-4084-ad1d-566a09e8d316")
-                        .publiclyVisible(true)
-                        .active(true)
-                        .serviceUrl("/v2/services/8ac39757-0f9d-4295-9b6f-e626f7ee3cd4")
-                        .serviceInstancesUrl("/v2/service_plans/f6ceb8a2-e6fc-43d5-a11b-7ced9e1b47c7/service_instances")
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/v2/service_plans/test-service-plan-id")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/service_plans/GET_{id}_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<GetServicePlanResponse> invoke(GetServicePlanRequest request) {
-            return this.servicePlans.get(request);
-        }
-
-        @Override
-        protected GetServicePlanRequest validRequest() {
-            return GetServicePlanRequest.builder()
+        this.servicePlans
+            .get(GetServicePlanRequest.builder()
                 .servicePlanId("test-service-plan-id")
-                .build();
-        }
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetServicePlanResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2015-07-27T22:43:16Z")
+                    .id("f6ceb8a2-e6fc-43d5-a11b-7ced9e1b47c7")
+                    .url("/v2/service_plans/f6ceb8a2-e6fc-43d5-a11b-7ced9e1b47c7")
+                    .build())
+                .entity(ServicePlanEntity.builder()
+                    .name("name-462")
+                    .free(false)
+                    .description("desc-52")
+                    .serviceId("8ac39757-0f9d-4295-9b6f-e626f7ee3cd4")
+                    .uniqueId("2aa0162c-9c88-4084-ad1d-566a09e8d316")
+                    .publiclyVisible(true)
+                    .active(true)
+                    .serviceUrl("/v2/services/8ac39757-0f9d-4295-9b6f-e626f7ee3cd4")
+                    .serviceInstancesUrl("/v2/service_plans/f6ceb8a2-e6fc-43d5-a11b-7ced9e1b47c7/service_instances")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class List extends AbstractClientApiTest<ListServicePlansRequest, ListServicePlansResponse> {
+    @Test
+    public void list() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/service_plans?q=service_guid%20IN%20test-service-id&page=-1")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/service_plans/GET_response.json")
+                .build())
+            .build());
 
-        private final ReactorServicePlans servicePlans = new ReactorServicePlans(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<ListServicePlansResponse> expectations() {
-            return ScriptedSubscriber.<ListServicePlansResponse>create()
-                .expectNext(ListServicePlansResponse.builder()
-                    .totalResults(1)
-                    .totalPages(1)
-                    .resource(ServicePlanResource.builder()
-                        .metadata(Metadata.builder()
-                            .createdAt("2015-07-27T22:43:16Z")
-                            .id("956cb355-3acc-4ced-8161-a57b9b5c7943")
-                            .url("/v2/service_plans/956cb355-3acc-4ced-8161-a57b9b5c7943")
-                            .build())
-                        .entity(ServicePlanEntity.builder()
-                            .name("name-464")
-                            .free(false)
-                            .description("desc-54")
-                            .serviceId("83dc64ef-eb0a-454c-b3d9-c554921f3bd2")
-                            .uniqueId("49aee95b-2108-4bbb-9769-c6197f308acf")
-                            .publiclyVisible(true)
-                            .active(true)
-                            .serviceUrl("/v2/services/83dc64ef-eb0a-454c-b3d9-c554921f3bd2")
-                            .serviceInstancesUrl("/v2/service_plans/956cb355-3acc-4ced-8161-a57b9b5c7943/service_instances")
-                            .build())
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/v2/service_plans?q=service_guid%20IN%20test-service-id&page=-1")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/service_plans/GET_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<ListServicePlansResponse> invoke(ListServicePlansRequest request) {
-            return this.servicePlans.list(request);
-        }
-
-        @Override
-        protected ListServicePlansRequest validRequest() {
-            return ListServicePlansRequest.builder()
+        this.servicePlans
+            .list(ListServicePlansRequest.builder()
                 .serviceId("test-service-id")
                 .page(-1)
-                .build();
-        }
-    }
-
-    public static final class ListServiceInstances extends AbstractClientApiTest<ListServicePlanServiceInstancesRequest, ListServicePlanServiceInstancesResponse> {
-
-        private final ReactorServicePlans servicePlans = new ReactorServicePlans(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<ListServicePlanServiceInstancesResponse> expectations() {
-            return ScriptedSubscriber.<ListServicePlanServiceInstancesResponse>create()
-                .expectNext(ListServicePlanServiceInstancesResponse.builder()
-                    .totalResults(1)
-                    .totalPages(1)
-                    .resource(ServiceInstanceResource.builder()
-                        .metadata(Metadata.builder()
-                            .createdAt("2015-07-27T22:43:16Z")
-                            .id("b95c56b9-f81b-4d34-9a00-a1a1ddba5f2f")
-                            .url("/v2/service_instances/b95c56b9-f81b-4d34-9a00-a1a1ddba5f2f")
-                            .build())
-                        .entity(ServiceInstanceEntity.builder()
-                            .name("name-457")
-                            .credential("creds-key-268", "creds-val-268")
-                            .servicePlanId("bb29926c-7482-4ae5-803c-ec99e95aa278")
-                            .spaceId("cf5812f5-bf43-40cc-88d4-d50b76d7797d")
-                            .type("managed_service_instance")
-                            .tags(Collections.emptyList())
-                            .spaceUrl("/v2/spaces/cf5812f5-bf43-40cc-88d4-d50b76d7797d")
-                            .servicePlanUrl("/v2/service_plans/bb29926c-7482-4ae5-803c-ec99e95aa278")
-                            .serviceBindingsUrl("/v2/service_instances/b95c56b9-f81b-4d34-9a00-a1a1ddba5f2f/service_bindings")
-                            .serviceKeysUrl("/v2/service_instances/b95c56b9-f81b-4d34-9a00-a1a1ddba5f2f/service_keys")
-                            .build())
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListServicePlansResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(ServicePlanResource.builder()
+                    .metadata(Metadata.builder()
+                        .createdAt("2015-07-27T22:43:16Z")
+                        .id("956cb355-3acc-4ced-8161-a57b9b5c7943")
+                        .url("/v2/service_plans/956cb355-3acc-4ced-8161-a57b9b5c7943")
+                        .build())
+                    .entity(ServicePlanEntity.builder()
+                        .name("name-464")
+                        .free(false)
+                        .description("desc-54")
+                        .serviceId("83dc64ef-eb0a-454c-b3d9-c554921f3bd2")
+                        .uniqueId("49aee95b-2108-4bbb-9769-c6197f308acf")
+                        .publiclyVisible(true)
+                        .active(true)
+                        .serviceUrl("/v2/services/83dc64ef-eb0a-454c-b3d9-c554921f3bd2")
+                        .serviceInstancesUrl("/v2/service_plans/956cb355-3acc-4ced-8161-a57b9b5c7943/service_instances")
                         .build())
                     .build())
-                .expectComplete();
-        }
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(GET).path("/v2/service_plans/test-service-plan-id/service_instances?q=space_guid%20IN%20test-space-id&page=-1")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(OK)
-                    .payload("fixtures/client/v2/service_plans/GET_{id}_service_instances_response.json")
-                    .build())
-                .build();
-        }
+    @Test
+    public void listServiceInstances() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/service_plans/test-service-plan-id/service_instances?q=space_guid%20IN%20test-space-id&page=-1")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/service_plans/GET_{id}_service_instances_response.json")
+                .build())
+            .build());
 
-        @Override
-        protected Mono<ListServicePlanServiceInstancesResponse> invoke(ListServicePlanServiceInstancesRequest request) {
-            return this.servicePlans.listServiceInstances(request);
-        }
-
-        @Override
-        protected ListServicePlanServiceInstancesRequest validRequest() {
-            return ListServicePlanServiceInstancesRequest.builder()
+        this.servicePlans
+            .listServiceInstances(ListServicePlanServiceInstancesRequest.builder()
                 .servicePlanId("test-service-plan-id")
                 .spaceId("test-space-id")
                 .page(-1)
-                .build();
-        }
-
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListServicePlanServiceInstancesResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(ServiceInstanceResource.builder()
+                    .metadata(Metadata.builder()
+                        .createdAt("2015-07-27T22:43:16Z")
+                        .id("b95c56b9-f81b-4d34-9a00-a1a1ddba5f2f")
+                        .url("/v2/service_instances/b95c56b9-f81b-4d34-9a00-a1a1ddba5f2f")
+                        .build())
+                    .entity(ServiceInstanceEntity.builder()
+                        .name("name-457")
+                        .credential("creds-key-268", "creds-val-268")
+                        .servicePlanId("bb29926c-7482-4ae5-803c-ec99e95aa278")
+                        .spaceId("cf5812f5-bf43-40cc-88d4-d50b76d7797d")
+                        .type("managed_service_instance")
+                        .tags(Collections.emptyList())
+                        .spaceUrl("/v2/spaces/cf5812f5-bf43-40cc-88d4-d50b76d7797d")
+                        .servicePlanUrl("/v2/service_plans/bb29926c-7482-4ae5-803c-ec99e95aa278")
+                        .serviceBindingsUrl("/v2/service_instances/b95c56b9-f81b-4d34-9a00-a1a1ddba5f2f/service_bindings")
+                        .serviceKeysUrl("/v2/service_instances/b95c56b9-f81b-4d34-9a00-a1a1ddba5f2f/service_keys")
+                        .build())
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
-    public static final class Update extends AbstractClientApiTest<UpdateServicePlanRequest, UpdateServicePlanResponse> {
+    @Test
+    public void update() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PUT).path("/v2/service_plans/test-service-plan-id")
+                .payload("fixtures/client/v2/service_plans/PUT_{id}_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(CREATED)
+                .payload("fixtures/client/v2/service_plans/PUT_{id}_response.json")
+                .build())
+            .build());
 
-        private final ReactorServicePlans servicePlans = new ReactorServicePlans(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
-
-        @Override
-        protected ScriptedSubscriber<UpdateServicePlanResponse> expectations() {
-            return ScriptedSubscriber.<UpdateServicePlanResponse>create()
-                .expectNext(UpdateServicePlanResponse.builder()
-                    .metadata(Metadata.builder()
-                        .id("195f6bd5-0aa4-4a97-9c8d-5410e5e6d4b6")
-                        .url("/v2/service_plans/195f6bd5-0aa4-4a97-9c8d-5410e5e6d4b6")
-                        .createdAt("2016-02-19T02:04:09Z")
-                        .updatedAt("2016-02-19T02:04:09Z")
-                        .build())
-                    .entity(ServicePlanEntity.builder()
-                        .name("name-2674")
-                        .free(false)
-                        .description("desc-225")
-                        .serviceId("42bea093-8fe5-491a-8a34-b1943dc3709a")
-                        .uniqueId("7c4f2f8a-aa82-49e9-9f0c-76248aa1036d")
-                        .publiclyVisible(false)
-                        .active(true)
-                        .serviceUrl("/v2/services/42bea093-8fe5-491a-8a34-b1943dc3709a")
-                        .serviceInstancesUrl("/v2/service_plans/195f6bd5-0aa4-4a97-9c8d-5410e5e6d4b6/service_instances")
-                        .build())
-                    .build())
-                .expectComplete();
-        }
-
-        @Override
-        protected InteractionContext interactionContext() {
-            return InteractionContext.builder()
-                .request(TestRequest.builder()
-                    .method(PUT).path("/v2/service_plans/test-service-plan-id")
-                    .payload("fixtures/client/v2/service_plans/PUT_{id}_request.json")
-                    .build())
-                .response(TestResponse.builder()
-                    .status(CREATED)
-                    .payload("fixtures/client/v2/service_plans/PUT_{id}_response.json")
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected Mono<UpdateServicePlanResponse> invoke(UpdateServicePlanRequest request) {
-            return this.servicePlans.update(request);
-        }
-
-        @Override
-        protected UpdateServicePlanRequest validRequest() {
-            return UpdateServicePlanRequest.builder()
+        this.servicePlans
+            .update(UpdateServicePlanRequest.builder()
                 .servicePlanId("test-service-plan-id")
                 .publiclyVisible(false)
-                .build();
-        }
-
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(UpdateServicePlanResponse.builder()
+                .metadata(Metadata.builder()
+                    .id("195f6bd5-0aa4-4a97-9c8d-5410e5e6d4b6")
+                    .url("/v2/service_plans/195f6bd5-0aa4-4a97-9c8d-5410e5e6d4b6")
+                    .createdAt("2016-02-19T02:04:09Z")
+                    .updatedAt("2016-02-19T02:04:09Z")
+                    .build())
+                .entity(ServicePlanEntity.builder()
+                    .name("name-2674")
+                    .free(false)
+                    .description("desc-225")
+                    .serviceId("42bea093-8fe5-491a-8a34-b1943dc3709a")
+                    .uniqueId("7c4f2f8a-aa82-49e9-9f0c-76248aa1036d")
+                    .publiclyVisible(false)
+                    .active(true)
+                    .serviceUrl("/v2/services/42bea093-8fe5-491a-8a34-b1943dc3709a")
+                    .serviceInstancesUrl("/v2/service_plans/195f6bd5-0aa4-4a97-9c8d-5410e5e6d4b6/service_instances")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
+
 }

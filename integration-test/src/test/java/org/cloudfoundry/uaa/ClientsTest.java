@@ -27,7 +27,6 @@ import org.cloudfoundry.uaa.clients.BatchUpdateClientsRequest;
 import org.cloudfoundry.uaa.clients.BatchUpdateClientsResponse;
 import org.cloudfoundry.uaa.clients.ChangeSecret;
 import org.cloudfoundry.uaa.clients.ChangeSecretRequest;
-import org.cloudfoundry.uaa.clients.ChangeSecretResponse;
 import org.cloudfoundry.uaa.clients.Client;
 import org.cloudfoundry.uaa.clients.CreateClient;
 import org.cloudfoundry.uaa.clients.CreateClientAction;
@@ -36,14 +35,12 @@ import org.cloudfoundry.uaa.clients.CreateClientResponse;
 import org.cloudfoundry.uaa.clients.DeleteClientAction;
 import org.cloudfoundry.uaa.clients.DeleteClientRequest;
 import org.cloudfoundry.uaa.clients.GetClientRequest;
-import org.cloudfoundry.uaa.clients.GetClientResponse;
 import org.cloudfoundry.uaa.clients.GetMetadataRequest;
 import org.cloudfoundry.uaa.clients.GetMetadataResponse;
 import org.cloudfoundry.uaa.clients.ListClientsRequest;
 import org.cloudfoundry.uaa.clients.ListClientsResponse;
 import org.cloudfoundry.uaa.clients.ListMetadatasRequest;
 import org.cloudfoundry.uaa.clients.ListMetadatasResponse;
-import org.cloudfoundry.uaa.clients.Metadata;
 import org.cloudfoundry.uaa.clients.MixedActionsRequest;
 import org.cloudfoundry.uaa.clients.UpdateClient;
 import org.cloudfoundry.uaa.clients.UpdateClientAction;
@@ -58,7 +55,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.HttpException;
-import reactor.test.subscriber.ScriptedSubscriber;
+import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.Base64;
@@ -86,10 +83,6 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String newClientSecret1 = this.nameFactory.getClientSecret();
         String newClientSecret2 = this.nameFactory.getClientSecret();
 
-        ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
-            .expectNextCount(2)
-            .expectComplete();
-
         requestCreateClient(this.uaaClient, clientId1, clientSecret)
             .then(requestCreateClient(this.uaaClient, clientId2, clientSecret))
             .then(this.uaaClient.clients()
@@ -106,9 +99,10 @@ public final class ClientsTest extends AbstractIntegrationTest {
                             .build())
                     .build()))
             .flatMapIterable(BatchChangeSecretResponse::getClients)
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNextCount(2)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -116,15 +110,6 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientId1 = this.nameFactory.getClientId();
         String clientId2 = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
-
-        ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
-            .consumeNextWith(response -> {
-                assertThat(response.getAuthorizedGrantTypes()).containsExactly(PASSWORD, REFRESH_TOKEN);
-                assertThat(response.getClientId()).isEqualTo(clientId1);
-                assertThat(response.getScopes()).containsExactly("client.read", "client.write");
-                assertThat(response.getTokenSalt()).isEqualTo("test-token-salt");
-            })
-            .expectComplete();
 
         this.uaaClient.clients()
             .batchCreate(BatchCreateClientsRequest.builder()
@@ -147,9 +132,15 @@ public final class ClientsTest extends AbstractIntegrationTest {
                 .build())
             .flatMapIterable(BatchCreateClientsResponse::getClients)
             .filter(client -> clientId1.equals(client.getClientId()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(response -> {
+                assertThat(response.getAuthorizedGrantTypes()).containsExactly(PASSWORD, REFRESH_TOKEN);
+                assertThat(response.getClientId()).isEqualTo(clientId1);
+                assertThat(response.getScopes()).containsExactly("client.read", "client.write");
+                assertThat(response.getTokenSalt()).isEqualTo("test-token-salt");
+            })
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -157,9 +148,6 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientId1 = this.nameFactory.getClientId();
         String clientId2 = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
-
-        ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
-            .expectComplete();
 
         batchCreateClients(this.uaaClient, clientId1, clientId2, clientSecret)
             .flatMapIterable(BatchCreateClientsResponse::getClients)
@@ -171,9 +159,9 @@ public final class ClientsTest extends AbstractIntegrationTest {
                     .build()))
             .flatMap(ignore -> requestListClients(this.uaaClient))
             .filter(client -> clientId1.equals(client.getClientId()) || clientId2.equals(client.getClientId()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -181,16 +169,6 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientId1 = this.nameFactory.getClientId();
         String clientId2 = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
-
-        ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
-            .consumeNextWith(response -> {
-                assertThat(response.getAuthorizedGrantTypes()).containsExactly(IMPLICIT, CLIENT_CREDENTIALS);
-                assertThat(response.getClientId()).isEqualTo(clientId1);
-                assertThat(response.getName()).isEqualTo("test-name");
-                assertThat(response.getScopes()).containsExactly("client.read", "client.write");
-                assertThat(response.getTokenSalt()).isEqualTo("test-token-salt");
-            })
-            .expectComplete();
 
         requestCreateClient(this.uaaClient, clientId1, clientSecret)
             .then(requestCreateClient(this.uaaClient, clientId2, clientSecret))
@@ -213,9 +191,16 @@ public final class ClientsTest extends AbstractIntegrationTest {
                     .build()))
             .flatMapIterable(BatchUpdateClientsResponse::getClients)
             .filter(client -> clientId1.equals(client.getClientId()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(response -> {
+                assertThat(response.getAuthorizedGrantTypes()).containsExactly(IMPLICIT, CLIENT_CREDENTIALS);
+                assertThat(response.getClientId()).isEqualTo(clientId1);
+                assertThat(response.getName()).isEqualTo("test-name");
+                assertThat(response.getScopes()).containsExactly("client.read", "client.write");
+                assertThat(response.getTokenSalt()).isEqualTo("test-token-salt");
+            })
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -224,9 +209,6 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String newClientSecret = this.nameFactory.getClientSecret();
         String oldClientSecret = this.nameFactory.getClientSecret();
 
-        ScriptedSubscriber<ChangeSecretResponse> subscriber = ScriptedSubscriber.<ChangeSecretResponse>create()
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(HttpException.class).hasMessage("HTTP request failed with code: 400"));
-
         requestCreateClient(this.uaaClient, clientId, oldClientSecret)
             .then(this.uaaClient.clients()
                 .changeSecret(ChangeSecretRequest.builder()
@@ -234,30 +216,21 @@ public final class ClientsTest extends AbstractIntegrationTest {
                     .oldSecret(oldClientSecret)
                     .secret(newClientSecret)
                     .build()))
-            .subscribe(subscriber);
-//        TODO: Update test based on https://www.pivotaltracker.com/n/projects/997278/stories/130645469 to use the following
-//            .subscribe(this.<ChangeSecretResponse>testSubscriber()
+            .as(StepVerifier::create)
+//          TODO: Update test based on https://www.pivotaltracker.com/n/projects/997278/stories/130645469 to use the following
 //                .expectThat(response -> {
 //                    assertEquals("secret updated", response.getMessage());
 //                    assertEquals("ok", response.getStatus());
 //                }));
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(HttpException.class).hasMessage("HTTP request failed with code: 400"))
+            .verify(Duration.ofMinutes(5));
 
-        subscriber.verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void create() throws TimeoutException, InterruptedException {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
-
-        ScriptedSubscriber<CreateClientResponse> subscriber = ScriptedSubscriber.<CreateClientResponse>create()
-            .consumeNextWith(response -> {
-                assertThat(response.getAuthorizedGrantTypes()).containsExactly(PASSWORD, REFRESH_TOKEN);
-                assertThat(response.getClientId()).isEqualTo(clientId);
-                assertThat(response.getScopes()).containsExactly("client.read", "client.write");
-                assertThat(response.getTokenSalt()).isEqualTo("test-token-salt");
-            })
-            .expectComplete();
 
         this.uaaClient.clients()
             .create(CreateClientRequest.builder()
@@ -268,16 +241,19 @@ public final class ClientsTest extends AbstractIntegrationTest {
                 .scope("client.read", "client.write")
                 .tokenSalt("test-token-salt")
                 .build())
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(response -> {
+                assertThat(response.getAuthorizedGrantTypes()).containsExactly(PASSWORD, REFRESH_TOKEN);
+                assertThat(response.getClientId()).isEqualTo(clientId);
+                assertThat(response.getScopes()).containsExactly("client.read", "client.write");
+                assertThat(response.getTokenSalt()).isEqualTo("test-token-salt");
+            })
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void delete() throws TimeoutException, InterruptedException {
-
-        ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
-            .expectComplete();
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
 
@@ -288,9 +264,9 @@ public final class ClientsTest extends AbstractIntegrationTest {
                     .build()))
             .flatMap(ignore -> requestListClients(this.uaaClient))
             .filter(client -> clientId.equals(client.getClientId()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -298,40 +274,34 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
 
-        ScriptedSubscriber<GetClientResponse> subscriber = ScriptedSubscriber.<GetClientResponse>create()
-            .consumeNextWith(response -> {
-                assertThat(response.getAuthorizedGrantTypes()).containsExactly(PASSWORD, REFRESH_TOKEN);
-                assertThat(response.getClientId()).isEqualTo(clientId);
-            })
-            .expectComplete();
-
         requestCreateClient(this.uaaClient, clientId, clientSecret)
             .then(this.uaaClient.clients()
                 .get(GetClientRequest.builder()
                     .clientId(clientId)
                     .build()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(response -> {
+                assertThat(response.getAuthorizedGrantTypes()).containsExactly(PASSWORD, REFRESH_TOKEN);
+                assertThat(response.getClientId()).isEqualTo(clientId);
+            })
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void getMetadata() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<GetMetadataResponse> subscriber = ScriptedSubscriber.<GetMetadataResponse>create()
-            .consumeNextWith(metadata -> {
-                assertThat(metadata.getAppLaunchUrl()).isEqualTo("http://test.get.url");
-                assertThat(metadata.getClientId()).isEqualTo(this.clientId);
-            })
-            .expectComplete();
-
         requestUpdateMetadata(this.uaaClient, this.clientId, "http://test.get.url")
             .then(this.uaaClient.clients()
                 .getMetadata(GetMetadataRequest.builder()
                     .clientId(this.clientId)
                     .build()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(metadata -> {
+                assertThat(metadata.getAppLaunchUrl()).isEqualTo("http://test.get.url");
+                assertThat(metadata.getClientId()).isEqualTo(this.clientId);
+            })
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -339,30 +309,20 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
 
-        ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
-            .expectNextCount(1)
-            .expectComplete();
-
         requestCreateClient(this.uaaClient, clientId, clientSecret)
             .then(this.uaaClient.clients()
                 .list(ListClientsRequest.builder()
                     .build()))
             .flatMapIterable(ListClientsResponse::getResources)
             .filter(client -> clientId.equals(client.getClientId()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listMetadatas() throws TimeoutException, InterruptedException {
-        ScriptedSubscriber<Metadata> subscriber = ScriptedSubscriber.<Metadata>create()
-            .consumeNextWith(metadata -> {
-                assertThat(metadata.getAppLaunchUrl()).isEqualTo("http://test.list.url");
-                assertThat(metadata.getClientId()).isEqualTo(this.clientId);
-            })
-            .expectComplete();
-
         requestUpdateMetadata(this.uaaClient, this.clientId, "http://test.list.url")
             .then(this.uaaClient.clients()
                 .listMetadatas(ListMetadatasRequest.builder()
@@ -370,9 +330,13 @@ public final class ClientsTest extends AbstractIntegrationTest {
             .flatMapIterable(ListMetadatasResponse::getMetadatas)
             .filter(metadata -> this.clientId.equals(metadata.getClientId()))
             .single()
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(metadata -> {
+                assertThat(metadata.getAppLaunchUrl()).isEqualTo("http://test.list.url");
+                assertThat(metadata.getClientId()).isEqualTo(this.clientId);
+            })
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -381,10 +345,6 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientId2 = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
         String newClientSecret = this.nameFactory.getClientSecret();
-
-        ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
-            .consumeNextWith(client -> assertThat(client.getName()).isEqualTo("test-name-new"))
-            .expectComplete();
 
         this.uaaClient.clients()
             .mixedActions(MixedActionsRequest.builder()
@@ -420,23 +380,16 @@ public final class ClientsTest extends AbstractIntegrationTest {
                 .build())
             .flatMap(ignore -> requestListClients(this.uaaClient))
             .filter(client -> clientId1.equals(client.getClientId()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(client -> assertThat(client.getName()).isEqualTo("test-name-new"))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void update() throws TimeoutException, InterruptedException {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
-
-        ScriptedSubscriber<Client> subscriber = ScriptedSubscriber.<Client>create()
-            .consumeNextWith(response -> {
-                assertThat(response.getAuthorizedGrantTypes()).containsExactly(CLIENT_CREDENTIALS);
-                assertThat(response.getClientId()).isEqualTo(clientId);
-                assertThat(response.getName()).isEqualTo("test-name");
-            })
-            .expectComplete();
 
         requestCreateClient(this.uaaClient, clientId, clientSecret)
             .then(this.uaaClient.clients()
@@ -447,24 +400,19 @@ public final class ClientsTest extends AbstractIntegrationTest {
                     .build()))
             .flatMap(ignore -> requestListClients(this.uaaClient))
             .filter(client -> clientId.equals(client.getClientId()))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(response -> {
+                assertThat(response.getAuthorizedGrantTypes()).containsExactly(CLIENT_CREDENTIALS);
+                assertThat(response.getClientId()).isEqualTo(clientId);
+                assertThat(response.getName()).isEqualTo("test-name");
+            })
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void updateMetadata() throws TimeoutException, InterruptedException {
         String appIcon = Base64.getEncoder().encodeToString(new AsciiString("test-image").toByteArray());
-
-        ScriptedSubscriber<GetMetadataResponse> subscriber = ScriptedSubscriber.<GetMetadataResponse>create()
-            .consumeNextWith(metadata -> {
-                assertThat(metadata.getAppIcon()).isEqualTo(appIcon);
-                assertThat(metadata.getAppLaunchUrl()).isEqualTo("http://test.app.launch.url");
-                assertThat(metadata.getClientId()).isEqualTo(this.clientId);
-                assertThat(metadata.getClientName()).isEqualTo("test-name");
-                assertThat(metadata.getShowOnHomePage()).isTrue();
-            })
-            .expectComplete();
 
         this.uaaClient.clients()
             .updateMetadata(UpdateMetadataRequest.builder()
@@ -475,9 +423,16 @@ public final class ClientsTest extends AbstractIntegrationTest {
                 .clientName("test-name")
                 .build())
             .then(requestGetMetadata(this.uaaClient, this.clientId))
-            .subscribe(subscriber);
-
-        subscriber.verify(Duration.ofMinutes(5));
+            .as(StepVerifier::create)
+            .consumeNextWith(metadata -> {
+                assertThat(metadata.getAppIcon()).isEqualTo(appIcon);
+                assertThat(metadata.getAppLaunchUrl()).isEqualTo("http://test.app.launch.url");
+                assertThat(metadata.getClientId()).isEqualTo(this.clientId);
+                assertThat(metadata.getClientName()).isEqualTo("test-name");
+                assertThat(metadata.getShowOnHomePage()).isTrue();
+            })
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     private static Mono<BatchCreateClientsResponse> batchCreateClients(UaaClient uaaClient, String clientId1, String clientId2, String clientSecret) {
