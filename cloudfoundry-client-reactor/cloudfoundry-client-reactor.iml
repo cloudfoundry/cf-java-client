@@ -32,7 +32,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: com.squareup.okhttp3:okhttp-ws:3.4.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.bouncycastle:bcprov-jdk15on:1.50" level="project" />
     <orderEntry type="library" name="Maven: io.jsonwebtoken:jjwt:0.6.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.projectreactor.addons:reactor-test:3.0.3.BUILD-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.projectreactor.addons:reactor-test:3.0.3.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: io.projectreactor:reactor-core:3.0.3.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.reactivestreams:reactive-streams:1.0.0" level="project" />
     <orderEntry type="library" name="Maven: io.projectreactor.ipc:reactor-netty:0.5.1.RELEASE" level="project" />
