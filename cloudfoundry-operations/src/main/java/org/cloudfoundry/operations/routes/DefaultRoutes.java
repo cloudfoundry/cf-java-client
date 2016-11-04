@@ -118,11 +118,12 @@ public final class DefaultRoutes implements Routes {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
             .flatMap(function((cloudFoundryClient, spaceId) -> requestSpaceRoutes(cloudFoundryClient, spaceId)
+                .filter(route -> isRouteOrphan(ResourceUtils.getEntity(route)))
                 .map(ResourceUtils::getId)
                 .map(routeId -> Tuples.of(cloudFoundryClient, routeId))))
             .flatMap(function((cloudFoundryClient, routeId) -> getApplications(cloudFoundryClient, routeId)
                 .map(applicationResources -> Tuples.of(cloudFoundryClient, applicationResources, routeId))))
-            .filter(predicate((cloudFoundryClient, applicationResources, routeId) -> isOrphan(applicationResources)))
+            .filter(predicate((cloudFoundryClient, applicationResources, routeId) -> isApplicationOrphan(applicationResources)))
             .flatMap(function((cloudFoundryClient, applicationResources, routeId) -> deleteRoute(cloudFoundryClient, routeId)))
             .then();
     }
@@ -296,12 +297,12 @@ public final class DefaultRoutes implements Routes {
         return Mono.just(spaces.get(spaceId));
     }
 
-    private static boolean isIdentical(String s, String t) {
-        return s == null ? t == null : s.equals(t);
+    private static boolean isApplicationOrphan(List<ApplicationResource> applications) {
+        return applications.isEmpty();
     }
 
-    private static boolean isOrphan(List<ApplicationResource> applications) {
-        return applications.isEmpty();
+    private static boolean isIdentical(String s, String t) {
+        return s == null ? t == null : s.equals(t);
     }
 
     private static String nullSafe(String host) {
@@ -464,6 +465,10 @@ public final class DefaultRoutes implements Routes {
             .path(entity.getPath())
             .space(space)
             .build();
+    }
+
+    private boolean isRouteOrphan(RouteEntity entity) {
+        return entity.getServiceInstanceId() == null || entity.getServiceInstanceId().isEmpty();
     }
 
 }
