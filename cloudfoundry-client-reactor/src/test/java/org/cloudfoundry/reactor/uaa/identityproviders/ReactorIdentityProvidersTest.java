@@ -63,7 +63,7 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
     public void createLdap() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/identity-providers")
+                .method(POST).path("/identity-providers?rawConfig=true")
                 .header("X-Identity-Zone-Id", "test-identity-zone-id")
                 .payload("fixtures/uaa/identity-providers/POST_request_ldap.json")
                 .build())
@@ -127,7 +127,7 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
     public void createOauth() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/identity-providers")
+                .method(POST).path("/identity-providers?rawConfig=true")
                 .header("X-Identity-Zone-Id", "test-identity-zone-id")
                 .payload("fixtures/uaa/identity-providers/POST_request_oauth.json")
                 .build())
@@ -190,7 +190,7 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
     public void createSaml() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/identity-providers")
+                .method(POST).path("/identity-providers?rawConfig=true")
                 .header("X-Identity-Zone-Id", "test-identity-zone-id")
                 .payload("fixtures/uaa/identity-providers/POST_request_saml.json")
                 .build())
@@ -283,7 +283,7 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/identity-providers/test-identity-provider-id")
+                .method(DELETE).path("/identity-providers/test-identity-provider-id?rawConfig=true")
                 .header("X-Identity-Zone-Id", "test-identity-zone-id")
                 .build())
             .response(TestResponse.builder()
@@ -346,7 +346,7 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/identity-providers/test-identity-provider-id")
+                .method(GET).path("/identity-providers/test-identity-provider-id?rawConfig=true")
                 .header("X-Identity-Zone-Id", "test-identity-zone-id")
                 .build())
             .response(TestResponse.builder()
@@ -409,7 +409,7 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/identity-providers")
+                .method(GET).path("/identity-providers?rawConfig=true")
                 .header("X-Identity-Zone-Id", "test-identity-zone-id")
                 .build())
             .response(TestResponse.builder()
@@ -530,7 +530,7 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/identity-providers/test-identity-provider-id")
+                .method(PUT).path("/identity-providers/test-identity-provider-id?rawConfig=true")
                 .header("X-Identity-Zone-Id", "test-identity-zone-id")
                 .payload("fixtures/uaa/identity-providers/PUT_{id}_request.json")
                 .build())
