@@ -166,7 +166,7 @@ public abstract class AbstractReactorOperations {
         return inbound -> inbound
             .then(i -> i.receive().aggregate().toInputStream())
             .map(JsonCodec.decode(this.connectionContext.getObjectMapper(), responseType))
-            .doOnError(JsonParsingException.class, e -> NetworkLogging.RESPONSE_LOGGER.debug("\n{}", e.getPayload()));
+            .doOnError(JsonParsingException.class, e -> NetworkLogging.RESPONSE_LOGGER.debug("{}\n{}", e.getCause().getMessage(), e.getPayload()));
     }
 
     private Mono<ByteBuf> serializedRequest(HttpClientRequest outbound, Object request) {

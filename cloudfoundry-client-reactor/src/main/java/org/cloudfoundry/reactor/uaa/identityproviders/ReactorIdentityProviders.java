@@ -50,27 +50,27 @@ public final class ReactorIdentityProviders extends AbstractUaaOperations implem
 
     @Override
     public Mono<CreateIdentityProviderResponse> create(CreateIdentityProviderRequest request) {
-        return post(request, CreateIdentityProviderResponse.class, builder -> builder.pathSegment("identity-providers"));
+        return post(request, CreateIdentityProviderResponse.class, builder -> builder.pathSegment("identity-providers").queryParam("rawConfig", true));
     }
 
     @Override
     public Mono<DeleteIdentityProviderResponse> delete(DeleteIdentityProviderRequest request) {
-        return delete(request, DeleteIdentityProviderResponse.class, builder -> builder.pathSegment("identity-providers", request.getIdentityProviderId()));
+        return delete(request, DeleteIdentityProviderResponse.class, builder -> builder.pathSegment("identity-providers", request.getIdentityProviderId()).queryParam("rawConfig", true));
     }
 
     @Override
     public Mono<GetIdentityProviderResponse> get(GetIdentityProviderRequest request) {
-        return get(request, GetIdentityProviderResponse.class, builder -> builder.pathSegment("identity-providers", request.getIdentityProviderId()));
+        return get(request, GetIdentityProviderResponse.class, builder -> builder.pathSegment("identity-providers", request.getIdentityProviderId()).queryParam("rawConfig", true));
     }
 
     @Override
     public Mono<ListIdentityProvidersResponse> list(ListIdentityProvidersRequest request) {
-        return get(request, ListIdentityProvidersResponse.class, builder -> builder.pathSegment("identity-providers"));
+        return get(request, ListIdentityProvidersResponse.class, builder -> builder.pathSegment("identity-providers").queryParam("rawConfig", true));
     }
 
     @Override
     public Mono<UpdateIdentityProviderResponse> update(UpdateIdentityProviderRequest request) {
-        return put(request, UpdateIdentityProviderResponse.class, builder -> builder.pathSegment("identity-providers", request.getIdentityProviderId()));
+        return put(request, UpdateIdentityProviderResponse.class, builder -> builder.pathSegment("identity-providers", request.getIdentityProviderId()).queryParam("rawConfig", true));
     }
 
 }

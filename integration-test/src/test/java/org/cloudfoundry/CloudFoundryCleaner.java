@@ -51,6 +51,12 @@ import org.cloudfoundry.uaa.clients.DeleteClientRequest;
 import org.cloudfoundry.uaa.clients.ListClientsRequest;
 import org.cloudfoundry.uaa.groups.DeleteGroupRequest;
 import org.cloudfoundry.uaa.groups.ListGroupsRequest;
+import org.cloudfoundry.uaa.identityproviders.DeleteIdentityProviderRequest;
+import org.cloudfoundry.uaa.identityproviders.ListIdentityProvidersRequest;
+import org.cloudfoundry.uaa.identityproviders.ListIdentityProvidersResponse;
+import org.cloudfoundry.uaa.identityzones.DeleteIdentityZoneRequest;
+import org.cloudfoundry.uaa.identityzones.ListIdentityZonesRequest;
+import org.cloudfoundry.uaa.identityzones.ListIdentityZonesResponse;
 import org.cloudfoundry.uaa.users.DeleteUserRequest;
 import org.cloudfoundry.uaa.users.ListUsersRequest;
 import org.cloudfoundry.util.FluentMap;
@@ -110,6 +116,8 @@ final class CloudFoundryCleaner {
             .thenMany(cleanUserProvidedServiceInstances(this.cloudFoundryClient, this.nameFactory))
             .thenMany(cleanSharedDomains(this.cloudFoundryClient, this.nameFactory))
             .thenMany(cleanPrivateDomains(this.cloudFoundryClient, this.nameFactory))
+            .thenMany(cleanIdentityProviders(this.uaaClient, this.nameFactory))
+            .thenMany(cleanIdentityZones(this.uaaClient, this.nameFactory))
             .thenMany(cleanGroups(this.uaaClient, this.nameFactory))
             .thenMany(cleanUsers(this.uaaClient, this.nameFactory))
             .thenMany(cleanClients(this.uaaClient, this.nameFactory))
@@ -213,6 +221,34 @@ final class CloudFoundryCleaner {
                     .version("*")
                     .build())
                 .doOnError(t -> LOGGER.error("Unable to delete group {}", group.getDisplayName(), t))
+                .then());
+    }
+
+    private static Flux<Void> cleanIdentityProviders(UaaClient uaaClient, NameFactory nameFactory) {
+        return uaaClient.identityProviders()
+            .list(ListIdentityProvidersRequest.builder()
+                .build())
+            .flatMapIterable(ListIdentityProvidersResponse::getIdentityProviders)
+            .filter(provider -> nameFactory.isIdentityProviderName(provider.getName()))
+            .flatMap(provider -> uaaClient.identityProviders()
+                .delete(DeleteIdentityProviderRequest.builder()
+                    .identityProviderId(provider.getId())
+                    .build())
+                .doOnError(t -> LOGGER.error("Unable to delete identity provider {}", provider.getName(), t))
+                .then());
+    }
+
+    private static Flux<Void> cleanIdentityZones(UaaClient uaaClient, NameFactory nameFactory) {
+        return uaaClient.identityZones()
+            .list(ListIdentityZonesRequest.builder()
+                .build())
+            .flatMapIterable(ListIdentityZonesResponse::getIdentityZones)
+            .filter(zone -> nameFactory.isIdentityZoneName(zone.getName()))
+            .flatMap(zone -> uaaClient.identityZones()
+                .delete(DeleteIdentityZoneRequest.builder()
+                    .identityZoneId(zone.getId())
+                    .build())
+                .doOnError(t -> LOGGER.error("Unable to delete identity zone {}", zone.getName(), t))
                 .then());
     }
 

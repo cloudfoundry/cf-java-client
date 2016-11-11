@@ -22,7 +22,7 @@
     "mailAttributeName": "mail",
     "mailSubstitute": null,
     "mailSubstituteOverridesLdap": false,
-    "ldapGroupFile": "ldap/ldap-no-groups.xml",
+    "ldapGroupFile": "ldap/ldap-groups-null.xml",
     "groupSearchBase": null,
     "groupSearchFilter": null,
     "groupsIgnorePartialResults": null,

@@ -38,7 +38,6 @@ abstract class _CreateIdentityProviderRequest implements IdentityZoned {
      * The configuration of this identity provider according to its type.
      */
     @JsonProperty("config")
-    @Nullable
     abstract IdentityProviderConfiguration getConfiguration();
 
     /**
