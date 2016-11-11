@@ -56,7 +56,7 @@ abstract class _InternalConfiguration extends AbstractIdentityProviderConfigurat
      */
     @JsonProperty("passwordPolicy")
     @Nullable
-    abstract PasswordPolicy getPassswordPolicy();
+    abstract PasswordPolicy getPasswordPolicy();
 
     /**
      * Human readable name/description of this provider
