@@ -35,4 +35,11 @@ abstract class _OAuth2Configuration extends AbstractAuthenticationConfiguration 
     @Nullable
     abstract String getCheckTokenUrl();
 
+    /**
+     * The OAuth 2.0 token issuer.
+     */
+    @JsonProperty("issuer")
+    @Nullable
+    abstract String getIssuer();
+
 }
