@@ -39,8 +39,7 @@ abstract class _UpdateIdentityProviderRequest implements IdentityZoned {
      * The configuration of this identity provider according to its type.
      */
     @JsonProperty("config")
-    @Nullable
-    abstract IdentityProviderConfiguration getConfiguration();
+    abstract String getConfiguration();
 
     /**
      * The identity provider id

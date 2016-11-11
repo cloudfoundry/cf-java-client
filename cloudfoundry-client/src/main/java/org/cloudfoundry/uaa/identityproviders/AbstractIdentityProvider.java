@@ -17,8 +17,6 @@
 package org.cloudfoundry.uaa.identityproviders;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.cloudfoundry.Nullable;
 
 /**
@@ -36,17 +34,8 @@ abstract class AbstractIdentityProvider {
      * The configuration of this identity provider
      */
     @JsonProperty("config")
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "type")
-    @JsonSubTypes({
-        @JsonSubTypes.Type(name = "keystone", value = KeystoneConfiguration.class),
-        @JsonSubTypes.Type(name = "ldap", value = LdapConfiguration.class),
-        @JsonSubTypes.Type(name = "oauth2.0", value = OAuth2Configuration.class),
-        @JsonSubTypes.Type(name = "oidc1.0", value = OpenIdConnectConfiguration.class),
-        @JsonSubTypes.Type(name = "saml", value = SamlConfiguration.class),
-        @JsonSubTypes.Type(name = "uaa", value = InternalConfiguration.class)
-    })
     @Nullable
-    abstract IdentityProviderConfiguration getConfiguration();
+    abstract String getConfiguration();
 
     /**
      * The creation date of the identity provider

@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * The file to be used for group integration.
  */
 public enum LdapGroupFile {
-    NoGroup("ldap/ldap-no-groups.xml"),
+    NoGroup("ldap/ldap-groups-null.xml"),
 
     GroupsAsScopes("ldap/ldap-groups-as-scopes.xml"),
 
@@ -48,7 +48,7 @@ public enum LdapGroupFile {
     @JsonCreator
     static LdapGroupFile from(String s) {
         switch (s.toLowerCase()) {
-            case "ldap/ldap-no-groups.xml":
+            case "ldap/ldap-groups-null.xml":
                 return NoGroup;
             case "ldap/ldap-groups-as-scopes.xml":
                 return GroupsAsScopes;

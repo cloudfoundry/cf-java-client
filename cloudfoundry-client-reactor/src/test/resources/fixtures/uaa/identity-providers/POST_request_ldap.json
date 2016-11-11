@@ -1,14 +1,6 @@
 {
   "type" : "ldap",
-  "config" : {
-    "attributeMappings" : { },
-    "ldapProfileFile" : "ldap/ldap-simple-bind.xml",
-    "baseUrl" : "ldap://localhost:33389",
-    "skipSSLVerification" : false,
-    "mailAttributeName" : "mail",
-    "mailSubstituteOverridesLdap" : false,
-    "ldapGroupFile" : "ldap/ldap-no-groups.xml"
-  },
+  "config" : "{\"addShadowUserOnLogin\":true,\"autoAddGroups\":true,\"baseUrl\":\"ldap://localhost:33389\",\"bindPassword\":null,\"bindUserDn\":null,\"groupRoleAttribute\":null,\"groupSearchBase\":null,\"maxGroupSearchDepth\":10,\"groupSearchFilter\":null,\"groupSearchSubTree\":true,\"groupsIgnorePartialResults\":null,\"ldapGroupFile\":\"ldap/ldap-groups-null.xml\",\"ldapProfileFile\":\"ldap/ldap-simple-bind.xml\",\"localPasswordCompare\":null,\"mailAttributeName\":\"mail\",\"mailSubstitute\":null,\"mailSubstituteOverridesLdap\":false,\"passwordAttributeName\":null,\"passwordEncoder\":null,\"referral\":null,\"skipSSLVerification\":false,\"tlsConfiguration\":\"none\",\"userDNPattern\":\"cn={0},ou=Users,dc=test,dc=com\",\"userDNPatternDelimiter\":\";\",\"userSearchBase\":null,\"userSearchFilter\":null,\"attributeMappings\":{\"email\":null,\"external_groups\":null,\"family_name\":null,\"first_name\":null,\"given_name\":null,\"phone_number\":null},\"externalGroupsWhitelist\":[],\"emailDomain\":null,\"providerDescription\":null}",
   "originKey" : "ldap",
   "name" : "ldap name",
   "active" : true

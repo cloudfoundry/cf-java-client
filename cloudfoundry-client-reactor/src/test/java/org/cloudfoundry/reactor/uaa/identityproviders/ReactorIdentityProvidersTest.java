@@ -21,24 +21,15 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
-import org.cloudfoundry.uaa.identityproviders.AttributeMappings;
 import org.cloudfoundry.uaa.identityproviders.CreateIdentityProviderRequest;
 import org.cloudfoundry.uaa.identityproviders.CreateIdentityProviderResponse;
 import org.cloudfoundry.uaa.identityproviders.DeleteIdentityProviderRequest;
 import org.cloudfoundry.uaa.identityproviders.DeleteIdentityProviderResponse;
-import org.cloudfoundry.uaa.identityproviders.ExternalGroupMappingMode;
 import org.cloudfoundry.uaa.identityproviders.GetIdentityProviderRequest;
 import org.cloudfoundry.uaa.identityproviders.GetIdentityProviderResponse;
 import org.cloudfoundry.uaa.identityproviders.IdentityProvider;
-import org.cloudfoundry.uaa.identityproviders.InternalConfiguration;
-import org.cloudfoundry.uaa.identityproviders.LdapConfiguration;
-import org.cloudfoundry.uaa.identityproviders.LdapGroupFile;
-import org.cloudfoundry.uaa.identityproviders.LdapProfileFile;
 import org.cloudfoundry.uaa.identityproviders.ListIdentityProvidersRequest;
 import org.cloudfoundry.uaa.identityproviders.ListIdentityProvidersResponse;
-import org.cloudfoundry.uaa.identityproviders.LockoutPolicy;
-import org.cloudfoundry.uaa.identityproviders.OAuth2Configuration;
-import org.cloudfoundry.uaa.identityproviders.SamlConfiguration;
 import org.cloudfoundry.uaa.identityproviders.Type;
 import org.cloudfoundry.uaa.identityproviders.UpdateIdentityProviderRequest;
 import org.cloudfoundry.uaa.identityproviders.UpdateIdentityProviderResponse;
@@ -46,7 +37,6 @@ import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
-import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -76,16 +66,13 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
         this.identityProviders
             .create(CreateIdentityProviderRequest.builder()
                 .active(true)
-                .configuration(LdapConfiguration.builder()
-                    .attributeMappings(AttributeMappings.builder()
-                        .build())
-                    .ldapProfileFile(LdapProfileFile.SimpleBind)
-                    .ldapGroupFile(LdapGroupFile.NoGroup)
-                    .baseUrl("ldap://localhost:33389")
-                    .skipSSLVerification(false)
-                    .mailAttributeName("mail")
-                    .mailSubstituteOverridesLdap(false)
-                    .build())
+                .configuration("{\"addShadowUserOnLogin\":true,\"autoAddGroups\":true,\"baseUrl\":\"ldap://localhost:33389\",\"bindPassword\":null,\"bindUserDn\":null,\"groupRoleAttribute\":null," +
+                    "\"groupSearchBase\":null,\"maxGroupSearchDepth\":10,\"groupSearchFilter\":null,\"groupSearchSubTree\":true,\"groupsIgnorePartialResults\":null," +
+                    "\"ldapGroupFile\":\"ldap/ldap-groups-null.xml\",\"ldapProfileFile\":\"ldap/ldap-simple-bind.xml\",\"localPasswordCompare\":null,\"mailAttributeName\":\"mail\"," +
+                    "\"mailSubstitute\":null,\"mailSubstituteOverridesLdap\":false,\"passwordAttributeName\":null,\"passwordEncoder\":null,\"referral\":null,\"skipSSLVerification\":false," +
+                    "\"tlsConfiguration\":\"none\",\"userDNPattern\":\"cn={0},ou=Users,dc=test,dc=com\",\"userDNPatternDelimiter\":\";\",\"userSearchBase\":null,\"userSearchFilter\":null," +
+                    "\"attributeMappings\":{\"email\":null,\"external_groups\":null,\"family_name\":null,\"first_name\":null,\"given_name\":null,\"phone_number\":null}," +
+                    "\"externalGroupsWhitelist\":[],\"emailDomain\":null,\"providerDescription\":null}")
                 .name("ldap name")
                 .originKey("ldap")
                 .type(Type.LDAP)
@@ -94,26 +81,17 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
             .as(StepVerifier::create)
             .expectNext(CreateIdentityProviderResponse.builder()
                 .active(true)
-                .createdAt(1465001967988L)
-                .configuration(LdapConfiguration.builder()
-                    .attributeMappings(AttributeMappings.builder()
-                        .build())
-                    .autoAddGroups(true)
-                    .baseUrl("ldap://localhost:33389")
-                    .externalGroupsWhitelist(Collections.emptyList())
-                    .groupSearchDepthLimit(10)
-                    .groupSearchSubTree(true)
-                    .ldapProfileFile(LdapProfileFile.SimpleBind)
-                    .ldapGroupFile(LdapGroupFile.NoGroup)
-                    .mailAttributeName("mail")
-                    .mailSubstituteOverridesLdap(false)
-                    .skipSSLVerification(false)
-                    .userDistinguishedNamePattern("cn={0},ou=Users,dc=test,dc=com")
-                    .userDistinguishedNamePatternDelimiter(";")
-                    .build())
-                .id("aaccbccb-1c85-4e8b-86ed-4ce66f91c856")
-                .identityZoneId("uaa")
-                .lastModified(1465001967988L)
+                .createdAt(1474923489869L)
+                .configuration("{\"addShadowUserOnLogin\":true,\"autoAddGroups\":true,\"baseUrl\":\"ldap://localhost:33389\",\"bindPassword\":null,\"bindUserDn\":null,\"groupRoleAttribute\":null," +
+                    "\"groupSearchBase\":null,\"maxGroupSearchDepth\":10,\"groupSearchFilter\":null,\"groupSearchSubTree\":true,\"groupsIgnorePartialResults\":null," +
+                    "\"ldapGroupFile\":\"ldap/ldap-groups-null.xml\",\"ldapProfileFile\":\"ldap/ldap-simple-bind.xml\",\"localPasswordCompare\":null,\"mailAttributeName\":\"mail\"," +
+                    "\"mailSubstitute\":null,\"mailSubstituteOverridesLdap\":false,\"passwordAttributeName\":null,\"passwordEncoder\":null,\"referral\":null,\"skipSSLVerification\":false," +
+                    "\"tlsConfiguration\":\"none\",\"userDNPattern\":\"cn={0},ou=Users,dc=test,dc=com\",\"userDNPatternDelimiter\":\";\",\"userSearchBase\":null,\"userSearchFilter\":null," +
+                    "\"attributeMappings\":{\"email\":null,\"external_groups\":null,\"family_name\":null,\"first_name\":null,\"given_name\":null,\"phone_number\":null}," +
+                    "\"externalGroupsWhitelist\":[],\"emailDomain\":null,\"providerDescription\":null}")
+                .id("45201375-13a3-4b62-8b88-25457a1f7d3a")
+                .identityZoneId("yetxjqgb")
+                .lastModified(1474923489869L)
                 .name("ldap name")
                 .originKey("ldap")
                 .type(Type.LDAP)
@@ -140,18 +118,10 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
         this.identityProviders
             .create(CreateIdentityProviderRequest.builder()
                 .active(true)
-                .configuration(OAuth2Configuration.builder()
-                    .attributeMappings(AttributeMappings.builder()
-                        .build())
-                    .authUrl("http://auth.url")
-                    .tokenUrl("http://token.url")
-                    .tokenKey("token-key")
-                    .showLinkText(false)
-                    .skipSslVerification(false)
-                    .relyingPartyId("uaa")
-                    .relyingPartySecret("secret")
-                    .addShadowUserOnLogin(true)
-                    .build())
+                .configuration("{\"checkTokenUrl\":null,\"addShadowUserOnLogin\":true,\"authUrl\":\"http://auth.url\",\"linkText\":null,\"relyingPartyId\":\"uaa\",\"relyingPartySecret\":\"secret\"," +
+                    "\"scopes\":null,\"showLinkText\":false,\"skipSslValidation\":false,\"tokenKey\":\"token-key\",\"tokenKeyUrl\":null,\"tokenUrl\":\"http://token.url\"," +
+                    "\"attributeMappings\":{\"email\":null,\"external_groups\":null,\"family_name\":null,\"first_name\":null,\"given_name\":null,\"phone_number\":null}," +
+                    "\"externalGroupsWhitelist\":null,\"emailDomain\":null,\"providerDescription\":null}")
                 .name("UAA Provider")
                 .originKey("oauth2.0")
                 .type(Type.OAUTH2)
@@ -161,19 +131,10 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
             .expectNext(CreateIdentityProviderResponse.builder()
                 .active(true)
                 .createdAt(1465001966855L)
-                .configuration(OAuth2Configuration.builder()
-                    .attributeMappings(AttributeMappings.builder()
-                        .build())
-                    .authUrl("http://auth.url")
-                    .externalGroupsWhitelist(Collections.emptyList())
-                    .tokenUrl("http://token.url")
-                    .tokenKey("token-key")
-                    .showLinkText(false)
-                    .skipSslVerification(false)
-                    .relyingPartyId("uaa")
-                    .relyingPartySecret("secret")
-                    .addShadowUserOnLogin(true)
-                    .build())
+                .configuration("{\"checkTokenUrl\":null,\"addShadowUserOnLogin\":true,\"authUrl\":\"http://auth.url\",\"linkText\":null,\"relyingPartyId\":\"uaa\",\"relyingPartySecret\":\"secret\"," +
+                    "\"scopes\":null,\"showLinkText\":false,\"skipSslValidation\":false,\"tokenKey\":\"token-key\",\"tokenKeyUrl\":null,\"tokenUrl\":\"http://token.url\"," +
+                    "\"attributeMappings\":{\"email\":null,\"external_groups\":null,\"family_name\":null,\"first_name\":null,\"given_name\":null,\"phone_number\":null}," +
+                    "\"externalGroupsWhitelist\":[],\"emailDomain\":null,\"providerDescription\":null}")
                 .id("16506900-561d-411f-904b-15c3e2722cba")
                 .identityZoneId("uaa")
                 .lastModified(1465001966855L)
@@ -203,32 +164,24 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
         this.identityProviders
             .create(CreateIdentityProviderRequest.builder()
                 .active(true)
-                .configuration(SamlConfiguration.builder()
-                    .addShadowUserOnLogin(true)
-                    .assertionConsumerIndex(0)
-                    .attributeMappings(AttributeMappings.builder()
-                        .build())
-                    .groupMappingMode(ExternalGroupMappingMode.EXPLICITLY_MAPPED)
-                    .linkText("IDPEndpointsMockTests Saml Provider:SAML")
-                    .metaDataLocation("<?xml version=\"1.0\" encoding=\"UTF-8\"?><md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"http://www.okta" +
-                        ".com/SAML\"><md:IDPSSODescriptor WantAuthnRequestsSigned=\"true\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\"><md:KeyDescriptor " +
-                        "use=\"signing\"><ds:KeyInfo xmlns:ds=\"http://www.w3" +
-                        ".org/2000/09/xmldsig#\"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG" +
-                        "\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu" +
-                        "\nZm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM" +
-                        "\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN\nAQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU" +
-                        "\nWWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O\nBw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL\n3tL" +
-                        "/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\nvvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\nGFHNkZ6DmoT" +
-                        "/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1" +
-                        ".1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService " +
-                        "Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://pivotal.oktapreview" +
-                        ".com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/><md:SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" " +
-                        "Location=\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/></md:IDPSSODescriptor></md:EntityDescriptor>\n")
-                    .metadataTrustCheck(false)
-                    .nameId("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress")
-                    .showSamlLink(false)
-                    .socketFactoryClassName("org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory")
-                    .build())
+                .configuration("{\"addShadowUserOnLogin\":true,\"assertionConsumerIndex\":0,\"groupMappingMode\":\"EXPLICITLY_MAPPED\",\"iconUrl\":null,\"idpEntityAlias\":null," +
+                    "\"linkText\":\"IDPEndpointsMockTests Saml Provider:SAML\",\"metaDataLocation\":\"<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?><md:EntityDescriptor " +
+                    "xmlns:md=\\\"urn:oasis:names:tc:SAML:2.0:metadata\\\" entityID=\\\"http://www.okta.com/SAML\\\"><md:IDPSSODescriptor WantAuthnRequestsSigned=\\\"true\\\" " +
+                    "protocolSupportEnumeration=\\\"urn:oasis:names:tc:SAML:2.0:protocol\\\"><md:KeyDescriptor use=\\\"signing\\\"><ds:KeyInfo xmlns:ds=\\\"http://www" +
+                    ".w3.org/2000/09/xmldsig#\\\"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG" +
+                    "\\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu" +
+                    "\\nZm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC\\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM" +
+                    "\\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN\\nAQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU" +
+                    "\\nWWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O\\nBw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL\\n3tL" +
+                    "/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\\nvvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\\nGFHNkZ6DmoT" +
+                    "/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format" +
+                    ":emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService " +
+                    "Binding=\\\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\\\" Location=\\\"https://pivotal.oktapreview" +
+                    ".com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\\\"/><md:SingleSignOnService Binding=\\\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\\\" " +
+                    "Location=\\\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\\\"/></md:IDPSSODescriptor></md:EntityDescriptor>\\n\"," +
+                    "\"metadataTrustCheck\":false,\"nameID\":\"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\",\"showSamlLink\":false,\"socketFactoryClassName\":\"org.apache.commons" +
+                    ".httpclient.protocol.DefaultProtocolSocketFactory\",\"zoneId\":null,\"attributeMappings\":{\"email\":null,\"external_groups\":null,\"family_name\":null,\"first_name\":null," +
+                    "\"given_name\":null,\"phone_number\":null},\"externalGroupsWhitelist\":null,\"emailDomain\":null,\"providerDescription\":null}")
                 .name("SAML name")
                 .originKey("SAML")
                 .type(Type.SAML)
@@ -238,35 +191,24 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
             .expectNext(CreateIdentityProviderResponse.builder()
                 .active(true)
                 .createdAt(1465001965526L)
-                .configuration(SamlConfiguration.builder()
-                    .addShadowUserOnLogin(true)
-                    .assertionConsumerIndex(0)
-                    .attributeMappings(AttributeMappings.builder()
-                        .build())
-                    .externalGroupsWhitelist(Collections.emptyList())
-                    .groupMappingMode(ExternalGroupMappingMode.EXPLICITLY_MAPPED)
-                    .idpEntityAlias("SAML")
-                    .linkText("IDPEndpointsMockTests Saml Provider:SAML")
-                    .metaDataLocation("<?xml version=\"1.0\" encoding=\"UTF-8\"?><md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"http://www.okta" +
-                        ".com/SAML\"><md:IDPSSODescriptor WantAuthnRequestsSigned=\"true\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\"><md:KeyDescriptor " +
-                        "use=\"signing\"><ds:KeyInfo xmlns:ds=\"http://www.w3" +
-                        ".org/2000/09/xmldsig#\"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG" +
-                        "\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu" +
-                        "\nZm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM" +
-                        "\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN\nAQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU" +
-                        "\nWWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O\nBw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL\n3tL" +
-                        "/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\nvvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\nGFHNkZ6DmoT" +
-                        "/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1" +
-                        ".1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService " +
-                        "Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://pivotal.oktapreview" +
-                        ".com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/><md:SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" " +
-                        "Location=\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/></md:IDPSSODescriptor></md:EntityDescriptor>\n")
-                    .metadataTrustCheck(false)
-                    .nameId("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress")
-                    .showSamlLink(false)
-                    .socketFactoryClassName("org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory")
-                    .zoneId("uaa")
-                    .build())
+                .configuration("{\"addShadowUserOnLogin\":true,\"assertionConsumerIndex\":0,\"groupMappingMode\":\"EXPLICITLY_MAPPED\",\"iconUrl\":null,\"idpEntityAlias\":\"SAML\"," +
+                    "\"linkText\":\"IDPEndpointsMockTests Saml Provider:SAML\",\"metaDataLocation\":\"<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?><md:EntityDescriptor " +
+                    "xmlns:md=\\\"urn:oasis:names:tc:SAML:2.0:metadata\\\" entityID=\\\"http://www.okta.com/SAML\\\"><md:IDPSSODescriptor WantAuthnRequestsSigned=\\\"true\\\" " +
+                    "protocolSupportEnumeration=\\\"urn:oasis:names:tc:SAML:2.0:protocol\\\"><md:KeyDescriptor use=\\\"signing\\\"><ds:KeyInfo xmlns:ds=\\\"http://www" +
+                    ".w3.org/2000/09/xmldsig#\\\"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG" +
+                    "\\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu" +
+                    "\\nZm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC\\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM" +
+                    "\\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN\\nAQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU" +
+                    "\\nWWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O\\nBw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL\\n3tL" +
+                    "/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\\nvvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\\nGFHNkZ6DmoT" +
+                    "/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format" +
+                    ":emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService " +
+                    "Binding=\\\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\\\" Location=\\\"https://pivotal.oktapreview" +
+                    ".com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\\\"/><md:SingleSignOnService Binding=\\\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\\\" " +
+                    "Location=\\\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\\\"/></md:IDPSSODescriptor></md:EntityDescriptor>\\n\"," +
+                    "\"metadataTrustCheck\":false,\"nameID\":\"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\",\"showSamlLink\":false,\"socketFactoryClassName\":\"org.apache.commons" +
+                    ".httpclient.protocol.DefaultProtocolSocketFactory\",\"zoneId\":\"uaa\",\"attributeMappings\":{\"email\":null,\"external_groups\":null,\"family_name\":null,\"first_name\":null," +
+                    "\"given_name\":null,\"phone_number\":null},\"externalGroupsWhitelist\":[],\"emailDomain\":null,\"providerDescription\":null}")
                 .id("a2e96056-c777-40b8-95b8-ff81b441fcf1")
                 .identityZoneId("uaa")
                 .lastModified(1465001965526L)
@@ -301,35 +243,24 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
             .expectNext(DeleteIdentityProviderResponse.builder()
                 .active(true)
                 .createdAt(1466035298319L)
-                .configuration(SamlConfiguration.builder()
-                    .addShadowUserOnLogin(true)
-                    .assertionConsumerIndex(0)
-                    .attributeMappings(AttributeMappings.builder()
-                        .build())
-                    .externalGroupsWhitelist(Collections.emptyList())
-                    .groupMappingMode(ExternalGroupMappingMode.EXPLICITLY_MAPPED)
-                    .idpEntityAlias("saml-for-delete")
-                    .linkText("IDPEndpointsMockTests Saml Provider:saml-for-delete")
-                    .metaDataLocation("<?xml version=\"1.0\" encoding=\"UTF-8\"?><md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"http://www.okta" +
-                        ".com/saml-for-delete\"><md:IDPSSODescriptor WantAuthnRequestsSigned=\"true\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\"><md:KeyDescriptor " +
-                        "use=\"signing\"><ds:KeyInfo xmlns:ds=\"http://www.w3" +
-                        ".org/2000/09/xmldsig#\"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG" +
-                        "\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu" +
-                        "\nZm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM" +
-                        "\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN\nAQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU" +
-                        "\nWWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O\nBw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL\n3tL" +
-                        "/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\nvvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\nGFHNkZ6DmoT" +
-                        "/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1" +
-                        ".1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService " +
-                        "Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://pivotal.oktapreview" +
-                        ".com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/><md:SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" " +
-                        "Location=\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/></md:IDPSSODescriptor></md:EntityDescriptor>\n")
-                    .metadataTrustCheck(false)
-                    .nameId("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress")
-                    .showSamlLink(false)
-                    .socketFactoryClassName("org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory")
-                    .zoneId("uaa")
-                    .build())
+                .configuration("{\"addShadowUserOnLogin\":true,\"assertionConsumerIndex\":0,\"groupMappingMode\":\"EXPLICITLY_MAPPED\",\"iconUrl\":null,\"idpEntityAlias\":\"saml-for-delete\"," +
+                    "\"linkText\":\"IDPEndpointsMockTests Saml Provider:saml-for-delete\",\"metaDataLocation\":\"<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?><md:EntityDescriptor " +
+                    "xmlns:md=\\\"urn:oasis:names:tc:SAML:2.0:metadata\\\" entityID=\\\"http://www.okta.com/saml-for-delete\\\"><md:IDPSSODescriptor WantAuthnRequestsSigned=\\\"true\\\" " +
+                    "protocolSupportEnumeration=\\\"urn:oasis:names:tc:SAML:2.0:protocol\\\"><md:KeyDescriptor use=\\\"signing\\\"><ds:KeyInfo xmlns:ds=\\\"http://www" +
+                    ".w3.org/2000/09/xmldsig#\\\"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG" +
+                    "\\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu" +
+                    "\\nZm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC\\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM" +
+                    "\\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN\\nAQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU" +
+                    "\\nWWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O\\nBw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL\\n3tL" +
+                    "/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\\nvvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\\nGFHNkZ6DmoT" +
+                    "/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format" +
+                    ":emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService " +
+                    "Binding=\\\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\\\" Location=\\\"https://pivotal.oktapreview" +
+                    ".com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\\\"/><md:SingleSignOnService Binding=\\\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\\\" " +
+                    "Location=\\\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\\\"/></md:IDPSSODescriptor></md:EntityDescriptor>\\n\"," +
+                    "\"metadataTrustCheck\":false,\"nameID\":\"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\",\"showSamlLink\":false,\"socketFactoryClassName\":\"org.apache.commons" +
+                    ".httpclient.protocol.DefaultProtocolSocketFactory\",\"zoneId\":\"uaa\",\"attributeMappings\":{\"email\":null,\"external_groups\":null,\"family_name\":null,\"first_name\":null," +
+                    "\"given_name\":null,\"phone_number\":null},\"externalGroupsWhitelist\":[],\"emailDomain\":null,\"providerDescription\":null}")
                 .id("3ba5978b-8db1-4f27-bfbd-f24f6773b52f")
                 .identityZoneId("uaa")
                 .lastModified(1466035298319L)
@@ -364,35 +295,24 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
             .expectNext(GetIdentityProviderResponse.builder()
                 .active(true)
                 .createdAt(1465001966715L)
-                .configuration(SamlConfiguration.builder()
-                    .addShadowUserOnLogin(true)
-                    .assertionConsumerIndex(0)
-                    .attributeMappings(AttributeMappings.builder()
-                        .build())
-                    .externalGroupsWhitelist(Collections.emptyList())
-                    .groupMappingMode(ExternalGroupMappingMode.EXPLICITLY_MAPPED)
-                    .idpEntityAlias("saml-for-get")
-                    .linkText("IDPEndpointsMockTests Saml Provider:saml-for-get")
-                    .metaDataLocation("<?xml version=\"1.0\" encoding=\"UTF-8\"?><md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"http://www.okta" +
-                        ".com/saml-for-get\"><md:IDPSSODescriptor WantAuthnRequestsSigned=\"true\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\"><md:KeyDescriptor " +
-                        "use=\"signing\"><ds:KeyInfo xmlns:ds=\"http://www.w3" +
-                        ".org/2000/09/xmldsig#\"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG" +
-                        "\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu" +
-                        "\nZm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM" +
-                        "\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN\nAQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU" +
-                        "\nWWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O\nBw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL\n3tL" +
-                        "/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\nvvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\nGFHNkZ6DmoT" +
-                        "/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1" +
-                        ".1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService " +
-                        "Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://pivotal.oktapreview" +
-                        ".com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/><md:SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" " +
-                        "Location=\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/></md:IDPSSODescriptor></md:EntityDescriptor>\n")
-                    .metadataTrustCheck(false)
-                    .nameId("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress")
-                    .showSamlLink(false)
-                    .socketFactoryClassName("org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory")
-                    .zoneId("uaa")
-                    .build())
+                .configuration("{\"addShadowUserOnLogin\":true,\"assertionConsumerIndex\":0,\"groupMappingMode\":\"EXPLICITLY_MAPPED\",\"iconUrl\":null,\"idpEntityAlias\":\"saml-for-get\"," +
+                    "\"linkText\":\"IDPEndpointsMockTests Saml Provider:saml-for-get\",\"metaDataLocation\":\"<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?><md:EntityDescriptor " +
+                    "xmlns:md=\\\"urn:oasis:names:tc:SAML:2.0:metadata\\\" entityID=\\\"http://www.okta.com/saml-for-get\\\"><md:IDPSSODescriptor WantAuthnRequestsSigned=\\\"true\\\" " +
+                    "protocolSupportEnumeration=\\\"urn:oasis:names:tc:SAML:2.0:protocol\\\"><md:KeyDescriptor use=\\\"signing\\\"><ds:KeyInfo xmlns:ds=\\\"http://www" +
+                    ".w3.org/2000/09/xmldsig#\\\"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG" +
+                    "\\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu" +
+                    "\\nZm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC\\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM" +
+                    "\\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN\\nAQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU" +
+                    "\\nWWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O\\nBw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL\\n3tL" +
+                    "/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\\nvvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\\nGFHNkZ6DmoT" +
+                    "/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format" +
+                    ":emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService " +
+                    "Binding=\\\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\\\" Location=\\\"https://pivotal.oktapreview" +
+                    ".com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\\\"/><md:SingleSignOnService Binding=\\\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\\\" " +
+                    "Location=\\\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\\\"/></md:IDPSSODescriptor></md:EntityDescriptor>\\n\"," +
+                    "\"metadataTrustCheck\":false,\"nameID\":\"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\",\"showSamlLink\":false,\"socketFactoryClassName\":\"org.apache.commons" +
+                    ".httpclient.protocol.DefaultProtocolSocketFactory\",\"zoneId\":\"uaa\",\"attributeMappings\":{\"email\":null,\"external_groups\":null,\"family_name\":null,\"first_name\":null," +
+                    "\"given_name\":null,\"phone_number\":null},\"externalGroupsWhitelist\":[],\"emailDomain\":null,\"providerDescription\":null}")
                 .id("0077d56d-4e10-447a-9438-57d058e033ae")
                 .identityZoneId("uaa")
                 .lastModified(1465001966715L)
@@ -427,35 +347,24 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
                 .identityProvider(IdentityProvider.builder()
                     .active(true)
                     .createdAt(1465001965526L)
-                    .configuration(SamlConfiguration.builder()
-                        .addShadowUserOnLogin(true)
-                        .assertionConsumerIndex(0)
-                        .attributeMappings(AttributeMappings.builder()
-                            .build())
-                        .externalGroupsWhitelist(Collections.emptyList())
-                        .groupMappingMode(ExternalGroupMappingMode.EXPLICITLY_MAPPED)
-                        .idpEntityAlias("SAML")
-                        .linkText("IDPEndpointsMockTests Saml Provider:SAML")
-                        .metaDataLocation("<?xml version=\"1.0\" encoding=\"UTF-8\"?><md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"http://www.okta" +
-                            ".com/SAML\"><md:IDPSSODescriptor WantAuthnRequestsSigned=\"true\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\"><md:KeyDescriptor " +
-                            "use=\"signing\"><ds:KeyInfo xmlns:ds=\"http://www.w3" +
-                            ".org/2000/09/xmldsig#\"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG" +
-                            "\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu" +
-                            "\nZm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM" +
-                            "\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN\nAQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU" +
-                            "\nWWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O\nBw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL\n3tL" +
-                            "/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\nvvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\nGFHNkZ6DmoT" +
-                            "/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1" +
-                            ".1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService " +
-                            "Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://pivotal.oktapreview" +
-                            ".com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/><md:SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" " +
-                            "Location=\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/></md:IDPSSODescriptor></md:EntityDescriptor>\n")
-                        .metadataTrustCheck(false)
-                        .nameId("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress")
-                        .showSamlLink(false)
-                        .socketFactoryClassName("org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory")
-                        .zoneId("uaa")
-                        .build())
+                    .configuration("{\"addShadowUserOnLogin\":true,\"assertionConsumerIndex\":0,\"groupMappingMode\":\"EXPLICITLY_MAPPED\",\"iconUrl\":null,\"idpEntityAlias\":\"SAML\"," +
+                        "\"linkText\":\"IDPEndpointsMockTests Saml Provider:SAML\",\"metaDataLocation\":\"<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?><md:EntityDescriptor " +
+                        "xmlns:md=\\\"urn:oasis:names:tc:SAML:2.0:metadata\\\" entityID=\\\"http://www.okta.com/SAML\\\"><md:IDPSSODescriptor WantAuthnRequestsSigned=\\\"true\\\" " +
+                        "protocolSupportEnumeration=\\\"urn:oasis:names:tc:SAML:2.0:protocol\\\"><md:KeyDescriptor use=\\\"signing\\\"><ds:KeyInfo xmlns:ds=\\\"http://www" +
+                        ".w3.org/2000/09/xmldsig#\\\"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG" +
+                        "\\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu" +
+                        "\\nZm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC\\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM" +
+                        "\\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN\\nAQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU" +
+                        "\\nWWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O\\nBw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL\\n3tL" +
+                        "/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\\nvvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\\nGFHNkZ6DmoT" +
+                        "/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format" +
+                        ":emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService " +
+                        "Binding=\\\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\\\" Location=\\\"https://pivotal.oktapreview" +
+                        ".com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\\\"/><md:SingleSignOnService Binding=\\\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\\\" " +
+                        "Location=\\\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\\\"/></md:IDPSSODescriptor></md:EntityDescriptor>\\n\"," +
+                        "\"metadataTrustCheck\":false,\"nameID\":\"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\",\"showSamlLink\":false,\"socketFactoryClassName\":\"org.apache.commons" +
+                        ".httpclient.protocol.DefaultProtocolSocketFactory\",\"zoneId\":\"uaa\",\"attributeMappings\":{\"email\":null,\"external_groups\":null,\"family_name\":null," +
+                        "\"first_name\":null,\"given_name\":null,\"phone_number\":null},\"externalGroupsWhitelist\":[],\"emailDomain\":null,\"providerDescription\":null}")
                     .id("a2e96056-c777-40b8-95b8-ff81b441fcf1")
                     .identityZoneId("uaa")
                     .lastModified(1465001965526L)
@@ -489,19 +398,10 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
                 .identityProvider(IdentityProvider.builder()
                     .active(true)
                     .createdAt(1465001966855L)
-                    .configuration(OAuth2Configuration.builder()
-                        .attributeMappings(AttributeMappings.builder()
-                            .build())
-                        .authUrl("http://auth.url")
-                        .externalGroupsWhitelist(Collections.emptyList())
-                        .tokenUrl("http://token.url")
-                        .tokenKey("token-key")
-                        .showLinkText(false)
-                        .skipSslVerification(false)
-                        .relyingPartyId("uaa")
-                        .relyingPartySecret("secret")
-                        .addShadowUserOnLogin(true)
-                        .build())
+                    .configuration("{\"checkTokenUrl\":null,\"addShadowUserOnLogin\":true,\"authUrl\":\"http://auth.url\",\"linkText\":null,\"relyingPartyId\":\"uaa\"," +
+                        "\"relyingPartySecret\":\"secret\",\"scopes\":null,\"showLinkText\":false,\"skipSslValidation\":false,\"tokenKey\":\"token-key\",\"tokenKeyUrl\":null," +
+                        "\"tokenUrl\":\"http://token.url\",\"attributeMappings\":{\"email\":null,\"external_groups\":null,\"family_name\":null,\"first_name\":null,\"given_name\":null," +
+                        "\"phone_number\":null},\"externalGroupsWhitelist\":[],\"emailDomain\":null,\"providerDescription\":null}")
                     .id("16506900-561d-411f-904b-15c3e2722cba")
                     .identityZoneId("uaa")
                     .lastModified(1465001966855L)
@@ -543,14 +443,8 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
         this.identityProviders
             .update(UpdateIdentityProviderRequest.builder()
                 .active(true)
-                .configuration(InternalConfiguration.builder()
-                    .disableInternalUserManagement(false)
-                    .lockoutPolicy(LockoutPolicy.builder()
-                        .lockAccountPeriodInSecond(8)
-                        .lockoutPeriodInSecond(8)
-                        .numberOfAllowedFailures(8)
-                        .build())
-                    .build())
+                .configuration("{\"disableInternalUserManagement\":false,\"emailDomain\":null,\"lockoutPolicy\":{\"countFailuresWithin\":8,\"lockoutPeriodSeconds\":8,\"lockoutAfterFailures\":8}," +
+                    "\"passwordPolicy\":null,\"providerDescription\":null}")
                 .name("uaa")
                 .originKey("uaa")
                 .type(Type.INTERNAL)
@@ -562,14 +456,8 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
             .expectNext(UpdateIdentityProviderResponse.builder()
                 .active(true)
                 .createdAt(946713600000L)
-                .configuration(InternalConfiguration.builder()
-                    .disableInternalUserManagement(false)
-                    .lockoutPolicy(LockoutPolicy.builder()
-                        .lockAccountPeriodInSecond(8)
-                        .lockoutPeriodInSecond(8)
-                        .numberOfAllowedFailures(8)
-                        .build())
-                    .build())
+                .configuration("{\"disableInternalUserManagement\":false,\"emailDomain\":null,\"lockoutPolicy\":{\"countFailuresWithin\":8,\"lockoutPeriodSeconds\":8,\"lockoutAfterFailures\":8}," +
+                    "\"passwordPolicy\":null,\"providerDescription\":null}")
                 .id("test-identity-provider-id")
                 .identityZoneId("uaa")
                 .lastModified(1465001967669L)

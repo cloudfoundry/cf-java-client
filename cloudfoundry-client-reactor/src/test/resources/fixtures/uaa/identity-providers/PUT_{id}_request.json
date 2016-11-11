@@ -1,13 +1,6 @@
 {
   "active": true,
-  "config": {
-    "disableInternalUserManagement": false,
-    "lockoutPolicy": {
-      "countFailuresWithin": 8,
-      "lockoutAfterFailures": 8,
-      "lockoutPeriodSeconds": 8
-    }
-  },
+  "config": "{\"disableInternalUserManagement\":false,\"emailDomain\":null,\"lockoutPolicy\":{\"countFailuresWithin\":8,\"lockoutPeriodSeconds\":8,\"lockoutAfterFailures\":8},\"passwordPolicy\":null,\"providerDescription\":null}",
   "originKey": "uaa",
   "name": "uaa",
   "type": "uaa",

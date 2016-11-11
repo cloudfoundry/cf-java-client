@@ -23,9 +23,7 @@ public final class CreateIdentityProviderRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noName() {
         CreateIdentityProviderRequest.builder()
-            .configuration(SamlConfiguration.builder()
-                .metaDataLocation("test-metadata-location")
-                .build())
+            .configuration("{\"metaDataLocation\":\"test-metadata-location\"}")
             .identityZoneId("test-identity-zone-id")
             .type(Type.SAML)
             .originKey("test-origin-key")
@@ -35,9 +33,7 @@ public final class CreateIdentityProviderRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noOriginKey() {
         CreateIdentityProviderRequest.builder()
-            .configuration(SamlConfiguration.builder()
-                .metaDataLocation("test-metadata-location")
-                .build())
+            .configuration("{\"metaDataLocation\":\"test-metadata-location\"}")
             .identityZoneId("test-identity-zone-id")
             .name("test-name")
             .type(Type.SAML)
@@ -47,9 +43,7 @@ public final class CreateIdentityProviderRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noType() {
         CreateIdentityProviderRequest.builder()
-            .configuration(SamlConfiguration.builder()
-                .metaDataLocation("test-metadata-location")
-                .build())
+            .configuration("{\"metaDataLocation\":\"test-metadata-location\"}")
             .identityZoneId("test-identity-zone-id")
             .name("test-name")
             .originKey("test-origin-key")
@@ -59,9 +53,7 @@ public final class CreateIdentityProviderRequestTest {
     @Test
     public void valid() {
         CreateIdentityProviderRequest.builder()
-            .configuration(SamlConfiguration.builder()
-                .metaDataLocation("test-metadata-location")
-                .build())
+            .configuration("{\"metaDataLocation\":\"test-metadata-location\"}")
             .identityZoneId("test-identity-zone-id")
             .name("test-name")
             .originKey("test-origin-key")
