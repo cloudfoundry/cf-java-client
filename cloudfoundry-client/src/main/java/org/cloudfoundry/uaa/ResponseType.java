@@ -27,9 +27,9 @@ public enum ResponseType {
 
     ID_TOKEN("id_token"),
 
-    ID_TOKEN_CODE("code id_token"),
+    CODE_AND_ID_TOKEN("code id_token"),
 
-    ID_TOKEN_TOKEN("token id_token"),
+    TOKEN_AND_ID_TOKEN("token id_token"),
 
     TOKEN("token");
 
