@@ -80,8 +80,8 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
     }
 
     @Override
-    public Mono<String> openIdWithAuthorizationCodeGrant(AuthorizeByOpenIdWithAuthorizationCodeGrantRequest request) {
-        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.ID_TOKEN_CODE),
+    public Mono<String> openIdWithAuthorizationCodeAndIdToken(AuthorizeByOpenIdWithAuthorizationCodeGrantRequest request) {
+        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE_AND_ID_TOKEN),
             outbound -> {
                 outbound.headers().remove(AUTHORIZATION);
                 return outbound;
@@ -96,8 +96,8 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
     }
 
     @Override
-    public Mono<String> openIdWithImplicitGrant(AuthorizeByOpenIdWithImplicitGrantRequest request) {
-        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.ID_TOKEN_TOKEN))
+    public Mono<String> openIdWithTokenAndIdToken(AuthorizeByOpenIdWithImplicitGrantRequest request) {
+        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.TOKEN_AND_ID_TOKEN))
             .map(inbound -> inbound.responseHeaders().get(LOCATION));
     }
 

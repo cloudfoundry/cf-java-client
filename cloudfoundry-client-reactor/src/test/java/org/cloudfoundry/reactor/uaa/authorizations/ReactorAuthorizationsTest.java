@@ -130,7 +130,7 @@ public final class ReactorAuthorizationsTest extends AbstractUaaApiTest {
             .build());
 
         this.authorizations
-            .openIdWithAuthorizationCodeGrant(AuthorizeByOpenIdWithAuthorizationCodeGrantRequest.builder()
+            .openIdWithAuthorizationCodeAndIdToken(AuthorizeByOpenIdWithAuthorizationCodeGrantRequest.builder()
                 .clientId("app")
                 .redirectUri("http://localhost:8080/app/")
                 .scope("openid")
@@ -191,7 +191,7 @@ public final class ReactorAuthorizationsTest extends AbstractUaaApiTest {
             .build());
 
         this.authorizations
-            .openIdWithImplicitGrant(AuthorizeByOpenIdWithImplicitGrantRequest.builder()
+            .openIdWithTokenAndIdToken(AuthorizeByOpenIdWithImplicitGrantRequest.builder()
                 .clientId("app")
                 .redirectUri("http://localhost:8080/app/")
                 .scope("openid")

@@ -53,7 +53,7 @@ public interface Authorizations {
      * @param request Authorize By Open ID with an Authorization Code Grant request
      * @return the authentication location URI, including Access Token
      */
-    Mono<String> openIdWithAuthorizationCodeGrant(AuthorizeByOpenIdWithAuthorizationCodeGrantRequest request);
+    Mono<String> openIdWithAuthorizationCodeAndIdToken(AuthorizeByOpenIdWithAuthorizationCodeGrantRequest request);
 
     /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#id-token">Authorize By Open ID with an ID Token</a> request
@@ -69,6 +69,6 @@ public interface Authorizations {
      * @param request Authorize By Open ID with Implicit Grant request
      * @return the authentication location URI, including Access Token
      */
-    Mono<String> openIdWithImplicitGrant(AuthorizeByOpenIdWithImplicitGrantRequest request);
+    Mono<String> openIdWithTokenAndIdToken(AuthorizeByOpenIdWithImplicitGrantRequest request);
 
 }

@@ -23,6 +23,7 @@ import org.cloudfoundry.uaa.authorizations.AuthorizeByImplicitGrantBrowserReques
 import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithAuthorizationCodeGrantRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithIdTokenRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithImplicitGrantRequest;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
@@ -66,6 +67,12 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/134345481")
+    @Test
+    public void authorizeByAuthorizationCodeGrantHybrid() throws TimeoutException, InterruptedException {
+        //
+    }
+
     @Test
     public void authorizeByImplicitGrantBrowser() throws TimeoutException, InterruptedException {
         this.uaaClient.authorizations()
@@ -82,7 +89,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
     @Test
     public void authorizeByOpenIdWithAuthorizationCodeGrant() throws TimeoutException, InterruptedException {
         this.uaaClient.authorizations()
-            .openIdWithAuthorizationCodeGrant(AuthorizeByOpenIdWithAuthorizationCodeGrantRequest.builder()
+            .openIdWithAuthorizationCodeAndIdToken(AuthorizeByOpenIdWithAuthorizationCodeGrantRequest.builder()
                 .clientId("app")
                 .redirectUri("http://redirect.to/app")
                 .scope("openid")
@@ -110,7 +117,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
     @Test
     public void authorizeByOpenIdWithImplicitGrant() throws TimeoutException, InterruptedException {
         this.uaaClient.authorizations()
-            .openIdWithImplicitGrant(AuthorizeByOpenIdWithImplicitGrantRequest.builder()
+            .openIdWithTokenAndIdToken(AuthorizeByOpenIdWithImplicitGrantRequest.builder()
                 .clientId("app")
                 .redirectUri("http://redirect.to/app")
                 .scope("openid")
@@ -119,6 +126,12 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
             .consumeNextWith(startsWithExpectation("https://uaa."))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
+    }
+
+    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/134351627")
+    @Test
+    public void openIdProviderConfiguration() throws TimeoutException, InterruptedException {
+        //
     }
 
     private static Consumer<String> startsWithExpectation(String prefix) {
