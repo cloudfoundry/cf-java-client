@@ -63,6 +63,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/v2/user_provided_service_instances/5badd282-6e07-4fc6-a8c4-78be99040774/routes/237d9236-7997-4b1a-be8d-2aaf2d85421a")
+                .payload("fixtures/client/v2/user_provided_service_instances/PUT_{id}_route_request.json")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

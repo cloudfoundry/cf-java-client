@@ -18,13 +18,24 @@ package org.cloudfoundry.client.v2.userprovidedserviceinstances;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
+
+import java.util.Map;
 
 /**
  * The request payload for the Associate Route User Provided Service Instance
  */
 @Value.Immutable
 abstract class _AssociateUserProvidedServiceInstanceRouteRequest {
+
+    /**
+     * Key/value pairs to store credentials
+     */
+    @JsonProperty("parameters")
+    @Nullable
+    abstract Map<String, Object> getParameters();
 
     /**
      * The route id

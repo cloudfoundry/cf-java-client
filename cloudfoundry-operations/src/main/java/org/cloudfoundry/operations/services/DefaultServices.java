@@ -25,6 +25,8 @@ import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
+import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
+import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingRequest;
@@ -61,6 +63,8 @@ import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServicesRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.AssociateUserProvidedServiceInstanceRouteRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.AssociateUserProvidedServiceInstanceRouteResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceResponse;
@@ -76,15 +80,19 @@ import reactor.util.function.Tuples;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class DefaultServices implements Services {
+
+    private static final int CF_ROUTE_SERVICE_ALREADY_BOUND = 130008;
 
     private static final int CF_SERVICE_ALREADY_BOUND = 90003;
 
@@ -118,45 +126,22 @@ public final class DefaultServices implements Services {
 
     @Override
     public Mono<Void> bindRoute(BindRouteServiceInstanceRequest request) {
-        return null;
-
-    }
-
-    private static Mono<String> getDomainId(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
-            return getPrivateDomainId(cloudFoundryClient, domain, organizationId)
-                .otherwiseIfEmpty(getSharedDomainId(cloudFoundryClient, domain))
-                .otherwiseIfEmpty(ExceptionUtils.illegalArgument("Domain %s not found", domain));
-    }
-
-    private static Mono<String> getPrivateDomainId(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
-        return requestPrivateDomain(cloudFoundryClient, domain, organizationId)
-            .map(ResourceUtils::getId)
-            .singleOrEmpty();
-    }
-
-    private static Flux<PrivateDomainResource> requestPrivateDomain(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
-        return PaginationUtils
-            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
-                .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
-                    .name(domain)
-                    .organizationId(organizationId)
-                    .page(page)
-                    .build()));
-    }
-
-    private static Mono<String> getSharedDomainId(CloudFoundryClient cloudFoundryClient, String domain) {
-        return requestSharedDomain(cloudFoundryClient, domain)
-            .map(ResourceUtils::getId)
-            .singleOrEmpty();
-    }
-
-    private static Flux<SharedDomainResource> requestSharedDomain(CloudFoundryClient cloudFoundryClient, String domain) {
-        return PaginationUtils
-            .requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
-                .list(ListSharedDomainsRequest.builder()
-                    .name(domain)
-                    .page(page)
-                    .build()));
+        return Mono
+            .when(this.cloudFoundryClient, this.organizationId, this.spaceId)
+            .then(function((cloudFoundryClient, organizationId, spaceId) -> Mono
+                .when(
+                    Mono.just(cloudFoundryClient),
+                    getDomainId(cloudFoundryClient, request.getDomainName(), organizationId),
+                    Mono.just(spaceId)
+                )))
+            .then(function((cloudFoundryClient, domainId, spaceId) -> Mono
+                .when(
+                    Mono.just(cloudFoundryClient),
+                    getRouteId(cloudFoundryClient, request.getDomainName(), domainId, request.getHostname(), request.getPath()),
+                    getSpaceUserProvidedServiceInstanceId(cloudFoundryClient, request.getServiceInstanceName(), spaceId)
+                )))
+            .then(function((cloudFoundryClient, routeId, userProvidedServiceInstanceId) -> createRouteBinding(cloudFoundryClient, routeId, userProvidedServiceInstanceId, request.getParameters())))
+            .then();
     }
 
     @Override
@@ -406,6 +391,12 @@ public final class DefaultServices implements Services {
             .then(Mono.just(Optional.of(servicePlanId)));
     }
 
+    private static Mono<AssociateUserProvidedServiceInstanceRouteResponse> createRouteBinding(CloudFoundryClient cloudFoundryClient, String routeId, String userProvidedServiceInstanceId,
+                                                                                              Map<String, Object> parameters) {
+        return requestCreateRouteBinding(cloudFoundryClient, routeId, userProvidedServiceInstanceId, parameters)
+            .otherwise(ExceptionUtils.statusCode(CF_ROUTE_SERVICE_ALREADY_BOUND), t -> Mono.empty());
+    }
+
     private static Mono<CreateServiceBindingResponse> createServiceBinding(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId, Map<String, Object> parameters) {
         return requestCreateServiceBinding(cloudFoundryClient, applicationId, serviceInstanceId, parameters)
             .otherwise(ExceptionUtils.statusCode(CF_SERVICE_ALREADY_BOUND), t -> Mono.empty());
@@ -454,6 +445,12 @@ public final class DefaultServices implements Services {
             .collectList();
     }
 
+    private static Mono<String> getDomainId(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
+        return getPrivateDomainId(cloudFoundryClient, domain, organizationId)
+            .otherwiseIfEmpty(getSharedDomainId(cloudFoundryClient, domain))
+            .otherwiseIfEmpty(ExceptionUtils.illegalArgument("Domain %s not found", domain));
+    }
+
     @SuppressWarnings("unchecked")
     private static String getExtraValue(String extra, String key) {
         if (extra == null || extra.isEmpty()) {
@@ -488,6 +485,29 @@ public final class DefaultServices implements Services {
             .singleOrEmpty()
             .otherwiseIfEmpty(ExceptionUtils.illegalArgument("New service plan %s not found", planName))
             .then(resource -> checkVisibility(cloudFoundryClient, organizationId, resource));
+    }
+
+    private static Mono<String> getPrivateDomainId(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
+        return requestPrivateDomain(cloudFoundryClient, domain, organizationId)
+            .map(ResourceUtils::getId)
+            .singleOrEmpty();
+    }
+
+    private static Mono<RouteResource> getRoute(CloudFoundryClient cloudFoundryClient, String domainId, String domain, String host, String path) {
+        return getRoute(cloudFoundryClient, domainId, host, path)
+            .otherwiseIfEmpty(ExceptionUtils.illegalArgument("Route %s.%s does not exist", host, domain));
+    }
+
+    private static Mono<RouteResource> getRoute(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
+        return requestRoutes(cloudFoundryClient, domainId, host, path)
+            .filter(resource -> isIdentical(host, ResourceUtils.getEntity(resource).getHost()))
+            .filter(resource -> isIdentical(path, ResourceUtils.getEntity(resource).getPath()))
+            .singleOrEmpty();
+    }
+
+    private static Mono<String> getRouteId(CloudFoundryClient cloudFoundryClient, String domain, String domainId, String host, String path) {
+        return getRoute(cloudFoundryClient, domainId, domain, host, path)
+            .map(ResourceUtils::getId);
     }
 
     private static Mono<String> getServiceBindingId(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId, String serviceInstanceName) {
@@ -537,6 +557,12 @@ public final class DefaultServices implements Services {
             .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Service plan %s does not exist", plan));
     }
 
+    private static Mono<String> getSharedDomainId(CloudFoundryClient cloudFoundryClient, String domain) {
+        return requestSharedDomain(cloudFoundryClient, domain)
+            .map(ResourceUtils::getId)
+            .singleOrEmpty();
+    }
+
     private static Mono<ServiceResource> getSpaceService(CloudFoundryClient cloudFoundryClient, String spaceId, String service) {
         return requestListServices(cloudFoundryClient, spaceId, service)
             .single()
@@ -566,6 +592,10 @@ public final class DefaultServices implements Services {
             .map(ResourceUtils::getId);
     }
 
+    private static boolean isIdentical(String s, String t) {
+        return s == null ? t == null : s.equals(t);
+    }
+
     private static boolean isNotInProgress(String state) {
         return !state.equals("in progress");
     }
@@ -578,6 +608,10 @@ public final class DefaultServices implements Services {
         return ServiceInstanceType.from(ResourceUtils.getEntity(serviceInstance).getType()).equals(ServiceInstanceType.USER_PROVIDED);
     }
 
+    private static String nullSafe(String host) {
+        return host == null ? "" : host;
+    }
+
     private static Mono<BaseServiceInstanceEntity> renameServiceInstance(CloudFoundryClient cloudFoundryClient, UnionServiceInstanceResource serviceInstance, String newName) {
         if (isUserProvidedService(serviceInstance)) {
             return requestUserProvidedServiceInstanceUpdate(cloudFoundryClient, ResourceUtils.getId(serviceInstance), newName)
@@ -588,6 +622,15 @@ public final class DefaultServices implements Services {
                 .map(ResourceUtils::getEntity)
                 .cast(BaseServiceInstanceEntity.class);
         }
+    }
+
+    private static Mono<AssociateUserProvidedServiceInstanceRouteResponse> requestCreateRouteBinding(CloudFoundryClient cloudFoundryClient, String routeId, String userProvidedServiceInstanceId,
+                                                                                                     Map<String, Object> parameters) {
+        return cloudFoundryClient.userProvidedServiceInstances()
+            .associateRoute(AssociateUserProvidedServiceInstanceRouteRequest.builder()
+                .routeId(routeId)
+                .userProvidedServiceInstanceId(userProvidedServiceInstanceId)
+                .build());
     }
 
     private static Mono<CreateServiceBindingResponse> requestCreateServiceBinding(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId,
@@ -799,12 +842,50 @@ public final class DefaultServices implements Services {
                     .build()));
     }
 
+    private static Flux<PrivateDomainResource> requestPrivateDomain(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
+                .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
+                    .name(domain)
+                    .organizationId(organizationId)
+                    .page(page)
+                    .build()));
+    }
+
+    private static Flux<RouteResource> requestRoutes(CloudFoundryClient cloudFoundryClient, UnaryOperator<ListRoutesRequest.Builder> modifier) {
+
+        ListRoutesRequest.Builder listBuilder = modifier.apply(ListRoutesRequest.builder());
+
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.routes()
+                .list(listBuilder
+                    .page(page)
+                    .build()));
+    }
+
+    private static Flux<RouteResource> requestRoutes(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
+        return requestRoutes(cloudFoundryClient, builder -> builder
+            .domainId(domainId)
+            .hosts(Optional.ofNullable(host).map(Collections::singletonList).orElse(null))
+            .paths(Optional.ofNullable(path).map(Collections::singletonList).orElse(null))
+        );
+    }
+
     private static Mono<UpdateServiceInstanceResponse> requestServiceInstanceUpdate(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String newName) {
         return cloudFoundryClient.serviceInstances()
             .update(org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest.builder()
                 .name(newName)
                 .serviceInstanceId(serviceInstanceId)
                 .build());
+    }
+
+    private static Flux<SharedDomainResource> requestSharedDomain(CloudFoundryClient cloudFoundryClient, String domain) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
+                .list(ListSharedDomainsRequest.builder()
+                    .name(domain)
+                    .page(page)
+                    .build()));
     }
 
     private static Mono<UpdateUserProvidedServiceInstanceResponse> requestUserProvidedServiceInstanceUpdate(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String newName) {

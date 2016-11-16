@@ -30,7 +30,7 @@ import java.util.Map;
 abstract class _CreateUserProvidedServiceInstanceRequest {
 
     /**
-     * Key/value pairs that can be stored to store credentials
+     * Key/value pairs to store credentials
      */
     @JsonProperty("credentials")
     @Nullable
