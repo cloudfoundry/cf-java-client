@@ -18,7 +18,7 @@ package org.cloudfoundry.client.v2.userprovidedserviceinstances;
 
 import org.junit.Test;
 
-public final class AssociateRouteWithUserProvidedServiceInstanceRequestTest {
+public final class AssociateUserProvidedServiceInstanceRouteRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noRouteId() {
@@ -37,6 +37,7 @@ public final class AssociateRouteWithUserProvidedServiceInstanceRequestTest {
     @Test
     public void valid() {
         AssociateUserProvidedServiceInstanceRouteRequest.builder()
+            .parameter("test-key", "test-value")
             .routeId("test-route-id")
             .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
             .build();

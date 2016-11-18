@@ -14,39 +14,45 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.userprovidedserviceinstances;
+package org.cloudfoundry.operations.services;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.Map;
 
 /**
- * The request payload for the Associate Route User Provided Service Instance
+ * The request options for the bind service instance operation
  */
 @Value.Immutable
-abstract class _AssociateUserProvidedServiceInstanceRouteRequest {
+abstract class _BindRouteServiceInstanceRequest {
 
     /**
-     * Key/value pairs to store credentials
+     * The domain for the bound route
      */
-    @JsonProperty("parameters")
+    abstract String getDomainName();
+
+    /**
+     * The hostname for the bound route
+     */
+    @Nullable
+    abstract String getHostname();
+
+    /**
+     * The parameters for the bound route
+     */
     @Nullable
     abstract Map<String, Object> getParameters();
 
     /**
-     * The route id
+     * The path for the bound route
      */
-    @JsonIgnore
-    abstract String getRouteId();
+    @Nullable
+    abstract String getPath();
 
     /**
-     * The user provided service instance id
+     * The name of the service instance to bind
      */
-    @JsonIgnore
-    abstract String getUserProvidedServiceInstanceId();
+    abstract String getServiceInstanceName();
 
 }
