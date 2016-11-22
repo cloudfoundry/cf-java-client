@@ -700,9 +700,13 @@ public final class DefaultApplications implements Applications {
             .ofNullable(entity.getMetadatas())
             .orElse(Collections.emptyMap());
 
-        return metadata.get("request")
-            .map(m -> (Map<String, Object>) m)
-            .orElse(Collections.emptyMap());
+        if (metadata.get("request") != null) {
+            return metadata.get("request")
+                .map(m -> (Map<String, Object>) m)
+                .orElse(Collections.emptyMap());
+        } else {
+            return Collections.emptyMap();
+        }
     }
 
     private static Mono<Optional<List<Route>>> getOptionalRoutes(CloudFoundryClient cloudFoundryClient, boolean deleteRoutes, String applicationId) {
