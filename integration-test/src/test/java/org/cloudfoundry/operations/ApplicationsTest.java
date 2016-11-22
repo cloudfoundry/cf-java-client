@@ -22,6 +22,7 @@ import org.cloudfoundry.operations.applications.ApplicationEnvironments;
 import org.cloudfoundry.operations.applications.ApplicationHealthCheck;
 import org.cloudfoundry.operations.applications.DeleteApplicationRequest;
 import org.cloudfoundry.operations.applications.GetApplicationEnvironmentsRequest;
+import org.cloudfoundry.operations.applications.GetApplicationEventsRequest;
 import org.cloudfoundry.operations.applications.GetApplicationHealthCheckRequest;
 import org.cloudfoundry.operations.applications.GetApplicationRequest;
 import org.cloudfoundry.operations.applications.PushApplicationRequest;
@@ -114,6 +115,20 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .map(ApplicationDetail::getName)
             .as(StepVerifier::create)
             .expectNext(applicationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void getEvents() throws TimeoutException, InterruptedException, IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
+            .flatMap(ignore -> this.cloudFoundryOperations.applications()
+                .getEvents(GetApplicationEventsRequest.builder()
+                    .name(applicationName)
+                    .build()))
+            .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
