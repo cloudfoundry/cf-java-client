@@ -28,15 +28,15 @@ import org.immutables.value.Value;
 abstract class _Email {
 
     /**
-     * The email address
-     */
-    @JsonProperty("value")
-    abstract String getValue();
-
-    /**
      * Whether this email address is the primary
      */
     @JsonProperty("primary")
     abstract Boolean getPrimary();
+
+    /**
+     * The email address
+     */
+    @JsonProperty("value")
+    abstract String getValue();
 
 }

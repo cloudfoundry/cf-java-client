@@ -23,17 +23,17 @@ import java.nio.file.Paths;
 public final class PushApplicationRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void noApplicationOrDocker() {
+    public void applicationAndDocker() {
         PushApplicationRequest.builder()
+            .application(Paths.get("test-application"))
+            .dockerImage("test-docker")
             .name("test-name")
             .build();
     }
 
     @Test(expected = IllegalStateException.class)
-    public void ApplicationAndDocker() {
+    public void noApplicationOrDocker() {
         PushApplicationRequest.builder()
-            .application(Paths.get("test-application"))
-            .dockerImage("test-docker")
             .name("test-name")
             .build();
     }

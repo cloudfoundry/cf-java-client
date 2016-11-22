@@ -298,16 +298,6 @@ public interface NameFactory {
     }
 
     /**
-     * Tests a name to determine if it is an identity zone name
-     *
-     * @param candidate the candidate name
-     * @return {@code true} if the name is an identity zone name, {@code false} otherwise
-     */
-    default boolean isIdentityZoneName(String candidate) {
-        return isName(IDENTITY_ZONE_PREFIX, candidate);
-    }
-
-    /**
      * Tests a name to determine if it is an identity provider name
      *
      * @param candidate the candidate name
@@ -315,6 +305,16 @@ public interface NameFactory {
      */
     default boolean isIdentityProviderName(String candidate) {
         return isName(IDENTITY_PROVIDER_PREFIX, candidate);
+    }
+
+    /**
+     * Tests a name to determine if it is an identity zone name
+     *
+     * @param candidate the candidate name
+     * @return {@code true} if the name is an identity zone name, {@code false} otherwise
+     */
+    default boolean isIdentityZoneName(String candidate) {
+        return isName(IDENTITY_ZONE_PREFIX, candidate);
     }
 
     /**

@@ -48,20 +48,20 @@ public interface Tokens {
     Mono<GetTokenByClientCredentialsResponse> getByClientCredentials(GetTokenByClientCredentialsRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#openid-connect">OpenID Connect</a> request
-     *
-     * @param request the OpenId request
-     * @return the response from the OpenId request
-     */
-    Mono<GetTokenByOpenIdResponse> getByOpenId(GetTokenByOpenIdRequest request);
-
-    /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#one-time-passcode">One-time Passcode</a> request
      *
      * @param request the One Time Passcode token request
      * @return the response from the One Time Passcode token request
      */
     Mono<GetTokenByOneTimePasscodeResponse> getByOneTimePasscode(GetTokenByOneTimePasscodeRequest request);
+
+    /**
+     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#openid-connect">OpenID Connect</a> request
+     *
+     * @param request the OpenId request
+     * @return the response from the OpenId request
+     */
+    Mono<GetTokenByOpenIdResponse> getByOpenId(GetTokenByOpenIdRequest request);
 
     /**
      * Makes the <a href="http://docs.cloudfoundry.com/uaa/#password-grant">Password Grant</a> request
