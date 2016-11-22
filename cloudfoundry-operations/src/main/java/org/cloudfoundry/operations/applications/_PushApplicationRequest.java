@@ -28,6 +28,17 @@ import java.time.Duration;
 @Value.Immutable
 abstract class _PushApplicationRequest {
 
+    @Value.Check
+    void check() {
+        if (getApplication() == null && getDockerImage() == null) {
+            throw new IllegalStateException("One of application or dockerImage must be supplied");
+        }
+
+        if (getApplication() != null && getDockerImage() != null) {
+            throw new IllegalStateException("Only one of application or dockerImage can be supplied");
+        }
+    }
+
     /**
      * The path to the application
      */
@@ -152,15 +163,4 @@ abstract class _PushApplicationRequest {
      */
     @Nullable
     abstract Integer getTimeout();
-
-    @Value.Check
-    void check() {
-        if (getApplication() == null && getDockerImage() == null) {
-            throw new IllegalStateException("One of application or dockerImage must be supplied");
-        }
-
-        if (getApplication() != null && getDockerImage() != null) {
-            throw new IllegalStateException("Only one of application or dockerImage can be supplied");
-        }
-    }
 }

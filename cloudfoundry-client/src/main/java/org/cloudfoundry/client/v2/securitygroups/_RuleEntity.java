@@ -29,11 +29,25 @@ import org.immutables.value.Value;
 abstract class _RuleEntity {
 
     /**
+     * The control signal for icmp
+     */
+    @JsonProperty("code")
+    @Nullable
+    abstract Integer getCode();
+
+    /**
      * The destination
      */
     @JsonProperty("destination")
     @Nullable
     abstract String getDestination();
+
+    /**
+     * Enables logging for the egress rule
+     */
+    @JsonProperty("log")
+    @Nullable
+    abstract Boolean getLog();
 
     /**
      * The ports
@@ -55,19 +69,5 @@ abstract class _RuleEntity {
     @JsonProperty("type")
     @Nullable
     abstract Integer getType();
-
-    /**
-     * The control signal for icmp
-     */
-    @JsonProperty("code")
-    @Nullable
-    abstract Integer getCode();
-
-    /**
-     * Enables logging for the egress rule
-     */
-    @JsonProperty("log")
-    @Nullable
-    abstract Boolean getLog();
 
 }

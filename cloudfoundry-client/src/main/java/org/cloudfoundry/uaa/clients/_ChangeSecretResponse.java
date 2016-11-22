@@ -29,15 +29,15 @@ import org.immutables.value.Value;
 abstract class _ChangeSecretResponse {
 
     /**
-     * The change status
-     */
-    @JsonProperty("status")
-    abstract String getStatus();
-
-    /**
      * The change message
      */
     @JsonProperty("message")
     abstract String getMessage();
+
+    /**
+     * The change status
+     */
+    @JsonProperty("status")
+    abstract String getStatus();
 
 }

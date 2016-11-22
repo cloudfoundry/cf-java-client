@@ -35,7 +35,7 @@ public interface Applications {
 
     /**
      * Deletes a specific application and, optionally, all routes mapped to the application.
-     *
+     * <p>
      * Warning: deleting routes mapped to the application deletes them even if they are mapped to other applications.
      *
      * @param request the delete application request

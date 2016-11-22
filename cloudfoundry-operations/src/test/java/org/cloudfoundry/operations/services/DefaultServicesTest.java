@@ -97,7 +97,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.function.Supplier;
 
@@ -108,6 +107,24 @@ import static org.mockito.Mockito.when;
 public final class DefaultServicesTest extends AbstractOperationsTest {
 
     private final DefaultServices services = new DefaultServices(Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+
+    @Test
+    public void bindRouteServiceInstanceAlreadyBound() {
+        requestListOrganizationPrivateDomains(this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
+        requestListSpaceServiceInstancesUserProvided(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+        requestListRoutes(this.cloudFoundryClient, "test-private-domain-id");
+        requestAssociateUserProvidedServiceInstanceRouteError(this.cloudFoundryClient, "test-route-id", "test-service-instance-id", 130008);
+
+        this.services
+            .bindRoute(BindRouteServiceInstanceRequest.builder()
+                .domainName("test-domain-name")
+                .parameter("test-parameter-key", "test-parameter-value")
+                .serviceInstanceName("test-service-instance-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     @Test
     public void bindRouteServiceInstanceDomainNotFound() {
@@ -156,24 +173,6 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                 .hostname("test-host")
                 .parameter("test-parameter-key", "test-parameter-value")
                 .path("test-path")
-                .serviceInstanceName("test-service-instance-name")
-                .build())
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void bindRouteServiceInstanceAlreadyBound() {
-        requestListOrganizationPrivateDomains(this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
-        requestListSpaceServiceInstancesUserProvided(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
-        requestListRoutes(this.cloudFoundryClient, "test-private-domain-id");
-        requestAssociateUserProvidedServiceInstanceRouteError(this.cloudFoundryClient, "test-route-id", "test-service-instance-id", 130008);
-
-        this.services
-            .bindRoute(BindRouteServiceInstanceRequest.builder()
-                .domainName("test-domain-name")
-                .parameter("test-parameter-key", "test-parameter-value")
                 .serviceInstanceName("test-service-instance-name")
                 .build())
             .as(StepVerifier::create)

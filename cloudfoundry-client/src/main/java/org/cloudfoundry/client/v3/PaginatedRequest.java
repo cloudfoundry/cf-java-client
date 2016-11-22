@@ -25,17 +25,6 @@ import org.immutables.value.Value;
  */
 public abstract class PaginatedRequest {
 
-    @Value.Check
-    void check() {
-        if (getPage() != null && getPage() < 1) {
-            throw new IllegalStateException("page must be greater than or equal to 1");
-        }
-
-        if (getPerPage() != null && (getPerPage() < 1 || getPerPage() > 5_000)) {
-            throw new IllegalStateException("perPage much be between 1 and 5000 inclusive");
-        }
-    }
-
     /**
      * The page
      */
@@ -49,5 +38,16 @@ public abstract class PaginatedRequest {
     @Nullable
     @QueryParameter("per_page")
     public abstract Integer getPerPage();
+
+    @Value.Check
+    void check() {
+        if (getPage() != null && getPage() < 1) {
+            throw new IllegalStateException("page must be greater than or equal to 1");
+        }
+
+        if (getPerPage() != null && (getPerPage() < 1 || getPerPage() > 5_000)) {
+            throw new IllegalStateException("perPage much be between 1 and 5000 inclusive");
+        }
+    }
 
 }
