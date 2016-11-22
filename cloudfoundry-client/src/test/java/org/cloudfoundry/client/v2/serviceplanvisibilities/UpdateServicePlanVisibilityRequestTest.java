@@ -21,14 +21,6 @@ import org.junit.Test;
 public final class UpdateServicePlanVisibilityRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void noServicePlanVisibilityId() {
-        UpdateServicePlanVisibilityRequest.builder()
-            .organizationId("organization-id")
-            .servicePlanId("service-plan-id")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
         UpdateServicePlanVisibilityRequest.builder()
             .servicePlanId("service-plan-id")
@@ -41,6 +33,14 @@ public final class UpdateServicePlanVisibilityRequestTest {
         UpdateServicePlanVisibilityRequest.builder()
             .organizationId("organization-id")
             .servicePlanVisibilityId("test-service-plan-visibility-id")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noServicePlanVisibilityId() {
+        UpdateServicePlanVisibilityRequest.builder()
+            .organizationId("organization-id")
+            .servicePlanId("service-plan-id")
             .build();
     }
 

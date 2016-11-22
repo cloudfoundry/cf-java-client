@@ -28,6 +28,17 @@ import java.util.List;
 @Value.Immutable
 abstract class _CreateUserRequest {
 
+    @Value.Check
+    void check() {
+        if (getName().getFamilyName() == null || getName().getFamilyName().isEmpty()) {
+            throw new IllegalStateException("Cannot build CreateUserRequest, required attribute familyName is not set, or is empty");
+        }
+
+        if (getName().getGivenName() == null || getName().getGivenName().isEmpty()) {
+            throw new IllegalStateException("Cannot build CreateUserRequest, required attribute givenName is not set, or is empty");
+        }
+    }
+
     /**
      * Whether the user is active
      */
@@ -79,16 +90,5 @@ abstract class _CreateUserRequest {
     @JsonProperty("verified")
     @Nullable
     abstract Boolean getVerified();
-
-    @Value.Check
-    void check() {
-        if (getName().getFamilyName() == null || getName().getFamilyName().isEmpty()) {
-            throw new IllegalStateException("Cannot build CreateUserRequest, required attribute familyName is not set, or is empty");
-        }
-
-        if (getName().getGivenName() == null || getName().getGivenName().isEmpty()) {
-            throw new IllegalStateException("Cannot build CreateUserRequest, required attribute givenName is not set, or is empty");
-        }
-    }
 
 }

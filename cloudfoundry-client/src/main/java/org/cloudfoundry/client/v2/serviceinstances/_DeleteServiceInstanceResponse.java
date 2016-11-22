@@ -17,9 +17,7 @@
 package org.cloudfoundry.client.v2.serviceinstances;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.jobs.AbstractJobResource;
-import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.immutables.value.Value;
 
 /**

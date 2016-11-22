@@ -29,6 +29,13 @@ import java.util.List;
 @Value.Immutable
 abstract class _InviteUsersRequest {
 
+    @Value.Check
+    void check() {
+        if (getEmails().isEmpty()) {
+            throw new IllegalStateException("Cannot build InviteUsersRequest, at least one email must be provided");
+        }
+    }
+
     /**
      * The client registration information
      */
@@ -47,12 +54,5 @@ abstract class _InviteUsersRequest {
      */
     @QueryParameter("redirect_uri")
     abstract String getRedirectUri();
-
-    @Value.Check
-    void check() {
-        if (getEmails().isEmpty()) {
-            throw new IllegalStateException("Cannot build InviteUsersRequest, at least one email must be provided");
-        }
-    }
 
 }

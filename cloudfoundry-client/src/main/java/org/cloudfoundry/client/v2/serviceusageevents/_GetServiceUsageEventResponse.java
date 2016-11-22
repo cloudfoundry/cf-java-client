@@ -17,7 +17,6 @@
 package org.cloudfoundry.client.v2.serviceusageevents;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.client.v2.Resource;
 import org.immutables.value.Value;
 
 /**

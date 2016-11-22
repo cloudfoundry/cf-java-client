@@ -49,11 +49,9 @@ import org.cloudfoundry.util.FluentMap;
 import org.cloudfoundry.util.OperationUtils;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
-import reactor.core.Exceptions;
 import reactor.test.StepVerifier;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.time.Duration;
 import java.util.Collections;

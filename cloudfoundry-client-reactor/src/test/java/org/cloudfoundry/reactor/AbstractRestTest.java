@@ -56,6 +56,13 @@ public abstract class AbstractRestTest {
 
     private InteractionContext interactionContext;
 
+    @After
+    public final void verify() {
+        if (this.interactionContext != null) {
+            assertThat(this.interactionContext.isDone()).as("Expected request not received").isTrue();
+        }
+    }
+
     protected final void mockRequest(InteractionContext interactionContext) {
         this.interactionContext = interactionContext;
         this.mockWebServer.setDispatcher(new Dispatcher() {
@@ -71,13 +78,6 @@ public abstract class AbstractRestTest {
                 return interactionContext.getResponse().getMockResponse();
             }
         });
-    }
-
-    @After
-    public final void verify() {
-        if (this.interactionContext != null) {
-            assertThat(this.interactionContext.isDone()).as("Expected request not received").isTrue();
-        }
     }
 
     private static final class FailingDeserializationProblemHandler extends DeserializationProblemHandler {
