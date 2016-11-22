@@ -668,6 +668,31 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
+    public void getEventsNoRequestMetadata() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestEvents(this.cloudFoundryClient, "test-metadata-id",
+            fill(EventEntity.builder(), "event-")
+                .timestamp("2016-02-08T15:45:59Z")
+                .metadata("index", Optional.of(1))
+                .build());
+
+        this.applications
+            .getEvents(GetApplicationEventsRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ApplicationEvent.builder()
+                .actor("test-event-actorName")
+                .description("")
+                .event("test-event-type")
+                .time(DateUtils.parseFromIso8601("2016-02-08T15:45:59Z"))
+                .id("test-event-id")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void getEventsTwo() {
         requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
         requestEvents(this.cloudFoundryClient, "test-metadata-id",
