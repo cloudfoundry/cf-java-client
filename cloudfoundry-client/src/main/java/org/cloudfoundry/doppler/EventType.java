@@ -29,11 +29,7 @@ public enum EventType {
 
     ERROR,
 
-    HTTP_START,
-
     HTTP_START_STOP,
-
-    HTTP_STOP,
 
     LOG_MESSAGE,
 
@@ -47,12 +43,8 @@ public enum EventType {
                 return COUNTER_EVENT;
             case Error:
                 return ERROR;
-            case HttpStart:
-                return HTTP_START;
             case HttpStartStop:
                 return HTTP_START_STOP;
-            case HttpStop:
-                return HTTP_STOP;
             case LogMessage:
                 return LOG_MESSAGE;
             case ValueMetric:
