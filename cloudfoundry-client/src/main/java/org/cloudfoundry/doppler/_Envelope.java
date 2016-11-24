@@ -45,9 +45,7 @@ abstract class _Envelope {
         Optional.ofNullable(dropsonde.containerMetric).ifPresent(d -> envelope.containerMetric(ContainerMetric.from(d)));
         Optional.ofNullable(dropsonde.counterEvent).ifPresent(d -> envelope.counterEvent(CounterEvent.from(d)));
         Optional.ofNullable(dropsonde.error).ifPresent(d -> envelope.error(Error.from(d)));
-        Optional.ofNullable(dropsonde.httpStart).ifPresent(d -> envelope.httpStart(HttpStart.from(d)));
         Optional.ofNullable(dropsonde.httpStartStop).ifPresent(d -> envelope.httpStartStop(HttpStartStop.from(d)));
-        Optional.ofNullable(dropsonde.httpStop).ifPresent(d -> envelope.httpStop(HttpStop.from(d)));
         Optional.ofNullable(dropsonde.logMessage).ifPresent(d -> envelope.logMessage(LogMessage.from(d)));
         Optional.ofNullable(dropsonde.valueMetric).ifPresent(d -> envelope.valueMetric(ValueMetric.from(d)));
 
@@ -84,22 +82,10 @@ abstract class _Envelope {
     abstract EventType getEventType();
 
     /**
-     * The enclosed {@link HttpStart}
-     */
-    @Nullable
-    abstract HttpStart getHttpStart();
-
-    /**
      * The enclosed {@link HttpStartStop}
      */
     @Nullable
     abstract HttpStartStop getHttpStartStop();
-
-    /**
-     * The enclosed {@link HttpStop}
-     */
-    @Nullable
-    abstract HttpStop getHttpStop();
 
     /**
      * Index of job (used to uniquely identify source)
