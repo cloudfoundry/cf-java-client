@@ -120,10 +120,8 @@ public final class DefaultSpaces implements Spaces {
                         .map(ResourceUtils::getId),
                     Mono.just(username)
                 )))
-            .then(function((cloudFoundryClient, organizationId, spaceId, username) -> {
-                return requestAssociateOrganizationUserByUsername(cloudFoundryClient, organizationId, username)
-                    .then(Mono.just(Tuples.of(cloudFoundryClient, organizationId, spaceId, username)));
-            }))
+            .then(function((cloudFoundryClient, organizationId, spaceId, username) -> requestAssociateOrganizationUserByUsername(cloudFoundryClient, organizationId, username)
+                .then(Mono.just(Tuples.of(cloudFoundryClient, organizationId, spaceId, username)))))
             .then(function((cloudFoundryClient, organizationId, spaceId, username) -> Mono
                 .when(
                     requestAssociateSpaceManagerByUsername(cloudFoundryClient, spaceId, username),
@@ -309,9 +307,8 @@ public final class DefaultSpaces implements Spaces {
                 getServiceNames(cloudFoundryClient, resource),
                 getOptionalSpaceQuotaDefinition(cloudFoundryClient, resource)
             )
-            .map(function((applications, domains, organization, securityGroups, services, spaceQuota) -> {
-                return toSpaceDetail(applications, domains, organization, resource, securityGroups, services, spaceQuota);
-            }));
+            .map(function((applications, domains, organization, securityGroups, services, spaceQuota) ->
+                toSpaceDetail(applications, domains, organization, resource, securityGroups, services, spaceQuota)));
     }
 
     private static Mono<SpaceQuotaDefinitionResource> getSpaceQuota(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceQuota) {

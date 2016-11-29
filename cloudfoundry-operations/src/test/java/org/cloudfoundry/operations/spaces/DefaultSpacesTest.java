@@ -546,7 +546,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
 
                     @Override
                     public Mono<GetJobResponse> get() {
-                        return Mono.just(responses.poll());
+                        return Mono.just(this.responses.poll());
                     }
 
                 }));
@@ -575,7 +575,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
 
                     @Override
                     public Mono<GetJobResponse> get() {
-                        return Mono.just(responses.poll());
+                        return Mono.just(this.responses.poll());
                     }
 
                 }));
