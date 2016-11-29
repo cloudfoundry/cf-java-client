@@ -147,7 +147,6 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .email("test@email.address")
                 .redirectUri("test-redirect-uri")
                 .build())
-            .log("stream.invite")
             .flatMapIterable(InviteUsersResponse::getNewInvites)
             .single()
             .as(StepVerifier::create)

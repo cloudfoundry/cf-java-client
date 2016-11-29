@@ -124,7 +124,8 @@ public final class FileUtils {
         return Optional.ofNullable(Files.readAttributes(path, PosixFileAttributes.class))
             .map(attributes -> attributes.permissions().stream()
                 .map(PERMISSION_MODES::get)
-                .collect(Collectors.summingInt(i -> i)))
+                .mapToInt(i -> i)
+                .sum())
             .orElse(DEFAULT_PERMISSIONS);
     }
 

@@ -96,7 +96,7 @@ import org.cloudfoundry.util.SortingUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
-import reactor.util.function.Tuple6;
+import reactor.util.function.Tuple4;
 import reactor.util.function.Tuples;
 
 import java.io.InputStream;
@@ -129,7 +129,7 @@ public final class DefaultApplications implements Applications {
 
     private static final int CF_STAGING_NOT_FINISHED = 170002;
 
-    private static final Comparator<LogMessage> LOG_MESSAGE_COMPARATOR = (a, b) -> a.getTimestamp().compareTo(b.getTimestamp());
+    private static final Comparator<LogMessage> LOG_MESSAGE_COMPARATOR = Comparator.comparing(LogMessage::getTimestamp);
 
     private static final Duration LOG_MESSAGE_TIMESPAN = Duration.ofMillis(500);
 
@@ -634,7 +634,7 @@ public final class DefaultApplications implements Applications {
             .otherwise(ExceptionUtils.statusCode(CF_APP_STOPPED_STATS_ERROR), t -> Mono.just(ApplicationStatisticsResponse.builder().build()));
     }
 
-    private static Mono<Tuple6<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse, List<InstanceDetail>, List<String>>>
+    private static Mono<Tuple4<SummaryApplicationResponse, GetStackResponse, List<InstanceDetail>, List<String>>>
     getAuxiliaryContent(CloudFoundryClient cloudFoundryClient, AbstractApplicationResource applicationResource) {
 
         String applicationId = ResourceUtils.getId(applicationResource);
@@ -647,10 +647,8 @@ public final class DefaultApplications implements Applications {
                 getApplicationInstances(cloudFoundryClient, applicationId)
             )
             .then(function((applicationStatisticsResponse, summaryApplicationResponse, applicationInstancesResponse) -> Mono.when(
-                Mono.just(applicationStatisticsResponse),
                 Mono.just(summaryApplicationResponse),
                 requestStack(cloudFoundryClient, stackId),
-                Mono.just(applicationInstancesResponse),
                 toInstanceDetailList(applicationInstancesResponse, applicationStatisticsResponse),
                 toUrls(summaryApplicationResponse.getRoutes())
             )));
@@ -1236,9 +1234,8 @@ public final class DefaultApplications implements Applications {
         return isNotIn(resource, STOPPED_STATE) ? stopApplication(cloudFoundryClient, ResourceUtils.getId(resource)) : Mono.just(resource);
     }
 
-    private static ApplicationDetail toApplicationDetail(ApplicationStatisticsResponse applicationStatisticsResponse, SummaryApplicationResponse summaryApplicationResponse,
-                                                         GetStackResponse getStackResponse, ApplicationInstancesResponse applicationInstancesResponse,
-                                                         List<InstanceDetail> instanceDetails, List<String> urls) {
+    private static ApplicationDetail toApplicationDetail(SummaryApplicationResponse summaryApplicationResponse, GetStackResponse getStackResponse, List<InstanceDetail> instanceDetails,
+                                                         List<String> urls) {
         return ApplicationDetail.builder()
             .buildpack(getBuildpack(summaryApplicationResponse))
             .diskQuota(summaryApplicationResponse.getDiskQuota())

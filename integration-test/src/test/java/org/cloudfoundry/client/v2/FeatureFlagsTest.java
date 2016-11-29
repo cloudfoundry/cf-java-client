@@ -114,12 +114,10 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
                     ))))
             .collectList()
             .as(StepVerifier::create)
-            .consumeNextWith(list -> {
-                list.forEach(consumer((getResponse, setResponse, resetResponse) -> {
-                    assertThat(setResponse.getEnabled()).isNotEqualTo(getResponse.getEnabled());
-                    assertThat(resetResponse.getEnabled()).isEqualTo(getResponse.getEnabled());
-                }));
-            })
+            .consumeNextWith(list -> list.forEach(consumer((getResponse, setResponse, resetResponse) -> {
+                assertThat(setResponse.getEnabled()).isNotEqualTo(getResponse.getEnabled());
+                assertThat(resetResponse.getEnabled()).isEqualTo(getResponse.getEnabled());
+            })))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }

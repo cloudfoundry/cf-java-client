@@ -16,10 +16,6 @@
 
 package org.cloudfoundry.uaa.clients;
 
-/**
- * The response from the list Members request
- */
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
