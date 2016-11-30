@@ -22,6 +22,7 @@ import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantBrowserRequest;
+import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantHybridRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByImplicitGrantBrowserRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithAuthorizationCodeGrantRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithIdTokenRequest;
@@ -83,6 +84,42 @@ public final class ReactorAuthorizationsTest extends AbstractUaaApiTest {
                 .build())
             .as(StepVerifier::create)
             .expectNext("http://redirect.to/login")
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void authorizeByAuthorizationCodeGrantHybrid() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/oauth/authorize?client_id=app&redirect_uri=http://localhost:8080/app/&scope=openid&response_type=code%20id_token")
+                .build())
+            .response(TestResponse.builder()
+                .status(FOUND)
+                .header("Location", "http://localhost:8080/app/#token_type=bearer&" +
+                    "id_token=eyJhbGciOiJIUzI1NiIsImtpZCI6ImxlZ2FjeS10b2tlbi1rZXkiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiI3ZmQyZDAyNi0yNzA0LTQ5MjItODA4YS1lZThiZGFhY2RkMjciLCJ1c2VyX25hbWUiOiJtYXJpc3NhIiwib3Jp" +
+                    "Z2luIjoidWFhIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3VhYS9vYXV0aC90b2tlbiIsImNsaWVudF9pZCI6ImFwcCIsImF1ZCI6WyJhcHAiXSwiemlkIjoidWFhIiwidXNlcl9pZCI6IjdmZDJkMDI2LTI3MDQtNDkyMi04" +
+                    "MDhhLWVlOGJkYWFjZGQyNyIsImF6cCI6ImFwcCIsInNjb3BlIjpbIm9wZW5pZCJdLCJleHAiOjE0NzQ5NjY2ODAsImlhdCI6MTQ3NDkyMzQ4MCwianRpIjoiOGRmMjBhNDZjOThjNGYxNGIzOTBjMTdlZWU4YTM1NmYiLCJlbWFpbCI6" +
+                    "Im1hcmlzc2FAdGVzdC5vcmciLCJyZXZfc2lnIjoiOTE3NjM3NTUiLCJjaWQiOiJhcHAifQ.YvgEJn1zG30IO_JL5iEY0ytT5rQIPscrAuZa0SBrU0I&" +
+                    "code=8wcTGEtsLK&" +
+                    "expires_in=43199&jti=8df20a46c98c4f14b390c17eee8a356f")
+                .build())
+            .build());
+
+        this.authorizations
+            .authorizationCodeGrantHybrid(AuthorizeByAuthorizationCodeGrantHybridRequest.builder()
+                .clientId("app")
+                .redirectUri("http://localhost:8080/app/")
+                .scope("openid")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext("http://localhost:8080/app/#token_type=bearer&" +
+                "id_token=eyJhbGciOiJIUzI1NiIsImtpZCI6ImxlZ2FjeS10b2tlbi1rZXkiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiI3ZmQyZDAyNi0yNzA0LTQ5MjItODA4YS1lZThiZGFhY2RkMjciLCJ1c2VyX25hbWUiOiJtYXJpc3NhIiwib3JpZ2lu" +
+                "IjoidWFhIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3VhYS9vYXV0aC90b2tlbiIsImNsaWVudF9pZCI6ImFwcCIsImF1ZCI6WyJhcHAiXSwiemlkIjoidWFhIiwidXNlcl9pZCI6IjdmZDJkMDI2LTI3MDQtNDkyMi04MDhhLWVl" +
+                "OGJkYWFjZGQyNyIsImF6cCI6ImFwcCIsInNjb3BlIjpbIm9wZW5pZCJdLCJleHAiOjE0NzQ5NjY2ODAsImlhdCI6MTQ3NDkyMzQ4MCwianRpIjoiOGRmMjBhNDZjOThjNGYxNGIzOTBjMTdlZWU4YTM1NmYiLCJlbWFpbCI6Im1hcmlzc2FA" +
+                "dGVzdC5vcmciLCJyZXZfc2lnIjoiOTE3NjM3NTUiLCJjaWQiOiJhcHAifQ.YvgEJn1zG30IO_JL5iEY0ytT5rQIPscrAuZa0SBrU0I&" +
+                "code=8wcTGEtsLK&" +
+                "expires_in=43199&jti=8df20a46c98c4f14b390c17eee8a356f")
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }

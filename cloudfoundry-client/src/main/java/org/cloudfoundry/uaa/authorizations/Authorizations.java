@@ -40,7 +40,15 @@ public interface Authorizations {
     Mono<String> authorizationCodeGrantBrowser(AuthorizeByAuthorizationCodeGrantBrowserRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#browser-flow6">Authorize By Implicit Grant (Browser)</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#hybrid-flow">Authorize By Authorization Code Grant (Hybrid)</a> request
+     *
+     * @param request Authorize By Authorization Code Grant (Hybrid) request
+     * @return the authentication redirect URI
+     */
+    Mono<String> authorizationCodeGrantHybrid(AuthorizeByAuthorizationCodeGrantHybridRequest request);
+
+    /**
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#implicit-grant">Authorize By Implicit Grant (Browser)</a> request
      *
      * @param request Authorize By Implicit Grant (Browser) request
      * @return the authentication redirect URI
