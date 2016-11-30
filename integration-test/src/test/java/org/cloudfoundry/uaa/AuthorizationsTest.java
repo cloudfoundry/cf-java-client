@@ -19,6 +19,7 @@ package org.cloudfoundry.uaa;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantBrowserRequest;
+import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantHybridRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByImplicitGrantBrowserRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithAuthorizationCodeGrantRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithIdTokenRequest;
@@ -67,10 +68,17 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/134345481")
     @Test
     public void authorizeByAuthorizationCodeGrantHybrid() throws TimeoutException, InterruptedException {
-        //
+        this.uaaClient.authorizations()
+            .authorizationCodeGrantHybrid(AuthorizeByAuthorizationCodeGrantHybridRequest.builder()
+                .clientId(this.clientId)
+                .redirectUri("http://redirect.to/app")
+                .build())
+            .as(StepVerifier::create)
+            .consumeNextWith(startsWithExpectation("https://uaa."))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test

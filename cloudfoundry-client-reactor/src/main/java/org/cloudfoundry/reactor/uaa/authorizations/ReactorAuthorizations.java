@@ -24,6 +24,7 @@ import org.cloudfoundry.uaa.ResponseType;
 import org.cloudfoundry.uaa.authorizations.Authorizations;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantBrowserRequest;
+import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantHybridRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByImplicitGrantBrowserRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithAuthorizationCodeGrantRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithIdTokenRequest;
@@ -62,6 +63,16 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
     @Override
     public Mono<String> authorizationCodeGrantBrowser(AuthorizeByAuthorizationCodeGrantBrowserRequest request) {
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE),
+            outbound -> {
+                outbound.headers().remove(AUTHORIZATION);
+                return outbound;
+            })
+            .map(inbound -> inbound.responseHeaders().get(LOCATION));
+    }
+
+    @Override
+    public Mono<String> authorizationCodeGrantHybrid(AuthorizeByAuthorizationCodeGrantHybridRequest request) {
+        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE_AND_ID_TOKEN),
             outbound -> {
                 outbound.headers().remove(AUTHORIZATION);
                 return outbound;
