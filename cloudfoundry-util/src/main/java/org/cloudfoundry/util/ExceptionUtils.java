@@ -19,10 +19,8 @@ package org.cloudfoundry.util;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * Utilities for dealing with {@link Exception}s
@@ -69,9 +67,8 @@ public final class ExceptionUtils {
      * @return {@code true} if the exception is a {@link CloudFoundryException} and its code matches
      */
     public static Predicate<? super Throwable> statusCode(Integer... codes) {
-        List<Integer> codesList = new ArrayList<>(Arrays.asList(codes));
-
-        return t -> t instanceof CloudFoundryException && codesList.contains(((CloudFoundryException) t).getCode());
+        return t -> t instanceof CloudFoundryException &&
+            Stream.of(codes).anyMatch(candidate -> ((CloudFoundryException) t).getCode().equals(candidate));
     }
 
 }
