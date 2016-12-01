@@ -129,6 +129,8 @@ public final class DefaultApplications implements Applications {
 
     private static final int CF_STAGING_NOT_FINISHED = 170002;
 
+    private static final int CF_STAGING_TIME_EXPIRED = 170007;
+
     private static final Comparator<LogMessage> LOG_MESSAGE_COMPARATOR = Comparator.comparing(LogMessage::getTimestamp);
 
     private static final Duration LOG_MESSAGE_TIMESPAN = Duration.ofMillis(500);
@@ -624,9 +626,8 @@ public final class DefaultApplications implements Applications {
 
     private static Mono<ApplicationInstancesResponse> getApplicationInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestApplicationInstances(cloudFoundryClient, applicationId)
-            .otherwise(ExceptionUtils.statusCode(CF_BUILDPACK_COMPILED_FAILED), t -> Mono.just(ApplicationInstancesResponse.builder().build()))
-            .otherwise(ExceptionUtils.statusCode(CF_INSTANCES_ERROR), t -> Mono.just(ApplicationInstancesResponse.builder().build()))
-            .otherwise(ExceptionUtils.statusCode(CF_STAGING_NOT_FINISHED), t -> Mono.just(ApplicationInstancesResponse.builder().build()));
+            .otherwise(ExceptionUtils.statusCode(CF_BUILDPACK_COMPILED_FAILED, CF_INSTANCES_ERROR, CF_STAGING_NOT_FINISHED, CF_STAGING_TIME_EXPIRED),
+                t -> Mono.just(ApplicationInstancesResponse.builder().build()));
     }
 
     private static Mono<ApplicationStatisticsResponse> getApplicationStatistics(CloudFoundryClient cloudFoundryClient, String applicationId) {
