@@ -25,6 +25,20 @@ import org.immutables.value.Value;
 @Value.Immutable
 abstract class _CreateRouteRequest {
 
+    @Value.Check
+    void checkPorts() {
+        if (getRandomPort() != null && getRandomPort() && getPort() != null) {
+            throw new IllegalStateException("Only one of port and randomPort can be set");
+        }
+    }
+
+    @Value.Check
+    void checkSetup() {
+        if (portSet() && hostOrPathSet()) {
+            throw new IllegalStateException("Cannot set port/randomPort and hostname/path");
+        }
+    }
+
     /**
      * The domain of the route
      */
@@ -43,8 +57,28 @@ abstract class _CreateRouteRequest {
     abstract String getPath();
 
     /**
+     * The port of the route
+     */
+    @Nullable
+    abstract Integer getPort();
+
+    /**
+     * Generate a random port
+     */
+    @Nullable
+    abstract Boolean getRandomPort();
+
+    /**
      * The space to create the route in
      */
     abstract String getSpace();
+
+    private boolean hostOrPathSet() {
+        return getHost() != null || getPath() != null;
+    }
+
+    private boolean portSet() {
+        return (getRandomPort() != null && getRandomPort()) || getPort() != null;
+    }
 
 }

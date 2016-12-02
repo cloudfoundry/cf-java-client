@@ -38,7 +38,7 @@ abstract class _CreateRouteRequest {
      */
     @Nullable
     @QueryParameter("generate_port")
-    abstract String getGeneratePort();
+    abstract Boolean getGeneratePort();
 
     /**
      * The host

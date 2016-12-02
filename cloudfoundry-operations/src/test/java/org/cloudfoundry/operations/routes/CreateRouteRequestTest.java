@@ -35,6 +35,26 @@ public final class CreateRouteRequestTest {
             .build();
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void portConflict() {
+        CreateRouteRequest.builder()
+            .domain("test-domain")
+            .port(123)
+            .randomPort(true)
+            .space("test-space")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void setupConflict() {
+        CreateRouteRequest.builder()
+            .domain("test-domain")
+            .host("test-hostname")
+            .port(123)
+            .space("test-space")
+            .build();
+    }
+
     @Test
     public void valid() {
         CreateRouteRequest.builder()
