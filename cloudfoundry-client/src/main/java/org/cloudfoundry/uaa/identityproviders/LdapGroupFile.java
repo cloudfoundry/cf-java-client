@@ -24,11 +24,11 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum LdapGroupFile {
 
-    NoGroup("ldap/ldap-groups-null.xml"),
+    GROUPS_AS_SCOPES("ldap/ldap-groups-as-scopes.xml"),
 
-    GroupsAsScopes("ldap/ldap-groups-as-scopes.xml"),
+    GROUPS_MAP_TO_SCOPES("ldap/ldap-groups-map-to-scopes.xml"),
 
-    GroupsMapToScopes("ldap/ldap-groups-map-to-scopes.xml");
+    NO_GROUP("ldap/ldap-groups-null.xml");
 
     private final String value;
 
@@ -49,12 +49,12 @@ public enum LdapGroupFile {
     @JsonCreator
     public static LdapGroupFile from(String s) {
         switch (s.toLowerCase()) {
-            case "ldap/ldap-groups-null.xml":
-                return NoGroup;
             case "ldap/ldap-groups-as-scopes.xml":
-                return GroupsAsScopes;
+                return GROUPS_AS_SCOPES;
             case "ldap/ldap-groups-map-to-scopes.xml":
-                return GroupsMapToScopes;
+                return GROUPS_MAP_TO_SCOPES;
+            case "ldap/ldap-groups-null.xml":
+                return NO_GROUP;
             default:
                 throw new IllegalArgumentException(String.format("Unknown ldap group file: %s", s));
         }

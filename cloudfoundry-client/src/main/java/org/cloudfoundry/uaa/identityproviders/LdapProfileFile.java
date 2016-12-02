@@ -24,11 +24,11 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum LdapProfileFile {
 
-    SimpleBind("ldap/ldap-simple-bind.xml"),
+    SEARCH_AND_BIND("ldap/ldap-search-and-bind.xml"),
 
-    SearchAndBind("ldap/ldap-search-and-bind.xml"),
+    SEARCH_AND_COMPARE("ldap/ldap-search-and-compare.xml"),
 
-    SearchAndCompare("ldap/ldap-search-and-compare.xml");
+    SIMPLE_BIND("ldap/ldap-simple-bind.xml");
 
     private final String value;
 
@@ -49,12 +49,12 @@ public enum LdapProfileFile {
     @JsonCreator
     public static LdapProfileFile from(String s) {
         switch (s.toLowerCase()) {
-            case "ldap/ldap-simple-bind.xml":
-                return SimpleBind;
             case "ldap/ldap-search-and-bind.xml":
-                return SearchAndBind;
+                return SEARCH_AND_BIND;
             case "ldap/ldap-search-and-compare.xml":
-                return SearchAndCompare;
+                return SEARCH_AND_COMPARE;
+            case "ldap/ldap-simple-bind.xml":
+                return SIMPLE_BIND;
             default:
                 throw new IllegalArgumentException(String.format("Unknown ldap profile file: %s", s));
         }
