@@ -602,7 +602,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	@Override
-	public LastOperation getLastOperationForAServiceInSpace(String spaceGuid, String serviceName) throws ParseException {
+	public LastOperation getLastOperationForAServiceInSpace(String spaceName, String serviceName) throws ParseException {
 		/*
 		Provides support for the following GET
 		GET /v2/spaces/4aac4aa9-fa1b-478f-b277-0ea1f8c8e127/service_instances?return_user_provided_service_instances=true&q=name%3Abd3bc418-5e54-48d9-8fda-e8def5fb010d-database&inline-relations-depth=1
@@ -610,7 +610,8 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		LastOperation result = new LastOperation();
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		String urlPath = "/v2/spaces/{spaceGuid}/service_instances?return_user_provided_service_instances=true&q=name:{serviceName}&inline-relations-depth=1";
-		urlVars.put("spaceGuid", spaceGuid);
+		CloudSpace space = getSpace(spaceName);
+		urlVars.put("spaceGuid", space.getMeta().getGuid().toString());
 		urlVars.put("serviceName", serviceName);
 		// there will be a single resource because of inline relations depth
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);

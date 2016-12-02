@@ -218,7 +218,7 @@ public interface CloudControllerClient {
 
 	void deleteSpace(String spaceName);
 
-	LastOperation getLastOperationForAServiceInSpace(String spaceGuid, String serviceName) throws ParseException;
+	LastOperation getLastOperationForAServiceInSpace(String spaceName, String serviceName) throws ParseException;
 
 	// Domains and routes management
 
