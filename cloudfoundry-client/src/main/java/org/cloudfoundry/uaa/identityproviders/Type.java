@@ -55,7 +55,7 @@ public enum Type {
     }
 
     @JsonCreator
-    static Type from(String s) {
+    public static Type from(String s) {
         switch (s.toLowerCase()) {
             case "uaa":
                 return INTERNAL;

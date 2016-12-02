@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * The file to be used for group integration.
  */
 public enum TlsConfiguration {
+
     NONE("none"),
 
     SIMPLE("simple"),
@@ -46,7 +47,7 @@ public enum TlsConfiguration {
     }
 
     @JsonCreator
-    static TlsConfiguration from(String s) {
+    public static TlsConfiguration from(String s) {
         switch (s.toLowerCase()) {
             case "none":
                 return NONE;

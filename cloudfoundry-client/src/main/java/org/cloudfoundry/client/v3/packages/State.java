@@ -71,7 +71,7 @@ public enum State {
     }
 
     @JsonCreator
-    static State from(String s) {
+    public static State from(String s) {
         switch (s.toLowerCase()) {
             case "awaiting_upload":
                 return AWAITING_UPLOAD;
