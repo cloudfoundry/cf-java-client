@@ -23,15 +23,15 @@ public final class LdapConfigurationTest {
     @Test(expected = IllegalStateException.class)
     public void noBaseUrl() {
         LdapConfiguration.builder()
-            .ldapProfileFile(LdapProfileFile.SimpleBind)
-            .ldapGroupFile(LdapGroupFile.NoGroup)
+            .ldapProfileFile(LdapProfileFile.SIMPLE_BIND)
+            .ldapGroupFile(LdapGroupFile.NO_GROUP)
             .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noLdapGroupFile() {
         LdapConfiguration.builder()
-            .ldapProfileFile(LdapProfileFile.SimpleBind)
+            .ldapProfileFile(LdapProfileFile.SIMPLE_BIND)
             .baseUrl("test-base-url")
             .build();
     }
@@ -39,7 +39,7 @@ public final class LdapConfigurationTest {
     @Test(expected = IllegalStateException.class)
     public void noLdapProfileFile() {
         LdapConfiguration.builder()
-            .ldapGroupFile(LdapGroupFile.NoGroup)
+            .ldapGroupFile(LdapGroupFile.NO_GROUP)
             .baseUrl("test-base-url")
             .build();
     }
@@ -47,8 +47,8 @@ public final class LdapConfigurationTest {
     @Test
     public void valid() {
         LdapConfiguration.builder()
-            .ldapProfileFile(LdapProfileFile.SimpleBind)
-            .ldapGroupFile(LdapGroupFile.NoGroup)
+            .ldapProfileFile(LdapProfileFile.SIMPLE_BIND)
+            .ldapGroupFile(LdapGroupFile.NO_GROUP)
             .baseUrl("test-base-url")
             .build();
     }
