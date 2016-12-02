@@ -34,7 +34,7 @@ public enum ExternalGroupMappingMode {
     AS_SCOPES;
 
     @JsonCreator
-    static ExternalGroupMappingMode from(String s) {
+    public static ExternalGroupMappingMode from(String s) {
         switch (s.toLowerCase()) {
             case "explicitly_mapped":
                 return EXPLICITLY_MAPPED;

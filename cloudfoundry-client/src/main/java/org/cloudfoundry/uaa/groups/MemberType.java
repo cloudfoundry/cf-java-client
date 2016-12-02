@@ -51,7 +51,7 @@ public enum MemberType {
     }
 
     @JsonCreator
-    static MemberType from(String s) {
+    public static MemberType from(String s) {
         switch (s.toLowerCase()) {
             case "group":
                 return GROUP;

@@ -67,7 +67,7 @@ public enum State {
     }
 
     @JsonCreator
-    static State from(String s) {
+    public static State from(String s) {
         switch (s.toLowerCase()) {
             case "expired":
                 return EXPIRED;

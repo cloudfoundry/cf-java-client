@@ -34,7 +34,7 @@ public enum KeyType {
     RSA;
 
     @JsonCreator
-    static KeyType from(String s) {
+    public static KeyType from(String s) {
         switch (s.toLowerCase()) {
             case "mac":
                 return MAC;

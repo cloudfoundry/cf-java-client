@@ -45,7 +45,7 @@ public enum ServiceInstanceType {
     }
 
     @JsonCreator
-    static ServiceInstanceType from(String s) {
+    public static ServiceInstanceType from(String s) {
         switch (s.toLowerCase()) {
             case "managed_service_instance":
                 return MANAGED;
