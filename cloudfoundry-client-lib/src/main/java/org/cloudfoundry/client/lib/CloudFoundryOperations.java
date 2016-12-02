@@ -236,12 +236,12 @@ public interface CloudFoundryOperations {
 
 	/**
 	 *
-	 * @param spaceGuid
+	 * @param spaceName
 	 * @param serviceName
 	 * @return the last_operation data of the service instance / unpacked
 	 * @throws ParseException
 	 */
-	LastOperation getLastOperationForAServiceInSpace(String spaceGuid, String serviceName) throws ParseException;
+	LastOperation getLastOperationForAServiceInSpace(String spaceName, String serviceName) throws ParseException;
 
 	/**
 	 * Get list of CloudOrganizations for the current cloud.

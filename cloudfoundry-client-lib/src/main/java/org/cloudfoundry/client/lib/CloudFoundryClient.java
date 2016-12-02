@@ -603,8 +603,8 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	}
 
 	@Override
-	public LastOperation getLastOperationForAServiceInSpace(String spaceGuid, String serviceName) throws ParseException
-    { return cc.getLastOperationForAServiceInSpace(spaceGuid, serviceName); }
+	public LastOperation getLastOperationForAServiceInSpace(String spaceName, String serviceName) throws ParseException
+    { return cc.getLastOperationForAServiceInSpace(spaceName, serviceName); }
 
 	@Override
 	public CloudSpace getSpace(String spaceName) {
