@@ -26,13 +26,14 @@ public class LastOperation {
         this.simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     }
 
-
     public Date getCreatedAt() {
         return createdAt;
     }
 
     public void setCreatedAt(String createdAt) throws ParseException {
-        this.createdAt = simpleDateFormat.parse(createdAt);
+        if (createdAt != null) {
+            this.createdAt = simpleDateFormat.parse(createdAt);
+        }
     }
 
     public String getDescription() {
@@ -56,7 +57,9 @@ public class LastOperation {
     }
 
     public void setUpdatedAt(String updatedAt) throws ParseException {
-        this.updatedAt = simpleDateFormat.parse(updatedAt);
+        if (updatedAt != null) {
+            this.updatedAt = simpleDateFormat.parse(updatedAt);
+        }
     }
 
     public String getType() {
