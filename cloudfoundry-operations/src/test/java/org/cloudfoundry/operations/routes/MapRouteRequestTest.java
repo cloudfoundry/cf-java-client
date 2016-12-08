@@ -38,6 +38,24 @@ public final class MapRouteRequestTest {
             .build();
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void portConflict() {
+        MapRouteRequest.builder()
+            .domain("test-domain")
+            .port(123)
+            .randomPort(true)
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void setupConflict() {
+        MapRouteRequest.builder()
+            .domain("test-domain")
+            .host("test-hostname")
+            .port(123)
+            .build();
+    }
+
     @Test
     public void validMax() {
         MapRouteRequest.builder()
@@ -55,5 +73,6 @@ public final class MapRouteRequestTest {
             .domain("test-domain")
             .build();
     }
+
 
 }

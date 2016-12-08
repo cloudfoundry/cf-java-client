@@ -18,25 +18,17 @@ package org.cloudfoundry.operations.routes;
 
 import org.junit.Test;
 
-public final class UnmapRouteRequestTest {
-
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationName() {
-        UnmapRouteRequest.builder()
-            .domain("test-domain")
-            .build();
-    }
+public final class DeleteRouteRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noDomain() {
-        UnmapRouteRequest.builder()
-            .applicationName("test-applicationName")
+        DeleteRouteRequest.builder()
             .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void setupConflict() {
-        UnmapRouteRequest.builder()
+        DeleteRouteRequest.builder()
             .domain("test-domain")
             .host("test-hostname")
             .port(123)
@@ -45,8 +37,7 @@ public final class UnmapRouteRequestTest {
 
     @Test
     public void valid() {
-        UnmapRouteRequest.builder()
-            .applicationName("test-applicationName")
+        DeleteRouteRequest.builder()
             .domain("test-domain")
             .build();
     }

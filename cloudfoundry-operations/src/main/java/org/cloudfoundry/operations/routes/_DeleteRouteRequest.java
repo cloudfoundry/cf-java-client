@@ -25,6 +25,13 @@ import org.immutables.value.Value;
 @Value.Immutable
 abstract class _DeleteRouteRequest {
 
+    @Value.Check
+    void checkSetup() {
+        if (getPort() != null && hostOrPathSet()) {
+            throw new IllegalStateException("Cannot specify port together with hostname and/or path");
+        }
+    }
+
     /**
      * The domain of the route
      */
@@ -43,5 +50,15 @@ abstract class _DeleteRouteRequest {
      */
     @Nullable
     abstract String getPath();
+
+    /**
+     * The port of the route
+     */
+    @Nullable
+    abstract Integer getPort();
+
+    private boolean hostOrPathSet() {
+        return getHost() != null || getPath() != null;
+    }
 
 }

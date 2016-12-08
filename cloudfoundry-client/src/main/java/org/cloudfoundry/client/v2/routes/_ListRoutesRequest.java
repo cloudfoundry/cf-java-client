@@ -57,4 +57,11 @@ abstract class _ListRoutesRequest extends PaginatedRequest {
     @Nullable
     abstract List<String> getPaths();
 
+    /**
+     * The port
+     */
+    @InFilterParameter("port")
+    @Nullable
+    abstract Integer getPort();
+
 }
