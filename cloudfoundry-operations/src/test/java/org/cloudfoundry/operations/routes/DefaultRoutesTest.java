@@ -324,7 +324,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                 .path("test-path")
                 .build())
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Route test-host.test-domain does not exist"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Route for test-domain does not exist"))
             .verify(Duration.ofSeconds(5));
     }
 
@@ -716,7 +716,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                 .path("test-path")
                 .build())
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Route test-host.test-domain does not exist"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Route for test-domain does not exist"))
             .verify(Duration.ofSeconds(5));
     }
 
