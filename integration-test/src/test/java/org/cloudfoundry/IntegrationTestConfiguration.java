@@ -20,7 +20,9 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
+import com.github.zafarkhaja.semver.Version;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
@@ -190,6 +192,18 @@ public class IntegrationTestConfiguration {
             .organization(organizationName)
             .space(spaceName)
             .build();
+    }
+
+    @Bean
+    CloudFoundryVersionConditionalRule cloudFoundryVersionConditionalRule(CloudFoundryClient cloudFoundryClient) {
+        return cloudFoundryClient.info()
+            .get(GetInfoRequest.builder()
+                .build())
+            .map(response -> Version.valueOf(response.getApiVersion()))
+            .map(CloudFoundryVersionConditionalRule::new)
+            .doOnSubscribe(s -> this.logger.debug(">> CLOUD FOUNDRY VERSION <<"))
+            .doOnSuccess(r -> this.logger.debug("<< CLOUD FOUNDRY VERSION >>"))
+            .block();
     }
 
     @Bean
