@@ -54,7 +54,7 @@ public abstract class AbstractApplicationEntity {
     @Deprecated
     @JsonProperty("debug")
     @Nullable
-    public abstract Boolean getDebug();
+    public abstract String getDebug();
 
     /**
      * The detected start command
@@ -184,4 +184,3 @@ public abstract class AbstractApplicationEntity {
     public abstract String getState();
 
 }
-
