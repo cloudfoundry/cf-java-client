@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.operations.applications.ApplicationHealthCheck;
 import org.cloudfoundry.operations.applications.PushApplicationRequest;
 import org.cloudfoundry.operations.domains.CreateDomainRequest;
@@ -44,6 +45,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.IfCloudFoundryVersion.CloudFoundryVersion.PCF_1_8;
 import static org.cloudfoundry.operations.routes.Level.ORGANIZATION;
 import static org.cloudfoundry.operations.routes.Level.SPACE;
 
@@ -76,6 +78,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = PCF_1_8)
     @Test
     public void checkTruePrivateDomainNoHost() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
