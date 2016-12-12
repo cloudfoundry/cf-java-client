@@ -57,7 +57,7 @@ abstract class _CreateApplicationRequest {
     @Deprecated
     @JsonProperty("debug")
     @Nullable
-    abstract Boolean getDebug();
+    abstract String getDebug();
 
     /**
      * The command detected by the buildpack during staging

@@ -63,7 +63,7 @@ abstract class _UpdateApplicationRequest {
     @Deprecated
     @JsonProperty("debug")
     @Nullable
-    abstract Boolean getDebug();
+    abstract String getDebug();
 
     /**
      * Use diego to stage and to run when available
