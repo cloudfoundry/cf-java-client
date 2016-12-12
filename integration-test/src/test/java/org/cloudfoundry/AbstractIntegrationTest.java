@@ -49,6 +49,10 @@ public abstract class AbstractIntegrationTest {
     public final TestName testName = new TestName();
 
     @Autowired
+    @Rule
+    public CloudFoundryVersionConditionalRule cloudFoundryVersion;
+
+    @Autowired
     protected NameFactory nameFactory;
 
     @Before
