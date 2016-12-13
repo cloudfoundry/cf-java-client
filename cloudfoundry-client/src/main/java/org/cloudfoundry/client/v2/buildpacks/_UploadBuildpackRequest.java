@@ -20,7 +20,7 @@ package org.cloudfoundry.client.v2.buildpacks;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.immutables.value.Value;
 
-import java.io.InputStream;
+import java.nio.file.Path;
 
 /**
  * The request payload to Upload a Buildpack
@@ -32,7 +32,7 @@ abstract class _UploadBuildpackRequest {
      * A binary zip file containing the buildpack bits.
      */
     @JsonIgnore
-    abstract InputStream getBuildpack();
+    abstract Path getBuildpack();
 
     /**
      * The buildpack id

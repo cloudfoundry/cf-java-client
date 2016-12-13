@@ -19,7 +19,7 @@ package org.cloudfoundry.client.v3.packages;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.immutables.value.Value;
 
-import java.io.InputStream;
+import java.nio.file.Path;
 
 /**
  * The request payload for the Upload Package operation
@@ -31,7 +31,7 @@ abstract class _UploadPackageRequest {
      * The bits
      */
     @JsonIgnore
-    abstract InputStream getBits();
+    abstract Path getBits();
 
     /**
      * The package id

@@ -40,7 +40,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.HttpException;
+import reactor.ipc.netty.http.client.HttpClientException;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -77,7 +77,7 @@ public final class TokensTest extends AbstractIntegrationTest {
                     .scope("scim.userids")
                     .build()))
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(HttpException.class).hasMessage("HTTP request failed with code: 403"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(HttpClientException.class).hasMessage("HTTP request failed with code: 403"))
             .verify(Duration.ofMinutes(5));
     }
 

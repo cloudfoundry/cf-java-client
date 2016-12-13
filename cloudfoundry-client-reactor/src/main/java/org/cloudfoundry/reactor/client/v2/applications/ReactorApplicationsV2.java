@@ -54,15 +54,22 @@ import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.HttpClientRequest;
-import reactor.ipc.netty.http.HttpClientResponse;
+import reactor.ipc.netty.http.client.HttpClientRequest;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 
 /**
  * The Reactor-based implementation of {@link ApplicationsV2}
  */
 public final class ReactorApplicationsV2 extends AbstractClientV2Operations implements ApplicationsV2 {
+
+    private final ConnectionContext connectionContext;
 
     /**
      * Creates an instance
@@ -73,6 +80,7 @@ public final class ReactorApplicationsV2 extends AbstractClientV2Operations impl
      */
     public ReactorApplicationsV2(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider);
+        this.connectionContext = connectionContext;
     }
 
     @Override
@@ -98,13 +106,13 @@ public final class ReactorApplicationsV2 extends AbstractClientV2Operations impl
     @Override
     public Flux<byte[]> download(DownloadApplicationRequest request) {
         return get(request, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "download"), HttpClientRequest::followRedirect)
-            .flatMap(HttpClientResponse::receiveByteArray);
+            .flatMap(response -> response.receive().asByteArray());
     }
 
     @Override
     public Flux<byte[]> downloadDroplet(DownloadApplicationDropletRequest request) {
         return get(request, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "droplet", "download"), HttpClientRequest::followRedirect)
-            .flatMap(HttpClientResponse::receiveByteArray);
+            .flatMap(response -> response.receive().asByteArray());
     }
 
     @Override
@@ -172,17 +180,22 @@ public final class ReactorApplicationsV2 extends AbstractClientV2Operations impl
         return put(request, UpdateApplicationResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId()));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Mono<UploadApplicationResponse> upload(UploadApplicationRequest request) {
         return put(request, UploadApplicationResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "bits"),
             outbound -> outbound
-                .addPart(part -> part.setContentDispositionFormData("resources")
-                    .addHeader(CONTENT_TYPE, APPLICATION_JSON)
-                    .send(request.getResources()))
-                .addPart(part -> part.setContentDispositionFormData("application", "application.zip")
-                    .addHeader(CONTENT_TYPE, APPLICATION_ZIP)
-                    .sendInputStream(request.getApplication()))
-                .done());
+                .disableChunkedTransfer()
+                .sendMultipart(form -> {
+                    try (InputStream resources = new ByteArrayInputStream(this.connectionContext.getObjectMapper().writeValueAsBytes(request.getResources()))) {
+                        form
+                            .textFile("resources", resources, APPLICATION_JSON)
+                            .file("application", "application.zip", request.getApplication().toFile(), APPLICATION_ZIP);
+                    } catch (IOException e) {
+                        throw Exceptions.propagate(e);
+                    }
+                })
+                .then());
     }
 
 }

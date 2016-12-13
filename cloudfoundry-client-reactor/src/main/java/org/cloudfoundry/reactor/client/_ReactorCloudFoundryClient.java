@@ -95,7 +95,7 @@ import org.cloudfoundry.reactor.client.v3.servicebindings.ReactorServiceBindings
 import org.cloudfoundry.reactor.client.v3.tasks.ReactorTasks;
 import org.immutables.value.Value;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.HttpClient;
+import reactor.ipc.netty.http.client.HttpClient;
 
 /**
  * The Reactor-based implementation of {@link CloudFoundryClient}

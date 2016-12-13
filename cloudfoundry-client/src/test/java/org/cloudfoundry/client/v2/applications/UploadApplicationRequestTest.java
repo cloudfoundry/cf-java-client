@@ -18,11 +18,12 @@ package org.cloudfoundry.client.v2.applications;
 
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public final class UploadApplicationRequestTest {
 
-    private static final ByteArrayInputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[0]);
+    private static final Path TEST_APPLICATION = Paths.get("/");
 
     @Test(expected = IllegalStateException.class)
     public void noApplication() {
@@ -34,14 +35,14 @@ public final class UploadApplicationRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
         UploadApplicationRequest.builder()
-            .application(EMPTY_STREAM)
+            .application(TEST_APPLICATION)
             .build();
     }
 
     @Test
     public void valid() {
         UploadApplicationRequest.builder()
-            .application(EMPTY_STREAM)
+            .application(TEST_APPLICATION)
             .applicationId("test-application-id")
             .build();
     }

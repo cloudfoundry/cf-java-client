@@ -278,12 +278,14 @@ public final class ReactorBuildpacksTest extends AbstractClientApiTest {
 
                     assertThat(body.readString(Charset.defaultCharset()))
                         .isEqualTo("--" + boundary + "\r\n" +
-                            "Content-Disposition: form-data; name=\"buildpack\"; filename=\"test-filename\"\r\n" +
-                            "Content-Type: application/zip\r\n" +
+                            "content-disposition: form-data; name=\"buildpack\"; filename=\"test-filename\"\r\n" +
+                            "content-length: 13\r\n" +
+                            "content-type: application/zip\r\n" +
+                            "content-transfer-encoding: application/octet-stream\r\n" +
                             "\r\n" +
                             "test-content\n" +
                             "\r\n" +
-                            "--" + boundary + "--");
+                            "--" + boundary + "--\r\n");
                 }))
                 .build())
             .response(TestResponse.builder()
@@ -294,7 +296,7 @@ public final class ReactorBuildpacksTest extends AbstractClientApiTest {
 
         this.buildpacks
             .upload(UploadBuildpackRequest.builder()
-                .buildpack(new ClassPathResource("fixtures/client/v2/buildpacks/test-buildpack.zip").getInputStream())
+                .buildpack(new ClassPathResource("fixtures/client/v2/buildpacks/test-buildpack.zip").getFile().toPath())
                 .buildpackId("test-buildpack-id")
                 .filename("test-filename")
                 .build())

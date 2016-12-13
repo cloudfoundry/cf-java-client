@@ -27,8 +27,7 @@ import org.junit.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 
@@ -37,14 +36,12 @@ import static org.mockito.Mockito.when;
 
 public final class DefaultBuildpacksTest extends AbstractOperationsTest {
 
-    private final ByteArrayInputStream stream = new ByteArrayInputStream(new byte[0]);
-
-    private final DefaultBuildpacks buildpacks = new DefaultBuildpacks(Mono.just(this.cloudFoundryClient), p -> this.stream);
+    private final DefaultBuildpacks buildpacks = new DefaultBuildpacks(Mono.just(this.cloudFoundryClient));
 
     @Test
     public void create() {
         requestCreateBuildpack(this.cloudFoundryClient, "test-buildpack", 1, true);
-        requestUploadBuildpack(this.cloudFoundryClient, "test-buildpack-id", this.stream, "test-buildpack.zip");
+        requestUploadBuildpack(this.cloudFoundryClient, "test-buildpack-id", Paths.get("test-buildpack"), "test-buildpack.zip");
 
         this.buildpacks
             .create(CreateBuildpackRequest.builder()
@@ -102,7 +99,7 @@ public final class DefaultBuildpacksTest extends AbstractOperationsTest {
                     .build()));
     }
 
-    private static void requestUploadBuildpack(CloudFoundryClient cloudFoundryClient, String buildpackId, InputStream buildpack, String filename) {
+    private static void requestUploadBuildpack(CloudFoundryClient cloudFoundryClient, String buildpackId, Path buildpack, String filename) {
         when(cloudFoundryClient.buildpacks()
             .upload(org.cloudfoundry.client.v2.buildpacks.UploadBuildpackRequest.builder()
                 .buildpackId(buildpackId)

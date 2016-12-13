@@ -64,7 +64,7 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
     public Mono<String> authorizationCodeGrantBrowser(AuthorizeByAuthorizationCodeGrantBrowserRequest request) {
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE),
             outbound -> {
-                outbound.headers().remove(AUTHORIZATION);
+                outbound.requestHeaders().remove(AUTHORIZATION);
                 return outbound;
             })
             .map(inbound -> inbound.responseHeaders().get(LOCATION));
@@ -74,7 +74,7 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
     public Mono<String> authorizationCodeGrantHybrid(AuthorizeByAuthorizationCodeGrantHybridRequest request) {
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE_AND_ID_TOKEN),
             outbound -> {
-                outbound.headers().remove(AUTHORIZATION);
+                outbound.requestHeaders().remove(AUTHORIZATION);
                 return outbound;
             })
             .map(inbound -> inbound.responseHeaders().get(LOCATION));
@@ -84,7 +84,7 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
     public Mono<String> implicitGrantBrowser(AuthorizeByImplicitGrantBrowserRequest request) {
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.TOKEN),
             outbound -> {
-                outbound.headers().remove(AUTHORIZATION);
+                outbound.requestHeaders().remove(AUTHORIZATION);
                 return outbound;
             })
             .map(inbound -> inbound.responseHeaders().get(LOCATION));
@@ -94,7 +94,7 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
     public Mono<String> openIdWithAuthorizationCodeAndIdToken(AuthorizeByOpenIdWithAuthorizationCodeGrantRequest request) {
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE_AND_ID_TOKEN),
             outbound -> {
-                outbound.headers().remove(AUTHORIZATION);
+                outbound.requestHeaders().remove(AUTHORIZATION);
                 return outbound;
             })
             .map(inbound -> inbound.responseHeaders().get(LOCATION));

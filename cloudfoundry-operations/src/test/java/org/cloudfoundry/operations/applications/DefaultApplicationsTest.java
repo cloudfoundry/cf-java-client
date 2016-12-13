@@ -108,8 +108,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Arrays;
@@ -129,11 +128,9 @@ import static org.mockito.Mockito.when;
 
 public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
-    private InputStream applicationBits = new ByteArrayInputStream("test-application".getBytes());
-
     private RandomWords randomWords = mock(RandomWords.class, RETURNS_SMART_NULLS);
 
-    private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), p -> this.applicationBits, Mono.just(TEST_SPACE_ID),
+    private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID),
         this.randomWords);
 
     @Test
@@ -1153,7 +1150,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
         requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", Paths.get("test-application"), "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
@@ -1184,7 +1181,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
         requestRoutes(this.cloudFoundryClient, "test-domain-id", "test-host", null, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", Paths.get("test-application"), "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
@@ -1216,7 +1213,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
         requestRoutes(this.cloudFoundryClient, "test-domain-id", null, null, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", Paths.get("test-application"), "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
@@ -1263,7 +1260,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
         requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", Paths.get("test-application"), "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
@@ -1295,7 +1292,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-host", null);
         requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-host", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", Paths.get("test-application"), "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
@@ -1328,7 +1325,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", null, null);
         requestCreateRoute(this.cloudFoundryClient, "test-domain-id", null, null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", Paths.get("test-application"), "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
@@ -1381,7 +1378,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
         requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", Paths.get("test-application"), "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
@@ -1410,7 +1407,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
         requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", Paths.get("test-application"), "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
@@ -1437,7 +1434,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
         requestSharedDomains(this.cloudFoundryClient, "test-domain-id");
-        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", Paths.get("test-application"), "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
@@ -1468,7 +1465,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
         requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", Paths.get("test-application"), "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
 
@@ -1498,7 +1495,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name-test-adjective-test-noun", null);
         requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name-test-adjective-test-noun", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", Paths.get("test-application"), "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
@@ -1531,7 +1528,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
         requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", Paths.get("test-application"), "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
@@ -1562,7 +1559,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
         requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", Paths.get("test-application"), "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
@@ -1593,7 +1590,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
         requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", Paths.get("test-application"), "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
@@ -1623,7 +1620,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
         requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-        requestUpload(this.cloudFoundryClient, "test-application-id", this.applicationBits, "test-job-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", Paths.get("test-application"), "test-job-id");
         requestJobFailure(this.cloudFoundryClient, "test-job-id");
 
         this.applications
@@ -3209,7 +3206,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                     .build()));
     }
 
-    private static void requestUpload(CloudFoundryClient cloudFoundryClient, String applicationId, InputStream application, String jobId) {
+    private static void requestUpload(CloudFoundryClient cloudFoundryClient, String applicationId, Path application, String jobId) {
         when(cloudFoundryClient.applicationsV2()
             .upload(UploadApplicationRequest.builder()
                 .applicationId(applicationId)

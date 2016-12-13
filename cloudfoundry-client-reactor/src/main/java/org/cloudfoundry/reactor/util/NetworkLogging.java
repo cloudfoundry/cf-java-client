@@ -21,8 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.HttpClientResponse;
-import reactor.ipc.netty.http.HttpException;
+import reactor.ipc.netty.http.client.HttpClientException;
+import reactor.ipc.netty.http.client.HttpClientResponse;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -58,7 +58,7 @@ public final class NetworkLogging {
 
     public static Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> response(String uri) {
         return inbound -> inbound
-            .doOnSuccess(i -> {
+            .doOnNext(i -> {
                 List<String> warnings = i.responseHeaders().getAll(CF_WARNINGS);
 
                 if (warnings.isEmpty()) {
@@ -68,8 +68,8 @@ public final class NetworkLogging {
                 }
             })
             .doOnError(t -> {
-                if (t instanceof HttpException) {
-                    RESPONSE_LOGGER.debug("{}    {}", ((HttpException) t).getResponseStatus().code(), uri);
+                if (t instanceof HttpClientException) {
+                    RESPONSE_LOGGER.debug("{}    {}", ((HttpClientException) t).getResponseStatus().code(), uri);
                 }
             });
     }

@@ -21,7 +21,7 @@ import org.cloudfoundry.Nullable;
 import org.cloudfoundry.QueryParameter;
 import org.immutables.value.Value;
 
-import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -34,7 +34,7 @@ abstract class _UploadApplicationRequest {
      * A binary zip file containing the application bits
      */
     @JsonIgnore
-    abstract InputStream getApplication();
+    abstract Path getApplication();
 
     /**
      * The application id

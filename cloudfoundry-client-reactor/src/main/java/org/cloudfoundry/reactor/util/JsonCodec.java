@@ -19,42 +19,48 @@ package org.cloudfoundry.reactor.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
+import io.netty.handler.codec.json.JsonObjectDecoder;
 import io.netty.util.AsciiString;
 import reactor.core.Exceptions;
-import reactor.ipc.netty.http.HttpClientRequest;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.ipc.netty.http.client.HttpClientRequest;
+import reactor.ipc.netty.http.client.HttpClientResponse;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.function.Function;
 
 public final class JsonCodec {
+
+    public static final String JSON_DECODER = "jsonDecoder";
 
     private static final AsciiString APPLICATION_JSON = new AsciiString("application/json; charset=utf-8");
 
     private static final AsciiString CONTENT_TYPE = new AsciiString("Content-Type");
 
-    public static <T> Function<InputStream, T> decode(ObjectMapper objectMapper, Class<T> type) {
-        return inputStream -> {
-            try (InputStream in = inputStream) {
-                return objectMapper.readValue(in, type);
-            } catch (IOException e) {
-                throw new JsonParsingException("Unable to parse JSON Payload", e, inputStream);
-            }
-        };
+    public static <T> Function<Mono<HttpClientResponse>, Flux<T>> decode(ObjectMapper objectMapper, Class<T> type) {
+        return response -> response
+            .flatMap(inbound -> inbound.addChannelHandler(JSON_DECODER, new JsonObjectDecoder()).receive().aggregate())
+            .map(byteBuf -> {
+                try {
+                    return objectMapper.readValue(byteBuf.toString(Charset.defaultCharset()), type);
+                } catch (IOException e) {
+                    throw Exceptions.propagate(e);
+                }
+            });
     }
 
     static <T> Function<T, ByteBuf> encode(ObjectMapper objectMapper, HttpClientRequest request) {
         request.header(CONTENT_TYPE, APPLICATION_JSON);
-        return source -> encode(request.delegate().alloc(), objectMapper, source);
-    }
 
-    static <T> ByteBuf encode(ByteBufAllocator allocator, ObjectMapper objectMapper, T source) {
-        try {
-            return allocator.directBuffer().writeBytes(objectMapper.writeValueAsBytes(source));
-        } catch (JsonProcessingException e) {
-            throw Exceptions.propagate(e);
-        }
+        return source -> {
+            try {
+                return request.channel().alloc().directBuffer().writeBytes(objectMapper.writeValueAsBytes(source));
+            } catch (JsonProcessingException e) {
+                throw Exceptions.propagate(e);
+            }
+        };
     }
 
 }

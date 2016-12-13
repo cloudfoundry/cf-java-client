@@ -75,7 +75,7 @@ public final class PackagesTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.packages()
                         .upload(UploadPackageRequest.builder()
                             .packageId(packageId)
-                            .bits(new ClassPathResource("test-application.zip").getInputStream())
+                            .bits(new ClassPathResource("test-application.zip").getFile().toPath())
                             .build());
                 } catch (IOException e) {
                     throw Exceptions.propagate(e);
