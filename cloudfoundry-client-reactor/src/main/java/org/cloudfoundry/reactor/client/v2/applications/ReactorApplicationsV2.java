@@ -62,7 +62,6 @@ import reactor.ipc.netty.http.client.HttpClientRequest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 
 /**
  * The Reactor-based implementation of {@link ApplicationsV2}
@@ -195,7 +194,10 @@ public final class ReactorApplicationsV2 extends AbstractClientV2Operations impl
                         throw Exceptions.propagate(e);
                     }
                 })
-                .then());
+                .then(() -> {
+                    outbound.context().channel().flush();
+                    return outbound;
+                }));
     }
 
 }

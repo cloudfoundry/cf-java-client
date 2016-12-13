@@ -77,7 +77,7 @@ public final class TokensTest extends AbstractIntegrationTest {
                     .scope("scim.userids")
                     .build()))
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(HttpClientException.class).hasMessage("HTTP request failed with code: 403"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(HttpClientException.class).hasMessageContaining("HTTP request failed with code: 403"))
             .verify(Duration.ofMinutes(5));
     }
 

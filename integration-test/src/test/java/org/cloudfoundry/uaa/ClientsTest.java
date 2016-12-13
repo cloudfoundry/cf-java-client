@@ -222,7 +222,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
 //                    assertEquals("secret updated", response.getMessage());
 //                    assertEquals("ok", response.getStatus());
 //                }));
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(HttpClientException.class).hasMessage("HTTP request failed with code: 400"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(HttpClientException.class).hasMessageContaining("HTTP request failed with code: 400"))
             .verify(Duration.ofMinutes(5));
 
     }
