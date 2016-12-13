@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.reactor.doppler;
 
-import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import org.cloudfoundry.doppler.ContainerMetricsRequest;
 import org.cloudfoundry.doppler.Envelope;
 import org.cloudfoundry.doppler.FirehoseRequest;
@@ -27,8 +26,6 @@ import org.cloudfoundry.reactor.TokenProvider;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.ByteBufFlux;
-import reactor.ipc.netty.NettyInbound;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,14 +57,6 @@ final class ReactorDopplerEndpoints extends AbstractDopplerOperations {
     Flux<Envelope> stream(StreamRequest request) {
         return ws(builder -> builder.pathSegment("apps", request.getApplicationId(), "stream"))
             .flatMap(response -> response.receive().aggregate().asInputStream())
-            .flatMap(NettyInbound::receiveObject)  // TODO: Replace with proper alias from reactor-netty 0.6.0
-            .cast(WebSocketFrame.class)
-            .window()
-            .concatMap(w -> w
-                .takeUntil(WebSocketFrame::isFinalFragment)
-                .as(ByteBufFlux::fromInbound)
-                .aggregate()
-                .asInputStream())
             .map(ReactorDopplerEndpoints::toEnvelope);
     }
 
