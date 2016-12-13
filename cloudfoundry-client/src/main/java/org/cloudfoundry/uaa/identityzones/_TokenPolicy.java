@@ -18,6 +18,7 @@ package org.cloudfoundry.uaa.identityzones;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
@@ -54,6 +55,7 @@ abstract class _TokenPolicy {
     /**
      * The keys of the token policy
      */
+    @AllowNulls
     @JsonProperty("keys")
     @Nullable
     abstract Map<String, Object> getKeys();

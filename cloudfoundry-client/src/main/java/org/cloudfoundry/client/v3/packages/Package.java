@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Link;
 import reactor.core.Exceptions;
@@ -58,6 +59,7 @@ public abstract class Package {
     /**
      * The links
      */
+    @AllowNulls
     @JsonProperty("links")
     @Nullable
     public abstract Map<String, Link> getLinks();

@@ -21,6 +21,6 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The resource response payload for User Provided Service Instances
  */
-public abstract class AbstractUserProvidedServiceInstanceResource extends Resource<UserProvidedServiceInstanceEntity> {
+public abstract class AbstractUserProvidedServiceInstanceResource extends Resource<org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceEntity> {
 
 }

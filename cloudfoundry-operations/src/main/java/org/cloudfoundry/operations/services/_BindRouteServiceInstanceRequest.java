@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.operations.services;
 
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
@@ -41,6 +42,7 @@ abstract class _BindRouteServiceInstanceRequest {
     /**
      * The parameters for the bound route
      */
+    @AllowNulls
     @Nullable
     abstract Map<String, Object> getParameters();
 

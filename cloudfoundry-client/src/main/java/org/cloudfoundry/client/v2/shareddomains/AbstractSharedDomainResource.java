@@ -21,6 +21,6 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The base class for Shared Domain resources
  */
-public abstract class AbstractSharedDomainResource extends Resource<SharedDomainEntity> {
+public abstract class AbstractSharedDomainResource extends Resource<org.cloudfoundry.client.v2.shareddomains.SharedDomainEntity> {
 
 }

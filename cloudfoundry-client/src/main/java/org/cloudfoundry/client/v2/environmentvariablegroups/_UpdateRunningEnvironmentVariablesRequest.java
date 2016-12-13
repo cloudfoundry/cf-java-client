@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v2.environmentvariablegroups;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
@@ -28,6 +29,7 @@ import java.util.Map;
 @Value.Immutable
 abstract class _UpdateRunningEnvironmentVariablesRequest {
 
+    @AllowNulls
     @JsonValue
     @Nullable
     abstract Map<String, Object> getEnvironmentVariables();

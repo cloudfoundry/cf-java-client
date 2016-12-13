@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.operations.services;
 
+import org.cloudfoundry.AllowNulls;
 import org.immutables.value.Value;
 
 import java.util.Map;
@@ -29,6 +30,7 @@ abstract class _ServiceKey {
     /**
      * The credentials
      */
+    @AllowNulls
     abstract Map<String, Object> getCredentials();
 
     /**

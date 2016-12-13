@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.organizations;
+package org.cloudfoundry;
 
-import org.cloudfoundry.client.v2.Resource;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-/**
- * The base class for user Organization Role Resources
- */
-public abstract class AbstractUserOrganizationRoleResource extends Resource<org.cloudfoundry.client.v2.organizations.UserOrganizationRoleEntity> {
+@Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface AllowNulls {
 
 }

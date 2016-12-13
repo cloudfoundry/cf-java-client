@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.operations.services;
 
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
@@ -31,6 +32,7 @@ abstract class _CreateServiceInstanceRequest {
     /**
      * The parameters of the service instance
      */
+    @AllowNulls
     @Nullable
     abstract Map<String, Object> getParameters();
 

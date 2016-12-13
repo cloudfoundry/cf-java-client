@@ -19,6 +19,7 @@ package org.cloudfoundry.client.v2.events;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
@@ -77,6 +78,7 @@ abstract class _EventEntity {
     /**
      * The metadatas
      */
+    @AllowNulls
     @JsonProperty("metadata")
     @Nullable
     abstract Map<String, Optional<Object>> getMetadatas();

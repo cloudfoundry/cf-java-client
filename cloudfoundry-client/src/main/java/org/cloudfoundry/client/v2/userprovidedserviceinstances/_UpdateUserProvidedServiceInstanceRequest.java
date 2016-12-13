@@ -19,6 +19,7 @@ package org.cloudfoundry.client.v2.userprovidedserviceinstances;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
@@ -33,6 +34,7 @@ abstract class _UpdateUserProvidedServiceInstanceRequest {
     /**
      * Key/value pairs that can be stored to store credentials
      */
+    @AllowNulls
     @JsonProperty("credentials")
     @Nullable
     abstract Map<String, Object> getCredentials();

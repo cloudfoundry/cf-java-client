@@ -21,6 +21,6 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The resource response payload for Service Keys
  */
-public abstract class AbstractServiceKeyResource extends Resource<ServiceKeyEntity> {
+public abstract class AbstractServiceKeyResource extends Resource<org.cloudfoundry.client.v2.servicekeys.ServiceKeyEntity> {
 
 }

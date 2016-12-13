@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.operations.applications;
 
+import org.cloudfoundry.AllowNulls;
 import org.immutables.value.Value;
 
 import java.util.Map;
@@ -29,21 +30,25 @@ abstract class _ApplicationEnvironments {
     /**
      * The running environment variables
      */
+    @AllowNulls
     abstract Map<String, Object> getRunning();
 
     /**
      * The staging environment variables
      */
+    @AllowNulls
     abstract Map<String, Object> getStaging();
 
     /**
      * The system provided environment variables
      */
+    @AllowNulls
     abstract Map<String, Object> getSystemProvided();
 
     /**
      * The user defined environment variables
      */
+    @AllowNulls
     abstract Map<String, Object> getUserProvided();
 
 }

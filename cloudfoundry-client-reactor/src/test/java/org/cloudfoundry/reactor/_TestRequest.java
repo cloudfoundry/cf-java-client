@@ -22,6 +22,7 @@ import io.netty.handler.codec.http.HttpMethod;
 import okhttp3.Headers;
 import okhttp3.mockwebserver.RecordedRequest;
 import okio.Buffer;
+import org.cloudfoundry.AllowNulls;
 import org.immutables.value.Value;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.Exceptions;
@@ -41,8 +42,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Value.Immutable
 abstract class _TestRequest {
 
-    public static final String EMPTY_HEADER = "EMPTY-HEADER";
-
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private static final Pattern PATH_PATTERN = Pattern.compile("[A-Z]+ (.*) [A-Z0-9\\./]+");
@@ -52,7 +51,7 @@ abstract class _TestRequest {
         assertThat(getPath()).isEqualTo(extractPath(request));
 
         getHeaders().forEach((key, value) -> {
-            if (EMPTY_HEADER == value) {
+            if (value == null) {
                 assertThat(request.getHeader(key)).isNull();
             } else {
                 assertThat(value).isEqualTo(request.getHeader(key));
@@ -70,6 +69,7 @@ abstract class _TestRequest {
 
     abstract Optional<Consumer<Tuple2<Headers, Buffer>>> getContents();
 
+    @AllowNulls
     abstract Map<String, String> getHeaders();
 
     abstract HttpMethod getMethod();

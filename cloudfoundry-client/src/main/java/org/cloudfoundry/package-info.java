@@ -19,6 +19,7 @@
     defaults = @Value.Immutable(copy = false),
     depluralize = true,
     depluralizeDictionary = "status:statuses",
+    jdkOnly = true,
     put = "*",
     typeAbstract = "_*",
     typeImmutable = "*",
