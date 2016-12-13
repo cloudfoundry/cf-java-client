@@ -18,7 +18,7 @@ package org.cloudfoundry.reactor.uaa;
 
 import io.netty.util.AsciiString;
 import org.cloudfoundry.uaa.BasicAuthorized;
-import reactor.ipc.netty.http.HttpClientRequest;
+import reactor.ipc.netty.http.client.HttpClientRequest;
 
 import java.util.Base64;
 
@@ -35,7 +35,7 @@ public final class BasicAuthorizationBuilder {
         if (request instanceof BasicAuthorized) {
             BasicAuthorized basicAuthorized = (BasicAuthorized) request;
             String encoded = Base64.getEncoder().encodeToString(new AsciiString(basicAuthorized.getClientId()).concat(":").concat(basicAuthorized.getClientSecret()).toByteArray());
-            outbound.headers().set(AUTHORIZATION, BASIC_PREAMBLE + encoded);
+            outbound.requestHeaders().set(AUTHORIZATION, BASIC_PREAMBLE + encoded);
         }
     }
 

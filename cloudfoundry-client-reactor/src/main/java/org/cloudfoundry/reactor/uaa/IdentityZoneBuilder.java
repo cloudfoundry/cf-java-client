@@ -17,7 +17,7 @@
 package org.cloudfoundry.reactor.uaa;
 
 import org.cloudfoundry.uaa.IdentityZoned;
-import reactor.ipc.netty.http.HttpClientRequest;
+import reactor.ipc.netty.http.client.HttpClientRequest;
 
 import java.util.Optional;
 

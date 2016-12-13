@@ -19,7 +19,7 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%-23thread %-35logger %msg%n</pattern>
+            <pattern>%-20thread %-33logger %msg%n</pattern>
         </encoder>
     </appender>
 

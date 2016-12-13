@@ -22,8 +22,8 @@ import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.HttpClientRequest;
-import reactor.ipc.netty.http.HttpClientResponse;
+import reactor.ipc.netty.http.client.HttpClientRequest;
+import reactor.ipc.netty.http.client.HttpClientResponse;
 
 import java.util.function.Function;
 
@@ -100,12 +100,12 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
                                          Function<HttpClientRequest, HttpClientRequest> requestTransformer) {
 
         return doPost(responseType, getUriAugmenter(request, uriTransformer), outbound -> {
-            outbound.headers().remove(AUTHORIZATION);
+            outbound.requestHeaders().remove(AUTHORIZATION);
             getRequestTransformer(request).apply(outbound);
             return requestTransformer.apply(outbound)
                 .addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED)
-                .removeTransferEncodingChunked()
-                .sendHeaders();
+                .disableChunkedTransfer()
+                .send();
         });
     }
 

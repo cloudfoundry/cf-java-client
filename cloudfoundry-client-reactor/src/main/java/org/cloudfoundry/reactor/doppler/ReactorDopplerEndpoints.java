@@ -26,7 +26,6 @@ import org.cloudfoundry.reactor.TokenProvider;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.HttpClientResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,25 +38,25 @@ final class ReactorDopplerEndpoints extends AbstractDopplerOperations {
 
     Flux<Envelope> containerMetrics(ContainerMetricsRequest request) {
         return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "containermetrics"))
-            .flatMap(inbound -> inbound.receiveMultipart().receiveInputStream())
+            .flatMap(inbound -> inbound.receiveMultipart().receive().asInputStream())
             .map(ReactorDopplerEndpoints::toEnvelope);
     }
 
     Flux<Envelope> firehose(FirehoseRequest request) {
         return ws(builder -> builder.pathSegment("firehose", request.getSubscriptionId()))
-            .flatMap(HttpClientResponse::receiveInputStream)
+            .flatMap(response -> response.receive().aggregate().asInputStream())
             .map(ReactorDopplerEndpoints::toEnvelope);
     }
 
     Flux<Envelope> recentLogs(RecentLogsRequest request) {
         return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "recentlogs"))
-            .flatMap(inbound -> inbound.receiveMultipart().receiveInputStream())
+            .flatMap(inbound -> inbound.receiveMultipart().receive().asInputStream())
             .map(ReactorDopplerEndpoints::toEnvelope);
     }
 
     Flux<Envelope> stream(StreamRequest request) {
         return ws(builder -> builder.pathSegment("apps", request.getApplicationId(), "stream"))
-            .flatMap(HttpClientResponse::receiveInputStream)
+            .flatMap(response -> response.receive().aggregate().asInputStream())
             .map(ReactorDopplerEndpoints::toEnvelope);
     }
 

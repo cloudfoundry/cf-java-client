@@ -18,9 +18,12 @@ package org.cloudfoundry.client.v3.packages;
 
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public final class UploadPackageRequestTest {
+
+    private static final Path TEST_PACKAGE = Paths.get("/");
 
     @Test(expected = IllegalStateException.class)
     public void noBits() {
@@ -32,14 +35,14 @@ public final class UploadPackageRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noPackageId() {
         UploadPackageRequest.builder()
-            .bits(new ByteArrayInputStream(new byte[0]))
+            .bits(TEST_PACKAGE)
             .build();
     }
 
     @Test
     public void valid() {
         UploadPackageRequest.builder()
-            .bits(new ByteArrayInputStream(new byte[0]))
+            .bits(TEST_PACKAGE)
             .packageId("test-package-id")
             .build();
     }

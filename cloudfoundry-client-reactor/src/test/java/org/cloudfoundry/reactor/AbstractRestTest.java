@@ -28,7 +28,7 @@ import org.junit.After;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.HttpClient;
+import reactor.ipc.netty.http.client.HttpClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -48,7 +48,7 @@ public abstract class AbstractRestTest {
         SLF4JBridgeHandler.install();
     }
 
-    private final MockWebServer mockWebServer = new MockWebServer();
+    protected final MockWebServer mockWebServer = new MockWebServer();
 
     protected final Mono<String> root = Mono.just(UriComponentsBuilder.newInstance()
         .scheme("http").host(this.mockWebServer.getHostName()).port(this.mockWebServer.getPort())

@@ -75,7 +75,6 @@ import reactor.util.function.Tuple2;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashSet;
@@ -1018,7 +1017,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         try {
             return cloudFoundryClient.applicationsV2()
                 .upload(UploadApplicationRequest.builder()
-                    .application(new ClassPathResource("test-application.zip").getInputStream())
+                    .application(new ClassPathResource("test-application.zip").getFile().toPath())
                     .async(true)
                     .applicationId(applicationId)
                     .build())
@@ -1030,10 +1029,9 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     private static Mono<UploadApplicationResponse> uploadApplicationAsyncFalse(CloudFoundryClient cloudFoundryClient, String applicationId) {
         try {
-            final InputStream inputStream = new ClassPathResource("test-application.zip").getInputStream();
             return cloudFoundryClient.applicationsV2()
                 .upload(UploadApplicationRequest.builder()
-                    .application(inputStream)
+                    .application(new ClassPathResource("test-application.zip").getFile().toPath())
                     .async(false)
                     .applicationId(applicationId)
                     .build());

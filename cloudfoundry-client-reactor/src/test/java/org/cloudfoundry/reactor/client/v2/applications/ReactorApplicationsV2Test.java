@@ -963,18 +963,21 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
 
                     assertThat(body.readString(Charset.defaultCharset()))
                         .isEqualTo("--" + boundary + "\r\n" +
-                            "Content-Disposition: form-data; name=\"resources\"\r\n" +
-                            "Content-Type: application/json\r\n" +
+                            "content-disposition: form-data; name=\"resources\";\r\n" +
+                            "content-length: 178\r\n" +
+                            "content-type: application/json; charset=UTF-8\r\n" +
                             "\r\n" +
                             "[{\"sha1\":\"b907173290db6a155949ab4dc9b2d019dea0c901\",\"fn\":\"path/to/content.txt\",\"size\":123}," +
                             "{\"sha1\":\"ff84f89760317996b9dd180ab996b079f418396f\",\"fn\":\"path/to/code.jar\",\"size\":123}]" +
                             "\r\n" + "--" + boundary + "\r\n" +
-                            "Content-Disposition: form-data; name=\"application\"; filename=\"application.zip\"\r\n" +
-                            "Content-Type: application/zip\r\n" +
+                            "content-disposition: form-data; name=\"application\"; filename=\"application.zip\"\r\n" +
+                            "content-length: 13\r\n" +
+                            "content-type: application/zip\r\n" +
+                            "content-transfer-encoding: application/octet-stream\r\n" +
                             "\r\n" +
                             "test-content\n" +
                             "\r\n" +
-                            "--" + boundary + "--");
+                            "--" + boundary + "--\r\n");
                 }))
                 .build())
             .response(TestResponse.builder()
@@ -985,7 +988,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
 
         this.applications
             .upload(UploadApplicationRequest.builder()
-                .application(new ClassPathResource("fixtures/client/v2/apps/test-application.zip").getInputStream())
+                .application(new ClassPathResource("fixtures/client/v2/apps/test-application.zip").getFile().toPath())
                 .applicationId("test-application-id")
                 .resource(Resource.builder()
                     .hash("b907173290db6a155949ab4dc9b2d019dea0c901")

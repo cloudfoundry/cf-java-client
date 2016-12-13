@@ -19,7 +19,7 @@ package org.cloudfoundry.reactor.util;
 import org.cloudfoundry.reactor.ProxyConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.ipc.netty.config.ClientOptions;
+import reactor.ipc.netty.options.ClientOptions;
 import reactor.ipc.netty.tcp.TcpClient;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
@@ -89,6 +89,7 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
         }
 
         this.trustedHostsAndPorts.add(hostAndPort);
+        this.logger.debug("Trusted SSL Certificate for {}:{}", host, port);
     }
 
     private static KeyStore addToTrustStore(X509Certificate[] untrustedCertificates, X509TrustManager trustManager) {
@@ -111,13 +112,12 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
     }
 
     private static TcpClient getTcpClient(Optional<ProxyConfiguration> proxyConfiguration, CertificateCollectingTrustManager collector, String host, int port) {
-        ClientOptions options = ClientOptions.to(host, port)
-            .sslSupport()
-            .sslConfigurer(ssl -> ssl.trustManager(new StaticTrustManagerFactory(collector)));
+        return TcpClient.create(options -> {
+            options.connect(host, port)
+                .sslSupport(ssl -> ssl.trustManager(new StaticTrustManagerFactory(collector)));
 
-        proxyConfiguration.ifPresent(c -> options.proxy(ClientOptions.Proxy.HTTP, c.getHost(), c.getPort().orElse(null), c.getUsername().orElse(null), u -> c.getPassword().orElse(null)));
-
-        return TcpClient.create(options);
+            proxyConfiguration.ifPresent(c -> options.proxy(ClientOptions.Proxy.HTTP, c.getHost(), c.getPort().orElse(null), c.getUsername().orElse(null), u -> c.getPassword().orElse(null)));
+        });
     }
 
     private static X509TrustManager getTrustManager(TrustManagerFactory trustManagerFactory) {
@@ -145,7 +145,7 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
         CertificateCollectingTrustManager collector = new CertificateCollectingTrustManager(delegate);
 
         getTcpClient(proxyConfiguration, collector, host, port)
-            .start(channel -> channel.receive().then())
+            .newHandler((inbound, outbound) -> inbound.receive().then())
             .block(duration);
 
         X509Certificate[] chain = collector.getCollectedCertificateChain();

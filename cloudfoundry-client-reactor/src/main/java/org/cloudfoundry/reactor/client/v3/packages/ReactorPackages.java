@@ -36,7 +36,6 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.HttpClientResponse;
 
 /**
  * The Reactor-based implementation of {@link Packages}
@@ -72,7 +71,7 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
     @Override
     public Flux<byte[]> download(DownloadPackageRequest request) {
         return get(request, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "download"))
-            .flatMap(HttpClientResponse::receiveByteArray);
+            .flatMap(response -> response.receive().aggregate().asByteArray());
     }
 
     @Override
@@ -94,10 +93,9 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
     public Mono<UploadPackageResponse> upload(UploadPackageRequest request) {
         return post(request, UploadPackageResponse.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "upload"),
             outbound -> outbound
-                .addPart(part -> part.setContentDispositionFormData("bits", "application.zip")
-                    .addHeader(CONTENT_TYPE, APPLICATION_ZIP)
-                    .sendInputStream(request.getBits()))
-                .done());
+                .disableChunkedTransfer()
+                .sendMultipart(form -> form.file("bits", "application.zip", request.getBits().toFile(), APPLICATION_ZIP))
+                .then());
     }
 
 }

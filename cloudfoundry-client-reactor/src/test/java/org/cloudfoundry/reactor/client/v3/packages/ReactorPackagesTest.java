@@ -417,12 +417,14 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
 
                     assertThat(body.readString(Charset.defaultCharset()))
                         .isEqualTo("--" + boundary + "\r\n" +
-                            "Content-Disposition: form-data; name=\"bits\"; filename=\"application.zip\"\r\n" +
-                            "Content-Type: application/zip\r\n" +
+                            "content-disposition: form-data; name=\"bits\"; filename=\"application.zip\"\r\n" +
+                            "content-length: 13\r\n" +
+                            "content-type: application/zip\r\n" +
+                            "content-transfer-encoding: application/octet-stream\r\n" +
                             "\r\n" +
                             "test-content\n" +
                             "\r\n" +
-                            "--" + boundary + "--");
+                            "--" + boundary + "--\r\n");
                 }))
                 .build())
             .response(TestResponse.builder()
@@ -433,7 +435,7 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
 
         this.packages
             .upload(UploadPackageRequest.builder()
-                .bits(new ClassPathResource("fixtures/client/v3/packages/test-package.zip").getInputStream())
+                .bits(new ClassPathResource("fixtures/client/v3/packages/test-package.zip").getFile().toPath())
                 .packageId("test-package-id")
                 .build())
             .as(StepVerifier::create)

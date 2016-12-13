@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.HttpException;
+import reactor.ipc.netty.http.client.HttpClientException;
 
 import java.io.IOException;
 import java.util.Map;
@@ -33,15 +33,15 @@ public final class CloudFoundryExceptionBuilder {
     }
 
     /**
-     * Build a {@link CloudFoundryException} from an {@link HttpException}
+     * Build a {@link CloudFoundryException} from an {@link HttpClientException}
      *
      * @param cause the cause
      * @param <T>   The type of the {@link Mono}
      * @return a {@link Mono#error} with a properly configured {@link CloudFoundryException}
      */
     @SuppressWarnings("unchecked")
-    public static <T> Mono<T> build(HttpException cause) {
-        return cause.getChannel().receive().aggregate().toInputStream()
+    public static <T> Mono<T> build(HttpClientException cause) {
+        return cause.getResponse().receive().aggregate().asInputStream()
             .then(in -> {
                 try {
                     Map<String, ?> response = OBJECT_MAPPER.readValue(in, Map.class);

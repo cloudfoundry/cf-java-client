@@ -29,9 +29,9 @@ import org.immutables.value.Value;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.config.ClientOptions;
-import reactor.ipc.netty.config.HttpClientOptions;
-import reactor.ipc.netty.http.HttpClient;
+import reactor.ipc.netty.http.client.HttpClient;
+import reactor.ipc.netty.options.ClientOptions;
+import reactor.ipc.netty.resources.PoolResources;
 
 import java.time.Duration;
 import java.util.List;
@@ -42,6 +42,10 @@ import java.util.regex.Pattern;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
+import static io.netty.channel.ChannelOption.SO_RCVBUF;
+import static io.netty.channel.ChannelOption.SO_SNDBUF;
+import static io.netty.channel.ChannelOption.SO_TIMEOUT;
 
 /**
  * The default implementation of the {@link ConnectionContext} interface.  This is the implementation that should be used for most non-testing cases.
@@ -59,21 +63,27 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
 
     private static final int UNDEFINED_PORT = -1;
 
+    @Value.Default
+    public Integer getConnectionPoolSize() {
+        return PoolResources.DEFAULT_POOL_MAX_CONNECTION;
+    }
+
     @Override
     @Value.Default
     public HttpClient getHttpClient() {
-        ClientOptions options = HttpClientOptions.create()
-            .sslSupport()
-            .sndbuf(SEND_BUFFER_SIZE)
-            .rcvbuf(RECEIVE_BUFFER_SIZE);
+        return HttpClient.create(options -> {
+            options
+                .option(SO_SNDBUF, SEND_BUFFER_SIZE)
+                .option(SO_RCVBUF, RECEIVE_BUFFER_SIZE)
+                .poolResources(PoolResources.fixed("cloudfoundry-client", getConnectionPoolSize()));
 
-        getKeepAlive().ifPresent(options::keepAlive);
-        getProxyConfiguration().ifPresent(c -> options.proxy(ClientOptions.Proxy.HTTP, c.getHost(), c.getPort().orElse(null), c.getUsername().orElse(null), u -> c.getPassword().orElse(null)));
-        getSocketTimeout().ifPresent(options::timeout);
-        getSslCertificateTruster().ifPresent(trustManager -> options.ssl().trustManager(new StaticTrustManagerFactory(trustManager)));
-        getSslHandshakeTimeout().ifPresent(options::sslHandshakeTimeout);
+            getKeepAlive().ifPresent(keepAlive -> options.option(SO_KEEPALIVE, keepAlive));
+            getProxyConfiguration().ifPresent(c -> options.proxy(ClientOptions.Proxy.HTTP, c.getHost(), c.getPort().orElse(null), c.getUsername().orElse(null), u -> c.getPassword().orElse(null)));
+            getSocketTimeout().ifPresent(socketTimeout -> options.option(SO_TIMEOUT, (int) socketTimeout.toMillis()));
 
-        return HttpClient.create(options);
+            options.sslSupport(ssl -> getSslCertificateTruster().ifPresent(trustManager -> ssl.trustManager(new StaticTrustManagerFactory(trustManager))));
+            getSslHandshakeTimeout().ifPresent(options::sslHandshakeTimeout);
+        });
     }
 
     @Override
@@ -103,7 +113,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             builder.port(port);
         }
 
-        UriComponents components = normalize(builder);
+        UriComponents components = normalize(builder, getScheme());
         trust(components, getSslCertificateTruster());
 
         return Mono.just(components.toUriString());
@@ -112,8 +122,8 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     @Override
     public Mono<String> getRoot(String key) {
         return getInfo()
-            .map(info -> normalize(UriComponentsBuilder.fromUriString(info.get(key))))
-            .doOnSuccess(components -> trust(components, getSslCertificateTruster()))
+            .map(info -> normalize(UriComponentsBuilder.fromUriString(info.get(key)), getScheme()))
+            .doOnNext(components -> trust(components, getSslCertificateTruster()))
             .map(UriComponents::toUriString)
             .cache();
     }
@@ -141,8 +151,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
                 .get(uri)
                 .doOnSubscribe(NetworkLogging.get(uri))
                 .compose(NetworkLogging.response(uri)))
-            .then(inbound -> inbound.receive().aggregate().toInputStream())
-            .map(JsonCodec.decode(getObjectMapper(), Map.class))
+            .compose(JsonCodec.decode(getObjectMapper(), Map.class))
             .map(m -> (Map<String, String>) m)
             .cache();
     }
@@ -161,6 +170,20 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
      * The (optional) proxy configuration
      */
     abstract Optional<ProxyConfiguration> getProxyConfiguration();
+
+    @Value.Derived
+    String getScheme() {
+        if (getSecure().orElse(true)) {
+            return "https";
+        } else {
+            return "http";
+        }
+    }
+
+    /**
+     * Whether the connection to the root API should be secure (i.e. using HTTPS).
+     */
+    abstract Optional<Boolean> getSecure();
 
     /**
      * Whether to skip SSL certificate validation for all hosts reachable from the API host.  Defaults to {@code false}.
@@ -186,10 +209,10 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
      */
     abstract Optional<Duration> getSslHandshakeTimeout();
 
-    private static UriComponents normalize(UriComponentsBuilder builder) {
+    private static UriComponents normalize(UriComponentsBuilder builder, String scheme) {
         UriComponents components = builder.build();
 
-        builder.scheme("https");
+        builder.scheme(scheme);
 
         if (UNDEFINED_PORT == components.getPort()) {
             builder.port(DEFAULT_PORT);

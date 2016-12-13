@@ -18,11 +18,12 @@ package org.cloudfoundry.client.v2.buildpacks;
 
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public final class UploadBuildpackRequestTest {
 
-    private static final ByteArrayInputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[0]);
+    private static final Path TEST_BUILDPACK = Paths.get("/");
 
     @Test(expected = IllegalStateException.class)
     public void noBuildpack() {
@@ -35,7 +36,7 @@ public final class UploadBuildpackRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noBuildpackId() {
         UploadBuildpackRequest.builder()
-            .buildpack(EMPTY_STREAM)
+            .buildpack(TEST_BUILDPACK)
             .filename("test-filename")
             .build();
     }
@@ -43,7 +44,7 @@ public final class UploadBuildpackRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noFilename() {
         UploadBuildpackRequest.builder()
-            .buildpack(EMPTY_STREAM)
+            .buildpack(TEST_BUILDPACK)
             .buildpackId("test-buildpack-id")
             .build();
     }
@@ -51,7 +52,7 @@ public final class UploadBuildpackRequestTest {
     @Test
     public void valid() {
         UploadBuildpackRequest.builder()
-            .buildpack(EMPTY_STREAM)
+            .buildpack(TEST_BUILDPACK)
             .buildpackId("test-buildpack-id")
             .filename("test-filename")
             .build();
