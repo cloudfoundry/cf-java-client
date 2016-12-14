@@ -21,6 +21,6 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The base class for service broker resources
  */
-public abstract class AbstractServiceBrokerResource extends Resource<ServiceBrokerEntity> {
+public abstract class AbstractServiceBrokerResource extends Resource<org.cloudfoundry.client.v2.servicebrokers.ServiceBrokerEntity> {
 
 }

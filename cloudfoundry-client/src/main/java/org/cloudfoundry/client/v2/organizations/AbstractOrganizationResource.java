@@ -21,6 +21,6 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The core resource in organization responses
  */
-public abstract class AbstractOrganizationResource extends Resource<OrganizationEntity> {
+public abstract class AbstractOrganizationResource extends Resource<org.cloudfoundry.client.v2.organizations.OrganizationEntity> {
 
 }

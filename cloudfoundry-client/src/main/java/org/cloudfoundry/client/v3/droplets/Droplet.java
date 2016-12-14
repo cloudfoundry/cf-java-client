@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
@@ -44,6 +45,7 @@ public abstract class Droplet {
     /**
      * The environment variables
      */
+    @AllowNulls
     @JsonProperty("environment_variables")
     @Nullable
     public abstract Map<String, Object> getEnvironmentVariables();
@@ -72,6 +74,7 @@ public abstract class Droplet {
     /**
      * The links
      */
+    @AllowNulls
     @JsonProperty("links")
     @Nullable
     public abstract Map<String, Link> getLinks();

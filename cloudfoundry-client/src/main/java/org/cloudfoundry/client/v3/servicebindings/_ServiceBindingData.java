@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v3.servicebindings;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
@@ -34,6 +35,7 @@ abstract class _ServiceBindingData {
     /**
      * The service binding credentials
      */
+    @AllowNulls
     @JsonProperty("credentials")
     @Nullable
     abstract Map<String, Object> getCredentials();

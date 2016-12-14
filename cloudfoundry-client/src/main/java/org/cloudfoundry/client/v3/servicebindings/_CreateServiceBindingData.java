@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v3.servicebindings;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
@@ -31,6 +32,7 @@ abstract class _CreateServiceBindingData {
     /**
      * The parameters
      */
+    @AllowNulls
     @JsonProperty("parameters")
     @Nullable
     abstract Map<String, Object> getParameters();

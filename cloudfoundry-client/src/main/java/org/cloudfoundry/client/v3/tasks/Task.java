@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v3.tasks;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Link;
 
@@ -44,6 +45,7 @@ public abstract class Task {
     /**
      * The environment variables
      */
+    @AllowNulls
     @JsonProperty("environment_variables")
     @Nullable
     public abstract Map<String, String> getEnvironmentVariables();
@@ -58,6 +60,7 @@ public abstract class Task {
     /**
      * The links
      */
+    @AllowNulls
     @JsonProperty("links")
     @Nullable
     public abstract Map<String, Link> getLinks();

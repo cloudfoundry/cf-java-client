@@ -21,6 +21,6 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * Base class for all route resources
  */
-public abstract class AbstractRouteResource extends Resource<RouteEntity> {
+public abstract class AbstractRouteResource extends Resource<org.cloudfoundry.client.v2.routes.RouteEntity> {
 
 }

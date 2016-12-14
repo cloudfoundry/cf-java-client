@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v3.droplets;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Hash;
 import org.immutables.value.Value;
@@ -40,6 +41,7 @@ abstract class _StagedResult implements Result {
     @Nullable
     abstract Hash getHash();
 
+    @AllowNulls
     @JsonProperty("process_types")
     @Nullable
     abstract Map<String, String> getProcessTypes();

@@ -21,6 +21,6 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The core resource in Service Bindings
  */
-public abstract class AbstractServiceBindingResource extends Resource<ServiceBindingEntity> {
+public abstract class AbstractServiceBindingResource extends Resource<org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity> {
 
 }

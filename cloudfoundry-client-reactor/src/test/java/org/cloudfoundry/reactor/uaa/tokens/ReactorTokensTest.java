@@ -50,7 +50,6 @@ import java.util.Arrays;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.cloudfoundry.reactor.TestRequest.EMPTY_HEADER;
 
 public final class ReactorTokensTest extends AbstractUaaApiTest {
 
@@ -148,7 +147,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
             .request(TestRequest.builder()
                 .method(POST).path("/oauth/token?code=zI6Z1X&client_id=login&client_secret=loginsecret&redirect_uri=https://uaa.cloudfoundry.com/redirect/cf" +
                     "&token_format=opaque&grant_type=authorization_code&response_type=token")
-                .header("Authorization", EMPTY_HEADER)
+                .header("Authorization", null)
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .build())
             .response(TestResponse.builder()
@@ -183,7 +182,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/oauth/token?client_id=login&client_secret=loginsecret&token_format=opaque&grant_type=client_credentials&response_type=token")
-                .header("Authorization", EMPTY_HEADER)
+                .header("Authorization", null)
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .build())
             .response(TestResponse.builder()
@@ -250,7 +249,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
             .request(TestRequest.builder()
                 .method(POST).path("/oauth/token?code=NAlA1d&client_id=app&client_secret=appclientsecret&redirect_uri=https://uaa.cloudfoundry.com/redirect/cf&token_format=opaque" +
                     "&grant_type=authorization_code&response_type=id_token")
-                .header("Authorization", EMPTY_HEADER)
+                .header("Authorization", null)
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .build())
             .response(TestResponse.builder()
@@ -287,7 +286,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
             .request(TestRequest.builder()
                 .method(POST).path("/oauth/token?client_id=app&client_secret=appclientsecret&password=secr3T&token_format=opaque&" +
                     "username=jENeJj@test.org&grant_type=password&response_type=token")
-                .header("Authorization", EMPTY_HEADER)
+                .header("Authorization", null)
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .build())
             .response(TestResponse.builder()

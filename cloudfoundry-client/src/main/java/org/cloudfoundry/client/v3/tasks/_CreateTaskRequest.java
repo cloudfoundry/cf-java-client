@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v3.tasks;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
@@ -51,6 +52,7 @@ abstract class _CreateTaskRequest {
     /**
      * The environment variables
      */
+    @AllowNulls
     @JsonProperty("environment_variables")
     @Nullable
     abstract Map<String, String> getEnvironmentVariables();

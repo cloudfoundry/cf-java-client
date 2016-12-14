@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.serviceinstances;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 
 import java.util.Map;
@@ -30,6 +31,7 @@ public abstract class BaseServiceInstanceEntity {
     /**
      * The credentials
      */
+    @AllowNulls
     @JsonProperty("credentials")
     @Nullable
     public abstract Map<String, Object> getCredentials();

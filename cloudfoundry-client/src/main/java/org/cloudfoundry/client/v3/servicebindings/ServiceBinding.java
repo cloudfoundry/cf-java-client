@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v3.servicebindings;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Link;
 
@@ -51,6 +52,7 @@ public abstract class ServiceBinding {
     /**
      * The links
      */
+    @AllowNulls
     @JsonProperty("links")
     @Nullable
     public abstract Map<String, Link> getLinks();

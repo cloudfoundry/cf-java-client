@@ -21,6 +21,6 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * Buildpacks in responses
  */
-public abstract class AbstractBuildpackResource extends Resource<BuildpackEntity> {
+public abstract class AbstractBuildpackResource extends Resource<org.cloudfoundry.client.v2.buildpacks.BuildpackEntity> {
 
 }

@@ -21,6 +21,6 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The core resource in Service responses
  */
-public abstract class AbstractServiceResource extends Resource<ServiceEntity> {
+public abstract class AbstractServiceResource extends Resource<org.cloudfoundry.client.v2.services.ServiceEntity> {
 
 }

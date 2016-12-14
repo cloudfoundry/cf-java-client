@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import org.cloudfoundry.AllowNulls;
 import org.immutables.value.Value;
 
 import java.io.IOException;
@@ -36,6 +37,7 @@ abstract class _ApplicationStatisticsResponse {
     /**
      * The instances
      */
+    @AllowNulls
     abstract Map<String, InstanceStatistics> getInstances();
 
     static final class ApplicationStatisticsResponseDeserializer extends StdDeserializer<ApplicationStatisticsResponse> {

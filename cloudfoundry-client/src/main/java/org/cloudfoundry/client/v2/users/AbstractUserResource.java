@@ -21,6 +21,6 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The base clasee for User resources
  */
-public abstract class AbstractUserResource extends Resource<UserEntity> {
+public abstract class AbstractUserResource extends Resource<org.cloudfoundry.client.v2.users.UserEntity> {
 
 }

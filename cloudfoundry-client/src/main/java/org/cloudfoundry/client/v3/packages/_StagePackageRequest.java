@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v3.packages;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.immutables.value.Value;
@@ -33,6 +34,7 @@ abstract class _StagePackageRequest {
     /**
      * The environment variables
      */
+    @AllowNulls
     @JsonProperty("environment_variables")
     @Nullable
     abstract Map<String, Object> getEnvironmentVariables();

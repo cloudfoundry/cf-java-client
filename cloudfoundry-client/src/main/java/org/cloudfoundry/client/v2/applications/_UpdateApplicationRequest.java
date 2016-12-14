@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.applications;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
@@ -82,6 +83,7 @@ abstract class _UpdateApplicationRequest {
     /**
      * Docker credentials for pulling docker image
      */
+    @AllowNulls
     @JsonProperty("docker_credentials_json")
     @Nullable
     abstract Map<String, Object> getDockerCredentialsJsons();
@@ -103,6 +105,7 @@ abstract class _UpdateApplicationRequest {
     /**
      * Key/value pairs of all the environment variables to run in your application. Does not include any system or service variables.
      */
+    @AllowNulls
     @JsonProperty("environment_json")
     @Nullable
     abstract Map<String, Object> getEnvironmentJsons();

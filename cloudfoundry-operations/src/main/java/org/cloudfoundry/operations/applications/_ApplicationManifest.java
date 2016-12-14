@@ -18,6 +18,7 @@ package org.cloudfoundry.operations.applications;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
@@ -65,6 +66,7 @@ abstract class _ApplicationManifest {
     /**
      * The environment variables to set on the application
      */
+    @AllowNulls
     @JsonProperty("env")
     @Nullable
     abstract Map<String, Object> getEnvironmentVariables();

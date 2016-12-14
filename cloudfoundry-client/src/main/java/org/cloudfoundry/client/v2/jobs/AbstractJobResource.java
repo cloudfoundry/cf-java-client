@@ -21,7 +21,6 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The base class for Job resources
  */
-//TODO: Remove explicit reference subject to resolution of https://github.com/immutables/immutables/issues/390)
 public abstract class AbstractJobResource extends Resource<org.cloudfoundry.client.v2.jobs.JobEntity> {
 
 }

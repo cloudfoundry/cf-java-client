@@ -19,6 +19,7 @@ package org.cloudfoundry.reactor;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import okhttp3.mockwebserver.MockResponse;
 import okio.Buffer;
+import org.cloudfoundry.AllowNulls;
 import org.immutables.value.Value;
 import org.springframework.core.io.ClassPathResource;
 
@@ -31,6 +32,7 @@ abstract class _TestResponse {
 
     abstract Optional<String> getContentType();
 
+    @AllowNulls
     abstract Map<String, String> getHeaders();
 
     MockResponse getMockResponse() {

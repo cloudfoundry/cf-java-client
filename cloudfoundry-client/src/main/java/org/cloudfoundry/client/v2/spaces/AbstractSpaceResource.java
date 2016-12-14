@@ -21,6 +21,6 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * Base class for space resources
  */
-public abstract class AbstractSpaceResource extends Resource<SpaceEntity> {
+public abstract class AbstractSpaceResource extends Resource<org.cloudfoundry.client.v2.spaces.SpaceEntity> {
 
 }

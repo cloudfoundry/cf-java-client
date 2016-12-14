@@ -21,6 +21,6 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The base class for Domain resources
  */
-public abstract class AbstractDomainResource extends Resource<DomainEntity> {
+public abstract class AbstractDomainResource extends Resource<org.cloudfoundry.client.v2.domains.DomainEntity> {
 
 }

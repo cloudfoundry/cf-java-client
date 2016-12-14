@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.doppler;
 
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
@@ -133,6 +134,7 @@ abstract class _Envelope {
     /**
      * key/value tags to include additional identifying information
      */
+    @AllowNulls
     abstract Map<String, String> getTags();
 
     /**
