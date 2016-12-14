@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.ipc.netty.http.HttpException;
 
 import java.time.Duration;
 import java.util.Base64;
@@ -131,6 +132,13 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
                 Mono.just(r.get("access_token")),
                 Mono.delay(getRefreshDelay(r)).then()
             ))
+            .onErrorResumeWith(t -> isUnauthorized(t), v -> {
+                synchronized (this.refreshTokenMonitor) {
+                    this.refreshToken = null;
+                }
+                LOGGER.debug("{}. Cannot get access token using refresh token. This may due to refresh token expiration. Getting a new access token...", v);
+                return Flux.empty();
+            })
             .repeat()
             .cast(String.class)
             .doOnNext(token -> LOGGER.debug("JWT Token: {}", token))
@@ -147,6 +155,10 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
         }
 
         return builder.build().encode().toUriString();
+    }
+
+    private boolean isUnauthorized(Throwable t) {
+        return (t instanceof HttpException) && "HTTP request failed with code: 401".equals(t.getMessage());
     }
 
 }
