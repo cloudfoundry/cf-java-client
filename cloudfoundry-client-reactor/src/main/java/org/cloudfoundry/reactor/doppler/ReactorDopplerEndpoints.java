@@ -24,6 +24,7 @@ import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
+import org.cloudfoundry.reactor.util.MultipartDecoderChannelHandler;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -31,7 +32,6 @@ import reactor.ipc.netty.ByteBufFlux;
 import reactor.ipc.netty.NettyInbound;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 final class ReactorDopplerEndpoints extends AbstractDopplerOperations {
 
@@ -41,19 +41,40 @@ final class ReactorDopplerEndpoints extends AbstractDopplerOperations {
 
     Flux<Envelope> containerMetrics(ContainerMetricsRequest request) {
         return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "containermetrics"))
-            .flatMap(inbound -> inbound.receiveMultipart().receive().asInputStream())
+            .flatMap(inbound -> inbound.addHandler(new MultipartDecoderChannelHandler(inbound)).receiveObject())
+            .takeWhile(t -> MultipartDecoderChannelHandler.CLOSE_DELIMITER != t)
+            .window()
+            .concatMap(w -> w
+                .takeWhile(t -> MultipartDecoderChannelHandler.DELIMITER != t)
+                .as(ByteBufFlux::fromInbound)
+                .aggregate()
+                .asByteArray(), Integer.MAX_VALUE)
             .map(ReactorDopplerEndpoints::toEnvelope);
     }
 
     Flux<Envelope> firehose(FirehoseRequest request) {
         return ws(builder -> builder.pathSegment("firehose", request.getSubscriptionId()))
-            .flatMap(response -> response.receive().aggregate().asInputStream())
+            .flatMap(NettyInbound::receiveObject)  // TODO: Replace with proper alias from reactor-netty 0.6.0
+            .cast(WebSocketFrame.class)
+            .window()
+            .concatMap(w -> w
+                .takeUntil(WebSocketFrame::isFinalFragment)
+                .as(ByteBufFlux::fromInbound)
+                .aggregate()
+                .asByteArray(), Integer.MAX_VALUE)
             .map(ReactorDopplerEndpoints::toEnvelope);
     }
 
     Flux<Envelope> recentLogs(RecentLogsRequest request) {
         return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "recentlogs"))
-            .flatMap(inbound -> inbound.receiveMultipart().receive().asInputStream())
+            .flatMap(inbound -> inbound.addHandler(new MultipartDecoderChannelHandler(inbound)).receiveObject())
+            .takeWhile(t -> MultipartDecoderChannelHandler.CLOSE_DELIMITER != t)
+            .window()
+            .concatMap(w -> w
+                .takeWhile(t -> MultipartDecoderChannelHandler.DELIMITER != t)
+                .as(ByteBufFlux::fromInbound)
+                .aggregate()
+                .asByteArray(), Integer.MAX_VALUE)
             .map(ReactorDopplerEndpoints::toEnvelope);
     }
 
@@ -66,14 +87,15 @@ final class ReactorDopplerEndpoints extends AbstractDopplerOperations {
                 .takeUntil(WebSocketFrame::isFinalFragment)
                 .as(ByteBufFlux::fromInbound)
                 .aggregate()
-                .asInputStream())
+                .asByteArray(), Integer.MAX_VALUE)
             .map(ReactorDopplerEndpoints::toEnvelope);
     }
 
-    private static Envelope toEnvelope(InputStream inputStream) {
-        try (InputStream in = inputStream) {
-            return Envelope.from(org.cloudfoundry.dropsonde.events.Envelope.ADAPTER.decode(in));
+    private static Envelope toEnvelope(byte[] bytes) {
+        try {
+            return Envelope.from(org.cloudfoundry.dropsonde.events.Envelope.ADAPTER.decode(bytes));
         } catch (IOException e) {
+            e.printStackTrace();
             throw Exceptions.propagate(e);
         }
     }
