@@ -94,7 +94,7 @@ abstract class _HttpStartStop {
     abstract String getRemoteAddress();
 
     /**
-     * The ID for tracking lifecycle of request. Should match requestId of a {@link HttpStop} event
+     * The ID for tracking lifecycle of request.
      */
     abstract UUID getRequestId();
 
