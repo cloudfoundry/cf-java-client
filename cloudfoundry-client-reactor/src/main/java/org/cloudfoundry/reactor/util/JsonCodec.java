@@ -33,18 +33,13 @@ import java.util.function.Function;
 
 public final class JsonCodec {
 
-    public static final String JSON_DECODER = "jsonDecoder";
-
     private static final AsciiString APPLICATION_JSON = new AsciiString("application/json; charset=utf-8");
 
     private static final AsciiString CONTENT_TYPE = new AsciiString("Content-Type");
 
     public static <T> Function<Mono<HttpClientResponse>, Flux<T>> decode(ObjectMapper objectMapper, Class<T> type) {
         return response -> response
-            .flatMap(inbound -> {
-                inbound.context().addHandler(JSON_DECODER, new JsonObjectDecoder());
-                return inbound.receive().aggregate();
-            })
+            .flatMap(inbound -> inbound.addHandler(new JsonObjectDecoder()).receive().aggregate())
             .map(byteBuf -> {
                 try {
                     return objectMapper.readValue(byteBuf.toString(Charset.defaultCharset()), type);

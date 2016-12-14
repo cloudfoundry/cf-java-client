@@ -26,6 +26,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.function.Function;
@@ -49,7 +50,12 @@ public final class SortingUtils {
      */
     public static <T> Function<Flux<T>, Flux<T>> timespan(Comparator<T> comparator, Duration timespan) {
         return source -> {
-            Queue<Tuple2<Long, T>> accumulator = new PriorityQueue<>((o1, o2) -> comparator.compare(o1.getT2(), o2.getT2()));
+            Queue<Tuple2<Long, T>> accumulator = new PriorityQueue<>((o1, o2) -> {
+                T first = Optional.ofNullable(o1).map(Tuple2::getT2).orElse(null);
+                T second = Optional.ofNullable(o2).map(Tuple2::getT2).orElse(null);
+
+                return comparator.compare(first, second);
+            });
             Object monitor = new Object();
 
             DirectProcessor<Void> d = DirectProcessor.create();

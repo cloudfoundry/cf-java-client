@@ -194,10 +194,7 @@ public final class ReactorApplicationsV2 extends AbstractClientV2Operations impl
                         throw Exceptions.propagate(e);
                     }
                 })
-                .then(() -> {
-                    outbound.context().channel().flush();
-                    return outbound;
-                }));
+                .then());
     }
 
 }
