@@ -16,13 +16,7 @@
 
 package org.cloudfoundry.reactor.util;
 
-import reactor.core.Exceptions;
-
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.Charset;
 
 final class JsonParsingException extends RuntimeException {
 
@@ -30,34 +24,13 @@ final class JsonParsingException extends RuntimeException {
 
     private final String payload;
 
-    JsonParsingException(String message, Throwable cause, InputStream in) {
+    JsonParsingException(String message, Throwable cause, String payload) {
         super(message, cause);
-        this.payload = getPayload(in);
+        this.payload = payload;
     }
 
     public String getPayload() {
         return this.payload;
-    }
-
-    private static String getPayload(InputStream in) {
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            in.reset();
-
-            try (Reader reader = new InputStreamReader(in, Charset.forName("UTF-8"))) {
-
-                int length;
-                char[] buffer = new char[8192];
-                while ((length = reader.read(buffer)) != -1) {
-                    sb.append(buffer, 0, length);
-                }
-            }
-        } catch (IOException e) {
-            throw Exceptions.propagate(e);
-        }
-
-        return sb.toString();
     }
 
 }

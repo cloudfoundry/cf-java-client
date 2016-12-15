@@ -41,10 +41,12 @@ public final class JsonCodec {
         return response -> response
             .flatMap(inbound -> inbound.addHandler(new JsonObjectDecoder()).receive().aggregate())
             .map(byteBuf -> {
+                String content = byteBuf.toString(Charset.defaultCharset());
+
                 try {
-                    return objectMapper.readValue(byteBuf.toString(Charset.defaultCharset()), type);
+                    return objectMapper.readValue(content, type);
                 } catch (IOException e) {
-                    throw Exceptions.propagate(e);
+                    throw Exceptions.propagate(new JsonParsingException(e.getMessage(), e, content));
                 }
             });
     }

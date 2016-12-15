@@ -50,22 +50,21 @@ public final class SortingUtils {
      */
     public static <T> Function<Flux<T>, Flux<T>> timespan(Comparator<T> comparator, Duration timespan) {
         return source -> {
-            Queue<Tuple2<Long, T>> accumulator = new PriorityQueue<>((o1, o2) -> {
-                T first = Optional.ofNullable(o1).map(Tuple2::getT2).orElse(null);
-                T second = Optional.ofNullable(o2).map(Tuple2::getT2).orElse(null);
+            Queue<Tuple2<Long, T>> accumulator = new PriorityQueue<>((o1, o2) -> comparator.compare(o1.getT2(), o2.getT2()));
 
-                return comparator.compare(first, second);
-            });
             Object monitor = new Object();
 
             DirectProcessor<Void> d = DirectProcessor.create();
 
             Cancellation cancellation = source
                 .timestamp()
-                .subscribe(e -> {
-                    synchronized (monitor) {
-                        accumulator.add(e);
-                    }
+                .subscribe(item -> {
+                    Optional.ofNullable(item)
+                        .ifPresent(i -> {
+                            synchronized (monitor) {
+                                accumulator.add(i);
+                            }
+                        });
                 }, d::onError, d::onComplete);
 
             return Flux
