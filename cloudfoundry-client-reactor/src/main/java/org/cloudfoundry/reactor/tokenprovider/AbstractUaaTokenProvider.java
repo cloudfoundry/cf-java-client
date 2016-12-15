@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.ipc.netty.http.client.HttpClientRequest.Form;
 
 import java.time.Duration;
 import java.util.Base64;
@@ -82,15 +83,20 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
     }
 
     /**
-     * Return a {@link UriComponentsBuilder} that contains the configured access token uri
+     * Augment the form with the payload required to request and access token
      *
-     * @param builder a {@link UriComponentsBuilder} to modify
-     * @return the modified {@link UriComponentsBuilder}
+     * @param form the form to augment
      */
-    protected abstract UriComponentsBuilder getAccessTokenUri(UriComponentsBuilder builder);
+    protected abstract void accessTokenPayload(Form form);
 
     private static Duration getRefreshDelay(Map<String, Integer> r) {
         return Duration.ofSeconds(r.get("expires_in")).minus(REFRESH_MARGIN);
+    }
+
+    private static String getTokenUri(String root) {
+        return UriComponentsBuilder.fromUriString(root)
+            .pathSegment("oauth", "token")
+            .build().encode().toUriString();
     }
 
     private String getAuthorizationValue() {
@@ -98,27 +104,18 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
         return String.format("Basic %s", encoded);
     }
 
-    private UriComponentsBuilder getRefreshTokenUri(UriComponentsBuilder builder, String refreshToken) {
-        return builder
-            .queryParam("grant_type", "refresh_token")
-            .queryParam("client_id", getClientId())
-            .queryParam("client_secret", getClientSecret())
-            .queryParam("refresh_token", refreshToken);
-    }
-
     @SuppressWarnings("unchecked")
     private Mono<String> getTokenFlow(ConnectionContext connectionContext) {
         return connectionContext
             .getRoot("authorization_endpoint")
-            .map(this::getTokenUri)
+            .map(AbstractUaaTokenProvider::getTokenUri)
             .then(uri -> connectionContext.getHttpClient()
                 .post(uri, outbound -> outbound
                     .header(HttpHeaderNames.ACCEPT, HttpHeaderValues.APPLICATION_JSON)
                     .header(HttpHeaderNames.AUTHORIZATION, getAuthorizationValue())
-                    .header(HttpHeaderNames.CONTENT_LENGTH, "0")
                     .header(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED)
-                    .disableChunkedTransfer()
-                    .send())
+                    .sendForm(this::tokenPayload)
+                    .then())
                 .doOnSubscribe(NetworkLogging.post(uri))
                 .compose(NetworkLogging.response(uri)))
             .compose(JsonCodec.decode(connectionContext.getObjectMapper(), Map.class))
@@ -138,15 +135,22 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
             .next();
     }
 
-    private String getTokenUri(String root) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(root)
-            .pathSegment("oauth", "token");
+    private void refreshTokenPayload(Form form, String refreshToken) {
+        form
+            .attr("grant_type", "refresh_token")
+            .attr("client_id", getClientId())
+            .attr("client_secret", getClientSecret())
+            .attr("refresh_token", refreshToken);
+    }
 
+    private void tokenPayload(Form form) {
         synchronized (this.refreshTokenMonitor) {
-            builder = this.refreshToken == null ? getAccessTokenUri(builder) : getRefreshTokenUri(builder, this.refreshToken);
+            if (this.refreshToken == null) {
+                accessTokenPayload(form);
+            } else {
+                refreshTokenPayload(form, this.refreshToken);
+            }
         }
-
-        return builder.build().encode().toUriString();
     }
 
 }

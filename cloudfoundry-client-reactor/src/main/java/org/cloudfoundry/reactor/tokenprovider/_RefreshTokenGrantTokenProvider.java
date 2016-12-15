@@ -18,7 +18,7 @@ package org.cloudfoundry.reactor.tokenprovider;
 
 import org.cloudfoundry.reactor.TokenProvider;
 import org.immutables.value.Value;
-import org.springframework.web.util.UriComponentsBuilder;
+import reactor.ipc.netty.http.client.HttpClientRequest.Form;
 
 /**
  * The OAuth Refresh Token Grant implementation of {@link TokenProvider}
@@ -27,12 +27,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 abstract class _RefreshTokenGrantTokenProvider extends AbstractUaaTokenProvider {
 
     @Override
-    protected UriComponentsBuilder getAccessTokenUri(UriComponentsBuilder builder) {
-        return builder
-            .queryParam("grant_type", "refresh_token")
-            .queryParam("client_id", getClientId())
-            .queryParam("client_secret", getClientSecret())
-            .queryParam("refresh_token", getToken());
+    protected void accessTokenPayload(Form form) {
+        form
+            .attr("grant_type", "refresh_token")
+            .attr("client_id", getClientId())
+            .attr("client_secret", getClientSecret())
+            .attr("refresh_token", getToken());
     }
 
     /**

@@ -18,7 +18,7 @@ package org.cloudfoundry.reactor.tokenprovider;
 
 import org.cloudfoundry.reactor.TokenProvider;
 import org.immutables.value.Value;
-import org.springframework.web.util.UriComponentsBuilder;
+import reactor.ipc.netty.http.client.HttpClientRequest.Form;
 
 /**
  * The One-time Passcode Password Grant implementation of {@link TokenProvider}
@@ -27,12 +27,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 abstract class _OneTimePasscodeTokenProvider extends AbstractUaaTokenProvider {
 
     @Override
-    protected UriComponentsBuilder getAccessTokenUri(UriComponentsBuilder builder) {
-        return builder
-            .queryParam("client_id", getClientId())
-            .queryParam("client_secret", getClientSecret())
-            .queryParam("grant_type", "password")
-            .queryParam("passcode", getPasscode());
+    protected void accessTokenPayload(Form form) {
+        form
+            .attr("client_id", getClientId())
+            .attr("client_secret", getClientSecret())
+            .attr("grant_type", "password")
+            .attr("passcode", getPasscode());
     }
 
     /**
