@@ -1,12 +1,79 @@
 {
+  "id": "twiglet-get",
+  "subdomain": "twiglet-get",
   "config": {
-    "idpDiscoveryEnabled": false,
+    "clientLockoutPolicy": {
+      "lockoutPeriodSeconds": -1,
+      "lockoutAfterFailures": -1,
+      "countFailuresWithin": -1
+    },
+    "tokenPolicy": {
+      "accessTokenValidity": -1,
+      "refreshTokenValidity": -1,
+      "jwtRevocable": false,
+      "activeKeyId": null,
+      "keys": {}
+    },
+    "samlConfig": {
+      "assertionSigned": true,
+      "requestSigned": true,
+      "wantAssertionSigned": true,
+      "wantAuthnRequestSigned": false,
+      "assertionTimeToLiveSeconds": 600,
+      "certificate": null,
+      "privateKey": null,
+      "privateKeyPassword": null
+    },
+    "corsPolicy": {
+      "xhrConfiguration": {
+        "allowedOrigins": [
+          ".*"
+        ],
+        "allowedOriginPatterns": [],
+        "allowedUris": [
+          ".*"
+        ],
+        "allowedUriPatterns": [],
+        "allowedHeaders": [
+          "Accept",
+          "Authorization",
+          "Content-Type"
+        ],
+        "allowedMethods": [
+          "GET"
+        ],
+        "allowedCredentials": false,
+        "maxAge": 1728000
+      },
+      "defaultConfiguration": {
+        "allowedOrigins": [
+          ".*"
+        ],
+        "allowedOriginPatterns": [],
+        "allowedUris": [
+          ".*"
+        ],
+        "allowedUriPatterns": [],
+        "allowedHeaders": [
+          "Accept",
+          "Authorization",
+          "Content-Type"
+        ],
+        "allowedMethods": [
+          "GET"
+        ],
+        "allowedCredentials": false,
+        "maxAge": 1728000
+      }
+    },
     "links": {
       "logout": {
         "redirectUrl": "/login",
         "redirectParameterName": "redirect",
-        "disableRedirectParameter": true
+        "disableRedirectParameter": true,
+        "whitelist": null
       },
+      "homeRedirect": "http://my.hosted.homepage.com/",
       "selfService": {
         "selfServiceLinksEnabled": true,
         "signup": "/create_account",
@@ -30,24 +97,20 @@
         "text": "One Time Code (Get on at /passcode)"
       }
     ],
-    "samlConfig": {
-      "assertionSigned": true,
-      "requestSigned": true,
-      "wantAssertionSigned": false,
-      "wantAuthnRequestSigned": false,
-      "assertionTimeToLiveSeconds": 600
+    "idpDiscoveryEnabled": false,
+    "branding": {
+      "companyName": "Test Company",
+      "productLogo": "VGVzdFByb2R1Y3RMb2dv",
+      "squareLogo": "VGVzdFNxdWFyZUxvZ28=",
+      "footerLegalText": "Test footer legal text",
+      "footerLinks": {
+        "Support": "http://support.example.com"
+      }
     },
-    "tokenPolicy": {
-      "accessTokenValidity": -1,
-      "refreshTokenValidity": -1,
-      "jwtRevocable": false,
-      "keys": {}
-    }
+    "accountChooserEnabled": false
   },
-  "created": 1463595920104,
-  "id": "twiglet-get",
-  "last_modified": 1463595920104,
   "name": "The Twiglet Zone",
-  "subdomain": "twiglet-get",
-  "version": 0
+  "version": 0,
+  "created": 1481728057382,
+  "last_modified": 1481728057382
 }

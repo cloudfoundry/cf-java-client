@@ -1,12 +1,78 @@
 [
   {
+    "id": "15wtczzd",
+    "subdomain": "15wtczzd",
     "config": {
-      "idpDiscoveryEnabled": false,
+      "clientLockoutPolicy": {
+        "lockoutPeriodSeconds": -1,
+        "lockoutAfterFailures": -1,
+        "countFailuresWithin": -1
+      },
+      "tokenPolicy": {
+        "accessTokenValidity": -1,
+        "refreshTokenValidity": -1,
+        "jwtRevocable": false,
+        "activeKeyId": null,
+        "keys": {}
+      },
+      "samlConfig": {
+        "assertionSigned": true,
+        "requestSigned": true,
+        "wantAssertionSigned": true,
+        "wantAuthnRequestSigned": false,
+        "assertionTimeToLiveSeconds": 600,
+        "certificate": null,
+        "privateKey": null,
+        "privateKeyPassword": null
+      },
+      "corsPolicy": {
+        "xhrConfiguration": {
+          "allowedOrigins": [
+            ".*"
+          ],
+          "allowedOriginPatterns": [],
+          "allowedUris": [
+            ".*"
+          ],
+          "allowedUriPatterns": [],
+          "allowedHeaders": [
+            "Accept",
+            "Authorization",
+            "Content-Type"
+          ],
+          "allowedMethods": [
+            "GET"
+          ],
+          "allowedCredentials": false,
+          "maxAge": 1728000
+        },
+        "defaultConfiguration": {
+          "allowedOrigins": [
+            ".*"
+          ],
+          "allowedOriginPatterns": [],
+          "allowedUris": [
+            ".*"
+          ],
+          "allowedUriPatterns": [],
+          "allowedHeaders": [
+            "Accept",
+            "Authorization",
+            "Content-Type"
+          ],
+          "allowedMethods": [
+            "GET"
+          ],
+          "allowedCredentials": false,
+          "maxAge": 1728000
+        }
+      },
       "links": {
         "logout": {
-          "disableRedirectParameter": true,
           "redirectUrl": "/login",
-          "redirectParameterName": "redirect"
+          "redirectParameterName": "redirect",
+          "disableRedirectParameter": true,
+          "whitelist": null
         },
         "selfService": {
           "selfServiceLinksEnabled": true,
@@ -31,80 +97,13 @@
           "text": "One Time Code (Get on at /passcode)"
         }
       ],
-      "samlConfig": {
-        "assertionSigned": true,
-        "assertionTimeToLiveSeconds": 600,
-        "requestSigned": true,
-        "wantAssertionSigned": false,
-        "wantAuthnRequestSigned": false
-      },
-      "tokenPolicy": {
-        "accessTokenValidity": -1,
-        "jwtRevocable": false,
-        "refreshTokenValidity": -1,
-        "keys": {}
-      }
+      "idpDiscoveryEnabled": false,
+      "accountChooserEnabled": false
     },
-    "created": 1463595916851,
-    "description": "Like the Twilight Zone but tastier.",
-    "id": "twiglet-list-1",
-    "last_modified": 1463595916851,
     "name": "The Twiglet Zone",
     "version": 0,
-    "subdomain": "twiglet-list-1"
-  },
-  {
-    "config": {
-      "idpDiscoveryEnabled": false,
-      "links": {
-        "logout": {
-          "disableRedirectParameter": true,
-          "redirectUrl": "/login",
-          "redirectParameterName": "redirect"
-        },
-        "selfService": {
-          "selfServiceLinksEnabled": true,
-          "signup": "/create_account",
-          "passwd": "/forgot_password"
-        }
-      },
-      "prompts": [
-        {
-          "name": "username",
-          "type": "text",
-          "text": "Email"
-        },
-        {
-          "name": "password",
-          "type": "password",
-          "text": "Password"
-        },
-        {
-          "name": "passcode",
-          "type": "password",
-          "text": "One Time Code (Get on at /passcode)"
-        }
-      ],
-      "samlConfig": {
-        "assertionSigned": true,
-        "assertionTimeToLiveSeconds": 600,
-        "requestSigned": true,
-        "wantAssertionSigned": false,
-        "wantAuthnRequestSigned": false
-      },
-      "tokenPolicy": {
-        "accessTokenValidity": -1,
-        "jwtRevocable": false,
-        "refreshTokenValidity": -1,
-        "keys": {}
-      }
-    },
-    "created": 1463595918196,
     "description": "Like the Twilight Zone but tastier.",
-    "id": "twiglet-list-2",
-    "last_modified": 1463595918196,
-    "name": "The Twiglet Zone",
-    "subdomain": "twiglet-list-2",
-    "version": 0
+    "created": 1481728053399,
+    "last_modified": 1481728053399
   }
 ]

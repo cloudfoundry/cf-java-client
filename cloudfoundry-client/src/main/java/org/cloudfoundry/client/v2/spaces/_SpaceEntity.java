@@ -78,6 +78,13 @@ abstract class _SpaceEntity {
     abstract String getEventsUrl();
 
     /**
+     * The isolation segment id
+     */
+    @JsonProperty("isolation_segment_guid")
+    @Nullable
+    abstract String getIsolationSegmentId();
+
+    /**
      * The managers url
      */
     @JsonProperty("managers_url")

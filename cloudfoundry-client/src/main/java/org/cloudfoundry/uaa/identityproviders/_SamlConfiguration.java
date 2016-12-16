@@ -98,6 +98,13 @@ abstract class _SamlConfiguration extends AbstractExternalIdentityProviderConfig
     abstract Boolean getShowSamlLink();
 
     /**
+     * Whether to skip SSL validation
+     */
+    @JsonProperty("skipSslValidation")
+    @Nullable
+    abstract Boolean getSkipSslValidation();
+
+    /**
      * Either "org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory" or"org.apache.commons.httpclient.contrib.ssl.EasySSLProtocolSocketFactory" depending on if the metaDataLocation of
      * type URL is HTTP or HTTPS, respectively
      */

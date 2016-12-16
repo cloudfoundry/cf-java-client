@@ -31,6 +31,34 @@ import java.util.List;
 abstract class _IdentityZoneConfiguration {
 
     /**
+     * This flag is required to enable account choosing functionality for IDP discovery page.
+     */
+    @JsonProperty("accountChooserEnabled")
+    @Nullable
+    abstract Boolean getAccountChooserEnabled();
+
+    /**
+     * The branding
+     */
+    @JsonProperty("branding")
+    @Nullable
+    abstract Branding getBranding();
+
+    /**
+     * The client lockout policy
+     */
+    @JsonProperty("clientLockoutPolicy")
+    @Nullable
+    abstract ClientLockoutPolicy getClientLockoutPolicy();
+
+    /**
+     * The CORS policy
+     */
+    @JsonProperty("corsPolicy")
+    @Nullable
+    abstract CorsPolicy getCorsPolicy();
+
+    /**
      * IDP Discovery should be set to true if you have configured more than one identity provider for UAA. The discovery relies on email domain being set for each additional provider.
      */
     @JsonProperty("idpDiscoveryEnabled")

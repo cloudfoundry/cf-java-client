@@ -50,7 +50,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
                 .clientId(this.clientId)
                 .build())
             .as(StepVerifier::create)
-            .consumeNextWith(actual -> assertThat(actual).hasSize(6))
+            .consumeNextWith(actual -> assertThat(actual.length()).isGreaterThanOrEqualTo(6))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }

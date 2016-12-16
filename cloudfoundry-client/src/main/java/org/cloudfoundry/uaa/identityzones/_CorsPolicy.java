@@ -14,39 +14,29 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.identityproviders;
+package org.cloudfoundry.uaa.identityzones;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * The payload for the OAuth2 identity provider configuration
+ * The payload for the identity zone CORS policy
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _OAuth2Configuration extends AbstractAuthenticationConfiguration {
+abstract class _CorsPolicy {
 
     /**
-     * The OAuth check token endpoint URL. Reserved for future OAuth use.
+     * The default configuration
      */
-    @JsonProperty("checkTokenUrl")
-    @Nullable
-    abstract String getCheckTokenUrl();
+    @JsonProperty("defaultConfiguration")
+    abstract CorsConfiguration getDefaultConfiguration();
 
     /**
-     * The OAuth 2.0 token issuer.
+     * The XHR configuration
      */
-    @JsonProperty("issuer")
-    @Nullable
-    abstract String getIssuer();
-
-    /**
-     * The OAuth 2.0 response type.
-     */
-    @JsonProperty("responseType")
-    @Nullable
-    abstract String getResponseType();
+    @JsonProperty("xhrConfiguration")
+    abstract CorsConfiguration getXhrConfiguration();
 
 }

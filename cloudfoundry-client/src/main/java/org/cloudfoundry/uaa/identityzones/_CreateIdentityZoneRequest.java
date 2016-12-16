@@ -34,6 +34,13 @@ abstract class _CreateIdentityZoneRequest {
     abstract IdentityZoneConfiguration getConfiguration();
 
     /**
+     * The creation date of the identity zone
+     */
+    @JsonProperty("created")
+    @Nullable
+    abstract Long getCreatedAt();
+
+    /**
      * The description of the identity zone
      */
     @JsonProperty("description")
@@ -46,6 +53,13 @@ abstract class _CreateIdentityZoneRequest {
     @JsonProperty("id")
     @Nullable
     abstract String getIdentityZoneId();
+
+    /**
+     * The last modification date of the identity zone
+     */
+    @JsonProperty("last_modified")
+    @Nullable
+    abstract Long getLastModified();
 
     /**
      * The name of the identity zone
