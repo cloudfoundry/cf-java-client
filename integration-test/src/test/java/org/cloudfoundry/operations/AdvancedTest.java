@@ -36,7 +36,7 @@ public final class AdvancedTest extends AbstractIntegrationTest {
         this.cloudFoundryOperations.advanced()
             .sshCode()
             .as(StepVerifier::create)
-            .consumeNextWith(actual -> assertThat(actual).hasSize(6))
+            .consumeNextWith(actual -> assertThat(actual.length()).isGreaterThanOrEqualTo(6))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }

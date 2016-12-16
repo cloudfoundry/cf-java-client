@@ -14,39 +14,35 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.identityproviders;
+package org.cloudfoundry.uaa.identityzones;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * The payload for the OAuth2 identity provider configuration
+ * The payload for the identity zone client lockout policy
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _OAuth2Configuration extends AbstractAuthenticationConfiguration {
+abstract class _ClientLockoutPolicy {
 
     /**
-     * The OAuth check token endpoint URL. Reserved for future OAuth use.
+     * Number of seconds in which {@code lockoutAfterFailures} failures must occur in order for account to be locked
      */
-    @JsonProperty("checkTokenUrl")
-    @Nullable
-    abstract String getCheckTokenUrl();
+    @JsonProperty("countFailuresWithin")
+    abstract Integer getCountFailuresWithin();
 
     /**
-     * The OAuth 2.0 token issuer.
+     * Number of allowed failures before account is locked
      */
-    @JsonProperty("issuer")
-    @Nullable
-    abstract String getIssuer();
+    @JsonProperty("lockoutAfterFailures")
+    abstract Integer getLockoutAfterFailures();
 
     /**
-     * The OAuth 2.0 response type.
+     * Number of seconds to lock out an account when lockoutAfterFailures failures is exceeded
      */
-    @JsonProperty("responseType")
-    @Nullable
-    abstract String getResponseType();
+    @JsonProperty("lockoutPeriodSeconds")
+    abstract Integer getLockoutPeriodSeconds();
 
 }

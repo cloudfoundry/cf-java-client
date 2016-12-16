@@ -57,6 +57,13 @@ abstract class _OrganizationEntity {
     abstract String getBillingManagersUrl();
 
     /**
+     * The default isolation segment id
+     */
+    @JsonProperty("default_isolation_segment_guid")
+    @Nullable
+    abstract String getDefaultIsolationSegmentId();
+
+    /**
      * The domains url
      */
     @JsonProperty("domains_url")

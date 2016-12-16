@@ -25,6 +25,7 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.After;
+import org.junit.ComparisonFailure;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
@@ -74,8 +75,14 @@ public abstract class AbstractRestTest {
                 }
 
                 interactionContext.setDone(true);
-                interactionContext.getRequest().assertEquals(request);
-                return interactionContext.getResponse().getMockResponse();
+
+                try {
+                    interactionContext.getRequest().assertEquals(request);
+                    return interactionContext.getResponse().getMockResponse();
+                } catch (ComparisonFailure e) {
+                    e.printStackTrace();
+                    return new MockResponse().setResponseCode(400);
+                }
             }
         });
     }

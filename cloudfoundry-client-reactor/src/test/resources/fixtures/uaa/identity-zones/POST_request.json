@@ -1,16 +1,82 @@
 {
+  "id": "twiglet-create",
+  "subdomain": "twiglet-create",
   "config": {
-    "idpDiscoveryEnabled": false,
+    "clientLockoutPolicy": {
+      "lockoutPeriodSeconds": 300,
+      "lockoutAfterFailures": 5,
+      "countFailuresWithin": 3600
+    },
+    "tokenPolicy": {
+      "accessTokenValidity": -1,
+      "refreshTokenValidity": -1,
+      "jwtRevocable": false,
+      "keys": {
+        "exampleKeyId": {
+          "signingKey": "s1gNiNg.K3y/t3XT"
+        }
+      }
+    },
+    "samlConfig": {
+      "assertionSigned": true,
+      "requestSigned": true,
+      "wantAssertionSigned": true,
+      "wantAuthnRequestSigned": false,
+      "assertionTimeToLiveSeconds": 600
+    },
+    "corsPolicy": {
+      "xhrConfiguration": {
+        "allowedOrigins": [
+          ".*"
+        ],
+        "allowedOriginPatterns": [],
+        "allowedUris": [
+          ".*"
+        ],
+        "allowedUriPatterns": [],
+        "allowedHeaders": [
+          "Accept",
+          "Authorization",
+          "Content-Type"
+        ],
+        "allowedMethods": [
+          "GET"
+        ],
+        "allowedCredentials": false,
+        "maxAge": 1728000
+      },
+      "defaultConfiguration": {
+        "allowedOrigins": [
+          ".*"
+        ],
+        "allowedOriginPatterns": [],
+        "allowedUris": [
+          ".*"
+        ],
+        "allowedUriPatterns": [],
+        "allowedHeaders": [
+          "Accept",
+          "Authorization",
+          "Content-Type"
+        ],
+        "allowedMethods": [
+          "GET"
+        ],
+        "allowedCredentials": false,
+        "maxAge": 1728000
+      }
+    },
     "links": {
       "logout": {
-        "disableRedirectParameter": true,
+        "redirectUrl": "/login",
         "redirectParameterName": "redirect",
-        "redirectUrl": "/login"
+        "disableRedirectParameter": true
       },
+      "homeRedirect": "http://my.hosted.homepage.com/",
       "selfService": {
-        "passwd": "/forgot_password",
         "selfServiceLinksEnabled": true,
-        "signup": "/create_account"
+        "signup": "/create_account",
+        "passwd": "/forgot_password"
       }
     },
     "prompts": [
@@ -30,27 +96,21 @@
         "text": "One Time Code (Get on at /passcode)"
       }
     ],
-    "samlConfig": {
-      "assertionSigned": true,
-      "assertionTimeToLiveSeconds": 600,
-      "requestSigned": true,
-      "wantAssertionSigned": false,
-      "wantAuthnRequestSigned": false
+    "idpDiscoveryEnabled": false,
+    "branding": {
+      "companyName": "Test Company",
+      "productLogo": "VGVzdFByb2R1Y3RMb2dv",
+      "squareLogo": "VGVzdFNxdWFyZUxvZ28=",
+      "footerLegalText": "Test footer legal text",
+      "footerLinks": {
+        "Support": "http://support.example.com"
+      }
     },
-    "tokenPolicy": {
-      "accessTokenValidity": -1,
-      "jwtRevocable": false,
-      "keys": {
-        "exampleKeyId": {
-          "signingKey": "s1gNiNg.K3y/t3XT"
-        }
-      },
-      "refreshTokenValidity": -1
-    }
+    "accountChooserEnabled": false
   },
-  "description": "Like the Twilight Zone but tastier.",
-  "id": "twiglet-create",
   "name": "The Twiglet Zone",
-  "subdomain": "twiglet-create",
-  "version": 0
+  "version": 0,
+  "description": "Like the Twilight Zone but tastier.",
+  "created": 1481728057524,
+  "last_modified": 1481728057524
 }
