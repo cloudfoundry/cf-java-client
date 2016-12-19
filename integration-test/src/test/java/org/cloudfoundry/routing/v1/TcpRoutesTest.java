@@ -39,9 +39,9 @@ import reactor.test.StepVerifier;
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
-import static org.cloudfoundry.IfCloudFoundryVersion.CloudFoundryVersion.PCF_1_7;
+import static org.cloudfoundry.IfCloudFoundryVersion.CloudFoundryVersion.PCF_1_8;
 
-@IfCloudFoundryVersion(greaterThanOrEqualTo = PCF_1_7)
+@IfCloudFoundryVersion(greaterThanOrEqualTo = PCF_1_8)
 public final class TcpRoutesTest extends AbstractIntegrationTest {
 
     private static final String DEFAULT_ROUTER_GROUP = "default-tcp";
