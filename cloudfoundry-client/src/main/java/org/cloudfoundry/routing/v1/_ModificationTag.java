@@ -14,24 +14,26 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.routing;
+package org.cloudfoundry.routing.v1;
 
-import org.cloudfoundry.routing.v1.routergroups.RouterGroups;
-import org.cloudfoundry.routing.v1.tcproutes.TcpRoutes;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
-/**
- * Main entry point to the Routing Client API
- */
-public interface RoutingClient {
-
-    /**
-     * Main entry point to the Routing Groups API
-     */
-    RouterGroups routerGroups();
+@JsonDeserialize
+@Value.Immutable
+abstract class _ModificationTag {
 
     /**
-     * Main entry point to the TCP Routing API
+     * The ID of the route.
      */
-    TcpRoutes tcpRoutes();
+    @JsonProperty("guid")
+    abstract String getModificationTagId();
+
+    /**
+     * The index of the tag.
+     */
+    @JsonProperty("index")
+    abstract Integer getIndex();
 
 }

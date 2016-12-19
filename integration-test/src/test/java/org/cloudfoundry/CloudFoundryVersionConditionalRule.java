@@ -41,7 +41,10 @@ final class CloudFoundryVersionConditionalRule implements MethodRule {
 
             @Override
             public void evaluate() throws Throwable {
-                boolean enabled = Optional.ofNullable(AnnotationUtils.findAnnotation(method.getMethod(), IfCloudFoundryVersion.class))
+                IfCloudFoundryVersion annotation = Optional.ofNullable(AnnotationUtils.findAnnotation(method.getMethod(), IfCloudFoundryVersion.class))
+                    .orElse(AnnotationUtils.findAnnotation(method.getDeclaringClass(), IfCloudFoundryVersion.class));
+
+                boolean enabled = Optional.ofNullable(annotation)
                     .map(c -> isTestEnabled(c, CloudFoundryVersionConditionalRule.this.server))
                     .orElse(true);
 
