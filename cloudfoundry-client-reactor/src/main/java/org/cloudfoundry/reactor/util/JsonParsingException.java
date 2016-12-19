@@ -16,8 +16,6 @@
 
 package org.cloudfoundry.reactor.util;
 
-import java.io.InputStream;
-
 final class JsonParsingException extends RuntimeException {
 
     private static final long serialVersionUID = 689280281752742553L;

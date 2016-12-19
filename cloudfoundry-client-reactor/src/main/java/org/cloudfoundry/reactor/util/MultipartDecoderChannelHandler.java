@@ -106,11 +106,6 @@ public final class MultipartDecoderChannelHandler extends ChannelInboundHandlerA
         }
     }
 
-    @Override
-    public void channelReadComplete(ChannelHandlerContext context) throws Exception {
-        reset();
-    }
-
     private static char[] extractMultipartBoundary(HttpClientResponse response) {
         String contentType = response.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE);
         Matcher matcher = BOUNDARY_PATTERN.matcher(contentType);
