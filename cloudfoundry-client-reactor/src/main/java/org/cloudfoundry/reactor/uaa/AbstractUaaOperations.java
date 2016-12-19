@@ -41,7 +41,7 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
     }
 
     protected final <T> Mono<T> delete(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doDelete(request, responseType, getUriAugmenter(request, uriTransformer), getRequestTransformer(request));
+        return doDelete(request, responseType, getUriAugmenter(request, uriTransformer), getRequestTransformer(request), inbound -> inbound);
     }
 
     protected final <T> Mono<T> delete(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
@@ -50,11 +50,11 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
         return doDelete(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> {
             getRequestTransformer(request).apply(outbound);
             return requestTransformer.apply(outbound);
-        });
+        }, inbound -> inbound);
     }
 
     protected final Mono<HttpClientResponse> get(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doGet(getUriAugmenter(request, uriTransformer), getRequestTransformer(request));
+        return doGet(getUriAugmenter(request, uriTransformer), getRequestTransformer(request), inbound -> inbound);
     }
 
     protected final Mono<HttpClientResponse> get(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
@@ -63,11 +63,11 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
         return doGet(getUriAugmenter(request, uriTransformer), outbound -> {
             getRequestTransformer(request).apply(outbound);
             return requestTransformer.apply(outbound);
-        });
+        }, inbound -> inbound);
     }
 
     protected final <T> Mono<T> get(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doGet(responseType, getUriAugmenter(request, uriTransformer), getRequestTransformer(request));
+        return doGet(responseType, getUriAugmenter(request, uriTransformer), getRequestTransformer(request), inbound -> inbound);
     }
 
     protected final <T> Mono<T> get(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
@@ -76,7 +76,7 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
         return doGet(responseType, getUriAugmenter(request, uriTransformer), outbound -> {
             getRequestTransformer(request).apply(outbound);
             return requestTransformer.apply(outbound);
-        });
+        }, inbound -> inbound);
     }
 
     protected final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
@@ -85,11 +85,11 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
         return doPost(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> {
             getRequestTransformer(request).apply(outbound);
             return requestTransformer.apply(outbound);
-        });
+        }, inbound -> inbound);
     }
 
     protected final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doPost(request, responseType, getUriAugmenter(request, uriTransformer), getRequestTransformer(request));
+        return doPost(request, responseType, getUriAugmenter(request, uriTransformer), getRequestTransformer(request), inbound -> inbound);
     }
 
     protected final <T> Mono<T> postForm(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
@@ -106,11 +106,11 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
                 .addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED)
                 .disableChunkedTransfer()
                 .send();
-        });
+        }, inbound -> inbound);
     }
 
     protected final <T> Mono<T> put(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doPut(request, responseType, getUriAugmenter(request, uriTransformer), getRequestTransformer(request));
+        return doPut(request, responseType, getUriAugmenter(request, uriTransformer), getRequestTransformer(request), inbound -> inbound);
     }
 
     private static Function<HttpClientRequest, HttpClientRequest> getRequestTransformer(Object request) {

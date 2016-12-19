@@ -24,16 +24,13 @@ public final class CloudFoundryExceptionTest {
 
     @Test
     public void test() {
-        Exception cause = new Exception();
-        CloudFoundryException exception = new CloudFoundryException(-1, "test-description", "test-error-code", cause);
+        CloudFoundryException exception = new CloudFoundryException(-1, "test-description", "test-error-code");
 
         assertThat(exception.getCode()).isEqualTo(-1);
         assertThat(exception.getDescription()).isEqualTo("test-description");
         assertThat(exception.getErrorCode()).isEqualTo("test-error-code");
         assertThat(exception.getMessage()).isEqualTo("test-error-code(-1): test-description");
-        assertThat(exception.getCause()).isEqualTo(cause);
-
-        assertThat(new CloudFoundryException(-1, "test-description", "test-error-code").getCause()).isNull();
+        assertThat(exception.getCause()).isNull();
     }
 
 }

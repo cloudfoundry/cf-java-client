@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.client.HttpClientException;
 import reactor.ipc.netty.http.client.HttpClientResponse;
 
 import java.util.List;
@@ -65,11 +64,6 @@ public final class NetworkLogging {
                     RESPONSE_LOGGER.debug("{}    {}", i.status().code(), uri);
                 } else {
                     RESPONSE_LOGGER.warn("{}    {} ({})", i.status().code(), uri, StringUtils.collectionToCommaDelimitedString(warnings));
-                }
-            })
-            .doOnError(t -> {
-                if (t instanceof HttpClientException) {
-                    RESPONSE_LOGGER.debug("{}    {}", ((HttpClientException) t).getResponseStatus().code(), uri);
                 }
             });
     }

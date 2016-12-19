@@ -18,12 +18,11 @@ package org.cloudfoundry.reactor.client.v2;
 
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
-import org.cloudfoundry.reactor.client.CloudFoundryExceptionBuilder;
+import org.cloudfoundry.reactor.client.ClientErrorMapper;
 import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.client.HttpClientException;
 import reactor.ipc.netty.http.client.HttpClientRequest;
 import reactor.ipc.netty.http.client.HttpClientResponse;
 
@@ -39,46 +38,45 @@ public abstract class AbstractClientV2Operations extends AbstractReactorOperatio
     }
 
     protected final <T> Mono<T> delete(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doDelete(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> outbound)
-            .otherwise(HttpClientException.class, CloudFoundryExceptionBuilder::build);
+        return doDelete(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> outbound.failOnClientError(false),
+            ClientErrorMapper.cloudFoundry(this.connectionContext.getObjectMapper()));
     }
 
     protected final <T> Mono<T> get(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doGet(responseType, getUriAugmenter(request, uriTransformer), outbound -> outbound)
-            .otherwise(HttpClientException.class, CloudFoundryExceptionBuilder::build);
+        return doGet(responseType, getUriAugmenter(request, uriTransformer), outbound -> outbound.failOnClientError(false), ClientErrorMapper.cloudFoundry(this.connectionContext.getObjectMapper()));
     }
 
     protected final Mono<HttpClientResponse> get(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return get(request, uriTransformer, outbound -> outbound);
+        return get(request, uriTransformer, outbound -> outbound.failOnClientError(false));
     }
 
     protected final Mono<HttpClientResponse> get(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
                                                  Function<HttpClientRequest, HttpClientRequest> requestTransformer) {
 
-        return doGet(getUriAugmenter(request, uriTransformer), requestTransformer)
-            .otherwise(HttpClientException.class, CloudFoundryExceptionBuilder::build);
+        return doGet(getUriAugmenter(request, uriTransformer), outbound -> requestTransformer.apply(outbound.failOnClientError(false)),
+            ClientErrorMapper.cloudFoundry(this.connectionContext.getObjectMapper()));
     }
 
     protected final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doPost(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> outbound)
-            .otherwise(HttpClientException.class, CloudFoundryExceptionBuilder::build);
+        return doPost(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> outbound.failOnClientError(false),
+            ClientErrorMapper.cloudFoundry(this.connectionContext.getObjectMapper()));
     }
 
     protected final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
                                      Function<HttpClientRequest, Mono<Void>> requestTransformer) {
-        return doPost(responseType, getUriAugmenter(request, uriTransformer), requestTransformer)
-            .otherwise(HttpClientException.class, CloudFoundryExceptionBuilder::build);
+        return doPost(responseType, getUriAugmenter(request, uriTransformer), outbound -> requestTransformer.apply(outbound.failOnClientError(false)),
+            ClientErrorMapper.cloudFoundry(this.connectionContext.getObjectMapper()));
     }
 
     protected final <T> Mono<T> put(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doPut(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> outbound)
-            .otherwise(HttpClientException.class, CloudFoundryExceptionBuilder::build);
+        return doPut(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> outbound.failOnClientError(false),
+            ClientErrorMapper.cloudFoundry(this.connectionContext.getObjectMapper()));
     }
 
     protected final <T> Mono<T> put(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
                                     Function<HttpClientRequest, Mono<Void>> requestTransformer) {
-        return doPut(responseType, getUriAugmenter(request, uriTransformer), requestTransformer)
-            .otherwise(HttpClientException.class, CloudFoundryExceptionBuilder::build);
+        return doPut(responseType, getUriAugmenter(request, uriTransformer), outbound -> requestTransformer.apply(outbound.failOnClientError(false)),
+            ClientErrorMapper.cloudFoundry(this.connectionContext.getObjectMapper()));
     }
 
     private static Function<UriComponentsBuilder, UriComponentsBuilder> getUriAugmenter(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {

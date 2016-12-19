@@ -37,19 +37,7 @@ public final class CloudFoundryException extends RuntimeException {
      * @param errorCode   the error code
      */
     public CloudFoundryException(Integer code, String description, String errorCode) {
-        this(code, description, errorCode, null);
-    }
-
-    /**
-     * Creates a new instance
-     *
-     * @param code        the code
-     * @param description the description
-     * @param errorCode   the error code
-     * @param cause       the cause
-     */
-    public CloudFoundryException(Integer code, String description, String errorCode, Throwable cause) {
-        super(String.format("%s(%d): %s", errorCode, code, description), cause);
+        super(String.format("%s(%d): %s", errorCode, code, description));
         this.code = code;
         this.description = description;
         this.errorCode = errorCode;
