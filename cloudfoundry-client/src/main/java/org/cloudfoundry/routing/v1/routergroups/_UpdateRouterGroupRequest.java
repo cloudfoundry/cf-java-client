@@ -14,16 +14,28 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.groups;
+package org.cloudfoundry.routing.v1.routergroups;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.immutables.value.Value;
 
 /**
- * The resource in the list groups response
+ * The request payload for the Update Router Group operation
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class _Group extends AbstractGroup {
+abstract class _UpdateRouterGroupRequest {
+
+    /**
+     * The reservable ports
+     */
+    @JsonProperty("reservable_ports")
+    abstract String getReservablePorts();
+
+    /**
+     * The router group id
+     */
+    @JsonIgnore
+    abstract String getRouterGroupId();
 
 }

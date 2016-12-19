@@ -1,0 +1,6 @@
+[{
+  "guid": "abc123",
+  "name": "default-tcp",
+  "reservable_ports":"1024-65535",
+  "type": "tcp"
+}]

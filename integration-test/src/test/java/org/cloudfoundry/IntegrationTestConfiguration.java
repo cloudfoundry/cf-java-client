@@ -34,12 +34,16 @@ import org.cloudfoundry.reactor.ProxyConfiguration;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.ReactorCloudFoundryClient;
 import org.cloudfoundry.reactor.doppler.ReactorDopplerClient;
+import org.cloudfoundry.reactor.routing.ReactorRoutingClient;
 import org.cloudfoundry.reactor.tokenprovider.ClientCredentialsGrantTokenProvider;
 import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.cloudfoundry.reactor.uaa.ReactorUaaClient;
+import org.cloudfoundry.routing.RoutingClient;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.clients.CreateClientRequest;
 import org.cloudfoundry.uaa.groups.AddMemberRequest;
+import org.cloudfoundry.uaa.groups.CreateGroupRequest;
+import org.cloudfoundry.uaa.groups.CreateGroupResponse;
 import org.cloudfoundry.uaa.groups.Group;
 import org.cloudfoundry.uaa.groups.ListGroupsRequest;
 import org.cloudfoundry.uaa.groups.ListGroupsResponse;
@@ -85,6 +89,8 @@ public class IntegrationTestConfiguration {
         "clients.secret",
         "cloud_controller.admin",
         "idps.write",
+        "routing.router_groups.read",
+        "routing.router_groups.write",
         "scim.create",
         "scim.invite",
         "scim.read",
@@ -103,6 +109,8 @@ public class IntegrationTestConfiguration {
         "cloud_controller.write",
         "idps.write",
         "password.write",
+        "routing.router_groups.read",
+        "routing.router_groups.write",
         "scim.create",
         "scim.invite",
         "scim.read",
@@ -279,6 +287,14 @@ public class IntegrationTestConfiguration {
         return new SecureRandom();
     }
 
+    @Bean
+    RoutingClient routingClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
+        return ReactorRoutingClient.builder()
+            .connectionContext(connectionContext)
+            .tokenProvider(tokenProvider)
+            .build();
+    }
+
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
     Mono<String> spaceId(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, String spaceName) throws InterruptedException {
@@ -364,8 +380,13 @@ public class IntegrationTestConfiguration {
                         .filter(String.format("displayName eq \"%s\"", group))
                         .build())
                     .flatMapIterable(ListGroupsResponse::getResources)
-                    .single()
+                    .singleOrEmpty()
                     .map(Group::getId)
+                    .otherwiseIfEmpty(uaaClient.groups()
+                        .create(CreateGroupRequest.builder()
+                            .displayName(group)
+                            .build())
+                        .map(CreateGroupResponse::getId))
                     .then(groupId -> uaaClient.groups()
                         .addMember(AddMemberRequest.builder()
                             .groupId(groupId)

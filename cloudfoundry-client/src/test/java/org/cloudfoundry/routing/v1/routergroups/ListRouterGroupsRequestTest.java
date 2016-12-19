@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.groups;
+package org.cloudfoundry.routing.v1.routergroups;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.immutables.value.Value;
+import org.junit.Test;
 
-/**
- * The resource in the list groups response
- */
-@JsonDeserialize
-@Value.Immutable
-abstract class _Group extends AbstractGroup {
+public class ListRouterGroupsRequestTest {
+
+    @Test
+    public void valid() {
+        ListRouterGroupsRequest.builder()
+            .build();
+    }
 
 }
