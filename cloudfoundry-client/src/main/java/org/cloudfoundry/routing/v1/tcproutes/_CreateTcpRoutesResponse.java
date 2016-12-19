@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.routing;
+package org.cloudfoundry.routing.v1.tcproutes;
 
-import org.cloudfoundry.routing.v1.routergroups.RouterGroups;
-import org.cloudfoundry.routing.v1.tcproutes.TcpRoutes;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
 /**
- * Main entry point to the Routing Client API
+ * The response payload for the Create TCP Routes operation
  */
-public interface RoutingClient {
-
-    /**
-     * Main entry point to the Routing Groups API
-     */
-    RouterGroups routerGroups();
-
-    /**
-     * Main entry point to the TCP Routing API
-     */
-    TcpRoutes tcpRoutes();
+@JsonDeserialize
+@Value.Immutable
+abstract class _CreateTcpRoutesResponse {
 
 }

@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.routing;
+package org.cloudfoundry.routing.v1.tcproutes;
 
-import org.cloudfoundry.routing.v1.routergroups.RouterGroups;
-import org.cloudfoundry.routing.v1.tcproutes.TcpRoutes;
+import org.junit.Test;
 
-/**
- * Main entry point to the Routing Client API
- */
-public interface RoutingClient {
+public class ListTcpRoutesRequestTest {
 
-    /**
-     * Main entry point to the Routing Groups API
-     */
-    RouterGroups routerGroups();
-
-    /**
-     * Main entry point to the TCP Routing API
-     */
-    TcpRoutes tcpRoutes();
+    @Test
+    public void valid() {
+        ListTcpRoutesRequest.builder()
+            .build();
+    }
 
 }

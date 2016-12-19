@@ -20,8 +20,10 @@ import org.cloudfoundry.Nullable;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.routing.v1.routergroups.ReactorRouterGroups;
+import org.cloudfoundry.reactor.routing.v1.tcproutes.ReactorTcpRoutes;
 import org.cloudfoundry.routing.RoutingClient;
 import org.cloudfoundry.routing.v1.routergroups.RouterGroups;
+import org.cloudfoundry.routing.v1.tcproutes.TcpRoutes;
 import org.cloudfoundry.uaa.UaaClient;
 import org.immutables.value.Value;
 import reactor.core.publisher.Mono;
@@ -36,6 +38,12 @@ abstract class _ReactorRoutingClient implements RoutingClient {
     @Value.Derived
     public RouterGroups routerGroups() {
         return new ReactorRouterGroups(getConnectionContext(), getRoot(), getTokenProvider());
+    }
+
+    @Override
+    @Value.Derived
+    public TcpRoutes tcpRoutes() {
+        return new ReactorTcpRoutes(getConnectionContext(), getRoot(), getTokenProvider());
     }
 
     @Nullable

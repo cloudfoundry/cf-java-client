@@ -139,6 +139,13 @@ public interface NameFactory {
     }
 
     /**
+     * Creates an IP address
+     *
+     * @return the IP address
+     */
+    String getIpAddress();
+
+    /**
      * Creates a name
      *
      * @param prefix the prefix to the name
@@ -172,6 +179,13 @@ public interface NameFactory {
     default String getPath() {
         return getName(PATH_PREFIX);
     }
+
+    /**
+     * Creates a port
+     *
+     * @return a port
+     */
+    int getPort();
 
     /**
      * Creates a quota definition name
@@ -318,6 +332,14 @@ public interface NameFactory {
     }
 
     /**
+     * Tests a string to determine if it is an IP address
+     *
+     * @param candidate the candidate string
+     * @return {@code true} if the string is an IP address, {@code false} otherwise
+     */
+    boolean isIpAddress(String candidate);
+
+    /**
      * Tests a name to determine if it starts with a prefix
      *
      * @param prefix    the prefix to the name
@@ -355,6 +377,14 @@ public interface NameFactory {
     default boolean isPath(String candidate) {
         return isName(PATH_PREFIX, candidate);
     }
+
+    /**
+     * Tests if an integer is a port
+     *
+     * @param candidate the candidate integer
+     * @return {@code true} if the integer is a port, {@code false} otherwise
+     */
+    boolean isPort(int candidate);
 
     /**
      * Tests a name to determine if it is a quota definition name

@@ -1,0 +1,6 @@
+[{
+  "router_group_guid": "xyz789",
+  "port": 5200,
+  "backend_ip": "10.1.1.12",
+  "backend_port": 60000
+}]

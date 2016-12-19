@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 
 import static org.cloudfoundry.IfCloudFoundryVersion.CloudFoundryVersion.UNSPECIFIED;
 
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
