@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.groups;
+package org.cloudfoundry.reactor.routing;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.immutables.value.Value;
+import org.cloudfoundry.reactor.AbstractRestTest;
 
-/**
- * The resource in the list groups response
- */
-@JsonDeserialize
-@Value.Immutable
-abstract class _Group extends AbstractGroup {
+public abstract class AbstractRoutingApiTest extends AbstractRestTest {
 
 }
