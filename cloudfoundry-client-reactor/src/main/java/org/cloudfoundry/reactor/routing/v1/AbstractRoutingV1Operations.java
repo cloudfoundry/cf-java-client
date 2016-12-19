@@ -18,12 +18,9 @@ package org.cloudfoundry.reactor.routing.v1;
 
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
-import org.cloudfoundry.reactor.client.CloudFoundryExceptionBuilder;
-import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.client.HttpClientException;
 
 import java.util.function.Function;
 
@@ -36,26 +33,16 @@ public abstract class AbstractRoutingV1Operations extends AbstractReactorOperati
         this.connectionContext = connectionContext;
     }
 
-    protected final <T> Mono<T> get(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doGet(responseType, getUriAugmenter(request, uriTransformer), outbound -> outbound)
-            .otherwise(HttpClientException.class, CloudFoundryExceptionBuilder::build);
+    protected final <T> Mono<T> get(Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return doGet(responseType, uriTransformer, outbound -> outbound, inbound -> inbound);
     }
 
     protected final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doPost(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> outbound)
-            .otherwise(HttpClientException.class, CloudFoundryExceptionBuilder::build);
+        return doPost(request, responseType, uriTransformer, outbound -> outbound, inbound -> inbound);
     }
 
     protected final <T> Mono<T> put(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doPut(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> outbound)
-            .otherwise(HttpClientException.class, CloudFoundryExceptionBuilder::build);
-    }
-
-    private static Function<UriComponentsBuilder, UriComponentsBuilder> getUriAugmenter(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return builder -> {
-            QueryBuilder.augment(builder, request);
-            return uriTransformer.apply(builder);
-        };
+        return doPut(request, responseType, uriTransformer, outbound -> outbound, inbound -> inbound);
     }
 
 }

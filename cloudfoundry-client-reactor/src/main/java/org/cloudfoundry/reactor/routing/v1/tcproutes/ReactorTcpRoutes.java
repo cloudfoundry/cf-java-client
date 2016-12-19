@@ -55,7 +55,7 @@ public class ReactorTcpRoutes extends AbstractRoutingV1Operations implements Tcp
 
     @Override
     public Mono<ListTcpRoutesResponse> list(ListTcpRoutesRequest request) {
-        return get(request, ListTcpRoutesResponse.class, builder -> builder.pathSegment("routing", "v1", "tcp_routes"));
+        return get(ListTcpRoutesResponse.class, builder -> builder.pathSegment("routing", "v1", "tcp_routes"));
     }
 
 }

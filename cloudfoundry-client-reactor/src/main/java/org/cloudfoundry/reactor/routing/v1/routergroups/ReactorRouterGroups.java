@@ -44,7 +44,7 @@ public class ReactorRouterGroups extends AbstractRoutingV1Operations implements 
 
     @Override
     public Mono<ListRouterGroupsResponse> list(ListRouterGroupsRequest request) {
-        return get(request, ListRouterGroupsResponse.class, builder -> builder.pathSegment("routing", "v1", "router_groups"));
+        return get(ListRouterGroupsResponse.class, builder -> builder.pathSegment("routing", "v1", "router_groups"));
     }
 
     @Override
