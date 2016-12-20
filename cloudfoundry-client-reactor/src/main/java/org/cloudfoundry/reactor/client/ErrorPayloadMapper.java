@@ -17,6 +17,7 @@
 package org.cloudfoundry.reactor.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.netty.handler.codec.http.HttpStatusClass;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
@@ -27,14 +28,16 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static io.netty.handler.codec.http.HttpStatusClass.CLIENT_ERROR;
+import static io.netty.handler.codec.http.HttpStatusClass.SERVER_ERROR;
 
-public final class ClientErrorMapper {
+public final class ErrorPayloadMapper {
 
     @SuppressWarnings("unchecked")
     public static Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> cloudFoundry(ObjectMapper objectMapper) {
         return inbound -> inbound
             .then(response -> {
-                if (response.status().codeClass() != CLIENT_ERROR) {
+                HttpStatusClass statusClass = response.status().codeClass();
+                if (statusClass != CLIENT_ERROR && statusClass != SERVER_ERROR) {
                     return Mono.just(response);
                 }
 
