@@ -47,6 +47,7 @@ import org.cloudfoundry.operations.spaces.DefaultSpaces;
 import org.cloudfoundry.operations.spaces.Spaces;
 import org.cloudfoundry.operations.stacks.DefaultStacks;
 import org.cloudfoundry.operations.stacks.Stacks;
+import org.cloudfoundry.routing.RoutingClient;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.PaginationUtils;
@@ -85,7 +86,7 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
     @Override
     @Value.Derived
     public Domains domains() {
-        return new DefaultDomains(getCloudFoundryClientPublisher());
+        return new DefaultDomains(getCloudFoundryClientPublisher(), getRoutingClientPublisher());
     }
 
     @Override
@@ -175,6 +176,19 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
                 .map(ResourceUtils::getId)
                 .cache())
             .orElse(Mono.error(new IllegalStateException("No organization targeted")));
+    }
+
+    /**
+     * The {@link RoutingClient} to use for operations functionality
+     */
+    @Nullable
+    abstract RoutingClient getRoutingClient();
+
+    @Value.Derived
+    Mono<RoutingClient> getRoutingClientPublisher() {
+        return Optional.ofNullable(getRoutingClient())
+            .map(Mono::just)
+            .orElse(Mono.error(new IllegalStateException("RoutingClient must be set")));
     }
 
     /**

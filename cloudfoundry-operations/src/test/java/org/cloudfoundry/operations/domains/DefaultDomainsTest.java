@@ -33,6 +33,9 @@ import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.operations.AbstractOperationsTest;
+import org.cloudfoundry.routing.RoutingClient;
+import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsRequest;
+import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsResponse;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -45,7 +48,7 @@ import static org.mockito.Mockito.when;
 
 public final class DefaultDomainsTest extends AbstractOperationsTest {
 
-    private final DefaultDomains domains = new DefaultDomains(Mono.just(this.cloudFoundryClient));
+    private final DefaultDomains domains = new DefaultDomains(Mono.just(this.cloudFoundryClient), Mono.just(this.routingClient));
 
     @Test
     public void createDomain() {
@@ -126,6 +129,22 @@ public final class DefaultDomainsTest extends AbstractOperationsTest {
                 .id("test-shared-domain-id")
                 .name("test-shared-domain-name")
                 .status(Status.SHARED)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listRouterGroups() {
+        requestListRouterGroups(this.routingClient);
+
+        this.domains
+            .listRouterGroups()
+            .as(StepVerifier::create)
+            .expectNext(RouterGroup.builder()
+                .id("test-routerGroupId")
+                .name("test-name")
+                .type("test-type")
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -233,6 +252,17 @@ public final class DefaultDomainsTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListPrivateDomainsResponse.builder())
+                    .build()));
+    }
+
+    private static void requestListRouterGroups(RoutingClient routingClient) {
+        when(routingClient.routerGroups()
+            .list(ListRouterGroupsRequest.builder()
+                .build()))
+            .thenReturn(Mono
+                .just(ListRouterGroupsResponse.builder()
+                    .routerGroup(fill(org.cloudfoundry.routing.v1.routergroups.RouterGroup.builder())
+                        .build())
                     .build()));
     }
 

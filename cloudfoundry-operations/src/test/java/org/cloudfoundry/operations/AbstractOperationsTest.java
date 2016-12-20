@@ -41,6 +41,8 @@ import org.cloudfoundry.client.v2.stacks.Stacks;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstances;
 import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.doppler.DopplerClient;
+import org.cloudfoundry.routing.RoutingClient;
+import org.cloudfoundry.routing.v1.routergroups.RouterGroups;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.authorizations.Authorizations;
 import org.cloudfoundry.uaa.tokens.Tokens;
@@ -95,7 +97,11 @@ public abstract class AbstractOperationsTest {
 
     protected final PrivateDomains privateDomains = mock(PrivateDomains.class, RETURNS_SMART_NULLS);
 
+    protected final RouterGroups routerGroups = mock(RouterGroups.class, RETURNS_SMART_NULLS);
+
     protected final Routes routes = mock(Routes.class, RETURNS_SMART_NULLS);
+
+    protected final RoutingClient routingClient = mock(RoutingClient.class, RETURNS_SMART_NULLS);
 
     protected final ServiceBindingsV2 serviceBindingsV2 = mock(ServiceBindingsV2.class, RETURNS_SMART_NULLS);
 
@@ -152,6 +158,8 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.stacks()).thenReturn(this.stacks);
         when(this.cloudFoundryClient.userProvidedServiceInstances()).thenReturn(this.userProvidedServiceInstances);
         when(this.cloudFoundryClient.users()).thenReturn(this.users);
+
+        when(this.routingClient.routerGroups()).thenReturn(this.routerGroups);
 
         when(this.uaaClient.authorizations()).thenReturn(this.authorizations);
         when(this.uaaClient.tokens()).thenReturn(this.tokens);
