@@ -33,6 +33,8 @@ import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultR
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultResponse;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupStagingDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupStagingDefaultResponse;
+import org.cloudfoundry.client.v2.securitygroups.UpdateSecurityGroupRequest;
+import org.cloudfoundry.client.v2.securitygroups.UpdateSecurityGroupResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
@@ -97,5 +99,10 @@ public class ReactorSecurityGroups extends AbstractClientV2Operations implements
     @Override
     public Mono<SetSecurityGroupStagingDefaultResponse> setStagingDefault(SetSecurityGroupStagingDefaultRequest request) {
         return put(request, SetSecurityGroupStagingDefaultResponse.class, builder -> builder.pathSegment("v2", "config", "staging_security_groups", request.getSecurityGroupStagingDefaultId()));
+    }
+
+    @Override
+    public Mono<UpdateSecurityGroupResponse> update(UpdateSecurityGroupRequest request) {
+        return put(request, UpdateSecurityGroupResponse.class, builder -> builder.pathSegment("v2", "security_groups", request.getSecurityGroupId()));
     }
 }
