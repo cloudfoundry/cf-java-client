@@ -196,10 +196,12 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    DefaultCloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient, DopplerClient dopplerClient, UaaClient uaaClient, String organizationName, String spaceName) {
+    DefaultCloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient, DopplerClient dopplerClient, RoutingClient routingClient, UaaClient uaaClient, String organizationName,
+                                                         String spaceName) {
         return DefaultCloudFoundryOperations.builder()
             .cloudFoundryClient(cloudFoundryClient)
             .dopplerClient(dopplerClient)
+            .routingClient(routingClient)
             .uaaClient(uaaClient)
             .organization(organizationName)
             .space(spaceName)

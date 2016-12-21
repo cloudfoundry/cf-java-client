@@ -31,6 +31,8 @@ import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainEntity;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
+import org.cloudfoundry.routing.RoutingClient;
+import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsResponse;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
@@ -45,8 +47,11 @@ public final class DefaultDomains implements Domains {
 
     private final Mono<CloudFoundryClient> cloudFoundryClient;
 
-    public DefaultDomains(Mono<CloudFoundryClient> cloudFoundryClient) {
+    private final Mono<RoutingClient> routingClient;
+
+    public DefaultDomains(Mono<CloudFoundryClient> cloudFoundryClient, Mono<RoutingClient> routingClient) {
         this.cloudFoundryClient = cloudFoundryClient;
+        this.routingClient = routingClient;
     }
 
     public Mono<Void> create(CreateDomainRequest request) {
@@ -73,6 +78,14 @@ public final class DefaultDomains implements Domains {
                 .map(DefaultDomains::toDomain)
                 .mergeWith(requestListSharedDomains(cloudFoundryClient)
                     .map(DefaultDomains::toDomain)));
+    }
+
+    @Override
+    public Flux<RouterGroup> listRouterGroups() {
+        return this.routingClient
+            .flatMap(routingClient -> requestListRouterGroups(routingClient)
+                .flatMapIterable(ListRouterGroupsResponse::getRouterGroups)
+                .map(DefaultDomains::toRouterGroup));
     }
 
     @Override
@@ -160,6 +173,12 @@ public final class DefaultDomains implements Domains {
                     .build()));
     }
 
+    private static Mono<ListRouterGroupsResponse> requestListRouterGroups(RoutingClient routingClient) {
+        return routingClient.routerGroups()
+            .list(org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsRequest.builder()
+                .build());
+    }
+
     private static Flux<SharedDomainResource> requestListSharedDomains(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
             .requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
@@ -202,6 +221,14 @@ public final class DefaultDomains implements Domains {
             .id(ResourceUtils.getId(resource))
             .name(entity.getName())
             .status(Status.SHARED)
+            .build();
+    }
+
+    private static RouterGroup toRouterGroup(org.cloudfoundry.routing.v1.routergroups.RouterGroup group) {
+        return RouterGroup.builder()
+            .id(group.getRouterGroupId())
+            .name(group.getName())
+            .type(group.getType())
             .build();
     }
 

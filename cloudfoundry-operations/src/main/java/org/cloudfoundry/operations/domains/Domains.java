@@ -48,6 +48,13 @@ public interface Domains {
     Flux<Domain> list();
 
     /**
+     * Lists the router groups
+     *
+     * @return the Router Groups
+     */
+    Flux<RouterGroup> listRouterGroups();
+
+    /**
      * Share a private domain
      *
      * @param request The Share Domain request

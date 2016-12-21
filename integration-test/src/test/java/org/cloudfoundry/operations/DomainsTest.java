@@ -34,6 +34,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public final class DomainsTest extends AbstractIntegrationTest {
 
+    private static final String DEFAULT_ROUTER_GROUP = "default-tcp";
+
     @Autowired
     private CloudFoundryOperations cloudFoundryOperations;
 
@@ -63,6 +65,17 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .build())
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-DomainInvalid\\([0-9]+\\): The domain is invalid.*"))
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listRouterGroups() throws TimeoutException, InterruptedException {
+        this.cloudFoundryOperations.domains()
+            .listRouterGroups()
+            .filter(response -> DEFAULT_ROUTER_GROUP.equals(response.getName()))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
 
