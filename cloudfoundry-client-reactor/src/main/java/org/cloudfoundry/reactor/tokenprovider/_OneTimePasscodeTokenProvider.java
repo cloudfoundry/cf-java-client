@@ -29,6 +29,7 @@ abstract class _OneTimePasscodeTokenProvider extends AbstractUaaTokenProvider {
     @Override
     protected void accessTokenPayload(Form form) {
         form
+            .multipart(false)
             .attr("client_id", getClientId())
             .attr("client_secret", getClientSecret())
             .attr("grant_type", "password")

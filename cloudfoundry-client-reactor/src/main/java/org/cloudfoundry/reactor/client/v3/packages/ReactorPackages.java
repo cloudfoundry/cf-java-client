@@ -94,7 +94,9 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
         return post(request, UploadPackageResponse.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "upload"),
             outbound -> outbound
                 .disableChunkedTransfer()
-                .sendMultipart(form -> form.file("bits", "application.zip", request.getBits().toFile(), APPLICATION_ZIP))
+                .sendForm(form -> form
+                    .multipart(true)
+                    .file("bits", "application.zip", request.getBits().toFile(), APPLICATION_ZIP))
                 .then());
     }
 

@@ -29,6 +29,7 @@ abstract class _RefreshTokenGrantTokenProvider extends AbstractUaaTokenProvider 
     @Override
     protected void accessTokenPayload(Form form) {
         form
+            .multipart(false)
             .attr("grant_type", "refresh_token")
             .attr("client_id", getClientId())
             .attr("client_secret", getClientSecret())

@@ -29,6 +29,7 @@ abstract class _ClientCredentialsGrantTokenProvider extends AbstractUaaTokenProv
     @Override
     protected void accessTokenPayload(Form form) {
         form
+            .multipart(false)
             .attr("client_id", getClientId())
             .attr("client_secret", getClientSecret())
             .attr("grant_type", "client_credentials")

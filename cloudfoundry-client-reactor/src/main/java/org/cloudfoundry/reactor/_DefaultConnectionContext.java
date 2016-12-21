@@ -150,8 +150,8 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             .then(uri -> getHttpClient()
                 .get(uri)
                 .doOnSubscribe(NetworkLogging.get(uri))
-                .compose(NetworkLogging.response(uri)))
-            .compose(JsonCodec.decode(getObjectMapper(), Map.class))
+                .transform(NetworkLogging.response(uri)))
+            .transform(JsonCodec.decode(getObjectMapper(), Map.class))
             .map(m -> (Map<String, String>) m)
             .cache();
     }

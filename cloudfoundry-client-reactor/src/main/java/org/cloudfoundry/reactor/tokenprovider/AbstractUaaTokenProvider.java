@@ -117,8 +117,8 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
                     .sendForm(this::tokenPayload)
                     .then())
                 .doOnSubscribe(NetworkLogging.post(uri))
-                .compose(NetworkLogging.response(uri)))
-            .compose(JsonCodec.decode(connectionContext.getObjectMapper(), Map.class))
+                .transform(NetworkLogging.response(uri)))
+            .transform(JsonCodec.decode(connectionContext.getObjectMapper(), Map.class))
             .doOnNext(r -> {
                 synchronized (this.refreshTokenMonitor) {
                     this.refreshToken = (String) r.get("refresh_token");
@@ -137,6 +137,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
 
     private void refreshTokenPayload(Form form, String refreshToken) {
         form
+            .multipart(false)
             .attr("grant_type", "refresh_token")
             .attr("client_id", getClientId())
             .attr("client_secret", getClientSecret())

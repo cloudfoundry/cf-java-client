@@ -104,7 +104,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
             .then(routeMappingId -> requestGetRouteMapping(this.cloudFoundryClient, routeMappingId))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching(".*\\([0-9]+\\): .*"))
-            .verify(/*Duration.ofMinutes(5)*/);
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test

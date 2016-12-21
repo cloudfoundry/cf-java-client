@@ -81,7 +81,9 @@ public final class ReactorBuildpacks extends AbstractClientV2Operations implemen
         return put(request, UploadBuildpackResponse.class, builder -> builder.pathSegment("v2", "buildpacks", request.getBuildpackId(), "bits"),
             outbound -> outbound
                 .disableChunkedTransfer()
-                .sendMultipart(form -> form.file("buildpack", request.getFilename(), request.getBuildpack().toFile(), APPLICATION_ZIP))
+                .sendForm(form -> form
+                    .multipart(true)
+                    .file("buildpack", request.getFilename(), request.getBuildpack().toFile(), APPLICATION_ZIP))
                 .then());
     }
 
