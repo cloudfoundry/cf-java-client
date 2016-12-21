@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.operations.domains.CreateDomainRequest;
 import org.cloudfoundry.operations.domains.ShareDomainRequest;
@@ -31,6 +32,7 @@ import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.IfCloudFoundryVersion.CloudFoundryVersion.PCF_1_8;
 
 public final class DomainsTest extends AbstractIntegrationTest {
 
@@ -68,6 +70,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = PCF_1_8)
     @Test
     public void listRouterGroups() throws TimeoutException, InterruptedException {
         this.cloudFoundryOperations.domains()
