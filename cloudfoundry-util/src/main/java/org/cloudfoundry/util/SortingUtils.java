@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.util;
 
-import reactor.core.Cancellation;
+import reactor.core.Disposable;
 import reactor.core.publisher.DirectProcessor;
 import reactor.core.publisher.Flux;
 import reactor.util.function.Tuple2;
@@ -56,7 +56,7 @@ public final class SortingUtils {
 
             DirectProcessor<Void> d = DirectProcessor.create();
 
-            Cancellation cancellation = source
+            Disposable disposable = source
                 .timestamp()
                 .subscribe(item -> {
                     Optional.ofNullable(item)
@@ -71,7 +71,7 @@ public final class SortingUtils {
                 .interval(timespan)
                 .takeUntilOther(d)
                 .flatMap(n -> getItems(accumulator, comparator, timespan), null, () -> getItems(accumulator, comparator, Duration.ZERO))
-                .doOnCancel(cancellation::dispose);
+                .doOnCancel(disposable::dispose);
         };
     }
 
