@@ -26,11 +26,8 @@ import java.util.function.Function;
 
 public abstract class AbstractRoutingV1Operations extends AbstractReactorOperations {
 
-    private final ConnectionContext connectionContext;
-
     protected AbstractRoutingV1Operations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider);
-        this.connectionContext = connectionContext;
     }
 
     protected final <T> Mono<T> get(Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
