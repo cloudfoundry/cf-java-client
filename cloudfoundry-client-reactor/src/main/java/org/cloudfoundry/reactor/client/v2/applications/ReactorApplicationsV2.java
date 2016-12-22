@@ -184,7 +184,7 @@ public final class ReactorApplicationsV2 extends AbstractClientV2Operations impl
     public Mono<UploadApplicationResponse> upload(UploadApplicationRequest request) {
         return put(request, UploadApplicationResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "bits"),
             outbound -> outbound
-                .disableChunkedTransfer()
+                .chunkedTransfer(false)
                 .sendForm(form -> {
                     try (InputStream resources = new ByteArrayInputStream(this.connectionContext.getObjectMapper().writeValueAsBytes(request.getResources()))) {
                         form
