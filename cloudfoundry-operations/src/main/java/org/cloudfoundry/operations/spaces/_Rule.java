@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.operations.spaces;
 
+import org.cloudfoundry.client.v2.securitygroups.Protocol;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -34,6 +35,6 @@ abstract class _Rule {
     /**
      * The protocol
      */
-    abstract String getProtocol();
+    abstract Protocol getProtocol();
 
 }

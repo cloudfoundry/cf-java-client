@@ -36,6 +36,8 @@ import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
+import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRequest;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsRequest;
 import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.shareddomains.DeleteSharedDomainRequest;
@@ -112,6 +114,7 @@ final class CloudFoundryCleaner {
             .thenMany(cleanApplicationsV2(this.cloudFoundryClient, this.nameFactory))
             .thenMany(cleanApplicationsV3(this.cloudFoundryClient, this.nameFactory))
             .thenMany(cleanPackages(this.cloudFoundryClient))
+            .thenMany(cleanSecurityGroups(this.cloudFoundryClient, this.nameFactory))
             .thenMany(cleanServiceInstances(this.cloudFoundryClient, this.nameFactory))
             .thenMany(cleanUserProvidedServiceInstances(this.cloudFoundryClient, this.nameFactory))
             .thenMany(cleanSharedDomains(this.cloudFoundryClient, this.nameFactory))
@@ -335,6 +338,21 @@ final class CloudFoundryCleaner {
                     RouteEntity entity = ResourceUtils.getEntity(route);
                     LOGGER.error("Unable to delete route {}.{}:{}{}", entity.getHost(), domains.get(entity.getDomainId()), entity.getPort(), entity.getPath(), t);
                 })));
+    }
+
+    private static Flux<Void> cleanSecurityGroups(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.securityGroups()
+                .list(ListSecurityGroupsRequest.builder()
+                    .page(page)
+                    .build()))
+            .filter(securityGroup -> nameFactory.isSecurityGroupName(ResourceUtils.getEntity(securityGroup).getName()))
+            .flatMap(securityGroup -> cloudFoundryClient.securityGroups()
+                .delete(DeleteSecurityGroupRequest.builder()
+                    .securityGroupId(ResourceUtils.getId(securityGroup))
+                    .build())
+                .doOnError(t -> LOGGER.error("Unable to delete security group {}", ResourceUtils.getEntity(securityGroup).getName(), t))
+            .then());
     }
 
     private static Flux<Void> cleanServiceInstances(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
