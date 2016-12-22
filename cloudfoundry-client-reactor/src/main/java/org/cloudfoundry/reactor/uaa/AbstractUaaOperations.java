@@ -104,7 +104,7 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
             getRequestTransformer(request).apply(outbound);
             return requestTransformer.apply(outbound)
                 .addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED)
-                .disableChunkedTransfer()
+                .chunkedTransfer(false)
                 .send();
         }, inbound -> inbound);
     }
