@@ -37,6 +37,8 @@ import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultR
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultResponse;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupStagingDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupStagingDefaultResponse;
+import org.cloudfoundry.client.v2.securitygroups.UpdateSecurityGroupRequest;
+import org.cloudfoundry.client.v2.securitygroups.UpdateSecurityGroupResponse;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -488,6 +490,45 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
                         .build())
                     .runningDefault(false)
                     .stagingDefault(true)
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void update() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PUT).path("/v2/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
+                .payload("fixtures/client/v2/security_groups/PUT_{id}_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/security_groups/PUT_{id}_response.json")
+                .build())
+            .build());
+
+        this.securityGroups
+            .update(UpdateSecurityGroupRequest.builder()
+                .name("new_name")
+                .rule()
+                .securityGroupId("1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(UpdateSecurityGroupResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2016-06-08T16:41:21Z")
+                    .id("1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
+                    .updatedAt("2016-06-08T16:41:21Z")
+                    .url("/v2/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
+                    .build())
+                .entity(SecurityGroupEntity.builder()
+                    .name("new_name")
+                    .rule()
+                    .runningDefault(false)
+                    .stagingDefault(false)
+                    .spacesUrl("/v2/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159/spaces")
                     .build())
                 .build())
             .expectComplete()

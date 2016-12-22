@@ -96,4 +96,13 @@ public interface SecurityGroups {
      * @return the response from the list staging security groups request
      */
     Mono<SetSecurityGroupStagingDefaultResponse> setStagingDefault(SetSecurityGroupStagingDefaultRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_groups/updating_a_security_group.html">Updating a Security Group</a> request.
+     *
+     * @param request the update security group request
+     * @return the response from the update security group request
+     */
+    Mono<UpdateSecurityGroupResponse> update(UpdateSecurityGroupRequest request);
+
 }
