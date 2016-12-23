@@ -29,11 +29,18 @@ import org.immutables.value.Value;
 abstract class _RuleEntity {
 
     /**
-     * The control signal for icmp
+     * The code control signal for icmp
      */
     @JsonProperty("code")
     @Nullable
     abstract Integer getCode();
+
+    /**
+     * The description of the rule
+     */
+    @JsonProperty("description")
+    @Nullable
+    abstract String getDescription();
 
     /**
      * The destination
@@ -61,10 +68,10 @@ abstract class _RuleEntity {
      */
     @JsonProperty("protocol")
     @Nullable
-    abstract String getProtocol();
+    abstract Protocol getProtocol();
 
     /**
-     * The control signal for icmp
+     * The type control signal for icmp
      */
     @JsonProperty("type")
     @Nullable

@@ -122,6 +122,7 @@ import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.cloudfoundry.client.v2.securitygroups.Protocol.UDP;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.builder;
 
 public final class ReactorSpacesTest extends AbstractClientApiTest {
@@ -1088,7 +1089,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                         .rule(RuleEntity.builder()
                             .destination("198.41.191.47/1")
                             .ports("8080")
-                            .protocol("udp")
+                            .protocol(UDP)
                             .build())
                         .runningDefault(false)
                         .spacesUrl("/v2/security_groups/a3728437-fe41-42c1-875c-b59cffc7498c/spaces")

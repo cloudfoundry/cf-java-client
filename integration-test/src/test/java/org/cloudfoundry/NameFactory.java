@@ -47,6 +47,8 @@ public interface NameFactory {
 
     String QUOTA_DEFINITION_PREFIX = "test-quota-definition-";
 
+    String SECURITY_GROUP_PREFIX = "test-security-group-";
+
     String SERVICE_INSTANCE_PREFIX = "test-service-instance-";
 
     String SPACE_PREFIX = "test-space-";
@@ -194,6 +196,15 @@ public interface NameFactory {
      */
     default String getQuotaDefinitionName() {
         return getName(QUOTA_DEFINITION_PREFIX);
+    }
+
+    /**
+     * Creates a security group name
+     *
+     * @return the security group name
+     */
+    default String getSecurityGroupName() {
+        return getName(SECURITY_GROUP_PREFIX);
     }
 
     /**
@@ -394,6 +405,16 @@ public interface NameFactory {
      */
     default boolean isQuotaDefinitionName(String candidate) {
         return isName(QUOTA_DEFINITION_PREFIX, candidate);
+    }
+
+    /**
+     * Tests a name to determine if it is a security group name
+     *
+     * @param candidate the candidate name
+     * @return {@code true} if the name is a security group name, {@code false} otherwise
+     */
+    default boolean isSecurityGroupName(String candidate) {
+        return isName(SECURITY_GROUP_PREFIX, candidate);
     }
 
     /**
