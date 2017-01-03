@@ -21,6 +21,14 @@ import reactor.core.publisher.Mono;
 public interface SecurityGroups {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_groups/associate_space_with_the_security_group.html">Associate Space with the Security Group</a> request.
+     *
+     * @param request the associate security group request
+     * @return the response from the associate security group request
+     */
+    Mono<AssociateSecurityGroupSpaceResponse> associateSpace(AssociateSecurityGroupSpaceRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_groups/creating_a_security_group.html">Creating a Security Group</a> request.
      *
      * @param request the create security group request

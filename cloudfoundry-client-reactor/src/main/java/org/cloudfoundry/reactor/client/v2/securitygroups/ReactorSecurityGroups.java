@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.reactor.client.v2.securitygroups;
 
+import org.cloudfoundry.client.v2.securitygroups.AssociateSecurityGroupSpaceRequest;
+import org.cloudfoundry.client.v2.securitygroups.AssociateSecurityGroupSpaceResponse;
 import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupRequest;
 import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupResponse;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRequest;
@@ -54,6 +56,11 @@ public class ReactorSecurityGroups extends AbstractClientV2Operations implements
      */
     public ReactorSecurityGroups(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider);
+    }
+
+    @Override
+    public Mono<AssociateSecurityGroupSpaceResponse> associateSpace(AssociateSecurityGroupSpaceRequest request) {
+        return put(request, AssociateSecurityGroupSpaceResponse.class, builder -> builder.pathSegment("v2", "security_groups", request.getSecurityGroupId(), "spaces", request.getSpaceId()));
     }
 
     @Override

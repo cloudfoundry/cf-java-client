@@ -18,6 +18,8 @@ package org.cloudfoundry.reactor.client.v2.securitygroups;
 
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
+import org.cloudfoundry.client.v2.securitygroups.AssociateSecurityGroupSpaceRequest;
+import org.cloudfoundry.client.v2.securitygroups.AssociateSecurityGroupSpaceResponse;
 import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupRequest;
 import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupResponse;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRequest;
@@ -63,6 +65,43 @@ import static org.cloudfoundry.client.v2.securitygroups.Protocol.UDP;
 public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
 
     private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+    @Test
+    public void associateSpace() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PUT).path("/v2/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159/spaces/1305ec2b-a31c-4d2e-adc8-d9b764237e96")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/security_groups/PUT_{id}_spaces_{space-id}_response.json")
+                .build())
+            .build());
+
+        this.securityGroups
+            .associateSpace(AssociateSecurityGroupSpaceRequest.builder()
+                .securityGroupId("1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
+                .spaceId("1305ec2b-a31c-4d2e-adc8-d9b764237e96")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(AssociateSecurityGroupSpaceResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2016-06-08T16:41:21Z")
+                    .id("1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
+                    .updatedAt("2016-06-08T16:41:26Z")
+                    .url("/v2/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
+                    .build())
+                .entity(SecurityGroupEntity.builder()
+                    .name("dummy1")
+                    .rule()
+                    .runningDefault(false)
+                    .stagingDefault(false)
+                    .spacesUrl("/v2/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159/spaces")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     @Test
     public void create() {
