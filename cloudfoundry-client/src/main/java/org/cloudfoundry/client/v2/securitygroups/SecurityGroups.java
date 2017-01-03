@@ -23,8 +23,8 @@ public interface SecurityGroups {
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_groups/associate_space_with_the_security_group.html">Associate Space with the Security Group</a> request.
      *
-     * @param request the associate security group request
-     * @return the response from the associate security group request
+     * @param request the associate security group space request
+     * @return the response from the associate security group space request
      */
     Mono<AssociateSecurityGroupSpaceResponse> associateSpace(AssociateSecurityGroupSpaceRequest request);
 
@@ -86,6 +86,14 @@ public interface SecurityGroups {
      * @return the response from the list staging security groups request
      */
     Mono<ListSecurityGroupStagingDefaultsResponse> listStagingDefaults(ListSecurityGroupStagingDefaultsRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_groups/remove_space_from_the_security_group.html">Remove Space from the Security Group</a> request.
+     *
+     * @param request the remove security group space request
+     * @return the response from the remove security group space request
+     */
+    Mono<Void> removeSpace(RemoveSecurityGroupSpaceRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_group_running_defaults/set_a_security_group_as_a_default_for_running_apps.html">Set a Security Group as a default for

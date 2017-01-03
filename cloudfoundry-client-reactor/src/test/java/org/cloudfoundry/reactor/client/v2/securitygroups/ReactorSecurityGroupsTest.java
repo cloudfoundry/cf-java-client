@@ -32,6 +32,7 @@ import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefault
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsResponse;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsResponse;
+import org.cloudfoundry.client.v2.securitygroups.RemoveSecurityGroupSpaceRequest;
 import org.cloudfoundry.client.v2.securitygroups.RuleEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
@@ -457,6 +458,27 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
                         .build())
                     .build())
                 .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void removeSpace() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/v2/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159/spaces/ca8f04d1-bc2b-40ef-975e-fda2cc785c2a")
+                .build())
+            .response(TestResponse.builder()
+                .status(NO_CONTENT)
+                .build())
+            .build());
+
+        this.securityGroups
+            .removeSpace(RemoveSecurityGroupSpaceRequest.builder()
+                .securityGroupId("1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
+                .spaceId("ca8f04d1-bc2b-40ef-975e-fda2cc785c2a")
+                .build())
+            .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }

@@ -30,6 +30,7 @@ import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefault
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsResponse;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsResponse;
+import org.cloudfoundry.client.v2.securitygroups.RemoveSecurityGroupSpaceRequest;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroups;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultResponse;
@@ -96,6 +97,11 @@ public class ReactorSecurityGroups extends AbstractClientV2Operations implements
     @Override
     public Mono<ListSecurityGroupStagingDefaultsResponse> listStagingDefaults(ListSecurityGroupStagingDefaultsRequest request) {
         return get(request, ListSecurityGroupStagingDefaultsResponse.class, builder -> builder.pathSegment("v2", "config", "staging_security_groups"));
+    }
+
+    @Override
+    public Mono<Void> removeSpace(RemoveSecurityGroupSpaceRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "security_groups", request.getSecurityGroupId(), "spaces", request.getSpaceId()));
     }
 
     @Override
