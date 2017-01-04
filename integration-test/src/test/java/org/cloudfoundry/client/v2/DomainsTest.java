@@ -100,7 +100,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))))
             .then(domainId -> requestGetDomain(this.cloudFoundryClient, domainId))
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"))
             .verify(Duration.ofMinutes(5));
     }
 
@@ -113,7 +113,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
             .as(thenKeep(domainId -> requestDeleteDomainAsyncFalse(this.cloudFoundryClient, domainId)))
             .then(domainId -> requestGetDomain(this.cloudFoundryClient, domainId))
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"))
             .verify(Duration.ofMinutes(5));
     }
 

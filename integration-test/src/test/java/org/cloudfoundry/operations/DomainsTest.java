@@ -18,7 +18,7 @@ package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.IfCloudFoundryVersion;
-import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.operations.domains.CreateDomainRequest;
 import org.cloudfoundry.operations.domains.ShareDomainRequest;
 import org.cloudfoundry.operations.domains.UnshareDomainRequest;
@@ -66,7 +66,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .organization(this.organizationName)
                 .build())
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-DomainInvalid\\([0-9]+\\): The domain is invalid.*"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-DomainInvalid\\([0-9]+\\): The domain is invalid.*"))
             .verify(Duration.ofMinutes(5));
     }
 

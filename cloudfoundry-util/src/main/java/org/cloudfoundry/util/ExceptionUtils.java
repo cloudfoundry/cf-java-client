@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.util;
 
-import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v2.ClientV2Exception;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
@@ -61,14 +61,14 @@ public final class ExceptionUtils {
     }
 
     /**
-     * A predicate that returns {@code true} if the exception is a {@link CloudFoundryException} and its code matches expectation
+     * A predicate that returns {@code true} if the exception is a {@link ClientV2Exception} and its code matches expectation
      *
      * @param codes the codes to match
-     * @return {@code true} if the exception is a {@link CloudFoundryException} and its code matches
+     * @return {@code true} if the exception is a {@link ClientV2Exception} and its code matches
      */
     public static Predicate<? super Throwable> statusCode(int... codes) {
-        return t -> t instanceof CloudFoundryException &&
-            Arrays.stream(codes).anyMatch(candidate -> ((CloudFoundryException) t).getCode().equals(candidate));
+        return t -> t instanceof ClientV2Exception &&
+            Arrays.stream(codes).anyMatch(candidate -> ((ClientV2Exception) t).getCode().equals(candidate));
     }
 
 }

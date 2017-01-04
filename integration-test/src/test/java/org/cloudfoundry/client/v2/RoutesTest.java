@@ -139,7 +139,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))))
             .then(routeId -> requestGetRoute(this.cloudFoundryClient, routeId))
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-RouteNotFound\\([0-9]+\\): The route could not be found: .*"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-RouteNotFound\\([0-9]+\\): The route could not be found: .*"))
             .verify(Duration.ofMinutes(5));
     }
 
@@ -161,7 +161,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .build())))
             .then(routeId -> requestGetRoute(this.cloudFoundryClient, routeId))
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-RouteNotFound\\([0-9]+\\): The route could not be found: .*"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-RouteNotFound\\([0-9]+\\): The route could not be found: .*"))
             .verify(Duration.ofMinutes(5));
     }
 

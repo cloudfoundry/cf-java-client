@@ -39,12 +39,12 @@ public abstract class AbstractClientV2Operations extends AbstractReactorOperatio
 
     protected final <T> Mono<T> delete(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doDelete(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> outbound.failOnClientError(false).failOnServerError(false),
-            ErrorPayloadMapper.cloudFoundry(this.connectionContext.getObjectMapper()));
+            ErrorPayloadMapper.clientV2(this.connectionContext.getObjectMapper()));
     }
 
     protected final <T> Mono<T> get(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doGet(responseType, getUriAugmenter(request, uriTransformer), outbound -> outbound.failOnClientError(false).failOnServerError(false),
-            ErrorPayloadMapper.cloudFoundry(this.connectionContext.getObjectMapper()));
+            ErrorPayloadMapper.clientV2(this.connectionContext.getObjectMapper()));
     }
 
     protected final Mono<HttpClientResponse> get(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
@@ -55,29 +55,29 @@ public abstract class AbstractClientV2Operations extends AbstractReactorOperatio
                                                  Function<HttpClientRequest, HttpClientRequest> requestTransformer) {
 
         return doGet(getUriAugmenter(request, uriTransformer), outbound -> requestTransformer.apply(outbound.failOnClientError(false).failOnServerError(false)),
-            ErrorPayloadMapper.cloudFoundry(this.connectionContext.getObjectMapper()));
+            ErrorPayloadMapper.clientV2(this.connectionContext.getObjectMapper()));
     }
 
     protected final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doPost(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> outbound.failOnClientError(false).failOnServerError(false),
-            ErrorPayloadMapper.cloudFoundry(this.connectionContext.getObjectMapper()));
+            ErrorPayloadMapper.clientV2(this.connectionContext.getObjectMapper()));
     }
 
     protected final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
                                      Function<HttpClientRequest, Mono<Void>> requestTransformer) {
         return doPost(responseType, getUriAugmenter(request, uriTransformer), outbound -> requestTransformer.apply(outbound.failOnClientError(false).failOnServerError(false)),
-            ErrorPayloadMapper.cloudFoundry(this.connectionContext.getObjectMapper()));
+            ErrorPayloadMapper.clientV2(this.connectionContext.getObjectMapper()));
     }
 
     protected final <T> Mono<T> put(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doPut(request, responseType, getUriAugmenter(request, uriTransformer), outbound -> outbound.failOnClientError(false).failOnServerError(false),
-            ErrorPayloadMapper.cloudFoundry(this.connectionContext.getObjectMapper()));
+            ErrorPayloadMapper.clientV2(this.connectionContext.getObjectMapper()));
     }
 
     protected final <T> Mono<T> put(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
                                     Function<HttpClientRequest, Mono<Void>> requestTransformer) {
         return doPut(responseType, getUriAugmenter(request, uriTransformer), outbound -> requestTransformer.apply(outbound.failOnClientError(false).failOnServerError(false)),
-            ErrorPayloadMapper.cloudFoundry(this.connectionContext.getObjectMapper()));
+            ErrorPayloadMapper.clientV2(this.connectionContext.getObjectMapper()));
     }
 
     private static Function<UriComponentsBuilder, UriComponentsBuilder> getUriAugmenter(Object request, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {

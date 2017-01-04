@@ -16,12 +16,15 @@
 
 package org.cloudfoundry.client.v2;
 
-/**
- * An exception encapsulating an error returned from Cloud Foundry
- */
-public final class CloudFoundryException extends RuntimeException {
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    private static final long serialVersionUID = 884665902665899098L;
+/**
+ * An exception encapsulating an error returned from Cloud Foundry V2 APIs
+ */
+public final class ClientV2Exception extends RuntimeException {
+
+    private static final long serialVersionUID = -6535511026861299871L;
 
     private final Integer code;
 
@@ -36,7 +39,8 @@ public final class CloudFoundryException extends RuntimeException {
      * @param description the description
      * @param errorCode   the error code
      */
-    public CloudFoundryException(Integer code, String description, String errorCode) {
+    @JsonCreator
+    public ClientV2Exception(@JsonProperty("code") Integer code, @JsonProperty("description") String description, @JsonProperty("error_code") String errorCode) {
         super(String.format("%s(%d): %s", errorCode, code, description));
         this.code = code;
         this.description = description;
@@ -45,8 +49,6 @@ public final class CloudFoundryException extends RuntimeException {
 
     /**
      * Returns the code
-     *
-     * @return the code
      */
     public Integer getCode() {
         return this.code;
@@ -54,8 +56,6 @@ public final class CloudFoundryException extends RuntimeException {
 
     /**
      * Returns the description
-     *
-     * @return the description
      */
     public String getDescription() {
         return this.description;
@@ -63,8 +63,6 @@ public final class CloudFoundryException extends RuntimeException {
 
     /**
      * Returns the error code
-     *
-     * @return the error code
      */
     public String getErrorCode() {
         return this.errorCode;

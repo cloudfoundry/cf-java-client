@@ -17,7 +17,7 @@
 package org.cloudfoundry.util;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.jobs.ErrorDetails;
 import org.cloudfoundry.client.v2.jobs.GetJobRequest;
@@ -64,7 +64,7 @@ public final class JobUtils {
 
     private static Mono<Void> getError(JobEntity entity) {
         ErrorDetails errorDetails = entity.getErrorDetails();
-        return Mono.error(new CloudFoundryException(errorDetails.getCode(), errorDetails.getDescription(), errorDetails.getErrorCode()));
+        return Mono.error(new ClientV2Exception(errorDetails.getCode(), errorDetails.getDescription(), errorDetails.getErrorCode()));
     }
 
     private static boolean isComplete(JobEntity entity) {

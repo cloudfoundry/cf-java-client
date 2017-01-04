@@ -17,13 +17,13 @@
 package org.cloudfoundry.reactor.util;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import javax.net.ssl.X509TrustManager;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -32,7 +32,7 @@ public final class CertificateCollectingTrustManagerTest {
 
     private final X509Certificate[] chain = new X509Certificate[0];
 
-    private final X509TrustManager delegate = mock(X509TrustManager.class, Mockito.RETURNS_SMART_NULLS);
+    private final X509TrustManager delegate = mock(X509TrustManager.class, RETURNS_SMART_NULLS);
 
     private final CertificateCollectingTrustManager trustManager = new CertificateCollectingTrustManager(this.delegate);
 

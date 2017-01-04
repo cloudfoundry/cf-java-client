@@ -20,17 +20,14 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public final class CloudFoundryExceptionTest {
+public final class ClientV2ExceptionTest {
 
     @Test
     public void test() {
-        CloudFoundryException exception = new CloudFoundryException(-1, "test-description", "test-error-code");
-
-        assertThat(exception.getCode()).isEqualTo(-1);
-        assertThat(exception.getDescription()).isEqualTo("test-description");
-        assertThat(exception.getErrorCode()).isEqualTo("test-error-code");
-        assertThat(exception.getMessage()).isEqualTo("test-error-code(-1): test-description");
-        assertThat(exception.getCause()).isNull();
+        assertThat(new ClientV2Exception(-1, "test-description", "test-error-code"))
+            .hasNoCause()
+            .hasMessage("test-error-code(-1): test-description")
+            .extracting("code", "description", "errorCode").containsExactly(-1, "test-description", "test-error-code");
     }
 
 }

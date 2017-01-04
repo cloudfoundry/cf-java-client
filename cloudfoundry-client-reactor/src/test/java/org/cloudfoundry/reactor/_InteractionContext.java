@@ -18,24 +18,11 @@ package org.cloudfoundry.reactor;
 
 import org.immutables.value.Value;
 
-import static io.netty.handler.codec.http.HttpResponseStatus.UNPROCESSABLE_ENTITY;
-
 @Value.Immutable
 abstract class _InteractionContext {
 
-    private static final TestResponse ERROR_RESPONSE = TestResponse.builder()
-        .status(UNPROCESSABLE_ENTITY)
-        .payload("fixtures/client/v2/error_response.json")
-        .build();
-
     @SuppressWarnings("immutables")
     private volatile boolean done = false;
-
-    public InteractionContext getErrorResponse() {
-        return InteractionContext.builder().from(this)
-            .response(ERROR_RESPONSE)
-            .build();
-    }
 
     abstract TestRequest getRequest();
 

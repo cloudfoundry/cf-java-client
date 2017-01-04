@@ -188,7 +188,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build())))
             .then(applicationId -> requestGetApplication(this.cloudFoundryClient, applicationId))
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-AppNotFound\\([0-9]+\\): The app could not be found: .*"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-AppNotFound\\([0-9]+\\): The app could not be found: .*"))
             .verify(Duration.ofMinutes(5));
     }
 

@@ -18,13 +18,13 @@ package org.cloudfoundry.reactor.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.handler.codec.http.HttpStatusClass;
-import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v2.ClientV2Exception;
+import org.cloudfoundry.client.v3.ClientV3Exception;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClientResponse;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.function.Function;
 
 import static io.netty.handler.codec.http.HttpStatusClass.CLIENT_ERROR;
@@ -32,29 +32,36 @@ import static io.netty.handler.codec.http.HttpStatusClass.SERVER_ERROR;
 
 public final class ErrorPayloadMapper {
 
-    @SuppressWarnings("unchecked")
-    public static Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> cloudFoundry(ObjectMapper objectMapper) {
+    public static Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> clientV2(ObjectMapper objectMapper) {
         return inbound -> inbound
-            .then(response -> {
-                HttpStatusClass statusClass = response.status().codeClass();
-                if (statusClass != CLIENT_ERROR && statusClass != SERVER_ERROR) {
-                    return Mono.just(response);
-                }
+            .then(mapToError(objectMapper, ClientV2Exception.class));
+    }
 
-                return response.receive().aggregate().asByteArray()
-                    .then(bytes -> {
-                        try {
-                            Map<String, ?> payload = objectMapper.readValue(bytes, Map.class);
-                            Integer code = (Integer) payload.get("code");
-                            String description = (String) payload.get("description");
-                            String errorCode = (String) payload.get("error_code");
+    public static Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> clientV3(ObjectMapper objectMapper) {
+        return inbound -> inbound
+            .then(mapToError(objectMapper, ClientV3Exception.class));
+    }
 
-                            return Mono.error(new CloudFoundryException(code, description, errorCode));
-                        } catch (IOException e) {
-                            throw Exceptions.propagate(e);
-                        }
-                    });
-            });
+    private static boolean isError(HttpClientResponse response) {
+        HttpStatusClass statusClass = response.status().codeClass();
+        return statusClass != CLIENT_ERROR && statusClass != SERVER_ERROR;
+    }
+
+    private static Function<HttpClientResponse, Mono<HttpClientResponse>> mapToError(ObjectMapper objectMapper, Class<? extends RuntimeException> type) {
+        return response -> {
+            if (isError(response)) {
+                return Mono.just(response);
+            }
+
+            return response.receive().aggregate().asByteArray()
+                .then(bytes -> {
+                    try {
+                        return Mono.error(objectMapper.readValue(bytes, type));
+                    } catch (IOException e) {
+                        throw Exceptions.propagate(e);
+                    }
+                });
+        };
     }
 
 }

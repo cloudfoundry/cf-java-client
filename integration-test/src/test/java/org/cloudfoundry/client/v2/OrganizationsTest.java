@@ -341,7 +341,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))))
             .then(organizationId -> requestGetOrganization(this.cloudFoundryClient, organizationId))
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-OrganizationNotFound\\([0-9]+\\): The organization could not be found: .*"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-OrganizationNotFound\\([0-9]+\\): The organization could not be found: .*"))
             .verify(Duration.ofMinutes(5));
     }
 
@@ -357,7 +357,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .build())))
             .then(organizationId -> requestGetOrganization(this.cloudFoundryClient, organizationId))
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-OrganizationNotFound\\([0-9]+\\): The organization could not be found: .*"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-OrganizationNotFound\\([0-9]+\\): The organization could not be found: .*"))
             .verify(Duration.ofMinutes(5));
     }
 

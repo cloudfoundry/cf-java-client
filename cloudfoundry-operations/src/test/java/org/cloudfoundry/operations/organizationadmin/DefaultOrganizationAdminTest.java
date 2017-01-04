@@ -17,7 +17,7 @@
 package org.cloudfoundry.operations.organizationadmin;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionResponse;
@@ -82,7 +82,7 @@ public final class DefaultOrganizationAdminTest extends AbstractOperationsTest {
             .name("test-quota-error")
             .build())
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessage("test-exception-errorCode(999): test-exception-description"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessage("test-exception-errorCode(999): test-exception-description"))
             .verify(Duration.ofSeconds(5));
     }
 
@@ -266,7 +266,7 @@ public final class DefaultOrganizationAdminTest extends AbstractOperationsTest {
                 .name(name)
                 .build()))
             .thenReturn(Mono
-                .error(new CloudFoundryException(999, "test-exception-description", "test-exception-errorCode")));
+                .error(new ClientV2Exception(999, "test-exception-description", "test-exception-errorCode")));
     }
 
     private static void requestListOrganizationEmpty(CloudFoundryClient cloudFoundryClient, String name) {

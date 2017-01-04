@@ -93,7 +93,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                 .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))))
             .then(organizationQuotaDefinitionId -> requestGetOrganizationQuotaDefinition(this.cloudFoundryClient, organizationQuotaDefinitionId))
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessageMatching("CF-QuotaDefinitionNotFound\\([0-9]+\\): Quota Definition could not be found: .*"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-QuotaDefinitionNotFound\\([0-9]+\\): Quota Definition could not be found: .*"))
             .verify(Duration.ofMinutes(5));
     }
 

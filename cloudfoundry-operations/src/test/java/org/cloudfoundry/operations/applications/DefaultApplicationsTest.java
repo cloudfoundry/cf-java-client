@@ -17,7 +17,7 @@
 package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.OrderDirection;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
@@ -266,7 +266,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .name("test-name")
                 .build())
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"))
             .verify(Duration.ofSeconds(5));
     }
 
@@ -1630,7 +1630,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .name("test-name")
                 .build())
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(CloudFoundryException.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"))
             .verify(Duration.ofSeconds(5));
     }
 
@@ -2255,7 +2255,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .applicationId(applicationId)
                 .build()))
             .thenReturn(Mono
-                .error(new CloudFoundryException(code, "test-exception-description", "test-exception-errorCode")));
+                .error(new ClientV2Exception(code, "test-exception-description", "test-exception-errorCode")));
     }
 
     private static void requestApplicationInstancesFailingPartial(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -2398,7 +2398,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .applicationId(applicationId)
                 .build()))
             .thenReturn(Mono
-                .error(new CloudFoundryException(code, "test-exception-description", "test-exception-errorCode")));
+                .error(new ClientV2Exception(code, "test-exception-description", "test-exception-errorCode")));
     }
 
     private static void requestApplicationSummary(CloudFoundryClient cloudFoundryClient, String applicationId) {
