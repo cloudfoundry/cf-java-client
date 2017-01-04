@@ -80,6 +80,14 @@ public interface SecurityGroups {
     Mono<ListSecurityGroupRunningDefaultsResponse> listRunningDefaults(ListSecurityGroupRunningDefaultsRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_groups/list_all_spaces_for_the_security_group.html">List all Spaces for the Security Group</a> request.
+     *
+     * @param request the list all spaces for the security group request
+     * @return the response from the list all spaces for the security group request
+     */
+    Mono<ListSecurityGroupSpacesResponse> listSpaces(ListSecurityGroupSpacesRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_group_staging_defaults/return_the_security_groups_used_for_staging.html">List Staging Security Groups</a> request.
      *
      * @param request the list staging security groups request

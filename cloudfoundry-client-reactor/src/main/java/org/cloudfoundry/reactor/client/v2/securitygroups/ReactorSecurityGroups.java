@@ -26,6 +26,8 @@ import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRunningDefau
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupStagingDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsResponse;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupSpacesRequest;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupSpacesResponse;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsResponse;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsRequest;
@@ -92,6 +94,11 @@ public class ReactorSecurityGroups extends AbstractClientV2Operations implements
     @Override
     public Mono<ListSecurityGroupRunningDefaultsResponse> listRunningDefaults(ListSecurityGroupRunningDefaultsRequest request) {
         return get(request, ListSecurityGroupRunningDefaultsResponse.class, builder -> builder.pathSegment("v2", "config", "running_security_groups"));
+    }
+
+    @Override
+    public Mono<ListSecurityGroupSpacesResponse> listSpaces(ListSecurityGroupSpacesRequest request) {
+        return get(request, ListSecurityGroupSpacesResponse.class, builder -> builder.pathSegment("v2", "security_groups", request.getSecurityGroupId(), "spaces"));
     }
 
     @Override
