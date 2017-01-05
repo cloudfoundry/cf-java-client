@@ -1014,7 +1014,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                 .userProvidedServiceInstanceId(userProvidedServiceInstanceId)
                 .build()))
             .thenReturn(Mono
-                .error(new ClientV2Exception(code, "test-exception-description", "test-exception-errorCode")));
+                .error(new ClientV2Exception(null, code, "test-exception-description", "test-exception-errorCode")));
     }
 
     private static void requestCreateServiceBinding(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId, Map<String, Object> parameters) {
@@ -1037,7 +1037,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                 .serviceInstanceId(serviceInstanceId)
                 .build()))
             .thenReturn(Mono
-                .error(new ClientV2Exception(code, "test-exception-description", "test-exception-errorCode")));
+                .error(new ClientV2Exception(null, code, "test-exception-description", "test-exception-errorCode")));
     }
 
     private static void requestCreateServiceInstance(CloudFoundryClient cloudFoundryClient, String spaceId, String planId, String serviceInstance, Map<String, Object> parameters, List<String> tags,

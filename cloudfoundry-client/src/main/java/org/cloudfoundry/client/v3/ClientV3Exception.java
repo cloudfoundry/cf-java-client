@@ -16,8 +16,7 @@
 
 package org.cloudfoundry.client.v3;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.AbstractCloudFoundryException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,20 +24,20 @@ import java.util.stream.Collectors;
 /**
  * An exception encapsulating an error returned from Cloud Foundry V3 APIs
  */
-public final class ClientV3Exception extends RuntimeException {
+public final class ClientV3Exception extends AbstractCloudFoundryException {
 
-    private static final long serialVersionUID = -8108267242858268495L;
+    private static final long serialVersionUID = 3422415564722151878L;
 
     private final List<Error> errors;
 
     /**
      * Creates a new instance
      *
-     * @param errors the errors
+     * @param statusCode the status code
+     * @param errors     the errors
      */
-    @JsonCreator
-    public ClientV3Exception(@JsonProperty("errors") List<Error> errors) {
-        super(errors.stream().map(Error::toString).collect(Collectors.joining(", ")));
+    public ClientV3Exception(Integer statusCode, List<Error> errors) {
+        super(statusCode, errors.stream().map(Error::toString).collect(Collectors.joining(", ")));
         this.errors = errors;
     }
 
@@ -67,8 +66,7 @@ public final class ClientV3Exception extends RuntimeException {
          * @param detail the detail
          * @param title  the title
          */
-        @JsonCreator
-        public Error(@JsonProperty("code") Integer code, @JsonProperty("detail") String detail, @JsonProperty("title") String title) {
+        public Error(Integer code, String detail, String title) {
             this.code = code;
             this.detail = detail;
             this.title = title;

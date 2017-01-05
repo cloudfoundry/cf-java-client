@@ -266,7 +266,7 @@ public final class DefaultOrganizationAdminTest extends AbstractOperationsTest {
                 .name(name)
                 .build()))
             .thenReturn(Mono
-                .error(new ClientV2Exception(999, "test-exception-description", "test-exception-errorCode")));
+                .error(new ClientV2Exception(null, 999, "test-exception-description", "test-exception-errorCode")));
     }
 
     private static void requestListOrganizationEmpty(CloudFoundryClient cloudFoundryClient, String name) {

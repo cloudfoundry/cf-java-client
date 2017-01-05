@@ -2255,7 +2255,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .applicationId(applicationId)
                 .build()))
             .thenReturn(Mono
-                .error(new ClientV2Exception(code, "test-exception-description", "test-exception-errorCode")));
+                .error(new ClientV2Exception(null, code, "test-exception-description", "test-exception-errorCode")));
     }
 
     private static void requestApplicationInstancesFailingPartial(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -2398,7 +2398,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .applicationId(applicationId)
                 .build()))
             .thenReturn(Mono
-                .error(new ClientV2Exception(code, "test-exception-description", "test-exception-errorCode")));
+                .error(new ClientV2Exception(null, code, "test-exception-description", "test-exception-errorCode")));
     }
 
     private static void requestApplicationSummary(CloudFoundryClient cloudFoundryClient, String applicationId) {

@@ -18,7 +18,7 @@ package org.cloudfoundry.reactor.client.v2;
 
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
-import org.cloudfoundry.reactor.client.ErrorPayloadMapper;
+import org.cloudfoundry.reactor.util.ErrorPayloadMapper;
 import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.springframework.web.util.UriComponentsBuilder;

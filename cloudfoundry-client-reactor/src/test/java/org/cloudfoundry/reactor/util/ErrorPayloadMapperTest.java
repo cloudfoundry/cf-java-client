@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.client;
+package org.cloudfoundry.reactor.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.cloudfoundry.UnknownCloudFoundryException;
 import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v3.ClientV3Exception;
 import org.junit.Test;
@@ -44,6 +45,22 @@ public final class ErrorPayloadMapperTest {
     private final HttpClientResponse response = mock(HttpClientResponse.class, RETURNS_SMART_NULLS);
 
     @Test
+    public void clientV2BadPayload() throws IOException {
+        when(this.response.status()).thenReturn(BAD_REQUEST);
+        when(this.response.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/invalid_error_response.json").getFile().toPath()));
+
+        Mono.just(this.response)
+            .transform(ErrorPayloadMapper.clientV2(this.objectMapper))
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t)
+                .isInstanceOf(UnknownCloudFoundryException.class)
+                .hasMessage("Unknown Cloud Foundry Exception")
+                .extracting("statusCode", "payload")
+                .containsExactly(BAD_REQUEST.code(), "Invalid Error Response"))
+            .verify(Duration.ofSeconds(1));
+    }
+
+    @Test
     public void clientV2ClientError() throws IOException {
         when(this.response.status()).thenReturn(BAD_REQUEST);
         when(this.response.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v2/error_response.json").getFile().toPath()));
@@ -54,8 +71,8 @@ public final class ErrorPayloadMapperTest {
             .consumeErrorWith(t -> assertThat(t)
                 .isInstanceOf(ClientV2Exception.class)
                 .hasMessage("CF-UnprocessableEntity(10008): The request is semantically invalid: space_guid and name unique")
-                .extracting("code", "description", "errorCode")
-                .containsExactly(10008, "The request is semantically invalid: space_guid and name unique", "CF-UnprocessableEntity"))
+                .extracting("statusCode", "code", "description", "errorCode")
+                .containsExactly(BAD_REQUEST.code(), 10008, "The request is semantically invalid: space_guid and name unique", "CF-UnprocessableEntity"))
             .verify(Duration.ofSeconds(1));
     }
 
@@ -82,8 +99,24 @@ public final class ErrorPayloadMapperTest {
             .consumeErrorWith(t -> assertThat(t)
                 .isInstanceOf(ClientV2Exception.class)
                 .hasMessage("CF-UnprocessableEntity(10008): The request is semantically invalid: space_guid and name unique")
-                .extracting("code", "description", "errorCode")
-                .containsExactly(10008, "The request is semantically invalid: space_guid and name unique", "CF-UnprocessableEntity"))
+                .extracting("statusCode", "code", "description", "errorCode")
+                .containsExactly(INTERNAL_SERVER_ERROR.code(), 10008, "The request is semantically invalid: space_guid and name unique", "CF-UnprocessableEntity"))
+            .verify(Duration.ofSeconds(1));
+    }
+
+    @Test
+    public void clientV3BadPayload() throws IOException {
+        when(this.response.status()).thenReturn(BAD_REQUEST);
+        when(this.response.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/invalid_error_response.json").getFile().toPath()));
+
+        Mono.just(this.response)
+            .transform(ErrorPayloadMapper.clientV3(this.objectMapper))
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t)
+                .isInstanceOf(UnknownCloudFoundryException.class)
+                .hasMessage("Unknown Cloud Foundry Exception")
+                .extracting("statusCode", "payload")
+                .containsExactly(BAD_REQUEST.code(), "Invalid Error Response"))
             .verify(Duration.ofSeconds(1));
     }
 
@@ -98,7 +131,9 @@ public final class ErrorPayloadMapperTest {
             .consumeErrorWith(t -> {
                 assertThat(t)
                     .isInstanceOf(ClientV3Exception.class)
-                    .hasMessage("CF-UnprocessableEntity(10008): The request is semantically invalid: something went wrong");
+                    .hasMessage("CF-UnprocessableEntity(10008): The request is semantically invalid: something went wrong")
+                    .extracting("statusCode")
+                    .containsExactly(BAD_REQUEST.code());
 
                 assertThat(((ClientV3Exception) t).getErrors())
                     .flatExtracting(ClientV3Exception.Error::getCode, ClientV3Exception.Error::getDetail, ClientV3Exception.Error::getTitle)
@@ -130,7 +165,9 @@ public final class ErrorPayloadMapperTest {
             .consumeErrorWith(t -> {
                 assertThat(t)
                     .isInstanceOf(ClientV3Exception.class)
-                    .hasMessage("CF-UnprocessableEntity(10008): The request is semantically invalid: something went wrong");
+                    .hasMessage("CF-UnprocessableEntity(10008): The request is semantically invalid: something went wrong")
+                    .extracting("statusCode")
+                    .containsExactly(INTERNAL_SERVER_ERROR.code());
 
                 assertThat(((ClientV3Exception) t).getErrors())
                     .flatExtracting(ClientV3Exception.Error::getCode, ClientV3Exception.Error::getDetail, ClientV3Exception.Error::getTitle)

@@ -26,17 +26,17 @@ public final class ClientV3ExceptionTest {
 
     @Test
     public void test() {
-        ClientV3Exception exception = new ClientV3Exception(Arrays.asList(new ClientV3Exception.Error(-1, "test-detail-1", "test-title-1"),
-            new ClientV3Exception.Error(-2, "test-detail-2", "test-title-2")));
+        ClientV3Exception exception = new ClientV3Exception(-1, Arrays.asList(new ClientV3Exception.Error(-2, "test-detail-1", "test-title-1"),
+            new ClientV3Exception.Error(-3, "test-detail-2", "test-title-2")));
 
         assertThat(exception)
             .hasNoCause()
-            .hasMessage("test-title-1(-1): test-detail-1, test-title-2(-2): test-detail-2")
-            .extracting("errors");
+            .hasMessage("test-title-1(-2): test-detail-1, test-title-2(-3): test-detail-2")
+            .extracting("statusCode").containsExactly(-1);
 
         assertThat(exception.getErrors())
             .flatExtracting(ClientV3Exception.Error::getCode, ClientV3Exception.Error::getDetail, ClientV3Exception.Error::getTitle)
-            .contains(-1, "test-detail-1", "test-title-1", -2, "test-detail-2", "test-title-2");
+            .contains(-2, "test-detail-1", "test-title-1", -3, "test-detail-2", "test-title-2");
     }
 
 }

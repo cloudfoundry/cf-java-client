@@ -64,7 +64,7 @@ public final class JobUtils {
 
     private static Mono<Void> getError(JobEntity entity) {
         ErrorDetails errorDetails = entity.getErrorDetails();
-        return Mono.error(new ClientV2Exception(errorDetails.getCode(), errorDetails.getDescription(), errorDetails.getErrorCode()));
+        return Mono.error(new ClientV2Exception(null, errorDetails.getCode(), errorDetails.getDescription(), errorDetails.getErrorCode()));
     }
 
     private static boolean isComplete(JobEntity entity) {

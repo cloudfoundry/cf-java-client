@@ -16,15 +16,14 @@
 
 package org.cloudfoundry.client.v2;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.AbstractCloudFoundryException;
 
 /**
  * An exception encapsulating an error returned from Cloud Foundry V2 APIs
  */
-public final class ClientV2Exception extends RuntimeException {
+public final class ClientV2Exception extends AbstractCloudFoundryException {
 
-    private static final long serialVersionUID = -6535511026861299871L;
+    private static final long serialVersionUID = -5211312680168239905L;
 
     private final Integer code;
 
@@ -35,13 +34,13 @@ public final class ClientV2Exception extends RuntimeException {
     /**
      * Creates a new instance
      *
+     * @param statusCode  the status code
      * @param code        the code
      * @param description the description
      * @param errorCode   the error code
      */
-    @JsonCreator
-    public ClientV2Exception(@JsonProperty("code") Integer code, @JsonProperty("description") String description, @JsonProperty("error_code") String errorCode) {
-        super(String.format("%s(%d): %s", errorCode, code, description));
+    public ClientV2Exception(Integer statusCode, Integer code, String description, String errorCode) {
+        super(statusCode, String.format("%s(%d): %s", errorCode, code, description));
         this.code = code;
         this.description = description;
         this.errorCode = errorCode;
