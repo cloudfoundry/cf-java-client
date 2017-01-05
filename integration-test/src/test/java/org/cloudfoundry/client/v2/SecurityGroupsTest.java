@@ -18,14 +18,21 @@ package org.cloudfoundry.client.v2;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.securitygroups.AssociateSecurityGroupSpaceRequest;
+import org.cloudfoundry.client.v2.securitygroups.AssociateSecurityGroupSpaceResponse;
 import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupRequest;
 import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupResponse;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRequest;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupSpacesRequest;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupSpacesResponse;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsRequest;
+import org.cloudfoundry.client.v2.securitygroups.RemoveSecurityGroupSpaceRequest;
 import org.cloudfoundry.client.v2.securitygroups.RuleEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
 import org.cloudfoundry.client.v2.securitygroups.UpdateSecurityGroupRequest;
+import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
+import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
@@ -35,21 +42,44 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import reactor.util.function.Tuples;
 
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.fail;
 import static org.cloudfoundry.client.v2.securitygroups.Protocol.TCP;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class SecurityGroupsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522654 et al")
+    @Autowired
+    private Mono<String> organizationId;
+
     @Test
     public void associateSpace() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/101522654");
+        String securityGroupName = this.nameFactory.getSecurityGroupName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        this.organizationId
+            .then(organizationId ->
+                Mono.when(
+                    createSecurityGroupId(this.cloudFoundryClient, securityGroupName),
+                    createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
+                ))
+            .then(function((securityGroupId, spaceId) -> this.cloudFoundryClient.securityGroups()
+                .associateSpace(AssociateSecurityGroupSpaceRequest.builder()
+                    .securityGroupId(securityGroupId)
+                    .spaceId(spaceId)
+                    .build())))
+            .map(ResourceUtils::getEntity)
+            .map(SecurityGroupEntity::getName)
+            .as(StepVerifier::create)
+            .expectNext(securityGroupName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -78,7 +108,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
     public void delete() {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
 
-        getSecurityGroupId(this.cloudFoundryClient, securityGroupName)
+        createSecurityGroupId(this.cloudFoundryClient, securityGroupName)
             .then(securityGroupId -> this.cloudFoundryClient.securityGroups()
                 .delete(DeleteSecurityGroupRequest.builder()
                     .securityGroupId(securityGroupId)
@@ -92,10 +122,29 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522664 et al")
     @Test
     public void deleteSpace() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/101522664");
+        String securityGroupName = this.nameFactory.getSecurityGroupName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        this.organizationId
+            .then(organizationId -> Mono.when(
+                createSecurityGroupId(this.cloudFoundryClient, securityGroupName),
+                createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
+            ))
+            .then(function((securityGroupId, spaceId) -> associateSpace(this.cloudFoundryClient, spaceId, securityGroupId)
+                .then(Mono.just(Tuples.of(securityGroupId, spaceId)))))
+            .flatMap(function((securityGroupId, spaceId) -> this.cloudFoundryClient.securityGroups()
+                .removeSpace(RemoveSecurityGroupSpaceRequest.builder()
+                    .securityGroupId(securityGroupId)
+                    .spaceId(spaceId)
+                    .build())
+                .then(Mono.just(Tuples.of(securityGroupId, spaceId)))))
+            .flatMap(function((securityGroupId, spaceId) -> requestListSecurityGroupSpaces(this.cloudFoundryClient, spaceId, securityGroupId)))
+            .as(StepVerifier::create)
+            .expectNextCount(0)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522666 et al")
@@ -129,10 +178,33 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         fail("TODO: finish story https://www.pivotaltracker.com/story/show/101522656 et al");
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522662 et al")
     @Test
     public void listSpaces() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/101522662");
+        String securityGroupName = this.nameFactory.getSecurityGroupName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        this.organizationId
+            .then(organizationId ->
+                Mono.when(
+                    createSecurityGroupId(this.cloudFoundryClient, securityGroupName),
+                    createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
+                ))
+            .then(function((securityGroupId, spaceId) -> associateSpace(this.cloudFoundryClient, spaceId, securityGroupId)
+                .then(Mono.just(Tuples.of(securityGroupId, spaceId)))))
+            .flatMap(function((securityGroupId, spaceId) -> PaginationUtils.
+                requestClientV2Resources(page -> this.cloudFoundryClient.securityGroups()
+                    .listSpaces(ListSecurityGroupSpacesRequest.builder()
+                        .page(page)
+                        .securityGroupId(securityGroupId)
+                        .spaceId(spaceId)
+                        .build()))))
+            .map(ResourceUtils::getEntity)
+            .map(SpaceEntity::getName)
+            .as(StepVerifier::create)
+            .expectNext(spaceName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+
     }
 
     @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656 et al")
@@ -170,7 +242,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         String oldSecurityGroupName = this.nameFactory.getSecurityGroupName();
         String newSecurityGroupName = this.nameFactory.getSecurityGroupName();
 
-        getSecurityGroupId(this.cloudFoundryClient, oldSecurityGroupName)
+        createSecurityGroupId(this.cloudFoundryClient, oldSecurityGroupName)
             .log("stream.before")
             .then(securityGroupId -> this.cloudFoundryClient.securityGroups()
                 .update(UpdateSecurityGroupRequest.builder()
@@ -187,8 +259,25 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    private static Mono<String> getSecurityGroupId(CloudFoundryClient cloudFoundryClient, String securityGroupName) {
+    private static Mono<AssociateSecurityGroupSpaceResponse> associateSpace(CloudFoundryClient cloudFoundryClient, String spaceId, String securityGroupId) {
+        return cloudFoundryClient.securityGroups()
+            .associateSpace(AssociateSecurityGroupSpaceRequest.builder()
+                .securityGroupId(securityGroupId)
+                .spaceId(spaceId)
+                .build());
+    }
+
+    private static Mono<String> createSecurityGroupId(CloudFoundryClient cloudFoundryClient, String securityGroupName) {
         return requestCreateSecurityGroup(cloudFoundryClient, securityGroupName)
+            .map(ResourceUtils::getId);
+    }
+
+    private static Mono<String> createSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
+        return cloudFoundryClient.spaces()
+            .create(CreateSpaceRequest.builder()
+                .organizationId(organizationId)
+                .name(spaceName)
+                .build())
             .map(ResourceUtils::getId);
     }
 
@@ -196,6 +285,14 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         return cloudFoundryClient.securityGroups()
             .create(CreateSecurityGroupRequest.builder()
                 .name(securityGroupName)
+                .build());
+    }
+
+    private static Mono<ListSecurityGroupSpacesResponse> requestListSecurityGroupSpaces(CloudFoundryClient cloudFoundryClient, String spaceId, String securityGroupId) {
+        return cloudFoundryClient.securityGroups()
+            .listSpaces(ListSecurityGroupSpacesRequest.builder()
+                .securityGroupId(securityGroupId)
+                .spaceId(spaceId)
                 .build());
     }
 
