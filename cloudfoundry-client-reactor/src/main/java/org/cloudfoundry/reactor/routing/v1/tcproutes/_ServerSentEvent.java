@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,24 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.routing.v1.tcproutes;
+package org.cloudfoundry.reactor.routing.v1.tcproutes;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.routing.v1.ModificationTag;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
-/**
- * The payload for TCP Route responses
- */
-@JsonDeserialize
 @Value.Immutable
-abstract class _TcpRoute extends AbstractTcpRoute {
+abstract class _ServerSentEvent {
+
+    @Nullable
+    abstract String getData();
+
+    @Nullable
+    abstract String getEventType();
+
+    @Nullable
+    abstract String getId();
+
+    @Nullable
+    abstract Integer getRetry();
 
 }

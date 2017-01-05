@@ -26,6 +26,7 @@ import org.cloudfoundry.routing.v1.routergroups.RouterGroup;
 import org.cloudfoundry.routing.v1.tcproutes.CreateTcpRoutesRequest;
 import org.cloudfoundry.routing.v1.tcproutes.CreateTcpRoutesResponse;
 import org.cloudfoundry.routing.v1.tcproutes.DeleteTcpRoutesRequest;
+import org.cloudfoundry.routing.v1.tcproutes.EventsRequest;
 import org.cloudfoundry.routing.v1.tcproutes.ListTcpRoutesRequest;
 import org.cloudfoundry.routing.v1.tcproutes.ListTcpRoutesResponse;
 import org.cloudfoundry.routing.v1.tcproutes.TcpRoute;
@@ -33,6 +34,7 @@ import org.cloudfoundry.routing.v1.tcproutes.TcpRouteConfiguration;
 import org.cloudfoundry.routing.v1.tcproutes.TcpRouteDeletion;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -104,6 +106,28 @@ public final class TcpRoutesTest extends AbstractIntegrationTest {
             .filter(route -> backendPort.equals(route.getBackendPort()))
             .filter(route -> port.equals(route.getPort()))
             .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void events() {
+        String backendIp = this.nameFactory.getIpAddress();
+        Integer backendPort = this.nameFactory.getPort();
+        Integer port = this.nameFactory.getPort();
+
+        Flux.firstEmitting(
+            getRouterGroupId(this.routingClient, DEFAULT_ROUTER_GROUP)
+                .flatMap(routerGroupId -> Flux.interval(Duration.ofMillis(500))
+                    .flatMap(i -> createTcpRoute(this.routingClient, backendIp, backendPort, port, routerGroupId)))
+                .then(),
+            this.routingClient.tcpRoutes()
+                .events(EventsRequest.builder()
+                    .build())
+                .filter(event -> event.getBackendIp().equals(backendIp) && event.getBackendPort().equals(backendPort) && event.getPort().equals(port))
+                .take(1))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
