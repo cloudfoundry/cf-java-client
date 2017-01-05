@@ -52,7 +52,12 @@ import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.clients.DeleteClientRequest;
 import org.cloudfoundry.uaa.clients.ListClientsRequest;
 import org.cloudfoundry.uaa.groups.DeleteGroupRequest;
+import org.cloudfoundry.uaa.groups.Group;
 import org.cloudfoundry.uaa.groups.ListGroupsRequest;
+import org.cloudfoundry.uaa.groups.ListMembersRequest;
+import org.cloudfoundry.uaa.groups.ListMembersResponse;
+import org.cloudfoundry.uaa.groups.RemoveMemberRequest;
+import org.cloudfoundry.uaa.groups.RemoveMemberResponse;
 import org.cloudfoundry.uaa.identityproviders.DeleteIdentityProviderRequest;
 import org.cloudfoundry.uaa.identityproviders.ListIdentityProvidersRequest;
 import org.cloudfoundry.uaa.identityproviders.ListIdentityProvidersResponse;
@@ -218,6 +223,8 @@ final class CloudFoundryCleaner {
                     .startIndex(startIndex)
                     .build()))
             .filter(group -> nameFactory.isGroupName(group.getDisplayName()))
+            .flatMap(group -> removeGroupMembers(uaaClient, group)
+                .thenMany(Flux.just(group)))
             .flatMap(group -> uaaClient.groups()
                 .delete(DeleteGroupRequest.builder()
                     .groupId(group.getId())
@@ -352,7 +359,7 @@ final class CloudFoundryCleaner {
                     .securityGroupId(ResourceUtils.getId(securityGroup))
                     .build())
                 .doOnError(t -> LOGGER.error("Unable to delete security group {}", ResourceUtils.getEntity(securityGroup).getName(), t))
-            .then());
+                .then());
     }
 
     private static Flux<Void> cleanServiceInstances(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
@@ -449,6 +456,20 @@ final class CloudFoundryCleaner {
             .collectMap(function((id, name) -> id), function((id, name) -> name));
     }
 
+    private static Flux<RemoveMemberResponse> removeGroupMembers(UaaClient uaaClient, Group group) {
+        return uaaClient.groups()
+            .listMembers(ListMembersRequest.builder()
+                .groupId(group.getId())
+                .build())
+            .flatMapIterable(ListMembersResponse::getMembers)
+            .flatMap(member -> uaaClient.groups()
+                .removeMember(RemoveMemberRequest.builder()
+                    .groupId(group.getId())
+                    .memberId(member.getMemberId())
+                    .build())
+                .doOnError(t -> LOGGER.error("Unable to remove member {} from {}", member.getMemberId(), group.getDisplayName(), t)));
+    }
+
     private static Flux<Void> removeServiceBindings(CloudFoundryClient cloudFoundryClient, ApplicationResource application) {
         return PaginationUtils
             .requestClientV2Resources(page -> cloudFoundryClient.applicationsV2()
@@ -461,7 +482,7 @@ final class CloudFoundryCleaner {
                     .applicationId(ResourceUtils.getId(application))
                     .serviceBindingId(ResourceUtils.getId(serviceBinding))
                     .build())
-                .doOnError(t -> LOGGER.error("Unable to delete remove service binding from {}", ResourceUtils.getEntity(application).getName(), t)));
+                .doOnError(t -> LOGGER.error("Unable to remove service binding from {}", ResourceUtils.getEntity(application).getName(), t)));
     }
 
 }
