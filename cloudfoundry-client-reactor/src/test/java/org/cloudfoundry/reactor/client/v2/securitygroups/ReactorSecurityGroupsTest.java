@@ -18,6 +18,8 @@ package org.cloudfoundry.reactor.client.v2.securitygroups;
 
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
+import org.cloudfoundry.client.v2.securitygroups.AssociateSecurityGroupSpaceRequest;
+import org.cloudfoundry.client.v2.securitygroups.AssociateSecurityGroupSpaceResponse;
 import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupRequest;
 import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupResponse;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRequest;
@@ -26,10 +28,13 @@ import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRunningDefau
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupStagingDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsResponse;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupSpacesRequest;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupSpacesResponse;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsResponse;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsResponse;
+import org.cloudfoundry.client.v2.securitygroups.RemoveSecurityGroupSpaceRequest;
 import org.cloudfoundry.client.v2.securitygroups.RuleEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
@@ -39,6 +44,8 @@ import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupStagingDefaultR
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupStagingDefaultResponse;
 import org.cloudfoundry.client.v2.securitygroups.UpdateSecurityGroupRequest;
 import org.cloudfoundry.client.v2.securitygroups.UpdateSecurityGroupResponse;
+import org.cloudfoundry.client.v2.spaces.SpaceEntity;
+import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -63,6 +70,43 @@ import static org.cloudfoundry.client.v2.securitygroups.Protocol.UDP;
 public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
 
     private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+    @Test
+    public void associateSpace() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PUT).path("/v2/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159/spaces/1305ec2b-a31c-4d2e-adc8-d9b764237e96")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/security_groups/PUT_{id}_spaces_{space-id}_response.json")
+                .build())
+            .build());
+
+        this.securityGroups
+            .associateSpace(AssociateSecurityGroupSpaceRequest.builder()
+                .securityGroupId("1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
+                .spaceId("1305ec2b-a31c-4d2e-adc8-d9b764237e96")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(AssociateSecurityGroupSpaceResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2016-06-08T16:41:21Z")
+                    .id("1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
+                    .updatedAt("2016-06-08T16:41:26Z")
+                    .url("/v2/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
+                    .build())
+                .entity(SecurityGroupEntity.builder()
+                    .name("dummy1")
+                    .rule()
+                    .runningDefault(false)
+                    .stagingDefault(false)
+                    .spacesUrl("/v2/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159/spaces")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     @Test
     public void create() {
@@ -382,6 +426,57 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     }
 
     @Test
+    public void listSpaces() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159/spaces?space_guid=09a060b2-f97a-4a57-b7d2-35e06ad71050")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/config/GET_{id}_spaces_response.json")
+                .build())
+            .build());
+
+        this.securityGroups
+            .listSpaces(ListSecurityGroupSpacesRequest.builder()
+                .securityGroupId("1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
+                .spaceId("09a060b2-f97a-4a57-b7d2-35e06ad71050")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListSecurityGroupSpacesResponse.builder()
+                .totalPages(1)
+                .totalResults(1)
+                .resource(SpaceResource.builder()
+                    .metadata(Metadata.builder()
+                        .createdAt("2016-06-08T16:41:21Z")
+                        .id("3435dd59-f289-4191-83e6-6201d6fb6a22")
+                        .updatedAt("2016-06-08T16:41:26Z")
+                        .url("/v2/spaces/3435dd59-f289-4191-83e6-6201d6fb6a22")
+                        .build())
+                    .entity(SpaceEntity.builder()
+                        .allowSsh(true)
+                        .applicationEventsUrl("/v2/spaces/3435dd59-f289-4191-83e6-6201d6fb6a22/app_events")
+                        .applicationsUrl("/v2/spaces/3435dd59-f289-4191-83e6-6201d6fb6a22/apps")
+                        .auditorsUrl("/v2/spaces/3435dd59-f289-4191-83e6-6201d6fb6a22/auditors")
+                        .developersUrl("/v2/spaces/3435dd59-f289-4191-83e6-6201d6fb6a22/developers")
+                        .domainsUrl("/v2/spaces/3435dd59-f289-4191-83e6-6201d6fb6a22/domains")
+                        .eventsUrl("/v2/spaces/3435dd59-f289-4191-83e6-6201d6fb6a22/events")
+                        .managersUrl("/v2/spaces/3435dd59-f289-4191-83e6-6201d6fb6a22/managers")
+                        .name("name-40")
+                        .organizationId("1d1dd3f4-36bd-4380-8d01-3c7a934a9281")
+                        .organizationUrl("/v2/organizations/1d1dd3f4-36bd-4380-8d01-3c7a934a9281")
+                        .routesUrl("/v2/spaces/3435dd59-f289-4191-83e6-6201d6fb6a22/routes")
+                        .securityGroupsUrl("/v2/spaces/3435dd59-f289-4191-83e6-6201d6fb6a22/security_groups")
+                        .serviceInstancesUrl("/v2/spaces/3435dd59-f289-4191-83e6-6201d6fb6a22/service_instances")
+                        .spaceQuotaDefinitionId(null)
+                        .build())
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void listStaging() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
@@ -418,6 +513,27 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
                         .build())
                     .build())
                 .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void removeSpace() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/v2/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159/spaces/ca8f04d1-bc2b-40ef-975e-fda2cc785c2a")
+                .build())
+            .response(TestResponse.builder()
+                .status(NO_CONTENT)
+                .build())
+            .build());
+
+        this.securityGroups
+            .removeSpace(RemoveSecurityGroupSpaceRequest.builder()
+                .securityGroupId("1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
+                .spaceId("ca8f04d1-bc2b-40ef-975e-fda2cc785c2a")
+                .build())
+            .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }

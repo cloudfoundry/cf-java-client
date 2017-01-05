@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.reactor.client.v2.securitygroups;
 
+import org.cloudfoundry.client.v2.securitygroups.AssociateSecurityGroupSpaceRequest;
+import org.cloudfoundry.client.v2.securitygroups.AssociateSecurityGroupSpaceResponse;
 import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupRequest;
 import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupResponse;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRequest;
@@ -24,10 +26,13 @@ import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRunningDefau
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupStagingDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsResponse;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupSpacesRequest;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupSpacesResponse;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsResponse;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsResponse;
+import org.cloudfoundry.client.v2.securitygroups.RemoveSecurityGroupSpaceRequest;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroups;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultResponse;
@@ -54,6 +59,11 @@ public class ReactorSecurityGroups extends AbstractClientV2Operations implements
      */
     public ReactorSecurityGroups(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider);
+    }
+
+    @Override
+    public Mono<AssociateSecurityGroupSpaceResponse> associateSpace(AssociateSecurityGroupSpaceRequest request) {
+        return put(request, AssociateSecurityGroupSpaceResponse.class, builder -> builder.pathSegment("v2", "security_groups", request.getSecurityGroupId(), "spaces", request.getSpaceId()));
     }
 
     @Override
@@ -87,8 +97,18 @@ public class ReactorSecurityGroups extends AbstractClientV2Operations implements
     }
 
     @Override
+    public Mono<ListSecurityGroupSpacesResponse> listSpaces(ListSecurityGroupSpacesRequest request) {
+        return get(request, ListSecurityGroupSpacesResponse.class, builder -> builder.pathSegment("v2", "security_groups", request.getSecurityGroupId(), "spaces"));
+    }
+
+    @Override
     public Mono<ListSecurityGroupStagingDefaultsResponse> listStagingDefaults(ListSecurityGroupStagingDefaultsRequest request) {
         return get(request, ListSecurityGroupStagingDefaultsResponse.class, builder -> builder.pathSegment("v2", "config", "staging_security_groups"));
+    }
+
+    @Override
+    public Mono<Void> removeSpace(RemoveSecurityGroupSpaceRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "security_groups", request.getSecurityGroupId(), "spaces", request.getSpaceId()));
     }
 
     @Override

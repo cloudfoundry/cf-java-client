@@ -21,6 +21,14 @@ import reactor.core.publisher.Mono;
 public interface SecurityGroups {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_groups/associate_space_with_the_security_group.html">Associate Space with the Security Group</a> request.
+     *
+     * @param request the associate security group space request
+     * @return the response from the associate security group space request
+     */
+    Mono<AssociateSecurityGroupSpaceResponse> associateSpace(AssociateSecurityGroupSpaceRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_groups/creating_a_security_group.html">Creating a Security Group</a> request.
      *
      * @param request the create security group request
@@ -72,12 +80,28 @@ public interface SecurityGroups {
     Mono<ListSecurityGroupRunningDefaultsResponse> listRunningDefaults(ListSecurityGroupRunningDefaultsRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_groups/list_all_spaces_for_the_security_group.html">List all Spaces for the Security Group</a> request.
+     *
+     * @param request the list all spaces for the security group request
+     * @return the response from the list all spaces for the security group request
+     */
+    Mono<ListSecurityGroupSpacesResponse> listSpaces(ListSecurityGroupSpacesRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_group_staging_defaults/return_the_security_groups_used_for_staging.html">List Staging Security Groups</a> request.
      *
      * @param request the list staging security groups request
      * @return the response from the list staging security groups request
      */
     Mono<ListSecurityGroupStagingDefaultsResponse> listStagingDefaults(ListSecurityGroupStagingDefaultsRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_groups/remove_space_from_the_security_group.html">Remove Space from the Security Group</a> request.
+     *
+     * @param request the remove security group space request
+     * @return the response from the remove security group space request
+     */
+    Mono<Void> removeSpace(RemoveSecurityGroupSpaceRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_group_running_defaults/set_a_security_group_as_a_default_for_running_apps.html">Set a Security Group as a default for
