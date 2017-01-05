@@ -21,6 +21,7 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
+import reactor.ipc.netty.http.client.HttpClientResponse;
 
 import java.util.function.Function;
 
@@ -32,6 +33,10 @@ public abstract class AbstractRoutingV1Operations extends AbstractReactorOperati
 
     protected final <T> Mono<T> get(Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doGet(responseType, uriTransformer, outbound -> outbound, inbound -> inbound);
+    }
+
+    protected final Mono<HttpClientResponse> get(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return doGet(uriTransformer, outbound -> outbound, inbound -> inbound);
     }
 
     protected final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {

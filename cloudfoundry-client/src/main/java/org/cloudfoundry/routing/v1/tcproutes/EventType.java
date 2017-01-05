@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,33 @@
 
 package org.cloudfoundry.routing.v1.tcproutes;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.routing.v1.ModificationTag;
-import org.immutables.value.Value;
+import com.fasterxml.jackson.annotation.JsonCreator;
 
 /**
- * The payload for TCP Route responses
+ * The event type
  */
-@JsonDeserialize
-@Value.Immutable
-abstract class _TcpRoute extends AbstractTcpRoute {
+public enum EventType {
+
+    /**
+     * The delete event type
+     */
+    DELETE,
+
+    /**
+     * The upsert event type
+     */
+    UPSERT;
+
+    @JsonCreator
+    public static EventType from(String s) {
+        switch (s.toLowerCase()) {
+            case "delete":
+                return DELETE;
+            case "upsert":
+                return UPSERT;
+            default:
+                throw new IllegalArgumentException(String.format("Unknown key type: %s", s));
+        }
+    }
 
 }

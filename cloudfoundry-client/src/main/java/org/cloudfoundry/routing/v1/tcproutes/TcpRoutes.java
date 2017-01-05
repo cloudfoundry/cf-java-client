@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.routing.v1.tcproutes;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -38,6 +39,14 @@ public interface TcpRoutes {
      * @return the response to the Delete TCP Routes request
      */
     Mono<Void> delete(DeleteTcpRoutesRequest request);
+
+    /**
+     * Makes the <a href="https://github.com/cloudfoundry-incubator/routing-api/blob/master/docs/api_docs.md#subscribe-to-events-for-tcp-routes">TCP Routes Events</a> request
+     *
+     * @param request the TCP Routes Events request
+     * @return the response to the TCP Routes Events request
+     */
+    Flux<TcpRouteEvent> events(EventsRequest request);
 
     /**
      * Makes the <a href="https://github.com/cloudfoundry-incubator/routing-api/blob/master/docs/api_docs.md#list-tcp-routes">List TCP Routes</a> request
