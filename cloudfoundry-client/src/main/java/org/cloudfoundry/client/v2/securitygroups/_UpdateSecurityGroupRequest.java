@@ -28,12 +28,6 @@ import java.util.List;
 abstract class _UpdateSecurityGroupRequest {
 
     /**
-     * The security group id
-     */
-    @JsonIgnore
-    abstract String getSecurityGroupId();
-
-    /**
      * The security group name
      */
     @JsonProperty("name")
@@ -45,6 +39,12 @@ abstract class _UpdateSecurityGroupRequest {
     @JsonProperty("rules")
     @Nullable
     abstract List<RuleEntity> getRules();
+
+    /**
+     * The security group id
+     */
+    @JsonIgnore
+    abstract String getSecurityGroupId();
 
     /**
      * The list of associated spaces

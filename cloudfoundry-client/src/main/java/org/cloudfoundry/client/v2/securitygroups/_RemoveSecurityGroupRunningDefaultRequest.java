@@ -16,21 +16,19 @@
 
 package org.cloudfoundry.client.v2.securitygroups;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.immutables.value.Value;
 
-public final class DeleteSecurityGroupRunningDefaultRequestTest {
+/**
+ * The request payload for the Remove Security Group Running Default operation
+ */
+@Value.Immutable
+abstract class _RemoveSecurityGroupRunningDefaultRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noSecurityGroupRunningDefaultId() {
-        DeleteSecurityGroupRunningDefaultRequest.builder()
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        DeleteSecurityGroupRunningDefaultRequest.builder()
-            .securityGroupRunningDefaultId("test-security-group-default-id")
-            .build();
-    }
+    /**
+     * The security group id
+     */
+    @JsonIgnore
+    abstract String getSecurityGroupId();
 
 }

@@ -29,7 +29,7 @@ public final class SetSecurityGroupStagingDefaultRequestTest {
     @Test
     public void valid() {
         SetSecurityGroupStagingDefaultRequest.builder()
-            .securityGroupStagingDefaultId("test-security-group-default-id")
+            .securityGroupId("test-security-group-default-id")
             .build();
     }
 

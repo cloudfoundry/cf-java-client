@@ -20,15 +20,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.immutables.value.Value;
 
 /**
- * The request payload for the Delete Security Group Running Default operation
+ * The request payload for the Get a Security Group operation
  */
 @Value.Immutable
-abstract class _DeleteSecurityGroupRunningDefaultRequest {
+abstract class _GetSecurityGroupRequest {
 
     /**
-     * The security group running default id
+     * The security group id
      */
     @JsonIgnore
-    abstract String getSecurityGroupRunningDefaultId();
+    abstract String getSecurityGroupId();
 
 }

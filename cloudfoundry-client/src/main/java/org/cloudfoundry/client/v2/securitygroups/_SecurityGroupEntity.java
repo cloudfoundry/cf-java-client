@@ -65,4 +65,11 @@ abstract class _SecurityGroupEntity {
     @Nullable
     abstract Boolean getStagingDefault();
 
+    /**
+     * The staging spaces url
+     */
+    @JsonProperty("staging_spaces_url")
+    @Nullable
+    abstract String getStagingSpacesUrl();
+
 }
