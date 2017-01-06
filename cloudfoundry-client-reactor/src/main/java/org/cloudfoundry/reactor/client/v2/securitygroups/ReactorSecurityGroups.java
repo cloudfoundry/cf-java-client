@@ -22,8 +22,8 @@ import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupRequest;
 import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupResponse;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRequest;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupResponse;
-import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRunningDefaultRequest;
-import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupStagingDefaultRequest;
+import org.cloudfoundry.client.v2.securitygroups.GetSecurityGroupRequest;
+import org.cloudfoundry.client.v2.securitygroups.GetSecurityGroupResponse;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsResponse;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupSpacesRequest;
@@ -32,7 +32,9 @@ import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefault
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsResponse;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsResponse;
+import org.cloudfoundry.client.v2.securitygroups.RemoveSecurityGroupRunningDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.RemoveSecurityGroupSpaceRequest;
+import org.cloudfoundry.client.v2.securitygroups.RemoveSecurityGroupStagingDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroups;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultResponse;
@@ -77,13 +79,8 @@ public class ReactorSecurityGroups extends AbstractClientV2Operations implements
     }
 
     @Override
-    public Mono<Void> deleteRunningDefault(DeleteSecurityGroupRunningDefaultRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "config", "running_security_groups", request.getSecurityGroupRunningDefaultId()));
-    }
-
-    @Override
-    public Mono<Void> deleteStagingDefault(DeleteSecurityGroupStagingDefaultRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "config", "staging_security_groups", request.getSecurityGroupStagingDefaultId()));
+    public Mono<GetSecurityGroupResponse> get(GetSecurityGroupRequest request) {
+        return get(request, GetSecurityGroupResponse.class, builder -> builder.pathSegment("v2", "security_groups", request.getSecurityGroupId()));
     }
 
     @Override
@@ -107,18 +104,28 @@ public class ReactorSecurityGroups extends AbstractClientV2Operations implements
     }
 
     @Override
+    public Mono<Void> removeRunningDefault(RemoveSecurityGroupRunningDefaultRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "config", "running_security_groups", request.getSecurityGroupId()));
+    }
+
+    @Override
     public Mono<Void> removeSpace(RemoveSecurityGroupSpaceRequest request) {
         return delete(request, Void.class, builder -> builder.pathSegment("v2", "security_groups", request.getSecurityGroupId(), "spaces", request.getSpaceId()));
     }
 
     @Override
+    public Mono<Void> removeStagingDefault(RemoveSecurityGroupStagingDefaultRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "config", "staging_security_groups", request.getSecurityGroupId()));
+    }
+
+    @Override
     public Mono<SetSecurityGroupRunningDefaultResponse> setRunningDefault(SetSecurityGroupRunningDefaultRequest request) {
-        return put(request, SetSecurityGroupRunningDefaultResponse.class, builder -> builder.pathSegment("v2", "config", "running_security_groups", request.getSecurityGroupRunningDefaultId()));
+        return put(request, SetSecurityGroupRunningDefaultResponse.class, builder -> builder.pathSegment("v2", "config", "running_security_groups", request.getSecurityGroupId()));
     }
 
     @Override
     public Mono<SetSecurityGroupStagingDefaultResponse> setStagingDefault(SetSecurityGroupStagingDefaultRequest request) {
-        return put(request, SetSecurityGroupStagingDefaultResponse.class, builder -> builder.pathSegment("v2", "config", "staging_security_groups", request.getSecurityGroupStagingDefaultId()));
+        return put(request, SetSecurityGroupStagingDefaultResponse.class, builder -> builder.pathSegment("v2", "config", "staging_security_groups", request.getSecurityGroupId()));
     }
 
     @Override

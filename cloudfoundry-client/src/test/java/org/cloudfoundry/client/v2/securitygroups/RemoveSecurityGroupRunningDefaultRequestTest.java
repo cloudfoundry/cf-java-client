@@ -16,19 +16,21 @@
 
 package org.cloudfoundry.client.v2.securitygroups;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.immutables.value.Value;
+import org.junit.Test;
 
-/**
- * The request payload for the Set Security Group Staging Default operation
- */
-@Value.Immutable
-abstract class _SetSecurityGroupStagingDefaultRequest {
+public final class RemoveSecurityGroupRunningDefaultRequestTest {
 
-    /**
-     * The security group to set as a default
-     */
-    @JsonIgnore
-    abstract String getSecurityGroupId();
+    @Test(expected = IllegalStateException.class)
+    public void noSecurityGroupRunningDefaultId() {
+        RemoveSecurityGroupRunningDefaultRequest.builder()
+            .build();
+    }
+
+    @Test
+    public void valid() {
+        RemoveSecurityGroupRunningDefaultRequest.builder()
+            .securityGroupId("test-security-group-default-id")
+            .build();
+    }
 
 }

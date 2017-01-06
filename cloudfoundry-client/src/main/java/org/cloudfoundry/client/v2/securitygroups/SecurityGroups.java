@@ -45,22 +45,12 @@ public interface SecurityGroups {
     Mono<DeleteSecurityGroupResponse> delete(DeleteSecurityGroupRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_group_running_defaults/return_the_security_groups_used_for_running_apps.html">Delete Running Security Group</a>
-     * request.
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_groups/retrieve_a_particular_security_group.html">Retrieve a Particular Security Group</a> request.
      *
-     * @param request the delete running security group request
-     * @return the response from the delete running security group request
+     * @param request the get security groups request
+     * @return the response from the get security groups request
      */
-    Mono<Void> deleteRunningDefault(DeleteSecurityGroupRunningDefaultRequest request);
-
-    /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_group_staging_defaults/removing_a_security_group_as_a_default_for_staging.html">Delete Staging Security Group</a>
-     * request.
-     *
-     * @param request the delete staging security group request
-     * @return the response from the delete runstagingning security group request
-     */
-    Mono<Void> deleteStagingDefault(DeleteSecurityGroupStagingDefaultRequest request);
+    Mono<GetSecurityGroupResponse> get(GetSecurityGroupRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_groups/list_all_security_groups.html">List all Security Groups</a> request.
@@ -96,12 +86,30 @@ public interface SecurityGroups {
     Mono<ListSecurityGroupStagingDefaultsResponse> listStagingDefaults(ListSecurityGroupStagingDefaultsRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_group_running_defaults/removing_a_security_group_as_a_default_for_running_apps.html">
+     * Removing a Security Group as a default for running Apps</a> request.
+     *
+     * @param request the remove running security group request
+     * @return the response from the remove running security group request
+     */
+    Mono<Void> removeRunningDefault(RemoveSecurityGroupRunningDefaultRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_groups/remove_space_from_the_security_group.html">Remove Space from the Security Group</a> request.
      *
      * @param request the remove security group space request
      * @return the response from the remove security group space request
      */
     Mono<Void> removeSpace(RemoveSecurityGroupSpaceRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_group_staging_defaults/removing_a_security_group_as_a_default_for_staging.html">
+     * Removing a Security Group as a default for staging</a> request.
+     *
+     * @param request the remove staging security group request
+     * @return the response from the remove staging security group request
+     */
+    Mono<Void> removeStagingDefault(RemoveSecurityGroupStagingDefaultRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/security_group_running_defaults/set_a_security_group_as_a_default_for_running_apps.html">Set a Security Group as a default for

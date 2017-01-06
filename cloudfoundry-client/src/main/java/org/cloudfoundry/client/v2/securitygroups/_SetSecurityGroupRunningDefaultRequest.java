@@ -26,9 +26,9 @@ import org.immutables.value.Value;
 abstract class _SetSecurityGroupRunningDefaultRequest {
 
     /**
-     * The security group running default id
+     * The security group to set as a default
      */
     @JsonIgnore
-    abstract String getSecurityGroupRunningDefaultId();
+    abstract String getSecurityGroupId();
 
 }

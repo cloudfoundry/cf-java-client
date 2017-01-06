@@ -23,20 +23,28 @@ import org.cloudfoundry.client.v2.securitygroups.AssociateSecurityGroupSpaceResp
 import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupRequest;
 import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupResponse;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRequest;
+import org.cloudfoundry.client.v2.securitygroups.GetSecurityGroupRequest;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupSpacesRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupSpacesResponse;
+import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsRequest;
+import org.cloudfoundry.client.v2.securitygroups.RemoveSecurityGroupRunningDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.RemoveSecurityGroupSpaceRequest;
+import org.cloudfoundry.client.v2.securitygroups.RemoveSecurityGroupStagingDefaultRequest;
 import org.cloudfoundry.client.v2.securitygroups.RuleEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
+import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultRequest;
+import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupRunningDefaultResponse;
+import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupStagingDefaultRequest;
+import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupStagingDefaultResponse;
 import org.cloudfoundry.client.v2.securitygroups.UpdateSecurityGroupRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
@@ -46,7 +54,6 @@ import reactor.util.function.Tuples;
 
 import java.time.Duration;
 
-import static org.assertj.core.api.Assertions.fail;
 import static org.cloudfoundry.client.v2.securitygroups.Protocol.TCP;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -147,10 +154,21 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522666 et al")
     @Test
     public void get() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/101522666");
+        String securityGroupName = this.nameFactory.getSecurityGroupName();
+
+        createSecurityGroupId(this.cloudFoundryClient, securityGroupName)
+            .then(securityGroupId -> this.cloudFoundryClient.securityGroups()
+                .get(GetSecurityGroupRequest.builder()
+                    .securityGroupId(securityGroupId)
+                    .build())
+                .map(ResourceUtils::getEntity)
+                .map(SecurityGroupEntity::getName))
+            .as(StepVerifier::create)
+            .expectNext(securityGroupName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -172,10 +190,21 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656 et al")
     @Test
     public void listRunningDefaults() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/101522656 et al");
+        String securityGroupName1 = this.nameFactory.getSecurityGroupName();
+        String securityGroupName2 = this.nameFactory.getSecurityGroupName();
+
+        createSecurityGroupId(this.cloudFoundryClient, securityGroupName1)
+            .then(securityGroupId -> requestSetRunningDefault(this.cloudFoundryClient, securityGroupId))
+            .then(createSecurityGroupId(this.cloudFoundryClient, securityGroupName2)
+                .then(securityGroupId -> requestSetRunningDefault(this.cloudFoundryClient, securityGroupId)))
+            .flatMap(ignore -> requestListRunningDefaults(this.cloudFoundryClient))
+            .filter(response -> securityGroupName1.equals(response.getEntity().getName()) || securityGroupName2.equals(response.getEntity().getName()))
+            .as(StepVerifier::create)
+            .expectNextCount(2)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -207,34 +236,91 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
 
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656 et al")
     @Test
     public void listStagingDefaults() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/101522650 et al");
+        String securityGroupName1 = this.nameFactory.getSecurityGroupName();
+        String securityGroupName2 = this.nameFactory.getSecurityGroupName();
+
+        createSecurityGroupId(this.cloudFoundryClient, securityGroupName1)
+            .then(securityGroupId -> requestSetStagingDefault(this.cloudFoundryClient, securityGroupId))
+            .then(createSecurityGroupId(this.cloudFoundryClient, securityGroupName2)
+                .then(securityGroupId -> requestSetStagingDefault(this.cloudFoundryClient, securityGroupId)))
+            .flatMap(ignore -> requestListStagingDefaults(this.cloudFoundryClient))
+            .filter(response -> securityGroupName1.equals(response.getEntity().getName()) || securityGroupName2.equals(response.getEntity().getName()))
+            .as(StepVerifier::create)
+            .expectNextCount(2)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522652")
     @Test
     public void setRunningDefault() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/101522652");
+        String securityGroupName = this.nameFactory.getSecurityGroupName();
+
+        createSecurityGroupId(this.cloudFoundryClient, securityGroupName)
+            .then(securityGroupId -> this.cloudFoundryClient.securityGroups()
+                .setRunningDefault(SetSecurityGroupRunningDefaultRequest.builder()
+                    .securityGroupId(securityGroupId)
+                    .build()))
+            .map(ResourceUtils::getEntity)
+            .map(SecurityGroupEntity::getName)
+            .as(StepVerifier::create)
+            .expectNext(securityGroupName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522652")
     @Test
     public void setStagingDefault() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/101522652");
+        String securityGroupName = this.nameFactory.getSecurityGroupName();
+
+        createSecurityGroupId(this.cloudFoundryClient, securityGroupName)
+            .then(securityGroupId -> this.cloudFoundryClient.securityGroups()
+                .setStagingDefault(SetSecurityGroupStagingDefaultRequest.builder()
+                    .securityGroupId(securityGroupId)
+                    .build()))
+            .map(ResourceUtils::getEntity)
+            .map(SecurityGroupEntity::getName)
+            .as(StepVerifier::create)
+            .expectNext(securityGroupName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656 et al")
     @Test
     public void unsetRunningDefault() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656 et al");
+        String securityGroupName = this.nameFactory.getSecurityGroupName();
+
+        createSecurityGroupId(this.cloudFoundryClient, securityGroupName)
+            .then(securityGroupId -> requestSetRunningDefault(this.cloudFoundryClient, securityGroupId)
+                .then(this.cloudFoundryClient.securityGroups()
+                    .removeRunningDefault(RemoveSecurityGroupRunningDefaultRequest.builder()
+                        .securityGroupId(securityGroupId)
+                        .build())))
+            .flatMap(ignore -> requestListRunningDefaults(this.cloudFoundryClient))
+            .filter(response -> securityGroupName.equals(response.getEntity().getName()))
+            .as(StepVerifier::create)
+            .expectNextCount(0)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522644")
     @Test
     public void unsetStagingDefault() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/101522644");
+        String securityGroupName = this.nameFactory.getSecurityGroupName();
+
+        createSecurityGroupId(this.cloudFoundryClient, securityGroupName)
+            .then(securityGroupId -> requestSetStagingDefault(this.cloudFoundryClient, securityGroupId)
+                .then(this.cloudFoundryClient.securityGroups()
+                    .removeStagingDefault(RemoveSecurityGroupStagingDefaultRequest.builder()
+                        .securityGroupId(securityGroupId)
+                        .build())))
+            .flatMap(ignore -> requestListRunningDefaults(this.cloudFoundryClient))
+            .filter(response -> securityGroupName.equals(response.getEntity().getName()))
+            .as(StepVerifier::create)
+            .expectNextCount(0)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -288,6 +374,13 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
                 .build());
     }
 
+    private static Flux<SecurityGroupResource> requestListRunningDefaults(CloudFoundryClient cloudFoundryClient) {
+        return PaginationUtils.
+            requestClientV2Resources(page -> cloudFoundryClient.securityGroups()
+                .listRunningDefaults(ListSecurityGroupRunningDefaultsRequest.builder()
+                    .build()));
+    }
+
     private static Mono<ListSecurityGroupSpacesResponse> requestListSecurityGroupSpaces(CloudFoundryClient cloudFoundryClient, String spaceId, String securityGroupId) {
         return cloudFoundryClient.securityGroups()
             .listSpaces(ListSecurityGroupSpacesRequest.builder()
@@ -302,6 +395,27 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
                 .name(securityGroupName)
                 .page(page)
                 .build()));
+    }
+
+    private static Flux<SecurityGroupResource> requestListStagingDefaults(CloudFoundryClient cloudFoundryClient) {
+        return PaginationUtils.
+            requestClientV2Resources(page -> cloudFoundryClient.securityGroups()
+                .listStagingDefaults(ListSecurityGroupStagingDefaultsRequest.builder()
+                    .build()));
+    }
+
+    private static Mono<SetSecurityGroupRunningDefaultResponse> requestSetRunningDefault(CloudFoundryClient cloudFoundryClient, String securityGroupId) {
+        return cloudFoundryClient.securityGroups()
+            .setRunningDefault(SetSecurityGroupRunningDefaultRequest.builder()
+                .securityGroupId(securityGroupId)
+                .build());
+    }
+
+    private static Mono<SetSecurityGroupStagingDefaultResponse> requestSetStagingDefault(CloudFoundryClient cloudFoundryClient, String securityGroupId) {
+        return cloudFoundryClient.securityGroups()
+            .setStagingDefault(SetSecurityGroupStagingDefaultRequest.builder()
+                .securityGroupId(securityGroupId)
+                .build());
     }
 
 }

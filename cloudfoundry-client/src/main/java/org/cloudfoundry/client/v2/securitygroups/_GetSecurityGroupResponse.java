@@ -16,19 +16,14 @@
 
 package org.cloudfoundry.client.v2.securitygroups;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 /**
- * The request payload for the Delete Security Group Staging Default operation
+ * The response payload for the Get a Security Group operation
  */
+@JsonDeserialize
 @Value.Immutable
-abstract class _DeleteSecurityGroupStagingDefaultRequest {
-
-    /**
-     * The security group staging default id
-     */
-    @JsonIgnore
-    abstract String getSecurityGroupStagingDefaultId();
+abstract class _GetSecurityGroupResponse extends AbstractSecurityGroupResource {
 
 }
