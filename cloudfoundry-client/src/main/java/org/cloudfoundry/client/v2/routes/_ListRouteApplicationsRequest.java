@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.routes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.QueryParameter;
 import org.cloudfoundry.client.v2.InFilterParameter;
 import org.cloudfoundry.client.v2.IsFilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
@@ -30,6 +31,13 @@ import java.util.List;
  */
 @Value.Immutable
 abstract class _ListRouteApplicationsRequest extends PaginatedRequest {
+
+    /**
+     * The application id
+     */
+    @Nullable
+    @QueryParameter("app_guid")
+    abstract String getApplicationId();
 
     /**
      * The diego flag
