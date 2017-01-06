@@ -65,7 +65,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
 
     @Value.Default
     public Integer getConnectionPoolSize() {
-        return PoolResources.DEFAULT_POOL_MAX_CONNECTION;
+        return 2 * PoolResources.DEFAULT_POOL_MAX_CONNECTION;
     }
 
     @Override
