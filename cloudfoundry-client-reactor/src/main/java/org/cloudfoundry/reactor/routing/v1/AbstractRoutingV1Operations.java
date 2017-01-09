@@ -31,7 +31,9 @@ public abstract class AbstractRoutingV1Operations extends AbstractReactorOperati
         super(connectionContext, root, tokenProvider);
     }
 
-    protected final <T> Mono<T> get(Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+    protected final <T> Mono<T> get(Class<T> responseType,
+                                    Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+
         return doGet(responseType, uriTransformer, outbound -> outbound, inbound -> inbound);
     }
 
@@ -39,12 +41,16 @@ public abstract class AbstractRoutingV1Operations extends AbstractReactorOperati
         return doGet(uriTransformer, outbound -> outbound, inbound -> inbound);
     }
 
-    protected final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+    protected final <T> Mono<T> post(Object request, Class<T> responseType,
+                                     Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+
         return doPost(request, responseType, uriTransformer, outbound -> outbound, inbound -> inbound);
     }
 
-    protected final <T> Mono<T> put(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doPut(request, responseType, uriTransformer, outbound -> outbound, inbound -> inbound);
+    protected final <T> Mono<T> put(Object requestPayload, Class<T> responseType,
+                                    Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+
+        return doPut(requestPayload, responseType, uriTransformer, outbound -> outbound, inbound -> inbound);
     }
 
 }

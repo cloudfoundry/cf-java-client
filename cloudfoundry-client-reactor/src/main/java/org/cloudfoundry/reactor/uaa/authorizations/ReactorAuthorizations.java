@@ -32,8 +32,11 @@ import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithImplicitGrantReq
 import org.cloudfoundry.util.ExceptionUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
+import reactor.ipc.netty.http.client.HttpClientRequest;
 
 import java.util.Optional;
+
+import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
 
 /**
  * The Reactor-based implementation of {@link Authorizations}
@@ -57,46 +60,44 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
     public Mono<String> authorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest request) {
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE))
             .map(inbound -> inbound.responseHeaders().get(LOCATION))
-            .then(location -> uriParameterValue(location, "code"));
+            .then(location -> {
+                String candidate = UriComponentsBuilder.fromUriString(location).build().getQueryParams().getFirst("code");
+
+                return Optional.ofNullable(candidate)
+                    .map(Mono::just)
+                    .orElse(ExceptionUtils.illegalState(String.format("Parameter %s not in URI %s", "code", location)));
+            });
     }
 
     @Override
     public Mono<String> authorizationCodeGrantBrowser(AuthorizeByAuthorizationCodeGrantBrowserRequest request) {
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE),
-            outbound -> {
-                outbound.requestHeaders().remove(AUTHORIZATION);
-                return outbound;
-            })
+            outbound -> outbound
+                .map(ReactorAuthorizations::removeAuthorization))
             .map(inbound -> inbound.responseHeaders().get(LOCATION));
     }
 
     @Override
     public Mono<String> authorizationCodeGrantHybrid(AuthorizeByAuthorizationCodeGrantHybridRequest request) {
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE_AND_ID_TOKEN),
-            outbound -> {
-                outbound.requestHeaders().remove(AUTHORIZATION);
-                return outbound;
-            })
+            outbound -> outbound
+                .map(ReactorAuthorizations::removeAuthorization))
             .map(inbound -> inbound.responseHeaders().get(LOCATION));
     }
 
     @Override
     public Mono<String> implicitGrantBrowser(AuthorizeByImplicitGrantBrowserRequest request) {
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.TOKEN),
-            outbound -> {
-                outbound.requestHeaders().remove(AUTHORIZATION);
-                return outbound;
-            })
+            outbound -> outbound
+                .map(ReactorAuthorizations::removeAuthorization))
             .map(inbound -> inbound.responseHeaders().get(LOCATION));
     }
 
     @Override
     public Mono<String> openIdWithAuthorizationCodeAndIdToken(AuthorizeByOpenIdWithAuthorizationCodeGrantRequest request) {
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE_AND_ID_TOKEN),
-            outbound -> {
-                outbound.requestHeaders().remove(AUTHORIZATION);
-                return outbound;
-            })
+            outbound -> outbound
+                .map(ReactorAuthorizations::removeAuthorization))
             .map(inbound -> inbound.responseHeaders().get(LOCATION));
     }
 
@@ -112,10 +113,9 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
             .map(inbound -> inbound.responseHeaders().get(LOCATION));
     }
 
-    private static Mono<String> uriParameterValue(String uriString, String parameter) {
-        return Optional.ofNullable(UriComponentsBuilder.fromUriString(uriString).build().getQueryParams().getFirst(parameter))
-            .map(Mono::just)
-            .orElse(ExceptionUtils.illegalState(String.format("Parameter %s not in URI %s", parameter, uriString)));
+    private static HttpClientRequest removeAuthorization(HttpClientRequest request) {
+        request.requestHeaders().remove(AUTHORIZATION);
+        return request;
     }
 
 }

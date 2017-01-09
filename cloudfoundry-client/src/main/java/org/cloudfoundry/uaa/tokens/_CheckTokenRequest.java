@@ -16,9 +16,9 @@
 
 package org.cloudfoundry.uaa.tokens;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.QueryParameter;
-import org.cloudfoundry.uaa.BasicAuthorized;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -27,7 +27,19 @@ import java.util.List;
  * The request payload for the check token operation
  */
 @Value.Immutable
-abstract class _CheckTokenRequest implements BasicAuthorized {
+abstract class _CheckTokenRequest {
+
+    /**
+     * The client id
+     */
+    @JsonIgnore
+    public abstract String getClientId();
+
+    /**
+     * The client secret
+     */
+    @JsonIgnore
+    public abstract String getClientSecret();
 
     /**
      * The scopes authorized by the user for this client

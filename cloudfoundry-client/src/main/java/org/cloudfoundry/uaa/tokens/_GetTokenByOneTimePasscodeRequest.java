@@ -18,14 +18,25 @@ package org.cloudfoundry.uaa.tokens;
 
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.QueryParameter;
-import org.cloudfoundry.uaa.BasicAuthorized;
 import org.immutables.value.Value;
 
 /**
  * The request payload for the get token by one-time passcode operation
  */
 @Value.Immutable
-abstract class _GetTokenByOneTimePasscodeRequest implements BasicAuthorized {
+abstract class _GetTokenByOneTimePasscodeRequest {
+
+    /**
+     * The client identifier
+     */
+    @QueryParameter("client_id")
+    abstract String getClientId();
+
+    /**
+     * The client's secret passphrase
+     */
+    @QueryParameter("client_secret")
+    abstract String getClientSecret();
 
     /**
      * The passcode

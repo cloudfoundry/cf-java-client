@@ -57,13 +57,13 @@ public final class NetworkLogging {
 
     public static Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> response(String uri) {
         return inbound -> inbound
-            .doOnNext(i -> {
-                List<String> warnings = i.responseHeaders().getAll(CF_WARNINGS);
+            .doOnNext(response -> {
+                List<String> warnings = response.responseHeaders().getAll(CF_WARNINGS);
 
                 if (warnings.isEmpty()) {
-                    RESPONSE_LOGGER.debug("{}    {}", i.status().code(), uri);
+                    RESPONSE_LOGGER.debug("{}    {}", response.status().code(), uri);
                 } else {
-                    RESPONSE_LOGGER.warn("{}    {} ({})", i.status().code(), uri, StringUtils.collectionToCommaDelimitedString(warnings));
+                    RESPONSE_LOGGER.warn("{}    {} ({})", response.status().code(), uri, StringUtils.collectionToCommaDelimitedString(warnings));
                 }
             });
     }
