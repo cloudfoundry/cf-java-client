@@ -1,4 +1,22 @@
 # Cloud Foundry Java Client
+
+[![Maven Central](https://img.shields.io/maven-central/v/org.cloudfoundry/cloudfoundry-client.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.cloudfoundry%22%20AND%20a%3A%22cloudfoundry-*%22)
+
+| Job | Status
+| --- | ------
+| `unit-test` | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/cf-java-client/jobs/unit-test-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/cf-java-client/jobs/unit-test-master/builds)
+| `integration-test-1.7` | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.7-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.7-master/builds)
+| `integration-test-1.8` | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.8-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.8-master/builds)
+| `integration-test-1.9` | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.9-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.9-master/builds)
+| `deploy` | [![deploy-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/cf-java-client/jobs/deploy-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/cf-java-client/jobs/deploy-master/builds)
+
+| Artifact | Javadocs
+| -------- | --------
+| `cloudfoundry-client` | [![Javadocs](https://javadoc.io/badge/org.cloudfoundry/cloudfoundry-client.svg)](https://javadoc.io/doc/org.cloudfoundry/cloudfoundry-client)
+| `cloudfoundry-client-reactor` | [![Javadocs](https://javadoc.io/badge/org.cloudfoundry/cloudfoundry-client-reactor.svg)](https://javadoc.io/doc/org.cloudfoundry/cloudfoundry-client-reactor)
+| `cloudfoundry-operations` | [![Javadocs](https://javadoc.io/badge/org.cloudfoundry/cloudfoundry-operations.svg)](https://javadoc.io/doc/org.cloudfoundry/cloudfoundry-operations)
+| `cloudfoundry-util` | [![Javadocs](https://javadoc.io/badge/org.cloudfoundry/cloudfoundry-util.svg)](https://javadoc.io/doc/org.cloudfoundry/cloudfoundry-util)
+
 The `cf-java-client` project is a Java language binding for interacting with a Cloud Foundry instance.  The project is broken up into a number of components which expose different levels of abstraction depending on need.
 
 * `cloudfoundry-client` – Interfaces, request, and response objects mapping to the [Cloud Foundry REST APIs][a].  This project has no implementation and therefore cannot connect a Cloud Foundry instance on its own.
@@ -34,29 +52,7 @@ Most projects will need two dependencies; the Operations API and an implementati
 </dependencies>
 ```
 
-The artifacts can be found in the Spring release, milestone, and snapshot repositories:
-
-```xml
-<repositories>
-    <repository>
-        <id>spring-releases</id>
-        <name>Spring Releases</name>
-        <url>http://repo.spring.io/release</url>
-    </repository>
-    ...
-</repositories>
-```
-
-```xml
-<repositories>
-    <repository>
-        <id>spring-milestones</id>
-        <name>Spring Milestones</name>
-        <url>http://repo.spring.io/milestone</url>
-    </repository>
-    ...
-</repositories>
-```
+Snapshot artifacts can be found in the Spring snapshot repository:
 
 ```xml
 <repositories>
@@ -84,21 +80,7 @@ dependencies {
 }
 ```
 
-The artifacts can be found in the Spring release, milestone, and snapshot repositories:
-
-```groovy
-repositories {
-    maven { url 'http://repo.spring.io/release' }
-    ...
-}
-```
-
-```groovy
-repositories {
-    maven { url 'http://repo.spring.io/milestone' }
-    ...
-}
-```
+Snapshot artifacts can be found in the Spring snapshot repository:
 
 ```groovy
 repositories {
@@ -277,14 +259,6 @@ TODO: Document once implemented
 ### Gradle Plugin
 
 TODO: Document once implemented
-
-## Documentation
-API Documentation for each module can be found at the following locations:
-
-* `cloudfoundry-client` – [`release`](http://cloudfoundry.github.io/cf-java-client/api/latest-release/cloudfoundry-client), [`milestone`](http://cloudfoundry.github.io/cf-java-client/api/latest-milestone/cloudfoundry-client), [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/latest-snapshot/cloudfoundry-client)
-* `cloudfoundry-client-reactor` – [`release`](http://cloudfoundry.github.io/cf-java-client/api/latest-release/cloudfoundry-client-reactor), [`milestone`](http://cloudfoundry.github.io/cf-java-client/api/latest-milestone/cloudfoundry-client-reactor), [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/latest-snapshot/cloudfoundry-client-reactor)
-* `cloudfoundry-operations` – [`release`](http://cloudfoundry.github.io/cf-java-client/api/latest-release/cloudfoundry-operations), [`milestone`](http://cloudfoundry.github.io/cf-java-client/api/latest-milestone/cloudfoundry-operations), [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/latest-snapshot/cloudfoundry-operations)
-* `cloudfoundry-util` – [`release`](http://cloudfoundry.github.io/cf-java-client/api/latest-release/cloudfoundry-util), [`milestone`](http://cloudfoundry.github.io/cf-java-client/api/latest-milestone/cloudfoundry-util), [`snapshot`](http://cloudfoundry.github.io/cf-java-client/api/latest-snapshot/cloudfoundry-util)
 
 ## Development
 The project depends on Java 8.  To build from source and install to your local Maven cache, run the following:
