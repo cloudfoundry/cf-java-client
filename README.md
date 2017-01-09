@@ -1,14 +1,14 @@
 # Cloud Foundry Java Client
 
-[![Maven Central](https://img.shields.io/maven-central/v/org.cloudfoundry/cloudfoundry-client.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.cloudfoundry%22%20AND%20a%3A%22cloudfoundry-*%22)
+[![Maven Central](https://img.shields.io/maven-central/v/org.cloudfoundry/cloudfoundry-client.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3Aorg.cloudfoundry%20AND%20a%3Acloudfoundry-*)
 
 | Job | Status
 | --- | ------
-| `unit-test` | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/cf-java-client/jobs/unit-test-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/cf-java-client/jobs/unit-test-master/builds)
-| `integration-test-1.7` | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.7-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.7-master/builds)
-| `integration-test-1.8` | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.8-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.8-master/builds)
-| `integration-test-1.9` | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.9-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.9-master/builds)
-| `deploy` | [![deploy-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/cf-java-client/jobs/deploy-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/cf-java-client/jobs/deploy-master/builds)
+| `unit-test` | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/cf-java-client/jobs/unit-test-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/cf-java-client/jobs/unit-test-master)
+| `integration-test-1.7` | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.7-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.7-master)
+| `integration-test-1.8` | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.8-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.8-master)
+| `integration-test-1.9` | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.9-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.9-master)
+| `deploy` | [![deploy-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/cf-java-client/jobs/deploy-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/cf-java-client/jobs/deploy-master)
 
 | Artifact | Javadocs
 | -------- | --------
