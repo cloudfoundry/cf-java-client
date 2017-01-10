@@ -83,4 +83,12 @@ public interface SpaceQuotaDefinitions {
      */
     Mono<Void> removeSpace(RemoveSpaceQuotaDefinitionRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/space_quota_definitions/updating_a_space_quota_definition.html">Updating a Space Quota Definition</a> request
+     *
+     * @param request the Update Space Quota Definitions request
+     * @return the response from the Update Space Quota Definitions request
+     */
+    Mono<UpdateSpaceQuotaDefinitionResponse> update(UpdateSpaceQuotaDefinitionRequest request);
+
 }
