@@ -29,6 +29,7 @@ import reactor.ipc.netty.http.client.HttpClientResponse;
 
 import java.util.function.Function;
 
+import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public abstract class AbstractReactorOperations {
@@ -184,7 +185,7 @@ public abstract class AbstractReactorOperations {
 
     private static Function<Mono<HttpClientRequest>, Mono<HttpClientRequest>> addAuthorization(ConnectionContext connectionContext, TokenProvider tokenProvider) {
         return outbound -> Mono.when(outbound, tokenProvider.getToken(connectionContext))
-            .map(function((request, token) -> request.addHeader(HttpHeaderNames.AUTHORIZATION, String.format("bearer %s", token))));
+            .map(function((request, token) -> request.addHeader(AUTHORIZATION, String.format("bearer %s", token))));
     }
 
     private static Function<Mono<String>, Mono<String>> transformUri(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
