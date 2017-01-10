@@ -18,9 +18,10 @@ package org.cloudfoundry.reactor.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.json.JsonObjectDecoder;
-import io.netty.util.AsciiString;
+import org.reactivestreams.Publisher;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -33,34 +34,36 @@ import java.util.function.Function;
 
 public final class JsonCodec {
 
-    private static final AsciiString APPLICATION_JSON = new AsciiString("application/json; charset=utf-8");
-
-    private static final AsciiString CONTENT_TYPE = new AsciiString("Content-Type");
-
-    public static <T> Function<Mono<HttpClientResponse>, Flux<T>> decode(ObjectMapper objectMapper, Class<T> type) {
-        return response -> response
-            .flatMap(inbound -> inbound.addHandler(new JsonObjectDecoder()).receive().aggregate())
+    public static <T> Function<Mono<HttpClientResponse>, Flux<T>> decode(ObjectMapper objectMapper, Class<T> responseType) {
+        return inbound -> inbound
+            .flatMap(response -> response.addHandler(new JsonObjectDecoder()).receive().aggregate())
             .map(byteBuf -> {
                 String content = byteBuf.toString(Charset.defaultCharset());
 
                 try {
-                    return objectMapper.readValue(content, type);
+                    return objectMapper.readValue(content, responseType);
                 } catch (IOException e) {
                     throw Exceptions.propagate(new JsonParsingException(e.getMessage(), e, content));
                 }
             });
     }
 
-    static <T> Function<T, ByteBuf> encode(ObjectMapper objectMapper, HttpClientRequest request) {
-        request.header(CONTENT_TYPE, APPLICATION_JSON);
+    static Function<Mono<HttpClientRequest>, Publisher<Void>> encode(ObjectMapper objectMapper, Object requestPayload) {
+        if (!objectMapper.canSerialize(requestPayload.getClass())) {
+            return outbound -> outbound
+                .then(HttpClientRequest::send);
+        }
 
-        return source -> {
-            try {
-                return request.alloc().directBuffer().writeBytes(objectMapper.writeValueAsBytes(source));
-            } catch (JsonProcessingException e) {
-                throw Exceptions.propagate(e);
-            }
-        };
+        return outbound -> outbound
+            .map(request -> request.header(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON))
+            .flatMap(request -> {
+                try {
+
+                    return request.sendByteArray(Mono.just(objectMapper.writeValueAsBytes(requestPayload)));
+                } catch (JsonProcessingException e) {
+                    throw Exceptions.propagate(e);
+                }
+            });
     }
 
 }

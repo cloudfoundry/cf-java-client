@@ -17,16 +17,19 @@
 package org.cloudfoundry.reactor.util;
 
 
-import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.util.AsciiString;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
+import org.reactivestreams.Publisher;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClientRequest;
 import reactor.ipc.netty.http.client.HttpClientResponse;
 
 import java.util.function.Function;
+
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public abstract class AbstractReactorOperations {
 
@@ -35,10 +38,6 @@ public abstract class AbstractReactorOperations {
     protected static final AsciiString APPLICATION_X_WWW_FORM_URLENCODED = new AsciiString("application/x-www-form-urlencoded");
 
     protected static final String APPLICATION_ZIP = "application/zip";
-
-    protected static final AsciiString AUTHORIZATION = new AsciiString("Authorization");
-
-    protected static final String CONTENT_TYPE = "Content-Type";
 
     private final ConnectionContext connectionContext;
 
@@ -52,125 +51,147 @@ public abstract class AbstractReactorOperations {
         this.tokenProvider = tokenProvider;
     }
 
-    protected final <T> Mono<T> doDelete(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
-                                         Function<HttpClientRequest, HttpClientRequest> requestTransformer, Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
+    protected final <T> Mono<T> doDelete(Object requestPayload, Class<T> responseType,
+                                         Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+                                         Function<Mono<HttpClientRequest>, Mono<HttpClientRequest>> requestTransformer,
+                                         Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
         return this.root
-            .map(root -> buildUri(root, uriTransformer))
+            .transform(transformUri(uriTransformer))
             .then(uri -> this.connectionContext.getHttpClient()
-                .delete(uri, outbound -> addAuthorization(outbound, this.connectionContext, this.tokenProvider)
-                    .map(requestTransformer)
-                    .then(o -> o.send(serializedRequest(o, request)).then()))  // TODO: Reactor 3.0.4 thenEmpty()
+                .delete(uri, request -> Mono.just(request)
+                    .transform(addAuthorization(this.connectionContext, this.tokenProvider))
+                    .transform(requestTransformer)
+                    .transform(serializedRequest(requestPayload)))
                 .doOnSubscribe(NetworkLogging.delete(uri))
                 .transform(NetworkLogging.response(uri))
                 .transform(responseTransformer))
             .transform(deserializedResponse(responseType));
     }
 
-    protected final <T> Mono<T> doGet(Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<HttpClientRequest, HttpClientRequest> requestTransformer,
+    protected final <T> Mono<T> doGet(Class<T> responseType,
+                                      Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+                                      Function<Mono<HttpClientRequest>, Mono<HttpClientRequest>> requestTransformer,
                                       Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
-        return doGet(uriTransformer, requestTransformer, responseTransformer)
+
+        return doGet(uriTransformer, requestTransformer,
+            inbound -> inbound
+                .transform(responseTransformer))
             .transform(deserializedResponse(responseType));
     }
 
-    protected final Mono<HttpClientResponse> doGet(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<HttpClientRequest, HttpClientRequest> requestTransformer,
+    protected final Mono<HttpClientResponse> doGet(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+                                                   Function<Mono<HttpClientRequest>, Mono<HttpClientRequest>> requestTransformer,
                                                    Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
         return this.root
-            .map(root -> buildUri(root, uriTransformer))
+            .transform(transformUri(uriTransformer))
             .then(uri -> this.connectionContext.getHttpClient()
-                .get(uri, outbound -> addAuthorization(outbound, this.connectionContext, this.tokenProvider)
-                    .map(requestTransformer)
-                    .then(HttpClientRequest::send))
+                .get(uri, request -> Mono.just(request)
+                    .transform(addAuthorization(this.connectionContext, this.tokenProvider))
+                    .transform(requestTransformer)
+                    .flatMap(HttpClientRequest::send))
                 .doOnSubscribe(NetworkLogging.get(uri))
                 .transform(NetworkLogging.response(uri))
                 .transform(responseTransformer));
     }
 
-    protected final <T> Mono<T> doPatch(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
-                                        Function<HttpClientRequest, HttpClientRequest> requestTransformer, Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
+    protected final <T> Mono<T> doPatch(Object requestPayload, Class<T> responseType,
+                                        Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+                                        Function<Mono<HttpClientRequest>, Mono<HttpClientRequest>> requestTransformer,
+                                        Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
         return this.root
-            .map(root -> buildUri(root, uriTransformer))
+            .transform(transformUri(uriTransformer))
             .then(uri -> this.connectionContext.getHttpClient()
-                .patch(uri, outbound -> addAuthorization(outbound, this.connectionContext, this.tokenProvider)
-                    .map(requestTransformer)
-                    .then(o -> o.send(serializedRequest(o, request)).then()))  // TODO: Reactor 3.0.4 thenEmpty()
+                .patch(uri, request -> Mono.just(request)
+                    .transform(addAuthorization(this.connectionContext, this.tokenProvider))
+                    .transform(requestTransformer)
+                    .transform(serializedRequest(requestPayload)))
                 .doOnSubscribe(NetworkLogging.patch(uri))
                 .transform(NetworkLogging.response(uri))
                 .transform(responseTransformer))
             .transform(deserializedResponse(responseType));
     }
 
-    protected final <T> Mono<T> doPost(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
-                                       Function<HttpClientRequest, HttpClientRequest> requestTransformer, Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
+    protected final <T> Mono<T> doPost(Object requestPayload, Class<T> responseType,
+                                       Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+                                       Function<Mono<HttpClientRequest>, Mono<HttpClientRequest>> requestTransformer,
+                                       Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
 
-        return doPost(responseType, uriTransformer, outbound -> requestTransformer.apply(outbound)
-            .send(serializedRequest(outbound, request)).then(), responseTransformer);   // TODO: Reactor 3.0.4 thenEmpty()
+        return doPost(responseType, uriTransformer,
+            outbound -> outbound
+                .transform(requestTransformer)
+                .transform(serializedRequest(requestPayload)),
+            responseTransformer);
     }
 
-    protected final <T> Mono<T> doPost(Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<HttpClientRequest, Mono<Void>> requestTransformer,
+    protected final <T> Mono<T> doPost(Class<T> responseType,
+                                       Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+                                       Function<Mono<HttpClientRequest>, Publisher<Void>> requestTransformer,
                                        Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
         return this.root
-            .map(root -> buildUri(root, uriTransformer))
+            .transform(transformUri(uriTransformer))
             .then(uri -> this.connectionContext.getHttpClient()
-                .post(uri, outbound -> addAuthorization(outbound, this.connectionContext, this.tokenProvider)
-                    .then(requestTransformer))
+                .post(uri, request -> Mono.just(request)
+                    .transform(addAuthorization(this.connectionContext, this.tokenProvider))
+                    .transform(requestTransformer))
                 .doOnSubscribe(NetworkLogging.post(uri))
                 .transform(NetworkLogging.response(uri))
                 .transform(responseTransformer))
             .transform(deserializedResponse(responseType));
     }
 
-    protected final <T> Mono<T> doPut(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
-                                      Function<HttpClientRequest, HttpClientRequest> requestTransformer, Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
-        return this.root
-            .map(root -> buildUri(root, uriTransformer))
-            .then(uri -> this.connectionContext.getHttpClient()
-                .put(uri, outbound -> addAuthorization(outbound, this.connectionContext, this.tokenProvider)
-                    .map(requestTransformer)
-                    .then(o -> o.send(serializedRequest(o, request)).then()))  // TODO: Reactor 3.0.4 thenEmpty()
-                .doOnSubscribe(NetworkLogging.put(uri))
-                .transform(NetworkLogging.response(uri))
-                .transform(responseTransformer))
-            .transform(deserializedResponse(responseType));
+    protected final <T> Mono<T> doPut(Object requestPayload, Class<T> responseType,
+                                      Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+                                      Function<Mono<HttpClientRequest>, Mono<HttpClientRequest>> requestTransformer,
+                                      Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
+
+        return doPut(responseType, uriTransformer,
+            outbound -> outbound
+                .transform(requestTransformer)
+                .transform(serializedRequest(requestPayload)),
+            responseTransformer);
     }
 
-    protected final <T> Mono<T> doPut(Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<HttpClientRequest, Mono<Void>> requestTransformer,
+    protected final <T> Mono<T> doPut(Class<T> responseType,
+                                      Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+                                      Function<Mono<HttpClientRequest>, Publisher<Void>> requestTransformer,
                                       Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
         return this.root
-            .map(root -> buildUri(root, uriTransformer))
+            .transform(transformUri(uriTransformer))
             .then(uri -> this.connectionContext.getHttpClient()
-                .put(uri, outbound -> addAuthorization(outbound, this.connectionContext, this.tokenProvider)
-                    .then(requestTransformer))
+                .put(uri, request -> Mono.just(request)
+                    .transform(addAuthorization(this.connectionContext, this.tokenProvider))
+                    .transform(requestTransformer))
                 .doOnSubscribe(NetworkLogging.put(uri))
                 .transform(NetworkLogging.response(uri))
                 .transform(responseTransformer))
             .transform(deserializedResponse(responseType));
     }
 
-    protected final Mono<HttpClientResponse> doWs(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<HttpClientRequest, HttpClientRequest> requestTransformer,
+    protected final Mono<HttpClientResponse> doWs(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+                                                  Function<Mono<HttpClientRequest>, Mono<HttpClientRequest>> requestTransformer,
                                                   Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
         return this.root
-            .map(root -> buildUri(root, uriTransformer))
+            .transform(transformUri(uriTransformer))
             .then(uri -> this.connectionContext.getHttpClient()
-                .get(uri, outbound -> addAuthorization(outbound, this.connectionContext, this.tokenProvider)
-                    .map(requestTransformer)
-                    .then(request -> request.sendWebsocket().then()))  // TODO: Reactor 3.0.4 thenEmpty()
+                .get(uri, request -> Mono.just(request)
+                    .transform(addAuthorization(this.connectionContext, this.tokenProvider))
+                    .transform(requestTransformer)
+                    .flatMap(HttpClientRequest::sendWebsocket))
                 .doOnSubscribe(NetworkLogging.ws(uri))
                 .transform(NetworkLogging.response(uri))
                 .transform(responseTransformer));
     }
 
-    private static <T extends HttpClientRequest> Mono<T> addAuthorization(T outbound, ConnectionContext connectionContext, TokenProvider tokenProvider) {
-        return tokenProvider.getToken(connectionContext)
-            .map(token -> {
-                outbound.addHeader("Authorization", String.format("bearer %s", token));
-                return outbound;
-            });
+    private static Function<Mono<HttpClientRequest>, Mono<HttpClientRequest>> addAuthorization(ConnectionContext connectionContext, TokenProvider tokenProvider) {
+        return outbound -> Mono.when(outbound, tokenProvider.getToken(connectionContext))
+            .map(function((request, token) -> request.addHeader(HttpHeaderNames.AUTHORIZATION, String.format("bearer %s", token))));
     }
 
-    private static String buildUri(String root, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return uriTransformer
-            .apply(UriComponentsBuilder.fromUriString(root))
-            .build().encode().toUriString();
+    private static Function<Mono<String>, Mono<String>> transformUri(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return uri -> uri
+            .map(UriComponentsBuilder::fromUriString)
+            .map(uriTransformer)
+            .map(builder -> builder.build().encode().toString());
     }
 
     private <T> Function<Mono<HttpClientResponse>, Mono<T>> deserializedResponse(Class<T> responseType) {
@@ -179,10 +200,9 @@ public abstract class AbstractReactorOperations {
             .doOnError(JsonParsingException.class, e -> NetworkLogging.RESPONSE_LOGGER.debug("{}\n{}", e.getCause().getMessage(), e.getPayload()));
     }
 
-    private Mono<ByteBuf> serializedRequest(HttpClientRequest outbound, Object request) {
-        return Mono.just(request)
-            .filter(req -> this.connectionContext.getObjectMapper().canSerialize(req.getClass()))
-            .map(JsonCodec.encode(this.connectionContext.getObjectMapper(), outbound));
+    private Function<Mono<HttpClientRequest>, Publisher<Void>> serializedRequest(Object requestPayload) {
+        return outbound -> outbound
+            .transform(JsonCodec.encode(this.connectionContext.getObjectMapper(), requestPayload));
     }
 
 }

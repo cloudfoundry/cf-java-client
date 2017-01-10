@@ -31,24 +31,8 @@ abstract class AbstractDopplerOperations extends AbstractReactorOperations {
         super(connectionContext, root, tokenProvider);
     }
 
-    final <T> Mono<T> delete(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doDelete(request, responseType, uriTransformer, outbound -> outbound, inbound -> inbound);
-    }
-
-    final <T> Mono<T> get(Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doGet(responseType, uriTransformer, outbound -> outbound, inbound -> inbound);
-    }
-
     final Mono<HttpClientResponse> get(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doGet(uriTransformer, outbound -> outbound, inbound -> inbound);
-    }
-
-    final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doPost(request, responseType, uriTransformer, outbound -> outbound, inbound -> inbound);
-    }
-
-    final <T> Mono<T> put(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return doPut(request, responseType, uriTransformer, outbound -> outbound, inbound -> inbound);
     }
 
     final Mono<HttpClientResponse> ws(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {

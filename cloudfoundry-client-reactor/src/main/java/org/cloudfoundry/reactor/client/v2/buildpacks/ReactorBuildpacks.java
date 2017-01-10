@@ -80,10 +80,11 @@ public final class ReactorBuildpacks extends AbstractClientV2Operations implemen
     public Mono<UploadBuildpackResponse> upload(UploadBuildpackRequest request) {
         return put(request, UploadBuildpackResponse.class, builder -> builder.pathSegment("v2", "buildpacks", request.getBuildpackId(), "bits"),
             outbound -> outbound
-                .chunkedTransfer(false)
-                .sendForm(form -> form
-                    .multipart(true)
-                    .file("buildpack", request.getFilename(), request.getBuildpack().toFile(), APPLICATION_ZIP))
+                .flatMap(r -> r
+                    .chunkedTransfer(false)
+                    .sendForm(form -> form
+                        .multipart(true)
+                        .file("buildpack", request.getFilename(), request.getBuildpack().toFile(), APPLICATION_ZIP)))
                 .then());
     }
 

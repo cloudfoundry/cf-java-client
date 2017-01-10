@@ -104,13 +104,13 @@ public final class ReactorApplicationsV2 extends AbstractClientV2Operations impl
 
     @Override
     public Flux<byte[]> download(DownloadApplicationRequest request) {
-        return get(request, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "download"), HttpClientRequest::followRedirect)
+        return get(request, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "download"), outbound -> outbound.map(HttpClientRequest::followRedirect))
             .flatMap(response -> response.receive().asByteArray());
     }
 
     @Override
     public Flux<byte[]> downloadDroplet(DownloadApplicationDropletRequest request) {
-        return get(request, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "droplet", "download"), HttpClientRequest::followRedirect)
+        return get(request, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "droplet", "download"), outbound -> outbound.map(HttpClientRequest::followRedirect))
             .flatMap(response -> response.receive().asByteArray());
     }
 
@@ -184,17 +184,18 @@ public final class ReactorApplicationsV2 extends AbstractClientV2Operations impl
     public Mono<UploadApplicationResponse> upload(UploadApplicationRequest request) {
         return put(request, UploadApplicationResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "bits"),
             outbound -> outbound
-                .chunkedTransfer(false)
-                .sendForm(form -> {
-                    try (InputStream resources = new ByteArrayInputStream(this.connectionContext.getObjectMapper().writeValueAsBytes(request.getResources()))) {
-                        form
-                            .multipart(true)
-                            .textFile("resources", resources, APPLICATION_JSON)
-                            .file("application", "application.zip", request.getApplication().toFile(), APPLICATION_ZIP);
-                    } catch (IOException e) {
-                        throw Exceptions.propagate(e);
-                    }
-                })
+                .flatMap(r -> r
+                    .chunkedTransfer(false)
+                    .sendForm(form -> {
+                        try (InputStream resources = new ByteArrayInputStream(this.connectionContext.getObjectMapper().writeValueAsBytes(request.getResources()))) {
+                            form
+                                .multipart(true)
+                                .textFile("resources", resources, APPLICATION_JSON)
+                                .file("application", "application.zip", request.getApplication().toFile(), APPLICATION_ZIP);
+                        } catch (IOException e) {
+                            throw Exceptions.propagate(e);
+                        }
+                    }))
                 .then());
     }
 

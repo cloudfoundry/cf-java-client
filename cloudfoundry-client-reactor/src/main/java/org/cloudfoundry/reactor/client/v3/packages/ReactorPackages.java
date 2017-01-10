@@ -93,10 +93,11 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
     public Mono<UploadPackageResponse> upload(UploadPackageRequest request) {
         return post(request, UploadPackageResponse.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "upload"),
             outbound -> outbound
-                .chunkedTransfer(false)
-                .sendForm(form -> form
-                    .multipart(true)
-                    .file("bits", "application.zip", request.getBits().toFile(), APPLICATION_ZIP))
+                .flatMap(r -> r
+                    .chunkedTransfer(false)
+                    .sendForm(form -> form
+                        .multipart(true)
+                        .file("bits", "application.zip", request.getBits().toFile(), APPLICATION_ZIP)))
                 .then());
     }
 

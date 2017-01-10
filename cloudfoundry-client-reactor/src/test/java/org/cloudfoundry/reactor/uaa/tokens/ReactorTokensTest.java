@@ -213,8 +213,8 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     public void getTokenByOneTimePasscode() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/oauth/token?passcode=qcZNkd&token_format=opaque&grant_type=password&response_type=token")
-                .header("Authorization", "Basic YXBwOmFwcGNsaWVudHNlY3JldA==")
+                .method(POST).path("/oauth/token?client_id=app&client_secret=appclientsecret&passcode=qcZNkd&token_format=opaque&grant_type=password&response_type=token")
+                .header("Authorization", null)
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .build())
             .response(TestResponse.builder()
