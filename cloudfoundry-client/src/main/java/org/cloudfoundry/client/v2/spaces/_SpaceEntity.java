@@ -140,4 +140,18 @@ abstract class _SpaceEntity {
     @Nullable
     abstract String getSpaceQuotaDefinitionId();
 
+    /**
+     * The space quota definition url
+     */
+    @JsonProperty("space_quota_definition_url")
+    @Nullable
+    abstract String getSpaceQuotaDefinitionUrl();
+
+    /**
+     * The space quota definition url
+     */
+    @JsonProperty("staging_security_groups_url")
+    @Nullable
+    abstract String getStagingSecurityGroupsUrl();
+
 }
