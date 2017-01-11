@@ -229,7 +229,7 @@ final class CloudFoundryCleaner {
                     return 0;
                 }
             })
-            .flatMap(group -> uaaClient.groups()
+            .concatMap(group -> uaaClient.groups()
                 .delete(DeleteGroupRequest.builder()
                     .groupId(group.getId())
                     .version("*")
