@@ -54,10 +54,7 @@ import org.cloudfoundry.uaa.clients.ListClientsRequest;
 import org.cloudfoundry.uaa.groups.DeleteGroupRequest;
 import org.cloudfoundry.uaa.groups.Group;
 import org.cloudfoundry.uaa.groups.ListGroupsRequest;
-import org.cloudfoundry.uaa.groups.ListMembersRequest;
-import org.cloudfoundry.uaa.groups.ListMembersResponse;
-import org.cloudfoundry.uaa.groups.RemoveMemberRequest;
-import org.cloudfoundry.uaa.groups.RemoveMemberResponse;
+import org.cloudfoundry.uaa.groups.MemberSummary;
 import org.cloudfoundry.uaa.identityproviders.DeleteIdentityProviderRequest;
 import org.cloudfoundry.uaa.identityproviders.ListIdentityProvidersRequest;
 import org.cloudfoundry.uaa.identityproviders.ListIdentityProvidersResponse;
@@ -223,8 +220,15 @@ final class CloudFoundryCleaner {
                     .startIndex(startIndex)
                     .build()))
             .filter(group -> nameFactory.isGroupName(group.getDisplayName()))
-            .flatMap(group -> removeGroupMembers(uaaClient, group)
-                .thenMany(Flux.just(group)))
+            .sort((group1, group2) -> {
+                if (containsMember(group1, group2)) {
+                    return -1;
+                } else if (containsMember(group2, group1)) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            })
             .flatMap(group -> uaaClient.groups()
                 .delete(DeleteGroupRequest.builder()
                     .groupId(group.getId())
@@ -440,6 +444,12 @@ final class CloudFoundryCleaner {
                 .then());
     }
 
+    private static boolean containsMember(Group group, Group candidate) {
+        return group.getMembers().stream()
+            .map(MemberSummary::getMemberId)
+            .anyMatch(id -> candidate.getId().equals(id));
+    }
+
     private static Mono<Map<String, String>> getAllDomains(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
             .requestClientV2Resources(page -> cloudFoundryClient.privateDomains()
@@ -454,20 +464,6 @@ final class CloudFoundryCleaner {
                         .build()))
                 .map(response -> Tuples.of(ResourceUtils.getId(response), ResourceUtils.getEntity(response).getName())))
             .collectMap(function((id, name) -> id), function((id, name) -> name));
-    }
-
-    private static Flux<RemoveMemberResponse> removeGroupMembers(UaaClient uaaClient, Group group) {
-        return uaaClient.groups()
-            .listMembers(ListMembersRequest.builder()
-                .groupId(group.getId())
-                .build())
-            .flatMapIterable(ListMembersResponse::getMembers)
-            .flatMap(member -> uaaClient.groups()
-                .removeMember(RemoveMemberRequest.builder()
-                    .groupId(group.getId())
-                    .memberId(member.getMemberId())
-                    .build())
-                .doOnError(t -> LOGGER.error("Unable to remove member {} from {}", member.getMemberId(), group.getDisplayName(), t)));
     }
 
     private static Flux<Void> removeServiceBindings(CloudFoundryClient cloudFoundryClient, ApplicationResource application) {
