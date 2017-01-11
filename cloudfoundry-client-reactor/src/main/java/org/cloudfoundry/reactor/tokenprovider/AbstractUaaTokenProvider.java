@@ -23,6 +23,7 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.util.JsonCodec;
 import org.cloudfoundry.reactor.util.NetworkLogging;
+import org.cloudfoundry.reactor.util.UserAgent;
 import org.immutables.value.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,12 +111,14 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
             .getRoot("authorization_endpoint")
             .map(AbstractUaaTokenProvider::getTokenUri)
             .then(uri -> connectionContext.getHttpClient()
-                .post(uri, outbound -> outbound
-                    .header(HttpHeaderNames.ACCEPT, HttpHeaderValues.APPLICATION_JSON)
-                    .header(HttpHeaderNames.AUTHORIZATION, getAuthorizationValue())
-                    .header(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED)
-                    .sendForm(this::tokenPayload)
-                    .then())
+                .post(uri, request -> Mono.just(request)
+                    .transform(UserAgent::addUserAgent)
+                    .flatMap(r -> r
+                        .header(HttpHeaderNames.ACCEPT, HttpHeaderValues.APPLICATION_JSON)
+                        .header(HttpHeaderNames.AUTHORIZATION, getAuthorizationValue())
+                        .header(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED)
+                        .sendForm(this::tokenPayload)
+                        .then()))
                 .doOnSubscribe(NetworkLogging.post(uri))
                 .transform(NetworkLogging.response(uri)))
             .transform(JsonCodec.decode(connectionContext.getObjectMapper(), Map.class))

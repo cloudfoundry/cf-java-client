@@ -17,7 +17,6 @@
 package org.cloudfoundry.reactor.util;
 
 
-import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.util.AsciiString;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
@@ -29,6 +28,7 @@ import reactor.ipc.netty.http.client.HttpClientResponse;
 
 import java.util.function.Function;
 
+import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public abstract class AbstractReactorOperations {
@@ -59,7 +59,8 @@ public abstract class AbstractReactorOperations {
             .transform(transformUri(uriTransformer))
             .then(uri -> this.connectionContext.getHttpClient()
                 .delete(uri, request -> Mono.just(request)
-                    .transform(addAuthorization(this.connectionContext, this.tokenProvider))
+                    .transform(this::addAuthorization)
+                    .transform(UserAgent::addUserAgent)
                     .transform(requestTransformer)
                     .transform(serializedRequest(requestPayload)))
                 .doOnSubscribe(NetworkLogging.delete(uri))
@@ -86,7 +87,8 @@ public abstract class AbstractReactorOperations {
             .transform(transformUri(uriTransformer))
             .then(uri -> this.connectionContext.getHttpClient()
                 .get(uri, request -> Mono.just(request)
-                    .transform(addAuthorization(this.connectionContext, this.tokenProvider))
+                    .transform(this::addAuthorization)
+                    .transform(UserAgent::addUserAgent)
                     .transform(requestTransformer)
                     .flatMap(HttpClientRequest::send))
                 .doOnSubscribe(NetworkLogging.get(uri))
@@ -102,7 +104,8 @@ public abstract class AbstractReactorOperations {
             .transform(transformUri(uriTransformer))
             .then(uri -> this.connectionContext.getHttpClient()
                 .patch(uri, request -> Mono.just(request)
-                    .transform(addAuthorization(this.connectionContext, this.tokenProvider))
+                    .transform(this::addAuthorization)
+                    .transform(UserAgent::addUserAgent)
                     .transform(requestTransformer)
                     .transform(serializedRequest(requestPayload)))
                 .doOnSubscribe(NetworkLogging.patch(uri))
@@ -131,7 +134,8 @@ public abstract class AbstractReactorOperations {
             .transform(transformUri(uriTransformer))
             .then(uri -> this.connectionContext.getHttpClient()
                 .post(uri, request -> Mono.just(request)
-                    .transform(addAuthorization(this.connectionContext, this.tokenProvider))
+                    .transform(this::addAuthorization)
+                    .transform(UserAgent::addUserAgent)
                     .transform(requestTransformer))
                 .doOnSubscribe(NetworkLogging.post(uri))
                 .transform(NetworkLogging.response(uri))
@@ -159,7 +163,8 @@ public abstract class AbstractReactorOperations {
             .transform(transformUri(uriTransformer))
             .then(uri -> this.connectionContext.getHttpClient()
                 .put(uri, request -> Mono.just(request)
-                    .transform(addAuthorization(this.connectionContext, this.tokenProvider))
+                    .transform(this::addAuthorization)
+                    .transform(UserAgent::addUserAgent)
                     .transform(requestTransformer))
                 .doOnSubscribe(NetworkLogging.put(uri))
                 .transform(NetworkLogging.response(uri))
@@ -174,7 +179,8 @@ public abstract class AbstractReactorOperations {
             .transform(transformUri(uriTransformer))
             .then(uri -> this.connectionContext.getHttpClient()
                 .get(uri, request -> Mono.just(request)
-                    .transform(addAuthorization(this.connectionContext, this.tokenProvider))
+                    .transform(this::addAuthorization)
+                    .transform(UserAgent::addUserAgent)
                     .transform(requestTransformer)
                     .flatMap(HttpClientRequest::sendWebsocket))
                 .doOnSubscribe(NetworkLogging.ws(uri))
@@ -182,16 +188,16 @@ public abstract class AbstractReactorOperations {
                 .transform(responseTransformer));
     }
 
-    private static Function<Mono<HttpClientRequest>, Mono<HttpClientRequest>> addAuthorization(ConnectionContext connectionContext, TokenProvider tokenProvider) {
-        return outbound -> Mono.when(outbound, tokenProvider.getToken(connectionContext))
-            .map(function((request, token) -> request.addHeader(HttpHeaderNames.AUTHORIZATION, String.format("bearer %s", token))));
-    }
-
     private static Function<Mono<String>, Mono<String>> transformUri(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return uri -> uri
             .map(UriComponentsBuilder::fromUriString)
             .map(uriTransformer)
             .map(builder -> builder.build().encode().toString());
+    }
+
+    private Mono<HttpClientRequest> addAuthorization(Mono<HttpClientRequest> outbound) {
+        return Mono.when(outbound, this.tokenProvider.getToken(this.connectionContext))
+            .map(function((request, token) -> request.addHeader(AUTHORIZATION, String.format("bearer %s", token))));
     }
 
     private <T> Function<Mono<HttpClientResponse>, Mono<T>> deserializedResponse(Class<T> responseType) {
