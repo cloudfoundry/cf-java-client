@@ -26,11 +26,17 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.DeleteSpaceQuotaDefiniti
 import org.cloudfoundry.client.v2.spacequotadefinitions.DeleteSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionResponse;
+import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionSpacesRequest;
+import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionSpacesResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.RemoveSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
+import org.cloudfoundry.client.v2.spacequotadefinitions.UpdateSpaceQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.spacequotadefinitions.UpdateSpaceQuotaDefinitionResponse;
+import org.cloudfoundry.client.v2.spaces.SpaceEntity;
+import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -282,6 +288,58 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     }
 
     @Test
+    public void listSpaces() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/space_quota_definitions/e37cdd97-af56-4417-a99d-060093057275/spaces")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/space_quota_definitions/GET_{id}_spaces_response.json")
+                .build())
+            .build());
+
+        this.spaceQuotaDefinitions
+            .listSpaces(ListSpaceQuotaDefinitionSpacesRequest.builder()
+                .spaceQuotaDefinitionId("e37cdd97-af56-4417-a99d-060093057275")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListSpaceQuotaDefinitionSpacesResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(SpaceResource.builder()
+                    .metadata(Metadata.builder()
+                        .createdAt("2016-06-08T16:41:29Z")
+                        .id("a1f21571-07a6-42df-b9c0-501b97fac05b")
+                        .updatedAt("2016-06-08T16:41:29Z")
+                        .url("/v2/spaces/a1f21571-07a6-42df-b9c0-501b97fac05b")
+                        .build())
+                    .entity(SpaceEntity.builder()
+                        .name("name-1473")
+                        .organizationId("e0878e36-e2f3-4290-b7c6-50f825ce6c77")
+                        .organizationUrl("/v2/organizations/e0878e36-e2f3-4290-b7c6-50f825ce6c77")
+                        .spaceQuotaDefinitionId("e37cdd97-af56-4417-a99d-060093057275")
+                        .spaceQuotaDefinitionUrl("/v2/space_quota_definitions/e37cdd97-af56-4417-a99d-060093057275")
+                        .allowSsh(true)
+                        .developersUrl("/v2/spaces/a1f21571-07a6-42df-b9c0-501b97fac05b/developers")
+                        .managersUrl("/v2/spaces/a1f21571-07a6-42df-b9c0-501b97fac05b/managers")
+                        .auditorsUrl("/v2/spaces/a1f21571-07a6-42df-b9c0-501b97fac05b/auditors")
+                        .applicationsUrl("/v2/spaces/a1f21571-07a6-42df-b9c0-501b97fac05b/apps")
+                        .routesUrl("/v2/spaces/a1f21571-07a6-42df-b9c0-501b97fac05b/routes")
+                        .domainsUrl("/v2/spaces/a1f21571-07a6-42df-b9c0-501b97fac05b/domains")
+                        .serviceInstancesUrl("/v2/spaces/a1f21571-07a6-42df-b9c0-501b97fac05b/service_instances")
+                        .applicationEventsUrl("/v2/spaces/a1f21571-07a6-42df-b9c0-501b97fac05b/app_events")
+                        .eventsUrl("/v2/spaces/a1f21571-07a6-42df-b9c0-501b97fac05b/events")
+                        .securityGroupsUrl("/v2/spaces/a1f21571-07a6-42df-b9c0-501b97fac05b/security_groups")
+                        .stagingSecurityGroupsUrl("/v2/spaces/a1f21571-07a6-42df-b9c0-501b97fac05b/staging_security_groups")
+                        .build())
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void removeSpace() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
@@ -298,6 +356,52 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
                 .spaceQuotaDefinitionId("test-space-quota-definition-id")
                 .build())
             .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void update() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PUT).path("/v2/space_quota_definitions/bbd837ac-309d-4f53-9d49-67cb75364904")
+                .payload("fixtures/client/v2/space_quota_definitions/PUT_{id}_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(CREATED)
+                .payload("fixtures/client/v2/space_quota_definitions/PUT_{id}_response.json")
+                .build())
+            .build());
+
+        this.spaceQuotaDefinitions
+            .update(UpdateSpaceQuotaDefinitionRequest.builder()
+                .name("new_name")
+                .spaceQuotaDefinitionId("bbd837ac-309d-4f53-9d49-67cb75364904")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(UpdateSpaceQuotaDefinitionResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2016-06-08T16:41:29Z")
+                    .id("bbd837ac-309d-4f53-9d49-67cb75364904")
+                    .updatedAt("2016-06-08T16:41:29Z")
+                    .url("/v2/space_quota_definitions/bbd837ac-309d-4f53-9d49-67cb75364904")
+                    .build())
+                .entity(SpaceQuotaDefinitionEntity.builder()
+                    .applicationInstanceLimit(-1)
+                    .applicationTaskLimit(5)
+                    .instanceMemoryLimit(-1)
+                    .memoryLimit(20480)
+                    .name("new_name")
+                    .nonBasicServicesAllowed(true)
+                    .organizationId("dbd76462-6fec-4add-aaca-35b2ca7493bb")
+                    .organizationUrl("/v2/organizations/dbd76462-6fec-4add-aaca-35b2ca7493bb")
+                    .spacesUrl("/v2/space_quota_definitions/bbd837ac-309d-4f53-9d49-67cb75364904/spaces")
+                    .totalReservedRoutePorts(-1)
+                    .totalRoutes(1000)
+                    .totalServices(60)
+                    .totalServiceKeys(600)
+                    .build())
+                .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }

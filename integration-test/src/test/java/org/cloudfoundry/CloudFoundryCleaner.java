@@ -42,6 +42,8 @@ import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.shareddomains.DeleteSharedDomainRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
+import org.cloudfoundry.client.v2.spacequotadefinitions.DeleteSpaceQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
@@ -126,6 +128,7 @@ final class CloudFoundryCleaner {
             .thenMany(cleanGroups(this.uaaClient, this.nameFactory))
             .thenMany(cleanUsers(this.uaaClient, this.nameFactory))
             .thenMany(cleanClients(this.uaaClient, this.nameFactory))
+            .thenMany(cleanSpaceQuotaDefinitions(this.cloudFoundryClient, this.nameFactory))
             .thenMany(cleanSpaces(this.cloudFoundryClient, this.nameFactory))
             .thenMany(cleanOrganizations(this.cloudFoundryClient, this.nameFactory))
             .thenMany(cleanOrganizationQuotaDefinitions(this.cloudFoundryClient, this.nameFactory))
@@ -479,6 +482,22 @@ final class CloudFoundryCleaner {
                     .serviceBindingId(ResourceUtils.getId(serviceBinding))
                     .build())
                 .doOnError(t -> LOGGER.error("Unable to remove service binding from {}", ResourceUtils.getEntity(application).getName(), t)));
+    }
+
+    private static Flux<Void> cleanSpaceQuotaDefinitions(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.spaceQuotaDefinitions()
+                .list(ListSpaceQuotaDefinitionsRequest.builder()
+                    .page(page)
+                    .build()))
+            .filter(quota -> nameFactory.isQuotaDefinitionName(ResourceUtils.getEntity(quota).getName()))
+            .flatMap(quota -> cloudFoundryClient.spaceQuotaDefinitions()
+                .delete((DeleteSpaceQuotaDefinitionRequest.builder()
+                    .async(true)
+                    .spaceQuotaDefinitionId(ResourceUtils.getId(quota))
+                    .build()))
+                .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job))
+                .doOnError(t -> LOGGER.error("Unable to delete space quota definition {}", ResourceUtils.getEntity(quota).getName(), t)));
     }
 
 }

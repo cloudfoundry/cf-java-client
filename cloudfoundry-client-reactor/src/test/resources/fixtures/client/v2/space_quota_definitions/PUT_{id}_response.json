@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "guid": "bbd837ac-309d-4f53-9d49-67cb75364904",
+    "url": "/v2/space_quota_definitions/bbd837ac-309d-4f53-9d49-67cb75364904",
+    "created_at": "2016-06-08T16:41:29Z",
+    "updated_at": "2016-06-08T16:41:29Z"
+  },
+  "entity": {
+    "name": "new_name",
+    "organization_guid": "dbd76462-6fec-4add-aaca-35b2ca7493bb",
+    "non_basic_services_allowed": true,
+    "total_services": 60,
+    "total_routes": 1000,
+    "memory_limit": 20480,
+    "instance_memory_limit": -1,
+    "app_instance_limit": -1,
+    "app_task_limit": 5,
+    "total_service_keys": 600,
+    "total_reserved_route_ports": -1,
+    "organization_url": "/v2/organizations/dbd76462-6fec-4add-aaca-35b2ca7493bb",
+    "spaces_url": "/v2/space_quota_definitions/bbd837ac-309d-4f53-9d49-67cb75364904/spaces"
+  }
+}

@@ -18,94 +18,408 @@ package org.cloudfoundry.client.v2;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
+import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
+import org.cloudfoundry.client.v2.spacequotadefinitions.AssociateSpaceQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.spacequotadefinitions.AssociateSpaceQuotaDefinitionResponse;
+import org.cloudfoundry.client.v2.spacequotadefinitions.CreateSpaceQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.spacequotadefinitions.CreateSpaceQuotaDefinitionResponse;
+import org.cloudfoundry.client.v2.spacequotadefinitions.DeleteSpaceQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionSpacesRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsRequest;
+import org.cloudfoundry.client.v2.spacequotadefinitions.RemoveSpaceQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
+import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
+import org.cloudfoundry.client.v2.spacequotadefinitions.UpdateSpaceQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
+import org.cloudfoundry.client.v2.spaces.SpaceEntity;
+import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
+import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import reactor.util.function.Tuples;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
-import static org.assertj.core.api.Assertions.fail;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
 
-    @Ignore("TODO: finish story https://www.pivotaltracker.com/story/show/101527366")
-    @Test
-    public void create() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/101527366");
-    }
+    @Autowired
+    private Mono<String> organizationId;
 
-    @Ignore("TODO: finish story https://www.pivotaltracker.com/story/show/101527368")
     @Test
-    public void delete() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/101527368");
-    }
+    public void associateSpace() {
+        String quotaName = this.nameFactory.getQuotaDefinitionName();
+        String spaceName = this.nameFactory.getSpaceName();
 
-    @Ignore("TODO: finish story https://www.pivotaltracker.com/story/show/101527366")
-    @Test
-    public void get() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/101527366");
-    }
-
-    @Ignore("TODO: finish story https://www.pivotaltracker.com/story/show/101527366")
-    @Test
-    public void list() throws TimeoutException, InterruptedException {
-        PaginationUtils
-            .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
-                .list(ListSpaceQuotaDefinitionsRequest.builder()
-                    .page(page)
-                    .build()))
+        this.organizationId
+            .then(organizationId -> Mono.when(
+                createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
+                createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName)
+            ))
+            .then(function((spaceId, quotaId) -> this.cloudFoundryClient.spaceQuotaDefinitions()
+                .associateSpace(AssociateSpaceQuotaDefinitionRequest.builder()
+                    .spaceId(spaceId)
+                    .spaceQuotaDefinitionId(quotaId)
+                    .build())))
+            .map(ResourceUtils::getEntity)
+            .map(SpaceQuotaDefinitionEntity::getName)
             .as(StepVerifier::create)
+            .expectNext(quotaName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: finish story https://www.pivotaltracker.com/story/show/101527372")
+    @Test
+    public void create() {
+        String quotaName = this.nameFactory.getQuotaDefinitionName();
+
+        this.organizationId
+            .then(organizationId -> this.cloudFoundryClient.spaceQuotaDefinitions()
+                .create(CreateSpaceQuotaDefinitionRequest.builder()
+                    .memoryLimit(512)
+                    .name(quotaName)
+                    .nonBasicServicesAllowed(false)
+                    .organizationId(organizationId)
+                    .totalRoutes(1)
+                    .totalServices(1)
+                    .build()))
+            .map(ResourceUtils::getEntity)
+            .map(SpaceQuotaDefinitionEntity::getName)
+            .as(StepVerifier::create)
+            .expectNext(quotaName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void delete() {
+        String quotaName = this.nameFactory.getQuotaDefinitionName();
+
+        this.organizationId
+            .then(organizationId -> createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName))
+            .then(quotaId -> this.cloudFoundryClient.spaceQuotaDefinitions()
+                .delete(DeleteSpaceQuotaDefinitionRequest.builder()
+                    .async(true)
+                    .spaceQuotaDefinitionId(quotaId)
+                    .build())
+                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job)))
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+
+    }
+
+    @Test
+    public void get() {
+        String quotaName = this.nameFactory.getQuotaDefinitionName();
+
+        this.organizationId
+            .then(organizationId -> createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName))
+            .then(quotaId -> this.cloudFoundryClient.spaceQuotaDefinitions()
+                .get(GetSpaceQuotaDefinitionRequest.builder()
+                    .spaceQuotaDefinitionId(quotaId)
+                    .build()))
+            .map(ResourceUtils::getEntity)
+            .map(SpaceQuotaDefinitionEntity::getName)
+            .as(StepVerifier::create)
+            .expectNext(quotaName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void list() throws TimeoutException, InterruptedException {
+        String quotaName = this.nameFactory.getQuotaDefinitionName();
+
+        this.organizationId
+            .then(organizationId -> createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
+                    .list(ListSpaceQuotaDefinitionsRequest.builder()
+                        .page(page)
+                        .build()))
+                .map(ResourceUtils::getEntity))
+            .filter(quota -> quotaName.equals(quota.getName()))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
     @Test
     public void listSpaces() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/101527372");
+        String quotaName = this.nameFactory.getQuotaDefinitionName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        this.organizationId
+            .then(organizationId -> Mono.when(
+                createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
+                createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName)
+            ))
+            .then(function((spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
+                .map(ignore -> quotaId)))
+            .flatMap(quotaId -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
+                    .listSpaces(ListSpaceQuotaDefinitionSpacesRequest.builder()
+                        .page(page)
+                        .spaceQuotaDefinitionId(quotaId)
+                        .build())))
+            .map(ResourceUtils::getEntity)
+            .map(SpaceEntity::getName)
+            .as(StepVerifier::create)
+            .expectNext(spaceName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: finish story https://www.pivotaltracker.com/story/show/101527372")
     @Test
     public void listSpacesFilterByApplicationId() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/101527372");
+        String applicationName = this.nameFactory.getApplicationName();
+        String quotaName = this.nameFactory.getQuotaDefinitionName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        this.organizationId
+            .then(organizationId -> Mono.when(
+                createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName),
+                createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
+            ))
+            .then(function((quotaId, spaceId) -> Mono.when(
+                requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
+                    .map(ignore -> quotaId),
+                createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
+            ))
+            .flatMap(function((quotaId, applicationId) -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
+                    .listSpaces(ListSpaceQuotaDefinitionSpacesRequest.builder()
+                        .applicationId(applicationId)
+                        .page(page)
+                        .spaceQuotaDefinitionId(quotaId)
+                        .build()))))
+            .map(ResourceUtils::getEntity)
+            .map(SpaceEntity::getName)
+            .as(StepVerifier::create)
+            .expectNext(spaceName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: finish story https://www.pivotaltracker.com/story/show/101527372")
+    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522686 really create a new user")
     @Test
     public void listSpacesFilterByDeveloperId() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/101527372");
+
     }
 
-    @Ignore("TODO: finish story https://www.pivotaltracker.com/story/show/101527372")
     @Test
     public void listSpacesFilterByName() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/101527372");
+        String quotaName = this.nameFactory.getQuotaDefinitionName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        this.organizationId
+            .then(organizationId -> Mono.when(
+                createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
+                createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName)
+            ))
+            .then(function((spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
+                .map(ignore -> quotaId)))
+            .flatMap(quotaId -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
+                    .listSpaces(ListSpaceQuotaDefinitionSpacesRequest.builder()
+                        .name(spaceName)
+                        .page(page)
+                        .spaceQuotaDefinitionId(quotaId)
+                        .build())))
+            .map(ResourceUtils::getEntity)
+            .map(SpaceEntity::getName)
+            .as(StepVerifier::create)
+            .expectNext(spaceName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: finish story https://www.pivotaltracker.com/story/show/101527372")
     @Test
     public void listSpacesFilterByOrganizationId() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/101527372");
+        String quotaName = this.nameFactory.getQuotaDefinitionName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        this.organizationId
+            .then(organizationId -> Mono.when(
+                Mono.just(organizationId),
+                createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
+                createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName)
+            ))
+            .then(function((organizationId, spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
+                .map(ignore -> Tuples.of(organizationId, quotaId))))
+            .flatMap(function((organizationId, quotaId) -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
+                    .listSpaces(ListSpaceQuotaDefinitionSpacesRequest.builder()
+                        .organizationId(organizationId)
+                        .page(page)
+                        .spaceQuotaDefinitionId(quotaId)
+                        .build()))))
+            .map(ResourceUtils::getEntity)
+            .map(SpaceEntity::getName)
+            .as(StepVerifier::create)
+            .expectNext(spaceName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: finish story https://www.pivotaltracker.com/story/show/101527372")
     @Test
     public void listSpacesNotFound() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/101527372");
+        String quotaName = this.nameFactory.getQuotaDefinitionName();
+
+        this.organizationId
+            .then(organizationId -> createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName))
+            .flatMap(quotaId -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
+                    .listSpaces(ListSpaceQuotaDefinitionSpacesRequest.builder()
+                        .spaceQuotaDefinitionId(quotaId)
+                        .build())))
+            .as(StepVerifier::create)
+            .expectNextCount(0)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: finish story https://www.pivotaltracker.com/story/show/101527378")
+    @Test
+    public void listSpacesQueryBySpaceId() {
+        String quotaName = this.nameFactory.getQuotaDefinitionName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        this.organizationId
+            .then(organizationId -> Mono.when(
+                createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
+                createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName)
+            ))
+            .then(function((spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
+                .map(ignore -> quotaId)))
+            .flatMap(quotaId -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
+                    .listSpaces(ListSpaceQuotaDefinitionSpacesRequest.builder()
+                        .page(page)
+                        .spaceQuotaDefinitionId(quotaId)
+                        .build())))
+            .map(ResourceUtils::getEntity)
+            .map(SpaceEntity::getName)
+            .as(StepVerifier::create)
+            .expectNext(spaceName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void removeSpace() {
+        String quotaName = this.nameFactory.getQuotaDefinitionName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        this.organizationId
+            .then(organizationId -> Mono.when(
+                createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
+                createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName)
+            ))
+            .then(function((spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
+                .then(this.cloudFoundryClient.spaceQuotaDefinitions()
+                    .removeSpace(RemoveSpaceQuotaDefinitionRequest.builder()
+                        .spaceId(spaceId)
+                        .spaceQuotaDefinitionId(quotaId)
+                        .build()))
+                .then()))
+            .as(StepVerifier::create)
+            .expectNextCount(0)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
     @Test
     public void update() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/101527378");
+        String quotaName1 = this.nameFactory.getQuotaDefinitionName();
+        String quotaName2 = this.nameFactory.getQuotaDefinitionName();
+
+        this.organizationId
+            .then(organizationId -> createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName1))
+            .then(quotaId -> this.cloudFoundryClient.spaceQuotaDefinitions()
+                .update(UpdateSpaceQuotaDefinitionRequest.builder()
+                    .name(quotaName2)
+                    .spaceQuotaDefinitionId(quotaId)
+                    .build()))
+            .flatMap(ignore -> requestList(this.cloudFoundryClient)
+                .map(ResourceUtils::getEntity))
+            .filter(quota -> quotaName2.equals(quota.getName()))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    private static Mono<String> createApplicationId(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
+        return requestCreateApplication(cloudFoundryClient, spaceId, applicationName)
+            .map(ResourceUtils::getId);
+    }
+
+    private static Mono<String> createSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
+        return cloudFoundryClient.spaces()
+            .create(CreateSpaceRequest.builder()
+                .organizationId(organizationId)
+                .name(spaceName)
+                .build())
+            .map(ResourceUtils::getId);
+    }
+
+    private static Mono<String> createSpaceQuotaDefinitionId(CloudFoundryClient cloudFoundryClient, String organizationId, String quotaName) {
+        return requestCreateSpaceQuotaDefinition(cloudFoundryClient, organizationId, quotaName)
+            .map(ResourceUtils::getId);
+    }
+
+    private static Mono<AssociateSpaceQuotaDefinitionResponse> requestAssociateSpace(CloudFoundryClient cloudFoundryClient, String quotaId, String spaceId) {
+        return cloudFoundryClient.spaceQuotaDefinitions()
+            .associateSpace(AssociateSpaceQuotaDefinitionRequest.builder()
+                .spaceId(spaceId)
+                .spaceQuotaDefinitionId(quotaId)
+                .build());
+    }
+
+    private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
+        return cloudFoundryClient.applicationsV2()
+            .create(CreateApplicationRequest.builder()
+                .buildpack("staticfile_buildpack")
+                .diego(true)
+                .diskQuota(512)
+                .memory(64)
+                .name(applicationName)
+                .spaceId(spaceId)
+                .build());
+    }
+
+    private static Mono<CreateSpaceQuotaDefinitionResponse> requestCreateSpaceQuotaDefinition(CloudFoundryClient cloudFoundryClient, String organizationId, String quotaName) {
+        return cloudFoundryClient.spaceQuotaDefinitions()
+            .create(CreateSpaceQuotaDefinitionRequest.builder()
+                .memoryLimit(512)
+                .name(quotaName)
+                .nonBasicServicesAllowed(false)
+                .organizationId(organizationId)
+                .totalRoutes(1)
+                .totalServices(1)
+                .build());
+    }
+
+    private static Flux<SpaceQuotaDefinitionResource> requestList(CloudFoundryClient cloudFoundryClient) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.spaceQuotaDefinitions()
+                .list(ListSpaceQuotaDefinitionsRequest.builder()
+                    .page(page)
+                    .build()));
     }
 
 }
