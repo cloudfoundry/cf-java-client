@@ -36,6 +36,9 @@ import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v2.routes.RouteResource;
+import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupRequest;
+import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupResponse;
+import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorResponse;
@@ -44,6 +47,8 @@ import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerResponse;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceSecurityGroupRequest;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceSecurityGroupResponse;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceRequest;
@@ -56,6 +61,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceDomainsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceEventsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceManagersRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceSecurityGroupsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceUserRolesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceAuditorByUsernameRequest;
@@ -64,6 +70,7 @@ import org.cloudfoundry.client.v2.spaces.RemoveSpaceDeveloperByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceDeveloperRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceManagerRequest;
+import org.cloudfoundry.client.v2.spaces.RemoveSpaceSecurityGroupRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceRequest;
@@ -244,11 +251,29 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Ready to implement
-    @Ignore("Ready to implement")
     @Test
     public void associateSecurityGroup() {
-        //
+        String securityGroupName = this.nameFactory.getSecurityGroupName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        this.organizationId
+            .then(organizationId ->
+                Mono.when(
+                    createSecurityGroupId(this.cloudFoundryClient, securityGroupName),
+                    createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
+                ))
+            .then(function((securityGroupId, spaceId) -> this.cloudFoundryClient.spaces()
+                .associateSecurityGroup(AssociateSpaceSecurityGroupRequest.builder()
+                    .securityGroupId(securityGroupId)
+                    .spaceId(spaceId)
+                    .build())
+                .then(Mono.just(spaceId))))
+            .flatMap(spaceId -> requestListSecurityGroups(this.cloudFoundryClient, spaceId))
+            .filter(response -> securityGroupName.equals(response.getEntity().getName()))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -987,18 +1012,56 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Ready to implement
-    @Ignore("Ready to implement")
     @Test
     public void listSecurityGroups() {
-        //
+        String securityGroupName = this.nameFactory.getSecurityGroupName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        this.organizationId
+            .then(organizationId ->
+                Mono.when(
+                    createSecurityGroupId(this.cloudFoundryClient, securityGroupName),
+                    createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
+                ))
+            .then(function((securityGroupId, spaceId) -> requestAssociateSpaceSecurityGroup(this.cloudFoundryClient, spaceId, securityGroupId)
+                .map(ignore -> spaceId)))
+            .flatMap(spaceId -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
+                    .listSecurityGroups(ListSpaceSecurityGroupsRequest.builder()
+                        .page(page)
+                        .spaceId(spaceId)
+                        .build())))
+            .filter(response -> securityGroupName.equals(response.getEntity().getName()))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Ready to implement
-    @Ignore("Ready to implement")
     @Test
     public void listSecurityGroupsFilterByName() {
-        //
+        String securityGroupName = this.nameFactory.getSecurityGroupName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        this.organizationId
+            .then(organizationId ->
+                Mono.when(
+                    createSecurityGroupId(this.cloudFoundryClient, securityGroupName),
+                    createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
+                ))
+            .then(function((securityGroupId, spaceId) -> requestAssociateSpaceSecurityGroup(this.cloudFoundryClient, spaceId, securityGroupId)
+                .map(ignore -> spaceId)))
+            .flatMap(spaceId -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
+                    .listSecurityGroups(ListSpaceSecurityGroupsRequest.builder()
+                        .page(page)
+                        .spaceId(spaceId)
+                        .name(securityGroupName)
+                        .build())))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
@@ -1242,11 +1305,30 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Ready to implement
-    @Ignore("Ready to implement")
     @Test
     public void removeSecurityGroup() {
-        //
+        String securityGroupName = this.nameFactory.getSecurityGroupName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        this.organizationId
+            .then(organizationId ->
+                Mono.when(
+                    createSecurityGroupId(this.cloudFoundryClient, securityGroupName),
+                    createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
+                ))
+            .as(thenKeep(function((securityGroupId, spaceId) -> requestAssociateSpaceSecurityGroup(this.cloudFoundryClient, spaceId, securityGroupId))))
+            .then(function((securityGroupId, spaceId) -> this.cloudFoundryClient.spaces()
+                .removeSecurityGroup(RemoveSpaceSecurityGroupRequest.builder()
+                    .securityGroupId(securityGroupId)
+                    .spaceId(spaceId)
+                    .build())
+                .map(ignore -> spaceId)))
+            .flatMap(spaceId -> requestListSecurityGroups(this.cloudFoundryClient, spaceId))
+            .filter(response -> securityGroupName.equals(response.getEntity().getName()))
+            .as(StepVerifier::create)
+            .expectNextCount(0)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1314,6 +1396,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
     private static Mono<String> createRouteId(CloudFoundryClient cloudFoundryClient, String spaceId, String domainName, String host, String path) {
         return getSpaceDomainId(cloudFoundryClient, spaceId, domainName)
             .then(domainId -> requestCreateRoute(cloudFoundryClient, spaceId, domainId, path, host))
+            .map(ResourceUtils::getId);
+    }
+
+    private static Mono<String> createSecurityGroupId(CloudFoundryClient cloudFoundryClient, String securityGroupName) {
+        return requestCreateSecurityGroup(cloudFoundryClient, securityGroupName)
             .map(ResourceUtils::getId);
     }
 
@@ -1400,6 +1487,14 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .build());
     }
 
+    private static Mono<AssociateSpaceSecurityGroupResponse> requestAssociateSpaceSecurityGroup(CloudFoundryClient cloudFoundryClient, String spaceId, String securityGroupId) {
+        return cloudFoundryClient.spaces()
+            .associateSecurityGroup(AssociateSpaceSecurityGroupRequest.builder()
+                .securityGroupId(securityGroupId)
+                .spaceId(spaceId)
+                .build());
+    }
+
     private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
         return cloudFoundryClient.applicationsV2()
             .create(CreateApplicationRequest.builder()
@@ -1424,6 +1519,22 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .host(host)
                 .path(path)
                 .build());
+    }
+
+    private static Mono<CreateSecurityGroupResponse> requestCreateSecurityGroup(CloudFoundryClient cloudFoundryClient, String securityGroupName) {
+        return cloudFoundryClient.securityGroups()
+            .create(CreateSecurityGroupRequest.builder()
+                .name(securityGroupName)
+                .build());
+    }
+
+    private static Flux<SecurityGroupResource> requestListSecurityGroups(CloudFoundryClient cloudFoundryClient, String spaceId) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
+                .listSecurityGroups(ListSpaceSecurityGroupsRequest.builder()
+                    .page(page)
+                    .spaceId(spaceId)
+                    .build()));
     }
 
     private static Flux<ApplicationResource> requestListSpaceApplications(CloudFoundryClient cloudFoundryClient, String spaceId) {
