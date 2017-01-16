@@ -23,6 +23,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.cloudfoundry.reactor.util.DefaultSslCertificateTruster;
 import org.cloudfoundry.reactor.util.JsonCodec;
 import org.cloudfoundry.reactor.util.NetworkLogging;
+import org.cloudfoundry.reactor.util.ProxyConfigurator;
 import org.cloudfoundry.reactor.util.SslCertificateTruster;
 import org.cloudfoundry.reactor.util.StaticTrustManagerFactory;
 import org.immutables.value.Value;
@@ -78,7 +79,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
                 .poolResources(PoolResources.fixed("cloudfoundry-client", getConnectionPoolSize()));
 
             getKeepAlive().ifPresent(keepAlive -> options.option(SO_KEEPALIVE, keepAlive));
-            getProxyConfiguration().ifPresent(c -> options.proxy(ClientOptions.Proxy.HTTP, c.getHost(), c.getPort().orElse(null), c.getUsername().orElse(null), u -> c.getPassword().orElse(null)));
+            getProxyConfiguration().ifPresent(c -> ProxyConfigurator.configure(options, c));
             getSocketTimeout().ifPresent(socketTimeout -> options.option(SO_TIMEOUT, (int) socketTimeout.toMillis()));
 
             options.sslSupport(ssl -> getSslCertificateTruster().ifPresent(trustManager -> ssl.trustManager(new StaticTrustManagerFactory(trustManager))));

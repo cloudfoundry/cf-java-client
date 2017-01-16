@@ -116,7 +116,7 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
             options.connect(host, port)
                 .sslSupport(ssl -> ssl.trustManager(new StaticTrustManagerFactory(collector)));
 
-            proxyConfiguration.ifPresent(c -> options.proxy(ClientOptions.Proxy.HTTP, c.getHost(), c.getPort().orElse(null), c.getUsername().orElse(null), u -> c.getPassword().orElse(null)));
+            proxyConfiguration.ifPresent(c -> ProxyConfigurator.configure(options, c));
         });
     }
 
