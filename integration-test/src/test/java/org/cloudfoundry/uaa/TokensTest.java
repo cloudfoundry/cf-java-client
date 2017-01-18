@@ -17,6 +17,7 @@
 package org.cloudfoundry.uaa;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.UnknownCloudFoundryException;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.uaa.tokens.CheckTokenRequest;
@@ -77,7 +78,7 @@ public final class TokensTest extends AbstractIntegrationTest {
                     .scope("scim.userids")
                     .build()))
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(HttpClientException.class).hasMessageContaining("HTTP request failed with code: 403"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(UnknownCloudFoundryException.class))
             .verify(Duration.ofMinutes(5));
     }
 

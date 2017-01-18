@@ -59,7 +59,8 @@ final class UsernameProvider {
         return Mono
             .when(
                 getSigningKey(this.tokens),
-                this.tokenProvider.getToken(this.connectionContext))
+                this.tokenProvider.getToken(this.connectionContext)
+                    .map(s -> s.split(" ")[1]))
             .map(function(UsernameProvider::getUsername));
     }
 
