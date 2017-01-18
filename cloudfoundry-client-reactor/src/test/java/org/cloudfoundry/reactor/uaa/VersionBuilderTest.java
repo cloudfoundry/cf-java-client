@@ -32,7 +32,7 @@ public final class VersionBuilderTest {
     @Test
     public void augment() {
         VersionBuilder.augment(this.outbound, new StubVersioned("test-version"));
-        verify(this.outbound).addHeader("If-Match", "test-version");
+        verify(this.outbound).header("If-Match", "test-version");
     }
 
     @Test

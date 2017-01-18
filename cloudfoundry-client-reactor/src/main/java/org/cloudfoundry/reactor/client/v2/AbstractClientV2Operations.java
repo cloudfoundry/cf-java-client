@@ -42,8 +42,7 @@ public abstract class AbstractClientV2Operations extends AbstractReactorOperatio
         return doDelete(requestPayload, responseType,
             queryTransformer(requestPayload)
                 .andThen(uriTransformer),
-            outbound -> outbound
-                .map(AbstractClientV2Operations::disableFailOnError),
+            outbound -> outbound,
             ErrorPayloadMapper.clientV2(this.connectionContext.getObjectMapper()));
     }
 
@@ -51,8 +50,7 @@ public abstract class AbstractClientV2Operations extends AbstractReactorOperatio
         return doGet(responseType,
             queryTransformer(requestPayload)
                 .andThen(uriTransformer),
-            outbound -> outbound
-                .map(AbstractClientV2Operations::disableFailOnError),
+            outbound -> outbound,
             ErrorPayloadMapper.clientV2(this.connectionContext.getObjectMapper()));
     }
 
@@ -62,7 +60,6 @@ public abstract class AbstractClientV2Operations extends AbstractReactorOperatio
         return doGet(queryTransformer(requestPayload)
                 .andThen(uriTransformer),
             outbound -> outbound
-                .map(AbstractClientV2Operations::disableFailOnError)
                 .transform(requestTransformer),
             ErrorPayloadMapper.clientV2(this.connectionContext.getObjectMapper()));
     }
@@ -71,8 +68,7 @@ public abstract class AbstractClientV2Operations extends AbstractReactorOperatio
         return doPost(requestPayload, responseType,
             queryTransformer(requestPayload)
                 .andThen(uriTransformer),
-            outbound -> outbound
-                .map(AbstractClientV2Operations::disableFailOnError),
+            outbound -> outbound,
             ErrorPayloadMapper.clientV2(this.connectionContext.getObjectMapper()));
     }
 
@@ -82,7 +78,6 @@ public abstract class AbstractClientV2Operations extends AbstractReactorOperatio
             queryTransformer(requestPayload)
                 .andThen(uriTransformer),
             outbound -> outbound
-                .map(AbstractClientV2Operations::disableFailOnError)
                 .transform(requestTransformer),
             ErrorPayloadMapper.clientV2(this.connectionContext.getObjectMapper()));
     }
@@ -91,8 +86,7 @@ public abstract class AbstractClientV2Operations extends AbstractReactorOperatio
         return doPut(requestPayload, responseType,
             queryTransformer(requestPayload)
                 .andThen(uriTransformer),
-            outbound -> outbound
-                .map(AbstractClientV2Operations::disableFailOnError),
+            outbound -> outbound,
             ErrorPayloadMapper.clientV2(this.connectionContext.getObjectMapper()));
     }
 
@@ -102,15 +96,8 @@ public abstract class AbstractClientV2Operations extends AbstractReactorOperatio
             queryTransformer(requestPayload)
                 .andThen(uriTransformer),
             outbound -> outbound
-                .map(AbstractClientV2Operations::disableFailOnError)
                 .transform(requestTransformer),
             ErrorPayloadMapper.clientV2(this.connectionContext.getObjectMapper()));
-    }
-
-    private static HttpClientRequest disableFailOnError(HttpClientRequest request) {
-        return request
-            .failOnClientError(false)
-            .failOnServerError(false);
     }
 
     private static Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(Object requestPayload) {

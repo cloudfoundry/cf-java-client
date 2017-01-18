@@ -19,6 +19,8 @@ package org.cloudfoundry.reactor.uaa;
 import org.cloudfoundry.uaa.Versioned;
 import reactor.ipc.netty.http.client.HttpClientRequest;
 
+import java.util.Optional;
+
 final class VersionBuilder {
 
     private VersionBuilder() {
@@ -27,11 +29,7 @@ final class VersionBuilder {
     static void augment(HttpClientRequest outbound, Object request) {
         if (request instanceof Versioned) {
             Versioned versioned = (Versioned) request;
-            String version = versioned.getVersion();
-
-            if (version != null) {
-                outbound.addHeader("If-Match", version);
-            }
+            Optional.ofNullable(versioned.getVersion()).ifPresent(version -> outbound.header("If-Match", version));
         }
     }
 

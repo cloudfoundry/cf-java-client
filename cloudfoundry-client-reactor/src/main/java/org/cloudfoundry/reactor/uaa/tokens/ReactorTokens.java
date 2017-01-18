@@ -149,7 +149,7 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
     private static HttpClientRequest setUrlEncoded(HttpClientRequest request) {
         return request
             .chunkedTransfer(false)
-            .addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED);
+            .header(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED);
     }
 
 }

@@ -42,44 +42,39 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
         return doDelete(requestPayload, responseType,
             queryTransformer(requestPayload)
                 .andThen(uriTransformer),
-            outbound -> outbound
-                .map(AbstractClientV3Operations::disableFailOnError),
-            ErrorPayloadMapper.clientV2(this.connectionContext.getObjectMapper()));
+            outbound -> outbound,
+            ErrorPayloadMapper.clientV3(this.connectionContext.getObjectMapper()));
     }
 
     protected final <T> Mono<T> get(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doGet(responseType,
             queryTransformer(requestPayload)
                 .andThen(uriTransformer),
-            outbound -> outbound
-                .map(AbstractClientV3Operations::disableFailOnError),
-            ErrorPayloadMapper.clientV2(this.connectionContext.getObjectMapper()));
+            outbound -> outbound,
+            ErrorPayloadMapper.clientV3(this.connectionContext.getObjectMapper()));
     }
 
     protected final Mono<HttpClientResponse> get(Object requestPayload, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doGet(queryTransformer(requestPayload)
                 .andThen(uriTransformer),
-            outbound -> outbound
-                .map(AbstractClientV3Operations::disableFailOnError),
-            ErrorPayloadMapper.clientV2(this.connectionContext.getObjectMapper()));
+            outbound -> outbound,
+            ErrorPayloadMapper.clientV3(this.connectionContext.getObjectMapper()));
     }
 
     protected final <T> Mono<T> patch(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doPatch(requestPayload, responseType,
             queryTransformer(requestPayload)
                 .andThen(uriTransformer),
-            outbound -> outbound
-                .map(AbstractClientV3Operations::disableFailOnError),
-            ErrorPayloadMapper.clientV2(this.connectionContext.getObjectMapper()));
+            outbound -> outbound,
+            ErrorPayloadMapper.clientV3(this.connectionContext.getObjectMapper()));
     }
 
     protected <T> Mono<T> post(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doPost(requestPayload, responseType,
             queryTransformer(requestPayload)
                 .andThen(uriTransformer),
-            outbound -> outbound
-                .map(AbstractClientV3Operations::disableFailOnError),
-            ErrorPayloadMapper.clientV2(this.connectionContext.getObjectMapper()));
+            outbound -> outbound,
+            ErrorPayloadMapper.clientV3(this.connectionContext.getObjectMapper()));
     }
 
     protected final <T> Mono<T> post(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
@@ -88,18 +83,16 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
             queryTransformer(requestPayload)
                 .andThen(uriTransformer),
             outbound -> outbound
-                .map(AbstractClientV3Operations::disableFailOnError)
                 .transform(requestTransformer),
-            ErrorPayloadMapper.clientV2(this.connectionContext.getObjectMapper()));
+            ErrorPayloadMapper.clientV3(this.connectionContext.getObjectMapper()));
     }
 
     protected final <T> Mono<T> put(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doPut(requestPayload, responseType,
             queryTransformer(requestPayload)
                 .andThen(uriTransformer),
-            outbound -> outbound
-                .map(AbstractClientV3Operations::disableFailOnError),
-            ErrorPayloadMapper.clientV2(this.connectionContext.getObjectMapper()));
+            outbound -> outbound,
+            ErrorPayloadMapper.clientV3(this.connectionContext.getObjectMapper()));
     }
 
     protected final <T> Mono<T> put(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
@@ -108,15 +101,8 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
             queryTransformer(requestPayload)
                 .andThen(uriTransformer),
             outbound -> outbound
-                .map(AbstractClientV3Operations::disableFailOnError)
                 .transform(requestTransformer),
-            ErrorPayloadMapper.clientV2(this.connectionContext.getObjectMapper()));
-    }
-
-    private static HttpClientRequest disableFailOnError(HttpClientRequest request) {
-        return request
-            .failOnClientError(false)
-            .failOnServerError(false);
+            ErrorPayloadMapper.clientV3(this.connectionContext.getObjectMapper()));
     }
 
     private static Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(Object requestPayload) {

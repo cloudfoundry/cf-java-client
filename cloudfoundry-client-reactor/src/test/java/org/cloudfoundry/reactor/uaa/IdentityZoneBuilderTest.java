@@ -32,7 +32,7 @@ public final class IdentityZoneBuilderTest {
     public void augment() {
         IdentityZoneBuilder.augment(this.outbound, new StubIdentityZoned());
 
-        verify(this.outbound).addHeader("X-Identity-Zone-Id", "test-identity-zone-id");
+        verify(this.outbound).header("X-Identity-Zone-Id", "test-identity-zone-id");
     }
 
     @Test

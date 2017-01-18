@@ -37,7 +37,7 @@ public final class ErrorPayloadMapper {
     @SuppressWarnings("unchecked")
     public static Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> clientV2(ObjectMapper objectMapper) {
         return inbound -> inbound
-            .then(mapToError(objectMapper, (statusCode, payload) -> {
+            .then(mapToError((statusCode, payload) -> {
                 Map<String, Object> map = objectMapper.readValue(payload, Map.class);
                 Integer code = (Integer) map.get("code");
                 String description = (String) map.get("description");
@@ -50,7 +50,7 @@ public final class ErrorPayloadMapper {
     @SuppressWarnings("unchecked")
     public static Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> clientV3(ObjectMapper objectMapper) {
         return inbound -> inbound
-            .then(mapToError(objectMapper, (statusCode, payload) -> {
+            .then(mapToError((statusCode, payload) -> {
                 List<ClientV3Exception.Error> errors = ((Map<String, List<Map<String, Object>>>) objectMapper.readValue(payload, Map.class)).get("errors").stream()
                     .map(map -> {
                         Integer code = (Integer) map.get("code");
@@ -65,14 +65,26 @@ public final class ErrorPayloadMapper {
             }));
     }
 
-    private static boolean isError(HttpClientResponse response) {
-        HttpStatusClass statusClass = response.status().codeClass();
-        return statusClass != CLIENT_ERROR && statusClass != SERVER_ERROR;
+    public static Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> fallback() {
+        return inbound -> inbound
+            .then(response -> {
+                if (!isError(response)) {
+                    return Mono.just(response);
+                }
+
+                return response.receive().aggregate().asString()
+                    .then(payload -> Mono.error(new UnknownCloudFoundryException(response.status().code(), payload)));
+            });
     }
 
-    private static Function<HttpClientResponse, Mono<HttpClientResponse>> mapToError(ObjectMapper objectMapper, ExceptionGenerator exceptionGenerator) {
+    private static boolean isError(HttpClientResponse response) {
+        HttpStatusClass statusClass = response.status().codeClass();
+        return statusClass == CLIENT_ERROR || statusClass == SERVER_ERROR;
+    }
+
+    private static Function<HttpClientResponse, Mono<HttpClientResponse>> mapToError(ExceptionGenerator exceptionGenerator) {
         return response -> {
-            if (isError(response)) {
+            if (!isError(response)) {
                 return Mono.just(response);
             }
 
