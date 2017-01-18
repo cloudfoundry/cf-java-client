@@ -31,4 +31,13 @@ public interface TokenProvider {
      */
     Mono<String> getToken(ConnectionContext connectionContext);
 
+    /**
+     * Called when a {@code 401 UNAUTHORIZED} is received as part of a request.  Since not all {@link TokenProvider}s care about this possibility, the default implementation does nothing.
+     * Implementations are free to manage internal state with this call if they choose to.
+     *
+     * @param connectionContext A {@link ConnectionContext} to be used if a token needs to be retrieved via a network request
+     */
+    default void invalidate(ConnectionContext connectionContext) {
+    }
+
 }

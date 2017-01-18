@@ -17,6 +17,7 @@
 package org.cloudfoundry.reactor.util;
 
 
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.AsciiString;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
@@ -59,13 +60,16 @@ public abstract class AbstractReactorOperations {
             .transform(transformUri(uriTransformer))
             .then(uri -> this.connectionContext.getHttpClient()
                 .delete(uri, request -> Mono.just(request)
+                    .map(AbstractReactorOperations::disableFailOnError)
                     .transform(this::addAuthorization)
-                    .transform(UserAgent::addUserAgent)
+                    .map(UserAgent::addUserAgent)
                     .transform(requestTransformer)
                     .transform(serializedRequest(requestPayload)))
                 .doOnSubscribe(NetworkLogging.delete(uri))
                 .transform(NetworkLogging.response(uri))
-                .transform(responseTransformer))
+                .transform(this::invalidateToken)
+                .transform(responseTransformer)
+                .transform(ErrorPayloadMapper.fallback()))
             .transform(deserializedResponse(responseType));
     }
 
@@ -87,13 +91,16 @@ public abstract class AbstractReactorOperations {
             .transform(transformUri(uriTransformer))
             .then(uri -> this.connectionContext.getHttpClient()
                 .get(uri, request -> Mono.just(request)
+                    .map(AbstractReactorOperations::disableFailOnError)
                     .transform(this::addAuthorization)
-                    .transform(UserAgent::addUserAgent)
+                    .map(UserAgent::addUserAgent)
                     .transform(requestTransformer)
                     .flatMap(HttpClientRequest::send))
                 .doOnSubscribe(NetworkLogging.get(uri))
                 .transform(NetworkLogging.response(uri))
-                .transform(responseTransformer));
+                .transform(this::invalidateToken)
+                .transform(responseTransformer)
+                .transform(ErrorPayloadMapper.fallback()));
     }
 
     protected final <T> Mono<T> doPatch(Object requestPayload, Class<T> responseType,
@@ -104,13 +111,16 @@ public abstract class AbstractReactorOperations {
             .transform(transformUri(uriTransformer))
             .then(uri -> this.connectionContext.getHttpClient()
                 .patch(uri, request -> Mono.just(request)
+                    .map(AbstractReactorOperations::disableFailOnError)
                     .transform(this::addAuthorization)
-                    .transform(UserAgent::addUserAgent)
+                    .map(UserAgent::addUserAgent)
                     .transform(requestTransformer)
                     .transform(serializedRequest(requestPayload)))
                 .doOnSubscribe(NetworkLogging.patch(uri))
                 .transform(NetworkLogging.response(uri))
-                .transform(responseTransformer))
+                .transform(this::invalidateToken)
+                .transform(responseTransformer)
+                .transform(ErrorPayloadMapper.fallback()))
             .transform(deserializedResponse(responseType));
     }
 
@@ -134,12 +144,15 @@ public abstract class AbstractReactorOperations {
             .transform(transformUri(uriTransformer))
             .then(uri -> this.connectionContext.getHttpClient()
                 .post(uri, request -> Mono.just(request)
+                    .map(AbstractReactorOperations::disableFailOnError)
                     .transform(this::addAuthorization)
-                    .transform(UserAgent::addUserAgent)
+                    .map(UserAgent::addUserAgent)
                     .transform(requestTransformer))
                 .doOnSubscribe(NetworkLogging.post(uri))
                 .transform(NetworkLogging.response(uri))
-                .transform(responseTransformer))
+                .transform(this::invalidateToken)
+                .transform(responseTransformer)
+                .transform(ErrorPayloadMapper.fallback()))
             .transform(deserializedResponse(responseType));
     }
 
@@ -163,12 +176,15 @@ public abstract class AbstractReactorOperations {
             .transform(transformUri(uriTransformer))
             .then(uri -> this.connectionContext.getHttpClient()
                 .put(uri, request -> Mono.just(request)
+                    .map(AbstractReactorOperations::disableFailOnError)
                     .transform(this::addAuthorization)
-                    .transform(UserAgent::addUserAgent)
+                    .map(UserAgent::addUserAgent)
                     .transform(requestTransformer))
                 .doOnSubscribe(NetworkLogging.put(uri))
                 .transform(NetworkLogging.response(uri))
-                .transform(responseTransformer))
+                .transform(this::invalidateToken)
+                .transform(responseTransformer)
+                .transform(ErrorPayloadMapper.fallback()))
             .transform(deserializedResponse(responseType));
     }
 
@@ -179,13 +195,22 @@ public abstract class AbstractReactorOperations {
             .transform(transformUri(uriTransformer))
             .then(uri -> this.connectionContext.getHttpClient()
                 .get(uri, request -> Mono.just(request)
+                    .map(AbstractReactorOperations::disableFailOnError)
                     .transform(this::addAuthorization)
-                    .transform(UserAgent::addUserAgent)
+                    .map(UserAgent::addUserAgent)
                     .transform(requestTransformer)
                     .flatMap(HttpClientRequest::sendWebsocket))
                 .doOnSubscribe(NetworkLogging.ws(uri))
                 .transform(NetworkLogging.response(uri))
-                .transform(responseTransformer));
+                .transform(this::invalidateToken)
+                .transform(responseTransformer)
+                .transform(ErrorPayloadMapper.fallback()));
+    }
+
+    private static HttpClientRequest disableFailOnError(HttpClientRequest request) {
+        return request
+            .failOnClientError(false)
+            .failOnServerError(false);
     }
 
     private static Function<Mono<String>, Mono<String>> transformUri(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
@@ -197,13 +222,26 @@ public abstract class AbstractReactorOperations {
 
     private Mono<HttpClientRequest> addAuthorization(Mono<HttpClientRequest> outbound) {
         return Mono.when(outbound, this.tokenProvider.getToken(this.connectionContext))
-            .map(function((request, token) -> request.addHeader(AUTHORIZATION, String.format("bearer %s", token))));
+            .map(function((request, token) -> request.header(AUTHORIZATION, token)));
     }
 
     private <T> Function<Mono<HttpClientResponse>, Mono<T>> deserializedResponse(Class<T> responseType) {
         return inbound -> inbound
             .transform(JsonCodec.decode(this.connectionContext.getObjectMapper(), responseType))
             .doOnError(JsonParsingException.class, e -> NetworkLogging.RESPONSE_LOGGER.debug("{}\n{}", e.getCause().getMessage(), e.getPayload()));
+    }
+
+    private Mono<HttpClientResponse> invalidateToken(Mono<HttpClientResponse> inbound) {
+        return inbound
+            .then(response -> {
+                if (response.status() == HttpResponseStatus.UNAUTHORIZED) {
+                    this.tokenProvider.invalidate(this.connectionContext);
+                    return inbound
+                        .transform(this::invalidateToken);
+                } else {
+                    return Mono.just(response);
+                }
+            });
     }
 
     private Function<Mono<HttpClientRequest>, Publisher<Void>> serializedRequest(Object requestPayload) {

@@ -29,7 +29,7 @@ final class IdentityZoneBuilder {
     static void augment(HttpClientRequest outbound, Object request) {
         if (request instanceof IdentityZoned) {
             IdentityZoned identityZoned = (IdentityZoned) request;
-            Optional.ofNullable(identityZoned.getIdentityZoneId()).ifPresent(identityZoneId -> outbound.addHeader("X-Identity-Zone-Id", identityZoneId));
+            Optional.ofNullable(identityZoned.getIdentityZoneId()).ifPresent(identityZoneId -> outbound.header("X-Identity-Zone-Id", identityZoneId));
         }
     }
 

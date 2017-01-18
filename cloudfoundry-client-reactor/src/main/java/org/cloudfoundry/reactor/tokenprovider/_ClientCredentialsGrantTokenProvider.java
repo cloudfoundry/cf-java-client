@@ -18,7 +18,8 @@ package org.cloudfoundry.reactor.tokenprovider;
 
 import org.cloudfoundry.reactor.TokenProvider;
 import org.immutables.value.Value;
-import reactor.ipc.netty.http.client.HttpClientRequest.Form;
+import reactor.core.publisher.Mono;
+import reactor.ipc.netty.http.client.HttpClientRequest;
 
 /**
  * The Client Credentials Grant implementation of {@link TokenProvider}
@@ -27,13 +28,16 @@ import reactor.ipc.netty.http.client.HttpClientRequest.Form;
 abstract class _ClientCredentialsGrantTokenProvider extends AbstractUaaTokenProvider {
 
     @Override
-    protected void accessTokenPayload(Form form) {
-        form
-            .multipart(false)
-            .attr("client_id", getClientId())
-            .attr("client_secret", getClientSecret())
-            .attr("grant_type", "client_credentials")
-            .attr("response_type", "token");
+    Mono<Void> tokenRequestTransformer(Mono<HttpClientRequest> outbound) {
+        return outbound
+            .then(request -> request
+                .sendForm(form -> form
+                    .multipart(false)
+                    .attr("client_id", getClientId())
+                    .attr("client_secret", getClientSecret())
+                    .attr("grant_type", "client_credentials")
+                    .attr("response_type", "token"))
+                .then());
     }
 
 }

@@ -17,8 +17,6 @@
 package org.cloudfoundry.reactor.util;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClientRequest;
 
 import java.util.Optional;
@@ -37,14 +35,13 @@ public final class UserAgent {
     }
 
     /**
-     * Add the {@code User-Agent} to a request.  Typically used with `.transform()`
+     * Add the {@code User-Agent} to a request.  Typically used with `.map`
      *
-     * @param outbound The request to transform
+     * @param request The request to transform
      * @return the transformed request
      */
-    public static Publisher<HttpClientRequest> addUserAgent(Mono<HttpClientRequest> outbound) {
-        return outbound
-            .map(request -> request.addHeader(HttpHeaderNames.USER_AGENT, USER_AGENT));
+    public static HttpClientRequest addUserAgent(HttpClientRequest request) {
+        return request.header(HttpHeaderNames.USER_AGENT, USER_AGENT);
     }
 
     private static String version() {
