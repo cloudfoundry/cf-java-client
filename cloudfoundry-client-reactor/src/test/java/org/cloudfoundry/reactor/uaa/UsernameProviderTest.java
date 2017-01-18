@@ -61,7 +61,7 @@ public final class UsernameProviderTest {
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
         this.publicKey = getPublicKey(keyPair.getPublic());
-        this.token = getToken(keyPair.getPrivate());
+        this.token = String.format("bearer %s", getToken(keyPair.getPrivate()));
     }
 
     @Test
