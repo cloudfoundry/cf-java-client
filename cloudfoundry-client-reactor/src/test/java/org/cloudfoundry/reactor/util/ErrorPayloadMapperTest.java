@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.UnknownCloudFoundryException;
 import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v3.ClientV3Exception;
+import org.cloudfoundry.uaa.UaaException;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Mono;
@@ -173,6 +174,67 @@ public final class ErrorPayloadMapperTest {
                     .flatExtracting(ClientV3Exception.Error::getCode, ClientV3Exception.Error::getDetail, ClientV3Exception.Error::getTitle)
                     .containsExactly(10008, "The request is semantically invalid: something went wrong", "CF-UnprocessableEntity");
             })
+            .verify(Duration.ofSeconds(1));
+    }
+
+
+    @Test
+    public void uaaBadPayload() throws IOException {
+        when(this.response.status()).thenReturn(BAD_REQUEST);
+        when(this.response.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/invalid_error_response.json").getFile().toPath()));
+
+        Mono.just(this.response)
+            .transform(ErrorPayloadMapper.uaa(this.objectMapper))
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t)
+                .isInstanceOf(UnknownCloudFoundryException.class)
+                .hasMessage("Unknown Cloud Foundry Exception")
+                .extracting("statusCode", "payload")
+                .containsExactly(BAD_REQUEST.code(), "Invalid Error Response"))
+            .verify(Duration.ofSeconds(1));
+    }
+
+    @Test
+    public void uaaClientError() throws IOException {
+        when(this.response.status()).thenReturn(BAD_REQUEST);
+        when(this.response.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/uaa/error_response.json").getFile().toPath()));
+
+        Mono.just(this.response)
+            .transform(ErrorPayloadMapper.uaa(this.objectMapper))
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t)
+                .isInstanceOf(UaaException.class)
+                .hasMessage("unauthorized: Bad credentials")
+                .extracting("statusCode", "error", "errorDescription")
+                .containsExactly(BAD_REQUEST.code(), "unauthorized", "Bad credentials"))
+            .verify(Duration.ofSeconds(1));
+    }
+
+    @Test
+    public void uaaNoError() {
+        when(this.response.status()).thenReturn(OK);
+
+        Mono.just(this.response)
+            .transform(ErrorPayloadMapper.uaa(this.objectMapper))
+            .as(StepVerifier::create)
+            .expectNext(this.response)
+            .expectComplete()
+            .verify(Duration.ofSeconds(1));
+    }
+
+    @Test
+    public void uaaServerError() throws IOException {
+        when(this.response.status()).thenReturn(INTERNAL_SERVER_ERROR);
+        when(this.response.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/uaa/error_response.json").getFile().toPath()));
+
+        Mono.just(this.response)
+            .transform(ErrorPayloadMapper.uaa(this.objectMapper))
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t)
+                .isInstanceOf(UaaException.class)
+                .hasMessage("unauthorized: Bad credentials")
+                .extracting("statusCode", "error", "errorDescription")
+                .containsExactly(INTERNAL_SERVER_ERROR.code(), "unauthorized", "Bad credentials"))
             .verify(Duration.ofSeconds(1));
     }
 

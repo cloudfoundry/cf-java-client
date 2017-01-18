@@ -20,6 +20,7 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
+import org.cloudfoundry.reactor.util.ErrorPayloadMapper;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClientRequest;
@@ -29,8 +30,11 @@ import java.util.function.Function;
 
 public abstract class AbstractUaaOperations extends AbstractReactorOperations {
 
+    private final ConnectionContext connectionContext;
+
     protected AbstractUaaOperations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider);
+        this.connectionContext = connectionContext;
     }
 
     protected final <T> Mono<T> delete(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
@@ -39,7 +43,7 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
                 .andThen(uriTransformer),
             outbound -> outbound
                 .transform(headerTransformer(requestPayload)),
-            inbound -> inbound);
+            ErrorPayloadMapper.uaa(this.connectionContext.getObjectMapper()));
     }
 
     protected final <T> Mono<T> delete(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
@@ -51,7 +55,7 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
             outbound -> outbound
                 .transform(headerTransformer(requestPayload))
                 .transform(requestTransformer),
-            inbound -> inbound);
+            ErrorPayloadMapper.uaa(this.connectionContext.getObjectMapper()));
     }
 
     protected final Mono<HttpClientResponse> get(Object requestPayload, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
@@ -59,7 +63,7 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
                 .andThen(uriTransformer),
             outbound -> outbound
                 .transform(headerTransformer(requestPayload)),
-            inbound -> inbound);
+            ErrorPayloadMapper.uaa(this.connectionContext.getObjectMapper()));
     }
 
     protected final Mono<HttpClientResponse> get(Object requestPayload, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
@@ -70,7 +74,7 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
             outbound -> outbound
                 .transform(headerTransformer(requestPayload))
                 .transform(requestTransformer),
-            inbound -> inbound);
+            ErrorPayloadMapper.uaa(this.connectionContext.getObjectMapper()));
     }
 
     protected final <T> Mono<T> get(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
@@ -79,7 +83,7 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
                 .andThen(uriTransformer),
             outbound -> outbound
                 .transform(headerTransformer(requestPayload)),
-            inbound -> inbound);
+            ErrorPayloadMapper.uaa(this.connectionContext.getObjectMapper()));
     }
 
     protected final <T> Mono<T> get(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
@@ -90,7 +94,7 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
             outbound -> outbound
                 .transform(headerTransformer(requestPayload))
                 .transform(requestTransformer),
-            inbound -> inbound);
+            ErrorPayloadMapper.uaa(this.connectionContext.getObjectMapper()));
     }
 
     protected final <T> Mono<T> post(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
@@ -101,7 +105,7 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
             outbound -> outbound
                 .transform(headerTransformer(requestPayload))
                 .transform(requestTransformer),
-            inbound -> inbound);
+            ErrorPayloadMapper.uaa(this.connectionContext.getObjectMapper()));
     }
 
     protected final <T> Mono<T> post(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
@@ -110,7 +114,7 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
                 .andThen(uriTransformer),
             outbound -> outbound
                 .transform(headerTransformer(requestPayload)),
-            inbound -> inbound);
+            ErrorPayloadMapper.uaa(this.connectionContext.getObjectMapper()));
     }
 
     protected final <T> Mono<T> put(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
@@ -119,7 +123,7 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
                 .andThen(uriTransformer),
             outbound -> outbound
                 .transform(headerTransformer(requestPayload)),
-            inbound -> inbound);
+            ErrorPayloadMapper.uaa(this.connectionContext.getObjectMapper()));
     }
 
     private static Function<Mono<HttpClientRequest>, Mono<HttpClientRequest>> headerTransformer(Object requestPayload) {

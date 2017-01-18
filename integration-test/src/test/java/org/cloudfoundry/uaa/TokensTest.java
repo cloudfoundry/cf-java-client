@@ -78,7 +78,7 @@ public final class TokensTest extends AbstractIntegrationTest {
                     .scope("scim.userids")
                     .build()))
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(UnknownCloudFoundryException.class))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(UaaException.class).hasMessage("access_denied: Access is denied"))
             .verify(Duration.ofMinutes(5));
     }
 

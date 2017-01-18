@@ -21,6 +21,7 @@ import io.netty.handler.codec.http.HttpStatusClass;
 import org.cloudfoundry.UnknownCloudFoundryException;
 import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v3.ClientV3Exception;
+import org.cloudfoundry.uaa.UaaException;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClientResponse;
 
@@ -75,6 +76,18 @@ public final class ErrorPayloadMapper {
                 return response.receive().aggregate().asString()
                     .then(payload -> Mono.error(new UnknownCloudFoundryException(response.status().code(), payload)));
             });
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> uaa(ObjectMapper objectMapper) {
+        return inbound -> inbound
+            .then(mapToError((statusCode, payload) -> {
+                Map<String, Object> map = objectMapper.readValue(payload, Map.class);
+                String error = (String) map.get("error");
+                String errorDescription = (String) map.get("error_description");
+
+                return new UaaException(statusCode, error, errorDescription);
+            }));
     }
 
     private static boolean isError(HttpClientResponse response) {

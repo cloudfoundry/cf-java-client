@@ -23,6 +23,7 @@ import org.cloudfoundry.reactor.util.ErrorPayloadMapper;
 import org.cloudfoundry.reactor.util.JsonCodec;
 import org.cloudfoundry.reactor.util.NetworkLogging;
 import org.cloudfoundry.reactor.util.UserAgent;
+import org.cloudfoundry.uaa.UaaException;
 import org.immutables.value.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,8 +56,6 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
     private static final String ACCESS_TOKEN = "access_token";
 
     private static final String AUTHORIZATION_ENDPOINT = "authorization_endpoint";
-
-    private static final String EXPIRES_IN = "expires_in";
 
     private static final String REFRESH_TOKEN = "refresh_token";
 
@@ -140,26 +139,12 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
     }
 
     private Mono<HttpClientResponse> primaryToken(ConnectionContext connectionContext) {
-        return requestToken(connectionContext, this::tokenRequestTransformer)
-            .then(response -> {
-                if (response.status() == UNAUTHORIZED) {
-                    return Mono.error(new IllegalStateException("Unable to negotiate token"));
-                } else {
-                    return Mono.just(response);
-                }
-            });
+        return requestToken(connectionContext, this::tokenRequestTransformer);
     }
 
     private Mono<HttpClientResponse> refreshToken(ConnectionContext connectionContext, String refreshToken) {
         return requestToken(connectionContext, refreshTokenGrantTokenRequestTransformer(refreshToken))
-            .then(response -> {
-                if (response.status() == UNAUTHORIZED) {
-                    this.refreshTokens.put(connectionContext, Mono.empty());
-                    return Mono.empty();
-                } else {
-                    return Mono.just(response);
-                }
-            });
+            .otherwise(t -> t instanceof UaaException && ((UaaException) t).getStatusCode() == UNAUTHORIZED.code(), t -> Mono.empty());
     }
 
     private Function<Mono<HttpClientRequest>, Mono<Void>> refreshTokenGrantTokenRequestTransformer(String refreshToken) {
@@ -186,7 +171,8 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
                     .map(AbstractUaaTokenProvider::addContentTypes)
                     .transform(tokenRequestTransformer))
                 .doOnSubscribe(NetworkLogging.post(uri))
-                .transform(NetworkLogging.response(uri)));
+                .transform(NetworkLogging.response(uri))
+                .transform(ErrorPayloadMapper.uaa(connectionContext.getObjectMapper())));
     }
 
     private Mono<String> token(ConnectionContext connectionContext) {

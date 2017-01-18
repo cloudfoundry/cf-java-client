@@ -223,7 +223,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
 //                    assertEquals("secret updated", response.getMessage());
 //                    assertEquals("ok", response.getStatus());
 //                }));
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(UnknownCloudFoundryException.class))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(UaaException.class).hasMessage("invalid_client: Only a client can change client secret"))
             .verify(Duration.ofMinutes(5));
 
     }
