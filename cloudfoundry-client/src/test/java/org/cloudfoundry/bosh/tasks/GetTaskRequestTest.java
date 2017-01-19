@@ -29,7 +29,7 @@ public final class GetTaskRequestTest {
     @Test
     public void valid() {
         GetTaskRequest.builder()
-            .taskId("test-task-id")
+            .taskId(-1)
             .build();
     }
 
