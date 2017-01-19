@@ -42,7 +42,7 @@ public final class ReactorStemcells extends AbstractBoshOperations implements St
 
     @Override
     public Mono<ListStemcellsResponse> list(ListStemcellsRequest request) {
-        return get(ListStemcellsResponse.class, builder -> builder.pathSegment("stemcells"));
+        return get(request, ListStemcellsResponse.class, builder -> builder.pathSegment("stemcells"));
     }
 
 }
