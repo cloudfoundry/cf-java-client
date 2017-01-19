@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.bosh.tasks;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
-import org.immutables.value.Value;
+import org.junit.Test;
 
-/**
- * The details of a task
- */
-@JsonDeserialize
-@Value.Immutable
-abstract class _Task extends AbstractTask {
+public final class GetTaskRequestTest {
+
+    @Test(expected = IllegalStateException.class)
+    public void noTaskId() {
+        GetTaskRequest.builder()
+            .build();
+    }
+
+    @Test
+    public void valid() {
+        GetTaskRequest.builder()
+            .taskId("test-task-id")
+            .build();
+    }
+
 
 }
-
-

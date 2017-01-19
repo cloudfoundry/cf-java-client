@@ -25,7 +25,7 @@ import org.cloudfoundry.client.v3.Link;
 import java.util.Map;
 
 /**
- * Base class for responses that are tasks
+ * Base class for responses that are applications
  */
 public abstract class Application {
 

@@ -16,27 +16,19 @@
 
 package org.cloudfoundry.bosh.tasks;
 
-import reactor.core.publisher.Mono;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.immutables.value.Value;
 
 /**
- * Main entry point to the BOSH Tasks API
+ * The request payload for the Get Task operation
  */
-public interface Tasks {
+@Value.Immutable
+abstract class _GetTaskRequest {
 
     /**
-     * Makes the <a href="https://bosh.io/docs/director-api-v1.html#get-task">Get Task</a> request
-     *
-     * @param request the Get Task Request
-     * @return the response from the Get Task request
+     * The task id
      */
-    Mono<GetTaskResponse> get(GetTaskRequest request);
-
-    /**
-     * Makes the <a href="https://bosh.io/docs/director-api-v1.html#list-tasks">List Tasks</a> request
-     *
-     * @param request the List Tasks Request
-     * @return the response from the List Tasks request
-     */
-    Mono<ListTasksResponse> list(ListTasksRequest request);
+    @JsonIgnore
+    abstract Integer getTaskId();
 
 }
