@@ -44,7 +44,8 @@ public final class ServicesTest extends AbstractIntegrationTest {
     @Autowired
     private String spaceName;
 
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/106155472 for cleanup for this and other tests required for bind route")
+    //TODO: Ready to implement
+    @Ignore("Ready to implement")
     @Test
     public void bindRoutePrivateDomain() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
@@ -76,7 +77,8 @@ public final class ServicesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: Needs marketplace feature to derive planName and serviceName - https://www.pivotaltracker.com/story/show/106155472")
+    //TODO: Ready to implement
+    @Ignore("Ready to implement")
     @Test
     public void getManagedService() throws TimeoutException, InterruptedException {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();

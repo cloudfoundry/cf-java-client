@@ -18,7 +18,6 @@ package org.cloudfoundry.uaa;
 
 import io.netty.util.AsciiString;
 import org.cloudfoundry.AbstractIntegrationTest;
-import org.cloudfoundry.UnknownCloudFoundryException;
 import org.cloudfoundry.uaa.clients.BatchChangeSecretRequest;
 import org.cloudfoundry.uaa.clients.BatchChangeSecretResponse;
 import org.cloudfoundry.uaa.clients.BatchCreateClientsRequest;
@@ -55,7 +54,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.client.HttpClientException;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;

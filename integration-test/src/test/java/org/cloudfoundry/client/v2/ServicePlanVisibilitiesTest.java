@@ -29,52 +29,60 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
 
-    @Ignore("TODO: awaiting story https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void create() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
-    @Ignore("TODO: awaiting story https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void delete() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
-    @Ignore("TODO: awaiting story https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void deleteAsyncFalse() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
-    @Ignore("TODO: awaiting story https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void get() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
-    @Ignore("TODO: awaiting story https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void list() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
-    @Ignore("TODO: awaiting story https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listFilterByOrganizationId() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
-    @Ignore("TODO: awaiting story https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listFilterByServicePlanId() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
-    @Ignore("TODO: awaiting story https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void update() {
-        fail("TODO: finish story https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
 }

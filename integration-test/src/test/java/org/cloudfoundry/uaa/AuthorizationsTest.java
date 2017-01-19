@@ -136,7 +136,8 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/134351627")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/670
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/670")
     @Test
     public void openIdProviderConfiguration() throws TimeoutException, InterruptedException {
         //

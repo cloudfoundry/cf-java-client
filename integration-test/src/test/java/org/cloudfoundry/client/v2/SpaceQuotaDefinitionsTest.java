@@ -215,7 +215,8 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522686 really create a new user")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/643
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/643")
     @Test
     public void listSpacesFilterByDeveloperId() {
 
