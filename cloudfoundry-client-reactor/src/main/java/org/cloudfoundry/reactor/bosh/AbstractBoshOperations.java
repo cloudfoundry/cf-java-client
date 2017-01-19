@@ -17,11 +17,12 @@
 package org.cloudfoundry.reactor.bosh;
 
 import org.cloudfoundry.reactor.ConnectionContext;
-import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.QueryBuilder;
+import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
+import reactor.ipc.netty.http.client.HttpClientResponse;
 
 import java.util.function.Function;
 
@@ -35,6 +36,15 @@ public abstract class AbstractBoshOperations extends AbstractReactorOperations {
                                     Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doGet(responseType,
             queryTransformer(requestPayload)
+                .andThen(uriTransformer),
+            outbound -> outbound,
+            inbound -> inbound);
+    }
+
+    protected final Mono<HttpClientResponse> get(Object requestPayload,
+                                                 Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+
+        return doGet(queryTransformer(requestPayload)
                 .andThen(uriTransformer),
             outbound -> outbound,
             inbound -> inbound);
