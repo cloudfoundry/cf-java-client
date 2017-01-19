@@ -20,10 +20,12 @@ import org.cloudfoundry.Nullable;
 import org.cloudfoundry.bosh.BoshClient;
 import org.cloudfoundry.bosh.info.Info;
 import org.cloudfoundry.bosh.stemcells.Stemcells;
+import org.cloudfoundry.bosh.tasks.Tasks;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.bosh.info.ReactorInfo;
 import org.cloudfoundry.reactor.bosh.stemcells.ReactorStemcells;
+import org.cloudfoundry.reactor.bosh.tasks.ReactorTasks;
 import org.immutables.value.Value;
 import reactor.core.publisher.Mono;
 
@@ -43,6 +45,12 @@ abstract class _ReactorBoshClient implements BoshClient {
     @Value.Derived
     public Stemcells stemcells() {
         return new ReactorStemcells(getConnectionContext(), getRoot(), getTokenProvider());
+    }
+
+    @Override
+    @Value.Derived
+    public Tasks tasks() {
+        return new ReactorTasks(getConnectionContext(), getRoot(), getTokenProvider());
     }
 
     @Nullable

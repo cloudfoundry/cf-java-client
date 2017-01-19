@@ -14,30 +14,21 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.bosh;
+package org.cloudfoundry.bosh.tasks;
 
-import org.cloudfoundry.bosh.info.Info;
-import org.cloudfoundry.bosh.stemcells.Stemcells;
-import org.cloudfoundry.bosh.tasks.Tasks;
+import reactor.core.publisher.Mono;
 
 /**
- * Main entry point to the BOSH API
+ * Main entry point to the BOSH Tasks API
  */
-public interface BoshClient {
+public interface Tasks {
 
     /**
-     * Main entry point to the BOSH Info API
+     * Makes the <a href="https://bosh.io/docs/director-api-v1.html#list-tasks">List Tasks</a> request
+     *
+     * @param request the List Tasks Request
+     * @return the response from the List Tasks request
      */
-    Info info();
-
-    /**
-     * Main entry point to the BOSH Stemcells API
-     */
-    Stemcells stemcells();
-
-    /**
-     * Main entry point to the BOSH Tasks API
-     */
-    Tasks tasks();
+    Mono<ListTasksResponse> list(ListTasksRequest request);
 
 }

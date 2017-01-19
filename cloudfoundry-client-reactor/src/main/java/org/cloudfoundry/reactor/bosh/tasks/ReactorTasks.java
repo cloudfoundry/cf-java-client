@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.bosh.info;
+package org.cloudfoundry.reactor.bosh.tasks;
 
-import org.cloudfoundry.bosh.info.GetInfoRequest;
-import org.cloudfoundry.bosh.info.GetInfoResponse;
-import org.cloudfoundry.bosh.info.Info;
+import org.cloudfoundry.bosh.tasks.ListTasksRequest;
+import org.cloudfoundry.bosh.tasks.ListTasksResponse;
+import org.cloudfoundry.bosh.tasks.Tasks;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.bosh.AbstractBoshOperations;
 import reactor.core.publisher.Mono;
 
 /**
- * The Reactor-based implementation of {@link Info}.
+ * The Reactor-based implementation of {@link Tasks}
  */
-public final class ReactorInfo extends AbstractBoshOperations implements Info {
+public final class ReactorTasks extends AbstractBoshOperations implements Tasks {
 
     /**
      * Creates an instance
@@ -36,13 +36,13 @@ public final class ReactorInfo extends AbstractBoshOperations implements Info {
      * @param root              the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      */
-    public ReactorInfo(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
+    public ReactorTasks(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider);
     }
 
     @Override
-    public Mono<GetInfoResponse> get(GetInfoRequest request) {
-        return get(request, GetInfoResponse.class, builder -> builder.pathSegment("info"));
+    public Mono<ListTasksResponse> list(ListTasksRequest request) {
+        return get(request, ListTasksResponse.class, builder -> builder.pathSegment("tasks"));
     }
 
 }

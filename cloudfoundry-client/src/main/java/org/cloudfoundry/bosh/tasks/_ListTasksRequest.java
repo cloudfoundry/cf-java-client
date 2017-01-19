@@ -14,30 +14,26 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.bosh;
+package org.cloudfoundry.bosh.tasks;
 
-import org.cloudfoundry.bosh.info.Info;
-import org.cloudfoundry.bosh.stemcells.Stemcells;
-import org.cloudfoundry.bosh.tasks.Tasks;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.QueryParameter;
+import org.immutables.value.Value;
+
+import java.util.List;
 
 /**
- * Main entry point to the BOSH API
+ * The request payload for the List Tasks operation
  */
-public interface BoshClient {
+@Value.Immutable
+abstract class _ListTasksRequest {
 
-    /**
-     * Main entry point to the BOSH Info API
-     */
-    Info info();
+    @Nullable
+    @QueryParameter("deployment")
+    abstract String getDeployment();
 
-    /**
-     * Main entry point to the BOSH Stemcells API
-     */
-    Stemcells stemcells();
-
-    /**
-     * Main entry point to the BOSH Tasks API
-     */
-    Tasks tasks();
+    @Nullable
+    @QueryParameter("state")
+    abstract List<State> getState();
 
 }

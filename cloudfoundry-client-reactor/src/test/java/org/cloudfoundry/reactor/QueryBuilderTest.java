@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.client;
+package org.cloudfoundry.reactor;
 
 import org.cloudfoundry.QueryParameter;
 import org.junit.Test;
