@@ -14,36 +14,21 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.bosh;
+package org.cloudfoundry.bosh.releases;
 
-import org.cloudfoundry.bosh.info.Info;
-import org.cloudfoundry.bosh.releases.Releases;
-import org.cloudfoundry.bosh.stemcells.Stemcells;
-import org.cloudfoundry.bosh.tasks.Tasks;
+import reactor.core.publisher.Mono;
 
 /**
- * Main entry point to the BOSH API
+ * Main entry point to the BOSH Releases API
  */
-public interface BoshClient {
+public interface Releases {
 
     /**
-     * Main entry point to the BOSH Info API
+     * Makes the <a href="https://bosh.io/docs/director-api-v1.html#list-releases">List Releases</a> request
+     *
+     * @param request the List Releases Request
+     * @return the response from the List Releases request
      */
-    Info info();
-
-    /**
-     * Main entry point to the BOSH Releases API
-     */
-    Releases releases();
-
-    /**
-     * Main entry point to the BOSH Stemcells API
-     */
-    Stemcells stemcells();
-
-    /**
-     * Main entry point to the BOSH Tasks API
-     */
-    Tasks tasks();
+    Mono<ListReleasesResponse> list(ListReleasesRequest request);
 
 }
