@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.bosh.tasks;
 
+import org.cloudfoundry.bosh.tasks.GetTaskOutputRequest;
 import org.cloudfoundry.bosh.tasks.GetTaskRequest;
 import org.cloudfoundry.bosh.tasks.GetTaskResponse;
 import org.cloudfoundry.bosh.tasks.ListTasksRequest;
@@ -45,6 +46,12 @@ public final class ReactorTasks extends AbstractBoshOperations implements Tasks 
     @Override
     public Mono<GetTaskResponse> get(GetTaskRequest request) {
         return get(request, GetTaskResponse.class, builder -> builder.pathSegment("tasks", String.valueOf(request.getTaskId())));
+    }
+
+    @Override
+    public Mono<String> getOutput(GetTaskOutputRequest request) {
+        return get(request, builder -> builder.pathSegment("tasks", String.valueOf(request.getTaskId()), "output"))
+            .then(r -> r.receive().aggregate().asString());
     }
 
     @Override

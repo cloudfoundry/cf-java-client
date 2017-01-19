@@ -1,0 +1,3 @@
+D, [2015-11-09 02:19:36 #32545] [] DEBUG -- DirectorJobRunner: RECEIVED: director.37d8c089-853e-458c-8535-195085b4b7ed.459b05ae-8b69-4679-b2d5-b34e5fef2dcc {"value":{"agent_task_id":"c9f5b328-0656-41f1-631c-e17151be1e18","state":"running"}}
+D, [2015-11-09 02:19:36 #32545] [task:1180] DEBUG -- DirectorJobRunner: (0.000441s) SELECT NULL
+D, [2015-11-09 02:19:36 #32545] [task:1180] DEBUG -- DirectorJobRunner: (0.000317s) SELECT * FROM "tasks" WHERE "id" = 1180

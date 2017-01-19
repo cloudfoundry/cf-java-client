@@ -32,6 +32,14 @@ public interface Tasks {
     Mono<GetTaskResponse> get(GetTaskRequest request);
 
     /**
+     * Makes the <a href="">Get Task Output</a> request
+     *
+     * @param request the Get Task Output request
+     * @return the response from the Get Task Output request
+     */
+    Mono<String> getOutput(GetTaskOutputRequest request);
+
+    /**
      * Makes the <a href="https://bosh.io/docs/director-api-v1.html#list-tasks">List Tasks</a> request
      *
      * @param request the List Tasks Request

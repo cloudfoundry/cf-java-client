@@ -16,12 +16,14 @@
 
 package org.cloudfoundry.reactor.bosh.tasks;
 
+import org.cloudfoundry.bosh.tasks.GetTaskOutputRequest;
 import org.cloudfoundry.bosh.tasks.GetTaskRequest;
 import org.cloudfoundry.bosh.tasks.GetTaskResponse;
 import org.cloudfoundry.bosh.tasks.ListTasksRequest;
 import org.cloudfoundry.bosh.tasks.ListTasksResponse;
 import org.cloudfoundry.bosh.tasks.State;
 import org.cloudfoundry.bosh.tasks.Task;
+import org.cloudfoundry.bosh.tasks.Type;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -62,6 +64,32 @@ public final class ReactorTasksTest extends AbstractBoshApiTest {
                 .timestamp(1447033291)
                 .user("admin")
                 .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getOutput() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/tasks/1180/output?type=debug")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/bosh/tasks/GET_{id}_output_response.txt")
+                .build())
+            .build());
+
+        this.tasks
+            .getOutput(GetTaskOutputRequest.builder()
+                .taskId(1180)
+                .type(Type.DEBUG)
+                .build())
+            .as(StepVerifier::create)
+            .expectNext("D, [2015-11-09 02:19:36 #32545] [] DEBUG -- DirectorJobRunner: RECEIVED: director.37d8c089-853e-458c-8535-195085b4b7ed.459b05ae-8b69-4679-b2d5-b34e5fef2dcc " +
+                "{\"value\":{\"agent_task_id\":\"c9f5b328-0656-41f1-631c-e17151be1e18\",\"state\":\"running\"}}\n" +
+                "D, [2015-11-09 02:19:36 #32545] [task:1180] DEBUG -- DirectorJobRunner: (0.000441s) SELECT NULL\n" +
+                "D, [2015-11-09 02:19:36 #32545] [task:1180] DEBUG -- DirectorJobRunner: (0.000317s) SELECT * FROM \"tasks\" WHERE \"id\" = 1180\n")
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
