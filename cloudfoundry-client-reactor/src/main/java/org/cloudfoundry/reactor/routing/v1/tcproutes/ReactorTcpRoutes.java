@@ -55,17 +55,17 @@ public class ReactorTcpRoutes extends AbstractRoutingV1Operations implements Tcp
 
     @Override
     public Mono<CreateTcpRoutesResponse> create(CreateTcpRoutesRequest request) {
-        return post(request, CreateTcpRoutesResponse.class, builder -> builder.pathSegment("routing", "v1", "tcp_routes", "create"));
+        return post(request, CreateTcpRoutesResponse.class, builder -> builder.pathSegment("v1", "tcp_routes", "create"));
     }
 
     @Override
     public Mono<Void> delete(DeleteTcpRoutesRequest request) {
-        return post(request, Void.class, builder -> builder.pathSegment("routing", "v1", "tcp_routes", "delete"));
+        return post(request, Void.class, builder -> builder.pathSegment("v1", "tcp_routes", "delete"));
     }
 
     @Override
     public Flux<TcpRouteEvent> events(EventsRequest request) {
-        return get(builder -> builder.pathSegment("routing", "v1", "tcp_routes", "events"))
+        return get(builder -> builder.pathSegment("v1", "tcp_routes", "events"))
             .flatMap(inbound -> inbound.addHandler(new EventStreamDecoderChannelHandler()).receiveObject().doOnCancel(() -> inbound.channel().close())) // TODO: No way this is the proper way to close.
             .cast(ServerSentEvent.class)
             .map(event -> {
@@ -81,7 +81,7 @@ public class ReactorTcpRoutes extends AbstractRoutingV1Operations implements Tcp
 
     @Override
     public Mono<ListTcpRoutesResponse> list(ListTcpRoutesRequest request) {
-        return get(ListTcpRoutesResponse.class, builder -> builder.pathSegment("routing", "v1", "tcp_routes"));
+        return get(ListTcpRoutesResponse.class, builder -> builder.pathSegment("v1", "tcp_routes"));
     }
 
 }

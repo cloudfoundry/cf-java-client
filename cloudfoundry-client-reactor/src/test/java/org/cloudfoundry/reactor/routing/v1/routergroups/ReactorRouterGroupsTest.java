@@ -43,7 +43,7 @@ public final class ReactorRouterGroupsTest extends AbstractRoutingApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/routing/v1/router_groups")
+                .method(GET).path("/v1/router_groups")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -71,7 +71,7 @@ public final class ReactorRouterGroupsTest extends AbstractRoutingApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/routing/v1/router_groups/abc123")
+                .method(PUT).path("/v1/router_groups/abc123")
                 .payload("fixtures/routing/v1/routergroups/PUT_{id}_request.json")
                 .build())
             .response(TestResponse.builder()

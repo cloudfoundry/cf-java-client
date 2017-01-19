@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.reactor.doppler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.doppler.ContainerMetricsRequest;
 import org.cloudfoundry.doppler.DopplerClient;
@@ -29,7 +28,6 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.immutables.value.Value;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.client.HttpClient;
 
 /**
  * The Reactor-based implementation of {@link DopplerClient}
@@ -63,16 +61,6 @@ abstract class _ReactorDopplerClient implements DopplerClient {
     @Value.Derived
     ReactorDopplerEndpoints getDopplerEndpoints() {
         return new ReactorDopplerEndpoints(getConnectionContext(), getRoot(), getTokenProvider());
-    }
-
-    @Value.Default
-    HttpClient getHttpClient() {
-        return getConnectionContext().getHttpClient();
-    }
-
-    @Value.Default
-    ObjectMapper getObjectMapper() {
-        return getConnectionContext().getObjectMapper();
     }
 
     @Value.Default
