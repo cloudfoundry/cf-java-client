@@ -35,6 +35,11 @@ public final class ReactorBoshClientTest extends AbstractRestTest {
     }
 
     @Test
+    public void releases() {
+        assertThat(this.client.releases()).isNotNull();
+    }
+
+    @Test
     public void stemcells() {
         assertThat(this.client.stemcells()).isNotNull();
     }

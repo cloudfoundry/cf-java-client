@@ -14,36 +14,14 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.bosh;
+package org.cloudfoundry.bosh.releases;
 
-import org.cloudfoundry.bosh.info.Info;
-import org.cloudfoundry.bosh.releases.Releases;
-import org.cloudfoundry.bosh.stemcells.Stemcells;
-import org.cloudfoundry.bosh.tasks.Tasks;
+import org.immutables.value.Value;
 
 /**
- * Main entry point to the BOSH API
+ * The request payload for the List Releases operation
  */
-public interface BoshClient {
-
-    /**
-     * Main entry point to the BOSH Info API
-     */
-    Info info();
-
-    /**
-     * Main entry point to the BOSH Releases API
-     */
-    Releases releases();
-
-    /**
-     * Main entry point to the BOSH Stemcells API
-     */
-    Stemcells stemcells();
-
-    /**
-     * Main entry point to the BOSH Tasks API
-     */
-    Tasks tasks();
+@Value.Immutable
+abstract class _ListReleasesRequest {
 
 }

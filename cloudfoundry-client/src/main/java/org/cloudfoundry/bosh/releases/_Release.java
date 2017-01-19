@@ -14,36 +14,31 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.bosh;
+package org.cloudfoundry.bosh.releases;
 
-import org.cloudfoundry.bosh.info.Info;
-import org.cloudfoundry.bosh.releases.Releases;
-import org.cloudfoundry.bosh.stemcells.Stemcells;
-import org.cloudfoundry.bosh.tasks.Tasks;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
+
+import java.util.List;
 
 /**
- * Main entry point to the BOSH API
+ * The release
  */
-public interface BoshClient {
+@JsonDeserialize
+@Value.Immutable
+abstract class _Release {
 
     /**
-     * Main entry point to the BOSH Info API
+     * The name
      */
-    Info info();
+    @JsonProperty("name")
+    abstract String getName();
 
     /**
-     * Main entry point to the BOSH Releases API
+     * The release versions
      */
-    Releases releases();
-
-    /**
-     * Main entry point to the BOSH Stemcells API
-     */
-    Stemcells stemcells();
-
-    /**
-     * Main entry point to the BOSH Tasks API
-     */
-    Tasks tasks();
+    @JsonProperty("release_versions")
+    abstract List<ReleaseVersion> getReleaseVersions();
 
 }
