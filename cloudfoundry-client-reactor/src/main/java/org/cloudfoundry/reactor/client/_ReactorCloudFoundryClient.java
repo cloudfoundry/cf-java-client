@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.reactor.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
@@ -95,7 +94,6 @@ import org.cloudfoundry.reactor.client.v3.servicebindings.ReactorServiceBindings
 import org.cloudfoundry.reactor.client.v3.tasks.ReactorTasks;
 import org.immutables.value.Value;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.client.HttpClient;
 
 /**
  * The Reactor-based implementation of {@link CloudFoundryClient}
@@ -325,16 +323,6 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
 
     @Nullable
     abstract ConnectionContext getConnectionContext();
-
-    @Value.Default
-    HttpClient getHttpClient() {
-        return getConnectionContext().getHttpClient();
-    }
-
-    @Value.Default
-    ObjectMapper getObjectMapper() {
-        return getConnectionContext().getObjectMapper();
-    }
 
     @Value.Default
     Mono<String> getRoot() {
