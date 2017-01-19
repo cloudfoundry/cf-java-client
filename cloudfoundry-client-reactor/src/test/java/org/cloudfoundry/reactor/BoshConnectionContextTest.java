@@ -24,9 +24,9 @@ import java.time.Duration;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class DefaultConnectionContextTest extends AbstractRestTest {
+public final class BoshConnectionContextTest extends AbstractRestTest {
 
-    private final ConnectionContext connectionContext = DefaultConnectionContext.builder()
+    private final ConnectionContext connectionContext = BoshConnectionContext.builder()
         .apiHost(this.mockWebServer.getHostName())
         .port(this.mockWebServer.getPort())
         .secure(false)
@@ -36,18 +36,18 @@ public final class DefaultConnectionContextTest extends AbstractRestTest {
     public void getInfo() throws Exception {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/info")
+                .method(GET).path("/info")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
-                .payload("fixtures/client/v2/info/GET_response.json")
+                .payload("fixtures/bosh/info/GET_response.json")
                 .build())
             .build());
 
         this.connectionContext
             .getRoot("token_endpoint")
             .as(StepVerifier::create)
-            .expectNext("http://localhost:8080/uaa")
+            .expectNext("http://10.194.46.3:8443")
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }

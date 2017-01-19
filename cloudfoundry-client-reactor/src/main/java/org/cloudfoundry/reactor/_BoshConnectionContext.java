@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor;
 
+import org.cloudfoundry.bosh.BoshClient;
 import org.cloudfoundry.reactor.util.JsonCodec;
 import org.cloudfoundry.reactor.util.NetworkLogging;
 import org.immutables.value.Value;
@@ -24,21 +25,31 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
- * The default implementation of the {@link ConnectionContext} interface.  This is the implementation that should be used for most non-testing cases.
+ * The BOSH implementation of the {@link ConnectionContext} interface.  This is the implementation that should be used for the {@link BoshClient}.
  */
 @Value.Immutable
-abstract class _DefaultConnectionContext extends AbstractConnectionContext {
+abstract class _BoshConnectionContext extends AbstractConnectionContext {
 
-    _DefaultConnectionContext() {
-        super(443, "cloudfoundry-client");
+    private static final String TOKEN_ENDPOINT = "token_endpoint";
+
+    public _BoshConnectionContext() {
+        super(25555, "bosh-client");
     }
 
     @Override
     public Mono<String> getRoot(String key) {
+        if (!key.equals(TOKEN_ENDPOINT)) {
+            return Mono.error(new IllegalArgumentException(String.format("Only the %s key is supported", TOKEN_ENDPOINT)));
+        }
+
         return getInfo()
-            .map(info -> normalize(UriComponentsBuilder.fromUriString(info.get(key)), getScheme()))
+            .then(info -> extractUrl(info)
+                .map(url -> normalize(UriComponentsBuilder.fromUriString(url), getScheme()))
+                .map(Mono::just)
+                .orElse(Mono.error(new IllegalStateException(String.format("Unable to extract token_endpoint from %s", info)))))
             .doOnNext(components -> trust(components, getSslCertificateTruster()))
             .map(UriComponents::toUriString)
             .cache();
@@ -46,16 +57,23 @@ abstract class _DefaultConnectionContext extends AbstractConnectionContext {
 
     @SuppressWarnings("unchecked")
     @Value.Derived
-    Mono<Map<String, String>> getInfo() {
+    Mono<Map<String, Object>> getInfo() {
         return getRoot()
-            .map(uri -> UriComponentsBuilder.fromUriString(uri).pathSegment("v2", "info").build().toUriString())
+            .map(uri -> UriComponentsBuilder.fromUriString(uri).pathSegment("info").build().toUriString())
             .then(uri -> getHttpClient()
                 .get(uri)
                 .doOnSubscribe(NetworkLogging.get(uri))
                 .transform(NetworkLogging.response(uri)))
             .transform(JsonCodec.decode(getObjectMapper(), Map.class))
-            .map(m -> (Map<String, String>) m)
+            .map(m -> (Map<String, Object>) m)
             .cache();
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Optional<String> extractUrl(Map<String, Object> info) {
+        Map<String, Object> user_authentication = (Map<String, Object>) info.get("user_authentication");
+        Map<String, Object> options = (Map<String, Object>) user_authentication.get("options");
+        return Optional.ofNullable((String) options.get("url"));
     }
 
 }
