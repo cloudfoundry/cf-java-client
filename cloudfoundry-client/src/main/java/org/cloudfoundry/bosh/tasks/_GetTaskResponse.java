@@ -16,18 +16,11 @@
 
 package org.cloudfoundry.bosh.tasks;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
-/**
- * The details of a task
- */
 @JsonDeserialize
 @Value.Immutable
-abstract class _Task extends AbstractTask {
+abstract class _GetTaskResponse extends AbstractTask {
 
 }
-
-

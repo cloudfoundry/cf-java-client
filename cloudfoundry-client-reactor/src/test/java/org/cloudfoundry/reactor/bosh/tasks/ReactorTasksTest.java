@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.reactor.bosh.tasks;
 
+import org.cloudfoundry.bosh.tasks.GetTaskRequest;
+import org.cloudfoundry.bosh.tasks.GetTaskResponse;
 import org.cloudfoundry.bosh.tasks.ListTasksRequest;
 import org.cloudfoundry.bosh.tasks.ListTasksResponse;
 import org.cloudfoundry.bosh.tasks.State;
@@ -35,6 +37,34 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 public final class ReactorTasksTest extends AbstractBoshApiTest {
 
     private final ReactorTasks tasks = new ReactorTasks(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+    @Test
+    public void get() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/tasks/1180")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/bosh/tasks/GET_{id}_response.json")
+                .build())
+            .build());
+
+        this.tasks
+            .get(GetTaskRequest.builder()
+                .taskId(1180)
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetTaskResponse.builder()
+                .id(1180)
+                .state(State.PROCESSING)
+                .description("run errand acceptance_tests from deployment cf-warden")
+                .timestamp(1447033291)
+                .user("admin")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     @Test
     public void list() {

@@ -17,17 +17,48 @@
 package org.cloudfoundry.bosh.tasks;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
-import org.immutables.value.Value;
 
 /**
- * The details of a task
+ * The core response payload for tasks
  */
-@JsonDeserialize
-@Value.Immutable
-abstract class _Task extends AbstractTask {
+abstract class AbstractTask {
+
+    /**
+     * The description of the task's purpose
+     */
+    @JsonProperty("description")
+    abstract String getDescription();
+
+    /**
+     * The id of the task
+     */
+    @JsonProperty("id")
+    abstract Integer getId();
+
+    /**
+     * The task's result
+     */
+    @JsonProperty("result")
+    @Nullable
+    abstract String getResult();
+
+    /**
+     * The state of the task
+     */
+    @JsonProperty("state")
+    abstract State getState();
+
+    /**
+     * The timestamp of the task
+     */
+    @JsonProperty("timestamp")
+    abstract Integer getTimestamp();
+
+    /**
+     * The user which started the task
+     */
+    @JsonProperty("user")
+    abstract String getUser();
 
 }
-
-
