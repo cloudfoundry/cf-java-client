@@ -37,7 +37,6 @@ import org.cloudfoundry.uaa.users.User;
 import org.cloudfoundry.uaa.users.UserId;
 import org.cloudfoundry.uaa.users.VerifyUserRequest;
 import org.cloudfoundry.uaa.users.VerifyUserResponse;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
@@ -60,7 +59,6 @@ public final class UsersTest extends AbstractIntegrationTest {
     @Autowired
     private String username;
 
-    @Ignore("TODO: Refresh token after password change")
     @Test
     public void changePassword() throws TimeoutException, InterruptedException {
         getUserIdByUsername(this.uaaClient, this.username)

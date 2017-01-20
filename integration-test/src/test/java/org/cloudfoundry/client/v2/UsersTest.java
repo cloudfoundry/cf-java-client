@@ -24,160 +24,186 @@ import java.util.concurrent.TimeoutException;
 
 public final class UsersTest extends AbstractIntegrationTest {
 
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522670")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/646
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/646")
     @Test
     public void associateAuditedOrganization() throws TimeoutException, InterruptedException {
-        //TODO
+        //
     }
 
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522672")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/647
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/647")
     @Test
     public void associateAuditedSpace() throws TimeoutException, InterruptedException {
-        //TODO
+        //
     }
 
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522674")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/648
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/648")
     @Test
     public void associateBillingManagedOrganization() throws TimeoutException, InterruptedException {
-        //TODO
+        //
     }
 
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522676")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/649
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/649")
     @Test
     public void associateManagedOrganization() throws TimeoutException, InterruptedException {
-        //TODO
+        //
     }
 
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522678")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/650
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/650")
     @Test
     public void associateManagedSpace() throws TimeoutException, InterruptedException {
-        //TODO
+        //
     }
 
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522682")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/651
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/651")
     @Test
     public void associateOrganization() throws TimeoutException, InterruptedException {
-        //TODO
+        //
     }
 
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522684")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/652
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/652")
     @Test
     public void associateSpace() throws TimeoutException, InterruptedException {
-        //TODO
+        //
     }
 
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522686")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/643
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/643")
     @Test
     public void create() throws TimeoutException, InterruptedException {
-        //TODO
+        //
     }
 
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522688")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/653
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/653")
     @Test
     public void delete() throws TimeoutException, InterruptedException {
-        //TODO
+        //
     }
 
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522690")
-    @Test
-    public void summary() throws TimeoutException, InterruptedException {
-        //TODO
-    }
-
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522686 to allow user creation")
-    @Test
-    public void list() throws TimeoutException, InterruptedException {
-        //TODO
-    }
-
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522692")
-    @Test
-    public void listAuditedOrganizations() throws TimeoutException, InterruptedException {
-        //TODO
-    }
-
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522694")
-    @Test
-    public void listAuditedSpaces() throws TimeoutException, InterruptedException {
-        //TODO
-    }
-
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522696")
-    @Test
-    public void listBillingManagedOrganizations() throws TimeoutException, InterruptedException {
-        //TODO
-    }
-
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522698")
-    @Test
-    public void listManagedOrganizations() throws TimeoutException, InterruptedException {
-        //TODO
-    }
-
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522700")
-    @Test
-    public void listManagedSpaces() throws TimeoutException, InterruptedException {
-        //TODO
-    }
-
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522702")
-    @Test
-    public void listOrganizations() throws TimeoutException, InterruptedException {
-        //TODO
-    }
-
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522704")
-    @Test
-    public void listSpaces() throws TimeoutException, InterruptedException {
-        //TODO
-    }
-
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522710")
-    @Test
-    public void removeAuditedOrganization() throws TimeoutException, InterruptedException {
-        //TODO
-    }
-
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522712")
-    @Test
-    public void removeAuditedSpace() throws TimeoutException, InterruptedException {
-        //TODO
-    }
-
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522714")
-    @Test
-    public void removeBillingManagedOrganization() throws TimeoutException, InterruptedException {
-        //TODO
-    }
-
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522718")
-    @Test
-    public void removeManagedOrganization() throws TimeoutException, InterruptedException {
-        //TODO
-    }
-
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522720")
-    @Test
-    public void removeManagedSpace() throws TimeoutException, InterruptedException {
-        //TODO
-    }
-
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522722")
-    @Test
-    public void removeOrganization() throws TimeoutException, InterruptedException {
-        //TODO
-    }
-
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/101522724")
-    @Test
-    public void removeSpace() throws TimeoutException, InterruptedException {
-        //TODO
-    }
-
-    @Ignore("TODO: Await https://www.pivotaltracker.com/story/show/109485544")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/669
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/669")
     @Test
     public void get() throws TimeoutException, InterruptedException {
-        //TODO
+        //
+    }
+
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/643 to allow user creation
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/643 to allow user creation")
+    @Test
+    public void list() throws TimeoutException, InterruptedException {
+        //
+    }
+
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/655
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/655")
+    @Test
+    public void listAuditedOrganizations() throws TimeoutException, InterruptedException {
+        //
+    }
+
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/656
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/656")
+    @Test
+    public void listAuditedSpaces() throws TimeoutException, InterruptedException {
+        //
+    }
+
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/657
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/657")
+    @Test
+    public void listBillingManagedOrganizations() throws TimeoutException, InterruptedException {
+        //
+    }
+
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/658
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/658")
+    @Test
+    public void listManagedOrganizations() throws TimeoutException, InterruptedException {
+        //
+    }
+
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/659
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/659")
+    @Test
+    public void listManagedSpaces() throws TimeoutException, InterruptedException {
+        //
+    }
+
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/660
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/660")
+    @Test
+    public void listOrganizations() throws TimeoutException, InterruptedException {
+        //
+    }
+
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/661
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/661")
+    @Test
+    public void listSpaces() throws TimeoutException, InterruptedException {
+        //
+    }
+
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/662
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/662")
+    @Test
+    public void removeAuditedOrganization() throws TimeoutException, InterruptedException {
+        //
+    }
+
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/663
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/663")
+    @Test
+    public void removeAuditedSpace() throws TimeoutException, InterruptedException {
+        //
+    }
+
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/664
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/664")
+    @Test
+    public void removeBillingManagedOrganization() throws TimeoutException, InterruptedException {
+        //
+    }
+
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/665
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/665")
+    @Test
+    public void removeManagedOrganization() throws TimeoutException, InterruptedException {
+        //
+    }
+
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/666
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/666")
+    @Test
+    public void removeManagedSpace() throws TimeoutException, InterruptedException {
+        //
+    }
+
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/667
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/667")
+    @Test
+    public void removeOrganization() throws TimeoutException, InterruptedException {
+        //
+    }
+
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/668
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/668")
+    @Test
+    public void removeSpace() throws TimeoutException, InterruptedException {
+        //
+    }
+
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/654
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/654")
+    @Test
+    public void summary() throws TimeoutException, InterruptedException {
+        //
     }
 
 }

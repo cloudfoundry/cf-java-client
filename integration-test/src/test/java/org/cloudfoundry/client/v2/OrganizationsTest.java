@@ -103,7 +103,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.UnaryOperator;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -605,7 +604,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: wait for resolution of issue https://github.com/cloudfoundry/cloud_controller_ng/issues/594, and then possibly create user APIs")
+    //TODO: https://github.com/cloudfoundry/cf-java-client/issues/617
+    @Ignore("https://github.com/cloudfoundry/cf-java-client/issues/617")
     @Test
     public void listAuditorsFilterBySpaceId() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
@@ -797,10 +797,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: wait for resolution of issue https://github.com/cloudfoundry/cloud_controller_ng/issues/594, and then possibly create user APIs")
+    //TODO: https://github.com/cloudfoundry/cf-java-client/issues/617
+    @Ignore("https://github.com/cloudfoundry/cf-java-client/issues/617")
     @Test
     public void listBillingManagersFilterBySpaceId() {
-        fail("TODO: wait for resolution of issue https://github.com/cloudfoundry/cloud_controller_ng/issues/594, and then possibly create user APIs");
+
     }
 
     @Test
@@ -846,7 +847,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: await resolution of issue https://github.com/cloudfoundry/cloud_controller_ng/issues/595")
+    //TODO: https://github.com/cloudfoundry/cf-java-client/issues/618
+    @Ignore("https://github.com/cloudfoundry/cf-java-client/issues/618")
     @Test
     public void listDomainsFilterByOwningOrganizationId() throws TimeoutException, InterruptedException {
         String organizationName1 = this.nameFactory.getOrganizationName();
@@ -877,7 +879,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: await resolution of issue https://github.com/cloudfoundry/cloud_controller_ng/issues/595")
+    //TODO: https://github.com/cloudfoundry/cf-java-client/issues/618
+    @Ignore("https://github.com/cloudfoundry/cf-java-client/issues/618")
     @Test
     public void listDomainsWithAssociatedPrivateDomain() throws TimeoutException, InterruptedException {
         String organizationName1 = this.nameFactory.getOrganizationName();
@@ -994,11 +997,10 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: find a valid status other than 'active' and re-instate this test")
     @Test
     public void listFilterByStatus() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
-        String organizationStatus = "inactive";   // TODO: find a valid status other than "active" and re-instate this test
+        String organizationStatus = "suspended";
 
         requestCreateOrganization(this.cloudFoundryClient, organizationName, builder -> builder.status(organizationStatus))
             .map(ResourceUtils::getId)
@@ -1195,7 +1197,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: wait for resolution of issue https://github.com/cloudfoundry/cloud_controller_ng/issues/594, and then possibly create user APIs")
+    //TODO: https://github.com/cloudfoundry/cf-java-client/issues/617
+    @Ignore("https://github.com/cloudfoundry/cf-java-client/issues/617")
     @Test
     public void listManagersFilterBySpaceId() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
@@ -1271,7 +1274,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: rework this test when managed services are available")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listServices() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
@@ -1288,28 +1292,32 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listServicesFilterByActive() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listServicesFilterByLabel() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listServicesFilterByProvider() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listServicesFilterByServiceBrokerId() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
     @Test
@@ -1585,7 +1593,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: wait for resolution of issue https://github.com/cloudfoundry/cloud_controller_ng/issues/594, and then possibly create user APIs")
+    //TODO: https://github.com/cloudfoundry/cf-java-client/issues/617
+    @Ignore("https://github.com/cloudfoundry/cf-java-client/issues/617")
     @Test
     public void listUsersFilterBySpaceId() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();

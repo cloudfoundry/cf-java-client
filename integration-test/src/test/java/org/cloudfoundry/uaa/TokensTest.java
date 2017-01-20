@@ -17,7 +17,6 @@
 package org.cloudfoundry.uaa;
 
 import org.cloudfoundry.AbstractIntegrationTest;
-import org.cloudfoundry.UnknownCloudFoundryException;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.uaa.tokens.CheckTokenRequest;
@@ -41,7 +40,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.client.HttpClientException;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -82,7 +80,8 @@ public final class TokensTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: use test authorizationCode")
+    //TODO: Ready to Implement - use test authorizationCode
+    @Ignore("Ready to Implement - use test authorizationCode")
     @Test
     public void getTokenByAuthorizationCode() throws TimeoutException, InterruptedException {
         this.uaaClient.tokens()
@@ -112,7 +111,8 @@ public final class TokensTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: use test one-time passcode")
+    //TODO: Ready to Implement - use test one-time passcode
+    @Ignore("Ready to Implement - use test one-time passcode")
     @Test
     public void getTokenByOneTimePasscode() throws TimeoutException, InterruptedException {
         this.uaaClient.tokens()
@@ -128,7 +128,8 @@ public final class TokensTest extends AbstractIntegrationTest {
             .expectComplete();
     }
 
-    @Ignore("TODO: use test openid authorizationCode")
+    //TODO: Ready to Implement - use test openid authorizationCode
+    @Ignore("Ready to Implement - use test openid authorizationCode")
     @Test
     public void getTokenByOpenId() throws TimeoutException, InterruptedException {
         this.uaaClient.tokens()
@@ -145,7 +146,8 @@ public final class TokensTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: use test username and password")
+    //TODO: Ready to Implement - use test username and password
+    @Ignore("Ready to Implement - use test username and password")
     @Test
     public void getTokenByPassword() throws TimeoutException, InterruptedException {
         this.uaaClient.tokens()
@@ -197,7 +199,8 @@ public final class TokensTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: use test refresh token")
+    //TODO: Ready to Implement - use test refresh token
+    @Ignore("Ready to Implement - use test refresh token")
     @Test
     public void refreshToken() throws TimeoutException, InterruptedException {
         this.uaaClient.tokens()

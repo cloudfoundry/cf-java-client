@@ -94,7 +94,6 @@ import java.util.function.UnaryOperator;
 
 import static java.time.temporal.ChronoUnit.HOURS;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -245,10 +244,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656")
+    //TODO: Ready to implement
+    @Ignore("Ready to implement")
     @Test
     public void associateSecurityGroup() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656");
+        //
     }
 
     @Test
@@ -555,7 +555,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("Filter parameter not honoured: see https://github.com/cloudfoundry/cloud_controller_ng/issues/584")
+    //TODO: Ready to implement, but see https://github.com/cloudfoundry/cloud_controller_ng/issues/584
+    @Ignore("Ready to implement, but see https://github.com/cloudfoundry/cloud_controller_ng/issues/584")
     @Test
     public void listDomainsFilterByOwningOrganizationId() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
@@ -682,10 +683,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522686 really create a new user")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/643
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/643")
     @Test
     public void listFilterByDeveloperId() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/101522686 really create a new user");
+        //
     }
 
     @Test
@@ -985,82 +987,95 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656")
+    //TODO: Ready to implement
+    @Ignore("Ready to implement")
     @Test
     public void listSecurityGroups() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656");
+        //
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656")
+    //TODO: Ready to implement
+    @Ignore("Ready to implement")
     @Test
     public void listSecurityGroupsFilterByName() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/101522656");
+        //
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listServiceInstances() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listServiceInstancesFilterByGatewayName() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listServiceInstancesFilterByName() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listServiceInstancesFilterByOrganizationId() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listServiceInstancesFilterByServiceBindingId() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listServiceInstancesFilterByServiceKeyId() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listServiceInstancesFilterByServicePlanId() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listServices() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listServicesFilterByActive() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listServicesFilterByLabel() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listServicesFilterByServiceBrokerId() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/118387501");
+        //
     }
 
     @Test
@@ -1227,10 +1242,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522658")
+    //TODO: Ready to implement
+    @Ignore("Ready to implement")
     @Test
     public void removeSecurityGroup() {
-        fail("TODO: awaiting https://www.pivotaltracker.com/story/show/101522658");
+        //
     }
 
     @Test
@@ -1326,7 +1342,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getId);
     }
 
-    // TODO: after: https://www.pivotaltracker.com/story/show/118387501 really create a new user
+    // TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/643 to really create a new user
     private static Mono<String> createUserId(CloudFoundryClient cloudFoundryClient, String organizationId, String username) {
         return cloudFoundryClient.organizations()
             .associateUserByUsername(AssociateOrganizationUserByUsernameRequest.builder()
