@@ -46,6 +46,14 @@ abstract class _TestRequest {
 
     private static final Pattern PATH_PATTERN = Pattern.compile("[A-Z]+ (.*) [A-Z0-9\\./]+");
 
+    public static Buffer getBuffer(String path) {
+        try {
+            return new Buffer().readFrom(new ClassPathResource(path).getInputStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void assertEquals(RecordedRequest request) {
         assertThat(getMethod()).hasToString(request.getMethod());
         assertThat(getPath()).isEqualTo(extractPath(request));
@@ -80,14 +88,6 @@ abstract class _TestRequest {
 
     private static void assertBodyEquals(Buffer expectedBuffer, Buffer actualBuffer) {
         assertThat(getValue(expectedBuffer)).isEqualTo(getValue(actualBuffer));
-    }
-
-    private static Buffer getBuffer(String path) {
-        try {
-            return new Buffer().readFrom(new ClassPathResource(path).getInputStream());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private static Object getValue(Buffer buffer) {

@@ -24,6 +24,14 @@ import reactor.core.publisher.Mono;
 public interface Deployments {
 
     /**
+     * Makes the <a href="https://bosh.io/docs/director-api-v1.html#post-deployment">Create Deployment</a> request
+     *
+     * @param request the Create Deployment Request
+     * @return the response from the Create Deployment request
+     */
+    Mono<CreateDeploymentResponse> create(CreateDeploymentRequest request);
+
+    /**
      * Makes the <a href="https://bosh.io/docs/director-api-v1.html#list-deployments">List Deployments</a> request
      *
      * @param request the List Deployments Request

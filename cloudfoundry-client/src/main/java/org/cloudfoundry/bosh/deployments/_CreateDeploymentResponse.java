@@ -16,14 +16,15 @@
 
 package org.cloudfoundry.bosh.deployments;
 
-import org.junit.Test;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.bosh.tasks.AbstractTask;
+import org.immutables.value.Value;
 
-public final class ListDeploymentsRequestTest {
-
-    @Test
-    public void valid() {
-        ListDeploymentsRequest.builder()
-            .build();
-    }
+/**
+ * The response payload for the Create Deployment operation
+ */
+@JsonDeserialize
+@Value.Immutable
+abstract class _CreateDeploymentResponse extends AbstractTask {
 
 }

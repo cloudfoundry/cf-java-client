@@ -18,11 +18,18 @@ package org.cloudfoundry.bosh.deployments;
 
 import org.junit.Test;
 
-public final class ListDeploymentsRequestTest {
+public final class CreateDeploymentRequestTest {
+
+    @Test(expected = IllegalStateException.class)
+    public void noManifest() {
+        CreateDeploymentRequest.builder()
+            .build();
+    }
 
     @Test
     public void valid() {
-        ListDeploymentsRequest.builder()
+        CreateDeploymentRequest.builder()
+            .manifest("test-mainfest")
             .build();
     }
 
