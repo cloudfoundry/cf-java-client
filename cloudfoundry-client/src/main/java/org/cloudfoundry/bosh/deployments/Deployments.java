@@ -32,6 +32,14 @@ public interface Deployments {
     Mono<CreateDeploymentResponse> create(CreateDeploymentRequest request);
 
     /**
+     * Makes the <a href="https://bosh.io/docs/director-api-v1.html#get-deployment">Get Deployment</a> request
+     *
+     * @param request the Get Deployment Request
+     * @return the response from the Get Deployment request
+     */
+    Mono<GetDeploymentResponse> get(GetDeploymentRequest request);
+
+    /**
      * Makes the <a href="https://bosh.io/docs/director-api-v1.html#list-deployments">List Deployments</a> request
      *
      * @param request the List Deployments Request

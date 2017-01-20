@@ -21,6 +21,8 @@ import org.cloudfoundry.bosh.deployments.CloudConfig;
 import org.cloudfoundry.bosh.deployments.CreateDeploymentRequest;
 import org.cloudfoundry.bosh.deployments.CreateDeploymentResponse;
 import org.cloudfoundry.bosh.deployments.Deployment;
+import org.cloudfoundry.bosh.deployments.GetDeploymentRequest;
+import org.cloudfoundry.bosh.deployments.GetDeploymentResponse;
 import org.cloudfoundry.bosh.deployments.ListDeploymentsRequest;
 import org.cloudfoundry.bosh.deployments.ListDeploymentsResponse;
 import org.cloudfoundry.bosh.deployments.Release;
@@ -74,6 +76,30 @@ public final class ReactorDeploymentsTest extends AbstractBoshApiTest {
                 .description("run errand acceptance_tests from deployment cf-warden")
                 .timestamp(1447033291)
                 .user("admin")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void get() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/deployments/cf-warden")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/bosh/deployments/GET_{name}_response.json")
+                .build())
+            .build());
+
+        this.deployments
+            .get(GetDeploymentRequest.builder()
+                .deploymentName("cf-warden")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetDeploymentResponse.builder()
+                .manifest("---\nname: cf-warden\n...")
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
