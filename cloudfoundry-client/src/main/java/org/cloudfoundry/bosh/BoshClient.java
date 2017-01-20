@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.bosh;
 
+import org.cloudfoundry.bosh.deployments.Deployments;
 import org.cloudfoundry.bosh.info.Info;
 import org.cloudfoundry.bosh.releases.Releases;
 import org.cloudfoundry.bosh.stemcells.Stemcells;
@@ -25,6 +26,11 @@ import org.cloudfoundry.bosh.tasks.Tasks;
  * Main entry point to the BOSH API
  */
 public interface BoshClient {
+
+    /**
+     * Main entry point to the BOSH Deployments API
+     */
+    Deployments deployments();
 
     /**
      * Main entry point to the BOSH Info API
