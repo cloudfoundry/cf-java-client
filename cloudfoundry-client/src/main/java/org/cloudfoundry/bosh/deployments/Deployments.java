@@ -32,6 +32,14 @@ public interface Deployments {
     Mono<CreateDeploymentResponse> create(CreateDeploymentRequest request);
 
     /**
+     * Makes the <a href="https://bosh.io/docs/director-api-v1.html#delete-deployment">Delete Deployment</a> request
+     *
+     * @param request the Delete Deployment Request
+     * @return the response from the Delete Deployment request
+     */
+    Mono<DeleteDeploymentResponse> delete(DeleteDeploymentRequest request);
+
+    /**
      * Makes the <a href="https://bosh.io/docs/director-api-v1.html#get-deployment">Get Deployment</a> request
      *
      * @param request the Get Deployment Request
