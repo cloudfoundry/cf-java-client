@@ -56,15 +56,15 @@ public final class UsersTest extends AbstractIntegrationTest {
     @Autowired
     private UaaClient uaaClient;
 
-    @Autowired
-    private String username;
-
     @Test
     public void changePassword() throws TimeoutException, InterruptedException {
-        getUserIdByUsername(this.uaaClient, this.username)
+        String userName = this.nameFactory.getUserName();
+
+        requestCreateUser(this.uaaClient, userName)
+            .map(CreateUserResponse::getId)
             .then(userId -> this.uaaClient.users()
                 .changePassword(ChangeUserPasswordRequest.builder()
-                    .oldPassword(this.password)
+                    .oldPassword("test-password")
                     .password("test-new-password")
                     .userId(userId)
                     .build()))
