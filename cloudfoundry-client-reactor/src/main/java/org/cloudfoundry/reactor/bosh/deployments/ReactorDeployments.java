@@ -19,6 +19,8 @@ package org.cloudfoundry.reactor.bosh.deployments;
 import io.netty.util.AsciiString;
 import org.cloudfoundry.bosh.deployments.CreateDeploymentRequest;
 import org.cloudfoundry.bosh.deployments.CreateDeploymentResponse;
+import org.cloudfoundry.bosh.deployments.DeleteDeploymentRequest;
+import org.cloudfoundry.bosh.deployments.DeleteDeploymentResponse;
 import org.cloudfoundry.bosh.deployments.Deployments;
 import org.cloudfoundry.bosh.deployments.GetDeploymentRequest;
 import org.cloudfoundry.bosh.deployments.GetDeploymentResponse;
@@ -28,7 +30,6 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.bosh.AbstractBoshOperations;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.client.HttpClientRequest;
 
 import java.nio.charset.Charset;
 
@@ -59,9 +60,13 @@ public final class ReactorDeployments extends AbstractBoshOperations implements 
         return post(request, CreateDeploymentResponse.class,
             builder -> builder.pathSegment("deployments"),
             outbound -> outbound
-                .map(HttpClientRequest::followRedirect)
                 .map(r -> r.header(CONTENT_TYPE, TEXT_YAML))
                 .flatMap(r -> r.sendString(Mono.just(request.getManifest()), UTF_8)));
+    }
+
+    @Override
+    public Mono<DeleteDeploymentResponse> delete(DeleteDeploymentRequest request) {
+        return delete(request, DeleteDeploymentResponse.class, builder -> builder.pathSegment("deployments", request.getDeploymentName()));
     }
 
     @Override

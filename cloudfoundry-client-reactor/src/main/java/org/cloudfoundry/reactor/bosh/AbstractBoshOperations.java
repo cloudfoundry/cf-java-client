@@ -34,6 +34,17 @@ public abstract class AbstractBoshOperations extends AbstractReactorOperations {
         super(connectionContext, root, tokenProvider);
     }
 
+    protected <T> Mono<T> delete(Object requestPayload, Class<T> responseType,
+                                 Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+
+        return doDelete(requestPayload, responseType,
+            queryTransformer(requestPayload)
+                .andThen(uriTransformer),
+            outbound -> outbound
+                .map(HttpClientRequest::followRedirect),
+            inbound -> inbound);
+    }
+
     protected final <T> Mono<T> get(Object requestPayload, Class<T> responseType,
                                     Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doGet(responseType,
@@ -59,7 +70,9 @@ public abstract class AbstractBoshOperations extends AbstractReactorOperations {
         return doPost(responseType,
             queryTransformer(requestPayload)
                 .andThen(uriTransformer),
-            requestTransformer,
+            outbound -> outbound
+                .map(HttpClientRequest::followRedirect)
+                .transform(requestTransformer),
             inbound -> inbound);
     }
 
