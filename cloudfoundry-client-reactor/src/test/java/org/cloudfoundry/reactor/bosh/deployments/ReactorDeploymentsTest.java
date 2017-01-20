@@ -16,12 +16,16 @@
 
 package org.cloudfoundry.reactor.bosh.deployments;
 
+import okio.Buffer;
 import org.cloudfoundry.bosh.deployments.CloudConfig;
+import org.cloudfoundry.bosh.deployments.CreateDeploymentRequest;
+import org.cloudfoundry.bosh.deployments.CreateDeploymentResponse;
 import org.cloudfoundry.bosh.deployments.Deployment;
 import org.cloudfoundry.bosh.deployments.ListDeploymentsRequest;
 import org.cloudfoundry.bosh.deployments.ListDeploymentsResponse;
 import org.cloudfoundry.bosh.deployments.Release;
 import org.cloudfoundry.bosh.deployments.Stemcell;
+import org.cloudfoundry.bosh.tasks.State;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -29,14 +33,51 @@ import org.cloudfoundry.reactor.bosh.AbstractBoshApiTest;
 import org.junit.Test;
 import reactor.test.StepVerifier;
 
+import java.nio.charset.Charset;
 import java.time.Duration;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 
 public final class ReactorDeploymentsTest extends AbstractBoshApiTest {
 
     private final ReactorDeployments deployments = new ReactorDeployments(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+    @Test
+    public void create() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(POST).path("/deployments")
+                .header("Content-Type", "text/yaml")
+                .contents(consumer((headers, body) -> {
+                    Buffer expected = TestRequest.getBuffer("fixtures/bosh/deployments/POST_request.yml");
+                    assertThat(body.readString(Charset.defaultCharset())).isEqualTo(expected.readString(Charset.defaultCharset()));
+                }))
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/bosh/deployments/POST_response.json")
+                .build())
+            .build());
+
+        this.deployments
+            .create(CreateDeploymentRequest.builder()
+                .manifest("---\nname: cf-warden\n")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(CreateDeploymentResponse.builder()
+                .id(1180)
+                .state(State.PROCESSING)
+                .description("run errand acceptance_tests from deployment cf-warden")
+                .timestamp(1447033291)
+                .user("admin")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     @Test
     public void list() {
@@ -79,4 +120,5 @@ public final class ReactorDeploymentsTest extends AbstractBoshApiTest {
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
+
 }

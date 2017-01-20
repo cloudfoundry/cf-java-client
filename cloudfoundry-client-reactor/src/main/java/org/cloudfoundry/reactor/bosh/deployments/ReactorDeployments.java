@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.reactor.bosh.deployments;
 
+import io.netty.util.AsciiString;
+import org.cloudfoundry.bosh.deployments.CreateDeploymentRequest;
+import org.cloudfoundry.bosh.deployments.CreateDeploymentResponse;
 import org.cloudfoundry.bosh.deployments.Deployments;
 import org.cloudfoundry.bosh.deployments.ListDeploymentsRequest;
 import org.cloudfoundry.bosh.deployments.ListDeploymentsResponse;
@@ -23,11 +26,20 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.bosh.AbstractBoshOperations;
 import reactor.core.publisher.Mono;
+import reactor.ipc.netty.http.client.HttpClientRequest;
+
+import java.nio.charset.Charset;
+
+import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 
 /**
  * The Reactor-based implementation of {@link Deployments}
  */
 public final class ReactorDeployments extends AbstractBoshOperations implements Deployments {
+
+    private static final AsciiString TEXT_YAML = new AsciiString("text/yaml");
+
+    private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     /**
      * Creates an instance
@@ -38,6 +50,16 @@ public final class ReactorDeployments extends AbstractBoshOperations implements 
      */
     public ReactorDeployments(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider);
+    }
+
+    @Override
+    public Mono<CreateDeploymentResponse> create(CreateDeploymentRequest request) {
+        return post(request, CreateDeploymentResponse.class,
+            builder -> builder.pathSegment("deployments"),
+            outbound -> outbound
+                .map(HttpClientRequest::followRedirect)
+                .map(r -> r.header(CONTENT_TYPE, TEXT_YAML))
+                .flatMap(r -> r.sendString(Mono.just(request.getManifest()), UTF_8)));
     }
 
     @Override

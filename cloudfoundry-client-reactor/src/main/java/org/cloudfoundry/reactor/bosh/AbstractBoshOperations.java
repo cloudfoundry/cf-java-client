@@ -20,8 +20,10 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.QueryBuilder;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
+import org.reactivestreams.Publisher;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
+import reactor.ipc.netty.http.client.HttpClientRequest;
 import reactor.ipc.netty.http.client.HttpClientResponse;
 
 import java.util.function.Function;
@@ -47,6 +49,17 @@ public abstract class AbstractBoshOperations extends AbstractReactorOperations {
         return doGet(queryTransformer(requestPayload)
                 .andThen(uriTransformer),
             outbound -> outbound,
+            inbound -> inbound);
+    }
+
+    protected final <T> Mono<T> post(Object requestPayload, Class<T> responseType,
+                                     Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+                                     Function<Mono<HttpClientRequest>, Publisher<Void>> requestTransformer) {
+
+        return doPost(responseType,
+            queryTransformer(requestPayload)
+                .andThen(uriTransformer),
+            requestTransformer,
             inbound -> inbound);
     }
 
