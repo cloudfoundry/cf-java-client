@@ -20,6 +20,8 @@ import io.netty.util.AsciiString;
 import org.cloudfoundry.bosh.deployments.CreateDeploymentRequest;
 import org.cloudfoundry.bosh.deployments.CreateDeploymentResponse;
 import org.cloudfoundry.bosh.deployments.Deployments;
+import org.cloudfoundry.bosh.deployments.GetDeploymentRequest;
+import org.cloudfoundry.bosh.deployments.GetDeploymentResponse;
 import org.cloudfoundry.bosh.deployments.ListDeploymentsRequest;
 import org.cloudfoundry.bosh.deployments.ListDeploymentsResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
@@ -60,6 +62,11 @@ public final class ReactorDeployments extends AbstractBoshOperations implements 
                 .map(HttpClientRequest::followRedirect)
                 .map(r -> r.header(CONTENT_TYPE, TEXT_YAML))
                 .flatMap(r -> r.sendString(Mono.just(request.getManifest()), UTF_8)));
+    }
+
+    @Override
+    public Mono<GetDeploymentResponse> get(GetDeploymentRequest request) {
+        return get(request, GetDeploymentResponse.class, builder -> builder.pathSegment("deployments", request.getDeploymentName()));
     }
 
     @Override
