@@ -18,12 +18,14 @@ package org.cloudfoundry.reactor.bosh;
 
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.bosh.BoshClient;
+import org.cloudfoundry.bosh.deployments.Deployments;
 import org.cloudfoundry.bosh.info.Info;
 import org.cloudfoundry.bosh.releases.Releases;
 import org.cloudfoundry.bosh.stemcells.Stemcells;
 import org.cloudfoundry.bosh.tasks.Tasks;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
+import org.cloudfoundry.reactor.bosh.deployments.ReactorDeployments;
 import org.cloudfoundry.reactor.bosh.info.ReactorInfo;
 import org.cloudfoundry.reactor.bosh.releases.ReactorReleases;
 import org.cloudfoundry.reactor.bosh.stemcells.ReactorStemcells;
@@ -36,6 +38,12 @@ import reactor.core.publisher.Mono;
  */
 @Value.Immutable
 abstract class _ReactorBoshClient implements BoshClient {
+
+    @Override
+    @Value.Derived
+    public Deployments deployments() {
+        return new ReactorDeployments(getConnectionContext(), getRoot(), getTokenProvider());
+    }
 
     @Override
     @Value.Derived

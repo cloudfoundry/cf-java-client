@@ -30,6 +30,11 @@ public final class ReactorBoshClientTest extends AbstractRestTest {
         .build();
 
     @Test
+    public void deployments() {
+        assertThat(this.client.deployments()).isNotNull();
+    }
+
+    @Test
     public void info() {
         assertThat(this.client.info()).isNotNull();
     }
